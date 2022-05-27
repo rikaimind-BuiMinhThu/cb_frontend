@@ -16,8 +16,10 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
-
+import React, { useState } from "react";
+import Cookies from "js-cookie";
+import api from '../api/api-management'
+import requestNewToken from "api/request-new-token";
 // reactstrap components
 import {
   Card,
@@ -30,6 +32,27 @@ import {
 } from "reactstrap";
 
 function Tables() {
+  var [dataList, setDataList] = useState([])
+
+  React.useEffect(() => {
+    Cookies.get('token')
+  });
+  function getCookieNe() {
+    console.log('Cookie ne: ', Cookies.get('token'))
+  }
+  React.useEffect(() => {
+    var path = window.location.pathname;
+    api.get(`/api/admin/get-users?key=&page=1&limit=10`).then(res => {
+      setDataList(res.data)
+    }).catch(error => {
+      console.log(error)
+      if (error.response.data.code === 3) {
+        requestNewToken(path)
+      }
+    })
+  }, [])
+
+  const items = dataList.data
   return (
     <>
       <div className="content">
@@ -50,7 +73,17 @@ function Tables() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
+                    {
+                      items && items.map(item => (
+                        <tr key={item.id}>
+                          <td>{item.username}</td>
+                          <td>{item.name}</td>
+                          <td>{item.email}</td>
+                          <td className="text-right">{item.id}</td>
+                        </tr>
+                      ))
+                    }
+                    {/* <tr>
                       <td>Dakota Rice</td>
                       <td>Niger</td>
                       <td>Oud-Turnhout</td>
@@ -91,7 +124,7 @@ function Tables() {
                       <td>Portugal</td>
                       <td>Gloucester</td>
                       <td className="text-right">$98,615</td>
-                    </tr>
+                    </tr> */}
                   </tbody>
                 </Table>
               </CardBody>

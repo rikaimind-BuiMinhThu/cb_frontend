@@ -23,16 +23,27 @@ import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.css";
 import "assets/scss/paper-dashboard.scss?v=1.3.0";
 import "assets/demo/demo.css";
+import "assets/css/login.css"
+import {createStore} from 'redux'
+import {Provider} from 'react-redux'
 import "perfect-scrollbar/css/perfect-scrollbar.css";
+import Login from './components/Admin/Login'
+import Admin from './components/Admin/Admin'
+import AdminLayout from './layouts/Admin'
 
-import AdminLayout from "layouts/Admin.js";
+
+// import AdminLayout from "layouts/Admin.js";
 
 ReactDOM.render(
-  <BrowserRouter>
-    <Switch>
-      <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
-      <Redirect to="/admin/dashboard" />
-    </Switch>
-  </BrowserRouter>,
+  // <Provider>
+    <Admin />
+  // </Provider>
+  // <BrowserRouter>
+  //       <Switch>
+  //     <Route path="/" render={(props) => <Login {...props} />} />
+  //     <Route path="/admin/dashboard" render={(props) => <AdminLayout {...props} />} />
+  //   </Switch>
+  // </BrowserRouter>
+  ,
   document.getElementById("root")
 );

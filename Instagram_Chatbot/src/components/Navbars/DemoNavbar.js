@@ -34,8 +34,9 @@ import {
   InputGroupText,
   InputGroupAddon,
   Input,
+  Button,
 } from "reactstrap";
-
+import Cookies from 'js-cookie'
 import routes from "routes.js";
 
 function Header(props) {
@@ -89,6 +90,10 @@ function Header(props) {
       sidebarToggle.current.classList.toggle("toggled");
     }
   }, [location]);
+  const logout = () =>{
+    Cookies.remove('token');
+    window.location.href ='/'
+  }
   return (
     // add or remove classes depending if we are on full-screen-maps page or not
     <Navbar
@@ -127,7 +132,7 @@ function Header(props) {
           <span className="navbar-toggler-bar navbar-kebab" />
         </NavbarToggler>
         <Collapse isOpen={isOpen} navbar className="justify-content-end">
-          <form>
+          {/* <form>
             <InputGroup className="no-border">
               <Input placeholder="Search..." />
               <InputGroupAddon addonType="append">
@@ -136,17 +141,17 @@ function Header(props) {
                 </InputGroupText>
               </InputGroupAddon>
             </InputGroup>
-          </form>
+          </form> */}
           <Nav navbar>
-            <NavItem>
+            {/* <NavItem>
               <Link to="#pablo" className="nav-link btn-magnify">
                 <i className="nc-icon nc-layout-11" />
                 <p>
                   <span className="d-lg-none d-md-block">Stats</span>
                 </p>
               </Link>
-            </NavItem>
-            <Dropdown
+            </NavItem> */}
+            {/* <Dropdown
               nav
               isOpen={dropdownOpen}
               toggle={(e) => dropdownToggle(e)}
@@ -162,14 +167,17 @@ function Header(props) {
                 <DropdownItem tag="a">Another Action</DropdownItem>
                 <DropdownItem tag="a">Something else here</DropdownItem>
               </DropdownMenu>
-            </Dropdown>
-            <NavItem>
-              <Link to="#pablo" className="nav-link btn-rotate">
+            </Dropdown> */}
+            {/* <NavItem>
+              <Link to='' className="nav-link btn-rotate">
                 <i className="nc-icon nc-settings-gear-65" />
                 <p>
                   <span className="d-lg-none d-md-block">Account</span>
                 </p>
               </Link>
+            </NavItem> */}
+            <NavItem>
+              <Button type="text" onClick={logout}>Logout</Button>
             </NavItem>
           </Nav>
         </Collapse>

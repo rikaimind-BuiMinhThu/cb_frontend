@@ -29,6 +29,7 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import Cookies from 'js-cookie'
 // core components
 import {
   dashboard24HoursPerformanceChart,
@@ -37,6 +38,10 @@ import {
 } from "variables/charts.js";
 
 function Dashboard() {
+
+  React.useEffect(() =>{
+    console.log('token in dashboard',Cookies.get('token'))
+  },[])
   return (
     <>
       <div className="content">
