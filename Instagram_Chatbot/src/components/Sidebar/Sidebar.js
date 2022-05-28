@@ -59,7 +59,7 @@ function Sidebar(props) {
     >
       <div className="logo" style={{ width: "100%" }}>
         <a
-          href="https://www.creative-tim.com"
+          href="/admin/dashboard"
         >
           <img src={logo} alt="react-logo" style={{ height: "60px", paddingLeft: "10px" }} />
         </a>

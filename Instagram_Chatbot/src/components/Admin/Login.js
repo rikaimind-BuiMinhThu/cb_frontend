@@ -16,27 +16,38 @@ class Login extends React.Component {
 
   handleLogin = (props) => {
     var nameValue = document.getElementById("email").value;
-    console.log(nameValue);
+    var password = document.getElementById("password").value;
 
-    const loginInfo = { username: "admine", password: "123456" };
+    if (nameValue === "" || password === "") {
+      if(password === ""){
+        document.getElementById('passwordMessage').innerHTML = "Password cannot be empty"
+      }else{
+        document.getElementById('passwordMessage').innerHTML = ""
+      }
+      if(nameValue === ""){
+        document.getElementById('emailMessage').innerHTML = "Email cannot be empty"
+      }else{
+        document.getElementById('emailMessage').innerHTML = ""
+      }
+    } else {
+      document.getElementById('emailMessage').innerHTML = ""
+      document.getElementById('passwordMessage').innerHTML = ""
+      const loginInfo = { username: nameValue, password: password };
+      axios.post(`http://rikai-dev.ddns.net:8000/api/admin/login`, loginInfo)
+        .then(res => {
+          const persons = res.data;
+          setToken(persons.access_token)
+          Cookies.set('refreshToken', persons.refresh_token); // {path: '/'}
+          // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
+          axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
+          getToDashboard();
+        })
+        .catch(error => alert("Sign in Failed. Please sign in again"));
 
-
-    axios.post(`http://rikai-dev.ddns.net:8000/api/admin/login`, loginInfo)
-      // api.post(`/login`, loginInfo)
-      .then(res => {
-        const persons = res.data;
-        setToken(persons.access_token)
-        Cookies.set('refreshToken', persons.refresh_token); // {path: '/'}
-        // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
-        axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
-        getToDashboard();
-      })
-      .catch(error => console.log(error));
-
-    function getToDashboard() {
-      window.location.href = '/admin/dashboard'
+      function getToDashboard() {
+        window.location.href = '/admin/dashboard'
+      }
     }
-
   }
   render() {
     return (
@@ -56,6 +67,7 @@ class Login extends React.Component {
                   placeholder="Enter email"
                   id="email"
                 />
+                <span id="emailMessage" style={{ color: 'red' }}></span>
               </div>
               <div className="mb-3">
                 <label>Password</label>
@@ -65,6 +77,7 @@ class Login extends React.Component {
                   placeholder="Enter password"
                   id="password"
                 />
+                <span id="passwordMessage" style={{ color: 'red' }}></span>
               </div>
               <div style={{ textAlign: "center" }} className="d-grid">
                 <button
