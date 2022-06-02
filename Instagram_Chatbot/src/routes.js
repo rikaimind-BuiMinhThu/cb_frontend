@@ -16,14 +16,15 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import Dashboard from "views/Dashboard.js";
-import Notifications from "views/Notifications.js";
-import Icons from "views/Icons.js";
-import Typography from "views/Typography.js";
-import TableList from "views/Tables.js";
-import Maps from "views/Map.js";
-import UserPage from "views/User.js";
-import UpgradeToPro from "views/Upgrade.js";
+import Dashboard from "views/Dashboard.jsx";
+import Chatbot from "views/Chatbot.jsx";
+import Icons from "views/Icons.jsx";
+import ClientManagement from "views/ClientManagement";
+import UserPage from "views/User.jsx";
+import UpgradeToPro from "views/Upgrade.jsx";
+import UserManagement from "views/UserManagement";
+import Pricing from "views/Pricing";
+// import Cookies from 'js-cookie'
 
 var routes = [
   {
@@ -34,54 +35,49 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/icons",
-    name: "Icons",
-    icon: "nc-icon nc-diamond",
-    component: Icons,
-    layout: "/admin",
-  },
-  {
-    path: "/maps",
-    name: "Maps",
+    path: "/client-management",
+    name: "ClientManagement",
     icon: "nc-icon nc-pin-3",
-    component: Maps,
+    component: ClientManagement,
     layout: "/admin",
   },
   {
-    path: "/notifications",
-    name: "Notifications",
+    path: "/user-management",
+    name: "UserManagement",
+    icon: "nc-icon nc-circle-10",
+    component: UserManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/pricing",
+    name: "Pricing",
+    icon: "nc-icon nc-bulb-63",
+    component: Pricing,
+    layout: "/admin",
+  },
+  {
+    path: "/chatbot",
+    name: "Chatbot",
     icon: "nc-icon nc-bell-55",
-    component: Notifications,
+    component: Chatbot,
     layout: "/admin",
   },
-  {
-    path: "/user-page",
-    name: "User Profile",
-    icon: "nc-icon nc-single-02",
-    component: UserPage,
-    layout: "/admin",
-  },
-  {
-    path: "/tables",
-    name: "Table List",
-    icon: "nc-icon nc-tile-56",
-    component: TableList,
-    layout: "/admin",
-  },
-  {
-    path: "/typography",
-    name: "Typography",
-    icon: "nc-icon nc-caps-small",
-    component: Typography,
-    layout: "/admin",
-  },
-  {
-    pro: true,
-    path: "/upgrade",
-    name: "Upgrade to PRO",
-    icon: "nc-icon nc-spaceship",
-    component: UpgradeToPro,
-    layout: "/admin",
-  },
+  // {
+  //   path: "/user-page",
+  //   name: "User Profile",
+  //   icon: "nc-icon nc-single-02",
+  //   component: UserPage,
+  //   layout: "/admin",
+  // },
+  // {
+  //   path: "/icons",
+  //   name: "Icons",
+  //   icon: "nc-icon nc-diamond",
+  //   component: Icons,
+  //   layout: "/admin",
+  // }
 ];
+// if(Cookies.get('token') !== ""){
+//   routes.splice('2','1')
+// }
 export default routes;

@@ -7,6 +7,7 @@ import "../../assets/demo/demo.css";
 import Cookies from 'js-cookie';
 import { setToken } from "api/auth";
 import logo from '../../assets/img/logoEC.jpg'
+import LoginFacebook from "./LoginFacebook";
 class Login extends React.Component {
 
   constructor(props) {
@@ -17,6 +18,12 @@ class Login extends React.Component {
   handleLogin = (props) => {
     var nameValue = document.getElementById("email").value;
     var password = document.getElementById("password").value;
+
+    const config = {
+      headers:{
+        'Access-Control-Allow-Origin': '*'
+      }
+    };
 
     if (nameValue === "" || password === "") {
       if(password === ""){
@@ -32,17 +39,18 @@ class Login extends React.Component {
     } else {
       document.getElementById('emailMessage').innerHTML = ""
       document.getElementById('passwordMessage').innerHTML = ""
-      const loginInfo = { username: nameValue, password: password };
-      axios.post(`http://rikai-dev.ddns.net:8000/api/admin/login`, loginInfo)
+      // const loginInfo = { username: nameValue, password: password };
+      const loginInfo = { user: { email: nameValue, password: password }}
+      axios.post(`http://ec2-107-21-168-134.compute-1.amazonaws.com/api/v1/sign_in`, loginInfo)
         .then(res => {
           const persons = res.data;
-          setToken(persons.access_token)
+          setToken(persons.token)
           Cookies.set('refreshToken', persons.refresh_token); // {path: '/'}
           // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
           axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
           getToDashboard();
         })
-        .catch(error => alert("Sign in Failed. Please sign in again"));
+        .catch(error => alert(error));
 
       function getToDashboard() {
         window.location.href = '/admin/dashboard'
@@ -90,6 +98,7 @@ class Login extends React.Component {
                 </button>
               </div>
             </div>
+            <LoginFacebook></LoginFacebook>
           </div>
         </div>
       </div>
