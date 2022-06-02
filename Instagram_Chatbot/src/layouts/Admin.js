@@ -21,9 +21,9 @@ import React from "react";
 import PerfectScrollbar from "perfect-scrollbar";
 import { Route, Switch, useLocation } from "react-router-dom";
 
-import DemoNavbar from "components/Navbars/DemoNavbar.js";
-import Footer from "components/Footer/Footer.js";
-import Sidebar from "components/Sidebar/Sidebar.js";
+import DemoNavbar from "components/Navbars/DemoNavbar.jsx";
+import Footer from "components/Footer/Footer.jsx";
+import Sidebar from "components/Sidebar/Sidebar.jsx";
 
 import routes from "routes.js";
 

@@ -70,28 +70,36 @@ function Sidebar(props) {
             <li className={activeRoute('dashboard') + (true ? " active-pro" : "")} key={'dashboard'}>
               <NavLink to="dashboard" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-bank" style={{ color: "black" }} />
-                <p>Dashboard</p>
+                <p>ホーム</p>
               </NavLink>
             </li>
-            <li className={activeRoute('icons') + (true ? " active-pro" : "")} key={'icons'}>
-              <NavLink to="icons" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
-                <i className="nc-icon nc-diamond" style={{ color: "black" }} />
-                <p style={{ color: "black" }}>Icons</p>
+            <li className={activeRoute('client-management') + (true ? " active-pro" : "")} key={'client-management'}>
+              <NavLink to="client-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>クライアント管理</p>
               </NavLink>
             </li>
-            <li className={activeRoute('maps') + (true ? " active-pro" : "")} key={'maps'}>
-              <NavLink to="maps" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
-                <i className="nc-icon nc-pin-3" style={{ color: "black" }} />
-                <p style={{ color: "black" }}>Maps</p>
+            <li className={activeRoute('user-management') + (true ? " active-pro" : "")} key={'user-management'}>
+              <NavLink to="user-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-circle-10" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>ユーザー管理
+
+</p>
               </NavLink>
             </li>
-            <li className={activeRoute('notifications') + (true ? " active-pro" : "")} key={'notifications'}>
-              <NavLink to="notifications" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
-                <i className="nc-icon nc-bell-55" style={{ color: "black" }} />
-                <p style={{ color: "black" }}>Notifications</p>
+            <li className={activeRoute('pricing') + (true ? " active-pro" : "")} key={'pricing'}>
+              <NavLink to="pricing" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-bulb-63" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>Pricing</p>
               </NavLink>
             </li>
-            <li className={activeRoute('user-page') + (true ? " active-pro" : "")} key={'user-page'}>
+            <li className={activeRoute('chatbot') + (true ? " active-pro" : "")} key={'notifications'}>
+              <NavLink to="chatbot" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-atom" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>Chatbot</p>
+              </NavLink>
+            </li>
+            {/* <li className={activeRoute('user-page') + (true ? " active-pro" : "")} key={'user-page'}>
               <NavLink to="user-page" onClick={hide} className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-single-02" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>User Profile{'>'}</p>
@@ -116,19 +124,13 @@ function Sidebar(props) {
                   </NavLink>
                 </li>
               </ul>
-            </li>
-            <li className={activeRoute('tables') + (true ? " active-pro" : "")} key={'table-list'}>
-              <NavLink to="tables" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
-                <i className="nc-icon nc-tile-56" style={{ color: "black" }} />
-                <p style={{ color: "black" }}>Table List</p>
+            </li> */}
+            {/* <li className={activeRoute('icons') + (true ? " active-pro" : "")} key={'icons'}>
+              <NavLink to="icons" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-diamond" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>Icons</p>
               </NavLink>
-            </li>
-            <li className={activeRoute('typography') + (true ? " active-pro" : "")} key={'typography'}>
-              <NavLink to="typography" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
-                <i className="nc-icon nc-caps-small" style={{ color: "black" }} />
-                <p style={{ color: "black" }}>Typography</p>
-              </NavLink>
-            </li>
+            </li> */}
           </ul>
           {/* {props.routes.map((prop, key) => {
             return (
