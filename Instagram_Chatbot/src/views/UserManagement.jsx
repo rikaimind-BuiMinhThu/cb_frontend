@@ -81,7 +81,7 @@ function UserManagement() {
     var name = document.getElementById('name').value
     var email = document.getElementById('email').value
     var phone = document.getElementById('phone').value
-    if (checkFieldUpdate(name, 'name') === true && checkFieldUpdate(email, "email") === true && checkFieldUpdate(phone, "phone") === true) {
+    if (checkFieldUpdate(name, 'name') === true) {
       var elements = document.getElementById("detailUserClient").elements;
       var obj = {};
       for (var i = 0; i < elements.length - 5; i++) {
