@@ -4,6 +4,7 @@ import React from "react";
 import "../../assets/css/login.css"
 import "../../assets/scss/paper-dashboard.scss?v=1.3.0";
 import "../../assets/demo/demo.css";
+import ModalNoti from "views/Popup/ModalNoti";
 import Cookies from 'js-cookie';
 import { setToken } from "api/auth";
 import logo from '../../assets/img/logoEC.jpg'
@@ -12,7 +13,7 @@ class Login extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { token: '', navigator: 'false' }
+    this.state = { token: '', navigator: 'false', msgNoti: '', isOpenNoti: false }
   }
 
   handleLogin = (props) => {
@@ -20,35 +21,40 @@ class Login extends React.Component {
     var password = document.getElementById("password").value;
 
     const config = {
-      headers:{
+      headers: {
         'Access-Control-Allow-Origin': '*'
       }
     };
 
     if (nameValue === "" || password === "") {
-      if(password === ""){
+      if (password === "") {
         document.getElementById('passwordMessage').innerHTML = "Password cannot be empty"
-      }else{
+      } else {
         document.getElementById('passwordMessage').innerHTML = ""
       }
-      if(nameValue === ""){
+      if (nameValue === "") {
         document.getElementById('emailMessage').innerHTML = "Email cannot be empty"
-      }else{
+      } else {
         document.getElementById('emailMessage').innerHTML = ""
       }
     } else {
       document.getElementById('emailMessage').innerHTML = ""
       document.getElementById('passwordMessage').innerHTML = ""
       // const loginInfo = { username: nameValue, password: password };
-      const loginInfo = { user: { email: nameValue, password: password }}
+      const loginInfo = { user: { email: nameValue, password: password } }
       axios.post(`http://ec2-107-21-168-134.compute-1.amazonaws.com/api/v1/sign_in`, loginInfo)
         .then(res => {
           const persons = res.data;
-          setToken(persons.token)
-          Cookies.set('refreshToken', persons.refresh_token); // {path: '/'}
-          // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
-          axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
-          getToDashboard();
+          if (persons.code === 1 || persons.code === "1") {
+            setToken(persons.token)
+            Cookies.set('refreshToken', persons.refresh_token); // {path: '/'}
+            // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
+            axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
+            getToDashboard();
+          }else{
+            this.setState({msgNoti: "Wrong username or password"})
+            this.setState({isOpenNoti: true})
+          }
         })
         .catch(error => alert(error));
 
@@ -101,6 +107,11 @@ class Login extends React.Component {
             <LoginFacebook></LoginFacebook>
           </div>
         </div>
+        <ModalNoti open={this.state.isOpenNoti} onClose={() => this.setState({isOpenNoti: false})}>
+          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+            <h6>{this.state.msgNoti}</h6>
+          </div>
+        </ModalNoti>
       </div>
     );
   }
