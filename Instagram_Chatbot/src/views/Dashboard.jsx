@@ -1,25 +1,5 @@
-/*!
-
-=========================================================
-* Paper Dashboard React - v1.3.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/paper-dashboard-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com)
-
-* Licensed under MIT (https://github.com/creativetimofficial/paper-dashboard-react/blob/main/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React from "react";
-// react plugin used to create charts
 import { Line, Pie } from "react-chartjs-2";
-// reactstrap components
 import {
   Card,
   CardHeader,
@@ -30,7 +10,6 @@ import {
   Col,
 } from "reactstrap";
 import Cookies from 'js-cookie'
-// core components
 import {
   dashboard24HoursPerformanceChart,
   dashboardEmailStatisticsChart,
@@ -39,116 +18,116 @@ import {
 
 function Dashboard() {
 
-  React.useEffect(() =>{
-    console.log('token in dashboard',Cookies.get('token'))
-  },[])
+  React.useEffect(() => {
+    console.log('token in dashboard', Cookies.get('token'))
+  }, [])
   return (
     <>
       <div className="content">
         <Row>
           <Col lg="3" md="6" sm="6">
-            <Card className="card-stats">
-              <CardBody>
-                <Row>
-                  <Col md="4" xs="5">
-                    <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-globe text-warning" />
-                    </div>
-                  </Col>
-                  <Col md="8" xs="7">
-                    <div className="numbers">
-                      <p className="card-category">Capacity</p>
-                      <CardTitle tag="p">150GB</CardTitle>
-                      <p />
-                    </div>
-                  </Col>
-                </Row>
-              </CardBody>
-              <CardFooter>
-                <hr />
-                <div className="stats">
-                  <i className="fas fa-sync-alt" /> Update Now
-                </div>
-              </CardFooter>
-            </Card>
+            <a href="/admin/client-management">
+              <Card className="card-stats">
+                <CardBody>
+                  <Row>
+                    <Col md="3" xs="5">
+                      <div className="icon-big text-center icon-warning">
+                        <i className="nc-icon nc-badge text-warning" />
+                      </div>
+                    </Col>
+                    <Col md="9" xs="7">
+                      <div className="numbers">
+                        <CardTitle tag="p">クライアント管理</CardTitle>
+                        <p />
+                      </div>
+                    </Col>
+                  </Row>
+                </CardBody>
+                <CardFooter>
+                  <hr />
+                  <div className="stats">
+                  </div>
+                </CardFooter>
+              </Card>
+            </a>
           </Col>
           <Col lg="3" md="6" sm="6">
-            <Card className="card-stats">
-              <CardBody>
-                <Row>
-                  <Col md="4" xs="5">
-                    <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-money-coins text-success" />
-                    </div>
-                  </Col>
-                  <Col md="8" xs="7">
-                    <div className="numbers">
-                      <p className="card-category">Revenue</p>
-                      <CardTitle tag="p">$ 1,345</CardTitle>
-                      <p />
-                    </div>
-                  </Col>
-                </Row>
-              </CardBody>
-              <CardFooter>
-                <hr />
-                <div className="stats">
-                  <i className="far fa-calendar" /> Last day
-                </div>
-              </CardFooter>
-            </Card>
+            <a href="/admin/user-management">
+              <Card className="card-stats">
+                <CardBody>
+                  <Row>
+                    <Col md="3" xs="5">
+                      <div className="icon-big text-center icon-warning">
+                        <i className="nc-icon nc-circle-10 text-success" />
+                      </div>
+                    </Col>
+                    <Col md="9" xs="7">
+                      <div className="numbers">
+                        <CardTitle tag="p">ユーザー管理</CardTitle>
+                        <p />
+                      </div>
+                    </Col>
+                  </Row>
+                </CardBody>
+                <CardFooter>
+                  <hr />
+                  <div className="stats">
+                  </div>
+                </CardFooter>
+              </Card>
+            </a>
           </Col>
           <Col lg="3" md="6" sm="6">
-            <Card className="card-stats">
-              <CardBody>
-                <Row>
-                  <Col md="4" xs="5">
-                    <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-vector text-danger" />
-                    </div>
-                  </Col>
-                  <Col md="8" xs="7">
-                    <div className="numbers">
-                      <p className="card-category">Errors</p>
-                      <CardTitle tag="p">23</CardTitle>
-                      <p />
-                    </div>
-                  </Col>
-                </Row>
-              </CardBody>
-              <CardFooter>
-                <hr />
-                <div className="stats">
-                  <i className="far fa-clock" /> In the last hour
-                </div>
-              </CardFooter>
-            </Card>
+            <a href="/admin/pricing">
+              <Card className="card-stats">
+                <CardBody>
+                  <Row>
+                    <Col md="4" xs="5">
+                      <div className="icon-big text-center icon-warning">
+                        <i className="nc-icon nc-bulb-63 text-danger" />
+                      </div>
+                    </Col>
+                    <Col md="8" xs="7">
+                      <div className="numbers">
+                        <CardTitle tag="p">Pricing</CardTitle>
+                        <p />
+                      </div>
+                    </Col>
+                  </Row>
+                </CardBody>
+                <CardFooter>
+                  <hr />
+                  <div className="stats">
+                  </div>
+                </CardFooter>
+              </Card>
+            </a>
           </Col>
           <Col lg="3" md="6" sm="6">
-            <Card className="card-stats">
-              <CardBody>
-                <Row>
-                  <Col md="4" xs="5">
-                    <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-favourite-28 text-primary" />
-                    </div>
-                  </Col>
-                  <Col md="8" xs="7">
-                    <div className="numbers">
-                      <p className="card-category">Followers</p>
-                      <CardTitle tag="p">+45K</CardTitle>
-                      <p />
-                    </div>
-                  </Col>
-                </Row>
-              </CardBody>
-              <CardFooter>
-                <hr />
-                <div className="stats">
-                  <i className="fas fa-sync-alt" /> Update now
-                </div>
-              </CardFooter>
-            </Card>
+            <a href="/admin/chatbot">
+              <Card className="card-stats">
+                <CardBody>
+                  <Row>
+                    <Col md="4" xs="5">
+                      <div className="icon-big text-center icon-warning">
+                        <i className="nc-icon nc-atom text-primary" />
+                      </div>
+                    </Col>
+                    <Col md="8" xs="7">
+                      <div className="numbers">
+                        <CardTitle tag="p">Chatbot</CardTitle>
+                        <p />
+                      </div>
+                    </Col>
+                  </Row>
+                </CardBody>
+                <CardFooter>
+                  <hr />
+                  <div className="stats">
+                  </div>
+                </CardFooter>
+              </Card>
+            </a>
           </Col>
         </Row>
         <Row>

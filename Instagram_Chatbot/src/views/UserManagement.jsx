@@ -26,7 +26,8 @@ function UserManagement() {
   React.useEffect(() => {
     var path = window.location.pathname;
     api.get(`/api/v1/managements/users`).then(res => {
-      setDataList(res.data)
+      // console.log(res.data.data.users)
+      setDataList(res.data.data)
     }).catch(error => {
       console.log(error)
       if (error.response.data.code === 3) {
@@ -38,7 +39,7 @@ function UserManagement() {
   function reloadListClient() {
     var path = window.location.pathname;
     api.get(`/api/v1/managements/users`).then(res => {
-      setDataList(res.data)
+      setDataList(res.data.data)
     }).catch(error => {
       console.log(error)
       if (error.response.data.code === 3) {
@@ -169,7 +170,8 @@ function UserManagement() {
     }
   }
 
-  const items = dataList.data
+  const items = dataList.users
+  console.log(items)
   return (
     <>
       <div className="content">
