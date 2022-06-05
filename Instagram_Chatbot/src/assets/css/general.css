@@ -2,27 +2,22 @@
     margin-left: 10px;
     margin-right: 10px;
 }
-
 .table .btn {
     margin-left: 10px;
     margin-right: 10px;
 }
-
 .editBtn {
     background-color: green;
     /* color: black; */
 }
-
 .deleteBtn {
     background-color: red;
     /* color: black; */
 }
-
 .div_left {
     width: 50%;
     float: left;
 }
-
 .div_right {
     width: 50%;
     float: right;
@@ -49,4 +44,19 @@
 ::placeholder {
     color: black;
     opacity: 1; /* Firefox */
-  }
+}
+.radioButtonAddClient{
+    padding-right: 15px;
+    margin-left: 5px;
+}
+.long-label{
+    width: 27%;
+    overflow-wrap: break-word;
+}
+.span-require{
+    background-color: red;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+    padding: 0px 3px 0px 3px;
+}

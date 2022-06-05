@@ -4,6 +4,7 @@ import ReactDom from 'react-dom'
 import { Button } from "react-bootstrap";
 
 const MODAL_STYLES = {
+  width: '45%',
   position: 'fixed',
   top: '45%',
   left: '50%',
@@ -12,7 +13,10 @@ const MODAL_STYLES = {
   padding: '50px',
   zIndex: 1000,
   border: '2px solid gray',
-  borderRadius: '5px'
+  borderRadius: '5px',
+  maxHeight: '70%', 
+  overflowY: 'scroll',
+  overflowX: 'hidden',
 }
 
 const OVERLAY_STYLES = {
