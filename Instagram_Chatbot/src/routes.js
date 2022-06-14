@@ -20,6 +20,7 @@ import Dashboard from "views/Dashboard.jsx";
 import Chatbot from "views/Chatbot.jsx";
 import Icons from "views/Icons.jsx";
 import ClientManagement from "views/ClientManagement";
+import Policy from "views/Policy"
 import UserPage from "views/User.jsx";
 import UpgradeToPro from "views/Upgrade.jsx";
 import UserManagement from "views/UserManagement";
@@ -29,28 +30,28 @@ import Pricing from "views/Pricing";
 var routes = [
   {
     path: "/dashboard",
-    name: "Dashboard",
+    name: "ホーム",
     icon: "nc-icon nc-bank",
     component: Dashboard,
     layout: "/admin",
   },
   {
     path: "/client-management",
-    name: "ClientManagement",
+    name: "クライアント管理",
     icon: "nc-icon nc-pin-3",
     component: ClientManagement,
     layout: "/admin",
   },
   {
     path: "/user-management",
-    name: "UserManagement",
+    name: "ユーザー管理",
     icon: "nc-icon nc-circle-10",
     component: UserManagement,
     layout: "/admin",
   },
   {
     path: "/pricing",
-    name: "Pricing",
+    name: "価格",
     icon: "nc-icon nc-bulb-63",
     component: Pricing,
     layout: "/admin",
@@ -60,6 +61,13 @@ var routes = [
     name: "Chatbot",
     icon: "nc-icon nc-bell-55",
     component: Chatbot,
+    layout: "/admin",
+  },
+  {
+    path: "/policy",
+    name: "Policy",
+    // icon: "nc-icon nc-bell-55",
+    component: Policy,
     layout: "/admin",
   },
   // {

@@ -65,14 +65,13 @@ function Sidebar(props) {
               <NavLink to="user-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-circle-10" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>ユーザー管理
-
-</p>
+                </p>
               </NavLink>
             </li>
             <li className={activeRoute('pricing') + (true ? " active-pro" : "")} key={'pricing'}>
               <NavLink to="pricing" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-bulb-63" style={{ color: "black" }} />
-                <p style={{ color: "black" }}>Pricing</p>
+                <p style={{ color: "black" }}>価格</p>
               </NavLink>
             </li>
             <li className={activeRoute('chatbot') + (true ? " active-pro" : "")} key={'notifications'}>

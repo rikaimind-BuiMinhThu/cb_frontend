@@ -19,7 +19,7 @@ import {
 function Dashboard() {
 
   React.useEffect(() => {
-    console.log('token in dashboard', Cookies.get('token'))
+    // console.log('token in dashboard', Cookies.get('token'))
   }, [])
   return (
     <>
@@ -89,7 +89,7 @@ function Dashboard() {
                     </Col>
                     <Col md="8" xs="7">
                       <div className="numbers">
-                        <CardTitle tag="p">Pricing</CardTitle>
+                        <CardTitle tag="p">価格</CardTitle>
                         <p />
                       </div>
                     </Col>
