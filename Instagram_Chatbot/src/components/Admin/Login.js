@@ -42,7 +42,7 @@ class Login extends React.Component {
       document.getElementById('passwordMessage').innerHTML = ""
       // const loginInfo = { username: nameValue, password: password };
       const loginInfo = { user: { email: nameValue, password: password } }
-      axios.post(`http://ec2-107-21-168-134.compute-1.amazonaws.com/api/v1/sign_in`, loginInfo)
+      axios.post(`http://ecchatbot-dev.ddns.net/api/v1/sign_in`, loginInfo)
         .then(res => {
           const persons = res.data;
           if (persons.code === 1 || persons.code === "1") {
