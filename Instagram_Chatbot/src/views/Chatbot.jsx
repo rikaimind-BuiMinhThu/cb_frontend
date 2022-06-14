@@ -181,8 +181,7 @@ function Chatbot() {
   };
 
   function loadFileImgMsg(event) {
-    var num = parseInt(imgCBNum) + 1
-    console.log("numIn: ", num)
+    var num = parseInt(imgMsgCBNum) + 1
     var output = document.getElementById(`outputImgMsg${num}`);
     var imgUrl = URL.createObjectURL(event.target.files[0]);
     output.src = imgUrl
@@ -290,6 +289,8 @@ function Chatbot() {
     <textarea name="message" class="mgsChatbot" id="imgMgsCustom${numIndex}" placeholder="Please input message..." type="text" rows="3"></textarea>
     </div>
   </div>`
+
+  console.log(document.getElementById(`outputImgMsg${numIndex}`))
     document.getElementById(`imgMsgNum${numIndex}`).addEventListener('change', (e) => loadFileImgMsg(e))
     document.getElementById(`imgMgsCustom${numIndex}`).addEventListener('change', (e) => imgMsgOV(e.target.value))
   }
