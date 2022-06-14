@@ -60,3 +60,22 @@
     font-weight: bold;
     padding: 0px 3px 0px 3px;
 }
+#dropdown-basic-button{
+    padding: 0;
+    margin-top: 0;
+    color: black;
+    font-weight: bold;
+    background-color: white;
+
+}
+#a_tag{
+    width: 70%;
+    color: black
+}
+#a_tag:hover{
+    color:#51cbce
+}
+.mgsChatbot{
+    width: 75%;
+     border-radius: 10px;
+}

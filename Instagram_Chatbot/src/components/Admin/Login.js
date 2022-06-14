@@ -72,23 +72,23 @@ class Login extends React.Component {
         <div className="auth-wrapper" >
           <div className="auth-inner">
             <div>
-              <h3>Sign In</h3>
+              <h3>ログイン</h3>
               <div className="mb-3">
-                <label>Email address</label>
+                <label>メールアドレス</label>
                 <input
                   type="email"
                   className="form-control"
-                  placeholder="Enter email"
+                  placeholder="メールアドレス入力"
                   id="email"
                 />
                 <span id="emailMessage" style={{ color: 'red' }}></span>
               </div>
               <div className="mb-3">
-                <label>Password</label>
+                <label>パスワード</label>
                 <input
                   type="password"
                   className="form-control"
-                  placeholder="Enter password"
+                  placeholder="パスワード入力"
                   id="password"
                 />
                 <span id="passwordMessage" style={{ color: 'red' }}></span>
@@ -100,11 +100,11 @@ class Login extends React.Component {
                   type="submit"
                   className="btn btn-primary"
                 >
-                  Submit
+                  ログイン
                 </button>
               </div>
             </div>
-            <LoginFacebook></LoginFacebook>
+            {/* <LoginFacebook></LoginFacebook> */}
           </div>
         </div>
         <ModalNoti open={this.state.isOpenNoti} onClose={() => this.setState({isOpenNoti: false})}>
