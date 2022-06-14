@@ -177,7 +177,7 @@ function Header(props) {
               </Link>
             </NavItem> */}
             <NavItem>
-              <Button type="text" onClick={logout}>Logout</Button>
+              <Button type="text" onClick={logout}>ログアウト</Button>
             </NavItem>
           </Nav>
         </Collapse>
