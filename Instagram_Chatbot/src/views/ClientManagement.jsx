@@ -73,11 +73,11 @@ function ClientManagement() {
     // console.log(Cookies.get('token'));
   });
   React.useEffect(() => {
-    var paramSearch={page: pageIndex}
+    var paramSearch = { page: pageIndex }
     var path = window.location.pathname;
     api.get(`/api/v1/managements/clients`, paramSearch).then(res => {
       // console.log(res.data.data)
-      var totalPage = Math.ceil(res.data.data.total/25)
+      var totalPage = Math.ceil(res.data.data.total / 25)
       setTotalPage(totalPage)
       setDataList(res.data.data)
     }).catch(error => {
@@ -91,7 +91,16 @@ function ClientManagement() {
   function reloadListClient(pgIndex) {
     var path = window.location.pathname;
     api.get(`/api/v1/managements/clients?name=&page=${pgIndex}&client_id=`).then(res => {
-      setDataList(res.data.data)
+      var totalPage = Math.ceil(res.data.data.total / 25)
+      if (pgIndex > totalPage) {
+        api.get(`/api/v1/managements/clients?name=&page=${totalPage}&client_id=`).then(resp => {
+          setDataList(resp.data.data)
+        })
+      } else {
+        setDataList(res.data.data)
+      }
+      setTotalPage(totalPage)
+
     }).catch(error => {
       console.log(error)
       if (error.response.data.code === 3) {
@@ -101,10 +110,63 @@ function ClientManagement() {
   }
 
   function getUserDetail(item) {
-    setDetailUpdateTitle("詳細詳細")
-    setDetailData(item)
-    setIsOpen(true)
-    setDisableInput(true)
+
+    var path = window.location.pathname;
+    api.get(`/api/v1/managements/clients/${item.id}`).then(res => {
+      var data = res.data.data
+      console.log(data)
+      setUpdateId(data.id)
+      setDetailUpdateTitle("詳細")
+      setContract(data.status)
+      setPlan(data.plan)
+      setPrice(data.price)
+      setInputStartDate(data.subscription_start_at.slice(0, 10))
+      setInputEndDate(data.subscription_end_at.slice(0, 10))
+      setIsInstagram(data.is_instagram)
+      setIsLine(data.is_line)
+      setIsTiktok(data.is_tiktok)
+      setIsWeb(data.is_web)
+      setNote(data.note)
+      setName(data.name)
+      setNameKata(data.name_katakana)
+      setCompanyType(data.enterprise_type)
+      setCompanyType2(data.enterprise_type_2)
+      setDepartmentName(data.department_name)
+      setTitle(data.title)
+      setManager(data.responsible_person)
+      setManagerKata(data.responsible_person_katakana)
+      setUrlLogo(`https://ecchatbot-dev.ddns.net/${data.logo_url.url}`)
+      setUrl(data.url)
+      setZipCode(data.zip_code)
+      console.log('prefecture: ' ,data.prefecture)
+      // if (data.prefecture === null) {
+      //   setPrefecture('')
+      // } else { setPrefecture(data.prefecture) }
+      setPrefecture(data.prefecture) 
+      if (data.municipality !== null) {
+        setMunicipality(data.municipality)
+      } else { setMunicipality('') }
+      setAddress(data.address)
+      setBuildingName(data.building_name)
+      setEmail(data.email)
+      setPhone(data.phone_number)
+      setIsOpen(true)
+      console.log(data.status)
+      if (data.status === 'active') {
+        document.getElementById("in_contract").checked = true
+      } else if (data.status === 'pause') {
+        document.getElementById("pause_contract").checked = true
+      } else if (data.status === 'ended') {
+        document.getElementById("finished_contract").checked = true
+      } else if (data.status === 'trial') {
+        document.getElementById("trial_contract").checked = true
+      }
+      setDisableInput(true)
+    }).catch(error => {
+      console.log(error)
+    })
+    // setIsOpen(true)
+    // setDisableInput(true)
   }
 
   function updateClientUser(item) {
@@ -132,12 +194,13 @@ function ClientManagement() {
       setTitle(data.title)
       setManager(data.responsible_person)
       setManagerKata(data.responsible_person_katakana)
-      setUrlLogo(`http://ec2-107-21-168-134.compute-1.amazonaws.com/${data.logo_url.url}`)
+      setUrlLogo(`https://ecchatbot-dev.ddns.net/${data.logo_url.url}`)
       setUrl(data.url)
       setZipCode(data.zip_code)
-      if (data.prefecture !== null) {
-        setPrefecture(data.prefecture)
-      } else { setPrefecture('') }
+      // if (data.prefecture === null) {
+      //   setPrefecture('')
+      // } else { setPrefecture(data.prefecture) }
+      setPrefecture(data.prefecture) 
       if (data.municipality !== null) {
         setMunicipality(data.municipality)
       } else { setMunicipality('') }
@@ -147,34 +210,25 @@ function ClientManagement() {
       setPhone(data.phone_number)
       setIsOpen(true)
       console.log(data.status)
-      if(data.status === 'active'){
+      if (data.status === 'active') {
         document.getElementById("in_contract").checked = true
-      } else if(data.status === 'pause'){
+      } else if (data.status === 'pause') {
         document.getElementById("pause_contract").checked = true
-      } else if(data.status === 'ended'){
+      } else if (data.status === 'ended') {
         document.getElementById("finished_contract").checked = true
-      } else if(data.status === 'trial'){
+      } else if (data.status === 'trial') {
         document.getElementById("trial_contract").checked = true
       }
       setDisableInput(false)
     }).catch(error => {
       console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
     })
-
-
-    // setInputValueName(item.name)
-    // setInputValueAddress(item.address)
-    // setInputValuePhone(item.phone_number)
-
   }
 
   function deleteClientUser(id) {
     var path = window.location.pathname;
     api.delete(`/api/v1/managements/clients/${id}`).then(res => {
-      reloadListClient()
+      reloadListClient(pageIndex)
       setMsgNoti("削除しました!")
       setIsOpenNoti(true)
     }).catch(error => {
@@ -221,41 +275,41 @@ function ClientManagement() {
       && checkFieldAdd(zipCode, "PostCode") === true && checkFieldAdd(prefectures, "Prefectures") === true
       && checkFieldAdd(building, "BuildingName") === true && checkFieldAdd(email, "Email") === true
       && checkFieldAdd(phone, "Phone") === true) {
-        var elements = document.getElementById("detailUserClient").elements;
-    var obj = {};
-    for (var i = 0; i < elements.length - 3; i++) {
-      var item = elements.item(i);
-      obj[item.name] = item.value;
+      var elements = document.getElementById("detailUserClient").elements;
+      var obj = {};
+      for (var i = 0; i < elements.length - 3; i++) {
+        var item = elements.item(i);
+        obj[item.name] = item.value;
+      }
+
+      // var passwordU = obj.password
+      // var conf_password = obj.password_confirmation
+      // var usr = { "password": passwordU, "password_confirmation": conf_password }
+      // delete obj.password_confirmation
+      // delete obj.password
+      obj.logo_url = inputImage
+      var updateClient = { client: obj };
+      // console.log(newClient)
+
+      var updateClient = { client: obj };
+      console.log(updateClient);
+      api.patch(`/api/v1/managements/clients/${updateId}`, updateClient).then(res => {
+        reloadListClient()
+        setMsgNoti("クライアント更新しました!")
+        setIsOpen(false)
+        setIsOpenNoti(true)
+      }).catch(error => {
+        alert(error)
+        console.log(error)
+        if (error.response.data.code === 3) {
+          requestNewToken(path)
+        }
+      })
+    } else {
+      console.log("Missing field")
     }
 
-    // var passwordU = obj.password
-    // var conf_password = obj.password_confirmation
-    // var usr = { "password": passwordU, "password_confirmation": conf_password }
-    // delete obj.password_confirmation
-    // delete obj.password
-    obj.logo_url = inputImage
-    var updateClient = { client: obj };
-    // console.log(newClient)
 
-    var updateClient = { client: obj };
-    console.log(updateClient);
-    api.patch(`/api/v1/managements/clients/${updateId}`, updateClient).then(res => {
-      reloadListClient()
-      setMsgNoti("クライアント更新しました!")
-      setIsOpen(false)
-      setIsOpenNoti(true)
-    }).catch(error => {
-      alert(error)
-      console.log(error)
-      if (error.response.data.code === 3) {
-        requestNewToken(path)
-      }
-    })
-      }else{
-        console.log("Missing field")
-      }
-
-    
     // }
   }
 
@@ -327,17 +381,17 @@ function ClientManagement() {
       var newClient = { client: obj, user: usr };
       console.log(newClient)
       api.post(`/api/v1/managements/clients`, newClient).then(res => {
-        if(res.data.code===1|| res.data.code === "1"){
+        if (res.data.code === 1 || res.data.code === "1") {
           reloadListClient()
-        setMsgNoti("クライアント追加しました!")
-        setIsOpenAddUser(false)
-        setIsOpenNoti(true)
-        }else{
+          setMsgNoti("クライアント追加しました!")
+          setIsOpenAddUser(false)
+          setIsOpenNoti(true)
+        } else {
           setMsgNoti(res.data.message)
           setIsOpenAddUser(false)
           setIsOpenNoti(true)
         }
-        
+
       }).catch(error => {
         alert(error)
         console.log(error)
@@ -389,6 +443,34 @@ function ClientManagement() {
       document.getElementById(`newClient${field}ErrMsg`).innerHTML = ""
       return true
     }
+  }
+  
+  function setSizeSlect() {
+    document.getElementById('newPrefectures').size = "10"
+  }
+  function setSizeSlectCom() {
+    document.getElementById('newCompanyType').size = "10"
+  }
+  function setSizeSlectCom2() {
+    document.getElementById('newCompanyType2').size = "10"
+  }
+  function setSizeAfterSelect() {
+    document.getElementById('newPrefectures').size = "1"
+  }
+  function setSizeAfterSelectCom() {
+    document.getElementById('newCompanyType').size = "1"
+  }
+  function setSizeAfterSelectCom2() {
+    document.getElementById('newCompanyType2').size = "1"
+  }
+  function closeSizeSelect() {
+    document.getElementById('newPrefectures').size = "1"
+  }
+  function closeSizeSelectCom() {
+    document.getElementById('newCompanyType').size = "1"
+  }
+  function closeSizeSelectCom2() {
+    document.getElementById('newCompanyType2').size = "1"
   }
 
   function checkInputNumber(value, field) {
@@ -486,19 +568,20 @@ function ClientManagement() {
                   <thead className="text-primary">
                     <tr>
                       <th style={{ width: "5%" }}>ID</th>
-                      <th style={{ width: "15%" }}>画像</th>
-                      <th style={{ width: "5%" }}>名称</th>
-                      <th style={{ width: "10%" }}><select className="text-primary" style={{ border: "none", fontWeight: "bold" }} defaultValue={''}>
+                      <th style={{ width: "7%" }}>画像</th>
+                      <th style={{ width: "10%" }}>名称</th>
+                      <th style={{width: '10%'}}>プラン</th>
+                      {/* <th style={{ width: "10%" }}><select className="text-primary" style={{ border: "none", fontWeight: "bold" }} defaultValue={''}>
                         <option value="">プラン</option>
                         <option value={0}>スタートアッププラン</option>
                         <option value={1}>プレミアムプラン</option>
                         <option value={2}>エキスパートプラン のいづれかを表示</option>
-                      </select></th>
+                      </select></th> */}
                       <th>プラン価格</th>{/**Plan price */}
                       <th>課金開始日</th>{/**Date start count price */}
-                      <th>最低利用期間終了日</th>{/**Date end using */}
+                      <th style={{width: '10%'}}>最低利用期間終了日</th>{/**Date end using */}
                       <th>住所</th>{/**Address */}
-                      {/* <th>最終ログイン日時</th> */}
+                      <th style={{width: '10%'}}>最終ログイン日時</th>
                       {/**Last login date_time */}
                       <th className="actionList">アクション</th>
                     </tr>
@@ -508,13 +591,14 @@ function ClientManagement() {
                       items && items.map(item => (
                         <tr key={item.id} style={{ overflow: "hidden", height: "14px", }}>
                           <td>{item.id}</td>
-                          <td style={{ margin: "0", padding: "0" }}><img src={`http://ec2-107-21-168-134.compute-1.amazonaws.com${item.logo_url.url}`} style={{ maxHeight: "60px", maxWidth: "100px" }} alt="" /></td>
+                          <td style={{ margin: "0", padding: "0" }}><img src={`https://ecchatbot-dev.ddns.net${item.logo_url.url}`} style={{ maxHeight: "60px", maxWidth: "100px" }} alt="" /></td>
                           <td>{item.name}</td>
                           <td>{item.plan}</td>
                           <td>{item.price}</td>
                           <td>{item.subscription_start_at.slice(0, 10)}</td>
                           <td>{item.subscription_end_at.slice(0, 10)}</td>
                           <td>{item.address}</td>
+                          <td>{item.last_sign_in_at}</td>
                           <td className="actionList">
                             <div>
                               <Button onClick={() => getUserDetail(item)}>詳細</Button>
@@ -561,7 +645,8 @@ function ClientManagement() {
                     {/* <option value="" disabled={true}>Select one option</option> */}
                     <option value="startup">スタートアッププラン</option>
                     <option value="premium">プレミアムプラン</option>
-                    <option value="expert">エキスパートプラン のいづれかを選択</option>
+                    <option value="expert">エキスパートプラン</option>
+                    <option value="complete">完全成果報酬プラン</option>
                   </select>
                 </label><br /><br />
                 <label className="label-input">プラン価格 {/**Plan price*/}
@@ -621,11 +706,53 @@ function ClientManagement() {
                   <label id="newClientNameKataErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">企業種別 <span className="span-require">*必須</span>
-                  <input className="input-field" value={companyType} onChange={(e) => setCompanyType(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "CompanyType")} type="text" id="newCompanyType" name="enterprise_type" />
+                  {/* <input className="input-field" value={companyType} onChange={(e) => setCompanyType(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "CompanyType")} type="text" id="newCompanyType" name="enterprise_type" /> */}
+                  <select style={{ padding: "3px 0px 3px 0px", maxHeight: "50%!important%" }} onMouseLeave={() => closeSizeSelectCom()} onMouseDown={() => setSizeSlectCom()} className="input-field" defaultValue={companyType} name="enterprise_type" id="newCompanyType">
+                    {/* <option value="" disabled={true}>Select one option</option> */}
+                    <option onClick={() => setSizeAfterSelectCom()} value="株式会社">株式会社</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="有限会社">有限会社</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="合名会社">合名会社</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="合資会社">合資会社</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="合同会社">合同会社</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="医療法人">医療法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="医療法人社団">医療法人社団</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="医療法人財団">医療法人財団</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="社会医療法人">社会医療法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="一般財団法人">一般財団法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="公益財団法人">公益財団法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="一般社団法人">一般社団法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="公益社団法人">公益社団法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="宗教法人">宗教法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="学校法人">学校法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="社会福祉法人">社会福祉法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="更生保護法人">更生保護法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="相互社会">相互社会</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="特定非営利活動法人">特定非営利活動法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="独立行政法人">独立行政法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="地方独立行政法人">地方独立行政法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="弁護士法人">弁護士法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="有限責任中間法人">有限責任中間法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="無限責任中間法人">無限責任中間法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="行政書士法人">行政書士法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="司法書士法人">司法書士法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="税理士法人">税理士法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="国立大学法人">国立大学法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="公立大学法人">公立大学法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="和歌山県">和歌山県</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="農事組合法人">農事組合法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="管理組合法人">管理組合法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="社会保険労務士法人">社会保険労務士法人</option>
+                  </select>
                   <label id="newClientCompanyTypeErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">企業種別２ <span className="span-require">*必須</span>
-                  <input className="input-field" value={companyType2} onChange={(e) => setCompanyType2(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "CompanyType2")} type="text" id="newCompanyType2" name="enterprise_type_2" />
+                  {/* <input className="input-field" value={companyType2} onChange={(e) => setCompanyType2(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "CompanyType2")} type="text" id="newCompanyType2" name="enterprise_type_2" /> */}
+                  <select style={{ padding: "3px 0px 3px 0px", maxHeight: "50%!important%" }} onMouseLeave={() => closeSizeSelectCom2()} onMouseDown={() => setSizeSlectCom2()} className="input-field" defaultValue={companyType2} name="enterprise_type_2" id="newCompanyType2">
+                    {/* <option value="" disabled={true}>Select one option</option> */}
+                    <option onClick={() => setSizeAfterSelectCom2()} value="先頭に使う">先頭に使う</option>
+                    <option onClick={() => setSizeAfterSelectCom2()} value="末尾に使う">末尾に使う</option>
+                    <option onClick={() => setSizeAfterSelectCom2()} value="なし">なし</option>
+                  </select>
                   <label id="newClientCompanyType2ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">部署名 <span className="span-require">*必須</span>
@@ -666,7 +793,57 @@ function ClientManagement() {
                   <label id="newClientPostCodeErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">都道府県 <span className="span-require">*必須</span>
-                  <input className="input-field" value={prefecture} onChange={(e) => setPrefecture(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "Prefectures")} type="text" id="newPrefectures" name="prefecture" />
+                  {/* <input className="input-field" value={prefecture} onChange={(e) => setPrefecture(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "Prefectures")} type="text" id="newPrefectures" name="prefecture" /> */}
+                  <select style={{ padding: "3px 0px 3px 0px", maxHeight: "50%!important%" }} onMouseLeave={() => closeSizeSelect()} onMouseDown={() => setSizeSlect()} className="input-field" defaultValue={prefecture} name="prefecture" id="newPrefectures">
+                    {/* <option value="" disabled={true}>Select one option</option> */}
+                    <option onClick={() => setSizeAfterSelect()} value="北海道">北海道</option>
+                    <option onClick={() => setSizeAfterSelect()} value="青森県">青森県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="岩手県">岩手県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="宮城県">宮城県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="秋田県">秋田県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="山形県">山形県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="福島県">福島県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="茨城県">茨城県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="栃木県">栃木県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="群馬県">群馬県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="埼玉県">埼玉県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="千葉県">千葉県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="東京都">東京都</option>
+                    <option onClick={() => setSizeAfterSelect()} value="神奈川県">神奈川県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="新潟県">新潟県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="富山県">富山県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="石川県">石川県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="福井県">福井県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="山梨県">山梨県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="長野県">長野県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="岐阜県">岐阜県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="静岡県">静岡県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="愛知県">愛知県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="三重県">三重県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="滋賀県">滋賀県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="京都府">京都府</option>
+                    <option onClick={() => setSizeAfterSelect()} value="大阪府">大阪府</option>
+                    <option onClick={() => setSizeAfterSelect()} value="兵庫県">兵庫県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="奈良県">奈良県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="和歌山県">和歌山県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="鳥取県">鳥取県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="島根県">島根県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="岡山県">岡山県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="広島県">広島県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="山口県">山口県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="徳島県">徳島県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="香川県">香川県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="愛媛県">愛媛県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="高知県">高知県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="福岡県">福岡県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="佐賀県">佐賀県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="長崎県">長崎県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="熊本県">熊本県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="大分県">大分県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="宮崎県">宮崎県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="鹿児島県">鹿児島県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="沖縄県">沖縄県</option>
+                  </select>
                   <label id="newClientPrefecturesErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">市区町村 <span className="span-require">*必須</span>
@@ -718,7 +895,8 @@ function ClientManagement() {
                     {/* <option value="" disabled={true}>Select one option</option> */}
                     <option value="startup">スタートアッププラン</option>
                     <option value="premium">プレミアムプラン</option>
-                    <option value="expert">エキスパートプラン のいづれかを選択</option>
+                    <option value="expert">エキスパートプラン</option>
+                    <option value="complete">完全成果報酬プラン</option>
                   </select>
                 </label><br /><br />
                 <label className="label-input">プラン価格 {/**Plan price*/}
@@ -778,11 +956,53 @@ function ClientManagement() {
                   <label id="newClientNameKataErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">企業種別 <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "CompanyType")} type="text" id="newCompanyType" name="enterprise_type" />
+                  {/* <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "CompanyType")} type="text" id="newCompanyType" name="enterprise_type" /> */}
+                  <select style={{ padding: "3px 0px 3px 0px", maxHeight: "50%!important%" }} onMouseLeave={() => closeSizeSelectCom()} onMouseDown={() => setSizeSlectCom()} className="input-field" defaultValue={'株式会社'} name="enterprise_type" id="newCompanyType">
+                    {/* <option value="" disabled={true}>Select one option</option> */}
+                    <option onClick={() => setSizeAfterSelectCom()} value="株式会社">株式会社</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="有限会社">有限会社</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="合名会社">合名会社</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="合資会社">合資会社</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="合同会社">合同会社</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="医療法人">医療法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="医療法人社団">医療法人社団</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="医療法人財団">医療法人財団</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="社会医療法人">社会医療法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="一般財団法人">一般財団法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="公益財団法人">公益財団法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="一般社団法人">一般社団法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="公益社団法人">公益社団法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="宗教法人">宗教法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="学校法人">学校法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="社会福祉法人">社会福祉法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="更生保護法人">更生保護法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="相互社会">相互社会</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="特定非営利活動法人">特定非営利活動法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="独立行政法人">独立行政法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="地方独立行政法人">地方独立行政法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="弁護士法人">弁護士法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="有限責任中間法人">有限責任中間法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="無限責任中間法人">無限責任中間法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="行政書士法人">行政書士法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="司法書士法人">司法書士法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="税理士法人">税理士法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="国立大学法人">国立大学法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="公立大学法人">公立大学法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="和歌山県">和歌山県</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="農事組合法人">農事組合法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="管理組合法人">管理組合法人</option>
+                    <option onClick={() => setSizeAfterSelectCom()} value="社会保険労務士法人">社会保険労務士法人</option>
+                  </select>
                   <label id="newClientCompanyTypeErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">企業種別２ <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "CompanyType2")} type="text" id="newCompanyType2" name="enterprise_type_2" />
+                  {/* <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "CompanyType2")} type="text" id="newCompanyType2" name="enterprise_type_2" /> */}
+                  <select style={{ padding: "3px 0px 3px 0px", maxHeight: "50%!important%" }} onMouseLeave={() => closeSizeSelectCom2()} onMouseDown={() => setSizeSlectCom2()} className="input-field" defaultValue={'先頭に使う'} name="enterprise_type_2" id="newCompanyType2">
+                    {/* <option value="" disabled={true}>Select one option</option> */}
+                    <option onClick={() => setSizeAfterSelectCom2()} value="先頭に使う">先頭に使う</option>
+                    <option onClick={() => setSizeAfterSelectCom2()} value="末尾に使う">末尾に使う</option>
+                    <option onClick={() => setSizeAfterSelectCom2()} value="なし">なし</option>
+                  </select>
                   <label id="newClientCompanyType2ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">部署名 <span className="span-require">*必須</span>
@@ -825,7 +1045,57 @@ function ClientManagement() {
                   <label id="newClientPostCodeErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">都道府県 <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "Prefectures")} type="text" id="newPrefectures" name="prefecture" />
+                  {/* <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "Prefectures")} type="text" id="newPrefectures" name="prefecture" /> */}
+                  <select style={{ padding: "3px 0px 3px 0px", maxHeight: "50%!important%" }} onMouseLeave={() => closeSizeSelect()} onMouseDown={() => setSizeSlect()} className="input-field" defaultValue={'北海道'} name="prefecture" id="newPrefectures">
+                    {/* <option value="" disabled={true}>Select one option</option> */}
+                    <option onClick={() => setSizeAfterSelect()} value="北海道">北海道</option>
+                    <option onClick={() => setSizeAfterSelect()} value="青森県">青森県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="岩手県">岩手県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="宮城県">宮城県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="秋田県">秋田県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="山形県">山形県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="福島県">福島県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="茨城県">茨城県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="栃木県">栃木県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="群馬県">群馬県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="埼玉県">埼玉県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="千葉県">千葉県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="東京都">東京都</option>
+                    <option onClick={() => setSizeAfterSelect()} value="神奈川県">神奈川県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="新潟県">新潟県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="富山県">富山県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="石川県">石川県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="福井県">福井県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="山梨県">山梨県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="長野県">長野県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="岐阜県">岐阜県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="静岡県">静岡県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="愛知県">愛知県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="三重県">三重県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="滋賀県">滋賀県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="京都府">京都府</option>
+                    <option onClick={() => setSizeAfterSelect()} value="大阪府">大阪府</option>
+                    <option onClick={() => setSizeAfterSelect()} value="兵庫県">兵庫県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="奈良県">奈良県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="和歌山県">和歌山県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="鳥取県">鳥取県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="島根県">島根県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="岡山県">岡山県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="広島県">広島県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="山口県">山口県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="徳島県">徳島県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="香川県">香川県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="愛媛県">愛媛県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="高知県">高知県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="福岡県">福岡県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="佐賀県">佐賀県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="長崎県">長崎県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="熊本県">熊本県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="大分県">大分県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="宮崎県">宮崎県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="鹿児島県">鹿児島県</option>
+                    <option onClick={() => setSizeAfterSelect()} value="沖縄県">沖縄県</option>
+                  </select>
                   <label id="newClientPrefecturesErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">市区町村 <span className="span-require">*必須</span>
