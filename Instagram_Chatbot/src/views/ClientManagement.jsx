@@ -82,9 +82,9 @@ function ClientManagement() {
       setDataList(res.data.data)
     }).catch(error => {
       console.log(error)
-      if (error.response.data.code === 3) {
-        requestNewToken(path)
-      }
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
     })
   }, [])
 
@@ -103,9 +103,9 @@ function ClientManagement() {
 
     }).catch(error => {
       console.log(error)
-      if (error.response.data.code === 3) {
-        requestNewToken(path)
-      }
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
     })
   }
 

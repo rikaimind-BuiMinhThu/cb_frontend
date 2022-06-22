@@ -58,15 +58,15 @@ function UserManagement() {
     var paramSearch={page: pageIndex}
     var path = window.location.pathname;
     api.get(`/api/v1/managements/users`, paramSearch).then(res => {
-      console.log(res.data.data.total)
-      var totalPage = Math.ceil(res.data.data.total/25)
+      console.log(res.data.total)
+      var totalPage = Math.ceil(res.data.total/25)
       setTotalPage(totalPage)
-      setDataList(res.data.data)
+      setDataList(res.data)
     }).catch(error => {
       console.log(error)
-      if (error.response.data.code === 3) {
-        requestNewToken(path)
-      }
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
     })
   }, [])
 

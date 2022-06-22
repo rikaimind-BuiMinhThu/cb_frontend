@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Dropdown, DropdownButton, Nav, NavLink } from "react-bootstrap";
 import NotificationAlert from "react-notification-alert";
@@ -57,7 +56,11 @@ function Chatbot() {
     })
   }, [])
 
-  function refreshMsgGroup(){
+
+
+  ///bo comment ben tren
+
+  function refreshMsgGroup() {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups`).then(res => {
       // var totalPage = Math.ceil(res.data.data.total / 25)
@@ -68,16 +71,123 @@ function Chatbot() {
         // 
       }
       var liMesBag = document.createElement('li')
-      liMesBag.setAttribute('id',liMesBag)
+      liMesBag.setAttribute('id', liMesBag)
       document.getElementById('ulMesBag').appendChild(liMesBag)
       setIdList(idli)
       // console.log(idli)
       setGroupList(res.data.data)
       setTimeout(() => {
-          var i =idli.length -1
-          document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
-        
+        var i = idli.length - 1
+        document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
+
       }, 1000)
+    }).catch(error => {
+      console.log(error)
+      if (error.response.data.code === 3) {
+        requestNewToken(path)
+      }
+    })
+  }
+
+  function getBagMsg(group, id) {//
+    var path = window.location.pathname;
+    const list = document.getElementById("div_custom");
+    while (list.hasChildNodes()) {
+      list.removeChild(list.firstChild);
+    }
+    const list2 = document.getElementById("logUserDiv");
+    while (list2.hasChildNodes()) {
+      list2.removeChild(list2.firstChild);
+    }
+    api.get(`/api/v1/message_managements/message_bags/${id}`).then(res => {
+      // var totalPage = Math.ceil(res.data.data.total / 25)
+      // setTotalPage(totalPage)
+      var bagMsg = res.data.data.messages
+      setMsgCBNum(bagMsg[bagMsg.length - 1].id)
+      setImgCBNum(bagMsg[bagMsg.length - 1].id)
+      setImgCBNum(bagMsg[bagMsg.length - 1].id)
+      bagMsg.forEach((item) => {
+        if (item.message_type == "msg") {
+          var abc = document.createElement("div")
+          document.getElementById("div_custom").appendChild(abc)
+          abc.innerHTML =
+            `<div id="chatbot_message${item.id}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
+              <div><textarea name="messageKey${item.id}" class="mgsChatbot" id="mgsCustomKey${item.id}" placeholder="Please input key..." type="text" rows="3"></textarea></div><br />
+              <div><textarea name="messagesVa${item.id}" class="mgsChatbot" id="mgsCustom${item.id}" placeholder="Please input answer message..." type="text" rows="3"></textarea></div>
+              <div id="btnDelMsg${item.id}" style="float:right; display:none">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+                font-weight:800">Delete</button>
+              </div>
+            </div>`
+          document.getElementById(`mgsCustomKey${item.id}`).textContent = item.received_message
+          document.getElementById(`mgsCustom${item.id}`).textContent = item.message_value
+
+          document.getElementById(`mgsCustom${item.id}`).addEventListener('change', (e) => msgOV(e.target.value))
+          document.getElementById(`mgsCustomKey${item.id}`).addEventListener('change', (e) => msgOVkey(e.target.value))
+          document.getElementById(`mgsCustom${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelMsg${item.id}`).style.display = 'block' })
+          document.getElementById(`btnDelMsg${item.id}`).addEventListener('click', () => deleteMsgCB(item.id))
+
+
+          var element2 = document.getElementById(`msgOVIKey${item.id}`)
+          if (typeof (element2) != 'undefined' && element2 != null) {
+            // Exists.
+            document.getElementById(`msgOVIKey${item.id}`).value = item.received_message
+          } else if (element2 === null) {
+            var abc = document.createElement(`div`)
+            document.getElementById('logUserDiv').appendChild(abc)
+            abc.innerHTML =
+              `<div id="ovMsgKey${item.id}" style="width: 70%; background-color: #51cbce; padding: 10px; float:left; margin:5px; display:block; border-radius: 10px">
+                <input type="text" id="msgOVIKey${item.id}" style="background-color: #51cbce; border: none" readonly/>
+               </div>`
+            document.getElementById(`msgOVIKey${item.id}`).value = item.received_message;
+          }
+
+          var element1 = document.getElementById(`msgOVI${item.id}`)
+          if (typeof (element1) != 'undefined' && element1 != null) {
+            // Exists.
+            document.getElementById(`msgOVI${item.id}`).value = item.message_value
+          } else if (element1 === null) {
+            var abc = document.createElement(`div`)
+            document.getElementById('logUserDiv').appendChild(abc)
+            abc.innerHTML =
+              `<div id="ovMsg${item.id}" style="width: 70%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+                <input type="text" id="msgOVI${item.id}" style="text-align: right; background-color: #51cbce; border: none" readonly/>
+               </div> `
+            document.getElementById(`msgOVI${item.id}`).value = item.message_value
+
+          }
+        } else if (item.message_type == "img") {
+          var abc = document.createElement("div")
+          document.getElementById("div_custom").appendChild(abc)
+          abc.innerHTML =
+            `<div id="chatbot_image${item.id}" style="border-radius: 20px; margin-top: 20px; display:block; background-color: rgb(244, 243, 239); padding: 40px; ">
+            <div><textarea name="imgKey${item.id}" class="mgsChatbot" id="imgCustomKey${item.id}" placeholder="Please input key..." type="text" rows="3"></textarea></div><br />
+          <input id="imgNum${item.id}" name="imageChatbot" type="file" accept="image/*" />
+          <input id="imgDataNum${item.id}" name="imgchatbot${item.id}" type=hidden /> <br /><br />
+          <div style=" text-align: center" }}>
+            <img id="output${item.id}" style=" max-height: 200px; max-width: 40%" }} />
+          </div>
+          <div id="btnDelImg${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Delete</button>
+            </div>
+        </div>`
+          document.getElementById(`imgNum${item.id}`).addEventListener('change', (e) => loadFile(e))
+          document.getElementById(`btnDelImg${item.id}`).addEventListener('click', () => deleteImgCB(item.id))
+
+        }
+
+
+        // bagMsg.forEach((item) => {
+
+        // })
+      })
+      // var bagItem = []
+      // for (var i = 0; i < bagMsg.length; i++) {
+      //   bagItem.push(res.data.data[i].id)
+      //   // 
+      // }
+      console.log(bagMsg)
     }).catch(error => {
       console.log(error)
       if (error.response.data.code === 3) {
@@ -92,7 +202,7 @@ function Chatbot() {
     api.get(`/api/v1/message_managements/message_groups/${idIn}`).then(res => {
       var bag = []
       var idMsgbag = []
-      console.log('message: ', res.data.data.message_bags)
+      console.log('message: ', res.data.data)
       for (var i = 0; i < res.data.data.message_bags.length; i++) {
         bag.push(res.data.data.message_bags[i].bag_name)
         idMsgbag.push(res.data.data.message_bags[i].id)
@@ -106,10 +216,11 @@ function Chatbot() {
         var divbig = document.createElement('div');
         // divbig.setAttribute("id", `divbig_${idIn}_id${idMsgbag[i]}`);
         var lidiv = document.createElement('div');
-      lidiv.setAttribute("id", `msg_group_div${idIn}_id${idMsgbag[i]}`);
+        lidiv.setAttribute("id", `msg_group_div${idIn}_id${idMsgbag[i]}`);
 
         const liTag = document.createElement('li');
         liTag.setAttribute("id", `msg_group${idIn}_id${idMsgbag[i]}`);
+
         liTag.innerHTML = bag[i];
         liTag.style.width = '80%'
         liTag.style.fontSize = '15px'
@@ -124,8 +235,8 @@ function Chatbot() {
         divbig.style.margin = 'auto'
         divbig.style.width = '100%'
 
-        
-        
+
+
       }
       if (document.getElementById(`liMesBag${idIn}`).outerHTML === `<li id="liMesBag${idIn}"></li>`) {
         document.getElementById(`liMesBag${idIn}`).appendChild(ulTag);
@@ -133,7 +244,7 @@ function Chatbot() {
       idMsgbag.forEach((idd) => {
         var abc = document.createElement('div')
         abc.setAttribute('id', `msgBag_item_${idIn}_${idd}`)
-
+        document.getElementById(`msg_group${idIn}_id${idd}`).addEventListener('click', () => { getBagMsg(idIn, idd) })
         document.getElementById(`msg_group_div${idIn}_id${idd}`).addEventListener('click', () => {
           document.getElementById(`msg_group${idIn}_id${idd}`).appendChild(abc)
           abc.innerHTML = `<div id="itemMsg_${idIn}_${idd}">
@@ -185,7 +296,7 @@ function Chatbot() {
     console.log('displayOption')
   }
 
-  
+
   const [isOpenAddChatbot, setIsOpenAddChatbot] = useState(false)
   const [isOpenAddMsgBag, setIsOpenAddMsgBag] = useState(false)
 
@@ -243,6 +354,17 @@ function Chatbot() {
     reader.readAsDataURL(file);
   }
 
+  function getBaseUrlImgMsg(id) {
+    var file = document.querySelector(`#imgMsgNum${id}`)['files'][0];
+    var reader = new FileReader();
+    var baseString;
+    reader.onloadend = function () {
+      baseString = reader.result;
+      document.getElementById(`imgValueMsgNum${id}`).value = baseString
+    };
+    reader.readAsDataURL(file);
+  }
+
   function loadFile(event) {
     var num = parseInt(imgCBNum) + 1
     getBaseUrl(num)
@@ -253,7 +375,6 @@ function Chatbot() {
     output.onload = function () {
       URL.revokeObjectURL(output.src) // free memory
     }
-
     var element = document.getElementById(`outputOV${num}`);
     console.log(element)
     if (typeof (element) != 'undefined' && element != null) {
@@ -274,6 +395,7 @@ function Chatbot() {
 
   function loadFileImgMsg(event) {
     var num = parseInt(imgMsgCBNum) + 1
+    getBaseUrlImgMsg(num)
     var output = document.getElementById(`outputImgMsg${num}`);
     var imgUrl = URL.createObjectURL(event.target.files[0]);
     output.src = imgUrl
@@ -372,6 +494,7 @@ function Chatbot() {
     document.getElementById("div_custom").appendChild(abc)
     abc.innerHTML =
       `<div id="chatbot_image${numIndex}" style="border-radius: 20px; margin-top: 20px; display:block; background-color: rgb(244, 243, 239); padding: 40px; ">
+      <div><textarea name="imgKey${numIndex}" class="mgsChatbot" id="imgCustomKey${numIndex}" placeholder="Please input key..." type="text" rows="3"></textarea></div><br />
     <input id="imgNum${numIndex}" name="imageChatbot" type="file" accept="image/*" />
     <input id="imgDataNum${numIndex}" name="imgchatbot${numIndex}" type=hidden /> <br /><br />
     <div style=" text-align: center" }}>
@@ -395,7 +518,7 @@ function Chatbot() {
     abc.innerHTML =
       `<div id="chatbot_message${numIndex}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
     <div><textarea name="messageKey${numIndex}" class="mgsChatbot" id="mgsCustomKey${numIndex}" placeholder="Please input key..." type="text" rows="3"></textarea></div><br />
-    <div><textarea name="messages${numIndex}" class="mgsChatbot" id="mgsCustom${numIndex}" placeholder="Please input answer message..." type="text" rows="3"></textarea></div>
+    <div><textarea name="messagesVa${numIndex}" class="mgsChatbot" id="mgsCustom${numIndex}" placeholder="Please input answer message..." type="text" rows="3"></textarea></div>
     <div id="btnDelMsg${numIndex}" style="float:right; display:none">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
         font-weight:800">Delete</button>
@@ -414,12 +537,14 @@ function Chatbot() {
     document.getElementById("div_custom").appendChild(abc)
     abc.innerHTML =
       `<div id="chatbot_image_msg${numIndex}" style="border-radius: 20px; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
+      <div><textarea name="imgMsgKey${numIndex}" class="mgsChatbot" id="imgMgsCustomKey${numIndex}" placeholder="Please input key..." type="text" rows="3"></textarea></div><br />
     <input id="imgMsgNum${numIndex}" type="file" accept="image/*" /> <br /><br />
+    <input id="imgValueMsgNum${numIndex}" name="imgValueMsgChatbot${numIndex}" type=hidden /> <br /><br />
     <div style=" text-align: center" }}>
       <img id="outputImgMsg${numIndex}" style=" max-height: 200px; max-width: 40%" }} />
     </div>
     <div style="text-align: center">
-    <textarea name="message" class="mgsChatbot" id="imgMgsCustom${numIndex}" placeholder="Please input message..." type="text" rows="3"></textarea>
+    <textarea class="mgsChatbot" id="imgMgsCustom${numIndex}" name="imgMsgValueChatbot${numIndex}" placeholder="Please input message..." type="text" rows="3"></textarea>
     </div>
     <div id="btnDelImgMsg${numIndex}" style="float:right; display:none">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
@@ -506,22 +631,60 @@ function Chatbot() {
     var obj = {};
     var key = []
     var value = []
+    var img_value = []
+    var type = []
     for (var i = 0; i < elements.length - 1; i++) {
       var item = elements.item(i);
       // obj[item.name] = item.value;
-      if (item.name.includes(`messageKey`)) {
-        // key.push({[item.name]: item.value})
-        key.push(item.value)
-        // obj.key =[]
-      } else {
-        if (item.value !== '') {
-          // value.push({[item.name]: item.value})
-          value.push(item.value)
+      if (item.name.includes(`Key`)) {
+        if (item.name.includes(`messageKey`)) {
+          // key.push({[item.name]: item.value})
+          key.push(item.value)
+          type.push('msg')
+          // obj.key =[]
+        } else if (item.name.includes(`imgKey`)) {
+          // key.push({[item.name]: item.value})
+          key.push(item.value)
+          type.push('img')
+          // obj.key =[]
+        } else if (item.name.includes(`imgMsgKey`)) {
+          key.push(item.value)
+          type.push('img_msg')
         }
       }
+
+      // else if(item.name.includes(`imgchatbot`)){
+      //   value.push(item.value)
+
+      // }
+      else {
+        if (item.name.includes(`messagesVa`)) {
+          // value.push({[item.name]: item.value})
+          value.push(item.value)
+          img_value.push('')
+        } else if (item.name.includes(`imgchatbot`)) {
+          // key.push({[item.name]: item.value})
+          // key.push('imgchatbot')
+          img_value.push(item.value)
+          value.push('')
+          // obj.key =[]
+        } else if (item.name.includes(`imgValueMsgChatbot`)) {
+          img_value.push(item.value)
+        } else if (item.name.includes(`imgMsgValueChatbot`)) {
+          value.push(item.value)
+        }
+
+      }
     }
+    console.log(obj)
     key.forEach((ele, index) => {
-      obj[ele] = { "message_bag_id": "1", message_key: key[index], message_value: value[index] }
+      // var type
+      // if(key[index].includes('imgchatbot')){
+      //   type = 'img'
+      // }else {
+      //   type = 'msg'
+      // }
+      obj[ele] = { "message_bag_id": "1", message_type: type[index], received_message: key[index], message_value: value[index], img_value: img_value[index] }
     })
     var script = { messages: Object.values(obj) }
 
@@ -542,7 +705,7 @@ function Chatbot() {
       }
     })
 
-
+    // bo comment doan tren
 
   }
   var itemGroup = groupList
@@ -551,14 +714,14 @@ function Chatbot() {
   function addChatBot() {
     var path = window.location.pathname;
     var newCB = document.getElementById("new_chatbot").value
-    if(utils.checkFieldAdd(newCB, "Chatbot") == true){
-      var newCBAdd = { message_group : { group_name : newCB}}
+    if (utils.checkFieldAdd(newCB, "Chatbot") == true) {
+      var newCBAdd = { message_group: { group_name: newCB } }
       api.post(`/api/v1/message_managements/message_groups`, newCBAdd).then(res => {
         refreshMsgGroup()
         setIsOpenAddChatbot(false)
         setMsgNoti("Add new chatbot successfully")
         setIsOpenNoti(true)
-        setTimeout(() =>{
+        setTimeout(() => {
           setIsOpenNoti(false)
         }, 2500)
       }).catch(error => {
@@ -569,7 +732,7 @@ function Chatbot() {
         }
       })
     }
-    
+
   }
 
   function addMsgBagPop(id) {
@@ -577,16 +740,16 @@ function Chatbot() {
     setIdMsgGr(id)
   }
 
-  function addMagBag(){
+  function addMagBag() {
     var path = window.location.pathname;
     var newBag = document.getElementById("new_bag").value
-    if(utils.checkFieldAdd(newBag, "MsgBag") == true){
-      var newBagAdd = {message_bag: {message_group_id: idMsgGr, bag_name: newBag}}
+    if (utils.checkFieldAdd(newBag, "MsgBag") == true) {
+      var newBagAdd = { message_bag: { message_group_id: idMsgGr, bag_name: newBag } }
       api.post(`/api/v1/message_managements/message_bags`, newBagAdd).then(res => {
         setIsOpenAddMsgBag(false)
         setMsgNoti("Add new bag successfully")
         setIsOpenNoti(true)
-        setTimeout(() =>{
+        setTimeout(() => {
           setIsOpenNoti(false)
           window.location.reload()
         }, 1500)
@@ -621,10 +784,10 @@ function Chatbot() {
                                 <ul style={{ listStyleType: "none", width: "100%" }}>
                                   {itemGroup.map((data, key) => {
                                     return (
-                                      <li style={{ marginLeft: "-30px", display:"flex" }} key={key}>
-                                        <Nav id="nav_option" style={{width:"90%"}}>
+                                      <li style={{ marginLeft: "-30px", display: "flex" }} key={key}>
+                                        <Nav id="nav_option" style={{ width: "90%" }}>
                                           <i className="nc-icon nc-bell-55" style={{ color: "black" }} />
-                                          <p id="a_tag" style={{fontSize:"15px"}} onClick={() => getMessage(data.id)}>&nbsp;&nbsp;{data.group_name}</p>
+                                          <p id="a_tag" style={{ fontSize: "15px" }} onClick={() => getMessage(data.id)}>&nbsp;&nbsp;{data.group_name}</p>
                                           <ul id="ulMesBag" style={{ listStyleType: "none", width: "100%" }}>
                                             <li id="liMesBag">
                                               {/* <Nav id="itemBag" >
@@ -650,8 +813,8 @@ function Chatbot() {
                                             <br />
                                           </ul>
                                         </Nav>
-                                        <Button style={{height: '30px', width:"10%", padding: '0', margin:"0px 10px 0px 0px", backgroundColor:"#838383"}}
-                                        onClick={() => addMsgBagPop(data.id)}><i className="nc-icon nc-simple-add" style={{ color: "black" }} /></Button>
+                                        <Button style={{ height: '30px', width: "10%", padding: '0', margin: "0px 10px 0px 0px", backgroundColor: "#838383" }}
+                                          onClick={() => addMsgBagPop(data.id)}><i className="nc-icon nc-simple-add" style={{ color: "black" }} /></Button>
                                       </li>
                                     )
                                   })}
