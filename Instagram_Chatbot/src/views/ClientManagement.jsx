@@ -76,7 +76,7 @@ function ClientManagement() {
     var paramSearch = { page: pageIndex }
     var path = window.location.pathname;
     api.get(`/api/v1/managements/clients`, paramSearch).then(res => {
-      // console.log(res.data.data)
+      console.log(res.data.data)
       var totalPage = Math.ceil(res.data.data.total / 25)
       setTotalPage(totalPage)
       setDataList(res.data.data)
@@ -87,6 +87,7 @@ function ClientManagement() {
       // }
     })
   }, [])
+
 
   function reloadListClient(pgIndex) {
     var path = window.location.pathname;
@@ -114,14 +115,14 @@ function ClientManagement() {
     var path = window.location.pathname;
     api.get(`/api/v1/managements/clients/${item.id}`).then(res => {
       var data = res.data.data
-      console.log(data)
+      // console.log(data)
       setUpdateId(data.id)
       setDetailUpdateTitle("詳細")
       setContract(data.status)
       setPlan(data.plan)
       setPrice(data.price)
-      setInputStartDate(data.subscription_start_at.slice(0, 10))
-      setInputEndDate(data.subscription_end_at.slice(0, 10))
+      setInputStartDate(data.subscription_start_at) //.slice(0, 10)
+      setInputEndDate(data.subscription_end_at) //.slice(0, 10)
       setIsInstagram(data.is_instagram)
       setIsLine(data.is_line)
       setIsTiktok(data.is_tiktok)
@@ -138,7 +139,7 @@ function ClientManagement() {
       setUrlLogo(`https://ecchatbot-dev.ddns.net/${data.logo_url.url}`)
       setUrl(data.url)
       setZipCode(data.zip_code)
-      console.log('prefecture: ' ,data.prefecture)
+      // console.log('prefecture: ' ,data.prefecture)
       // if (data.prefecture === null) {
       //   setPrefecture('')
       // } else { setPrefecture(data.prefecture) }
@@ -151,7 +152,7 @@ function ClientManagement() {
       setEmail(data.email)
       setPhone(data.phone_number)
       setIsOpen(true)
-      console.log(data.status)
+      // console.log(data.status)
       if (data.status === 'active') {
         document.getElementById("in_contract").checked = true
       } else if (data.status === 'pause') {
@@ -173,14 +174,14 @@ function ClientManagement() {
     var path = window.location.pathname;
     api.get(`/api/v1/managements/clients/${item.id}`).then(res => {
       var data = res.data.data
-      console.log(data)
+      // console.log(data)
       setUpdateId(data.id)
       setDetailUpdateTitle("クライアント更新")
       setContract(data.status)
       setPlan(data.plan)
       setPrice(data.price)
-      setInputStartDate(data.subscription_start_at.slice(0, 10))
-      setInputEndDate(data.subscription_end_at.slice(0, 10))
+      setInputStartDate(data.subscription_start_at) //.slice(0, 10)
+      setInputEndDate(data.subscription_end_at)// .slice(0, 10)
       setIsInstagram(data.is_instagram)
       setIsLine(data.is_line)
       setIsTiktok(data.is_tiktok)
@@ -209,7 +210,7 @@ function ClientManagement() {
       setEmail(data.email)
       setPhone(data.phone_number)
       setIsOpen(true)
-      console.log(data.status)
+      // console.log(data.status)
       if (data.status === 'active') {
         document.getElementById("in_contract").checked = true
       } else if (data.status === 'pause') {
@@ -544,7 +545,6 @@ function ClientManagement() {
   var [page, setPage] = useState(1)
   function handleChangePage(ef) {
     setPage(parseInt(ef))
-    console.log(ef)
     setPageIndex(ef)
     reloadListClient(ef)
   }
@@ -595,8 +595,10 @@ function ClientManagement() {
                           <td>{item.name}</td>
                           <td>{item.plan}</td>
                           <td>{item.price}</td>
-                          <td>{item.subscription_start_at.slice(0, 10)}</td>
-                          <td>{item.subscription_end_at.slice(0, 10)}</td>
+                          <td id="dateStart">{(item.subscription_start_at === null || item.subscription_start_at ==="") ? "" : item.subscription_start_at.slice(0, 10)}</td>
+                          {/* .slice(0, 10) */}
+                          <td id="dateEnd">{(item.subscription_end_at === null || item.subscription_end_at ==="") ? "" : item.subscription_end_at.slice(0, 10)}</td>
+                          {/* .slice(0, 10) */}
                           <td>{item.address}</td>
                           <td>{item.last_sign_in_at}</td>
                           <td className="actionList">

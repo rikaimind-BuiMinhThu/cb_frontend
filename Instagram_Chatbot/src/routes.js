@@ -23,6 +23,7 @@ import ClientManagement from "views/ClientManagement";
 import Policy from "views/Policy"
 import UserPage from "views/User.jsx";
 import UpgradeToPro from "views/Upgrade.jsx";
+import Release from "views/Release";
 import UserManagement from "views/UserManagement";
 import Pricing from "views/Pricing";
 // import Cookies from 'js-cookie'
@@ -61,6 +62,13 @@ var routes = [
     name: "Chatbot",
     icon: "nc-icon nc-bell-55",
     component: Chatbot,
+    layout: "/admin",
+  },
+  {
+    path: "/release",
+    name: "Release",
+    icon: "nc-icon nc-air-baloon",
+    component: Release,
     layout: "/admin",
   },
   {
