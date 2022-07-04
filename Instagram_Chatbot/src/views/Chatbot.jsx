@@ -28,6 +28,7 @@ function Chatbot() {
   const [msgNoti, setMsgNoti] = useState()
   const [idList, setIdList] = useState([])
   const [idMsgGr, setIdMsgGr] = useState()
+  const [bagId, setBagId] = useState()
 
   React.useEffect(() => {
     // var paramSearch = { page: pageIndex }
@@ -89,6 +90,8 @@ function Chatbot() {
     })
   }
 
+
+
   function getBagMsg(group, id) {//
     var path = window.location.pathname;
     const list = document.getElementById("div_custom");
@@ -112,8 +115,8 @@ function Chatbot() {
           document.getElementById("div_custom").appendChild(abc)
           abc.innerHTML =
             `<div id="chatbot_message${item.id}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
-              <div><textarea name="messageKey${item.id}" class="mgsChatbot" id="mgsCustomKey${item.id}" placeholder="Please input key..." type="text" rows="3"></textarea></div><br />
-              <div><textarea name="messagesVa${item.id}" class="mgsChatbot" id="mgsCustom${item.id}" placeholder="Please input answer message..." type="text" rows="3"></textarea></div>
+              <div><textarea name="messageKey${item.id}" class="mgsChatbot" id="mgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
+              <div><textarea name="messagesVa${item.id}" class="mgsChatbot" id="mgsCustom${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
               <div id="btnDelMsg${item.id}" style="float:right; display:none">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
                 font-weight:800">Delete</button>
@@ -161,19 +164,153 @@ function Chatbot() {
           document.getElementById("div_custom").appendChild(abc)
           abc.innerHTML =
             `<div id="chatbot_image${item.id}" style="border-radius: 20px; margin-top: 20px; display:block; background-color: rgb(244, 243, 239); padding: 40px; ">
-            <div><textarea name="imgKey${item.id}" class="mgsChatbot" id="imgCustomKey${item.id}" placeholder="Please input key..." type="text" rows="3"></textarea></div><br />
+            <div><textarea name="imgKey${item.id}" class="mgsChatbot" id="imgCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
           <input id="imgNum${item.id}" name="imageChatbot" type="file" accept="image/*" />
           <input id="imgDataNum${item.id}" name="imgchatbot${item.id}" type=hidden /> <br /><br />
-          <div style=" text-align: center" }}>
-            <img id="output${item.id}" style=" max-height: 200px; max-width: 40%" }} />
+          <div style=" text-align: center">
+            <img id="output${item.id}" style=" max-height: 200px; max-width: 40%"  />
           </div>
           <div id="btnDelImg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
               font-weight:800">Delete</button>
             </div>
         </div>`
+          document.getElementById(`imgCustomKey${item.id}`).value = item.received_message
+          document.getElementById(`output${item.id}`).src = `https://ecchatbot-dev.ddns.net/${item.img_value.url}`
+
+          // console.log('value ne: ',document.getElementById(`output${item.id}`))
+          // document.getElementById(`imgNum${item.id}`).value = item.img_value.src
+
+          // getBaseUrlDis(item.id, item.img_value.url)
+
+          
+
+          // const toDataURL = url => fetch(url)
+          //   .then(response => response.blob())
+          //   .then(blob => new Promise((resolve, reject) => {
+          //     const reader = new FileReader()
+          //     reader.onloadend = () => resolve(reader.result)
+          //     reader.onerror = reject
+          //     reader.readAsDataURL(blob)
+          //   }))
+
+
+          // toDataURL(`https://ecchatbot-dev.ddns.net/${item.img_value.url}`)
+          //   .then(dataUrl => {
+          //     console.log('RESULT:', dataUrl)
+          //   })
+
+          var src = document.getElementById(`output${item.id}`).src
+
+          const getEmergencyFoundImg = urlImg => {
+            var img = new Image();
+            img.src = urlImg;
+            img.crossOrigin = 'Anonymous';
+          
+            var canvas = document.createElement('canvas'),
+              ctx = canvas.getContext('2d');
+          
+            canvas.height = img.naturalHeight;
+            canvas.width = img.naturalWidth;
+            ctx.drawImage(img, 0, 0);
+          
+            var b64 = canvas.toDataURL('image/png').replace(/^data:image.+;base64,/, '');
+            return b64;
+          };
+          // document.getElementById(`output${item.id}`).setAttribute('crossOrigin', 'anonymous')
+
+          console.log(getEmergencyFoundImg(src))
+          
+          // document.getElementById(`output${item.id}`).setAttribute('crossOrigin', 'anonymous')
+//           var c = document.createElement('canvas');
+//           var img = document.getElementById(`output${item.id}`);
+//           c.height = img.naturalHeight;
+//           c.width = img.naturalWidth;
+//           var ctx = c.getContext('2d');
+
+//           ctx.drawImage(img, 0, 0, c.width, c.height);
+//           var base64String = c.toDataURL('image/jpeg');
+// console.log('base: ',base64String)
+
+
+          // function toDataURL(src, callback){
+          //   var image = new Image();
+         
+          //   image.onload = function(){
+          //     var canvas = document.createElement('canvas');
+          //     var context = canvas.getContext('2d');
+          //     canvas.height = this.naturalHeight;
+          //     canvas.width = this.naturalWidth;
+          //     context.drawImage(this, 0, 0);
+          //     var dataURL = canvas.toDataURL('image/jpeg');
+          //     callback(dataURL);
+          //   };
+          //   image.src = src;
+          // }
+          //     toDataURL(`https://ecchatbot-dev.ddns.net/${item.img_value.url}`, function(dataURL){
+          //       alert(dataURL);      
+          //   })
+
+          // function toDataURL(url, callback) {
+          //   var httpRequest = new XMLHttpRequest();
+            
+          //   httpRequest.onload = function () {
+          //     var fileReader = new FileReader();
+          //     fileReader.onloadend = function () {
+          //       callback(fileReader.result);
+          //     }
+          //     fileReader.readAsDataURL(httpRequest.response);
+          //   };
+          //   httpRequest.open('GET', url);
+          //   httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencode');
+          //   httpRequest.setRequestHeader( 'Access-Control-Allow-Origin', '*');
+          //   httpRequest.responseType = 'blob';
+          //   httpRequest.send();
+          // }
+          // toDataURL(`https://ecchatbot-dev.ddns.net/${item.img_value.url}`, function (dataUrl) {
+          //   console.log('Result in string:', dataUrl)
+          // })
+
+
+
+
+
+          // console.log(encrypt(item.img_value.url))
+
+          // console.log(document.getElementById(`imgDataNum${item.id}`).value)
+          // document.getElementById(`imgDataNum${item.id}`).value = encrypt(item.img_value.url)
           document.getElementById(`imgNum${item.id}`).addEventListener('change', (e) => loadFile(e))
           document.getElementById(`btnDelImg${item.id}`).addEventListener('click', () => deleteImgCB(item.id))
+
+        }else if(item.message_type == "img_msg"){
+          var abc = document.createElement("div")
+          document.getElementById("div_custom").appendChild(abc)
+          abc.innerHTML =
+            `<div id="chatbot_image_msg${item.id}" style="border-radius: 20px; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
+            <div><textarea name="imgMsgKey${item.id}" class="mgsChatbot" id="imgMgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
+          <input id="imgMsgNum${item.id}" type="file" accept="image/*" /> <br /><br />
+          <input id="imgValueMsgNum${item.id}" name="imgValueMsgChatbot${item.id}" type=hidden /> <br /><br />
+          <div style=" text-align: center" }}>
+            <img id="outputImgMsg${item.id}" style=" max-height: 200px; max-width: 40%" }} />
+          </div>
+          <div style="text-align: center">
+          <textarea class="mgsChatbot" id="imgMgsCustom${item.id}" name="imgMsgValueChatbot${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea>
+          </div>
+          <div id="btnDelImgMsg${item.id}" style="float:right; display:none">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Delete</button>
+            </div>
+        </div>`
+        document.getElementById(`imgMgsCustomKey${item.id}`).value = item.received_message
+        document.getElementById(`imgMgsCustom${item.id}`).value = item.message_value
+        document.getElementById(`outputImgMsg${item.id}`).src = `https://ecchatbot-dev.ddns.net/${item.img_value.url}`
+
+    
+          document.getElementById(`imgMsgNum${item.id}`).addEventListener('change', (e) => loadFileImgMsg(e))
+          document.getElementById(`imgMgsCustom${item.id}`).addEventListener('change', (e) => imgMsgOV(e.target.value))
+          document.getElementById(`imgMsgNum${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${item.id}`).style.display = 'block' })
+          document.getElementById(`imgMgsCustom${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${item.id}`).style.display = 'block' })
+          document.getElementById(`btnDelImgMsg${item.id}`).addEventListener('click', () => deleteImgMsgCB(item.id))
 
         }
 
@@ -190,9 +327,9 @@ function Chatbot() {
       console.log(bagMsg)
     }).catch(error => {
       console.log(error)
-      if (error.response.data.code === 3) {
-        requestNewToken(path)
-      }
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
     })
   }
 
@@ -244,6 +381,7 @@ function Chatbot() {
       idMsgbag.forEach((idd) => {
         var abc = document.createElement('div')
         abc.setAttribute('id', `msgBag_item_${idIn}_${idd}`)
+        setBagId(idd)
         document.getElementById(`msg_group${idIn}_id${idd}`).addEventListener('click', () => { getBagMsg(idIn, idd) })
         document.getElementById(`msg_group_div${idIn}_id${idd}`).addEventListener('click', () => {
           document.getElementById(`msg_group${idIn}_id${idd}`).appendChild(abc)
@@ -354,6 +492,18 @@ function Chatbot() {
     reader.readAsDataURL(file);
   }
 
+  function getBaseUrlDis(id, value) {
+    // var file = document.querySelector(`#imgNum${id}`)['files'][0];
+    var reader = new FileReader();
+    var baseString;
+    reader.onloadend = function () {
+      baseString = reader.result;
+      document.getElementById(`imgDataNum${id}`).value = baseString
+    };
+    reader.readAsDataURL(value);
+  }
+
+
   function getBaseUrlImgMsg(id) {
     var file = document.querySelector(`#imgMsgNum${id}`)['files'][0];
     var reader = new FileReader();
@@ -442,6 +592,30 @@ function Chatbot() {
     }
   }
 
+  function imgOVkey(msg) {
+    console.log(msg)
+    var num = parseInt(msgCBNum) + 1
+
+    var element = document.getElementById(`imgOVIKey${num}`)
+    console.log(element)
+    if (typeof (element) != 'undefined' && element != null) {
+      // Exists.
+      document.getElementById(`imgOVIKey${num}`).value = msg
+    } else if (element === null) {
+      var abc = document.createElement(`div`)
+      document.getElementById('logUserDiv').appendChild(abc)
+      abc.innerHTML =
+        `
+        <div id="ovImgKey${num}" style="width: 70%; background-color: #51cbce; padding: 10px; float:left; margin:5px; display:block; border-radius: 10px">
+      <input type="text" id="imgOVIKey${num}" style="background-color: #51cbce; border: none" readonly/>
+      </div>`
+      document.getElementById(`imgOVIKey${num}`).value = msg;
+      document.getElementById(`imgCustomKey${num}`).value = msg;
+    }
+    // setMsgCBNum(num)
+  }
+
+
   function msgOV(msg) {
     console.log(msg)
     var num = parseInt(msgCBNum) + 1
@@ -484,9 +658,31 @@ function Chatbot() {
       document.getElementById(`msgOVIKey${num}`).value = msg;
       document.getElementById(`mgsCustomKey${num}`).value = msg;
     }
-    setMsgCBNum(num)
+    // setMsgCBNum(num)
   }
 
+  function imgMsgOVkey(msg) {
+    console.log(msg)
+    var num = parseInt(msgCBNum) + 1
+
+    var element = document.getElementById(`imgMsgOVIKey${num}`)
+    console.log(element)
+    if (typeof (element) != 'undefined' && element != null) {
+      // Exists.
+      document.getElementById(`imgMsgOVIKey${num}`).value = msg
+    } else if (element === null) {
+      var abc = document.createElement(`div`)
+      document.getElementById('logUserDiv').appendChild(abc)
+      abc.innerHTML =
+        `
+        <div id="ovImgMsgKey${num}" style="width: 70%; background-color: #51cbce; padding: 10px; float:left; margin:5px; display:block; border-radius: 10px">
+      <input type="text" id="imgMsgOVIKey${num}" style="background-color: #51cbce; border: none" readonly/>
+      </div>`
+      document.getElementById(`imgMsgOVIKey${num}`).value = msg;
+      document.getElementById(`imgMgsCustomKey${num}`).value = msg;
+    }
+    // setMsgCBNum(num)
+  }
 
   function addImgChatbot() {
     var numIndex = parseInt(imgCBNum) + 1
@@ -494,7 +690,7 @@ function Chatbot() {
     document.getElementById("div_custom").appendChild(abc)
     abc.innerHTML =
       `<div id="chatbot_image${numIndex}" style="border-radius: 20px; margin-top: 20px; display:block; background-color: rgb(244, 243, 239); padding: 40px; ">
-      <div><textarea name="imgKey${numIndex}" class="mgsChatbot" id="imgCustomKey${numIndex}" placeholder="Please input key..." type="text" rows="3"></textarea></div><br />
+      <div><textarea name="imgKey${numIndex}" class="mgsChatbot" id="imgCustomKey${numIndex}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
     <input id="imgNum${numIndex}" name="imageChatbot" type="file" accept="image/*" />
     <input id="imgDataNum${numIndex}" name="imgchatbot${numIndex}" type=hidden /> <br /><br />
     <div style=" text-align: center" }}>
@@ -509,6 +705,7 @@ function Chatbot() {
     document.getElementById(`imgNum${numIndex}`).addEventListener('change', (e) => loadFile(e))
     // document.getElementById(`imgNum${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelImg${numIndex}`).style.display = 'block' })
     document.getElementById(`btnDelImg${numIndex}`).addEventListener('click', () => deleteImgCB(numIndex))
+    document.getElementById(`imgCustomKey${numIndex}`).addEventListener('change', (e) => imgOVkey(e.target.value))
   }
 
   function addMsgChatbot() {
@@ -517,8 +714,8 @@ function Chatbot() {
     document.getElementById("div_custom").appendChild(abc)
     abc.innerHTML =
       `<div id="chatbot_message${numIndex}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
-    <div><textarea name="messageKey${numIndex}" class="mgsChatbot" id="mgsCustomKey${numIndex}" placeholder="Please input key..." type="text" rows="3"></textarea></div><br />
-    <div><textarea name="messagesVa${numIndex}" class="mgsChatbot" id="mgsCustom${numIndex}" placeholder="Please input answer message..." type="text" rows="3"></textarea></div>
+    <div><textarea name="messageKey${numIndex}" class="mgsChatbot" id="mgsCustomKey${numIndex}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
+    <div><textarea name="messagesVa${numIndex}" class="mgsChatbot" id="mgsCustom${numIndex}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
     <div id="btnDelMsg${numIndex}" style="float:right; display:none">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
         font-weight:800">Delete</button>
@@ -537,14 +734,14 @@ function Chatbot() {
     document.getElementById("div_custom").appendChild(abc)
     abc.innerHTML =
       `<div id="chatbot_image_msg${numIndex}" style="border-radius: 20px; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
-      <div><textarea name="imgMsgKey${numIndex}" class="mgsChatbot" id="imgMgsCustomKey${numIndex}" placeholder="Please input key..." type="text" rows="3"></textarea></div><br />
+      <div><textarea name="imgMsgKey${numIndex}" class="mgsChatbot" id="imgMgsCustomKey${numIndex}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
     <input id="imgMsgNum${numIndex}" type="file" accept="image/*" /> <br /><br />
     <input id="imgValueMsgNum${numIndex}" name="imgValueMsgChatbot${numIndex}" type=hidden /> <br /><br />
     <div style=" text-align: center" }}>
       <img id="outputImgMsg${numIndex}" style=" max-height: 200px; max-width: 40%" }} />
     </div>
     <div style="text-align: center">
-    <textarea class="mgsChatbot" id="imgMgsCustom${numIndex}" name="imgMsgValueChatbot${numIndex}" placeholder="Please input message..." type="text" rows="3"></textarea>
+    <textarea class="mgsChatbot" id="imgMgsCustom${numIndex}" name="imgMsgValueChatbot${numIndex}" placeholder="返事入力..." type="text" rows="3"></textarea>
     </div>
     <div id="btnDelImgMsg${numIndex}" style="float:right; display:none">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
@@ -558,6 +755,8 @@ function Chatbot() {
     document.getElementById(`imgMsgNum${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${numIndex}`).style.display = 'block' })
     document.getElementById(`imgMgsCustom${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${numIndex}`).style.display = 'block' })
     document.getElementById(`btnDelImgMsg${numIndex}`).addEventListener('click', () => deleteImgMsgCB(numIndex))
+    document.getElementById(`imgMgsCustomKey${numIndex}`).addEventListener('change', (e) => imgMsgOVkey(e.target.value))
+
   }
 
   function deleteImgCB(idDelete) {
@@ -684,7 +883,7 @@ function Chatbot() {
       // }else {
       //   type = 'msg'
       // }
-      obj[ele] = { "message_bag_id": "1", message_type: type[index], received_message: key[index], message_value: value[index], img_value: img_value[index] }
+      obj[ele] = { "message_bag_id": bagId, message_type: type[index], received_message: key[index], message_value: value[index], img_value: img_value[index] }
     })
     var script = { messages: Object.values(obj) }
 
@@ -719,7 +918,7 @@ function Chatbot() {
       api.post(`/api/v1/message_managements/message_groups`, newCBAdd).then(res => {
         refreshMsgGroup()
         setIsOpenAddChatbot(false)
-        setMsgNoti("Add new chatbot successfully")
+        setMsgNoti("メッセージグループを追加しました。")
         setIsOpenNoti(true)
         setTimeout(() => {
           setIsOpenNoti(false)
@@ -747,7 +946,8 @@ function Chatbot() {
       var newBagAdd = { message_bag: { message_group_id: idMsgGr, bag_name: newBag } }
       api.post(`/api/v1/message_managements/message_bags`, newBagAdd).then(res => {
         setIsOpenAddMsgBag(false)
-        setMsgNoti("Add new bag successfully")
+        console.log(res)
+        setMsgNoti("メッセージ袋を追加しました。")
         setIsOpenNoti(true)
         setTimeout(() => {
           setIsOpenNoti(false)
@@ -777,9 +977,9 @@ function Chatbot() {
                       <CardBody style={{ width: "100%" }}>
                         <div style={{ display: "flex", width: "200%" }}>
                           <div style={{ width: "30%" }}>
-                            <h5 id="jjjj">Chatbot-management</h5>
-                            <div>
-                              <Button style={{ fontSize: "10px", marginTop: "-5%" }} onClick={() => setIsOpenAddChatbot(true)}>Add Chatbot</Button><br />
+                            <h5 id="jjjj">メッセージグループ</h5>
+                            <div> 
+                              <Button style={{ fontSize: "10px", marginTop: "-5%" }} onClick={() => setIsOpenAddChatbot(true)}>グループ追加</Button><br />
                               <Nav className="sidebar-wrapper">
                                 <ul style={{ listStyleType: "none", width: "100%" }}>
                                   {itemGroup.map((data, key) => {
@@ -823,36 +1023,37 @@ function Chatbot() {
                             </div>
                           </div>
                           <div style={{ width: "55%" }} id="abczyz">
-                            <h5>Design Chatbot</h5>
+                            <h5>メッセージ内容</h5>
                             {/* <div> */}
-                            <h6>Option</h6>
+                            <h6>メッセージタイプ</h6>
                             <div style={{ display: "flex" }}>
                               <button style={{ width: "100px", height: "80px", backgroundColor: "#f4f3ef", borderRadius: "20px", textAlign: "center", marginLeft: "10px" }}
                                 onClick={() => addImgChatbot()}>
                                 <i className="nc-icon nc-image" style={{ color: "black", fontSize: "20px", fontWeight: "100", paddingTop: "5px", paddingBottom: "10px" }} /><br />
-                                Image
+                                画像
                               </button>
                               <button style={{ width: "100px", height: "80px", backgroundColor: "#f4f3ef", borderRadius: "20px", textAlign: "center", marginLeft: "10px" }}
                                 onClick={() => addMsgChatbot()}>
                                 <i className="nc-icon nc-chat-33" style={{ color: "black", fontSize: "20px", fontWeight: "100", paddingTop: "5px", paddingBottom: "10px" }} /><br />
-                                Message
+                                テキスト
                               </button>
                               <button style={{ width: "100px", height: "80px", backgroundColor: "#f4f3ef", borderRadius: "20px", textAlign: "center", marginLeft: "10px" }}
                                 onClick={() => addImgMsgChatbot()}>
                                 <i className="nc-icon nc-single-copy-04" style={{ color: "black", fontSize: "20px", fontWeight: "100", paddingTop: "5px", paddingBottom: "10px" }} /><br />
-                                Image Message
+                                画像＋テキスト
                               </button>
                               <button style={{ width: "100px", height: "80px", backgroundColor: "#f4f3ef", borderRadius: "20px", textAlign: "center", marginLeft: "10px" }}>
                                 <i className="nc-icon nc-box" style={{ color: "black", fontSize: "20px", fontWeight: "100", paddingTop: "5px", paddingBottom: "10px" }} /><br />
-                                Past posts
+                                過去の投稿
                               </button>
                               <button style={{ width: "100px", height: "80px", backgroundColor: "#f4f3ef", borderRadius: "20px", textAlign: "center", marginLeft: "10px" }}>
                                 <i className="nc-icon nc-layout-11" style={{ color: "black", fontSize: "20px", fontWeight: "100", paddingTop: "5px", paddingBottom: "10px" }} /><br />
-                                Profile message
+                                プロファイルメッセージ
                               </button>
                             </div>
                             <div id="custom" style={{ paddingTop: "50px" }}>
-                              <h6>Custom</h6>
+                              <h6>メッセージ内容
+                              </h6>
                               {/* <ChatbotImage /> */}
                               <form id="scriptForm" style={{ height: "100%" }}>
                                 <div id="div_custom">
@@ -870,12 +1071,12 @@ function Chatbot() {
 
                                 </div>
                               </form>
-                              <Button style={{ float: "right" }} id="btnAddScript" onClick={addScript}> Add script</Button>
+                              <Button style={{ float: "right" }} id="btnAddScript" onClick={addScript}> 保存</Button>
                             </div>
                             {/* </div> */}
                           </div>
                           <div style={{ width: "25%" }}>
-                            <h5>Overview</h5>
+                            <h5>サンプル</h5>
 
                             <div id="logUserDiv" style={{ overflowY: "auto", height: "70%", maxHeight: "600px", maxWidth: "300px", minHeight: "300px", width: "90%", border: "2px solid black", display: 'block', borderRadius: "3%", marginLeft: "15%", padding: "5%", textAlign: "right" }}>
                               {/* {usersDiv} */}
@@ -895,22 +1096,22 @@ function Chatbot() {
         </Row>
         <ModalShort open={isOpenAddChatbot} onClose={() => setIsOpenAddChatbot(false)}>
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
-            <h4>Enter chatbot name</h4>
+            <h4>グループ名入力</h4>
             <label style={{ width: "100%" }}>
               <input id="new_chatbot" style={{ width: "100%" }} onBlur={(e) => utils.checkFieldAdd(e.target.value, "Chatbot")} name="chatbot_name"></input>
               <label id="newChatbotErrMsg" style={{ display: 'none', color: "red" }}></label>
             </label><br />
-            <Button onClick={() => addChatBot()}>Add Chatbot Group</Button>
+            <Button onClick={() => addChatBot()}>グループ追加</Button>
           </div>
         </ModalShort>
         <ModalShort open={isOpenAddMsgBag} onClose={() => setIsOpenAddMsgBag(false)}>
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
-            <h4>Enter message bag name</h4>
+            <h4>メッセージ袋名入力</h4>
             <label style={{ width: "100%" }}>
               <input id="new_bag" style={{ width: "100%" }} onBlur={(e) => utils.checkFieldAdd(e.target.value, "MsgBag")} name="chatbot_name"></input>
               <label id="newMsgBagErrMsg" style={{ display: 'none', color: "red" }}></label>
             </label><br />
-            <Button onClick={() => addMagBag()}>Add Message Bag</Button>
+            <Button onClick={() => addMagBag()}>メッセージ袋追加</Button>
           </div>
         </ModalShort>
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
