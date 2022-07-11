@@ -458,7 +458,7 @@ function Keyword() {
                                                             cdiv.is_story_comment, cdiv.is_post_comment, cdiv.is_live_comment, cdiv.is_active, cdiv.id, i)} onColor="#64c1ff" checked={cdiv.is_active = null ? false : cdiv.is_active} />
                                                         <input name={`l-title-keyword-${i}`} defaultValue={cdiv.title} id={`l-title-keyword-${i}`} className="new-faq-q-so" placeholder="Keyword group..." type="text" style={{ width: "20%" }} />
 
-                                                        <input name={`l-answer-${i}`} defaultValue={(cdiv.keyword === null || cdiv.keyword === "") ? "" : cdiv.keyword.replaceAll("|", ", ")} className="new-faq-q-so" type="text" id={`l-answer-${i}`} placeholder="Keyword split by comma or space(key1, key2,...)" style={{ width: "53%" }} />
+                                                        <input name={`l-answer-${i}`} defaultValue={cdiv.keyword.replaceAll("|", ", ")} className="new-faq-q-so" type="text" id={`l-answer-${i}`} placeholder="Keyword split by comma or space(key1, key2,...)" style={{ width: "53%" }} />
                                                         <select id={`listGroup${i}`} style={{ width: "25%" }} defaultValue={""} onChange={(e) => selectedGroup(e.target.value, i)} className="new-faq-q-so" name="l-group">
                                                             <option value="" disabled hidden>メッセージグループ選択 ...</option>
                                                             {listGroup?.map((group, i) => {
