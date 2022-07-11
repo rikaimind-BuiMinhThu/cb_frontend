@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import api from '../api/api-management'
 import requestNewToken from "api/request-new-token";
 import "../assets/css/release.css"
+import Cookies from "js-cookie";
 // reactstrap components
 import {
   Button,
@@ -21,6 +22,7 @@ import { element } from "prop-types";
 import Switch from "react-switch";
 import LoginFacebook from "components/Admin/LoginFacebook";
 import ModalNoti from "./Popup/ModalNoti";
+import axios from "axios";
 
 function Release() {
 
@@ -48,11 +50,12 @@ function Release() {
   const [fixMnText, setFixMnText] = useState()
   const [isOpenNoti, setIsOpenNoti] = useState(false)
   const [msgNoti, setMsgNoti] = useState()
+  const [listKeyword, setListKeyword] = useState([])
 
   React.useEffect(() => {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups`).then(res => {
-      console.log(res.data.data)
+      // console.log(res.data.data)
       setListGroup(res.data.data)
     }).catch(error => {
       console.log(error)
@@ -63,10 +66,112 @@ function Release() {
   }, [])
 
   React.useEffect(() => {
+    // var path = window.location.pathname;
+    var access_token = Cookies.get('page_access_token')
+    if (access_token == "" || access_token == undefined || access_token == null) {
+      api.get(`/api/v1/instagram_settings`).then(res => {
+        // console.log(res.data.data[0].page_access_token)
+        Cookies.set('page_access_token', res.data.data[0].page_access_token);
+        Cookies.set('ig_id', res.data.data[0].ig_id);
+      }).catch(error => {
+        console.log(error)
+      })
+    }
+
+  }, [])
+
+  const [idInstaSetting, setIdInstaSetting] = useState()
+  React.useEffect(() => {
+    api.get(`/api/v1/instagram_settings`).then(res => {
+      setIdInstaSetting(res.data.data[0].id)
+    }).catch(error => {
+      console.log(error)
+    })
+  }, [])
+
+  const [story_actived, setStory_actived] = useState()
+  const [live_actived, setLive_actived] = useState()
+  const [cm_actived, setCm_actived] = useState()
+  React.useEffect(() => {
     var path = window.location.pathname;
-    api.get(`/api/v1/message_managements/ice_breakers_status`).then(res => {
+
+    api.get(`/api/v1/message_managements/keyword_settings`).then(res => {
+      // console.log("keyword_settings: ", res.data.data)
+      setListKeyword(res.data.data)
+      var listkey = res.data.data
+      var story = []
+      var live = []
+      var cm = []
+      for (var i = 0; i < listkey.length; i++) {
+        if (listkey[i].is_story_comment == true) {
+          story.push(listkey[i].id)
+        }
+      }
+      setStory_actived(story)
+      for (var i = 0; i < listkey.length; i++) {
+        if (listkey[i].is_live_comment == true) {
+          live.push(listkey[i].id)
+        }
+      }
+      setLive_actived(live)
+      for (var i = 0; i < listkey.length; i++) {
+        if (listkey[i].is_post_comment == true) {
+          cm.push(listkey[i].id)
+        }
+      }
+      setCm_actived(cm)
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //     requestNewToken(path)
+      // }
+    })
+  }, [])
+
+
+  function reloadKeyWord() {
+    var path = window.location.pathname;
+
+    api.get(`/api/v1/message_managements/keyword_settings`).then(res => {
+      // console.log("keyword_settings: ", res.data.data)
+      setListKeyword(res.data.data)
+      var listkey = res.data.data
+      var story = []
+      var live = []
+      var cm = []
+      for (var i = 0; i < listkey.length; i++) {
+        if (listkey[i].is_story_comment == true) {
+          story.push(listkey[i].id)
+        }
+      }
+      setStory_actived(story)
+      for (var i = 0; i < listkey.length; i++) {
+        if (listkey[i].is_live_comment == true) {
+          live.push(listkey[i].id)
+        }
+      }
+      setLive_actived(live)
+      for (var i = 0; i < listkey.length; i++) {
+        if (listkey[i].is_post_comment == true) {
+          cm.push(listkey[i].id)
+        }
+      }
+      setCm_actived(cm)
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //     requestNewToken(path)
+      // }
+    })
+  }
+
+
+  React.useEffect(() => {
+    var path = window.location.pathname;
+    api.get(`/api/v1/message_managements/ice_breakers_status?ig_id=${Cookies.get("ig_id")}`).then(res => {
+      // console.log("ice_breakers_status res: ", res)
       var ice_breakers_status = res.data.instagram_ice_breakers.data
-      console.log(`ice_breakers_status: `, ice_breakers_status)
+      // console.log(`ice_breakers_status: `, ice_breakers_status)
       if (ice_breakers_status.length > 0) {
         trueConfigFAQ()
       } else {
@@ -80,7 +185,7 @@ function Release() {
 
   React.useEffect(() => {
     var path = window.location.pathname;
-    api.get(`/api/v1/message_managements/persistent_menus_status`).then(res => {
+    api.get(`/api/v1/message_managements/persistent_menus_status?ig_id=${Cookies.get("ig_id")}`).then(res => {
       var instagram_persistent_menus = res.data.instagram_persistent_menus.data
       if (instagram_persistent_menus.length > 0) {
         trueConfigFixedMenu()
@@ -92,9 +197,17 @@ function Release() {
     })
   }, [])
 
-  function reloadFAQStatus() {
+  function reloadFAQStatus(id_ig_get_status) {
     var path = window.location.pathname;
-    api.get(`/api/v1/message_managements/ice_breakers_status`).then(res => {
+    var id_change_status
+    if (ig_id_status == undefined) {
+      id_change_status = id_ig_get_status
+    } else {
+      id_change_status = ig_id_status
+    }
+    var faq_request = { ig_id: id_change_status }
+    // console.log(`get ig_id to load ice_breakers status: ${id_change_status}`)
+    api.get(`/api/v1/message_managements/ice_breakers_status?ig_id=${ig_id_status}`).then(res => {
       var ice_breakers_status = res.data.instagram_ice_breakers.data
       if (ice_breakers_status.length > 0) {
         trueConfigFAQ()
@@ -106,9 +219,17 @@ function Release() {
     })
   }
 
-  function reloadFixedMessageStatus() {
+  function reloadFixedMessageStatus(id_ig_get_status) {
     var path = window.location.pathname;
-    api.get(`/api/v1/message_managements/persistent_menus_status`).then(res => {
+    var id_change_status
+    if (ig_id_status == undefined) {
+      id_change_status = id_ig_get_status
+    } else {
+      id_change_status = ig_id_status
+    }
+    var FM_request = { ig_id: id_change_status }
+    // console.log(`get ig_id to load persistent_menus status: ${id_change_status}`)
+    api.get(`/api/v1/message_managements/persistent_menus_status?ig_id=${ig_id_status}`).then(res => {
       var instagram_persistent_menus = res.data.instagram_persistent_menus.data
       if (instagram_persistent_menus.length > 0) {
         trueConfigFixedMenu()
@@ -118,63 +239,73 @@ function Release() {
     }).catch(error => {
       console.log(error)
     })
+  }
+
+  function reloadFixedMessageStatusEmp() {
+    alert("enable roi ne")
+    trueConfigFixedMenu()
+
   }
 
   React.useEffect(() => {
     var path = window.location.pathname;
     api.get(`/api/v1/instagram_settings/1`).then(res => {
-      console.log('insta setting ', res.data.data)
+      // console.log('insta setting ', res.data.data)
       setInstaSetting(res.data.data)
       setInstaSettingId(res.data.data.id)
       setStoryOnOff(res.data.data.story_comment_bag_status)
-      if (res.data.data.story_comment_bag_status == false) {
+      if (res.data.data.story_comment_bag_status == "off") {
         falseConfigStory()
       } else {
         trueConfigStory()
       }
       setLiveOnOff(res.data.data.live_comment_bag_status)
-      if (res.data.data.live_comment_bag_status == false) {
+      if (res.data.data.live_comment_bag_status == "off") {
         falseConfigLive()
       } else {
         trueConfigLive()
       }
       setCmPostOnOff(res.data.data.post_comment_bag_status)
-      if (res.data.data.post_comment_bag_status == false) {
+      if (res.data.data.post_comment_bag_status == "off") {
         falseConfigCmPost()
       } else {
         trueConfigCmPost()
       }
       setDmOnOff(res.data.data.dm_bag_status)
-      if (res.data.data.dm_bag_status == false) {
-        falseConfigDM()
-      } else {
-        trueConfigDM()
-      }
+      // if (res.data.data.dm_bag_status == false) {
+      //   falseConfigDM()
+      // } else {
+      //   trueConfigDM()
+      // }
       api.get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`).then(res => {
+        // console.log("story_comment_bag_id: ", res.data)
         setStoryCommentBagName(res.data.data.message_bag.bag_name)
 
       }).catch(error => {
         console.log(error)
       })
       api.get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`).then(res => {
+        // console.log("post_comment_bag_id: ", res.data)
         setPostCommentBagName(res.data.data.message_bag.bag_name)
 
       }).catch(error => {
         console.log(error)
       })
       api.get(`/api/v1/message_managements/message_bags/${res.data.data.live_comment_bag_id}`).then(res => {
+        // console.log("live_comment_bag_id: ", res.data)
         setLiveCommentBagName(res.data.data.message_bag.bag_name)
 
       }).catch(error => {
         console.log(error)
       })
-      api.get(`/api/v1/message_managements/message_bags/${res.data.data.dm_bag_id}`).then(res => {
-        // setLiveCommentBagName(res.data.data.message_bag.bag_name)
-        setDmCommentBagName(res.data.data.message_bag.bag_name)
+      // api.get(`/api/v1/message_managements/message_bags/${res.data.data.dm_bag_id}`).then(res => {
+      //   // setLiveCommentBagName(res.data.data.message_bag.bag_name)
+      //   console.log("dm_bag_id: ", res.data)
+      //   // setDmCommentBagName(res.data.data.message_bag.bag_name)
 
-      }).catch(error => {
-        console.log(error)
-      })
+      // }).catch(error => {
+      //   console.log(error)
+      // })
     }).catch(error => {
       console.log(error)
       // if (error.response.data.code === 3) {
@@ -354,33 +485,33 @@ function Release() {
   function reloadUpdate() {
     var path = window.location.pathname;
     api.get(`/api/v1/instagram_settings/1`).then(res => {
-      console.log('insta setting ', res.data.data)
+      // console.log('insta setting ', res.data.data)
       setInstaSetting(res.data.data)
       setInstaSettingId(res.data.data.id)
       setStoryOnOff(res.data.data.story_comment_bag_status)
-      if (res.data.data.story_comment_bag_status == false) {
+      if (res.data.data.story_comment_bag_status == "off") {
         falseConfigStory()
       } else {
         trueConfigStory()
       }
       setLiveOnOff(res.data.data.live_comment_bag_status)
-      if (res.data.data.live_comment_bag_status == false) {
+      if (res.data.data.live_comment_bag_status == "off") {
         falseConfigLive()
       } else {
         trueConfigLive()
       }
       setCmPostOnOff(res.data.data.post_comment_bag_status)
-      if (res.data.data.post_comment_bag_status == false) {
+      if (res.data.data.post_comment_bag_status == "off") {
         falseConfigCmPost()
       } else {
         trueConfigCmPost()
       }
       setDmOnOff(res.data.data.dm_bag_status)
-      if (res.data.data.dm_bag_status == false) {
-        falseConfigDM()
-      } else {
-        trueConfigDM()
-      }
+      // if (res.data.data.dm_bag_status == false) {
+      //   falseConfigDM()
+      // } else {
+      //   trueConfigDM()
+      // }
       api.get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`).then(res => {
         setStoryCommentBagName(res.data.data.message_bag.bag_name)
 
@@ -393,12 +524,7 @@ function Release() {
       }).catch(error => {
         console.log(error)
       })
-      api.get(`/api/v1/message_managements/message_bags/${res.data.data.live_comment_bag_id}`).then(res => {
-        setLiveCommentBagName(res.data.data.message_bag.bag_name)
 
-      }).catch(error => {
-        console.log(error)
-      })
     }).catch(error => {
       console.log(error)
       // if (error.response.data.code === 3) {
@@ -410,7 +536,7 @@ function Release() {
   React.useEffect(() => {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/ice_breakers`).then(res => {
-      console.log('ice_breakers: ', res.data.data)
+      // console.log('ice_breakers: ', res.data.data)
       setListFAQ(res.data.data)
       // console.log("faq data: ", res.data.data.length)
       // var faqLength = res.data.data.length
@@ -438,7 +564,7 @@ function Release() {
   React.useEffect(() => {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/persistent_menus`).then(res => {
-      console.log('persistent_menus: ', res.data.data)
+      // console.log('persistent_menus: ', res.data.data)
 
       setListFixedMenu(res.data.data)
     }).catch(error => {
@@ -471,7 +597,7 @@ function Release() {
   function reloadFAQ() {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/ice_breakers`).then(res => {
-      console.log('ice_breakers: ', res.data.data)
+      // console.log('ice_breakers: ', res.data.data)
       setListFAQ(res.data.data)
       var faqLength = res.data.data.length
       if (faqLength >= 4) {
@@ -490,7 +616,7 @@ function Release() {
   function reloadFixedMenu() {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/persistent_menus`).then(res => {
-      console.log('persistent_menus: ', res.data.data)
+      // console.log('persistent_menus: ', res.data.data)
       setListFixedMenu(res.data.data)
       loadListFixed()
     }).catch(error => {
@@ -526,7 +652,7 @@ function Release() {
   function selectedGroup(value, key) {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups/${value}`).then(res => {
-      console.log(res.data.data.message_bags)
+      // console.log(res.data.data.message_bags)
       // setListBag(res.data.data.message_bags)
       var group = document.getElementById(`listGroup${key}`)
       removeOptions(group)
@@ -586,7 +712,7 @@ function Release() {
   function selectedGroupStory(value, key) {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups/${value}`).then(res => {
-      console.log(res.data.data.message_bags)
+      // console.log(res.data.data.message_bags)
       // setListBag(res.data.data.message_bags)
       var group = document.getElementById(`listGroupStory${1}`)
       for (var i = 0; i < res.data.data.message_bags.length; i++) {
@@ -597,7 +723,7 @@ function Release() {
 
       }
       const myOpts = document.getElementById(`listGroup${key}`).options
-      console.log('myOpts: ', myOpts)
+      // console.log('myOpts: ', myOpts)
       for (var i = 0; i < myOpts.length; i++) {
         if (i > 0) {
           if (myOpts[i].value == myOpts[i - 1].value) {
@@ -618,7 +744,7 @@ function Release() {
   function selectedGroupStoryRe(value, key) {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups/${value}`).then(res => {
-      console.log(res.data.data.message_bags)
+      // console.log(res.data.data.message_bags)
       // setListBag(res.data.data.message_bags)
       var group = document.getElementById(`listReplyBag`)
       removeOptions(group)
@@ -650,7 +776,7 @@ function Release() {
   function selectedLiveGroup(value, key) {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups/${value}`).then(res => {
-      console.log(res.data.data.message_bags)
+      // console.log(res.data.data.message_bags)
       // setListBag(res.data.data.message_bags)
       var group = document.getElementById(`listLiveBag`)
       removeOptions(group)
@@ -683,7 +809,7 @@ function Release() {
   function selectedCommentGroup(value, key) {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups/${value}`).then(res => {
-      console.log(res.data.data.message_bags)
+      // console.log(res.data.data.message_bags)
       // setListBag(res.data.data.message_bags)
       var group = document.getElementById(`listCommentBag`)
       removeOptions(group)
@@ -716,7 +842,7 @@ function Release() {
   function selectedDMGroup(value, key) {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups/${value}`).then(res => {
-      console.log(res.data.data.message_bags)
+      // console.log(res.data.data.message_bags)
       // setListBag(res.data.data.message_bags)
       var group = document.getElementById(`listDMBag`)
       removeOptions(group)
@@ -750,7 +876,7 @@ function Release() {
   function selectedGroupFM(value, key) {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups/${value}`).then(res => {
-      console.log(res.data.data.message_bags)
+      // console.log(res.data.data.message_bags)
       // setListBag(res.data.data.message_bags)
       var group = document.getElementById(`listGroupStory${3}`)
       for (var i = 0; i < res.data.data.message_bags.length; i++) {
@@ -761,7 +887,7 @@ function Release() {
 
       }
       const myOpts = document.getElementById(`listGroup${key}`).options
-      console.log('myOpts: ', myOpts)
+      // console.log('myOpts: ', myOpts)
       for (var i = 0; i < myOpts.length; i++) {
         if (i > 0) {
           if (myOpts[i].value == myOpts[i - 1].value) {
@@ -787,39 +913,39 @@ function Release() {
   function selectedReply(value) {
     // document.getElementById('listReplyBag').options[0].value = ""
     // document.getElementById('listReplyBag').options[0].text = "Select a message bag..."
-    // if (value === "dm-comment") {
-    //   document.getElementById('listkeyword').style.display = 'none'
-    //   document.getElementById('listReplyBag').style.display = 'block'
-    //   document.getElementById('listReplyGroup').style.display = 'block'
-    // } else {
-    //   document.getElementById('listkeyword').style.display = 'block'
-    //   document.getElementById('listReplyBag').style.display = 'none'
-    //   document.getElementById('listReplyGroup').style.display = 'none'
-    // }
+    if (value === "direct_message") {
+      document.getElementById('listkeyword').style.display = 'none'
+      document.getElementById('listReplyBag').style.display = 'block'
+      document.getElementById('listReplyGroup').style.display = 'block'
+    } else {
+      document.getElementById('listkeyword').style.display = 'block'
+      document.getElementById('listReplyBag').style.display = 'none'
+      document.getElementById('listReplyGroup').style.display = 'none'
+    }
   }
 
   function selectedLive(value) {
-    // if (value === "dm-comment") {
-    //   document.getElementById('listkeywordLive').style.display = 'none'
-    //   document.getElementById('listLiveGroup').style.display = 'block'
-    //   document.getElementById('listLiveBag').style.display = 'block'
-    // } else {
-    //   document.getElementById('listkeywordLive').style.display = 'block'
-    //   document.getElementById('listLiveGroup').style.display = 'none'
-    //   document.getElementById('listLiveBag').style.display = 'none'
-    // }
+    if (value === "direct_message") {
+      document.getElementById('listkeywordLive').style.display = 'none'
+      document.getElementById('listLiveGroup').style.display = 'block'
+      document.getElementById('listLiveBag').style.display = 'block'
+    } else {
+      document.getElementById('listkeywordLive').style.display = 'block'
+      document.getElementById('listLiveGroup').style.display = 'none'
+      document.getElementById('listLiveBag').style.display = 'none'
+    }
   }
 
   function selectedComment(value) {
-    // if (value === "dm-comment") {
-    //   document.getElementById('listkeywordComment').style.display = 'none'
-    //   document.getElementById('listCommentGroup').style.display = 'block'
-    //   document.getElementById('listCommentBag').style.display = 'block'
-    // } else {
-    //   document.getElementById('listkeywordComment').style.display = 'block'
-    //   document.getElementById('listCommentGroup').style.display = 'none'
-    //   document.getElementById('listCommentBag').style.display = 'none'
-    // }
+    if (value === "direct_message") {
+      document.getElementById('listkeywordCM').style.display = 'none'
+      document.getElementById('listCommentGroup').style.display = 'block'
+      document.getElementById('listCommentBag').style.display = 'block'
+    } else {
+      document.getElementById('listkeywordCM').style.display = 'block'
+      document.getElementById('listCommentGroup').style.display = 'none'
+      document.getElementById('listCommentBag').style.display = 'none'
+    }
   }
 
   function selectDM(value) {
@@ -836,7 +962,7 @@ function Release() {
 
   function checkDup(key) {
     const myOpts = document.getElementById(`listGroup${key}`).options
-    console.log('myOpts: ', myOpts)
+    // console.log('myOpts: ', myOpts)
     for (var i = 0; i < myOpts.length; i++) {
       if (i > 0) {
         if (myOpts[i].value == myOpts[i - 1].value) {
@@ -863,9 +989,71 @@ function Release() {
   function selectedBagFM(value) {
     console.log(value)
   }
-  function selectedKeyWord(value) {
+  const [story_kw_setting, setStory_kw_setting] = useState()
+  const [new_story_kw_id, setNew_story_kw_id] = useState()
+  function selectedKeyWordStory(value) {
+    setNew_story_kw_id(value)
+    api.get(`/api/v1/message_managements/keyword_settings/${value}`).then(res => {
+      // console.log("selectedKeyWord: ",res.data.data)
+      var setting = res.data.data
+      var update = {
+        keyword_setting: {
+          title: setting.title, keyword: setting.keyword, instagram_account_id: setting.instagram_account_id, message_bag_id: setting.message_bag_id,
+          is_dm: setting.is_dm, is_story_comment: true, is_post_comment: setting.is_post_comment, is_live_comment: setting.is_live_comment, is_active: true
+        }
+      }
+      console.log("setStory_kw_setting: ", update)
+      setStory_kw_setting(update)
+    }).catch(error => {
+      console.log(error)
+    })
+  }
+  function selectedBagLive(value) {
     console.log(value)
   }
+
+  const [live_kw_setting, setLive_kw_setting] = useState()
+  const [new_live_kw_id, setNew_live_kw_id] = useState()
+  function selectedKeyWordLive(value) {
+    setNew_live_kw_id(value)
+    api.get(`/api/v1/message_managements/keyword_settings/${value}`).then(res => {
+      // console.log("selectedKeyWord: ",res.data.data)
+      var setting = res.data.data
+      var update = {
+        keyword_setting: {
+          title: setting.title, keyword: setting.keyword, instagram_account_id: setting.instagram_account_id, message_bag_id: setting.message_bag_id,
+          is_dm: setting.is_dm, is_story_comment: setting.is_story_comment, is_post_comment: setting.is_post_comment, is_live_comment: true, is_active: true
+        }
+      }
+      setLive_kw_setting(update)
+    }).catch(error => {
+      console.log(error)
+    })
+  }
+
+
+
+  const [cm_kw_setting, setCM_kw_setting] = useState()
+  const [new_cm_kw_id, setNew_cm_kw_id] = useState()
+  function selectedKeyWordCM(value) {
+    setNew_cm_kw_id(value)
+    api.get(`/api/v1/message_managements/keyword_settings/${value}`).then(res => {
+      // console.log("selectedKeyWord: ",res.data.data)
+      var setting = res.data.data
+      var update = {
+        keyword_setting: {
+          title: setting.title, keyword: setting.keyword, instagram_account_id: setting.instagram_account_id, message_bag_id: setting.message_bag_id,
+          is_dm: setting.is_dm, is_story_comment: setting.is_story_comment, is_post_comment: true, is_live_comment: setting.is_live_comment, is_active: true
+        }
+      }
+      setCM_kw_setting(update)
+    }).catch(error => {
+      console.log(error)
+    })
+  }
+
+
+
   function selectedBagLive(value) {
     console.log(value)
   }
@@ -897,14 +1085,17 @@ function Release() {
   function changeStoryOnOff() {
     setChecked(!checked)
     var a
+    var onOff
     if (checked == true) {
       a = "ストーリー設定をオフにしました。"
+      onOff = "off"
     } else {
       a = "ストーリー設定をオンにしました。"
+      onOff = document.getElementById("replyStory").value
     }
     var updateStatus =
-      { instagram_setting: { dm_bag_status: dmOnOff, post_comment_bag_status: cmPostOnOff, story_comment_bag_status: !checked, live_comment_bag_status: liveOnOff } }
-    console.log("updateStatus: ", updateStatus)
+      { instagram_setting: { post_comment_bag_status: cmPostOnOff, story_comment_bag_status: onOff, live_comment_bag_status: liveOnOff } }
+    // console.log("updateStatus: ", updateStatus)
     var path = window.location.pathname;
     api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, updateStatus).then(res => {
       reloadUpdate()
@@ -925,14 +1116,17 @@ function Release() {
   function changeLiveOnOff() {
     setCheckedLive(!checkedLive)
     var a
+    var onOff
     if (checkedLive == true) {
       a = "ライブ設定をオフにしました。"
+      onOff = "off"
     } else {
       a = "ライブ設定をオンにしました。"
+      onOff = document.getElementById("replyLive").value
     }
     var updateStatus =
-      { instagram_setting: { dm_bag_status: dmOnOff, post_comment_bag_status: cmPostOnOff, story_comment_bag_status: storyOnOff, live_comment_bag_status: !checkedLive } }
-    console.log("updateStatus: ", updateStatus)
+      { instagram_setting: { post_comment_bag_status: cmPostOnOff, story_comment_bag_status: storyOnOff, live_comment_bag_status: onOff } }
+    // console.log("updateStatus: ", updateStatus)
     var path = window.location.pathname;
     api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, updateStatus).then(res => {
       reloadUpdate()
@@ -944,9 +1138,6 @@ function Release() {
       }, 2000)
     }).catch(error => {
       console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
     })
 
   }
@@ -954,14 +1145,17 @@ function Release() {
   function changeCMPostOnOff() {
     setCheckedCMPost(!checkedCMPost)
     var a
+    var onOff
     if (checkedCMPost == true) {
       a = "投稿コメント設定をオフにしました。"
+      onOff = "off"
     } else {
       a = "投稿コメント設定をオンにしました。"
+      onOff = document.getElementById("replyCMPost").value
     }
     var updateStatus =
-      { instagram_setting: { dm_bag_status: dmOnOff, post_comment_bag_status: !checkedCMPost, story_comment_bag_status: storyOnOff, live_comment_bag_status: liveOnOff } }
-    console.log("updateStatus: ", updateStatus)
+      { instagram_setting: { post_comment_bag_status: onOff, story_comment_bag_status: storyOnOff, live_comment_bag_status: liveOnOff } }
+    // console.log("updateStatus: ", updateStatus)
     var path = window.location.pathname;
     api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, updateStatus).then(res => {
       reloadUpdate()
@@ -989,7 +1183,7 @@ function Release() {
     }
     var updateStatus =
       { instagram_setting: { dm_bag_status: !checkedDM, post_comment_bag_status: cmPostOnOff, story_comment_bag_status: storyOnOff, live_comment_bag_status: liveOnOff } }
-    console.log("updateStatus: ", updateStatus)
+    // console.log("updateStatus: ", updateStatus)
     var path = window.location.pathname;
     api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, updateStatus).then(res => {
       reloadUpdate()
@@ -1007,9 +1201,13 @@ function Release() {
     })
   }
   function changeFAQOnOff() {
+
+    var ig_id_change_status = { ig_id: ig_id_status }
+    // console.log(`ig_id to set on off ice_breakers`)
+    // console.log(ig_id_change_status)
     setCheckedFAQ(!checkedFAQ)
     if (!checkedFAQ == true) {
-      api.get(`/api/v1/message_managements/ice_breakers_turn_on`).then(res => {
+      api.get(`/api/v1/message_managements/ice_breakers_turn_on?ig_id=${Cookies.get("ig_id")}`).then(res => {
         setMsgNoti("FAQ設定をオンにしました。")
         setIsOpenNoti(true)
         setTimeout(() => {
@@ -1021,7 +1219,7 @@ function Release() {
         console.log(error)
       })
     } else {
-      api.get(`/api/v1/message_managements/ice_breakers_turn_off`).then(res => {
+      api.get(`/api/v1/message_managements/ice_breakers_turn_off?ig_id=${Cookies.get("ig_id")}`).then(res => {
         setMsgNoti("FAQ設定をオフにしました。")
         setIsOpenNoti(true)
         setTimeout(() => {
@@ -1036,28 +1234,46 @@ function Release() {
   }
 
   function changeFixedMenuOnOff() {
+    var ig_id_change_status = { ig_id: ig_id_status }
+    // console.log(`ig_id to set on off persistent_menus`)
+    // console.log(ig_id_change_status)
     setCheckedFixedMenu(!checkedFixedMenu)
     if (!checkedFixedMenu == true) {
-      api.get(`/api/v1/message_managements/persistent_menus_turn_on`).then(res => {
-        reloadFixedMessageStatus()
-        setMsgNoti(`固定メッセージ設定をオンにしました。`)
-        setIsOpenNoti(true)
-        setTimeout(() => {
-          setMsgNoti("")
-          setIsOpenNoti(false)
-        }, 2000)
+      api.get(`/api/v1/message_managements/persistent_menus_turn_on?ig_id=${ig_id_status}`).then(res => {
+        // console.log(res.data.data)
+        if (res.data.code == 2) {
+          setCheckedFixedMenu(checkedFixedMenu)
+          reloadFixedMessageStatusEmp()
+        } else {
+          reloadFixedMessageStatus()
+          setMsgNoti(`固定メッセージ設定をオンにしました。`)
+          setIsOpenNoti(true)
+          setTimeout(() => {
+            setMsgNoti("")
+            setIsOpenNoti(false)
+          }, 2000)
+        }
+
       }).catch(error => {
         console.log(error)
       })
     } else {
-      api.get(`/api/v1/message_managements/persistent_menus_turn_off`).then(res => {
-        reloadFixedMessageStatus()
-        setMsgNoti(`固定メッセージ設定をオフにしました。`)
-        setIsOpenNoti(true)
-        setTimeout(() => {
-          setMsgNoti("")
-          setIsOpenNoti(false)
-        }, 2000)
+      api.get(`/api/v1/message_managements/persistent_menus_turn_off?ig_id=${ig_id_status}`).then(res => {
+        console.log(res)
+        if (res.data.code == 2) {
+          setCheckedFixedMenu(checkedFixedMenu)
+
+          reloadFixedMessageStatusEmp()
+        } else {
+          reloadFixedMessageStatus()
+          setMsgNoti(`固定メッセージ設定をオフにしました。`)
+          setIsOpenNoti(true)
+          setTimeout(() => {
+            setMsgNoti("")
+            setIsOpenNoti(false)
+          }, 2000)
+        }
+
       }).catch(error => {
         console.log(error)
       })
@@ -1080,10 +1296,10 @@ function Release() {
     } else {
       let cDivs = customDiv;
       cDivs.push(`newDiv${numFAQ}`)
-      console.log(cDivs)
+      // console.log(cDivs)
       setCustomDiv(cDivs)
       setNumFAQ(numFAQ + 1)
-      console.log(customDiv)
+      // console.log(customDiv)
       // newFAQ()
       document.getElementById('actionFAQ').style.display = "block"
       // if (document.getElementById('actionFAQ').style.display == "none") {
@@ -1095,7 +1311,7 @@ function Release() {
 
   function addnewFixedMenu() {
 
-    console.log(listFixedMenu.length)
+    // console.log(listFixedMenu.length)
     if (listFixedMenu.length >= 4) {
       setMsgNoti(`固定メッセージが４つ以下です。`)
       setIsOpenNoti(true)
@@ -1107,10 +1323,10 @@ function Release() {
       let cDivs = customDivFixed;
 
       cDivs.push(`newDivFixed${numFixedMenu}`)
-      console.log(cDivs)
+      // console.log(cDivs)
       setCustomDivFixed(cDivs)
       setNumFixedMenu(numFixedMenu + 1)
-      console.log(customDivFixed)
+      // console.log(customDivFixed)
       // newFAQ()
       document.getElementById('actionFixed').style.display = "block"
       // if (document.getElementById('actionFAQ').style.display == "none") {
@@ -1124,7 +1340,7 @@ function Release() {
   function cancelFAQ() {
     document.getElementById("actionFAQ").style.display = "none"
     const list = document.getElementById("faq_add");
-    console.log(list)
+    // console.log(list)
     while (list.hasChildNodes()) {
       list.removeChild(list.firstChild);
     }
@@ -1133,7 +1349,7 @@ function Release() {
   function cancelFixed() {
     document.getElementById("actionFixed").style.display = "none"
     const list = document.getElementById("fixed_add");
-    console.log(list)
+    // console.log(list)
     while (list.hasChildNodes()) {
       list.removeChild(list.firstChild);
     }
@@ -1172,7 +1388,7 @@ function Release() {
   function deleteFixedInList(value) {
     // alert(value)
     api.delete(`/api/v1/message_managements/persistent_menus/${value}`).then(res => {
-      console.log(res)
+      // console.log(res)
       reloadFixedMenu()
       api.get(`/api/v1/message_managements/persistent_menus_turn_on`).then(res => {
         reloadFixedMessageStatus()
@@ -1212,7 +1428,7 @@ function Release() {
     var anw = []
     for (var i = 0; i < elements.length; i++) {
       var item = elements.item(i);
-      console.log(item)
+      // console.log(item)
       if (item.name.includes("faq_key")) {
         faq.push(item.value)
       } else if (item.name.includes("group_id")) {
@@ -1233,11 +1449,11 @@ function Release() {
     var script = { ice_breaker: { question: faq[0], answer: anw[0] } }
 
     var newScript = JSON.stringify(script)
-    console.log(script)
+    // console.log(script)
 
 
     api.patch(`/api/v1/message_managements/ice_breakers/${value}`, script).then(res => {
-      console.log(res)
+      // console.log(res)
       document.getElementById(`ene-faq-${value}`).style.display = "block"
       document.getElementById(`sav-faq-${value}`).style.display = "none"
       document.getElementById(`faq-q-${value}`).readOnly = true;
@@ -1275,7 +1491,7 @@ function Release() {
     var urll = []
     for (var i = 0; i < elements.length; i++) {
       var item = elements.item(i);
-      console.log(item)
+      // console.log(item)
       if (item.name.includes("title-fixed-menu")) {
         faq.push(item.value)
       } else if (item.name.includes("fixed-option")) {
@@ -1316,7 +1532,7 @@ function Release() {
       setFixMnText("")
       document.getElementById("validateFixedMenu").style.display = "none"
       api.patch(`/api/v1/message_managements/persistent_menus/${value}`, script).then(res => {
-        console.log(res)
+        // console.log(res)
         document.getElementById(`title-fixed-menu-${value}`).readOnly = true;
         document.getElementById(`fixed-mnl-type${value}`).readOnly = true;
         document.getElementById(`anw-mnl-type${value}`).readOnly = true;
@@ -1344,7 +1560,7 @@ function Release() {
     var anw = []
     for (var i = 0; i < elements.length; i++) {
       var item = elements.item(i);
-      console.log(item)
+      // console.log(item)
       if (item.name.includes("faq_key")) {
         faq.push(item.value)
       } else if (item.name.includes("group_id")) {
@@ -1385,13 +1601,13 @@ function Release() {
     var script = { ice_breaker: { question: faq[0], answer: anw[0] } }
 
     var newScript = JSON.stringify(script)
-    console.log(script)
+    // console.log(script)
 
     api.post(`/api/v1/message_managements/ice_breakers`, script).then(res => {
-      console.log(res)
+      // console.log(res)
       cancelFAQ()
       reloadFAQ()
-      api.get(`/api/v1/message_managements/ice_breakers_turn_on`).then(res => {
+      api.get(`/api/v1/message_managements/ice_breakers_turn_on?ig_id=${ig_id_status}`).then(res => {
         reloadFAQStatus()
       }).catch(error => {
         console.log(error)
@@ -1424,7 +1640,7 @@ function Release() {
     var urll = []
     for (var i = 0; i < elements.length; i++) {
       var item = elements.item(i);
-      console.log(item)
+      // console.log(item)
       if (item.name.includes("title-fixed-menu")) {
         faq.push(item.value)
       } else if (item.name.includes("fixed-option")) {
@@ -1479,7 +1695,7 @@ function Release() {
       setFixMnText("")
       document.getElementById("validateFixedMenu").style.display = "none"
       api.post(`/api/v1/message_managements/persistent_menus`, script).then(res => {
-        console.log(res)
+        // console.log(res)
         api.get(`/api/v1/message_managements/persistent_menus_turn_on`).then(res => {
           reloadFixedMessageStatus()
         }).catch(error => {
@@ -1520,10 +1736,14 @@ function Release() {
 
 
   var [logedIn, setLogedIn] = useState()
-  const checkLogin = (isLogedIn) => {
+  const [ig_id_status, setIgId] = useState()
+  const checkLogin = (isLogedIn, ig_id) => {
     // console.log(event.target);
-    console.log("isLogedIn: ", isLogedIn)
+    // console.log("isLogedIn: ", isLogedIn, ", ig_id: ", ig_id)
     setLogedIn(isLogedIn)
+    setIgId(ig_id)
+    // reloadFAQStatus(ig_id)
+    // reloadFixedMessageStatus(ig_id)
     if (isLogedIn === true) {
       document.getElementById("releaseSetting").style.display = "block"
     } else {
@@ -1533,37 +1753,75 @@ function Release() {
   };
 
   function saveStorySetting() {
-    var reply = document.getElementById("replyStory").value
+    var reply = document.getElementById("replyStory").value //replyStory
     var msg_bag = document.getElementById("listReplyBag").value
     if (msg_bag == "") {
       msg_bag = instaSetting.story_comment_bag_id
     }
+    if (reply == "direct_message") {
+      var update = { instagram_setting: { dm_bag_id: instaSetting.dm_bag_id, post_comment_bag_id: instaSetting.post_comment_bag_id, story_comment_bag_id: msg_bag, live_comment_bag_id: instaSetting.live_comment_bag_id } }
+      var path = window.location.pathname;
+      var ig_setting = { instagram_setting: { story_comment_bag_status: "direct_message" } }
+      api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting).then(res => {
 
-    console.log("reply: ", reply, ", msgbag: ", msg_bag, ", checked: ", checked)
+      }).catch(error => {
+        console.log(error)
+      })
+      api.patch(`/api/v1/instagram_settings/${instaSettingId}`, update).then(res => {
+        reloadUpdate()
+        setMsgNoti("ストーリー設定を保存しました。")
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setMsgNoti("")
+          setIsOpenNoti(false)
+        }, 2000)
+      }).catch(error => {
+        console.log(error)
+      })
+    } else if (reply == "keyword") {
+      for (var i = 0; i < story_actived.length; i++) {
+        console.log("story_actived: ", story_actived[i])
+        var id = story_actived[i]
+        api.get(`/api/v1/message_managements/keyword_settings/${story_actived[i]}`).then(res => {
+          // console.log("kw actived: ", res.data.data)
+          var setting = res.data.data
+          var update = {
+            keyword_setting: {
+              title: setting.title, keyword: setting.keyword, instagram_account_id: setting.instagram_account_id, message_bag_id: setting.message_bag_id,
+              is_dm: setting.is_dm, is_story_comment: false, is_post_comment: setting.is_post_comment, is_live_comment: setting.is_live_comment, is_active: setting.is_active
+            }
+          }
+          api.patch(`/api/v1/message_managements/keyword_settings/${id}`, update).then(res => {
 
-    // console.log(instaSetting.dm_bag_id, " is dm bag id")
-    // console.log(instaSetting.post_comment_bag_id, " is post_comment_bag_id")
-    // console.log(instaSetting.live_comment_bag_id, " is live_comment_bag_id")
+          }).catch(error => {
+            console.log(error)
+          })
+        }).catch(error => {
+          console.log(error)
+        })
+      }
 
-    var update = { instagram_setting: { dm_bag_id: instaSetting.dm_bag_id, post_comment_bag_id: instaSetting.post_comment_bag_id, story_comment_bag_id: msg_bag, live_comment_bag_id: instaSetting.live_comment_bag_id } }
-    console.log(update)
-    var path = window.location.pathname;
-    api.patch(`/api/v1/instagram_settings/${instaSettingId}`, update).then(res => {
-      // console.log('res ne: ', res)
-      reloadUpdate()
-      setMsgNoti("ストーリー設定を保存しました。")
-      setIsOpenNoti(true)
-      setTimeout(() => {
-        setMsgNoti("")
-        setIsOpenNoti(false)
-      }, 2000)
-      // setListFixedMenu(res.data.data)
-    }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
-    })
+      setTimeout(function () {
+        var ig_setting = { instagram_setting: { story_comment_bag_status: "keyword" } }
+        api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting).then(res => {
+
+        }).catch(error => {
+          console.log(error)
+        })
+        api.patch(`/api/v1/message_managements/keyword_settings/${new_story_kw_id}`, story_kw_setting).then(res => {
+          console.log('res ne: ', res)
+          // reloadUpdate()
+          reloadKeyWord()
+
+        }).catch(error => {
+          console.log(error)(path)
+          // }
+        })
+      }, 1500);
+
+
+    }
+
 
 
   }
@@ -1574,26 +1832,73 @@ function Release() {
     if (msg_bag == "") {
       msg_bag = instaSetting.live_comment_bag_id
     }
+    if (reply == "direct_message") {
+      var update = { instagram_setting: { dm_bag_id: instaSetting.dm_bag_id, post_comment_bag_id: instaSetting.post_comment_bag_id, story_comment_bag_id: instaSetting.story_comment_bag_id, live_comment_bag_id: msg_bag } }
+      var path = window.location.pathname;
+      var ig_setting = { instagram_setting: { live_comment_bag_status: "direct_message" } }
+      api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting).then(res => {
 
-    var update = { instagram_setting: { dm_bag_id: instaSetting.dm_bag_id, post_comment_bag_id: instaSetting.post_comment_bag_id, story_comment_bag_id: instaSetting.story_comment_bag_id, live_comment_bag_id: msg_bag } }
+      }).catch(error => {
+        console.log(error)
+      })
+      api.patch(`/api/v1/instagram_settings/${instaSettingId}`, update).then(res => {
+        // console.log('res ne: ', res)
+        reloadUpdate()
+        setMsgNoti("ライブ設定を保存しました。")
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setMsgNoti("")
+          setIsOpenNoti(false)
+        }, 2000)
+        // setListFixedMenu(res.data.data)
+      }).catch(error => {
+        console.log(error)
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
+      })
+    } else {
+      for (var i = 0; i < live_actived.length; i++) {
+        // console.log("live_actived: ", live_actived[i])
+        var id = live_actived[i]
+        api.get(`/api/v1/message_managements/keyword_settings/${live_actived[i]}`).then(res => {
+          // console.log("kw actived: ", res.data.data)
+          var setting = res.data.data
+          var update = {
+            keyword_setting: {
+              title: setting.title, keyword: setting.keyword, instagram_account_id: setting.instagram_account_id, message_bag_id: setting.message_bag_id,
+              is_dm: setting.is_dm, is_story_comment: setting.is_story_comment, is_post_comment: setting.is_post_comment, is_live_comment: false, is_active: setting.is_active
+            }
+          }
+          api.patch(`/api/v1/message_managements/keyword_settings/${id}`, update).then(res => {
+          }).catch(error => {
+            console.log(error)
+          })
+        }).catch(error => {
+          console.log(error)
+        })
+      }
+      setTimeout(function () {
+        var ig_setting = { instagram_setting: { live_comment_bag_status: "keyword" } }
+        api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting).then(res => {
 
-    var path = window.location.pathname;
-    api.patch(`/api/v1/instagram_settings/${instaSettingId}`, update).then(res => {
-      // console.log('res ne: ', res)
-      reloadUpdate()
-      setMsgNoti("ライブ設定を保存しました。")
-      setIsOpenNoti(true)
-      setTimeout(() => {
-        setMsgNoti("")
-        setIsOpenNoti(false)
-      }, 2000)
-      // setListFixedMenu(res.data.data)
-    }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
-    })
+        }).catch(error => {
+          console.log(error)
+        })
+        api.patch(`/api/v1/message_managements/keyword_settings/${new_live_kw_id}`, live_kw_setting).then(res => {
+          console.log('res ne: ', res)
+          reloadKeyWord()
+          // reloadUpdate()
+
+        }).catch(error => {
+          console.log(error)
+          // }
+        })
+      }, 1500)
+
+
+    }
+
   }
 
   function saveCMPostSetting() {
@@ -1603,24 +1908,88 @@ function Release() {
     if (msg_bag == "") {
       msg_bag = instaSetting.post_comment_bag_id
     }
-    var update = { instagram_setting: { dm_bag_id: instaSetting.dm_bag_id, post_comment_bag_id: msg_bag, story_comment_bag_id: instaSetting.story_comment_bag_id, live_comment_bag_id: instaSetting.live_comment_bag_id } }
-    var path = window.location.pathname;
-    api.patch(`/api/v1/instagram_settings/${instaSettingId}`, update).then(res => {
-      // console.log('res ne: ', res)
-      reloadUpdate()
-      setMsgNoti("投稿コメント設定を保存しました。")
-      setIsOpenNoti(true)
-      setTimeout(() => {
-        setMsgNoti("")
-        setIsOpenNoti(false)
-      }, 2000)
-      // setListFixedMenu(res.data.data)
-    }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
-    })
+
+    if (reply == "direct_message") {
+      var update = { instagram_setting: { dm_bag_id: instaSetting.dm_bag_id, post_comment_bag_id: msg_bag, story_comment_bag_id: instaSetting.story_comment_bag_id, live_comment_bag_id: instaSetting.live_comment_bag_id } }
+      var path = window.location.pathname;
+      var ig_setting = { instagram_setting: { post_comment_bag_status: "direct_message" } }
+      api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting).then(res => {
+
+      }).catch(error => {
+        console.log(error)
+      })
+      api.patch(`/api/v1/instagram_settings/${instaSettingId}`, update).then(res => {
+        // console.log('res ne: ', res)
+        reloadUpdate()
+        setMsgNoti("投稿コメント設定を保存しました。")
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setMsgNoti("")
+          setIsOpenNoti(false)
+        }, 2000)
+        // setListFixedMenu(res.data.data)
+      }).catch(error => {
+        console.log(error)
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
+      })
+    } else {
+      for (var i = 0; i < cm_actived.length; i++) {
+        // console.log("live_actived: ", cm_actived[i])
+        var id = cm_actived[i]
+        // console.log("idne: ", id)
+        api.get(`/api/v1/message_managements/keyword_settings/${id}`).then(res => {
+          // console.log("kw actived: ", res.data.data)
+          var setting = res.data.data
+          var update = {
+            keyword_setting: {
+              title: setting.title, keyword: setting.keyword, instagram_account_id: setting.instagram_account_id, message_bag_id: setting.message_bag_id,
+              is_dm: setting.is_dm, is_story_comment: setting.is_story_comment, is_post_comment: false, is_live_comment: setting.is_live_comment, is_active: setting.is_active
+            }
+          }
+          api.patch(`/api/v1/message_managements/keyword_settings/${id}`, update).then(res => {
+            // console.log(res)
+            reloadUpdate()
+            setMsgNoti("Update Successfully")
+            setIsOpenNoti(true)
+            setTimeout(() => {
+              setMsgNoti("")
+              setIsOpenNoti(false)
+            }, 2000)
+          }).catch(error => {
+            console.log(error)
+          })
+        }).catch(error => {
+          console.log(error)
+        })
+      }
+      setTimeout(function () {
+        var ig_setting = { instagram_setting: { post_comment_bag_status: "keyword" } }
+        api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting).then(res => {
+
+        }).catch(error => {
+          console.log(error)
+        })
+        // console.log(cm_kw_setting)
+        api.patch(`/api/v1/message_managements/keyword_settings/${new_cm_kw_id}`, cm_kw_setting).then(res => {
+          reloadKeyWord()
+          // console.log('res ne: ', res)
+          // reloadUpdate()
+
+        }).catch(error => {
+          console.log(error)
+          // }
+        })
+      }, 1500)
+
+
+
+
+
+    }
+
+
 
   }
 
@@ -1632,9 +2001,9 @@ function Release() {
     if (msg_bag == "") {
       msg_bag = instaSetting.dm_bag_id
     }
-    console.log(msg_bag, "this is real msg_bag")
+    // console.log(msg_bag, "this is real msg_bag")
     var update = { instagram_setting: { dm_bag_id: msg_bag, post_comment_bag_id: instaSetting.dm_bag_id, story_comment_bag_id: instaSetting.story_comment_bag_id, live_comment_bag_id: instaSetting.live_comment_bag_id } }
-    console.log(update)
+    // console.log(update)
     var path = window.location.pathname;
     api.patch(`/api/v1/instagram_settings/${instaSettingId}`, update).then(res => {
       // console.log('res ne: ', res)
@@ -1679,7 +2048,7 @@ function Release() {
 
   function onChangeAnwFM(value) {
     var val = value
-    console.log("fixedOp: ", fixedOp)
+    // console.log("fixedOp: ", fixedOp)
     if (val.length >= 30) {
       setFixMnText("Answer must less than 30 character")
       document.getElementById("validateFixedMenu").style.display = "block"
@@ -1705,11 +2074,53 @@ function Release() {
 
   const settingIns = instaSetting
 
+  // function checkLogintoFacebook() {
+
+
+  //   console.log("page_access_token: ", page_access_token)
+  //   // if (page_access_token == "" || page_access_token == null || page_access_token == undefined) {
+  //   //   document.getElementById("login_facebook").style.display = "block"
+  //   //   document.getElementById("releaseSetting").style.display = "none"
+  //   // } else {
+
+  //   //   document.getElementById("login_facebook").style.display = "none"
+  //   //   document.getElementById("releaseSetting").style.display = "block"
+  //   // }
+  // }
+  var page_access_token = Cookies.get("page_access_token")
+  var ig_id = Cookies.get("ig_id")
+
+  const [idPastPost, setIdPastPost] = useState([])
+  async function getPastPost() {
+    const getPastPost = await axios.get(`https://graph.facebook.com/v14.0/${ig_id}/media?access_token=${page_access_token}`).then(res => {
+      return res.data.data
+
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+    // console.log("getPastPost: ", getPastPost)
+    var past_post = []
+    for (var i = 0; i < getPastPost.length; i++) {
+      await axios.get(`https://graph.facebook.com/v14.0/${getPastPost[i].id}?fields=id,media_type,media_url,username,timestamp&access_token=${page_access_token}`).then(res => {
+        // console.log(res)
+        past_post.push(res.data)
+
+      }).catch(error => {
+        console.log(error)
+      })
+    }
+    console.log(past_post)
+  }
+
+
   return (
     <>
       <div className="content">
 
-        <Card>
+        <Card id="login_facebook">
           <LoginFacebook checkLogin={checkLogin} style={{ padding: "20px" }}></LoginFacebook>
         </Card>
         {/* id="releaseSetting" style={{dislay:"none"}} */}
@@ -1721,6 +2132,12 @@ function Release() {
                   <div style={{ display: "flex", width: "100%" }}>
                     <div style={{ width: "50%" }}><br /><span>FAQ設定<i className="nc-icon icon-question-sign"></i></span></div>
                     <div id="addFAQbtn" style={{ width: "50%", textAlign: "right" }}>
+                      {/* <Button
+                        onClick={() => getPastPost()}
+                        style={{ backgroundColor: "white", color: "#248eff", border: "1px solid #248eff" }}
+                      >
+                        Get past post
+                      </Button> */}
                       <Button
                         onClick={() => addnewFAQ()}
                         style={{ backgroundColor: "white", color: "#248eff", border: "1px solid #248eff" }}
@@ -1836,9 +2253,10 @@ function Release() {
                     <div style={{ display: "flex" }}>
                       <span style={{ width: "10%" }}>ストーリー返事</span>
                       <div id="divStorySetting" style={{ width: "85%", display: "flex" }}>
-                        <select id="replyStory" defaultValue={""} style={{ width: "30%" }} onChange={(e) => selectedReply(e.target.value)} className="new-faq-q-so" name="reply">
-                          <option value="" disabled hidden>返事タイプ選択 ...</option>
-                          <option value="dm-comment">DM</option>
+                        <select id="replyStory" defaultValue={"direct_message"} style={{ width: "30%" }} onChange={(e) => selectedReply(e.target.value)} className="new-faq-q-so" name="reply">
+                          {/* <option value="" disabled hidden>返事タイプ選択 ...</option> */}
+                          <option value="direct_message">DM</option>
+                          <option value="keyword">keyword</option>
                           {/* <option value="keyword">Keywords</option> */}
                         </select>
                         <select id="listReplyGroup" style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectedGroupStoryRe(e.target.value)} className="new-faq-q-so" name="reply_group">
@@ -1856,12 +2274,16 @@ function Release() {
                         </select>
 
 
-                        {/* <select id={`listkeyword`} style={{ display: "none", width: "30%" }} defaultValue={""} onChange={(e) => selectedKeyWord(e.target.value)} className="new-faq-q-so" name="keyword">
+                        <select id={`listkeyword`} style={{ display: "none", width: "30%" }} defaultValue={""} onChange={(e) => selectedKeyWordStory(e.target.value)} className="new-faq-q-so" name="keyword">
                           <option value="" disabled hidden>Choose keyword...</option>
-                          <option value="keyword1">Keyword 1</option>
-                          <option value="keyword2">Keyword 2</option>
-                          <option value="keyword3">Keyword 3</option>
-                        </select> */}
+                          {listKeyword?.map((kw, i) => {
+                            return (
+                              <option key={i} value={kw.id}>
+                                {kw.title}
+                              </option>
+                            )
+                          })}
+                        </select>
                         <div id={`sav-story-setting`} onClick={() => saveStorySetting()} style={{ paddingLeft: "3%", width: "7%" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "0px" }}></i></div>
                       </div>
 
@@ -1885,9 +2307,10 @@ function Release() {
                       <div id="divLiveSetting" style={{ width: "85%", display: "flex" }}>
 
 
-                        <select id="replyLive" defaultValue={""} style={{ width: "30%" }} onChange={(e) => selectedLive(e.target.value)} className="new-faq-q-so" name="live-setting">
+                        <select id="replyLive" defaultValue={"direct_message"} style={{ width: "30%" }} onChange={(e) => selectedLive(e.target.value)} className="new-faq-q-so" name="live-setting">
                           <option value="" disabled hidden>返事タイプ選択...</option>
-                          <option value="dm-comment">DM</option>
+                          <option value="direct_message">DM</option>
+                          <option value="keyword">Keyword</option>
                           {/* <option value="keyword">Keywords</option> */}
                         </select>
 
@@ -1909,12 +2332,16 @@ function Release() {
                         </select>
 
 
-                        {/* <select id={`listkeywordLive`} style={{ display: "none", width: "30%" }} defaultValue={""} onChange={(e) => selectedKeyWord(e.target.value)} className="new-faq-q-so" name="live_keyword">
+                        <select id={`listkeywordLive`} style={{ display: "none", width: "30%" }} defaultValue={""} onChange={(e) => selectedKeyWordLive(e.target.value)} className="new-faq-q-so" name="live_keyword">
                           <option value="" disabled hidden>Choose keyword...</option>
-                          <option value="keyword1">Keyword 1</option>
-                          <option value="keyword2">Keyword 2</option>
-                          <option value="keyword3">Keyword 3</option>
-                        </select> */}
+                          {listKeyword?.map((kw, i) => {
+                            return (
+                              <option key={i} value={kw.id}>
+                                {kw.title}
+                              </option>
+                            )
+                          })}
+                        </select>
 
                         <div id={`sav-live-setting`} onClick={() => saveLiveSetting()} style={{ paddingLeft: "3%", width: "7%" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "0px" }}></i></div>
                       </div>
@@ -1939,9 +2366,10 @@ function Release() {
                       <div id="divCMPostSetting" style={{ width: "85%", display: "flex" }}>
 
 
-                        <select id="replyCMPost" defaultValue={""} style={{ width: "30%" }} onChange={(e) => selectedComment(e.target.value)} className="new-faq-q-so" name="comment-setting">
+                        <select id="replyCMPost" defaultValue={"direct_message"} style={{ width: "30%" }} onChange={(e) => selectedComment(e.target.value)} className="new-faq-q-so" name="comment-setting">
                           <option value="" disabled hidden>返事タイプ選択 ...</option>
-                          <option value="dm-comment">DM</option>
+                          <option value="direct_message">DM</option>
+                          <option value="keyword">Keyword</option>
                           {/* <option value="keyword">Keywords</option> */}
                         </select>
 
@@ -1964,12 +2392,16 @@ function Release() {
                         </select>
 
 
-                        {/* <select id={`listkeywordLive`} style={{ display: "none", width: "30%" }} defaultValue={""} onChange={(e) => selectedKeyWord(e.target.value)} className="new-faq-q-so" name="live_keyword">
+                        <select id={`listkeywordCM`} style={{ display: "none", width: "30%" }} defaultValue={""} onChange={(e) => selectedKeyWordCM(e.target.value)} className="new-faq-q-so" name="live_keyword">
                           <option value="" disabled hidden>Choose keyword...</option>
-                          <option value="keyword1">Keyword 1</option>
-                          <option value="keyword2">Keyword 2</option>
-                          <option value="keyword3">Keyword 3</option>
-                        </select> */}
+                          {listKeyword?.map((kw, i) => {
+                            return (
+                              <option key={i} value={kw.id}>
+                                {kw.title}
+                              </option>
+                            )
+                          })}
+                        </select>
 
                         <div id={`sav-cm-post-setting`} onClick={() => saveCMPostSetting()} style={{ paddingLeft: "3%", width: "7%" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "0px" }}></i></div>
                       </div>
@@ -1984,63 +2416,6 @@ function Release() {
                   </div>
                 </CardBody>
               </Card>
-
-
-              <Card>
-                <CardBody>
-                  <div style={{ width: "100%" }}>
-                    <div style={{ width: "50%" }}><br /><span>DM設定<i className="nc-icon icon-question-sign"></i></span></div><br />
-                    <div style={{ display: "flex" }}>
-                      <span style={{ width: "10%" }}></span>
-                      <div id="divDMSetting" style={{ width: "85%", display: "flex" }}>
-
-
-                        <select id="replyDM" defaultValue={""} style={{ width: "30%" }} onChange={(e) => selectDM(e.target.value)} className="new-faq-q-so" name="dm-setting">
-                          <option value="" disabled hidden>返事タイプ選択 ...</option>
-                          <option value="dm-comment"> DM</option>
-                          {/* <option value="keyword">Keywords</option> */}
-                        </select>
-
-
-
-
-                        <select id="listDMGroup" style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectedDMGroup(e.target.value)} className="new-faq-q-so" name="comment_group">
-                          <option value="" disabled hidden>メッセージグループ選択 ...</option>
-                          {listGroup?.map((group, i) => {
-                            return (
-                              <option key={i} value={group.id}>
-                                {group.group_name}
-                              </option>
-                            )
-                          })}
-                        </select>
-
-                        <select id={`listDMBag`} style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectedBagDMRe(e.target.value)} className="new-faq-q-so" name="comment_bag">
-                          <option value="" disabled hidden>{dmCommentBagName}</option>
-                        </select>
-
-
-                        {/* <select id={`listkeywordLive`} style={{ display: "none", width: "30%" }} defaultValue={""} onChange={(e) => selectedKeyWord(e.target.value)} className="new-faq-q-so" name="live_keyword">
-                          <option value="" disabled hidden>Choose keyword...</option>
-                          <option value="keyword1">Keyword 1</option>
-                          <option value="keyword2">Keyword 2</option>
-                          <option value="keyword3">Keyword 3</option>
-                        </select> */}
-
-                        <div id={`sav-cm-post-setting`} onClick={() => saveDMSetting()} style={{ paddingLeft: "3%", width: "7%" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "0px" }}></i></div>
-                      </div>
-
-
-                      <div style={{ margin: "5px 0px 0px 0px" }}>
-                        <Switch onChange={() => changeDMOnOff()} onColor="#64c1ff" checked={checkedDM} />
-                      </div>
-
-                    </div>
-                    <div id="notiMsgDM" style={{ width: "100%", textAlign: "center", color: "red", display: "none" }}>DM設定をオンにして設定してください。</div>
-                  </div>
-                </CardBody>
-              </Card>
-
 
               <Card>
                 <CardBody>

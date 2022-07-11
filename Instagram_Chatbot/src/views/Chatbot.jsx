@@ -13,22 +13,54 @@ import {
   Col,
   NavbarBrand,
 } from "reactstrap";
+import "../assets/css/general.css";
+import Cookies from "js-cookie";
 import api from '../api/api-management'
 import requestNewToken from "api/request-new-token";
 import ModalShort from "./Popup/ModalShort";
 import * as utils from './../JS/client.js'
 import ChatbotOption from "./ChatbotElement/ChatbotOption.jsx";
 import ModalNoti from "./Popup/ModalNoti";
+import axios from "axios";
+import Modal from "./Popup/Modal";
 
 function Chatbot() {
   const [groupList, setGroupList] = useState([])
   const [messageBag, setMessageBag] = useState([])
   const [idMsgB, setIdmsgB] = useState()
   const [isOpenNoti, setIsOpenNoti] = useState()
+  const [isOpenSelectPastPost, setIsOpenSelectPastPost] = useState()
+  const [isOpenSelectPastPostUp, setIsOpenSelectPastPostUp] = useState()
   const [msgNoti, setMsgNoti] = useState()
   const [idList, setIdList] = useState([])
   const [idMsgGr, setIdMsgGr] = useState()
   const [bagId, setBagId] = useState()
+  var [customDiv, setCustomDiv] = useState([])
+
+  React.useEffect(() => {
+    var page_access_token = Cookies.get("page_access_token")
+    var ig_id = Cookies.get("ig_id")
+
+    // console.log("page_access_token: ", page_access_token)
+    // console.log("ig_id: ", ig_id)
+
+
+  })
+
+  React.useEffect(() => {
+    // var path = window.location.pathname;
+    var access_token = Cookies.get('page_access_token')
+    if (access_token == "" || access_token == undefined || access_token == null) {
+      api.get(`/api/v1/instagram_settings`).then(res => {
+        // console.log(res.data.data[0].page_access_token)
+        Cookies.set('page_access_token', res.data.data[0].page_access_token);
+        Cookies.set('ig_id', res.data.data[0].ig_id);
+      }).catch(error => {
+        console.log(error)
+      })
+    }
+
+  }, [])
 
   React.useEffect(() => {
     // var paramSearch = { page: pageIndex }
@@ -60,7 +92,7 @@ function Chatbot() {
 
 
   ///bo comment ben tren
-
+  const [idPPUP, setIdPPUP] = useState()
   function refreshMsgGroup() {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups`).then(res => {
@@ -106,6 +138,7 @@ function Chatbot() {
       // var totalPage = Math.ceil(res.data.data.total / 25)
       // setTotalPage(totalPage)
       var bagMsg = res.data.data.messages
+      // console.log("bagMsg: ",res.data.data.messages)
       setMsgCBNum(bagMsg[bagMsg.length - 1].id)
       setImgCBNum(bagMsg[bagMsg.length - 1].id)
       setImgCBNum(bagMsg[bagMsg.length - 1].id)
@@ -115,35 +148,72 @@ function Chatbot() {
           document.getElementById("div_custom").appendChild(abc)
           abc.innerHTML =
             `<div id="chatbot_message${item.id}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
-              <div><textarea name="messageKey${item.id}" class="mgsChatbot" id="mgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
-              <div><textarea name="messagesVa${item.id}" class="mgsChatbot" id="mgsCustom${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
-              <div id="btnDelMsg${item.id}" style="float:right; display:none">
+              
+              <div><textarea name="messagesVa${item.id}" class="mgsChatbot" id="mgsCustomSaved${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
+              <div id="btnDelMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
                 font-weight:800">Delete</button>
               </div>
+              <div id="btnUpdateMsg${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+                font-weight:800">Update</button>
+              </div>
             </div>`
-          document.getElementById(`mgsCustomKey${item.id}`).textContent = item.received_message
-          document.getElementById(`mgsCustom${item.id}`).textContent = item.message_value
+          // document.getElementById(`mgsCustomKey${item.id}`).textContent = item.received_message
+          document.getElementById(`mgsCustomSaved${item.id}`).textContent = item.message_value
 
-          document.getElementById(`mgsCustom${item.id}`).addEventListener('change', (e) => msgOV(e.target.value))
-          document.getElementById(`mgsCustomKey${item.id}`).addEventListener('change', (e) => msgOVkey(e.target.value))
-          document.getElementById(`mgsCustom${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelMsg${item.id}`).style.display = 'block' })
-          document.getElementById(`btnDelMsg${item.id}`).addEventListener('click', () => deleteMsgCB(item.id))
+          document.getElementById(`mgsCustomSaved${item.id}`).addEventListener('change', (e) => msgOVSaved(e.target.value, item.id))
+          // <div><textarea name="messageKey${item.id}" class="mgsChatbot" id="mgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
+          // document.getElementById(`mgsCustomKey${item.id}`).addEventListener('change', (e) => msgOVkey(e.target.value))
+          // document.getElementById(`mgsCustom${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelMsg${item.id}`).style.display = 'block' })
+          document.getElementById(`btnDelMsg${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Delete Successfully")
+              }, 1500)
+              setTimeout(function () {
+                setIsOpenNoti(false)
+                window.location.reload()
+              }, 2000);
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+          document.getElementById(`btnUpdateMsg${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
+            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Update Successfully")
+              }, 1500)
+              setTimeout(function () {
+                setIsOpenNoti(false)
+                window.location.reload()
+              }, 2000);
+            }).catch(error => {
+              console.log(error)
+            })
+          })
 
 
-          var element2 = document.getElementById(`msgOVIKey${item.id}`)
-          if (typeof (element2) != 'undefined' && element2 != null) {
-            // Exists.
-            document.getElementById(`msgOVIKey${item.id}`).value = item.received_message
-          } else if (element2 === null) {
-            var abc = document.createElement(`div`)
-            document.getElementById('logUserDiv').appendChild(abc)
-            abc.innerHTML =
-              `<div id="ovMsgKey${item.id}" style="width: 70%; background-color: #51cbce; padding: 10px; float:left; margin:5px; display:block; border-radius: 10px">
-                <input type="text" id="msgOVIKey${item.id}" style="background-color: #51cbce; border: none" readonly/>
-               </div>`
-            document.getElementById(`msgOVIKey${item.id}`).value = item.received_message;
-          }
+          // var element2 = document.getElementById(`msgOVIKey${item.id}`)
+          // if (typeof (element2) != 'undefined' && element2 != null) {
+          //   // Exists.
+          //   document.getElementById(`msgOVIKey${item.id}`).value = item.received_message
+          // } else if (element2 === null) {
+          //   var abc = document.createElement(`div`)
+          //   document.getElementById('logUserDiv').appendChild(abc)
+          //   abc.innerHTML =
+          //     `<div id="ovMsgKey${item.id}" style="width: 70%; background-color: #51cbce; padding: 10px; float:left; margin:5px; display:block; border-radius: 10px">
+          //       <input type="text" id="msgOVIKey${item.id}" style="background-color: #51cbce; border: none" readonly/>
+          //      </div>`
+          //   document.getElementById(`msgOVIKey${item.id}`).value = item.received_message;
+          // }
 
           var element1 = document.getElementById(`msgOVI${item.id}`)
           if (typeof (element1) != 'undefined' && element1 != null) {
@@ -153,8 +223,8 @@ function Chatbot() {
             var abc = document.createElement(`div`)
             document.getElementById('logUserDiv').appendChild(abc)
             abc.innerHTML =
-              `<div id="ovMsg${item.id}" style="width: 70%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
-                <input type="text" id="msgOVI${item.id}" style="text-align: right; background-color: #51cbce; border: none" readonly/>
+              `<div id="ovMsg${item.id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+                <textarea type="text" id="msgOVI${item.id}" style="width:90%; text-align: right; background-color: #51cbce; border: none; overflow-y:auto" readonly/>
                </div> `
             document.getElementById(`msgOVI${item.id}`).value = item.message_value
 
@@ -164,9 +234,9 @@ function Chatbot() {
           document.getElementById("div_custom").appendChild(abc)
           abc.innerHTML =
             `<div id="chatbot_image${item.id}" style="border-radius: 20px; margin-top: 20px; display:block; background-color: rgb(244, 243, 239); padding: 40px; ">
-            <div><textarea name="imgKey${item.id}" class="mgsChatbot" id="imgCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
-          <input id="imgNum${item.id}" name="imageChatbot" type="file" accept="image/*" />
-          <input id="imgDataNum${item.id}" name="imgchatbot${item.id}" type=hidden /> <br /><br />
+            <div><textarea name="imgKey${item.id}" class="mgsChatbot" style="display:none" id="imgCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
+          <input id="imgNumSaved${item.id}" name="imageChatbot" type="file" accept="image/*" />
+          <input id="imgDataNumSaved${item.id}" name="imgchatbot${item.id}" type=hidden /> <br /><br />
           <div style=" text-align: center">
             <img id="output${item.id}" style=" max-height: 200px; max-width: 40%"  />
           </div>
@@ -174,16 +244,59 @@ function Chatbot() {
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
               font-weight:800">Delete</button>
             </div>
+            <div id="btnUpdateImg${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Update</button>
+            </div>
         </div>`
           document.getElementById(`imgCustomKey${item.id}`).value = item.received_message
-          document.getElementById(`output${item.id}`).src = `https://ecchatbot-dev.ddns.net/${item.img_value.url}`
+          document.getElementById(`imgNumSaved${item.id}`).addEventListener('change', (e) => loadFileSaved(e, item.id))
+          document.getElementById(`output${item.id}`).src = `https://ecchatbot-dev.ddns.net${item.img_value.url}`
+          document.getElementById(`btnDelImg${item.id}`).addEventListener("click", (event) => {
+            event.preventDefault()
+            api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
+              // alert("Delete Successfully")
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Delete Successfully")
+              }, 1500)
+              setTimeout(function () {
+                setIsOpenNoti(false)
+                window.location.reload()
+              }, 2000);
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+          document.getElementById(`btnUpdateImg${item.id}`).addEventListener("click", (event) => {
+            event.preventDefault()
+            var upd = {
+              message: { message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNumSaved${item.id}`).value }
+            }
+            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+              // alert("Delete Successfully")
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Update Successfully")
+              }, 1500)
+              setTimeout(function () {
+                setIsOpenNoti(false)
+                window.location.reload()
+              }, 2000);
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+
 
           // console.log('value ne: ',document.getElementById(`output${item.id}`))
           // document.getElementById(`imgNum${item.id}`).value = item.img_value.src
 
           // getBaseUrlDis(item.id, item.img_value.url)
 
-          
+
 
           // const toDataURL = url => fetch(url)
           //   .then(response => response.blob())
@@ -206,36 +319,36 @@ function Chatbot() {
             var img = new Image();
             img.src = urlImg;
             img.crossOrigin = 'Anonymous';
-          
+
             var canvas = document.createElement('canvas'),
               ctx = canvas.getContext('2d');
-          
+
             canvas.height = img.naturalHeight;
             canvas.width = img.naturalWidth;
             ctx.drawImage(img, 0, 0);
-          
+
             var b64 = canvas.toDataURL('image/png').replace(/^data:image.+;base64,/, '');
             return b64;
           };
           // document.getElementById(`output${item.id}`).setAttribute('crossOrigin', 'anonymous')
 
-          console.log(getEmergencyFoundImg(src))
-          
-          // document.getElementById(`output${item.id}`).setAttribute('crossOrigin', 'anonymous')
-//           var c = document.createElement('canvas');
-//           var img = document.getElementById(`output${item.id}`);
-//           c.height = img.naturalHeight;
-//           c.width = img.naturalWidth;
-//           var ctx = c.getContext('2d');
+          // console.log(getEmergencyFoundImg(src))
 
-//           ctx.drawImage(img, 0, 0, c.width, c.height);
-//           var base64String = c.toDataURL('image/jpeg');
-// console.log('base: ',base64String)
+          // document.getElementById(`output${item.id}`).setAttribute('crossOrigin', 'anonymous')
+          //           var c = document.createElement('canvas');
+          //           var img = document.getElementById(`output${item.id}`);
+          //           c.height = img.naturalHeight;
+          //           c.width = img.naturalWidth;
+          //           var ctx = c.getContext('2d');
+
+          //           ctx.drawImage(img, 0, 0, c.width, c.height);
+          //           var base64String = c.toDataURL('image/jpeg');
+          // console.log('base: ',base64String)
 
 
           // function toDataURL(src, callback){
           //   var image = new Image();
-         
+
           //   image.onload = function(){
           //     var canvas = document.createElement('canvas');
           //     var context = canvas.getContext('2d');
@@ -253,7 +366,7 @@ function Chatbot() {
 
           // function toDataURL(url, callback) {
           //   var httpRequest = new XMLHttpRequest();
-            
+
           //   httpRequest.onload = function () {
           //     var fileReader = new FileReader();
           //     fileReader.onloadend = function () {
@@ -279,40 +392,240 @@ function Chatbot() {
 
           // console.log(document.getElementById(`imgDataNum${item.id}`).value)
           // document.getElementById(`imgDataNum${item.id}`).value = encrypt(item.img_value.url)
-          document.getElementById(`imgNum${item.id}`).addEventListener('change', (e) => loadFile(e))
-          document.getElementById(`btnDelImg${item.id}`).addEventListener('click', () => deleteImgCB(item.id))
+          // document.getElementById(`imgNum${item.id}`).addEventListener('change', (e) => loadFile(e))
+          // document.getElementById(`btnDelImg${item.id}`).addEventListener('click', () => deleteImgCB(item.id))
 
-        }else if(item.message_type == "img_msg"){
+          var element1 = document.getElementById(`outputOV${item.id}`)
+          if (typeof (element1) != 'undefined' && element1 != null) {
+            // Exists.
+            document.getElementById(`outputOV${item.id}`).src = `https://ecchatbot-dev.ddns.net${item.img_value.url}`
+          } else if (element1 === null) {
+            var abc = document.createElement(`div`)
+            document.getElementById('logUserDiv').appendChild(abc)
+            abc.innerHTML =
+              `
+              <div style="width: 100%; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+              <img id="outputOV${item.id}" style="max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" src="${`https://ecchatbot-dev.ddns.net${item.img_value.url}`}">
+               </div> 
+              `
+            // document.getElementById(`msgOVI${item.id}`).value = item.message_value
+
+          }
+
+        } else if (item.message_type == "img_msg") {
           var abc = document.createElement("div")
           document.getElementById("div_custom").appendChild(abc)
           abc.innerHTML =
             `<div id="chatbot_image_msg${item.id}" style="border-radius: 20px; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
-            <div><textarea name="imgMsgKey${item.id}" class="mgsChatbot" id="imgMgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
-          <input id="imgMsgNum${item.id}" type="file" accept="image/*" /> <br /><br />
-          <input id="imgValueMsgNum${item.id}" name="imgValueMsgChatbot${item.id}" type=hidden /> <br /><br />
+            <div><textarea name="imgMsgKey${item.id}" style="display:none" class="mgsChatbot" id="imgMgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
+          <input id="imgMsgNumSaved${item.id}" type="file" accept="image/*" /> <br /><br />
+          <input id="imgValueMsgNumSaved${item.id}" name="imgValueMsgChatbot${item.id}" type=hidden /> <br /><br />
           <div style=" text-align: center" }}>
-            <img id="outputImgMsg${item.id}" style=" max-height: 200px; max-width: 40%" }} />
+            <img id="outputImgMsgSaved${item.id}" style=" max-height: 200px; max-width: 40%" }} />
           </div>
           <div style="text-align: center">
-          <textarea class="mgsChatbot" id="imgMgsCustom${item.id}" name="imgMsgValueChatbot${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea>
+          <textarea class="mgsChatbot" id="imgMgsCustomSaved${item.id}" name="imgMsgValueChatbot${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea>
           </div>
-          <div id="btnDelImgMsg${item.id}" style="float:right; display:none">
+          <div id="btnDelImgMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
               font-weight:800">Delete</button>
             </div>
+            <div id="btnUpImgMsg${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Update</button>
+            </div>
         </div>`
-        document.getElementById(`imgMgsCustomKey${item.id}`).value = item.received_message
-        document.getElementById(`imgMgsCustom${item.id}`).value = item.message_value
-        document.getElementById(`outputImgMsg${item.id}`).src = `https://ecchatbot-dev.ddns.net/${item.img_value.url}`
+          document.getElementById(`imgMgsCustomKey${item.id}`).value = item.received_message
+          document.getElementById(`imgMgsCustomSaved${item.id}`).value = item.message_value
+          document.getElementById(`outputImgMsgSaved${item.id}`).src = `https://ecchatbot-dev.ddns.net${item.img_value.url}`
 
-    
-          document.getElementById(`imgMsgNum${item.id}`).addEventListener('change', (e) => loadFileImgMsg(e))
-          document.getElementById(`imgMgsCustom${item.id}`).addEventListener('change', (e) => imgMsgOV(e.target.value))
-          document.getElementById(`imgMsgNum${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${item.id}`).style.display = 'block' })
-          document.getElementById(`imgMgsCustom${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${item.id}`).style.display = 'block' })
-          document.getElementById(`btnDelImgMsg${item.id}`).addEventListener('click', () => deleteImgMsgCB(item.id))
+
+          // document.getElementById(`imgMsgNum${item.id}`).addEventListener('change', (e) => loadFileImgMsg(e))
+          document.getElementById(`imgMgsCustomSaved${item.id}`).addEventListener('change', (e) => imgMsgOVSaved(e.target.value, item.id))
+          // document.getElementById(`imgMsgNum${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${item.id}`).style.display = 'block' })
+          // document.getElementById(`imgMgsCustom${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${item.id}`).style.display = 'block' })
+          document.getElementById(`imgMsgNumSaved${item.id}`).addEventListener('change', (e) => loadFileImgMsgSaved(e, item.id))
+          document.getElementById(`btnDelImgMsg${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Delete Successfully")
+              }, 1500)
+              setTimeout(function () {
+                setIsOpenNoti(false)
+                window.location.reload()
+              }, 2000);
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+
+          document.getElementById(`btnUpImgMsg${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            var upd = {
+              message: { message_value: document.getElementById(`imgMgsCustomSaved${item.id}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNumSaved${item.id}`).value }
+            }
+
+            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+              // alert("Delete Successfully")
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Update Successfully")
+              }, 1500)
+              setTimeout(function () {
+                setIsOpenNoti(false)
+                window.location.reload()
+              }, 2000);
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+
+          var element1 = document.getElementById(`imgMsgOVI${item.id}`)
+          var element2 = document.getElementById(`outputImgMsgOV${item.id}`)
+
+          if ((typeof (element1) != 'undefined' && element1 != null) || (typeof (element2) != 'undefined' && element2 != null)) {
+            // Exists.
+            document.getElementById(`imgMsgOVI${item.id}`).value = item.message_value
+            document.getElementById(`outputImgMsgOV${item.id}`).src = `https://ecchatbot-dev.ddns.net${item.img_value.url}`
+          } else if (element1 === null) {
+            var abc = document.createElement(`div`)
+            document.getElementById('logUserDiv').appendChild(abc)
+            abc.innerHTML =
+              `
+              <div id="ovMsg${item.id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+                <textarea type="text" id="imgMsgOVI${item.id}" style="width:90%; text-align: right; background-color: #51cbce; border: none; overflow-y:auto" readonly/>
+               </div> 
+              `
+            var abc1 = document.createElement(`div`)
+            document.getElementById('logUserDiv').appendChild(abc1)
+            abc1.innerHTML = `<br /><img id="outputImgMsgOV${item.id}" style="max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" src="${`https://ecchatbot-dev.ddns.net${item.img_value.url}`}">`
+            document.getElementById(`imgMsgOVI${item.id}`).value = item.message_value
+
+          }
+        } else if (item.message_type == "past_post") {
+          // alert ("PP roi")
+          var abc = document.createElement("div")
+          document.getElementById("div_custom").appendChild(abc)
+          abc.innerHTML =
+            `<div id="chatbot_pp${item.id}" style="border-radius: 20px; text-align:center; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
+            
+            <div style="width:100%">
+            <img id="imgUpPP${item.id}" src="${item.preview_past_post_url}" style="margin: auto; max-height:200px; max-width:200px" /></div>
+
+          <br />
+          <div id="btnDeletePP${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Delete</button>
+            </div>
+            <div id="btnUpdatePP${item.id}" style="float:right; display:none">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Update</button>
+            </div>
+            <div id="btnChangePP${item.id}" style="float:right;">
+              <button style="width:110px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Change post</button>
+            </div>
+        </div>`
+
+          //paste to above
+          // <input id="imgMsgNumSaved${item.id}" type="file" accept="image/*" /> <br /><br />
+          //   <input id="imgValueMsgNumSaved${item.id}" name="imgValueMsgChatbot${item.id}" type=hidden /> <br /><br />
+          //   <div style=" text-align: center" }}>
+          //     <img id="outputImgMsgSaved${item.id}" style=" max-height: 200px; max-width: 40%" }} />
+          //   </div> 
+
+          // document.getElementById(`ppCustomSaved${item.id}`).value = item.message_value
+
+          document.getElementById(`btnDeletePP${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Delete Successfully")
+              }, 1500)
+              setTimeout(function () {
+                setIsOpenNoti(false)
+                window.location.reload()
+              }, 2000);
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+
+          // document.getElementById(`btnUpdatePP${item.id}`).addEventListener('click', () => {
+          //   var update = { message: { message_value: urlUpdatePastPost, message_type: "past_post", img_value: "" } }
+          //   api.patch(`/api/v1/message_managements/messages/${item.id}`, update).then(res => {
+          //     console.log(res)
+          //   }).catch(error => {
+          //     console.log(error)
+          //   })
+          // })
+
+
+          // var element1 = document.getElementById(`ppOVI${item.id}`)
+
+          // if (typeof (element1) != 'undefined' && element1 != null) {
+          var abc = document.createElement(`div`)
+          document.getElementById('logUserDiv').appendChild(abc)
+          abc.innerHTML =
+            `<br/>
+            <div style="width: 100%; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+                <img id="PPUpOV${item.id}" src="${item.preview_past_post_url}" style="max-width:100px; max-height:100px; float:right" />
+               </div> 
+            
+              `
+          // document.getElementById(`PPUpOV${item.id}`).style.display = "none"
+
+
+
+          document.getElementById(`btnChangePP${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            setIdPPUP(item.id)
+            selectPastPostUp()
+            // document.getElementById(`PPUpOV${item.id}`).style.display = "block"
+            // document.getElementById(`imgUpPP${item.id}`).style.display = "block"
+            document.getElementById(`btnUpdatePP${item.id}`).style.display = "block"
+            document.getElementById(`btnChangePP${item.id}`).style.display = "none"
+            // document.getElementById(`ppCustomSavedOvi${item.id}`).style.display = "none"
+            // if (document.getElementById(`lbOvPP${item.id}}`) !== null) {
+
+            // } //
+            // document.getElementById(`PPUpOV${item.id}`).url = urlUpdatePastPost
+            // document.getElementById(`imgUpPP${item.id}`).style.display="block"
+            // document.getElementById(`imgUpPP${item.id}`).src = urlUpdatePastPost
+
+
+          })
+
+
+          // }
+          // document.getElementById(`ppCustomSaved${item.id}`).addEventListener('click', () => {
+          //   setIdPPUP(item.id)
+          //   selectPastPostUp()
+          //   // document.getElementById(`PPUpOV${item.id}`).style.display = "block"
+          //   // document.getElementById(`imgUpPP${item.id}`).style.display = "block"
+          //   document.getElementById(`btnUpdatePP${item.id}`).style.display = "block"
+          //   document.getElementById(`PPUpOV${item.id}`).style.display = "none"
+          //   // document.getElementById(`ppCustomSavedOvi${item.id}`).style.display = "none"
+          //   // if (document.getElementById(`lbOvPP${item.id}}`) !== null) {
+
+          //   // } //
+          //   // document.getElementById(`PPUpOV${item.id}`).url = urlUpdatePastPost
+          //   // document.getElementById(`imgUpPP${item.id}`).style.display="block"
+          //   // document.getElementById(`imgUpPP${item.id}`).src = urlUpdatePastPost
+
+
+          // })
 
         }
+
+
+        // document.getElementById(`outputImgMsgSaved${item.id}`).src = `https://ecchatbot-dev.ddns.net/${item.img_value.url}`
 
 
         // bagMsg.forEach((item) => {
@@ -324,7 +637,7 @@ function Chatbot() {
       //   bagItem.push(res.data.data[i].id)
       //   // 
       // }
-      console.log(bagMsg)
+      // console.log(bagMsg)
     }).catch(error => {
       console.log(error)
       // if (error.response.data.code === 3) {
@@ -334,17 +647,17 @@ function Chatbot() {
   }
 
   function getMessage(idIn) {
-    console.log(idList)
+    // console.log(idList)
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups/${idIn}`).then(res => {
       var bag = []
       var idMsgbag = []
-      console.log('message: ', res.data.data)
+      // console.log('message: ', res.data.data)
       for (var i = 0; i < res.data.data.message_bags.length; i++) {
         bag.push(res.data.data.message_bags[i].bag_name)
         idMsgbag.push(res.data.data.message_bags[i].id)
       }
-      console.log("idMsgbag: ", idMsgbag)
+      // console.log("idMsgbag: ", idMsgbag)
       setMessageBag(res.data.data)
       const ulTag = document.createElement('ul');
       ulTag.setAttribute('id', `msgBag${idIn}`);
@@ -381,22 +694,31 @@ function Chatbot() {
       idMsgbag.forEach((idd) => {
         var abc = document.createElement('div')
         abc.setAttribute('id', `msgBag_item_${idIn}_${idd}`)
-        setBagId(idd)
-        document.getElementById(`msg_group${idIn}_id${idd}`).addEventListener('click', () => { getBagMsg(idIn, idd) })
-        document.getElementById(`msg_group_div${idIn}_id${idd}`).addEventListener('click', () => {
-          document.getElementById(`msg_group${idIn}_id${idd}`).appendChild(abc)
-          abc.innerHTML = `<div id="itemMsg_${idIn}_${idd}">
-            <div class="dropdown-content">
-              <button style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Rename</button>
-              <button style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Delete</button>
-              <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Cancel</button>
-            </div>
-          </div>`
-          document.getElementById(`msgBag_item_${idIn}_${idd}`).removeAttribute('hidden')
 
-          document.getElementById(`cancelBtn${idIn}_${idd}`).addEventListener('click', () => {
-            document.getElementById(`msgBag_item_${idIn}_${idd}`).setAttribute("hidden", true)
-          })
+        // console.log("setBagId: ", idd)
+        document.getElementById(`msg_group${idIn}_id${idd}`).addEventListener('click', () => {
+          getBagMsg(idIn, idd)
+          setBagId(idd)
+        })
+        document.getElementById(`msg_group_div${idIn}_id${idd}`).addEventListener('click', () => {
+
+          //Rename, Delete, Cancel uncomment code below
+
+          // document.getElementById(`msg_group${idIn}_id${idd}`).appendChild(abc)
+          // abc.innerHTML = `<div id="itemMsg_${idIn}_${idd}">
+          //   <div class="dropdown-content">
+          //     <button style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Rename</button>
+          //     <button id="deleteBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Delete</button>
+          //     <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Cancel</button>
+          //   </div>
+          // </div>`
+          // document.getElementById(`msgBag_item_${idIn}_${idd}`).removeAttribute('hidden')
+
+          // document.getElementById(`cancelBtn${idIn}_${idd}`).addEventListener('click', () => {
+          //   document.getElementById(`msgBag_item_${idIn}_${idd}`).setAttribute("hidden", true)
+          // })
+          // document.getElementById(`deleteBtn${idIn}_${idd}`).addEventListener('click', () => {
+          // })
         }
 
         )
@@ -443,6 +765,7 @@ function Chatbot() {
   const [idImg, setImg] = useState()
   const [imgCBNum, setImgCBNum] = useState(0)
   const [msgCBNum, setMsgCBNum] = useState(0)
+  const [ppCBNum, setPpCBNum] = useState(0)
   const [imgMsgCBNum, setImgMsgCBNum] = useState(0)
 
   // console.log(messageGroup[0].group[0].name)
@@ -491,6 +814,16 @@ function Chatbot() {
     };
     reader.readAsDataURL(file);
   }
+  function getBaseUrlSaved(id) {
+    var file = document.querySelector(`#imgNumSaved${id}`)['files'][0];
+    var reader = new FileReader();
+    var baseString;
+    reader.onloadend = function () {
+      baseString = reader.result;
+      document.getElementById(`imgDataNumSaved${id}`).value = baseString
+    };
+    reader.readAsDataURL(file);
+  }
 
   function getBaseUrlDis(id, value) {
     // var file = document.querySelector(`#imgNum${id}`)['files'][0];
@@ -515,6 +848,19 @@ function Chatbot() {
     reader.readAsDataURL(file);
   }
 
+  //loadFileImgMsg
+
+  function getBaseUrlImgMsgSaved(id) {
+    var file = document.querySelector(`#imgMsgNumSaved${id}`)['files'][0];
+    var reader = new FileReader();
+    var baseString;
+    reader.onloadend = function () {
+      baseString = reader.result;
+      document.getElementById(`imgValueMsgNumSaved${id}`).value = baseString
+    };
+    reader.readAsDataURL(file);
+  }
+
   function loadFile(event) {
     var num = parseInt(imgCBNum) + 1
     getBaseUrl(num)
@@ -526,21 +872,49 @@ function Chatbot() {
       URL.revokeObjectURL(output.src) // free memory
     }
     var element = document.getElementById(`outputOV${num}`);
-    console.log(element)
+    // console.log(element)
     if (typeof (element) != 'undefined' && element != null) {
       // Exists.
       var output2 = document.getElementById(`outputOV${num}`);
-      console.log("output2", output2)
+      // console.log("output2", output2)
       output2.src = imgUrl
     } else if (element === null) {
       var abc = document.createElement(`div`)
-      console.log("div_num: ", num)
+      // console.log("div_num: ", num)
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML = `<img id="outputOV${num}" style= "max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" /> `
       var output2 = document.getElementById(`outputOV${num}`);
       output2.src = imgUrl
     }
     setImgCBNum(num)
+  };
+
+  function loadFileSaved(event, id) {
+    // var num = parseInt(id) + 1
+    getBaseUrlSaved(id)
+    var output = document.getElementById(`output${id}`);
+    var imgUrl = URL.createObjectURL(event.target.files[0]);
+    output.src = imgUrl
+    setTemp(imgUrl)
+    output.onload = function () {
+      URL.revokeObjectURL(output.src) // free memory
+    }
+    var element = document.getElementById(`outputOV${id}`);
+    // console.log(element)
+    if (typeof (element) != 'undefined' && element != null) {
+      // Exists.
+      var output2 = document.getElementById(`outputOV${id}`);
+      // console.log("output2", output2)
+      output2.src = imgUrl
+    } else if (element === null) {
+      var abc = document.createElement(`div`)
+      // console.log("div_num: ", id)
+      document.getElementById('logUserDiv').appendChild(abc)
+      abc.innerHTML = `<img id="outputOV${id}" style= "max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" /> `
+      var output2 = document.getElementById(`outputOV${id}`);
+      output2.src = imgUrl
+    }
+    setImgCBNum(id)
   };
 
   function loadFileImgMsg(event) {
@@ -555,14 +929,14 @@ function Chatbot() {
     }
 
     var element = document.getElementById(`outputImgMsgOV${num}`);
-    console.log(element)
+    // console.log(element)
     if (typeof (element) != 'undefined' && element != null) {
       // Exists.
       var output2 = document.getElementById(`outputImgMsgOV${num}`);
       output2.src = imgUrl
     } else if (element === null) {
       var abc = document.createElement(`div`)
-      console.log("div_num: ", num)
+      // console.log("div_num: ", num)
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML = `<img id="outputImgMsgOV${num}" style= "max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" /> `
       var output2 = document.getElementById(`outputImgMsgOV${num}`);
@@ -570,13 +944,40 @@ function Chatbot() {
     }
     setImgMsgCBNum(num)
   };
+  //loadFileImgMsg
+  function loadFileImgMsgSaved(event, id) {
+    // var num = parseInt(imgMsgCBNum) + 1
+    getBaseUrlImgMsgSaved(id)
+    var output = document.getElementById(`outputImgMsgSaved${id}`);
+    var imgUrl = URL.createObjectURL(event.target.files[0]);
+    output.src = imgUrl
+    setTemp(imgUrl)
+    output.onload = function () {
+      URL.revokeObjectURL(output.src) // free memory
+    }
+
+    var element = document.getElementById(`outputImgMsgOV${id}`);
+    // console.log(element)
+    if (typeof (element) != 'undefined' && element != null) {
+      // Exists.
+      var output2 = document.getElementById(`outputImgMsgOV${id}`);
+      output2.src = imgUrl
+    } else if (element === null) {
+      var abc = document.createElement(`div`)
+      document.getElementById('logUserDiv').appendChild(abc)
+      abc.innerHTML = `<img id="outputImgMsgOV${id}" style= "max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" /> `
+      var output2 = document.getElementById(`outputImgMsgOV${id}`);
+      output2.src = imgUrl
+    }
+    setImgMsgCBNum(id)
+  };
 
   function imgMsgOV(msg) {
 
     var num = parseInt(imgMsgCBNum) + 1
-    console.log("imgMsgOV: ", num)
+    // console.log("imgMsgOV: ", num)
     var element = document.getElementById(`imgMsgOVI${num}`)
-    console.log(element)
+    // console.log(element)
     if (typeof (element) != 'undefined' && element != null) {
       // Exists.
       document.getElementById(`imgMsgOVI${num}`).value = msg
@@ -584,20 +985,61 @@ function Chatbot() {
       var abc = document.createElement(`div`)
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML =
-        `<div id="ovMsgCB${num}" style="width: 70%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
-      <input type="text" id="imgMsgOVI${num}" style="text-align: right; background-color: #51cbce; border: none" readonly/>
+        `<div id="ovMsgCB${num}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+      <textarea type="text" id="imgMsgOVI${num}" style=" width: 70% ;text-align: right; background-color: #51cbce; border: none" readonly/>
       </div> `
       document.getElementById(`imgMsgOVI${num}`).value = msg;
       setImgMsgCBNum(num)
     }
   }
+  //imgMgsCustomSaved
+
+  function imgMsgOVSaved(msg, id) {
+
+    var num = parseInt(imgMsgCBNum) + 1
+    // console.log("imgMsgOV: ", id)
+    var element = document.getElementById(`imgMsgOVI${id}`)
+    // console.log(element)
+    if (typeof (element) != 'undefined' && element != null) {
+      // Exists.
+      document.getElementById(`imgMsgOVI${id}`).value = msg
+    } else if (element === null) {
+      var abc = document.createElement(`div`)
+      document.getElementById('logUserDiv').appendChild(abc)
+      abc.innerHTML =
+        `<div id="ovMsgCB${id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+      <textarea type="text" id="imgMsgOVI${id}" style=" width: 70% ;text-align: right; background-color: #51cbce; border: none" readonly/>
+      </div> `
+      document.getElementById(`imgMsgOVI${id}`).value = msg;
+      setImgMsgCBNum(id)
+    }
+  }
+  function ppOV(url) {
+
+    var num = parseInt(ppCBNum) + 1
+    var element = document.getElementById(`ppOVI${num}`)
+    // console.log(element)
+    if (typeof (element) != 'undefined' && element != null) {
+      // Exists.
+      document.getElementById(`ppOVI${num}`).src = url
+    } else if (element === null) {
+      var abc = document.createElement(`div`)
+      document.getElementById('logUserDiv').appendChild(abc)
+      abc.innerHTML =
+        `<div id="ovPPCB${num}" style="width: 100%; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+      <img id="ppOVI${num}" style="max-height:100px; max-width:100px" />
+      </div> `
+      document.getElementById(`ppOVI${num}`).src = url
+      setPpCBNum(num)
+    }
+  }
 
   function imgOVkey(msg) {
-    console.log(msg)
+    // console.log(msg)
     var num = parseInt(msgCBNum) + 1
 
     var element = document.getElementById(`imgOVIKey${num}`)
-    console.log(element)
+    // console.log(element)
     if (typeof (element) != 'undefined' && element != null) {
       // Exists.
       document.getElementById(`imgOVIKey${num}`).value = msg
@@ -617,11 +1059,11 @@ function Chatbot() {
 
 
   function msgOV(msg) {
-    console.log(msg)
+    // console.log(msg)
     var num = parseInt(msgCBNum) + 1
 
     var element = document.getElementById(`msgOVI${num}`)
-    console.log(element)
+    // console.log(element)
     if (typeof (element) != 'undefined' && element != null) {
       // Exists.
       document.getElementById(`msgOVI${num}`).value = msg
@@ -630,7 +1072,7 @@ function Chatbot() {
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML =
         `<div id="ovMsg${num}" style="width: 70%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
-      <input type="text" id="msgOVI${num}" style="text-align: right; background-color: #51cbce; border: none" readonly/>
+      <input type="text" id="msgOVI${num}" style=" width: 70%; text-align: right; background-color: #51cbce; border: none" readonly/>
       </div> `
       document.getElementById(`msgOVI${num}`).value = msg;
       document.getElementById(`mgsCustom${num}`).value = msg;
@@ -638,12 +1080,34 @@ function Chatbot() {
     setMsgCBNum(num)
   }
 
+  function msgOVSaved(msg, id) {
+    // console.log(msg)
+    var num = parseInt(msgCBNum) + 1
+
+    var element = document.getElementById(`msgOVI${id}`)
+    // console.log(element)
+    if (typeof (element) != 'undefined' && element != null) {
+      // Exists.
+      document.getElementById(`msgOVI${id}`).value = msg
+    } else if (element === null) {
+      var abc = document.createElement(`div`)
+      document.getElementById('logUserDiv').appendChild(abc)
+      abc.innerHTML =
+        `<div id="ovMsg${id}" style="width: 70%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+      <input type="text" id="msgOVI${id}" style=" width: 70%; text-align: right; background-color: #51cbce; border: none" readonly/>
+      </div> `
+      document.getElementById(`msgOVI${id}`).value = msg;
+      document.getElementById(`mgsCustomSaved${id}`).value = msg;
+    }
+    setMsgCBNum(id)
+  }
+
   function msgOVkey(msg) {
-    console.log(msg)
+    // console.log(msg)
     var num = parseInt(msgCBNum) + 1
 
     var element = document.getElementById(`msgOVIKey${num}`)
-    console.log(element)
+    // console.log(element)
     if (typeof (element) != 'undefined' && element != null) {
       // Exists.
       document.getElementById(`msgOVIKey${num}`).value = msg
@@ -653,7 +1117,7 @@ function Chatbot() {
       abc.innerHTML =
         `
         <div id="ovMsgKey${num}" style="width: 70%; background-color: #51cbce; padding: 10px; float:left; margin:5px; display:block; border-radius: 10px">
-      <input type="text" id="msgOVIKey${num}" style="background-color: #51cbce; border: none" readonly/>
+      <input type="text" id="msgOVIKey${num}" style="width: 70%; background-color: #51cbce; border: none" readonly/>
       </div>`
       document.getElementById(`msgOVIKey${num}`).value = msg;
       document.getElementById(`mgsCustomKey${num}`).value = msg;
@@ -662,11 +1126,11 @@ function Chatbot() {
   }
 
   function imgMsgOVkey(msg) {
-    console.log(msg)
+    // console.log(msg)
     var num = parseInt(msgCBNum) + 1
 
     var element = document.getElementById(`imgMsgOVIKey${num}`)
-    console.log(element)
+    // console.log(element)
     if (typeof (element) != 'undefined' && element != null) {
       // Exists.
       document.getElementById(`imgMsgOVIKey${num}`).value = msg
@@ -676,7 +1140,7 @@ function Chatbot() {
       abc.innerHTML =
         `
         <div id="ovImgMsgKey${num}" style="width: 70%; background-color: #51cbce; padding: 10px; float:left; margin:5px; display:block; border-radius: 10px">
-      <input type="text" id="imgMsgOVIKey${num}" style="background-color: #51cbce; border: none" readonly/>
+      <input type="text" id="imgMsgOVIKey${num}" style=" width: 70%; background-color: #51cbce; border: none" readonly/>
       </div>`
       document.getElementById(`imgMsgOVIKey${num}`).value = msg;
       document.getElementById(`imgMgsCustomKey${num}`).value = msg;
@@ -690,7 +1154,7 @@ function Chatbot() {
     document.getElementById("div_custom").appendChild(abc)
     abc.innerHTML =
       `<div id="chatbot_image${numIndex}" style="border-radius: 20px; margin-top: 20px; display:block; background-color: rgb(244, 243, 239); padding: 40px; ">
-      <div><textarea name="imgKey${numIndex}" class="mgsChatbot" id="imgCustomKey${numIndex}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
+      
     <input id="imgNum${numIndex}" name="imageChatbot" type="file" accept="image/*" />
     <input id="imgDataNum${numIndex}" name="imgchatbot${numIndex}" type=hidden /> <br /><br />
     <div style=" text-align: center" }}>
@@ -700,12 +1164,40 @@ function Chatbot() {
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
         font-weight:800">Delete</button>
       </div>
+      <div id="btnAddEachImg${numIndex}" style="float:right; display:block">
+      <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+      font-weight:800">Add</button>
+    </div>
   </div>`
     // document.getElementById(`btnDelImg${numIndex}`).style.display='none'
     document.getElementById(`imgNum${numIndex}`).addEventListener('change', (e) => loadFile(e))
     // document.getElementById(`imgNum${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelImg${numIndex}`).style.display = 'block' })
     document.getElementById(`btnDelImg${numIndex}`).addEventListener('click', () => deleteImgCB(numIndex))
-    document.getElementById(`imgCustomKey${numIndex}`).addEventListener('change', (e) => imgOVkey(e.target.value))
+    document.getElementById(`btnAddEachImg${numIndex}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      // console.log(bagId)
+      var add = {
+        message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value }
+      }
+      api.post(`/api/v1/message_managements/messages`, add).then(res => {
+        // console.log(res)
+        setTimeout(() => {
+          setIsOpenNoti(true)
+          setMsgNoti("Add Successfully")
+        }, 1500)
+        setTimeout(function () {
+          setIsOpenNoti(true)
+          window.location.reload()
+        }, 2000);
+
+      }).catch(error => {
+        console.log(error)
+        // if (error.response.data.code === 3) {
+        //     requestNewToken(path)
+        // }
+      })
+    })
+    // document.getElementById(`imgCustomKey${numIndex}`).addEventListener('change', (e) => imgOVkey(e.target.value))
   }
 
   function addMsgChatbot() {
@@ -714,18 +1206,134 @@ function Chatbot() {
     document.getElementById("div_custom").appendChild(abc)
     abc.innerHTML =
       `<div id="chatbot_message${numIndex}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
-    <div><textarea name="messageKey${numIndex}" class="mgsChatbot" id="mgsCustomKey${numIndex}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
+    
     <div><textarea name="messagesVa${numIndex}" class="mgsChatbot" id="mgsCustom${numIndex}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
-    <div id="btnDelMsg${numIndex}" style="float:right; display:none">
+    <div id="btnDelMsg${numIndex}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
         font-weight:800">Delete</button>
       </div>
+      <div id="btnAddEachMsg${numIndex}" style="float:right; display:block">
+      <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+      font-weight:800">Add</button>
+    </div>
     </div>`
-    document.getElementById(`mgsCustom${numIndex}`).addEventListener('change', (e) => msgOV(e.target.value))
-    document.getElementById(`mgsCustomKey${numIndex}`).addEventListener('change', (e) => msgOVkey(e.target.value))
-    document.getElementById(`mgsCustom${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelMsg${numIndex}`).style.display = 'block' })
-    document.getElementById(`btnDelMsg${numIndex}`).addEventListener('click', () => deleteMsgCB(numIndex))
+    document.getElementById(`btnAddEachMsg${numIndex}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      var element = document.getElementById(`mgsCustom${numIndex}`).value
+      // alert(bagId)
+      var add = {
+        message: { message_bag_id: bagId, message_value: element, message_type: "msg", img_value: "" }
+      }
 
+      api.post(`/api/v1/message_managements/messages`, add).then(res => {
+        // alert("Add Successfully")
+        console.log(res)
+        setTimeout(() => {
+          setIsOpenNoti(true)
+          setMsgNoti("Add Successfully")
+        }, 1500)
+        setTimeout(function () {
+          setIsOpenNoti(false)
+          window.location.reload()
+        }, 2000);
+
+        
+      }).catch(error => {
+        console.log(error)
+      })
+    })
+    document.getElementById(`mgsCustom${numIndex}`).addEventListener('change', (e) => msgOV(e.target.value))
+    // document.getElementById(`mgsCustom${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelMsg${numIndex}`).style.display = 'block' })
+    document.getElementById(`btnDelMsg${numIndex}`).addEventListener('click', () => deleteMsgCB(numIndex))
+  }
+
+  function addPPChatbot(url, id) {
+    setIsOpenSelectPastPost(false)
+    var numIndex = parseInt(ppCBNum) + 1
+    // setPpCBNum(numIndex)
+    var abc = document.createElement("div")
+    document.getElementById("div_custom").appendChild(abc)
+    abc.innerHTML =
+      `<div id="chatbot_pp${numIndex}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
+     <div>
+     <img style="max-width:200px; max-height:200px" src=${url} />
+     <input name="pp_value${numIndex}" value=${id} type=hidden />
+   </div>
+   <div id="btnDelPP${numIndex}" style="float:right; display:block">
+        <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+        font-weight:800">Delete</button>
+      </div>
+      <div id="btnAddPP${numIndex}" style="float:right; display:block">
+        <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+        font-weight:800">Add</button>
+      </div>
+    
+    </div>
+    `
+    // document.getElementById(`ppCustom${numIndex}`).addEventListener('change', (e) => msgOV(e.target.value))
+    ppOV(url)
+    // document.getElementById(`mgsCustom${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelMsg${numIndex}`).style.display = 'block' })
+    document.getElementById(`btnDelPP${numIndex}`).addEventListener('click', () => deletePPCB(numIndex))
+    document.getElementById(`btnAddPP${numIndex}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      var add = {
+        message: { message_bag_id: bagId, message_value: id.toString(), message_type: "past_post", img_value: "", preview_past_post_url: url }
+      }
+      api.post(`/api/v1/message_managements/messages`, add).then(res => {
+        console.log(res)
+        setTimeout(() => {
+          setIsOpenNoti(true)
+          setMsgNoti("Add Successfully")
+        }, 1500)
+        setTimeout(function () {
+          setIsOpenNoti(false)
+          window.location.reload()
+        }, 2000);
+      }).catch(error => {
+        console.log(error)
+        // if (error.response.data.code === 3) {
+        //     requestNewToken(path)
+        // }
+      })
+    })
+  }
+
+  const [idUpdatePastPost, setIdUpdatePastPost] = useState()
+  const [urlUpdatePastPost, setURLUpdatePastPost] = useState()
+  function upPP(ppurl, id) {
+    // if(document.getElementById(`lbOvPP${idPPUP}`)!== null){
+    //   document.getElementById(`lbOvPP${idPPUP}`).style.display = "none"
+    // document.getElementById(`ppCustomSavedOvi${idPPUP}`).style.display = "none"
+    // }
+    // document.getElementById(`imgUpPP${idPPUP}`).style.display = "block"
+
+    // document.getElementById(`imgUpPP${idPPUP}`).style.display = "block"
+
+    document.getElementById(`imgUpPP${idPPUP}`).src = ppurl
+    document.getElementById(`PPUpOV${idPPUP}`).src = ppurl
+    // setIdUpdatePastPost(id)
+    // setURLUpdatePastPost(ppurl)
+    setIsOpenSelectPastPostUp(false)
+    document.getElementById(`btnUpdatePP${idPPUP}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      document.getElementById(`btnUpdatePP${idPPUP}`).style.display = "none"
+      document.getElementById(`btnChangePP${idPPUP}`).style.display = "block"
+      var update = { message: { message_value: id, message_type: "past_post", img_value: "", preview_past_post_url: ppurl } }
+      api.patch(`/api/v1/message_managements/messages/${idPPUP}`, update).then(res => {
+        console.log("Update post response: ", res)
+        setTimeout(() => {
+          setIsOpenNoti(true)
+          setMsgNoti("Update Successfully")
+        }, 1500)
+        setTimeout(function () {
+          setIsOpenNoti(false)
+          window.location.reload()
+        }, 2000);
+        
+      }).catch(error => {
+        console.log(error)
+      })
+    })
   }
 
   function addImgMsgChatbot() {
@@ -734,7 +1342,7 @@ function Chatbot() {
     document.getElementById("div_custom").appendChild(abc)
     abc.innerHTML =
       `<div id="chatbot_image_msg${numIndex}" style="border-radius: 20px; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
-      <div><textarea name="imgMsgKey${numIndex}" class="mgsChatbot" id="imgMgsCustomKey${numIndex}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
+     
     <input id="imgMsgNum${numIndex}" type="file" accept="image/*" /> <br /><br />
     <input id="imgValueMsgNum${numIndex}" name="imgValueMsgChatbot${numIndex}" type=hidden /> <br /><br />
     <div style=" text-align: center" }}>
@@ -743,19 +1351,45 @@ function Chatbot() {
     <div style="text-align: center">
     <textarea class="mgsChatbot" id="imgMgsCustom${numIndex}" name="imgMsgValueChatbot${numIndex}" placeholder="返事入力..." type="text" rows="3"></textarea>
     </div>
-    <div id="btnDelImgMsg${numIndex}" style="float:right; display:none">
+    <div id="btnDelImgMsg${numIndex}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
         font-weight:800">Delete</button>
       </div>
+      <div id="btnAddImgMsg${numIndex}" style="float:right; display:block">
+        <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+        font-weight:800">Add</button>
+      </div>
   </div>`
 
-    console.log(document.getElementById(`outputImgMsg${numIndex}`))
+    // console.log(document.getElementById(`outputImgMsg${numIndex}`))
     document.getElementById(`imgMsgNum${numIndex}`).addEventListener('change', (e) => loadFileImgMsg(e))
     document.getElementById(`imgMgsCustom${numIndex}`).addEventListener('change', (e) => imgMsgOV(e.target.value))
-    document.getElementById(`imgMsgNum${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${numIndex}`).style.display = 'block' })
-    document.getElementById(`imgMgsCustom${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${numIndex}`).style.display = 'block' })
+    // document.getElementById(`imgMsgNum${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${numIndex}`).style.display = 'block' })
+    // document.getElementById(`imgMgsCustom${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${numIndex}`).style.display = 'block' })
     document.getElementById(`btnDelImgMsg${numIndex}`).addEventListener('click', () => deleteImgMsgCB(numIndex))
-    document.getElementById(`imgMgsCustomKey${numIndex}`).addEventListener('change', (e) => imgMsgOVkey(e.target.value))
+    document.getElementById(`btnAddImgMsg${numIndex}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      var add = {
+        message: { message_bag_id: bagId, message_value: document.getElementById(`imgMgsCustom${numIndex}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value }
+      }
+      api.post(`/api/v1/message_managements/messages`, add).then(res => {
+        console.log(res)
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setMsgNoti("Add Successfully")
+        }, 1500)
+        setTimeout(function () {
+          setIsOpenNoti(false)
+          window.location.reload()
+        }, 2000);
+      }).catch(error => {
+        console.log(error)
+        // if (error.response.data.code === 3) {
+        //     requestNewToken(path)
+        // }
+      })
+    })
+
 
   }
 
@@ -772,11 +1406,25 @@ function Chatbot() {
     var element = document.getElementById(`chatbot_message${idDelete}`)
     var elementOV = document.getElementById(`ovMsg${idDelete}`)
     element.remove()
-    elementOV.remove()
+    if (elementOV !== null) {
+      elementOV.remove()
+    }
+  }
+  function deleteSavedMsgCB(idDelete) {
+
+  }
+
+  function deletePPCB(idDelete) {
+    var element = document.getElementById(`chatbot_pp${idDelete}`)
+    var elementOV = document.getElementById(`ovPPCB${idDelete}`)
+    element.remove()
+    if (elementOV !== null) {
+      elementOV.remove()
+    }
   }
 
   function deleteImgMsgCB(idDelete) {
-    console.log('id delete: ', idDelete)
+    // console.log('id delete: ', idDelete)
     var element = document.getElementById(`chatbot_image_msg${idDelete}`)
     var elementMsgOV = document.getElementById(`ovMsgCB${idDelete}`)
     var elementImgOV = document.getElementById(`outputImgMsgOV${idDelete}`)
@@ -787,6 +1435,24 @@ function Chatbot() {
       elementMsgOV.remove()
     }
     element.remove()
+  }
+  function deleteSavedImgMsg(idDelete) {
+    alert('id delete: ', idDelete)
+    api.delete(`/api/v1/message_managements/messages/${idDelete}`).then(res => {
+      alert('deleted')
+    }).catch(error => {
+      console.log(error)
+    })
+    // var element = document.getElementById(`chatbot_image_msg${idDelete}`)
+    // var elementMsgOV = document.getElementById(`ovMsgCB${idDelete}`)
+    // var elementImgOV = document.getElementById(`outputImgMsgOV${idDelete}`)
+    // if (elementImgOV !== null) {
+    //   elementImgOV.remove()
+    // }
+    // if (elementMsgOV !== null) {
+    //   elementMsgOV.remove()
+    // }
+    // element.remove()
   }
 
   // function getBaseUrl() {
@@ -831,70 +1497,109 @@ function Chatbot() {
     var key = []
     var value = []
     var img_value = []
+    var pp = []
     var type = []
-    for (var i = 0; i < elements.length - 1; i++) {
+    for (var i = 0; i < elements.length - 1; i++) { //pp_value
       var item = elements.item(i);
       // obj[item.name] = item.value;
-      if (item.name.includes(`Key`)) {
-        if (item.name.includes(`messageKey`)) {
-          // key.push({[item.name]: item.value})
-          key.push(item.value)
-          type.push('msg')
-          // obj.key =[]
-        } else if (item.name.includes(`imgKey`)) {
-          // key.push({[item.name]: item.value})
-          key.push(item.value)
-          type.push('img')
-          // obj.key =[]
-        } else if (item.name.includes(`imgMsgKey`)) {
-          key.push(item.value)
-          type.push('img_msg')
-        }
-      }
 
-      // else if(item.name.includes(`imgchatbot`)){
+      if (item.name.includes(`messagesVa`)) {
+        // value.push({[item.name]: item.value})
+        value.push(item.value)
+        img_value.push('')
+        type.push('msg')
+      } else if (item.name.includes(`imgchatbot`)) {
+        // key.push({[item.name]: item.value})
+        // key.push('imgchatbot')
+        img_value.push(item.value)
+        value.push('')
+        type.push('img')
+        // obj.key =[]
+      } else if (item.name.includes(`imgValueMsgChatbot`)) {
+
+        img_value.push(item.value)
+        for (var i = 0; i < elements.length - 1; i++) {
+          var items = elements.item(i);
+          if (items.name.includes(`imgMsgValueChatbot`)) {
+            value.push(items.value)
+            alert("imgValueMsgChatbot")
+          }
+        }
+        // value.push(item.value)
+        type.push('img_msg')
+      } else if (item.name.includes(`pp_value`)) {
+        value.push(item.value)
+        img_value.push('')
+        type.push('past_post')
+      }
+      // else if (item.name.includes(`imgMsgValueChatbot`)) {
       //   value.push(item.value)
-
       // }
-      else {
-        if (item.name.includes(`messagesVa`)) {
-          // value.push({[item.name]: item.value})
-          value.push(item.value)
-          img_value.push('')
-        } else if (item.name.includes(`imgchatbot`)) {
-          // key.push({[item.name]: item.value})
-          // key.push('imgchatbot')
-          img_value.push(item.value)
-          value.push('')
-          // obj.key =[]
-        } else if (item.name.includes(`imgValueMsgChatbot`)) {
-          img_value.push(item.value)
-        } else if (item.name.includes(`imgMsgValueChatbot`)) {
-          value.push(item.value)
-        }
 
-      }
+
+      // if (item.name.includes(`Key`)) {
+      //   if (item.name.includes(`messageKey`)) {
+      //     // key.push({[item.name]: item.value})
+      //     key.push(item.value)
+      //     type.push('msg')
+      //     // obj.key =[]
+      //   } else if (item.name.includes(`imgKey`)) {
+      //     // key.push({[item.name]: item.value})
+      //     key.push(item.value)
+      //     type.push('img')
+      //     // obj.key =[]
+      //   } else if (item.name.includes(`imgMsgKey`)) {
+      //     key.push(item.value)
+      //     type.push('img_msg')
+      //   }
+      // }
+      // else {
+      //   if (item.name.includes(`messagesVa`)) {
+      //     // value.push({[item.name]: item.value})
+      //     value.push(item.value)
+      //     img_value.push('')
+      //   } else if (item.name.includes(`imgchatbot`)) {
+      //     // key.push({[item.name]: item.value})
+      //     // key.push('imgchatbot')
+      //     img_value.push(item.value)
+      //     value.push('')
+      //     // obj.key =[]
+      //   } else if (item.name.includes(`imgValueMsgChatbot`)) {
+      //     img_value.push(item.value)
+      //   } else if (item.name.includes(`imgMsgValueChatbot`)) {
+      //     value.push(item.value)
+      //   }
+      // }
     }
-    console.log(obj)
-    key.forEach((ele, index) => {
+    // console.log("value: ", value)
+    // console.log("img_value: ", img_value)
+    value.forEach((ele, index) => {
       // var type
       // if(key[index].includes('imgchatbot')){
       //   type = 'img'
       // }else {
       //   type = 'msg'
       // }
-      obj[ele] = { "message_bag_id": bagId, message_type: type[index], received_message: key[index], message_value: value[index], img_value: img_value[index] }
+
+      //old ele
+      // obj[ele] = { "message_bag_id": bagId, message_type: type[index], received_message: key[index], message_value: value[index], img_value: img_value[index] }
+      //new ele
+      obj[ele] = { "message_bag_id": bagId, message_type: type[index], message_value: value[index], img_value: img_value[index] }
+
     })
     var script = { messages: Object.values(obj) }
 
     // console.log(JSON.stringify(script))
     var newScript = JSON.stringify(script)
-    console.log(newScript)
+    // console.log(newScript)
 
 
 
     api.post(`/api/v1/message_managements/messages`, script).then(res => {
-      setMsgNoti("メッセージを追加しました。")
+      console.log("message_managements/messages: ", res)
+      setTimeout(() => {
+        setMsgNoti("メッセージを追加しました。")
+      }, 1500)
       setIsOpenNoti(true)
     }).catch(error => {
       alert(error)
@@ -963,6 +1668,58 @@ function Chatbot() {
     }
   }
 
+  var page_access_token = Cookies.get("page_access_token")
+  var ig_id = Cookies.get("ig_id")
+  const [idPastPost, setIdPastPost] = useState([])
+  const [pastPostList, setPastPostList] = useState([])
+  const [indexPP, setIndexPP] = useState()
+  async function getPastPost() {
+    const getPastPost = await axios.get(`https://graph.facebook.com/v14.0/${ig_id}/media?access_token=${page_access_token}`).then(res => {
+      return res.data.data
+
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+    console.log(getPastPost)
+    var past_post = []
+    for (var i = 0; i < getPastPost.length; i++) {
+      await axios.get(`https://graph.facebook.com/v14.0/${getPastPost[i].id}?fields=id,media_type,media_url,username,timestamp&access_token=${page_access_token}`).then(res => {
+        // console.log(res)
+        past_post.push(res.data)
+
+      }).catch(error => {
+        console.log(error)
+      })
+    }
+
+    setPastPostList(past_post)
+    setIndexPP(past_post.length)
+    // console.log("pp: ", past_post)
+
+  }
+
+  function selectPastPost() {
+    getPastPost()
+    setTimeout(() => {
+      setIsOpenSelectPastPost(true)
+      // console.log("getPP: ", pastPostList)
+    }, 1500)
+  }
+
+  function selectPastPostUp() {
+    getPastPost()
+    setTimeout(() => {
+      setIsOpenSelectPastPostUp(true)
+      // console.log("getPP: ", pastPostList)
+    }, 1500)
+  }
+
+  function setUpPP() {
+
+  }
 
   return (
     <>
@@ -978,7 +1735,7 @@ function Chatbot() {
                         <div style={{ display: "flex", width: "200%" }}>
                           <div style={{ width: "30%" }}>
                             <h5 id="jjjj">メッセージグループ</h5>
-                            <div> 
+                            <div>
                               <Button style={{ fontSize: "10px", marginTop: "-5%" }} onClick={() => setIsOpenAddChatbot(true)}>グループ追加</Button><br />
                               <Nav className="sidebar-wrapper">
                                 <ul style={{ listStyleType: "none", width: "100%" }}>
@@ -1042,7 +1799,8 @@ function Chatbot() {
                                 <i className="nc-icon nc-single-copy-04" style={{ color: "black", fontSize: "20px", fontWeight: "100", paddingTop: "5px", paddingBottom: "10px" }} /><br />
                                 画像＋テキスト
                               </button>
-                              <button style={{ width: "100px", height: "80px", backgroundColor: "#f4f3ef", borderRadius: "20px", textAlign: "center", marginLeft: "10px" }}>
+                              <button style={{ width: "100px", height: "80px", backgroundColor: "#f4f3ef", borderRadius: "20px", textAlign: "center", marginLeft: "10px" }}
+                                onClick={() => selectPastPost()}>
                                 <i className="nc-icon nc-box" style={{ color: "black", fontSize: "20px", fontWeight: "100", paddingTop: "5px", paddingBottom: "10px" }} /><br />
                                 過去の投稿
                               </button>
@@ -1071,7 +1829,7 @@ function Chatbot() {
 
                                 </div>
                               </form>
-                              <Button style={{ float: "right" }} id="btnAddScript" onClick={addScript}> 保存</Button>
+                              {/* <Button style={{ float: "right" }} id="btnAddScript" onClick={addScript}> 保存</Button> */}
                             </div>
                             {/* </div> */}
                           </div>
@@ -1119,6 +1877,33 @@ function Chatbot() {
             <h4>{msgNoti}</h4>
           </div>
         </ModalNoti>
+        <Modal open={isOpenSelectPastPost} onClose={() => setIsOpenSelectPastPost(false)}>
+          <div style={{ width: "700px", textAlign: "center", color: "#51cbce" }}>
+            <h4>Select past post</h4>
+            <div className="grid-container">
+              {pastPostList.map((pp, i) => (
+                <div onClick={() => addPPChatbot(pp.media_url, pp.id)} className="grid-item" style={{ width: "200px" }} key={i}>
+                  <img style={{ height: "100px" }} src={pp.media_url}></img>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </Modal>
+        <Modal open={isOpenSelectPastPostUp} onClose={() => setIsOpenSelectPastPostUp(false)}>
+          <div style={{ width: "700px", textAlign: "center", color: "#51cbce" }}>
+            <h4>Select past post</h4>
+            <div className="grid-container">
+              {pastPostList.map((pp, i) => (
+                <div onClick={() => upPP(pp.media_url, pp.id)} className="grid-item" style={{ width: "200px" }} key={i}>
+                  <img style={{ height: "100px" }} src={pp.media_url}></img>
+                </div>
+              ))}
+            </div>
+
+          </div>
+        </Modal>
+
       </div>
     </>
   );

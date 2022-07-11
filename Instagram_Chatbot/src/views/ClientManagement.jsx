@@ -595,9 +595,9 @@ function ClientManagement() {
                           <td>{item.name}</td>
                           <td>{item.plan}</td>
                           <td>{item.price}</td>
-                          <td id="dateStart">{(item.subscription_start_at === null || item.subscription_start_at ==="") ? "" : item.subscription_start_at.slice(0, 10)}</td>
+                          <td id="dateStart">{item.subscription_start_at}</td>
                           {/* .slice(0, 10) */}
-                          <td id="dateEnd">{(item.subscription_end_at === null || item.subscription_end_at ==="") ? "" : item.subscription_end_at.slice(0, 10)}</td>
+                          <td id="dateEnd">{item.subscription_end_at}</td>
                           {/* .slice(0, 10) */}
                           <td>{item.address}</td>
                           <td>{item.last_sign_in_at}</td>
