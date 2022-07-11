@@ -7,6 +7,7 @@ import requestNewToken from "api/request-new-token";
 // reactstrap components
 import { Card, CardHeader, CardBody, Row, Col } from "reactstrap";
 import Switch from "react-switch";
+import ModalNoti from "./Popup/ModalNoti";
 
 function Keyword() {
 
@@ -17,6 +18,8 @@ function Keyword() {
     const [bagName, setBagName] = useState([])
     const [instaSetting, setInstaSetting] = useState()
     const [newKWBag, setNewKWBag] = useState()
+    const [isOpenNoti, setIsOpenNoti] = useState(false)
+    const [msgNoti, setMsgNoti] = useState()
     // const [checked, setChecked] = useState([true, false, true])
 
     React.useEffect(() => {
@@ -191,28 +194,53 @@ function Keyword() {
         //     obj[ele] = { title: title_val[index], keyword: keyword_val[index], instagram_account_id: instaSetting, message_bag_id: bag[index] }
         // })
 
-        var newKW = { keyword_setting: { title: title_val[0], keyword: keyword_val[0], instagram_account_id: instaSetting, message_bag_id: parseInt(newKWBag) } }
-        console.log(newKW)
 
+        if (title_val[0] == "" || title_val[0] == null) {
+            setIsOpenNoti(true)
+            setMsgNoti("Please input Title")
+            setTimeout(() => {
+                setMsgNoti("")
+                setIsOpenNoti(false)
+            }, 1500)
+        } else if (keyword_val[0] == "" || keyword_val[0] == null) {
+            setIsOpenNoti(true)
+            setMsgNoti("Please input Keyword")
+            setTimeout(() => {
+                setMsgNoti("")
+                setIsOpenNoti(false)
+            }, 1500)
 
+        } else if (newKWBag == undefined || newKWBag == "") {
+            setIsOpenNoti(true)
+            setMsgNoti("Please input Bag")
+            setTimeout(() => {
+                setMsgNoti("")
+                setIsOpenNoti(false)
+            }, 1500)
+        } else {
+            var newKW = { keyword_setting: { title: title_val[0], keyword: keyword_val[0], instagram_account_id: instaSetting, message_bag_id: parseInt(newKWBag) } }
+            // console.log(newKW)
+            var nodeBtn = document.getElementById("addbtn").getElementsByTagName('*')
+            for (var i = 0; i < nodeBtn.length; i++) {
+                nodeBtn[i].disabled = false;
+            }
 
-
-
-        var nodeBtn = document.getElementById("addbtn").getElementsByTagName('*')
-        for (var i = 0; i < nodeBtn.length; i++) {
-            nodeBtn[i].disabled = false;
+            api.post(`/api/v1/message_managements/keyword_settings`, newKW).then(res => {
+                console.log(res)
+                setIsOpenNoti(true)
+                setMsgNoti("Add keyword sucessfully")
+                setTimeout(() => {
+                    setMsgNoti("")
+                    setIsOpenNoti(false)
+                }, 1500)
+                reloadListKW()
+                setCustomDiv([])
+                // setListBag(res.data.data.message_bags)
+            }).catch(error => {
+                console.log(error)
+            })
         }
-        // setFixMnText("")
-        // document.getElementById("validateFixedMenu").style.display = "none"
 
-        api.post(`/api/v1/message_managements/keyword_settings`, newKW).then(res => {
-            console.log(res)
-            reloadListKW()
-            setCustomDiv([])
-            // setListBag(res.data.data.message_bags)
-        }).catch(error => {
-            console.log(error)
-        })
     }
 
     function enableEdit(value) {
@@ -242,32 +270,63 @@ function Keyword() {
 
         }
 
-        if (is_active_val == null) {
-            a = false
+        if (title_val == "") {
+            setIsOpenNoti(true)
+            setMsgNoti("Please input Title")
+            setTimeout(() => {
+                setMsgNoti("")
+                setIsOpenNoti(false)
+            }, 1500)
+        } else if (bag_val == "") {
+            setIsOpenNoti(true)
+            setMsgNoti("Please select Bag")
+            setTimeout(() => {
+                setMsgNoti("")
+                setIsOpenNoti(false)
+            }, 1500)
+        } else if (ans_val == "") {
+            setIsOpenNoti(true)
+            setMsgNoti("Please input Keyword")
+            setTimeout(() => {
+                setMsgNoti("")
+                setIsOpenNoti(false)
+            }, 1500)
         } else {
-            a = is_active_val
-        }
-        var update = {
-            keyword_setting: {
-                title: title_val, keyword: kw, instagram_account_id: instagram_account_id_val, message_bag_id: parseInt(bag_val),
-                is_dm: true, is_story_comment: is_story_comment_val, is_post_comment: is_post_comment_val, is_live_comment: is_live_comment_val, is_active: a
+            if (is_active_val == null) {
+                a = false
+            } else {
+                a = is_active_val
             }
+            var update = {
+                keyword_setting: {
+                    title: title_val, keyword: kw, instagram_account_id: instagram_account_id_val, message_bag_id: parseInt(bag_val),
+                    is_dm: true, is_story_comment: is_story_comment_val, is_post_comment: is_post_comment_val, is_live_comment: is_live_comment_val, is_active: a
+                }
+            }
+
+            api.patch(`/api/v1/message_managements/keyword_settings/${idUpdate}`, update).then(res => {
+                reloadListKW()
+                document.getElementById(`ene-${i}`).style.display = "block"
+                document.getElementById(`sav-${i}`).style.display = "none"
+                // window.location.reload()
+                // setMsgNoti(`固定メッセージ設定をオンにしました。`)
+                // setIsOpenNoti(true)
+                // setTimeout(() => {
+                //   setMsgNoti("")
+                //   setIsOpenNoti(false)
+                // }, 2000)
+                setIsOpenNoti(true)
+                setMsgNoti("Update keyword successfully")
+                setTimeout(() => {
+                    setMsgNoti("")
+                    setIsOpenNoti(false)
+                }, 1500)
+            }).catch(error => {
+                console.log(error)
+            })
         }
 
-        api.patch(`/api/v1/message_managements/keyword_settings/${idUpdate}`, update).then(res => {
-            reloadListKW()
-            document.getElementById(`ene-${i}`).style.display = "block"
-            document.getElementById(`sav-${i}`).style.display = "none"
-            // window.location.reload()
-            // setMsgNoti(`固定メッセージ設定をオンにしました。`)
-            // setIsOpenNoti(true)
-            // setTimeout(() => {
-            //   setMsgNoti("")
-            //   setIsOpenNoti(false)
-            // }, 2000)
-        }).catch(error => {
-            console.log(error)
-        })
+
 
     }
     function deleteKeyword(value) {
@@ -283,7 +342,7 @@ function Keyword() {
 
         document.getElementById("cancel_save").style.display = "none"
         const list = document.getElementById("keyword_add");
-        console.log(list)
+        // console.log(list)
         while (list.hasChildNodes()) {
             list.removeChild(list.firstChild);
         }
@@ -295,7 +354,7 @@ function Keyword() {
 
     function getBgName(id, index) {
         api.get(`/api/v1/message_managements/message_bags/${id}`).then(res => {
-            console.log("index: ", index, ": ", res.data.data.message_bag.bag_name)
+            // console.log("index: ", index, ": ", res.data.data.message_bag.bag_name)
 
             var x = document.getElementById(`listBag${index}`)
             var option = document.createElement("option")
@@ -399,7 +458,7 @@ function Keyword() {
                                                             cdiv.is_story_comment, cdiv.is_post_comment, cdiv.is_live_comment, cdiv.is_active, cdiv.id, i)} onColor="#64c1ff" checked={cdiv.is_active = null ? false : cdiv.is_active} />
                                                         <input name={`l-title-keyword-${i}`} defaultValue={cdiv.title} id={`l-title-keyword-${i}`} className="new-faq-q-so" placeholder="Keyword group..." type="text" style={{ width: "20%" }} />
 
-                                                        <input name={`l-answer-${i}`} defaultValue={cdiv.keyword.replaceAll("|", ", ")} className="new-faq-q-so" type="text" id={`l-answer-${i}`} placeholder="Keyword split by comma or space(key1, key2,...)" style={{ width: "53%" }} />
+                                                        <input name={`l-answer-${i}`} defaultValue={(cdiv.keyword === null || cdiv.keyword === "") ? "" : cdiv.keyword.replaceAll("|", ", ")} className="new-faq-q-so" type="text" id={`l-answer-${i}`} placeholder="Keyword split by comma or space(key1, key2,...)" style={{ width: "53%" }} />
                                                         <select id={`listGroup${i}`} style={{ width: "25%" }} defaultValue={""} onChange={(e) => selectedGroup(e.target.value, i)} className="new-faq-q-so" name="l-group">
                                                             <option value="" disabled hidden>メッセージグループ選択 ...</option>
                                                             {listGroup?.map((group, i) => {
@@ -425,7 +484,7 @@ function Keyword() {
                                                 {customDiv.map((cdiv, i) => (
                                                     <div key={cdiv}>
                                                         <div id={`fixed-div-${i}`} className="div-add-aq" style={{ display: "flex", width: "100%" }}>
-                                                            <div style={{width:"90px", position: "relative", display: "inline-block", opacity: "1", direction: "ltr", transition: "opacity 0.25s ease 0s"}}></div>
+                                                            <div style={{ width: "90px", position: "relative", display: "inline-block", opacity: "1", direction: "ltr", transition: "opacity 0.25s ease 0s" }}></div>
                                                             <input name={`title-keyword-${i}`} id={`title-keyword-${i}`} className="new-faq-q-so" placeholder="Keyword group..." type="text" style={{ width: "20%" }} />
 
                                                             <input name={`answer-${i}`} className="new-faq-q-so" type="text" placeholder="Keyword split by space or comma (key1,key2,...)" style={{ width: "53%" }} />
@@ -459,6 +518,11 @@ function Keyword() {
                         </Card>
                     </Col>
                 </Row>
+                <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+                    <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+                        <h4>{msgNoti}</h4>
+                    </div>
+                </ModalNoti>
             </div>
         </>
     );
