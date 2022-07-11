@@ -26,6 +26,7 @@ import UpgradeToPro from "views/Upgrade.jsx";
 import Release from "views/Release";
 import UserManagement from "views/UserManagement";
 import Pricing from "views/Pricing";
+import Keyword from "views/Keyword";
 // import Cookies from 'js-cookie'
 
 var routes = [
@@ -55,6 +56,13 @@ var routes = [
     name: "価格",
     icon: "nc-icon nc-bulb-63",
     component: Pricing,
+    layout: "/admin",
+  },
+  {
+    path: "/keyword",
+    name: "Keyword",
+    icon: "nc-icon nc-key-25",
+    component: Keyword,
     layout: "/admin",
   },
   {

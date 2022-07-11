@@ -80,6 +80,12 @@ function Sidebar(props) {
                 <p style={{ color: "black" }}>Chatbot</p>
               </NavLink>
             </li>
+            <li className={activeRoute('keyword') + (true ? " active-pro" : "")} key={'keyword'}>
+              <NavLink to="keyword" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-key-25" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>Keyword</p>
+              </NavLink>
+            </li>
             <li className={activeRoute('release') + (true ? " active-pro" : "")} key={'release'}>
               <NavLink to="release" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-air-baloon" style={{ color: "black" }} />

@@ -4,11 +4,24 @@
     border-radius: 10px;
     border: 2px solid #64c1ff
 }
+.new-faq-q-title{
+    width: 50%;
+    margin-right: 3%;
+    border-radius: 10px;
+}
 .new-faq-q-so{
     width: 50%;
     margin-right: 3%;
     border-radius: 10px;
     border: 2px solid #64c1ff;
+    padding: 3px 0px 3px 0px;
+    margin: 0% 1% 0% 2%
+
+}
+.new-faq-q-so-title{
+    width: 50%;
+    margin-right: 3%;
+    border-radius: 10px;
     padding: 3px 0px 3px 0px;
     margin: 0% 1% 0% 2%
 
