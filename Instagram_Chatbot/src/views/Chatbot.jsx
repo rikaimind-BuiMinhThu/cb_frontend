@@ -1,17 +1,11 @@
 import React, { useState } from "react";
-import { Dropdown, DropdownButton, Nav, NavLink } from "react-bootstrap";
-import NotificationAlert from "react-notification-alert";
+import { Nav} from "react-bootstrap";
 import {
-  UncontrolledAlert,
-  Alert,
   Button,
   Card,
-  CardHeader,
   CardBody,
-  CardTitle,
   Row,
   Col,
-  NavbarBrand,
 } from "reactstrap";
 import "../assets/css/general.css";
 import Cookies from "js-cookie";
