@@ -390,7 +390,7 @@ function Chatbot() {
           //     toDataURL(`https://ec-chatbot-test.com/${item.img_value.url}`, function(dataURL){
           //       alert(dataURL);      
           //   })
-          
+
 
           // function toDataURL(url, callback) {
           //   var httpRequest = new XMLHttpRequest();
@@ -2469,6 +2469,7 @@ reloadMessMsgBag()
                                           <p id="a_tag" style={{ fontSize: "15px" }} onClick={() => getMessage(data.id)}>&nbsp;&nbsp;{data.group_name}</p>
                                           <ul id="ulMesBag" style={{ listStyleType: "none", width: "100%" }}>
                                             <li id="liMesBag">
+                                              
                                               {/* <Nav id="itemBag" >
                                                 {itemBbag.message_bags && itemBbag.message_bags.map((datagroup, key2) => {
                                                   return (
