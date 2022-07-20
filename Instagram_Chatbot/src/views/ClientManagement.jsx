@@ -136,7 +136,7 @@ function ClientManagement() {
       setTitle(data.title)
       setManager(data.responsible_person)
       setManagerKata(data.responsible_person_katakana)
-      setUrlLogo(`https://ecchatbot-dev.ddns.net/${data.logo_url.url}`)
+      setUrlLogo(`https://ec-chatbot-test.com/${data.logo_url.url}`)
       setUrl(data.url)
       setZipCode(data.zip_code)
       // console.log('prefecture: ' ,data.prefecture)
@@ -195,7 +195,7 @@ function ClientManagement() {
       setTitle(data.title)
       setManager(data.responsible_person)
       setManagerKata(data.responsible_person_katakana)
-      setUrlLogo(`https://ecchatbot-dev.ddns.net/${data.logo_url.url}`)
+      setUrlLogo(`https://ec-chatbot-test.com/${data.logo_url.url}`)
       setUrl(data.url)
       setZipCode(data.zip_code)
       // if (data.prefecture === null) {
@@ -591,7 +591,7 @@ function ClientManagement() {
                       items && items.map(item => (
                         <tr key={item.id} style={{ overflow: "hidden", height: "14px", }}>
                           <td>{item.id}</td>
-                          <td style={{ margin: "0", padding: "0" }}><img src={`https://ecchatbot-dev.ddns.net${item.logo_url.url}`} style={{ maxHeight: "60px", maxWidth: "100px" }} alt="" /></td>
+                          <td style={{ margin: "0", padding: "0" }}><img src={`https://ec-chatbot-test.com${item.logo_url.url}`} style={{ maxHeight: "60px", maxWidth: "100px" }} alt="" /></td>
                           <td>{item.name}</td>
                           <td>{item.plan}</td>
                           <td>{item.price}</td>
