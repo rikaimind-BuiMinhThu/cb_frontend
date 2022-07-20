@@ -1,17 +1,11 @@
 import React, { useState } from "react";
-import { Dropdown, DropdownButton, Nav, NavLink } from "react-bootstrap";
-import NotificationAlert from "react-notification-alert";
+import { Nav } from "react-bootstrap";
 import {
-  UncontrolledAlert,
-  Alert,
   Button,
   Card,
-  CardHeader,
   CardBody,
-  CardTitle,
   Row,
   Col,
-  NavbarBrand,
 } from "reactstrap";
 import "../assets/css/general.css";
 import Cookies from "js-cookie";
@@ -34,6 +28,7 @@ function Chatbot() {
   const [msgNoti, setMsgNoti] = useState()
   const [idList, setIdList] = useState([])
   const [idMsgGr, setIdMsgGr] = useState()
+  const [idMsgRenameGr, setIdRenameMsgGr] = useState()
   const [bagId, setBagId] = useState()
   var [customDiv, setCustomDiv] = useState([])
 
@@ -89,7 +84,31 @@ function Chatbot() {
     })
   }, [])
 
-
+  function reloadGroup(){
+    var path = window.location.pathname;
+    api.get(`/api/v1/message_managements/message_groups`).then(res => {
+      // var totalPage = Math.ceil(res.data.data.total / 25)
+      // setTotalPage(totalPage)
+      var idli = []
+      for (var i = 0; i < res.data.data.length; i++) {
+        idli.push(res.data.data[i].id)
+        // 
+      }
+      setIdList(idli)
+      // console.log(idli)
+      setGroupList(res.data.data)
+      setTimeout(() => {
+        for (var i = 0; i < idli.length; i++) {
+          document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
+        }
+      }, 1000)
+    }).catch(error => {
+      console.log(error)
+      if (error.response.data.code === 3) {
+        requestNewToken(path)
+      }
+    })
+  }
 
   ///bo comment ben tren
   const [idPPUP, setIdPPUP] = useState()
@@ -124,7 +143,9 @@ function Chatbot() {
 
 
 
+  const [idForReloadMsgBag, setIdForReloadMsgBag] = useState()
   function getBagMsg(group, id) {//
+    setIdForReloadMsgBag(id)
     var path = window.location.pathname;
     const list = document.getElementById("div_custom");
     while (list.hasChildNodes()) {
@@ -170,14 +191,16 @@ function Chatbot() {
             event.preventDefault()
             api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
               console.log(res)
+
+              
               setTimeout(() => {
                 setIsOpenNoti(true)
                 setMsgNoti("Delete Successfully")
               }, 1500)
               setTimeout(function () {
                 setIsOpenNoti(false)
-                window.location.reload()
               }, 2000);
+              getBagMsg(group, id)
             }).catch(error => {
               console.log(error)
             })
@@ -187,14 +210,16 @@ function Chatbot() {
             var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
             api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
               console.log(res)
+              
               setTimeout(() => {
                 setIsOpenNoti(true)
                 setMsgNoti("Update Successfully")
               }, 1500)
+
               setTimeout(function () {
                 setIsOpenNoti(false)
-                window.location.reload()
               }, 2000);
+              getBagMsg(group, id)
             }).catch(error => {
               console.log(error)
             })
@@ -261,10 +286,11 @@ function Chatbot() {
                 setIsOpenNoti(true)
                 setMsgNoti("Delete Successfully")
               }, 1500)
+              
               setTimeout(function () {
                 setIsOpenNoti(false)
-                window.location.reload()
               }, 2000);
+              getBagMsg(group, id)
             }).catch(error => {
               console.log(error)
             })
@@ -281,10 +307,550 @@ function Chatbot() {
                 setIsOpenNoti(true)
                 setMsgNoti("Update Successfully")
               }, 1500)
+              
               setTimeout(function () {
                 setIsOpenNoti(false)
-                window.location.reload()
               }, 2000);
+              getBagMsg(group, id)
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+
+
+          // console.log('value ne: ',document.getElementById(`output${item.id}`))
+          // document.getElementById(`imgNum${item.id}`).value = item.img_value.src
+
+          // getBaseUrlDis(item.id, item.img_value.url)
+
+
+
+          // const toDataURL = url => fetch(url)
+          //   .then(response => response.blob())
+          //   .then(blob => new Promise((resolve, reject) => {
+          //     const reader = new FileReader()
+          //     reader.onloadend = () => resolve(reader.result)
+          //     reader.onerror = reject
+          //     reader.readAsDataURL(blob)
+          //   }))
+
+
+          // toDataURL(`https://ecchatbot-dev.ddns.net/${item.img_value.url}`)
+          //   .then(dataUrl => {
+          //     console.log('RESULT:', dataUrl)
+          //   })
+
+          var src = document.getElementById(`output${item.id}`).src
+
+          const getEmergencyFoundImg = urlImg => {
+            var img = new Image();
+            img.src = urlImg;
+            img.crossOrigin = 'Anonymous';
+
+            var canvas = document.createElement('canvas'),
+              ctx = canvas.getContext('2d');
+
+            canvas.height = img.naturalHeight;
+            canvas.width = img.naturalWidth;
+            ctx.drawImage(img, 0, 0);
+
+            var b64 = canvas.toDataURL('image/png').replace(/^data:image.+;base64,/, '');
+            return b64;
+          };
+          // document.getElementById(`output${item.id}`).setAttribute('crossOrigin', 'anonymous')
+
+          // console.log(getEmergencyFoundImg(src))
+
+          // document.getElementById(`output${item.id}`).setAttribute('crossOrigin', 'anonymous')
+          //           var c = document.createElement('canvas');
+          //           var img = document.getElementById(`output${item.id}`);
+          //           c.height = img.naturalHeight;
+          //           c.width = img.naturalWidth;
+          //           var ctx = c.getContext('2d');
+
+          //           ctx.drawImage(img, 0, 0, c.width, c.height);
+          //           var base64String = c.toDataURL('image/jpeg');
+          // console.log('base: ',base64String)
+
+
+          // function toDataURL(src, callback){
+          //   var image = new Image();
+
+          //   image.onload = function(){
+          //     var canvas = document.createElement('canvas');
+          //     var context = canvas.getContext('2d');
+          //     canvas.height = this.naturalHeight;
+          //     canvas.width = this.naturalWidth;
+          //     context.drawImage(this, 0, 0);
+          //     var dataURL = canvas.toDataURL('image/jpeg');
+          //     callback(dataURL);
+          //   };
+          //   image.src = src;
+          // }
+          //     toDataURL(`https://ecchatbot-dev.ddns.net/${item.img_value.url}`, function(dataURL){
+          //       alert(dataURL);      
+          //   })
+
+          // function toDataURL(url, callback) {
+          //   var httpRequest = new XMLHttpRequest();
+
+          //   httpRequest.onload = function () {
+          //     var fileReader = new FileReader();
+          //     fileReader.onloadend = function () {
+          //       callback(fileReader.result);
+          //     }
+          //     fileReader.readAsDataURL(httpRequest.response);
+          //   };
+          //   httpRequest.open('GET', url);
+          //   httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencode');
+          //   httpRequest.setRequestHeader( 'Access-Control-Allow-Origin', '*');
+          //   httpRequest.responseType = 'blob';
+          //   httpRequest.send();
+          // }
+          // toDataURL(`https://ecchatbot-dev.ddns.net/${item.img_value.url}`, function (dataUrl) {
+          //   console.log('Result in string:', dataUrl)
+          // })
+
+
+
+
+
+          // console.log(encrypt(item.img_value.url))
+
+          // console.log(document.getElementById(`imgDataNum${item.id}`).value)
+          // document.getElementById(`imgDataNum${item.id}`).value = encrypt(item.img_value.url)
+          // document.getElementById(`imgNum${item.id}`).addEventListener('change', (e) => loadFile(e))
+          // document.getElementById(`btnDelImg${item.id}`).addEventListener('click', () => deleteImgCB(item.id))
+
+          var element1 = document.getElementById(`outputOV${item.id}`)
+          if (typeof (element1) != 'undefined' && element1 != null) {
+            // Exists.
+            document.getElementById(`outputOV${item.id}`).src = `https://ecchatbot-dev.ddns.net${item.img_value.url}`
+          } else if (element1 === null) {
+            var abc = document.createElement(`div`)
+            document.getElementById('logUserDiv').appendChild(abc)
+            abc.innerHTML =
+              `
+              <div style="width: 100%; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+              <img id="outputOV${item.id}" style="max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" src="${`https://ecchatbot-dev.ddns.net${item.img_value.url}`}">
+               </div> 
+              `
+            // document.getElementById(`msgOVI${item.id}`).value = item.message_value
+
+          }
+
+        } else if (item.message_type == "img_msg") {
+          var abc = document.createElement("div")
+          document.getElementById("div_custom").appendChild(abc)
+          abc.innerHTML =
+            `<div id="chatbot_image_msg${item.id}" style="border-radius: 20px; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
+            <div><textarea name="imgMsgKey${item.id}" style="display:none" class="mgsChatbot" id="imgMgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
+          <input id="imgMsgNumSaved${item.id}" type="file" accept="image/*" /> <br /><br />
+          <input id="imgValueMsgNumSaved${item.id}" name="imgValueMsgChatbot${item.id}" type=hidden /> <br /><br />
+          <div style=" text-align: center" }}>
+            <img id="outputImgMsgSaved${item.id}" style=" max-height: 200px; max-width: 40%" }} />
+          </div>
+          <div style="text-align: center">
+          <textarea class="mgsChatbot" id="imgMgsCustomSaved${item.id}" name="imgMsgValueChatbot${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea>
+          </div>
+          <div id="btnDelImgMsg${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Delete</button>
+            </div>
+            <div id="btnUpImgMsg${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Update</button>
+            </div>
+        </div>`
+          document.getElementById(`imgMgsCustomKey${item.id}`).value = item.received_message
+          document.getElementById(`imgMgsCustomSaved${item.id}`).value = item.message_value
+          document.getElementById(`outputImgMsgSaved${item.id}`).src = `https://ecchatbot-dev.ddns.net${item.img_value.url}`
+
+
+          // document.getElementById(`imgMsgNum${item.id}`).addEventListener('change', (e) => loadFileImgMsg(e))
+          document.getElementById(`imgMgsCustomSaved${item.id}`).addEventListener('change', (e) => imgMsgOVSaved(e.target.value, item.id))
+          // document.getElementById(`imgMsgNum${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${item.id}`).style.display = 'block' })
+          // document.getElementById(`imgMgsCustom${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${item.id}`).style.display = 'block' })
+          document.getElementById(`imgMsgNumSaved${item.id}`).addEventListener('change', (e) => loadFileImgMsgSaved(e, item.id))
+          document.getElementById(`btnDelImgMsg${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Delete Successfully")
+              }, 1500)
+              
+              setTimeout(function () {
+                setIsOpenNoti(false)
+              }, 2000);
+              getBagMsg(group, id)
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+
+          document.getElementById(`btnUpImgMsg${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            var upd = {
+              message: { message_value: document.getElementById(`imgMgsCustomSaved${item.id}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNumSaved${item.id}`).value }
+            }
+
+            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+              // alert("Delete Successfully")
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Update Successfully")
+              }, 1500)
+              
+              setTimeout(function () {
+                setIsOpenNoti(false)
+              }, 2000);
+              getBagMsg(group, id)
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+
+          var element1 = document.getElementById(`imgMsgOVI${item.id}`)
+          var element2 = document.getElementById(`outputImgMsgOV${item.id}`)
+
+          if ((typeof (element1) != 'undefined' && element1 != null) || (typeof (element2) != 'undefined' && element2 != null)) {
+            // Exists.
+            document.getElementById(`imgMsgOVI${item.id}`).value = item.message_value
+            document.getElementById(`outputImgMsgOV${item.id}`).src = `https://ecchatbot-dev.ddns.net${item.img_value.url}`
+          } else if (element1 === null) {
+            var abc = document.createElement(`div`)
+            document.getElementById('logUserDiv').appendChild(abc)
+            abc.innerHTML =
+              `
+              <div id="ovMsg${item.id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+                <textarea type="text" id="imgMsgOVI${item.id}" style="width:90%; text-align: right; background-color: #51cbce; border: none; overflow-y:auto" readonly/>
+               </div> 
+              `
+            var abc1 = document.createElement(`div`)
+            document.getElementById('logUserDiv').appendChild(abc1)
+            abc1.innerHTML = `<br /><img id="outputImgMsgOV${item.id}" style="max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" src="${`https://ecchatbot-dev.ddns.net${item.img_value.url}`}">`
+            document.getElementById(`imgMsgOVI${item.id}`).value = item.message_value
+
+          }
+        } else if (item.message_type == "past_post") {
+          // alert ("PP roi")
+          var abc = document.createElement("div")
+          document.getElementById("div_custom").appendChild(abc)
+          abc.innerHTML =
+            `<div id="chatbot_pp${item.id}" style="border-radius: 20px; text-align:center; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
+            
+            <div style="width:100%">
+            <img id="imgUpPP${item.id}" src="${item.preview_past_post_url}" style="margin: auto; max-height:200px; max-width:200px" /></div>
+
+          <br />
+          <div id="btnDeletePP${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Delete</button>
+            </div>
+            <div id="btnUpdatePP${item.id}" style="float:right; display:none">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Update</button>
+            </div>
+            <div id="btnChangePP${item.id}" style="float:right;">
+              <button style="width:110px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Change post</button>
+            </div>
+        </div>`
+
+          //paste to above
+          // <input id="imgMsgNumSaved${item.id}" type="file" accept="image/*" /> <br /><br />
+          //   <input id="imgValueMsgNumSaved${item.id}" name="imgValueMsgChatbot${item.id}" type=hidden /> <br /><br />
+          //   <div style=" text-align: center" }}>
+          //     <img id="outputImgMsgSaved${item.id}" style=" max-height: 200px; max-width: 40%" }} />
+          //   </div> 
+
+          // document.getElementById(`ppCustomSaved${item.id}`).value = item.message_value
+
+          document.getElementById(`btnDeletePP${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Delete Successfully")
+              }, 1500)
+              
+              setTimeout(function () {
+                setIsOpenNoti(false)
+              }, 2000);
+              getBagMsg(group, id)
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+
+          // document.getElementById(`btnUpdatePP${item.id}`).addEventListener('click', () => {
+          //   var update = { message: { message_value: urlUpdatePastPost, message_type: "past_post", img_value: "" } }
+          //   api.patch(`/api/v1/message_managements/messages/${item.id}`, update).then(res => {
+          //     console.log(res)
+          //   }).catch(error => {
+          //     console.log(error)
+          //   })
+          // })
+
+
+          // var element1 = document.getElementById(`ppOVI${item.id}`)
+
+          // if (typeof (element1) != 'undefined' && element1 != null) {
+          var abc = document.createElement(`div`)
+          document.getElementById('logUserDiv').appendChild(abc)
+          abc.innerHTML =
+            `<br/>
+            <div style="width: 100%; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+                <img id="PPUpOV${item.id}" src="${item.preview_past_post_url}" style="max-width:100px; max-height:100px; float:right" />
+               </div> 
+            
+              `
+          // document.getElementById(`PPUpOV${item.id}`).style.display = "none"
+
+
+
+          document.getElementById(`btnChangePP${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            setIdPPUP(item.id)
+            selectPastPostUp()
+            // document.getElementById(`PPUpOV${item.id}`).style.display = "block"
+            // document.getElementById(`imgUpPP${item.id}`).style.display = "block"
+            document.getElementById(`btnUpdatePP${item.id}`).style.display = "block"
+            document.getElementById(`btnChangePP${item.id}`).style.display = "none"
+            // document.getElementById(`ppCustomSavedOvi${item.id}`).style.display = "none"
+            // if (document.getElementById(`lbOvPP${item.id}}`) !== null) {
+
+            // } //
+            // document.getElementById(`PPUpOV${item.id}`).url = urlUpdatePastPost
+            // document.getElementById(`imgUpPP${item.id}`).style.display="block"
+            // document.getElementById(`imgUpPP${item.id}`).src = urlUpdatePastPost
+
+
+          })
+
+
+          // }
+          // document.getElementById(`ppCustomSaved${item.id}`).addEventListener('click', () => {
+          //   setIdPPUP(item.id)
+          //   selectPastPostUp()
+          //   // document.getElementById(`PPUpOV${item.id}`).style.display = "block"
+          //   // document.getElementById(`imgUpPP${item.id}`).style.display = "block"
+          //   document.getElementById(`btnUpdatePP${item.id}`).style.display = "block"
+          //   document.getElementById(`PPUpOV${item.id}`).style.display = "none"
+          //   // document.getElementById(`ppCustomSavedOvi${item.id}`).style.display = "none"
+          //   // if (document.getElementById(`lbOvPP${item.id}}`) !== null) {
+
+          //   // } //
+          //   // document.getElementById(`PPUpOV${item.id}`).url = urlUpdatePastPost
+          //   // document.getElementById(`imgUpPP${item.id}`).style.display="block"
+          //   // document.getElementById(`imgUpPP${item.id}`).src = urlUpdatePastPost
+
+
+          // })
+
+        }
+
+
+        // document.getElementById(`outputImgMsgSaved${item.id}`).src = `https://ecchatbot-dev.ddns.net/${item.img_value.url}`
+
+
+        // bagMsg.forEach((item) => {
+
+        // })
+      })
+      // var bagItem = []
+      // for (var i = 0; i < bagMsg.length; i++) {
+      //   bagItem.push(res.data.data[i].id)
+      //   // 
+      // }
+      // console.log(bagMsg)
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+  }
+
+  function reloadMessMsgBag() {
+    var id = idForReloadMsgBag
+    // var idIn
+    if (idForReloadMsgBag === undefined) {
+      id = idReloadMsgBagFromGetMSG
+    } else {
+      id = idForReloadMsgBag
+    }
+    console.log("iddddddd: ", id)
+    console.log("idReloadMsgBagFromGetMSG: ", idReloadMsgBagFromGetMSG)
+    console.log("idForReloadMsgBag: ", id)
+    var path = window.location.pathname;
+    const list = document.getElementById("div_custom");
+    while (list.hasChildNodes()) {
+      list.removeChild(list.firstChild);
+    }
+    const list2 = document.getElementById("logUserDiv");
+    while (list2.hasChildNodes()) {
+      list2.removeChild(list2.firstChild);
+    }
+    api.get(`/api/v1/message_managements/message_bags/${id}`).then(res => {
+      // var totalPage = Math.ceil(res.data.data.total / 25)
+      // setTotalPage(totalPage)
+      var bagMsg = res.data.data.messages
+      // console.log("bagMsg: ",res.data.data.messages)
+      setMsgCBNum(bagMsg[bagMsg.length - 1].id)
+      setImgCBNum(bagMsg[bagMsg.length - 1].id)
+      setImgCBNum(bagMsg[bagMsg.length - 1].id)
+      bagMsg.forEach((item) => {
+        if (item.message_type == "msg") {
+          var abc = document.createElement("div")
+          document.getElementById("div_custom").appendChild(abc)
+          abc.innerHTML =
+            `<div id="chatbot_message${item.id}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
+              
+              <div><textarea name="messagesVa${item.id}" class="mgsChatbot" id="mgsCustomSaved${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
+              <div id="btnDelMsg${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+                font-weight:800">Delete</button>
+              </div>
+              <div id="btnUpdateMsg${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+                font-weight:800">Update</button>
+              </div>
+            </div>`
+          // document.getElementById(`mgsCustomKey${item.id}`).textContent = item.received_message
+          document.getElementById(`mgsCustomSaved${item.id}`).textContent = item.message_value
+
+          document.getElementById(`mgsCustomSaved${item.id}`).addEventListener('change', (e) => msgOVSaved(e.target.value, item.id))
+          // <div><textarea name="messageKey${item.id}" class="mgsChatbot" id="mgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
+          // document.getElementById(`mgsCustomKey${item.id}`).addEventListener('change', (e) => msgOVkey(e.target.value))
+          // document.getElementById(`mgsCustom${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelMsg${item.id}`).style.display = 'block' })
+          document.getElementById(`btnDelMsg${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Delete Successfully")
+              }, 1500)
+              
+              setTimeout(function () {
+                setIsOpenNoti(false)
+              }, 2000);
+              getBagMsg(id, id)
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+          document.getElementById(`btnUpdateMsg${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
+            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Update Successfully")
+              }, 1500)
+              
+              setTimeout(function () {
+                setIsOpenNoti(false)
+              }, 2000);
+              getBagMsg(id, id)
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+
+
+          // var element2 = document.getElementById(`msgOVIKey${item.id}`)
+          // if (typeof (element2) != 'undefined' && element2 != null) {
+          //   // Exists.
+          //   document.getElementById(`msgOVIKey${item.id}`).value = item.received_message
+          // } else if (element2 === null) {
+          //   var abc = document.createElement(`div`)
+          //   document.getElementById('logUserDiv').appendChild(abc)
+          //   abc.innerHTML =
+          //     `<div id="ovMsgKey${item.id}" style="width: 70%; background-color: #51cbce; padding: 10px; float:left; margin:5px; display:block; border-radius: 10px">
+          //       <input type="text" id="msgOVIKey${item.id}" style="background-color: #51cbce; border: none" readonly/>
+          //      </div>`
+          //   document.getElementById(`msgOVIKey${item.id}`).value = item.received_message;
+          // }
+
+          var element1 = document.getElementById(`msgOVI${item.id}`)
+          if (typeof (element1) != 'undefined' && element1 != null) {
+            // Exists.
+            document.getElementById(`msgOVI${item.id}`).value = item.message_value
+          } else if (element1 === null) {
+            var abc = document.createElement(`div`)
+            document.getElementById('logUserDiv').appendChild(abc)
+            abc.innerHTML =
+              `<div id="ovMsg${item.id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+                <textarea type="text" id="msgOVI${item.id}" style="width:90%; text-align: right; background-color: #51cbce; border: none; overflow-y:auto" readonly/>
+               </div> `
+            document.getElementById(`msgOVI${item.id}`).value = item.message_value
+
+          }
+        } else if (item.message_type == "img") {
+          var abc = document.createElement("div")
+          document.getElementById("div_custom").appendChild(abc)
+          abc.innerHTML =
+            `<div id="chatbot_image${item.id}" style="border-radius: 20px; margin-top: 20px; display:block; background-color: rgb(244, 243, 239); padding: 40px; ">
+            <div><textarea name="imgKey${item.id}" class="mgsChatbot" style="display:none" id="imgCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
+          <input id="imgNumSaved${item.id}" name="imageChatbot" type="file" accept="image/*" />
+          <input id="imgDataNumSaved${item.id}" name="imgchatbot${item.id}" type=hidden /> <br /><br />
+          <div style=" text-align: center">
+            <img id="output${item.id}" style=" max-height: 200px; max-width: 40%"  />
+          </div>
+          <div id="btnDelImg${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Delete</button>
+            </div>
+            <div id="btnUpdateImg${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+              font-weight:800">Update</button>
+            </div>
+        </div>`
+          document.getElementById(`imgCustomKey${item.id}`).value = item.received_message
+          document.getElementById(`imgNumSaved${item.id}`).addEventListener('change', (e) => loadFileSaved(e, item.id))
+          document.getElementById(`output${item.id}`).src = `https://ecchatbot-dev.ddns.net${item.img_value.url}`
+          document.getElementById(`btnDelImg${item.id}`).addEventListener("click", (event) => {
+            event.preventDefault()
+            api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
+              // alert("Delete Successfully")
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Delete Successfully")
+              }, 1500)
+              
+              setTimeout(function () {
+                setIsOpenNoti(false)
+              }, 2000);
+              getBagMsg(id, id)
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+          document.getElementById(`btnUpdateImg${item.id}`).addEventListener("click", (event) => {
+            event.preventDefault()
+            var upd = {
+              message: { message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNumSaved${item.id}`).value }
+            }
+            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+              // alert("Delete Successfully")
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("Update Successfully")
+              }, 1500)
+              
+              setTimeout(function () {
+                setIsOpenNoti(false)
+              }, 2000);
+              getBagMsg(id, id)
             }).catch(error => {
               console.log(error)
             })
@@ -455,8 +1021,8 @@ function Chatbot() {
               }, 1500)
               setTimeout(function () {
                 setIsOpenNoti(false)
-                window.location.reload()
               }, 2000);
+              getBagMsg(id, id)
             }).catch(error => {
               console.log(error)
             })
@@ -477,8 +1043,8 @@ function Chatbot() {
               }, 1500)
               setTimeout(function () {
                 setIsOpenNoti(false)
-                window.location.reload()
               }, 2000);
+              getBagMsg(id, id)
             }).catch(error => {
               console.log(error)
             })
@@ -550,8 +1116,8 @@ function Chatbot() {
               }, 1500)
               setTimeout(function () {
                 setIsOpenNoti(false)
-                window.location.reload()
               }, 2000);
+              getBagMsg(id, id)
             }).catch(error => {
               console.log(error)
             })
@@ -646,8 +1212,10 @@ function Chatbot() {
     })
   }
 
+  const [idReloadMsgBag, setIdReloadMsgBag] = useState()
+  const [idReloadMsgBagFromGetMSG, setIdReloadMsgBagFromGetMSG] = useState()
   function getMessage(idIn) {
-    // console.log(idList)
+    setIdReloadMsgBag(idIn)    // console.log(idList)
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups/${idIn}`).then(res => {
       var bag = []
@@ -692,6 +1260,124 @@ function Chatbot() {
         document.getElementById(`liMesBag${idIn}`).appendChild(ulTag);
       }
       idMsgbag.forEach((idd) => {
+        console.log(idd)
+        var abc = document.createElement('div')
+        abc.setAttribute('id', `msgBag_item_${idIn}_${idd}`)
+
+        // console.log("setBagId: ", idd)
+        document.getElementById(`msg_group${idIn}_id${idd}`).addEventListener('click', () => {
+          setIdReloadMsgBagFromGetMSG(idd)
+          getBagMsg(idIn, idd)
+          setBagId(idd)
+        })
+        document.getElementById(`msg_group_div${idIn}_id${idd}`).addEventListener('click', (event) => {
+          event.preventDefault()
+          //Rename, Delete, Cancel uncomment code below
+
+          document.getElementById(`msg_group${idIn}_id${idd}`).appendChild(abc)
+          abc.innerHTML = `<div id="itemMsg_${idIn}_${idd}">
+            <div class="dropdown-content">
+              <button style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Rename</button>
+              <button id="deleteBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Delete</button>
+              <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Cancel</button>
+            </div>
+          </div>`
+          document.getElementById(`msgBag_item_${idIn}_${idd}`).removeAttribute('hidden')
+
+          document.getElementById(`cancelBtn${idIn}_${idd}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            document.getElementById(`msgBag_item_${idIn}_${idd}`).setAttribute("hidden", true)
+          })
+          document.getElementById(`deleteBtn${idIn}_${idd}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            alert(idd)
+          })
+        }
+
+        )
+
+      })
+      // for (var i = 0; i < bag.length; i++) {
+      //   var abc = document.createElement('div')
+      //   console.log("bbb: ", bag.length)
+      //     console.log(idIn,': ', idMsgbag[i])
+      //   document.getElementById(`msg_group${idIn}_id${idMsgbag[i]}`).addEventListener('click', ()=> {
+      //     console.log(`abc${idMsgbag[i-1]}`)
+      //     document.getElementById(`msg_group${idIn}_id${idMsgbag[i]}`).appendChild(abc)
+      //     abc.innerHTML = `<div class="dropdown">
+      //     <button class="dropbtn">Dropdown</button>
+      //     <div class="dropdown-content">
+      //       <a href="#">Link 1</a>
+      //       <a href="#">Link 2</a>
+      //       <a href="#">Link 3</a>
+      //     </div>
+      //   </div>`
+      //   })
+      // }
+      // setIdmsgB(`mgsBBB${id}`)
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+
+    // document.getElementById('itemBag').style.display = "block"
+  }
+
+  function reloadMsgBag() {
+
+    var idIn = idReloadMsgBag
+    console.log("id reload: ", idIn)
+    var path = window.location.pathname;
+    api.get(`/api/v1/message_managements/message_groups/${idIn}`).then(res => {
+      console.log("lay dc r")
+      var bag = []
+      var idMsgbag = []
+      // console.log('message: ', res.data.data)
+      for (var i = 0; i < res.data.data.message_bags.length; i++) {
+        bag.push(res.data.data.message_bags[i].bag_name)
+        idMsgbag.push(res.data.data.message_bags[i].id)
+      }
+      // console.log("idMsgbag: ", idMsgbag)
+      setMessageBag(res.data.data)
+      const ulTag = document.getElementById(`msgBag${idIn}`)
+      // ulTag.setAttribute('id', `msgBag${idIn}`);
+      // bag.forEach(item => {
+      ulTag.innerHTML = ""
+      for (var i = 0; i < bag.length; i++) {
+        var divbig = document.createElement('div');
+        // divbig.setAttribute("id", `divbig_${idIn}_id${idMsgbag[i]}`);
+        var lidiv = document.createElement('div');
+        lidiv.setAttribute("id", `msg_group_div${idIn}_id${idMsgbag[i]}`);
+
+        const liTag = document.createElement('li');
+        liTag.setAttribute("id", `msg_group${idIn}_id${idMsgbag[i]}`);
+
+        liTag.innerHTML = bag[i];
+        liTag.style.width = '80%'
+        liTag.style.fontSize = '15px'
+        lidiv.innerHTML = '<i class="nc-icon nc-bullet-list-67" /> <br />';
+        lidiv.style.width = '20%'
+        lidiv.style.textAlign = "right"
+        divbig.innerHTML = `<div id="divbig_${idIn}_id${idMsgbag[i]}"></div>`
+
+        ulTag.appendChild(divbig);
+        divbig.appendChild(liTag);
+        divbig.appendChild(lidiv)
+        divbig.style.display = 'flex'
+        divbig.style.margin = 'auto'
+        divbig.style.width = '100%'
+
+
+
+      }
+      if (document.getElementById(`liMesBag${idIn}`).outerHTML === `<li id="liMesBag${idIn}"></li>`) {
+        document.getElementById(`liMesBag${idIn}`).innerHTML = ""
+        document.getElementById(`liMesBag${idIn}`).appendChild(ulTag);
+      }
+      idMsgbag.forEach((idd) => {
+        console.log(idd)
         var abc = document.createElement('div')
         abc.setAttribute('id', `msgBag_item_${idIn}_${idd}`)
 
@@ -759,6 +1445,8 @@ function Chatbot() {
 
   const [isOpenAddChatbot, setIsOpenAddChatbot] = useState(false)
   const [isOpenAddMsgBag, setIsOpenAddMsgBag] = useState(false)
+  const [isOpenRenameMsgBag, setIsOpenRenameMsgBag] = useState(false)
+  
 
   const [nameChatbot, setNameChatbot] = useState()
   const [temp, setTemp] = useState()
@@ -1185,11 +1873,11 @@ function Chatbot() {
           setIsOpenNoti(true)
           setMsgNoti("Add Successfully")
         }, 1500)
+        
         setTimeout(function () {
           setIsOpenNoti(true)
-          window.location.reload()
         }, 2000);
-
+reloadMessMsgBag()
       }).catch(error => {
         console.log(error)
         // if (error.response.data.code === 3) {
@@ -1232,12 +1920,12 @@ function Chatbot() {
           setIsOpenNoti(true)
           setMsgNoti("Add Successfully")
         }, 1500)
+        
         setTimeout(function () {
           setIsOpenNoti(false)
-          window.location.reload()
         }, 2000);
+reloadMessMsgBag()
 
-        
       }).catch(error => {
         console.log(error)
       })
@@ -1285,10 +1973,11 @@ function Chatbot() {
           setIsOpenNoti(true)
           setMsgNoti("Add Successfully")
         }, 1500)
+       
         setTimeout(function () {
           setIsOpenNoti(false)
-          window.location.reload()
         }, 2000);
+         reloadMessMsgBag()
       }).catch(error => {
         console.log(error)
         // if (error.response.data.code === 3) {
@@ -1321,15 +2010,17 @@ function Chatbot() {
       var update = { message: { message_value: id, message_type: "past_post", img_value: "", preview_past_post_url: ppurl } }
       api.patch(`/api/v1/message_managements/messages/${idPPUP}`, update).then(res => {
         console.log("Update post response: ", res)
+
+
         setTimeout(() => {
           setIsOpenNoti(true)
           setMsgNoti("Update Successfully")
         }, 1500)
         setTimeout(function () {
           setIsOpenNoti(false)
-          window.location.reload()
         }, 2000);
-        
+
+        getBagMsg(idForReloadMsgBag, idForReloadMsgBag)
       }).catch(error => {
         console.log(error)
       })
@@ -1378,10 +2069,11 @@ function Chatbot() {
         setTimeout(() => {
           setMsgNoti("Add Successfully")
         }, 1500)
+        
         setTimeout(function () {
           setIsOpenNoti(false)
-          window.location.reload()
         }, 2000);
+        reloadMessMsgBag()
       }).catch(error => {
         console.log(error)
         // if (error.response.data.code === 3) {
@@ -1643,6 +2335,10 @@ function Chatbot() {
     setIsOpenAddMsgBag(true)
     setIdMsgGr(id)
   }
+  function renameMsgBagPop(id) {
+    setIsOpenRenameMsgBag(true)
+    setIdRenameMsgGr(id)
+  }
 
   function addMagBag() {
     var path = window.location.pathname;
@@ -1652,11 +2348,12 @@ function Chatbot() {
       api.post(`/api/v1/message_managements/message_bags`, newBagAdd).then(res => {
         setIsOpenAddMsgBag(false)
         console.log(res)
+
         setMsgNoti("メッセージ袋を追加しました。")
         setIsOpenNoti(true)
         setTimeout(() => {
           setIsOpenNoti(false)
-          window.location.reload()
+          reloadMsgBag()
         }, 1500)
       }).catch(error => {
         alert(error)
@@ -1664,6 +2361,30 @@ function Chatbot() {
         if (error.response.data.code === 3) {
           requestNewToken(path)
         }
+      })
+    }
+  }
+
+  function renameMagBag(){
+    var path = window.location.pathname;
+    var newBag = document.getElementById("rename_bag").value
+    if (utils.checkFieldAdd(newBag, "MsgBag") == true) {
+      var newBagAdd = { message_group: { group_name: newBag } }
+      api.patch(`/api/v1/message_managements/message_groups/${idMsgRenameGr}`, newBagAdd).then(res => {
+        setIsOpenRenameMsgBag(false)
+        console.log(res)
+        setMsgNoti("Update Group name successfully!")
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setIsOpenNoti(false)
+        }, 1500)
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
+        
+      }).catch(error => {
+        alert(error)
+        console.log(error)
       })
     }
   }
@@ -1697,7 +2418,7 @@ function Chatbot() {
 
     setPastPostList(past_post)
     setIndexPP(past_post.length)
-    // console.log("pp: ", past_post)
+    console.log("pp: ", past_post)
 
   }
 
@@ -1770,8 +2491,12 @@ function Chatbot() {
                                             <br />
                                           </ul>
                                         </Nav>
-                                        <Button style={{ height: '30px', width: "10%", padding: '0', margin: "0px 10px 0px 0px", backgroundColor: "#838383" }}
-                                          onClick={() => addMsgBagPop(data.id)}><i className="nc-icon nc-simple-add" style={{ color: "black" }} /></Button>
+                                        <Button style={{ height: '30px', width: "10%", padding: '0', margin: "0px 5px 0px 0px", backgroundColor: "#FFFFFF" }}
+                                          onClick={() => addMsgBagPop(data.id)}><i className="nc-icon nc-simple-add nc-3x" style={{ color: "black" }} /></Button>
+                                          <Button style={{ height: '30px', width: "10%", padding: '0', margin: "0px 5px 0px 0px", backgroundColor: "#FFFFFF" }}
+                                          onClick={() => renameMsgBagPop(data.id)}><i className="nc-icon nc-single-copy-04 nc-3x" style={{ color: "black" }} /></Button>
+                                        <Button style={{ height: '30px', width: "10%", padding: '0', margin: "0px 5px 0px 0px", backgroundColor: "#FFFFFF" }}
+                                          onClick={() => addMsgBagPop(data.id)}><i className="nc-icon nc-box nc-3x" style={{ color: "black" }} /></Button>
                                       </li>
                                     )
                                   })}
@@ -1870,6 +2595,16 @@ function Chatbot() {
               <label id="newMsgBagErrMsg" style={{ display: 'none', color: "red" }}></label>
             </label><br />
             <Button onClick={() => addMagBag()}>メッセージ袋追加</Button>
+          </div>
+        </ModalShort>
+        <ModalShort open={isOpenRenameMsgBag} onClose={() => setIsOpenRenameMsgBag(false)}>
+          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+            <h4>Rename Message Group</h4>
+            <label style={{ width: "100%" }}>
+              <input id="rename_bag" style={{ width: "100%" }} onBlur={(e) => utils.checkFieldAdd(e.target.value, "MsgBag")} name="chatbot_name"></input>
+              <label id="newMsgBagErrMsg" style={{ display: 'none', color: "red" }}></label>
+            </label><br />
+            <Button onClick={() => renameMagBag()}>Rename</Button>
           </div>
         </ModalShort>
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>

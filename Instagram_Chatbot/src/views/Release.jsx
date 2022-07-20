@@ -96,7 +96,7 @@ function Release() {
     var path = window.location.pathname;
 
     api.get(`/api/v1/message_managements/keyword_settings`).then(res => {
-      // console.log("keyword_settings: ", res.data.data)
+      console.log("keyword_settings: ", res.data.data)
       setListKeyword(res.data.data)
       var listkey = res.data.data
       var story = []
@@ -247,10 +247,15 @@ function Release() {
 
   }
 
+  const [story_saved_KW, setStory_saved_KW] = useState()
+  const [live_saved_KW, setLive_saved_KW] = useState()
+  const [cm_saved_KW, setCm_saved_KW] = useState()
   React.useEffect(() => {
     var path = window.location.pathname;
+
     api.get(`/api/v1/instagram_settings/1`).then(res => {
-      // console.log('insta setting ', res.data.data)
+      console.log('insta setting ', res.data.data)
+      var dataB = res.data.data
       setInstaSetting(res.data.data)
       setInstaSettingId(res.data.data.id)
       setStoryOnOff(res.data.data.story_comment_bag_status)
@@ -271,12 +276,119 @@ function Release() {
       } else {
         trueConfigCmPost()
       }
+      var story = []
+      var live = []
+      var cm = []
+      api.get(`/api/v1/message_managements/keyword_settings`).then(res => {
+        setListKeyword(res.data.data)
+        var listkey = res.data.data
+        for (var i = 0; i < listkey.length; i++) {
+          if (listkey[i].is_story_comment == true) {
+            story.push(listkey[i].id)
+          }
+        }
+        if (dataB.story_comment_bag_status === "keyword") {
+          document.getElementById('listkeyword').style.display = 'block'
+          document.getElementById('listReplyBag').style.display = 'none'
+          document.getElementById('listReplyGroup').style.display = 'none'
+          var selectedTypeStory = document.getElementById("replyStory")
+          var optionSelectedTypeStory = document.createElement('option')
+          optionSelectedTypeStory.disabled = true
+          optionSelectedTypeStory.hidden = true
+          optionSelectedTypeStory.selected = true
+          optionSelectedTypeStory.value = "keyword"
+          optionSelectedTypeStory.text = "keyword"
+          selectedTypeStory.add(optionSelectedTypeStory)
+          api.get(`/api/v1/message_managements/keyword_settings/${story[0]}`).then(res => {
+            console.log("story_comment_KW_id: ", res.data.data)
+            var select, option;
+            select = document.getElementById("listkeyword")
+            option = document.createElement('option')
+            option.disabled = true
+            option.hidden = true
+            option.selected = true
+            option.value = res.data.data.id
+            option.text = res.data.data.title
+            select.add(option);
+          }).catch(error => {
+            console.log(error)
+          })
+        }
+        for (var i = 0; i < listkey.length; i++) {
+          if (listkey[i].is_live_comment == true) {
+            live.push(listkey[i].id)
+          }
+        }
+        if (dataB.live_comment_bag_status === "keyword") {
+          document.getElementById('listkeywordLive').style.display = 'block'
+          document.getElementById('listLiveGroup').style.display = 'none'
+          document.getElementById('listLiveBag').style.display = 'none'
+          var selectedTypeStory = document.getElementById("replyLive")
+          var optionSelectedTypeStory = document.createElement('option')
+          optionSelectedTypeStory.disabled = true
+          optionSelectedTypeStory.hidden = true
+          optionSelectedTypeStory.selected = true
+          optionSelectedTypeStory.value = "keyword"
+          optionSelectedTypeStory.text = "keyword"
+          selectedTypeStory.add(optionSelectedTypeStory)
+          api.get(`/api/v1/message_managements/keyword_settings/${live[0]}`).then(res => {
+            console.log("story_comment_KW_id: ", res.data.data)
+            var select, option;
+            select = document.getElementById("listkeywordLive")
+            option = document.createElement('option')
+            option.disabled = true
+            option.hidden = true
+            option.selected = true
+            option.value = res.data.data.id
+            option.text = res.data.data.title
+            select.add(option);
+          }).catch(error => {
+            console.log(error)
+          })
+        }
+        for (var i = 0; i < listkey.length; i++) {
+          if (listkey[i].is_post_comment == true) {
+            cm.push(listkey[i].id)
+          }
+        }
+        if (dataB.post_comment_bag_status === "keyword") {
+          document.getElementById('listkeywordCM').style.display = 'block'
+          document.getElementById('listCommentGroup').style.display = 'none'
+          document.getElementById('listCommentBag').style.display = 'none'
+          var selectedTypeStory = document.getElementById("replyCMPost")
+          var optionSelectedTypeStory = document.createElement('option')
+          optionSelectedTypeStory.disabled = true
+          optionSelectedTypeStory.hidden = true
+          optionSelectedTypeStory.selected = true
+          optionSelectedTypeStory.value = "keyword"
+          optionSelectedTypeStory.text = "keyword"
+          selectedTypeStory.add(optionSelectedTypeStory)
+          api.get(`/api/v1/message_managements/keyword_settings/${cm[0]}`).then(res => {
+            console.log("story_comment_KW_id: ", res.data.data)
+            var select, option;
+            select = document.getElementById("listkeywordCM")
+            option = document.createElement('option')
+            option.disabled = true
+            option.hidden = true
+            option.selected = true
+            option.value = res.data.data.id
+            option.text = res.data.data.title
+            select.add(option);
+          }).catch(error => {
+            console.log(error)
+          })
+        }
+      }).catch(error => {
+        console.log(error)
+      })
+
       setDmOnOff(res.data.data.dm_bag_status)
       // if (res.data.data.dm_bag_status == false) {
       //   falseConfigDM()
       // } else {
       //   trueConfigDM()
       // }
+
       api.get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`).then(res => {
         // console.log("story_comment_bag_id: ", res.data)
         setStoryCommentBagName(res.data.data.message_bag.bag_name)
@@ -538,6 +650,7 @@ function Release() {
     api.get(`/api/v1/message_managements/ice_breakers`).then(res => {
       // console.log('ice_breakers: ', res.data.data)
       setListFAQ(res.data.data)
+      console.log("faq item: ", res.data.data.length)
       // console.log("faq data: ", res.data.data.length)
       // var faqLength = res.data.data.length
       // if (faqLength >= 4) {
@@ -1364,43 +1477,63 @@ function Release() {
     ele.remove()
   }
   function deleteFAQInList(value) {
-    api.delete(`/api/v1/message_managements/ice_breakers/${value}`).then(res => {
-      reloadFAQ()
-      api.get(`/api/v1/message_managements/ice_breakers_turn_on`).then(res => {
-        reloadFAQStatus()
-      }).catch(error => {
-        console.log(error)
-      })
-      setMsgNoti("削除しました。")
+    if (listFAQ.length <= 1) {
+      setMsgNoti("FAQ must has at least one option")
       setIsOpenNoti(true)
       setTimeout(() => {
         setMsgNoti("")
         setIsOpenNoti(false)
       }, 2000)
-    }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
-    })
+    } else {
+      api.delete(`/api/v1/message_managements/ice_breakers/${value}`).then(res => {
+        reloadFAQ()
+        api.get(`/api/v1/message_managements/ice_breakers_turn_on`).then(res => {
+          reloadFAQStatus()
+        }).catch(error => {
+          console.log(error)
+        })
+        setMsgNoti("削除しました。")
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setMsgNoti("")
+          setIsOpenNoti(false)
+        }, 2000)
+      }).catch(error => {
+        console.log(error)
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
+      })
+    }
+
   }
 
   function deleteFixedInList(value) {
     // alert(value)
-    api.delete(`/api/v1/message_managements/persistent_menus/${value}`).then(res => {
-      // console.log(res)
-      reloadFixedMenu()
-      api.get(`/api/v1/message_managements/persistent_menus_turn_on`).then(res => {
-        reloadFixedMessageStatus()
+    if (listFixedMenu.length <= 1) {
+      setMsgNoti("Fixed Menu must has at least one option")
+      setIsOpenNoti(true)
+      setTimeout(() => {
+        setMsgNoti("")
+        setIsOpenNoti(false)
+      }, 2000)
+    } else {
+      api.delete(`/api/v1/message_managements/persistent_menus/${value}`).then(res => {
+        // console.log(res)
+        reloadFixedMenu()
+        api.get(`/api/v1/message_managements/persistent_menus_turn_on`).then(res => {
+          reloadFixedMessageStatus()
+        }).catch(error => {
+          console.log(error)
+        })
       }).catch(error => {
         console.log(error)
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       })
-    }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
-    })
+    }
+
   }
   //editFAQInList
   function enableEdit(value) {
@@ -1814,7 +1947,7 @@ function Release() {
           reloadKeyWord()
 
         }).catch(error => {
-          console.log(error)(path)
+          console.log(error)
           // }
         })
       }, 1500);
@@ -2115,7 +2248,7 @@ function Release() {
     console.log(past_post)
   }
 
-
+  console.log("story_saved_KW: ", story_saved_KW)
   return (
     <>
       <div className="content">
@@ -2161,7 +2294,7 @@ function Release() {
                             name={`faq_answer${item.answer}`} readOnly="readonly"></input>
                           <div id={`ene-faq-${item.id}`} onClick={() => enableEdit(item.id)} style={{ width: "5%" }}><i className="nc-icon nc-align-center nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
                           <div id={`sav-faq-${item.id}`} onClick={() => editFAQInList(item.id)} style={{ width: "5%", display: "none" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
-                          <div onClick={() => deleteFAQInList(item.id)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px" }}></i></div>
+                          <div id={`deleteFAQfromList${item.id}`} onClick={() => deleteFAQInList(item.id)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px" }}></i></div>
 
                         </div>
                       </form>
@@ -2284,9 +2417,9 @@ function Release() {
                             )
                           })}
                         </select>
-                        <div id={`sav-story-setting`} onClick={() => saveStorySetting()} style={{ paddingLeft: "3%", width: "7%" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "0px" }}></i></div>
-                      </div>
 
+                      </div>
+                      <div id={`sav-story-setting`} onClick={() => saveStorySetting()} style={{ paddingLeft: "3%", width: "7%" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "0px" }}></i></div>
 
                       <div style={{ margin: "5px 0px 0px 0px" }}>
                         <Switch onChange={() => changeStoryOnOff()} onColor="#64c1ff" checked={checked} />
@@ -2343,9 +2476,9 @@ function Release() {
                           })}
                         </select>
 
-                        <div id={`sav-live-setting`} onClick={() => saveLiveSetting()} style={{ paddingLeft: "3%", width: "7%" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "0px" }}></i></div>
-                      </div>
 
+                      </div>
+                      <div id={`sav-live-setting`} onClick={() => saveLiveSetting()} style={{ paddingLeft: "3%", width: "7%" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "0px" }}></i></div>
 
                       <div style={{ margin: "5px 0px 0px 0px" }}>
                         <Switch onChange={() => changeLiveOnOff()} onColor="#64c1ff" checked={checkedLive} />
@@ -2403,10 +2536,10 @@ function Release() {
                           })}
                         </select>
 
-                        <div id={`sav-cm-post-setting`} onClick={() => saveCMPostSetting()} style={{ paddingLeft: "3%", width: "7%" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "0px" }}></i></div>
+
                       </div>
 
-
+                      <div id={`sav-cm-post-setting`} onClick={() => saveCMPostSetting()} style={{ paddingLeft: "3%", width: "7%" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "0px" }}></i></div>
                       <div style={{ margin: "5px 0px 0px 0px" }}>
                         <Switch onChange={() => changeCMPostOnOff()} onColor="#64c1ff" checked={checkedCMPost} />
                       </div>
@@ -2445,7 +2578,7 @@ function Release() {
                         <form key={item.id} id={`fixed-menu-${item.id}`}>
                           <div className="div-add-aq" style={{ display: "flex" }}>
                             <input name={`title-fixed-menu-${item.id}`} id={`title-fixed-menu-${item.id}`} className="new-faq-q-so" onChange={() => onChangeEditFM(`title-fixed-menu-${item.id}`)} defaultValue={item.title} type="text" readOnly="readonly" style={{ width: "20%" }} />
-                            <select style={{ width: "20%" }} onChange={(e) => selectFixedMenu(e.target.value)} id={`fixed-mnl-type${item.id}`} readOnly="readonly" className="new-faq-q-so" name={`fixed-option-${item.id}`}>
+                            <select style={{ width: "20%" }} id={`fixed-mnl-type${item.id}`} readOnly="readonly" className="new-faq-q-so" name={`fixed-option-${item.id}`}>
                               <option value="" disabled hidden>メッセージタイプ選択 ...</option>
                               <option value="message">メッセージ</option>
                               <option value="website">ウェブサイト</option>
