@@ -2469,7 +2469,6 @@ reloadMessMsgBag()
                                           <p id="a_tag" style={{ fontSize: "15px" }} onClick={() => getMessage(data.id)}>&nbsp;&nbsp;{data.group_name}</p>
                                           <ul id="ulMesBag" style={{ listStyleType: "none", width: "100%" }}>
                                             <li id="liMesBag">
-                                              
                                               {/* <Nav id="itemBag" >
                                                 {itemBbag.message_bags && itemBbag.message_bags.map((datagroup, key2) => {
                                                   return (
