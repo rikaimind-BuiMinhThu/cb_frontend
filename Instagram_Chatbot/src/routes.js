@@ -27,6 +27,8 @@ import Release from "views/Release";
 import UserManagement from "views/UserManagement";
 import Pricing from "views/Pricing";
 import Keyword from "views/Keyword";
+import DataAnalyst from "views/DataAnalyst";
+import listUser from "views/ListUser";
 // import Cookies from 'js-cookie'
 
 var routes = [
@@ -84,6 +86,20 @@ var routes = [
     name: "Policy",
     // icon: "nc-icon nc-bell-55",
     component: Policy,
+    layout: "/admin",
+  },
+  {
+    path: "/data-analyst",
+    name: "DataAnalyst",
+    // icon: "nc-icon nc-bell-55",
+    component: DataAnalyst,
+    layout: "/admin",
+  },
+  {
+    path: "/list-user",
+    name: "ListUser",
+    // icon: "nc-icon nc-bell-55",
+    component: listUser,
     layout: "/admin",
   },
   // {
