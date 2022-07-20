@@ -390,6 +390,7 @@ function Chatbot() {
           //     toDataURL(`https://ec-chatbot-test.com/${item.img_value.url}`, function(dataURL){
           //       alert(dataURL);      
           //   })
+          
 
           // function toDataURL(url, callback) {
           //   var httpRequest = new XMLHttpRequest();
