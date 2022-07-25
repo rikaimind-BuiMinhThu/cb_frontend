@@ -29,8 +29,17 @@ function Chatbot() {
   const [idList, setIdList] = useState([])
   const [idMsgGr, setIdMsgGr] = useState()
   const [idMsgRenameGr, setIdRenameMsgGr] = useState()
+  const [idMsgCopyGr, setIdCopyMsgGr] = useState()
+  const [idMsgDeleteGr, setIdDeleteMsgGr] = useState()
   const [bagId, setBagId] = useState()
   var [customDiv, setCustomDiv] = useState([])
+
+  React.useEffect(() => {
+    console.log('token in dashboard', Cookies.get('token'))
+    if(Cookies.get('token') == undefined){
+      window.location.href ='/'
+    }
+  }, [])
 
   React.useEffect(() => {
     var page_access_token = Cookies.get("page_access_token")
@@ -84,7 +93,7 @@ function Chatbot() {
     })
   }, [])
 
-  function reloadGroup(){
+  function reloadGroup() {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups`).then(res => {
       // var totalPage = Math.ceil(res.data.data.total / 25)
@@ -122,17 +131,22 @@ function Chatbot() {
         idli.push(res.data.data[i].id)
         // 
       }
-      var liMesBag = document.createElement('li')
-      liMesBag.setAttribute('id', liMesBag)
-      document.getElementById('ulMesBag').appendChild(liMesBag)
-      setIdList(idli)
-      // console.log(idli)
-      setGroupList(res.data.data)
-      setTimeout(() => {
-        var i = idli.length - 1
-        document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
+      document.getElementById('ulMesBag').innerHTML = ""
+      for (var i = 0; i < idli.length; i++) {
+        var liMesBag = document.createElement('li')
+        liMesBag.setAttribute('id', 'liMesBag')
 
-      }, 1000)
+        document.getElementById('ulMesBag').appendChild(liMesBag)
+        setIdList(idli)
+        // console.log(idli)
+        setGroupList(res.data.data)
+        setTimeout(() => {
+          var i = idli.length - 1
+          document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
+
+        }, 1000)
+      }
+
     }).catch(error => {
       console.log(error)
       if (error.response.data.code === 3) {
@@ -192,10 +206,10 @@ function Chatbot() {
             api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
               console.log(res)
 
-              
+
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Delete Successfully")
+                setMsgNoti("削除しました。")
               }, 1500)
               setTimeout(function () {
                 setIsOpenNoti(false)
@@ -210,10 +224,10 @@ function Chatbot() {
             var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
             api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
               console.log(res)
-              
+
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Update Successfully")
+                setMsgNoti("更新しました。")
               }, 1500)
 
               setTimeout(function () {
@@ -284,9 +298,9 @@ function Chatbot() {
               console.log(res)
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Delete Successfully")
+                setMsgNoti("削除しました。")
               }, 1500)
-              
+
               setTimeout(function () {
                 setIsOpenNoti(false)
               }, 2000);
@@ -305,9 +319,9 @@ function Chatbot() {
               console.log(res)
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Update Successfully")
+                setMsgNoti("更新しました。")
               }, 1500)
-              
+
               setTimeout(function () {
                 setIsOpenNoti(false)
               }, 2000);
@@ -390,7 +404,7 @@ function Chatbot() {
           //     toDataURL(`https://ec-chatbot-test.com/${item.img_value.url}`, function(dataURL){
           //       alert(dataURL);      
           //   })
-          
+
 
           // function toDataURL(url, callback) {
           //   var httpRequest = new XMLHttpRequest();
@@ -479,9 +493,9 @@ function Chatbot() {
               console.log(res)
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Delete Successfully")
+                setMsgNoti("削除しました。")
               }, 1500)
-              
+
               setTimeout(function () {
                 setIsOpenNoti(false)
               }, 2000);
@@ -502,9 +516,9 @@ function Chatbot() {
               console.log(res)
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Update Successfully")
+                setMsgNoti("更新しました。")
               }, 1500)
-              
+
               setTimeout(function () {
                 setIsOpenNoti(false)
               }, 2000);
@@ -576,9 +590,9 @@ function Chatbot() {
               console.log(res)
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Delete Successfully")
+                setMsgNoti("削除しました。")
               }, 1500)
-              
+
               setTimeout(function () {
                 setIsOpenNoti(false)
               }, 2000);
@@ -735,9 +749,9 @@ function Chatbot() {
               console.log(res)
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Delete Successfully")
+                setMsgNoti("更新しました。")
               }, 1500)
-              
+
               setTimeout(function () {
                 setIsOpenNoti(false)
               }, 2000);
@@ -753,9 +767,9 @@ function Chatbot() {
               console.log(res)
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Update Successfully")
+                setMsgNoti("更新しました。")
               }, 1500)
-              
+
               setTimeout(function () {
                 setIsOpenNoti(false)
               }, 2000);
@@ -824,9 +838,9 @@ function Chatbot() {
               console.log(res)
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Delete Successfully")
+                setMsgNoti("削除しました。")
               }, 1500)
-              
+
               setTimeout(function () {
                 setIsOpenNoti(false)
               }, 2000);
@@ -845,9 +859,9 @@ function Chatbot() {
               console.log(res)
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Update Successfully")
+                setMsgNoti("更新しました。")
               }, 1500)
-              
+
               setTimeout(function () {
                 setIsOpenNoti(false)
               }, 2000);
@@ -1018,7 +1032,7 @@ function Chatbot() {
               console.log(res)
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Delete Successfully")
+                setMsgNoti("削除しました。")
               }, 1500)
               setTimeout(function () {
                 setIsOpenNoti(false)
@@ -1040,7 +1054,7 @@ function Chatbot() {
               console.log(res)
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Update Successfully")
+                setMsgNoti("更新しました。")
               }, 1500)
               setTimeout(function () {
                 setIsOpenNoti(false)
@@ -1113,7 +1127,7 @@ function Chatbot() {
               console.log(res)
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("Delete Successfully")
+                setMsgNoti("削除しました。")
               }, 1500)
               setTimeout(function () {
                 setIsOpenNoti(false)
@@ -1215,6 +1229,9 @@ function Chatbot() {
 
   const [idReloadMsgBag, setIdReloadMsgBag] = useState()
   const [idReloadMsgBagFromGetMSG, setIdReloadMsgBagFromGetMSG] = useState()
+  const [idMsgBagRename, setIdMsgBagRename] = useState()
+  const [idMsgBagCopy, setIdMsgBagCopy] = useState()
+  const [idMsgBagDelete, setIdMsgBagDelete] = useState()
   function getMessage(idIn) {
     setIdReloadMsgBag(idIn)    // console.log(idList)
     var path = window.location.pathname;
@@ -1278,12 +1295,23 @@ function Chatbot() {
           document.getElementById(`msg_group${idIn}_id${idd}`).appendChild(abc)
           abc.innerHTML = `<div id="itemMsg_${idIn}_${idd}">
             <div class="dropdown-content">
-              <button style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Rename</button>
+              <button id="renameBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Rename</button>
+              <button id="copyBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Copy</button>
               <button id="deleteBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Delete</button>
               <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Cancel</button>
             </div>
           </div>`
           document.getElementById(`msgBag_item_${idIn}_${idd}`).removeAttribute('hidden')
+          document.getElementById(`renameBtn${idIn}_${idd}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            setIdMsgBagRename(idd)
+            setIsOpenMsgBagRename(true)
+          })
+          document.getElementById(`copyBtn${idIn}_${idd}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            setIdMsgBagCopy(idd)
+            setIsOpenMsgBagCopy(true)
+          })
 
           document.getElementById(`cancelBtn${idIn}_${idd}`).addEventListener('click', (event) => {
             event.preventDefault()
@@ -1291,7 +1319,8 @@ function Chatbot() {
           })
           document.getElementById(`deleteBtn${idIn}_${idd}`).addEventListener('click', (event) => {
             event.preventDefault()
-            alert(idd)
+            setIdMsgBagDelete(idd)
+            setIsOpenMsgBagDelete(true)
           })
         }
 
@@ -1391,21 +1420,36 @@ function Chatbot() {
 
           //Rename, Delete, Cancel uncomment code below
 
-          // document.getElementById(`msg_group${idIn}_id${idd}`).appendChild(abc)
-          // abc.innerHTML = `<div id="itemMsg_${idIn}_${idd}">
-          //   <div class="dropdown-content">
-          //     <button style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Rename</button>
-          //     <button id="deleteBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Delete</button>
-          //     <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Cancel</button>
-          //   </div>
-          // </div>`
-          // document.getElementById(`msgBag_item_${idIn}_${idd}`).removeAttribute('hidden')
+          document.getElementById(`msg_group${idIn}_id${idd}`).appendChild(abc)
+          abc.innerHTML = `<div id="itemMsg_${idIn}_${idd}">
+            <div class="dropdown-content">
+              <button id="renameBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Rename</button>
+              <button id="copyBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Copy</button>
+              <button id="deleteBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Delete</button>
+              <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Cancel</button>
+            </div>
+          </div>`
+          document.getElementById(`msgBag_item_${idIn}_${idd}`).removeAttribute('hidden')
+          document.getElementById(`renameBtn${idIn}_${idd}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            setIdMsgBagRename(idd)
+            setIsOpenMsgBagRename(true)
+          })
+          document.getElementById(`copyBtn${idIn}_${idd}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            setIdMsgBagCopy(idd)
+            setIsOpenMsgBagCopy(true)
+          })
 
-          // document.getElementById(`cancelBtn${idIn}_${idd}`).addEventListener('click', () => {
-          //   document.getElementById(`msgBag_item_${idIn}_${idd}`).setAttribute("hidden", true)
-          // })
-          // document.getElementById(`deleteBtn${idIn}_${idd}`).addEventListener('click', () => {
-          // })
+          document.getElementById(`cancelBtn${idIn}_${idd}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            document.getElementById(`msgBag_item_${idIn}_${idd}`).setAttribute("hidden", true)
+          })
+          document.getElementById(`deleteBtn${idIn}_${idd}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            setIdMsgBagDelete(idd)
+            setIsOpenMsgBagDelete(true)
+          })
         }
 
         )
@@ -1447,7 +1491,12 @@ function Chatbot() {
   const [isOpenAddChatbot, setIsOpenAddChatbot] = useState(false)
   const [isOpenAddMsgBag, setIsOpenAddMsgBag] = useState(false)
   const [isOpenRenameMsgBag, setIsOpenRenameMsgBag] = useState(false)
-  
+  const [isOpenCopyMsgBag, setIsOpenCopyMsgBag] = useState(false)
+  const [isOpenDeleteMsgBag, setIsOpenDeleteMsgBag] = useState(false)
+
+  const [isOpenMsgBagRename, setIsOpenMsgBagRename] = useState(false)
+  const [isOpenMsgBagCopy, setIsOpenMsgBagCopy] = useState(false)
+  const [isOpenMsgBagDelete, setIsOpenMsgBagDelete] = useState(false)
 
   const [nameChatbot, setNameChatbot] = useState()
   const [temp, setTemp] = useState()
@@ -1872,13 +1921,13 @@ function Chatbot() {
         // console.log(res)
         setTimeout(() => {
           setIsOpenNoti(true)
-          setMsgNoti("Add Successfully")
+          setMsgNoti("追加しました。")
         }, 1500)
-        
+
         setTimeout(function () {
           setIsOpenNoti(true)
         }, 2000);
-reloadMessMsgBag()
+        reloadMessMsgBag()
       }).catch(error => {
         console.log(error)
         // if (error.response.data.code === 3) {
@@ -1919,13 +1968,13 @@ reloadMessMsgBag()
         console.log(res)
         setTimeout(() => {
           setIsOpenNoti(true)
-          setMsgNoti("Add Successfully")
+          setMsgNoti("追加しました。")
         }, 1500)
-        
+
         setTimeout(function () {
           setIsOpenNoti(false)
         }, 2000);
-reloadMessMsgBag()
+        reloadMessMsgBag()
 
       }).catch(error => {
         console.log(error)
@@ -1972,13 +2021,13 @@ reloadMessMsgBag()
         console.log(res)
         setTimeout(() => {
           setIsOpenNoti(true)
-          setMsgNoti("Add Successfully")
+          setMsgNoti("追加しました。")
         }, 1500)
-       
+
         setTimeout(function () {
           setIsOpenNoti(false)
         }, 2000);
-         reloadMessMsgBag()
+        reloadMessMsgBag()
       }).catch(error => {
         console.log(error)
         // if (error.response.data.code === 3) {
@@ -2015,7 +2064,7 @@ reloadMessMsgBag()
 
         setTimeout(() => {
           setIsOpenNoti(true)
-          setMsgNoti("Update Successfully")
+          setMsgNoti("更新しました。")
         }, 1500)
         setTimeout(function () {
           setIsOpenNoti(false)
@@ -2068,9 +2117,9 @@ reloadMessMsgBag()
         console.log(res)
         setIsOpenNoti(true)
         setTimeout(() => {
-          setMsgNoti("Add Successfully")
+          setMsgNoti("追加しました。")
         }, 1500)
-        
+
         setTimeout(function () {
           setIsOpenNoti(false)
         }, 2000);
@@ -2340,6 +2389,14 @@ reloadMessMsgBag()
     setIsOpenRenameMsgBag(true)
     setIdRenameMsgGr(id)
   }
+  function copyMsgBagPop(id) {
+    setIsOpenCopyMsgBag(true)
+    setIdCopyMsgGr(id)
+  }
+  function deleteMsgBagPop(id) {
+    setIsOpenDeleteMsgBag(true)
+    setIdDeleteMsgGr(id)
+  }
 
   function addMagBag() {
     var path = window.location.pathname;
@@ -2366,7 +2423,7 @@ reloadMessMsgBag()
     }
   }
 
-  function renameMagBag(){
+  function renameMagBag() {
     var path = window.location.pathname;
     var newBag = document.getElementById("rename_bag").value
     if (utils.checkFieldAdd(newBag, "MsgBag") == true) {
@@ -2374,20 +2431,144 @@ reloadMessMsgBag()
       api.patch(`/api/v1/message_managements/message_groups/${idMsgRenameGr}`, newBagAdd).then(res => {
         setIsOpenRenameMsgBag(false)
         console.log(res)
-        setMsgNoti("Update Group name successfully!")
+        setMsgNoti("更新しました。")
         setIsOpenNoti(true)
         setTimeout(() => {
           setIsOpenNoti(false)
         }, 1500)
-        setTimeout(() => {
-          window.location.reload()
-        }, 1500)
-        
+        // setTimeout(() => {
+        //   window.location.reload()
+        // }, 1500)
+        refreshMsgGroup()
       }).catch(error => {
         alert(error)
         console.log(error)
       })
     }
+  }
+
+  function renameMessageBag() {
+    var path = window.location.pathname;
+    var newBag = document.getElementById("rename_bag_inside").value
+    if (utils.checkFieldAdd(newBag, "MsgBag") == true) {
+      var newBagAdd = { message_bag: { bag_name: newBag } }
+
+      api.patch(`/api/v1/message_managements/message_bags/${idMsgBagRename}`, newBagAdd).then(res => {
+        setIsOpenMsgBagRename(false)
+        console.log("message_group_id rename ne: ", res.data.data.message_group_id)
+        setMsgNoti("更新しました。")
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setIsOpenNoti(false)
+        }, 1500)
+        // setTimeout(() => {
+        //   window.location.reload()
+        // }, 1500)
+        reloadMsgBag()
+        getBagMsg(idMsgBagRename, idMsgBagRename)
+      }).catch(error => {
+        alert(error)
+        console.log(error)
+      })
+    }
+  }
+
+
+  function copyMagBag() {
+    // alert(idMsgCopyGr)
+    api.post(`/api/v1/message_managements/message_groups/${idMsgCopyGr}/copy`).then(res => {
+      setIsOpenCopyMsgBag(false)
+      console.log(res)
+      setMsgNoti("グループをコピーしました。")
+      setIsOpenNoti(true)
+      setTimeout(() => {
+        setIsOpenNoti(false)
+      }, 1500)
+      refreshMsgGroup()
+      // setTimeout(() => {
+      //   window.location.reload()
+      // }, 1500)
+
+    }).catch(error => {
+      console.log(error)
+    })
+  }
+  //copyMessageBag
+
+  function copyMessageBag() {
+    // alert(idMsgCopyGr)
+    api.post(`/api/v1/message_managements/message_bags/${idMsgBagCopy}/copy`).then(res => {
+      setIsOpenMsgBagCopy(false)
+      console.log(res)
+      setMsgNoti("メッセージ袋をコピーしました。")
+      setIsOpenNoti(true)
+      setTimeout(() => {
+        setIsOpenNoti(false)
+      }, 1500)
+      reloadMsgBag()
+      // setTimeout(() => {
+      //   window.location.reload()
+      // }, 1500)
+
+    }).catch(error => {
+      console.log(error)
+    })
+  }
+
+  function deleteMagBag() {
+    api.delete(`/api/v1/message_managements/message_groups/${idMsgDeleteGr}`).then(res => {
+      setIsOpenDeleteMsgBag(false)
+      if (res.data.code == 2) {
+        setMsgNoti("グループは利用中のため、削除できません！")
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setIsOpenNoti(false)
+        }, 1500)
+      } else {
+        setMsgNoti("メッセージグループを削除しました。")
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setIsOpenNoti(false)
+        }, 1500)
+        refreshMsgGroup()()
+      }
+
+
+      // setTimeout(() => {
+      //   window.location.reload()
+      // }, 1500)
+
+    }).catch(error => {
+      console.log(error)
+    })
+  }
+  //deleteMessageBag
+
+  function deleteMessageBag() {
+    api.delete(`/api/v1/message_managements/message_bags/${idMsgBagDelete}`).then(res => {
+      setIsOpenMsgBagDelete(false)
+      if (res.data.code == 2) {
+        setMsgNoti("メッセージ袋は利用中のため、削除できません！")
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setIsOpenNoti(false)
+        }, 1500)
+      } else {
+        setMsgNoti("メッセージ袋を削除しました。")
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setIsOpenNoti(false)
+        }, 1500)
+        reloadMsgBag()
+      }
+
+      // setTimeout(() => {
+      //   window.location.reload()
+      // }, 1500)
+
+    }).catch(error => {
+      console.log(error)
+    })
   }
 
   var page_access_token = Cookies.get("page_access_token")
@@ -2419,7 +2600,6 @@ reloadMessMsgBag()
 
     setPastPostList(past_post)
     setIndexPP(past_post.length)
-    console.log("pp: ", past_post)
 
   }
 
@@ -2455,7 +2635,7 @@ reloadMessMsgBag()
                     <Card className="card-plain">
                       <CardBody style={{ width: "100%" }}>
                         <div style={{ display: "flex", width: "200%" }}>
-                          <div style={{ width: "30%" }}>
+                          <div style={{ width: "35%" }}>
                             <h5 id="jjjj">メッセージグループ</h5>
                             <div>
                               <Button style={{ fontSize: "10px", marginTop: "-5%" }} onClick={() => setIsOpenAddChatbot(true)}>グループ追加</Button><br />
@@ -2466,8 +2646,16 @@ reloadMessMsgBag()
                                       <li style={{ marginLeft: "-30px", display: "flex" }} key={key}>
                                         <Nav id="nav_option" style={{ width: "90%" }}>
                                           <i className="nc-icon nc-bell-55" style={{ color: "black" }} />
-                                          <p id="a_tag" style={{ fontSize: "15px" }} onClick={() => getMessage(data.id)}>&nbsp;&nbsp;{data.group_name}</p>
-                                          <ul id="ulMesBag" style={{ listStyleType: "none", width: "100%" }}>
+                                          <p id="a_tag" style={{ fontSize: "15px", width: "60%" }} onClick={() => getMessage(data.id)}>&nbsp;&nbsp;{data.group_name}</p>
+                                          <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
+                                            onClick={() => addMsgBagPop(data.id)}><i className="nc-icon nc-simple-add nc-3x" style={{ color: "black" }} /></Button>
+                                          <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
+                                            onClick={() => copyMsgBagPop(data.id)}><i className="nc-icon nc-tag-content nc-3x" style={{ color: "black" }} /></Button>
+                                          <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
+                                            onClick={() => renameMsgBagPop(data.id)}><i className="nc-icon nc-single-copy-04 nc-3x" style={{ color: "black" }} /></Button>
+                                          <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
+                                            onClick={() => deleteMsgBagPop(data.id)}><i className="nc-icon nc-box nc-3x" style={{ color: "black" }} /></Button>
+                                          <ul id="ulMesBag" style={{ listStyleType: "none", width: "200%", marginLeft: "-20%" }}>
                                             <li id="liMesBag">
                                               {/* <Nav id="itemBag" >
                                                 {itemBbag.message_bags && itemBbag.message_bags.map((datagroup, key2) => {
@@ -2492,12 +2680,7 @@ reloadMessMsgBag()
                                             <br />
                                           </ul>
                                         </Nav>
-                                        <Button style={{ height: '30px', width: "10%", padding: '0', margin: "0px 5px 0px 0px", backgroundColor: "#FFFFFF" }}
-                                          onClick={() => addMsgBagPop(data.id)}><i className="nc-icon nc-simple-add nc-3x" style={{ color: "black" }} /></Button>
-                                          <Button style={{ height: '30px', width: "10%", padding: '0', margin: "0px 5px 0px 0px", backgroundColor: "#FFFFFF" }}
-                                          onClick={() => renameMsgBagPop(data.id)}><i className="nc-icon nc-single-copy-04 nc-3x" style={{ color: "black" }} /></Button>
-                                        <Button style={{ height: '30px', width: "10%", padding: '0', margin: "0px 5px 0px 0px", backgroundColor: "#FFFFFF" }}
-                                          onClick={() => addMsgBagPop(data.id)}><i className="nc-icon nc-box nc-3x" style={{ color: "black" }} /></Button>
+
                                       </li>
                                     )
                                   })}
@@ -2505,7 +2688,7 @@ reloadMessMsgBag()
                               </Nav>
                             </div>
                           </div>
-                          <div style={{ width: "55%" }} id="abczyz">
+                          <div style={{ width: "50%" }} id="abczyz">
                             <h5>メッセージ内容</h5>
                             {/* <div> */}
                             <h6>メッセージタイプ</h6>
@@ -2600,12 +2783,50 @@ reloadMessMsgBag()
         </ModalShort>
         <ModalShort open={isOpenRenameMsgBag} onClose={() => setIsOpenRenameMsgBag(false)}>
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
-            <h4>Rename Message Group</h4>
+            <h4>メッセージグループ名変更</h4>
             <label style={{ width: "100%" }}>
               <input id="rename_bag" style={{ width: "100%" }} onBlur={(e) => utils.checkFieldAdd(e.target.value, "MsgBag")} name="chatbot_name"></input>
               <label id="newMsgBagErrMsg" style={{ display: 'none', color: "red" }}></label>
             </label><br />
-            <Button onClick={() => renameMagBag()}>Rename</Button>
+            <Button onClick={() => renameMagBag()}>変更</Button>
+          </div>
+        </ModalShort>
+        <ModalShort open={isOpenCopyMsgBag} onClose={() => setIsOpenCopyMsgBag(false)}>
+          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+            <h4>メッセージグループをコピーしますか。</h4>
+            <Button onClick={() => copyMagBag()}>はい</Button>
+            <Button onClick={() => setIsOpenCopyMsgBag(false)}>いいえ</Button>
+          </div>
+        </ModalShort>
+        <ModalShort open={isOpenDeleteMsgBag} onClose={() => setIsOpenDeleteMsgBag(false)}>
+          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+            <h4>メッセージグループを削除しますか。</h4>
+            <Button onClick={() => deleteMagBag()}>はい</Button>
+            <Button onClick={() => setIsOpenDeleteMsgBag(false)}>いいえ</Button>
+          </div>
+        </ModalShort>
+        <ModalShort open={isOpenMsgBagRename} onClose={() => setIsOpenMsgBagRename(false)}>
+          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+            <h4>メッセージ袋名変更</h4>
+            <label style={{ width: "100%" }}>
+              <input id="rename_bag_inside" style={{ width: "100%" }} onBlur={(e) => utils.checkFieldAdd(e.target.value, "MsgBag")} name="chatbot_bag_name"></input>
+              <label id="newMsgBagErrMsg" style={{ display: 'none', color: "red" }}></label>
+            </label><br />
+            <Button onClick={() => renameMessageBag()}>変更</Button>
+          </div>
+        </ModalShort>
+        <ModalShort open={isOpenMsgBagCopy} onClose={() => setIsOpenMsgBagCopy(false)}>
+          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+            <h4>メッセージ袋をコピーしますか。</h4>
+            <Button onClick={() => copyMessageBag()}>はい</Button>
+            <Button onClick={() => setIsOpenMsgBagCopy(false)}>いいえ</Button>
+          </div>
+        </ModalShort>
+        <ModalShort open={isOpenMsgBagDelete} onClose={() => setIsOpenMsgBagDelete(false)}>
+          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+            <h4>メッセージ袋を削除しますか。</h4>
+            <Button onClick={() => deleteMessageBag()}>はい</Button>
+            <Button onClick={() => setIsOpenMsgBagDelete(false)}>いいえ</Button>
           </div>
         </ModalShort>
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
@@ -2615,7 +2836,7 @@ reloadMessMsgBag()
         </ModalNoti>
         <Modal open={isOpenSelectPastPost} onClose={() => setIsOpenSelectPastPost(false)}>
           <div style={{ width: "700px", textAlign: "center", color: "#51cbce" }}>
-            <h4>Select past post</h4>
+            <h4>過去の投稿選択</h4>
             <div className="grid-container">
               {pastPostList.map((pp, i) => (
                 <div onClick={() => addPPChatbot(pp.media_url, pp.id)} className="grid-item" style={{ width: "200px" }} key={i}>
@@ -2628,7 +2849,7 @@ reloadMessMsgBag()
         </Modal>
         <Modal open={isOpenSelectPastPostUp} onClose={() => setIsOpenSelectPastPostUp(false)}>
           <div style={{ width: "700px", textAlign: "center", color: "#51cbce" }}>
-            <h4>Select past post</h4>
+            <h4>過去の投稿選択</h4>
             <div className="grid-container">
               {pastPostList.map((pp, i) => (
                 <div onClick={() => upPP(pp.media_url, pp.id)} className="grid-item" style={{ width: "200px" }} key={i}>

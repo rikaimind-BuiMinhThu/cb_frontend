@@ -67,7 +67,12 @@ function ClientManagement() {
   const [isOpen, setIsOpen] = useState(false)
   const [isOpenNoti, setIsOpenNoti] = useState(false)
   const [isOpenAddUser, setIsOpenAddUser] = useState(false)
-
+  React.useEffect(() => {
+    console.log('token in dashboard', Cookies.get('token'))
+    if(Cookies.get('token') == undefined){
+      window.location.href ='/'
+    }
+  }, [])
   React.useEffect(() => {
     Cookies.get('token')
     // console.log(Cookies.get('token'));
