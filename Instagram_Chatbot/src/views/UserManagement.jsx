@@ -35,18 +35,26 @@ function UserManagement() {
   const [isOpenAddUser, setIsOpenAddUser] = useState(false)
   const [listClient, setListClient] = useState([])
 
-  // React.useEffect(() => {
-  //   var path = window.location.pathname;
-  //   api.get(`/api/v1/managements/clients`).then(res => {
-  //     // console.log(res.data.data)
-  //     setListClient(res.data.data)
-  //   }).catch(error => {
-  //     console.log(error)
-  //     if (error.response.data.code === 3) {
-  //       requestNewToken(path)
-  //     }
-  //   })
-  // }, [])
+
+  React.useEffect(() => {
+    console.log('token in dashboard', Cookies.get('token'))
+    if(Cookies.get('token') == undefined){
+      window.location.href ='/'
+    }
+  }, [])
+
+  React.useEffect(() => {
+    var path = window.location.pathname;
+    api.get(`/api/v1/managements/clients`).then(res => {
+      // console.log(res.data.data)
+      setListClient(res.data.data)
+    }).catch(error => {
+      console.log(error)
+      if (error.response.data.code === 3) {
+        requestNewToken(path)
+      }
+    })
+  }, [])
 
   const clients_id = listClient.clients
 
@@ -58,15 +66,15 @@ function UserManagement() {
     var paramSearch={page: pageIndex}
     var path = window.location.pathname;
     api.get(`/api/v1/managements/users`, paramSearch).then(res => {
-      console.log(res.data.data.total)
-      var totalPage = Math.ceil(res.data.data.total/25)
+      console.log(res.data.total)
+      var totalPage = Math.ceil(res.data.total/25)
       setTotalPage(totalPage)
-      setDataList(res.data.data)
+      setDataList(res.data)
     }).catch(error => {
       console.log(error)
-      if (error.response.data.code === 3) {
-        requestNewToken(path)
-      }
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
     })
   }, [])
 
@@ -74,7 +82,15 @@ function UserManagement() {
     var path = window.location.pathname;
     // setPageIndex(pgIndex)
     api.get(`/api/v1/managements/users?name=&page=${pgIndex}&client_id=`).then(res => {
-      setDataList(res.data.data)
+      var totalPage = Math.ceil(res.data.data.total / 25)
+      if (pgIndex > totalPage) {
+        api.get(`/api/v1/managements/users?name=&page=${totalPage}&client_id=`).then(resp => {
+          setDataList(resp.data.data)
+        })
+      } else {
+        setDataList(res.data.data)
+      }
+      setTotalPage(totalPage)
     }).catch(error => {
       console.log(error)
       if (error.response.data.code === 3) {
@@ -361,7 +377,7 @@ function UserManagement() {
                   <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "ConfirmPassword")} type="password" id="newConfirmPassword" name="confirm_password" />
                   <label id="newUserConfirmPasswordErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
-                <label className="label-input">Belong to <span className="span-require">*必須</span>
+                <label className="label-input">クライアント<span className="span-require">*必須</span>
                   <select style={{ padding: "3px 0px 3px 0px" }} className="input-field" name="client_id">
                     {clients_id?.map((client, i) => {
                       return (

@@ -78,4 +78,20 @@
 .mgsChatbot{
     width: 75%;
      border-radius: 10px;
+     margin-top: 10px;
 }
+
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    padding: 10px;
+  }
+  .grid-item {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    font-size: 30px;
+    text-align: center;
+  }
+  .ag-chart-wrapper{
+    height: 50%;
+  }

@@ -68,44 +68,59 @@ function Sidebar(props) {
                 </p>
               </NavLink>
             </li>
-            <li className={activeRoute('pricing') + (true ? " active-pro" : "")} key={'pricing'}>
+            {/* <li className={activeRoute('pricing') + (true ? " active-pro" : "")} key={'pricing'}>
               <NavLink to="pricing" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-bulb-63" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>価格</p>
               </NavLink>
-            </li>
+            </li> */}
             <li className={activeRoute('chatbot') + (true ? " active-pro" : "")} key={'notifications'}>
               <NavLink to="chatbot" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-atom" style={{ color: "black" }} />
-                <p style={{ color: "black" }}>Chatbot</p>
+                <p style={{ color: "black" }}>チャットボット作成</p>
               </NavLink>
             </li>
-            {/* <li className={activeRoute('user-page') + (true ? " active-pro" : "")} key={'user-page'}>
-              <NavLink to="user-page" onClick={hide} className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+            <li className={activeRoute('keyword') + (true ? " active-pro" : "")} key={'keyword'}>
+              <NavLink to="keyword" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-key-25" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>キーワード設定</p>
+              </NavLink>
+            </li>
+            <li className={activeRoute('release') + (true ? " active-pro" : "")} key={'release'}>
+              <NavLink to="release" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-air-baloon" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>リリース</p>
+              </NavLink>
+            </li>
+
+
+
+            <li className={activeRoute('data-analyst') + (true ? " active-pro" : "")} key={'user-page'}>
+              <NavLink to="data-analyst" onClick={hide} className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-single-02" style={{ color: "black" }} />
-                <p style={{ color: "black" }}>User Profile{'>'}</p>
+                <p style={{ color: "black" }}>データ分析{'>'}</p>
               </NavLink>
               <ul id="userDropdown" style={{ display: "none",marginLeft:"-30px" }}>
-                <li className={activeRoute('icons') + (true ? " active-pro" : "")} key={'profile'}>
-                  <NavLink to="icons" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <li className={activeRoute('data-analyst') + (true ? " active-pro" : "")} key={'profile'}>
+                  <NavLink to="data-analyst" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-bulb-63" style={{ color: "black" }} />
-                    <p style={{ color: "black" }}>Profile</p>
+                    <p style={{ color: "black" }}>サマリー</p>
                   </NavLink>
                 </li>
-                <li className={activeRoute('icons') + (true ? " active-pro" : "")} key={'setting'}>
-                  <NavLink to="icons" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <li className={activeRoute('list-user') + (true ? " active-pro" : "")} key={'setting'}>
+                  <NavLink to="list-user" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-bullet-list-67" style={{ color: "black" }} />
-                    <p style={{ color: "black" }}>Setting</p>
+                    <p style={{ color: "black" }}>ユーザー一覧</p>
                   </NavLink>
                 </li>
-                <li className={activeRoute('icons') + (true ? " active-pro" : "")} key={'about'}>
-                  <NavLink to="icons" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <li className={activeRoute('attracted-customer') + (true ? " active-pro" : "")} key={'about'}>
+                  <NavLink to="attracted-customer" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                    <p style={{ color: "black" }}>About</p>
+                    <p style={{ color: "black" }}>集客</p>
                   </NavLink>
                 </li>
               </ul>
-            </li> */}
+            </li>
             {/* <li className={activeRoute('icons') + (true ? " active-pro" : "")} key={'icons'}>
               <NavLink to="icons" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-diamond" style={{ color: "black" }} />
