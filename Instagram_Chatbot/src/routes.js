@@ -29,6 +29,7 @@ import Pricing from "views/Pricing";
 import Keyword from "views/Keyword";
 import DataAnalyst from "views/DataAnalyst";
 import listUser from "views/ListUser";
+import AttractedCusomer from "views/AttractedCusomer";
 // import Cookies from 'js-cookie'
 
 var routes = [
@@ -62,21 +63,21 @@ var routes = [
   },
   {
     path: "/keyword",
-    name: "Keyword",
+    name: "キーワード設定",
     icon: "nc-icon nc-key-25",
     component: Keyword,
     layout: "/admin",
   },
   {
     path: "/chatbot",
-    name: "Chatbot",
+    name: "チャットボット作成",
     icon: "nc-icon nc-bell-55",
     component: Chatbot,
     layout: "/admin",
   },
   {
     path: "/release",
-    name: "Release",
+    name: "リリース",
     icon: "nc-icon nc-air-baloon",
     component: Release,
     layout: "/admin",
@@ -90,16 +91,23 @@ var routes = [
   },
   {
     path: "/data-analyst",
-    name: "DataAnalyst",
+    name: "データ分析",
     // icon: "nc-icon nc-bell-55",
     component: DataAnalyst,
     layout: "/admin",
   },
   {
     path: "/list-user",
-    name: "ListUser",
+    name: "ユーザー一覧",
     // icon: "nc-icon nc-bell-55",
     component: listUser,
+    layout: "/admin",
+  },
+  {
+    path: "/attracted-customer",
+    name: "集客",
+    // icon: "nc-icon nc-bell-55",
+    component: AttractedCusomer,
     layout: "/admin",
   },
   // {

@@ -35,6 +35,14 @@ function UserManagement() {
   const [isOpenAddUser, setIsOpenAddUser] = useState(false)
   const [listClient, setListClient] = useState([])
 
+
+  React.useEffect(() => {
+    console.log('token in dashboard', Cookies.get('token'))
+    if(Cookies.get('token') == undefined){
+      window.location.href ='/'
+    }
+  }, [])
+
   React.useEffect(() => {
     var path = window.location.pathname;
     api.get(`/api/v1/managements/clients`).then(res => {

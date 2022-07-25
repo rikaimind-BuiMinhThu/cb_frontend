@@ -8,7 +8,7 @@ import requestNewToken from "api/request-new-token";
 import { Card, CardHeader, CardBody, Row, Col } from "reactstrap";
 import Switch from "react-switch";
 import ModalNoti from "./Popup/ModalNoti";
-
+import Cookies from 'js-cookie'
 function Keyword() {
 
     var [customDiv, setCustomDiv] = useState([])
@@ -22,6 +22,12 @@ function Keyword() {
     const [msgNoti, setMsgNoti] = useState()
     // const [checked, setChecked] = useState([true, false, true])
 
+    React.useEffect(() => {
+        console.log('token in dashboard', Cookies.get('token'))
+        if (Cookies.get('token') == undefined) {
+            window.location.href = '/'
+        }
+    }, [])
     React.useEffect(() => {
         var path = window.location.pathname;
 
@@ -197,14 +203,14 @@ function Keyword() {
 
         if (title_val[0] == "" || title_val[0] == null) {
             setIsOpenNoti(true)
-            setMsgNoti("Please input Title")
+            setMsgNoti("タイトルを入力してください！")
             setTimeout(() => {
                 setMsgNoti("")
                 setIsOpenNoti(false)
             }, 1500)
         } else if (keyword_val[0] == "" || keyword_val[0] == null) {
             setIsOpenNoti(true)
-            setMsgNoti("Please input Keyword")
+            setMsgNoti("キーワードを入力してください！")
             setTimeout(() => {
                 setMsgNoti("")
                 setIsOpenNoti(false)
@@ -212,7 +218,7 @@ function Keyword() {
 
         } else if (newKWBag == undefined || newKWBag == "") {
             setIsOpenNoti(true)
-            setMsgNoti("Please input Bag")
+            setMsgNoti("メッセージ袋を選択してください！")
             setTimeout(() => {
                 setMsgNoti("")
                 setIsOpenNoti(false)
@@ -228,7 +234,7 @@ function Keyword() {
             api.post(`/api/v1/message_managements/keyword_settings`, newKW).then(res => {
                 console.log(res)
                 setIsOpenNoti(true)
-                setMsgNoti("Add keyword sucessfully")
+                setMsgNoti("キーワードを追加しました。")
                 setTimeout(() => {
                     setMsgNoti("")
                     setIsOpenNoti(false)
@@ -272,21 +278,21 @@ function Keyword() {
 
         if (title_val == "") {
             setIsOpenNoti(true)
-            setMsgNoti("Please input Title")
+            setMsgNoti("タイトルを入力してください！")
             setTimeout(() => {
                 setMsgNoti("")
                 setIsOpenNoti(false)
             }, 1500)
         } else if (bag_val == "") {
             setIsOpenNoti(true)
-            setMsgNoti("Please select Bag")
+            setMsgNoti("メッセージ袋を選択してください！")
             setTimeout(() => {
                 setMsgNoti("")
                 setIsOpenNoti(false)
             }, 1500)
         } else if (ans_val == "") {
             setIsOpenNoti(true)
-            setMsgNoti("Please input Keyword")
+            setMsgNoti("キーワードを入力してください！")
             setTimeout(() => {
                 setMsgNoti("")
                 setIsOpenNoti(false)
@@ -316,7 +322,7 @@ function Keyword() {
                 //   setIsOpenNoti(false)
                 // }, 2000)
                 setIsOpenNoti(true)
-                setMsgNoti("Update keyword successfully")
+                setMsgNoti("キーワードを更新しました。")
                 setTimeout(() => {
                     setMsgNoti("")
                     setIsOpenNoti(false)
@@ -441,10 +447,10 @@ function Keyword() {
                                     </div>
                                     <div className="div-add-aq" style={{ width: "100%", display: "block" }}>
                                         <div style={{ display: "flex" }}>
-                                            <div className="new-faq-q-so-title" style={{ paddingLeft: "5%", width: "20%" }}>Title</div>
-                                            <div className="new-faq-q-so-title" style={{ paddingLeft: "9%", width: "43%" }}>Keyword</div>
-                                            <div className="new-faq-q-so-title" style={{ width: "30%" }}>Group</div>
-                                            <div className="new-faq-q-so-title" style={{ width: "30%" }}>Bag</div>
+                                            <div className="new-faq-q-so-title" style={{ paddingLeft: "8%", width: "20%" }}>タイトル</div>
+                                            <div className="new-faq-q-so-title" style={{ paddingLeft: "15%", width: "43%" }}>キーワード</div>
+                                            <div className="new-faq-q-so-title" style={{ paddingLeft: "5%", width: "30%" }}>メッセージグループ</div>
+                                            <div className="new-faq-q-so-title" style={{ paddingLeft: "2%", width: "30%" }}>メッセージ袋</div>
                                         </div>
 
                                     </div>
@@ -499,7 +505,7 @@ function Keyword() {
                                                                 })}
                                                             </select>
                                                             <select id={`listBag`} style={{ width: "25%" }} defaultValue={""} onChange={(e) => selectedBagNew(e.target.value)} className="new-faq-q-so" name="bag">
-                                                                <option value="" disabled hidden>Select a bag to reply</option>
+                                                                <option value="" disabled hidden>メッセージ袋選択 ...</option>
                                                             </select>
                                                             <div style={{ width: "90px" }}></div>
                                                             <div><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px" }}></i></div>
@@ -510,7 +516,7 @@ function Keyword() {
                                         <div id="cancel_save" style={{ width: "100%", textAlign: "right", padding: "20px" }}>
                                             <Button style={{ marginRight: "10px" }}
                                                 onClick={() => cancelAdd()}>キャンセル</Button>
-                                            <Button onClick={() => saveFixedMessage()}>Save</Button>
+                                            <Button onClick={() => saveFixedMessage()}>保存</Button>
                                         </div>
                                     </div>
                                 </div>

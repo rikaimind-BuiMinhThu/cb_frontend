@@ -53,6 +53,13 @@ function Release() {
   const [listKeyword, setListKeyword] = useState([])
 
   React.useEffect(() => {
+    console.log('token in dashboard', Cookies.get('token'))
+    if(Cookies.get('token') == undefined){
+      window.location.href ='/'
+    }
+  }, [])
+
+  React.useEffect(() => {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups`).then(res => {
       // console.log(res.data.data)
@@ -1478,7 +1485,7 @@ function Release() {
   }
   function deleteFAQInList(value) {
     if (listFAQ.length <= 1) {
-      setMsgNoti("FAQ must has at least one option")
+      setMsgNoti("よくある質問が最低1つの選択がある必要です。")
       setIsOpenNoti(true)
       setTimeout(() => {
         setMsgNoti("")
@@ -1511,7 +1518,7 @@ function Release() {
   function deleteFixedInList(value) {
     // alert(value)
     if (listFixedMenu.length <= 1) {
-      setMsgNoti("Fixed Menu must has at least one option")
+      setMsgNoti("固定メッセージが最低1つの選択がある必要です。")
       setIsOpenNoti(true)
       setTimeout(() => {
         setMsgNoti("")
@@ -1526,6 +1533,12 @@ function Release() {
         }).catch(error => {
           console.log(error)
         })
+        setMsgNoti("固定メッセージを削除しました。")
+      setIsOpenNoti(true)
+      setTimeout(() => {
+        setMsgNoti("")
+        setIsOpenNoti(false)
+      }, 2000)
       }).catch(error => {
         console.log(error)
         // if (error.response.data.code === 3) {
@@ -2084,7 +2097,7 @@ function Release() {
           api.patch(`/api/v1/message_managements/keyword_settings/${id}`, update).then(res => {
             // console.log(res)
             reloadUpdate()
-            setMsgNoti("Update Successfully")
+            setMsgNoti("更新しました。")
             setIsOpenNoti(true)
             setTimeout(() => {
               setMsgNoti("")

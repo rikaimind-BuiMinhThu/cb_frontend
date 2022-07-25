@@ -92,3 +92,6 @@
     font-size: 30px;
     text-align: center;
   }
+  .ag-chart-wrapper{
+    height: 50%;
+  }
