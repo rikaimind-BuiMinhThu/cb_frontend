@@ -187,11 +187,11 @@ function Chatbot() {
               <div><textarea name="messagesVa${item.id}" class="mgsChatbot" id="mgsCustomSaved${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
               <div id="btnDelMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-                font-weight:800">Delete</button>
+                font-weight:800">削除</button>
               </div>
               <div id="btnUpdateMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-                font-weight:800">Update</button>
+                font-weight:800">更新</button>
               </div>
             </div>`
           // document.getElementById(`mgsCustomKey${item.id}`).textContent = item.received_message
@@ -281,11 +281,11 @@ function Chatbot() {
           </div>
           <div id="btnDelImg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Delete</button>
+              font-weight:800">削除</button>
             </div>
             <div id="btnUpdateImg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Update</button>
+              font-weight:800">更新</button>
             </div>
         </div>`
           document.getElementById(`imgCustomKey${item.id}`).value = item.received_message
@@ -470,11 +470,11 @@ function Chatbot() {
           </div>
           <div id="btnDelImgMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Delete</button>
+              font-weight:800">削除</button>
             </div>
             <div id="btnUpImgMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Update</button>
+              font-weight:800">更新</button>
             </div>
         </div>`
           document.getElementById(`imgMgsCustomKey${item.id}`).value = item.received_message
@@ -563,15 +563,15 @@ function Chatbot() {
           <br />
           <div id="btnDeletePP${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Delete</button>
+              font-weight:800">削除</button>
             </div>
             <div id="btnUpdatePP${item.id}" style="float:right; display:none">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Update</button>
+              font-weight:800">更新</button>
             </div>
             <div id="btnChangePP${item.id}" style="float:right;">
               <button style="width:110px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Change post</button>
+              font-weight:800">変更</button>
             </div>
         </div>`
 
@@ -729,11 +729,11 @@ function Chatbot() {
               <div><textarea name="messagesVa${item.id}" class="mgsChatbot" id="mgsCustomSaved${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
               <div id="btnDelMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-                font-weight:800">Delete</button>
+                font-weight:800">削除</button>
               </div>
               <div id="btnUpdateMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-                font-weight:800">Update</button>
+                font-weight:800">更新</button>
               </div>
             </div>`
           // document.getElementById(`mgsCustomKey${item.id}`).textContent = item.received_message
@@ -821,11 +821,11 @@ function Chatbot() {
           </div>
           <div id="btnDelImg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Delete</button>
+              font-weight:800">削除</button>
             </div>
             <div id="btnUpdateImg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Update</button>
+              font-weight:800">更新</button>
             </div>
         </div>`
           document.getElementById(`imgCustomKey${item.id}`).value = item.received_message
@@ -1009,11 +1009,11 @@ function Chatbot() {
           </div>
           <div id="btnDelImgMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Delete</button>
+              font-weight:800">削除</button>
             </div>
             <div id="btnUpImgMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Update</button>
+              font-weight:800">更新</button>
             </div>
         </div>`
           document.getElementById(`imgMgsCustomKey${item.id}`).value = item.received_message
@@ -1100,15 +1100,15 @@ function Chatbot() {
           <br />
           <div id="btnDeletePP${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Delete</button>
+              font-weight:800">削除</button>
             </div>
             <div id="btnUpdatePP${item.id}" style="float:right; display:none">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Update</button>
+              font-weight:800">更新</button>
             </div>
             <div id="btnChangePP${item.id}" style="float:right;">
               <button style="width:110px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">Change post</button>
+              font-weight:800">変更</button>
             </div>
         </div>`
 
@@ -1295,10 +1295,10 @@ function Chatbot() {
           document.getElementById(`msg_group${idIn}_id${idd}`).appendChild(abc)
           abc.innerHTML = `<div id="itemMsg_${idIn}_${idd}">
             <div class="dropdown-content">
-              <button id="renameBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Rename</button>
-              <button id="copyBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Copy</button>
-              <button id="deleteBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Delete</button>
-              <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Cancel</button>
+              <button id="renameBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">名前変更</button>
+              <button id="copyBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">コピー</button>
+              <button id="deleteBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">削除</button>
+              <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">キャンセル</button>
             </div>
           </div>`
           document.getElementById(`msgBag_item_${idIn}_${idd}`).removeAttribute('hidden')
@@ -1423,10 +1423,10 @@ function Chatbot() {
           document.getElementById(`msg_group${idIn}_id${idd}`).appendChild(abc)
           abc.innerHTML = `<div id="itemMsg_${idIn}_${idd}">
             <div class="dropdown-content">
-              <button id="renameBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Rename</button>
-              <button id="copyBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Copy</button>
-              <button id="deleteBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Delete</button>
-              <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Cancel</button>
+              <button id="renameBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">名前変更</button>
+              <button id="copyBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">コピー</button>
+              <button id="deleteBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">削除</button>
+              <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">キャンセル</button>
             </div>
           </div>`
           document.getElementById(`msgBag_item_${idIn}_${idd}`).removeAttribute('hidden')
@@ -1900,11 +1900,11 @@ function Chatbot() {
     </div>
     <div id="btnDelImg${numIndex}" style="float:right;">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-        font-weight:800">Delete</button>
+        font-weight:800">削除</button>
       </div>
       <div id="btnAddEachImg${numIndex}" style="float:right; display:block">
       <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-      font-weight:800">Add</button>
+      font-weight:800">追加</button>
     </div>
   </div>`
     // document.getElementById(`btnDelImg${numIndex}`).style.display='none'
@@ -1948,11 +1948,11 @@ function Chatbot() {
     <div><textarea name="messagesVa${numIndex}" class="mgsChatbot" id="mgsCustom${numIndex}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
     <div id="btnDelMsg${numIndex}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-        font-weight:800">Delete</button>
+        font-weight:800">削除</button>
       </div>
       <div id="btnAddEachMsg${numIndex}" style="float:right; display:block">
       <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-      font-weight:800">Add</button>
+      font-weight:800">追加</button>
     </div>
     </div>`
     document.getElementById(`btnAddEachMsg${numIndex}`).addEventListener('click', (event) => {
@@ -1999,11 +1999,11 @@ function Chatbot() {
    </div>
    <div id="btnDelPP${numIndex}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-        font-weight:800">Delete</button>
+        font-weight:800">削除</button>
       </div>
       <div id="btnAddPP${numIndex}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-        font-weight:800">Add</button>
+        font-weight:800">追加</button>
       </div>
     
     </div>
@@ -2094,11 +2094,11 @@ function Chatbot() {
     </div>
     <div id="btnDelImgMsg${numIndex}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-        font-weight:800">Delete</button>
+        font-weight:800">削除</button>
       </div>
       <div id="btnAddImgMsg${numIndex}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-        font-weight:800">Add</button>
+        font-weight:800">追加</button>
       </div>
   </div>`
 
@@ -2638,7 +2638,7 @@ function Chatbot() {
                           <div style={{ width: "35%" }}>
                             <h5 id="jjjj">メッセージグループ</h5>
                             <div>
-                              <Button style={{ fontSize: "10px", marginTop: "-5%" }} onClick={() => setIsOpenAddChatbot(true)}>グループ追加</Button><br />
+                              <Button style={{ fontSize: "10px", marginTop: "-4%", padding:"10px" }} onClick={() => setIsOpenAddChatbot(true)}>グループ追加</Button><br />
                               <Nav className="sidebar-wrapper">
                                 <ul style={{ listStyleType: "none", width: "100%" }}>
                                   {itemGroup.map((data, key) => {
@@ -2655,7 +2655,7 @@ function Chatbot() {
                                             onClick={() => renameMsgBagPop(data.id)}><i className="nc-icon nc-single-copy-04 nc-3x" style={{ color: "black" }} /></Button>
                                           <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
                                             onClick={() => deleteMsgBagPop(data.id)}><i className="nc-icon nc-box nc-3x" style={{ color: "black" }} /></Button>
-                                          <ul id="ulMesBag" style={{ listStyleType: "none", width: "200%", marginLeft: "-20%" }}>
+                                          <ul id="ulMesBag" style={{ listStyleType: "none", width: "200%", marginLeft: "-10%" }}>
                                             <li id="liMesBag">
                                               {/* <Nav id="itemBag" >
                                                 {itemBbag.message_bags && itemBbag.message_bags.map((datagroup, key2) => {
