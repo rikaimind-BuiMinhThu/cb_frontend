@@ -1,12 +1,19 @@
 export function checkInputNumber(value, field) {
-  // var phoneRe = /^\d+$/;
-  if (value === '') {
-    document.getElementById(`newClient${field}ErrMsg`).style.display = 'block'
-    document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} cannot be empty`
-  } else {
+  var numRe = /^\d+$/;
+ if(value === "") {
       document.getElementById(`newClient${field}ErrMsg`).style.display = 'none'
       document.getElementById(`newClient${field}ErrMsg`).innerHTML = ""
       return true
+    }
+    else {
+      if (numRe.test(value) === false) {
+        document.getElementById(`newClient${field}ErrMsg`).style.display = 'block'
+        document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} must be a number`
+      }else if(numRe.test(value) === true){
+        document.getElementById(`newClient${field}ErrMsg`).style.display = 'none'
+      document.getElementById(`newClient${field}ErrMsg`).innerHTML = ""
+      return true
+      }
     }
 }
 

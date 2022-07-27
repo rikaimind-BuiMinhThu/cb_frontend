@@ -20,6 +20,9 @@ function Dashboard() {
 
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'))
+  }, [])
+  React.useEffect(() => {
+    console.log('token in dashboard', Cookies.get('token'))
     if(Cookies.get('token') == undefined){
       window.location.href ='/'
     }

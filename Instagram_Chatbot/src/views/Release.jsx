@@ -54,8 +54,8 @@ function Release() {
 
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'))
-    if(Cookies.get('token') == undefined){
-      window.location.href ='/'
+    if (Cookies.get('token') == undefined) {
+      window.location.href = '/'
     }
   }, [])
 
@@ -78,6 +78,7 @@ function Release() {
     if (access_token == "" || access_token == undefined || access_token == null) {
       api.get(`/api/v1/instagram_settings`).then(res => {
         // console.log(res.data.data[0].page_access_token)
+        console.log("dang get pat")
         Cookies.set('page_access_token', res.data.data[0].page_access_token);
         Cookies.set('ig_id', res.data.data[0].ig_id);
       }).catch(error => {
@@ -87,6 +88,19 @@ function Release() {
 
   }, [])
 
+  function setPATAL() {
+    var access_token = Cookies.get('page_access_token')
+    if (access_token == "" || access_token == undefined || access_token == null) {
+      api.get(`/api/v1/instagram_settings`).then(res => {
+        // console.log(res.data.data[0].page_access_token)
+        Cookies.set('page_access_token', res.data.data[0].page_access_token);
+        Cookies.set('ig_id', res.data.data[0].ig_id);
+      }).catch(error => {
+        console.log(error)
+      })
+    }
+  }
+
   const [idInstaSetting, setIdInstaSetting] = useState()
   React.useEffect(() => {
     api.get(`/api/v1/instagram_settings`).then(res => {
@@ -95,6 +109,14 @@ function Release() {
       console.log(error)
     })
   }, [])
+
+  function setIgIDS() {
+    api.get(`/api/v1/instagram_settings`).then(res => {
+      setIdInstaSetting(res.data.data[0].id)
+    }).catch(error => {
+      console.log(error)
+    })
+  }
 
   const [story_actived, setStory_actived] = useState()
   const [live_actived, setLive_actived] = useState()
@@ -188,6 +210,21 @@ function Release() {
       console.log(error)
     })
   }, [])
+  function getPMAL() {
+    var path = window.location.pathname;
+    api.get(`/api/v1/message_managements/ice_breakers_status?ig_id=${Cookies.get("ig_id")}`).then(res => {
+      // console.log("ice_breakers_status res: ", res)
+      var ice_breakers_status = res.data.instagram_ice_breakers.data
+      // console.log(`ice_breakers_status: `, ice_breakers_status)
+      if (ice_breakers_status.length > 0) {
+        trueConfigFAQ()
+      } else {
+        falseConfigFAQ()
+      }
+    }).catch(error => {
+      console.log(error)
+    })
+  }
 
 
   React.useEffect(() => {
@@ -203,6 +240,20 @@ function Release() {
       console.log(error)
     })
   }, [])
+
+  function getPMALS() {
+    var path = window.location.pathname;
+    api.get(`/api/v1/message_managements/persistent_menus_status?ig_id=${Cookies.get("ig_id")}`).then(res => {
+      var instagram_persistent_menus = res.data.instagram_persistent_menus.data
+      if (instagram_persistent_menus.length > 0) {
+        trueConfigFixedMenu()
+      } else {
+        falseConfigFixedMenu()
+      }
+    }).catch(error => {
+      console.log(error)
+    })
+  }
 
   function reloadFAQStatus(id_ig_get_status) {
     var path = window.location.pathname;
@@ -432,6 +483,182 @@ function Release() {
       // }
     })
   }, [])
+
+  function getAllN() {
+    var path = window.location.pathname;
+
+    api.get(`/api/v1/instagram_settings/1`).then(res => {
+      console.log('insta setting ', res.data.data)
+      var dataB = res.data.data
+      setInstaSetting(res.data.data)
+      setInstaSettingId(res.data.data.id)
+      setStoryOnOff(res.data.data.story_comment_bag_status)
+      if (res.data.data.story_comment_bag_status == "off") {
+        falseConfigStory()
+      } else {
+        trueConfigStory()
+      }
+      setLiveOnOff(res.data.data.live_comment_bag_status)
+      if (res.data.data.live_comment_bag_status == "off") {
+        falseConfigLive()
+      } else {
+        trueConfigLive()
+      }
+      setCmPostOnOff(res.data.data.post_comment_bag_status)
+      if (res.data.data.post_comment_bag_status == "off") {
+        falseConfigCmPost()
+      } else {
+        trueConfigCmPost()
+      }
+      var story = []
+      var live = []
+      var cm = []
+      api.get(`/api/v1/message_managements/keyword_settings`).then(res => {
+        setListKeyword(res.data.data)
+        var listkey = res.data.data
+        for (var i = 0; i < listkey.length; i++) {
+          if (listkey[i].is_story_comment == true) {
+            story.push(listkey[i].id)
+          }
+        }
+        if (dataB.story_comment_bag_status === "keyword") {
+          document.getElementById('listkeyword').style.display = 'block'
+          document.getElementById('listReplyBag').style.display = 'none'
+          document.getElementById('listReplyGroup').style.display = 'none'
+          var selectedTypeStory = document.getElementById("replyStory")
+          var optionSelectedTypeStory = document.createElement('option')
+          optionSelectedTypeStory.disabled = true
+          optionSelectedTypeStory.hidden = true
+          optionSelectedTypeStory.selected = true
+          optionSelectedTypeStory.value = "keyword"
+          optionSelectedTypeStory.text = "keyword"
+          selectedTypeStory.add(optionSelectedTypeStory)
+          api.get(`/api/v1/message_managements/keyword_settings/${story[0]}`).then(res => {
+            console.log("story_comment_KW_id: ", res.data.data)
+            var select, option;
+            select = document.getElementById("listkeyword")
+            option = document.createElement('option')
+            option.disabled = true
+            option.hidden = true
+            option.selected = true
+            option.value = res.data.data.id
+            option.text = res.data.data.title
+            select.add(option);
+          }).catch(error => {
+            console.log(error)
+          })
+        }
+        for (var i = 0; i < listkey.length; i++) {
+          if (listkey[i].is_live_comment == true) {
+            live.push(listkey[i].id)
+          }
+        }
+        if (dataB.live_comment_bag_status === "keyword") {
+          document.getElementById('listkeywordLive').style.display = 'block'
+          document.getElementById('listLiveGroup').style.display = 'none'
+          document.getElementById('listLiveBag').style.display = 'none'
+          var selectedTypeStory = document.getElementById("replyLive")
+          var optionSelectedTypeStory = document.createElement('option')
+          optionSelectedTypeStory.disabled = true
+          optionSelectedTypeStory.hidden = true
+          optionSelectedTypeStory.selected = true
+          optionSelectedTypeStory.value = "keyword"
+          optionSelectedTypeStory.text = "keyword"
+          selectedTypeStory.add(optionSelectedTypeStory)
+          api.get(`/api/v1/message_managements/keyword_settings/${live[0]}`).then(res => {
+            console.log("story_comment_KW_id: ", res.data.data)
+            var select, option;
+            select = document.getElementById("listkeywordLive")
+            option = document.createElement('option')
+            option.disabled = true
+            option.hidden = true
+            option.selected = true
+            option.value = res.data.data.id
+            option.text = res.data.data.title
+            select.add(option);
+          }).catch(error => {
+            console.log(error)
+          })
+        }
+        for (var i = 0; i < listkey.length; i++) {
+          if (listkey[i].is_post_comment == true) {
+            cm.push(listkey[i].id)
+          }
+        }
+        if (dataB.post_comment_bag_status === "keyword") {
+          document.getElementById('listkeywordCM').style.display = 'block'
+          document.getElementById('listCommentGroup').style.display = 'none'
+          document.getElementById('listCommentBag').style.display = 'none'
+          var selectedTypeStory = document.getElementById("replyCMPost")
+          var optionSelectedTypeStory = document.createElement('option')
+          optionSelectedTypeStory.disabled = true
+          optionSelectedTypeStory.hidden = true
+          optionSelectedTypeStory.selected = true
+          optionSelectedTypeStory.value = "keyword"
+          optionSelectedTypeStory.text = "keyword"
+          selectedTypeStory.add(optionSelectedTypeStory)
+          api.get(`/api/v1/message_managements/keyword_settings/${cm[0]}`).then(res => {
+            console.log("story_comment_KW_id: ", res.data.data)
+            var select, option;
+            select = document.getElementById("listkeywordCM")
+            option = document.createElement('option')
+            option.disabled = true
+            option.hidden = true
+            option.selected = true
+            option.value = res.data.data.id
+            option.text = res.data.data.title
+            select.add(option);
+          }).catch(error => {
+            console.log(error)
+          })
+        }
+      }).catch(error => {
+        console.log(error)
+      })
+
+      setDmOnOff(res.data.data.dm_bag_status)
+      // if (res.data.data.dm_bag_status == false) {
+      //   falseConfigDM()
+      // } else {
+      //   trueConfigDM()
+      // }
+
+      api.get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`).then(res => {
+        // console.log("story_comment_bag_id: ", res.data)
+        setStoryCommentBagName(res.data.data.message_bag.bag_name)
+
+      }).catch(error => {
+        console.log(error)
+      })
+      api.get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`).then(res => {
+        // console.log("post_comment_bag_id: ", res.data)
+        setPostCommentBagName(res.data.data.message_bag.bag_name)
+
+      }).catch(error => {
+        console.log(error)
+      })
+      api.get(`/api/v1/message_managements/message_bags/${res.data.data.live_comment_bag_id}`).then(res => {
+        // console.log("live_comment_bag_id: ", res.data)
+        setLiveCommentBagName(res.data.data.message_bag.bag_name)
+
+      }).catch(error => {
+        console.log(error)
+      })
+      // api.get(`/api/v1/message_managements/message_bags/${res.data.data.dm_bag_id}`).then(res => {
+      //   // setLiveCommentBagName(res.data.data.message_bag.bag_name)
+      //   console.log("dm_bag_id: ", res.data)
+      //   // setDmCommentBagName(res.data.data.message_bag.bag_name)
+
+      // }).catch(error => {
+      //   console.log(error)
+      // })
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+  }
 
   function falseConfigStory() {
     document.getElementById("notiMsgStory").style.display = "none"
@@ -675,11 +902,32 @@ function Release() {
       // }
     }).catch(error => {
       console.log(error)
-      if (error.response.data.code === 3) {
-        requestNewToken(path)
-      }
     })
   }, [])
+  function getFAQAL() {
+    var path = window.location.pathname;
+    api.get(`/api/v1/message_managements/ice_breakers`).then(res => {
+      // console.log('ice_breakers: ', res.data.data)
+      setListFAQ(res.data.data)
+      // console.log("faq data: ", res.data.data.length)
+      // var faqLength = res.data.data.length
+      // if (faqLength >= 4) {
+      //   // alert("too much")
+      //   var nodeBtn = document.getElementById("addFAQbtn").getElementsByTagName('*')
+      //   for (var i = 0; i < nodeBtn.length; i++) {
+      //     nodeBtn[i].disabled = true;
+      //   }
+      // } else {
+      //   var nodeBtn = document.getElementById("addFAQbtn").getElementsByTagName('*')
+      //   for (var i = 0; i < nodeBtn.length; i++) {
+      //     nodeBtn[i].disabled = false;
+      //   }
+
+      // }
+    }).catch(error => {
+      console.log(error)
+    })
+  }
 
   React.useEffect(() => {
     var path = window.location.pathname;
@@ -698,20 +946,21 @@ function Release() {
   React.useEffect(() => {
 
     var fixed = listFixedMenu
-    for (var i = 0; i < fixed.length; i++) {
-      var num = fixed[i].id
-      if (fixed[i].payload == null || fixed[i].payload == '') {
-        document.getElementById(`fixed-mnl-type${num}`).value = "website"
-        document.getElementById(`anw-mnl-type${num}`).value = fixed[i].url
-        setFixedOp("website")
-        // document.getElementById(`fixed-mnl-type${num}`).value =""
-      } else {
-        document.getElementById(`fixed-mnl-type${num}`).value = "message"
-        document.getElementById(`anw-mnl-type${num}`).value = fixed[i].payload
-        setFixedOp("message")
+    if (fixed !== undefined)
+      for (var i = 0; i < fixed.length; i++) {
+        var num = fixed[i].id
+        if (fixed[i].payload == null || fixed[i].payload == '') {
+          document.getElementById(`fixed-mnl-type${num}`).value = "website"
+          document.getElementById(`anw-mnl-type${num}`).value = fixed[i].url
+          setFixedOp("website")
+          // document.getElementById(`fixed-mnl-type${num}`).value =""
+        } else {
+          document.getElementById(`fixed-mnl-type${num}`).value = "message"
+          document.getElementById(`anw-mnl-type${num}`).value = fixed[i].payload
+          setFixedOp("message")
 
+        }
       }
-    }
   })
 
   function reloadFAQ() {
@@ -1534,11 +1783,11 @@ function Release() {
           console.log(error)
         })
         setMsgNoti("固定メッセージを削除しました。")
-      setIsOpenNoti(true)
-      setTimeout(() => {
-        setMsgNoti("")
-        setIsOpenNoti(false)
-      }, 2000)
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setMsgNoti("")
+          setIsOpenNoti(false)
+        }, 2000)
       }).catch(error => {
         console.log(error)
         // if (error.response.data.code === 3) {
@@ -1882,6 +2131,7 @@ function Release() {
 
 
   var [logedIn, setLogedIn] = useState()
+
   const [ig_id_status, setIgId] = useState()
   const checkLogin = (isLogedIn, ig_id) => {
     // console.log(event.target);
@@ -1892,12 +2142,21 @@ function Release() {
     // reloadFixedMessageStatus(ig_id)
     if (isLogedIn === true) {
       document.getElementById("releaseSetting").style.display = "block"
+
     } else {
       console.log("Please login")
     }
     // setCount(current => current + num);
   };
 
+  // if(logedIn == true){
+  //   setPATAL()
+  //     getPMALS()
+  //     getPMAL()
+  //     getFAQAL()
+  //     setIgIDS()
+  //     getAllN()
+  // }
   function saveStorySetting() {
     var reply = document.getElementById("replyStory").value //replyStory
     var msg_bag = document.getElementById("listReplyBag").value
@@ -2261,7 +2520,7 @@ function Release() {
     console.log(past_post)
   }
 
-  console.log("story_saved_KW: ", story_saved_KW)
+
   return (
     <>
       <div className="content">
@@ -2296,8 +2555,8 @@ function Release() {
                     </div>
                   </div>
 
-                  <div id="addFAQContent" style={{ width: "100%" }} >
-                    {listFAQ.map((item) => (
+                  <div id="addFAQContent" style={{ width: "100%" }}>
+                    {listFAQ != undefined ? (listFAQ.map((item) => (
                       <form key={item.id} id={`form-faq-${item.id}`}>
                         <div className="div-add-aq" style={{ display: "flex" }}>
 
@@ -2311,7 +2570,7 @@ function Release() {
 
                         </div>
                       </form>
-                    ))}
+                    ))) : ""}
                     <form action="" id="new_FAQ">
                       <div style={{ width: "100%" }} id="faq_add">
 
@@ -2587,7 +2846,7 @@ function Release() {
                     </div>
 
                     <div id="addFixedMenuContent" style={{ width: "100%" }}>
-                      {listFixedMenu.map((item) => (
+                      {listFixedMenu != undefined ? (listFixedMenu.map((item) => (
                         <form key={item.id} id={`fixed-menu-${item.id}`}>
                           <div className="div-add-aq" style={{ display: "flex" }}>
                             <input name={`title-fixed-menu-${item.id}`} id={`title-fixed-menu-${item.id}`} className="new-faq-q-so" onChange={() => onChangeEditFM(`title-fixed-menu-${item.id}`)} defaultValue={item.title} type="text" readOnly="readonly" style={{ width: "20%" }} />
@@ -2605,7 +2864,7 @@ function Release() {
 
                           </div>
                         </form>
-                      ))}
+                      ))) : ""}
                       <form action="" id="fixed-menu">
                         <div style={{ width: "100%" }} id="fixed_add">
                           {customDivFixed.map((cdiv, i) => (

@@ -51,7 +51,9 @@ function LoginFacebook({ checkLogin }) {
       // window.FB.getLoginStatus(function (response) {
       //   statusChangeCallback(response);
       // });
+      // console.log("chua login fb dau ne")
     } else {
+      console.log("login roi ne")
       // window.FB.api(`/${ig_id}?fields=id,username,ig_id,name,profile_picture_url,accessToken=${page_access_token},appId=1733245763691008`,
       //   function (response) {
       //     // Insert your code here
@@ -115,6 +117,7 @@ function LoginFacebook({ checkLogin }) {
     var authRes = window.FB.getAuthResponse();
     window.FB.api(`${authRes.userID}/accounts?fields=id,name,picture`,
       function (resPage) {
+        console.log("getPage: ", resPage)
         setPage(resPage.data)
       }
     );
@@ -221,14 +224,14 @@ function LoginFacebook({ checkLogin }) {
         <h4>{username}</h4>
       </div>
       <div id='listPage' style={{ display: "none" }}>
-        {page.map((item, i) => (
+        {page != undefined ? (page.map((item, i) => (
           <div key={i} style={{ display: "flex", height: "70px", textAlign: "left", margin: "auto", padding: "10px" }}>
             <img style={{ paddingLeft: "2.5%" }} src={item.picture.data.url}></img>
             <div style={{ paddingLeft: "10px", height: "70px", width: "20%", justifyContent: "center" }}>{item.name}</div>
-            <div style={{ width: "70%", textAlign: "right" }}><Button onClick={() => selectPage(item.id)}>Show</Button></div>
+            <div style={{ width: "70%", textAlign: "right" }}><Button onClick={() => selectPage(item.id)}>Select</Button></div>
           </div>
-
-        ))}
+        )
+        )) :""}
       </div>
       <div id='logoutFB' style={{ width: "100%", margin: "auto", textAlign: "center", display: "none" }}>
         <Button onClick={() => logoutFB()}>インスタグラムログアウト</Button>
