@@ -38,7 +38,7 @@ import {
 } from "reactstrap";
 import Cookies from 'js-cookie'
 import routes from "routes.js";
-
+var Cookiess = require('js-cookie-remove-all');
 function Header(props) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
@@ -91,8 +91,9 @@ function Header(props) {
     }
   }, [location]);
   const logout = () =>{
-    Cookies.remove('token');
+    Cookies.remove('token')
     window.location.href ='/'
+    // window.location.href ='/'
   }
   return (
     // add or remove classes depending if we are on full-screen-maps page or not
