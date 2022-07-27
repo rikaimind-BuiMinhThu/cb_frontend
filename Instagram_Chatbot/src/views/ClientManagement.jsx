@@ -11,12 +11,14 @@ import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from "reactstr
 import { Button } from "react-bootstrap";
 import { Title } from "chart.js";
 import { Pagination } from "@material-ui/lab";
+import ModalShort from "./Popup/ModalShort";
 function ClientManagement() {
   var [dataList, setDataList] = useState([])
   var [detailData, setDetailData] = useState({})
   var [msgNoti, setMsgNoti] = useState()
   var [detailUpdateTitle, setDetailUpdateTitle] = useState()
   var [disableInput, setDisableInput] = useState()
+  var [isOpenDeleteClient, setIsOpenDeleteClient] = useState(false)
 
   var [contract, setContract] = useState();
   var [inputEndDate, setInputEndDate] = useState('');
@@ -52,6 +54,7 @@ function ClientManagement() {
   var [updateId, setUpdateId] = useState()
 
 
+  var [namesearch, setNamesearch] = useState("")
   var [pageIndex, setPageIndex] = useState(1)
   var [totalPage, setTotalPage] = useState()
 
@@ -93,13 +96,35 @@ function ClientManagement() {
     })
   }, [])
 
+  function search(){
+    var searchVal = document.getElementById("searchUser").value
+    setNamesearch(searchVal)
+    var path = window.location.pathname;
+    api.get(`/api/v1/managements/clients?name=${searchVal}&page=${1}&client_id=`).then(res => {
+      var totalPage = Math.ceil(res.data.data.total / 25)
+      if (pageIndex > totalPage) {
+        api.get(`/api/v1/managements/clients?name=${searchVal}&page=${1}&client_id=`).then(resp => {
+          setDataList(resp.data.data)
+        })
+      } else {
+        setDataList(res.data.data)
+      }
+      setTotalPage(totalPage)
+
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+  }
 
   function reloadListClient(pgIndex) {
     var path = window.location.pathname;
-    api.get(`/api/v1/managements/clients?name=&page=${pgIndex}&client_id=`).then(res => {
+    api.get(`/api/v1/managements/clients?name=${namesearch}&page=${pgIndex}&client_id=`).then(res => {
       var totalPage = Math.ceil(res.data.data.total / 25)
       if (pgIndex > totalPage) {
-        api.get(`/api/v1/managements/clients?name=&page=${totalPage}&client_id=`).then(resp => {
+        api.get(`/api/v1/managements/clients?name=${namesearch}&page=${totalPage}&client_id=`).then(resp => {
           setDataList(resp.data.data)
         })
       } else {
@@ -126,8 +151,18 @@ function ClientManagement() {
       setContract(data.status)
       setPlan(data.plan)
       setPrice(data.price)
-      setInputStartDate(data.subscription_start_at) //.slice(0, 10)
-      setInputEndDate(data.subscription_end_at) //.slice(0, 10)
+      if(data.subscription_start_at != null){
+        setInputStartDate(data.subscription_start_at.slice(0, 10))
+      }else{
+        setInputStartDate(data.subscription_start_at)
+      }
+      if(data.subscription_end_at != null){
+        setInputEndDate(data.subscription_end_at.slice(0, 10))
+      }else{
+        setInputEndDate(data.subscription_end_at)
+      }
+      // setInputStartDate(data.subscription_start_at) //.slice(0, 10)
+      // setInputEndDate(data.subscription_end_at) //.slice(0, 10)
       setIsInstagram(data.is_instagram)
       setIsLine(data.is_line)
       setIsTiktok(data.is_tiktok)
@@ -185,8 +220,18 @@ function ClientManagement() {
       setContract(data.status)
       setPlan(data.plan)
       setPrice(data.price)
-      setInputStartDate(data.subscription_start_at) //.slice(0, 10)
-      setInputEndDate(data.subscription_end_at)// .slice(0, 10)
+      if(data.subscription_start_at != null){
+        setInputStartDate(data.subscription_start_at.slice(0, 10))
+      }else{
+        setInputStartDate(data.subscription_start_at)
+      }
+      if(data.subscription_end_at != null){
+        setInputEndDate(data.subscription_end_at.slice(0, 10))
+      }else{
+        setInputEndDate(data.subscription_end_at)
+      }
+       //.slice(0, 10)
+      // setInputEndDate(data.subscription_end_at)// .slice(0, 10)
       setIsInstagram(data.is_instagram)
       setIsLine(data.is_line)
       setIsTiktok(data.is_tiktok)
@@ -231,12 +276,24 @@ function ClientManagement() {
     })
   }
 
-  function deleteClientUser(id) {
+  const[idDeleteClient, setIdDeleteClient] = useState()
+
+  function deleteClientPopup(id){
+    setIsOpenDeleteClient(true)
+    setIdDeleteClient(id)
+  }
+  
+  function deleteClientUser() {
+    setIsOpenDeleteClient(false)
     var path = window.location.pathname;
-    api.delete(`/api/v1/managements/clients/${id}`).then(res => {
+    api.delete(`/api/v1/managements/clients/${idDeleteClient}`).then(res => {
       reloadListClient(pageIndex)
       setMsgNoti("削除しました!")
       setIsOpenNoti(true)
+      setTimeout(() =>{
+        setMsgNoti("")
+        setIsOpenNoti(false)
+      },2000)
     }).catch(error => {
       console.log(error)
       if (error.response.data.code === 3) {
@@ -333,6 +390,15 @@ function ClientManagement() {
   function addClient() {
     var path = window.location.pathname;
     // console.log(document.getElementById('newPlanPrice').style.display === "none")
+    const reader = new FileReader()
+
+// let files = document.getElementById('avatar_add').files
+// reader.onload = async (event) => {
+//     console.log(event.target.result)
+// }
+// // reader.readAsDataURL(files[0])
+    var ava = document.getElementById('avatar_add').value
+    console.log(ava)
     var price = document.getElementById('newPlanPrice').value
     var startDate = document.getElementById('startDate').value
     var endDate = document.getElementById('endDate').value
@@ -355,7 +421,10 @@ function ClientManagement() {
     var email = document.getElementById('newEmail').value
     var phone = document.getElementById('newPhone').value
 
-
+    if(ava === ""){
+      document.getElementById("newClientImgLogoErrMsg").innerHTML = "Please choose an image"
+      document.getElementById("newClientImgLogoErrMsg").style.display = "block"
+    }
 
     if (checkPickStatus() === true && checkInputNumber(price, 'Price') === true && checkFieldAdd(startDate, "Start") === true
       && checkFieldAdd(endDate, "End") === true && checkFieldAdd(name, "Name") === true
@@ -367,7 +436,7 @@ function ClientManagement() {
       && checkFieldAdd(address, "Address") === true && checkFieldAdd(municipalities, "Municipalities") === true
       && checkFieldAdd(zipCode, "PostCode") === true && checkFieldAdd(prefectures, "Prefectures") === true
       && checkFieldAdd(building, "BuildingName") === true && checkFieldAdd(email, "Email") === true
-      && checkFieldAdd(phone, "Phone") === true) {
+      && checkFieldAdd(phone, "Phone") === true && ava !== "") {
 
 
 
@@ -458,7 +527,7 @@ function ClientManagement() {
     document.getElementById('newCompanyType').size = "10"
   }
   function setSizeSlectCom2() {
-    document.getElementById('newCompanyType2').size = "10"
+    document.getElementById('newCompanyType2').size = "3"
   }
   function setSizeAfterSelect() {
     document.getElementById('newPrefectures').size = "1"
@@ -543,8 +612,13 @@ function ClientManagement() {
     reader.onloadend = function () {
       baseString = reader.result;
       setInputImage(baseString)
+      console.log(baseString)
+      if(baseString !== undefined || baseString !== ""){
+        document.getElementById("newClientImgLogoErrMsg").style.display = "none"
+      }
     };
     reader.readAsDataURL(file);
+    
   }
 
   var [page, setPage] = useState(1)
@@ -564,8 +638,9 @@ function ClientManagement() {
           <Col md="12">
             <Card>
               <CardHeader>
-                <div className="swap">
-                  <div className="div_right"><Button onClick={() => addUserPopup()}>クライアント追加</Button></div>
+                <div className="swap" style={{display:"flex", width:"100%"}}>
+                  <div style={{width:"50%"}}><input id="searchUser" name="searchUser" style={{height:"38px", width:"200px", border:"1px solid #dee2e6", paddingTop:"-10px", borderRadius:"3px"}}></input> <Button onClick={() => search()} style={{backgroundColor:"#66615b"}}>Search</Button></div>
+                  <div className="div_right" style={{float:"right"}}><Button type="text" onClick={() => addUserPopup()} style={{backgroundColor:"#66615b"}}>クライアント追加</Button></div>
                 </div>
               </CardHeader>
               <CardBody>
@@ -600,9 +675,9 @@ function ClientManagement() {
                           <td>{item.name}</td>
                           <td>{item.plan}</td>
                           <td>{item.price}</td>
-                          <td id="dateStart">{item.subscription_start_at}</td>
+                          <td id="dateStart">{(item.subscription_start_at == null) ? item.subscription_start_at : item.subscription_start_at.slice(0, 10) }</td>
                           {/* .slice(0, 10) */}
-                          <td id="dateEnd">{item.subscription_end_at}</td>
+                          <td id="dateEnd">{(item.subscription_end_at == null) ? item.subscription_end_at : item.subscription_end_at.slice(0, 10)}</td>
                           {/* .slice(0, 10) */}
                           <td>{item.address}</td>
                           <td>{item.last_sign_in_at}</td>
@@ -610,7 +685,7 @@ function ClientManagement() {
                             <div>
                               <Button onClick={() => getUserDetail(item)}>詳細</Button>
                               <Button className="editBtn" onClick={() => updateClientUser(item)}>編集</Button>
-                              <Button className="deleteBtn" onClick={() => deleteClientUser(item.id)}>削除</Button>
+                              <Button className="deleteBtn" onClick={() => deleteClientPopup(item.id)}>削除</Button>
 
                             </div>
                           </td>
@@ -632,6 +707,7 @@ function ClientManagement() {
           <div style={{ width: "100%" }}>
             <div style={{ marginTop: "-30px" }}>
               <h4>{detailUpdateTitle}</h4>
+              <div style={{width:"100%", height:"2px", backgroundColor:"#bbb", marginBottom:"15px"}}></div>
               <form id="detailUserClient" className="swap">
                 <label className="label-input">ステータス {/*Status*/}<span className="span-require">*必須</span>
                   <span className="input-field" value={contract}>
@@ -657,15 +733,15 @@ function ClientManagement() {
                   </select>
                 </label><br /><br />
                 <label className="label-input">プラン価格 {/**Plan price*/}
-                  <input className="input-field" value={price} onChange={(e) => setPrice(e.target.value)} onBlur={(e) => utils.checkInputNumber(e.target.value, "Price")} type="number" id="newPlanPrice" name="price" />
+                  <input className="input-field" value={price} onChange={(e) => setPrice(e.target.value)} onBlur={(e) => utils.checkInputNumber(e.target.value, "Price")} type="text" id="newPlanPrice" name="price" />
                   <label id="newClientPriceErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">課金開始日 {/** Date start count price */}
-                  <input type="date" id="startDate" name="subscription_start_at" value={inputStartDate} onChange={(e) => checkInputDate(e.target.value)} className="input-field" />
+                  <input style={{position: "relative"}} type="date" id="startDate" name="subscription_start_at" value={inputStartDate} onChange={(e) => checkInputDate(e.target.value)} className="input-field" />
                   <label id="newClientStartErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">最低利用期間終了日
-                  <input type="date" id="endDate" value={inputEndDate} name="subscription_end_at" onChange={(e) => checkEndDate(e.target.value)} className="input-field" />
+                  <input style={{position: "relative"}} type="date" id="endDate" value={inputEndDate} name="subscription_end_at" onChange={(e) => checkEndDate(e.target.value)} className="input-field" />
                   <label id="newClientEndErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input"><label className="long-label">Instagramチャットボット機能</label>
@@ -745,7 +821,7 @@ function ClientManagement() {
                     <option onClick={() => setSizeAfterSelectCom()} value="税理士法人">税理士法人</option>
                     <option onClick={() => setSizeAfterSelectCom()} value="国立大学法人">国立大学法人</option>
                     <option onClick={() => setSizeAfterSelectCom()} value="公立大学法人">公立大学法人</option>
-                    <option onClick={() => setSizeAfterSelectCom()} value="和歌山県">和歌山県</option>
+                    {/* <option onClick={() => setSizeAfterSelectCom()} value="和歌山県">和歌山県</option> */}
                     <option onClick={() => setSizeAfterSelectCom()} value="農事組合法人">農事組合法人</option>
                     <option onClick={() => setSizeAfterSelectCom()} value="管理組合法人">管理組合法人</option>
                     <option onClick={() => setSizeAfterSelectCom()} value="社会保険労務士法人">社会保険労務士法人</option>
@@ -882,6 +958,7 @@ function ClientManagement() {
           <div style={{ width: "100%" }}>
             <div style={{ marginTop: "-30px" }}>
               <h4>クライアント追加</h4>
+              <div style={{width:"100%", height:"2px", backgroundColor:"#bbb", marginBottom:"15px"}}></div>
               <form id="addForm" className="swap">
                 <label className="label-input">ステータス {/*Status*/}<span className="span-require">*必須</span>
                   <span className="input-field">
@@ -907,15 +984,15 @@ function ClientManagement() {
                   </select>
                 </label><br /><br />
                 <label className="label-input">プラン価格 {/**Plan price*/}
-                  <input className="input-field" onBlur={(e) => utils.checkInputNumber(e.target.value, "Price")} type="number" id="newPlanPrice" name="price" />
+                  <input className="input-field" onBlur={(e) => utils.checkInputNumber(e.target.value, "Price")} type="text" id="newPlanPrice" name="price" />
                   <label id="newClientPriceErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">課金開始日 {/** Date start count price */}
-                  <input type="date" id="startDate" name="subscription_start_at" onChange={(e) => checkInputDate(e.target.value)} className="input-field" />
+                  <input style={{position: "relative"}}  type="date" id="startDate" name="subscription_start_at" onChange={(e) => checkInputDate(e.target.value)} className="input-field" />
                   <label id="newClientStartErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">最低利用期間終了日
-                  <input type="date" id="endDate" value={inputEndDate} name="subscription_end_at" onChange={(e) => checkEndDate(e.target.value)} className="input-field" />
+                  <input style={{position: "relative"}}  type="date" id="endDate" value={inputEndDate} name="subscription_end_at" onChange={(e) => checkEndDate(e.target.value)} className="input-field" />
                   <label id="newClientEndErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input"><label className="long-label">Instagramチャットボット機能</label>
@@ -995,7 +1072,7 @@ function ClientManagement() {
                     <option onClick={() => setSizeAfterSelectCom()} value="税理士法人">税理士法人</option>
                     <option onClick={() => setSizeAfterSelectCom()} value="国立大学法人">国立大学法人</option>
                     <option onClick={() => setSizeAfterSelectCom()} value="公立大学法人">公立大学法人</option>
-                    <option onClick={() => setSizeAfterSelectCom()} value="和歌山県">和歌山県</option>
+                    {/* <option onClick={() => setSizeAfterSelectCom()} value="和歌山県">和歌山県</option> */}
                     <option onClick={() => setSizeAfterSelectCom()} value="農事組合法人">農事組合法人</option>
                     <option onClick={() => setSizeAfterSelectCom()} value="管理組合法人">管理組合法人</option>
                     <option onClick={() => setSizeAfterSelectCom()} value="社会保険労務士法人">社会保険労務士法人</option>
@@ -1040,7 +1117,7 @@ function ClientManagement() {
                   <label id="newClientConfirmPasswordErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">画像（ロゴ）<span className="span-require">*必須</span>
-                  <input className="input-field" type="file" id="avatar" onChange={(e) => getBaseUrl()} name="img_logo" accept="image/png, image/jpeg" />
+                  <input className="input-field" type="file" id="avatar_add" onChange={(e) => getBaseUrl()} name="img_logo" accept="image/png, image/jpeg" />
                   <label id="newClientImgLogoErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">サイトURL <span className="span-require">*必須</span>
@@ -1150,9 +1227,16 @@ function ClientManagement() {
         </Modal>
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
-            <h4>{msgNoti}</h4>
+            <span style={{fontSize:"16px"}}>{msgNoti}</span>
           </div>
         </ModalNoti>
+        <ModalShort open={isOpenDeleteClient} onClose={() => setIsOpenDeleteClient(false)}>
+          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+            <h4>クライアントを削除しますか。</h4>
+            <Button onClick={() => deleteClientUser()}>はい</Button>
+            <Button onClick={() => setIsOpenDeleteClient(false)}>いいえ</Button>
+          </div>
+        </ModalShort>
       </div>
     </>
   );

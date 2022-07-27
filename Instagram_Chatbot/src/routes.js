@@ -25,11 +25,12 @@ import UserPage from "views/User.jsx";
 import UpgradeToPro from "views/Upgrade.jsx";
 import Release from "views/Release";
 import UserManagement from "views/UserManagement";
-import Pricing from "views/Pricing";
+// import Pricing from "views/Pricing";
 import Keyword from "views/Keyword";
 import DataAnalyst from "views/DataAnalyst";
 import listUser from "views/ListUser";
 import AttractedCusomer from "views/AttractedCusomer";
+import CRM from "views/CRM";
 // import Cookies from 'js-cookie'
 
 var routes = [
@@ -55,10 +56,10 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/pricing",
-    name: "価格",
+    path: "/crm",
+    name: "CRM",
     icon: "nc-icon nc-bulb-63",
-    component: Pricing,
+    component: CRM,
     layout: "/admin",
   },
   {

@@ -9,6 +9,8 @@ import * as utils from './../JS/user.js'
 import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from "reactstrap";
 import { Button } from "react-bootstrap";
 import Pagination from '@material-ui/lab/Pagination';
+import ModalDetail from "./Popup/ModalDetail";
+import ava from "./Popup/ava.png";
 // import { Pagination } from "element-react";
 function UserManagement() {
   var [dataList, setDataList] = useState([])
@@ -33,13 +35,15 @@ function UserManagement() {
   const [isOpen, setIsOpen] = useState(false)
   const [isOpenNoti, setIsOpenNoti] = useState(false)
   const [isOpenAddUser, setIsOpenAddUser] = useState(false)
+  const [isOpenDetailUser, setIsOpenDetailUser] = useState(false)
   const [listClient, setListClient] = useState([])
 
+  const [namesearch, setNamesearch] = useState("")
 
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'))
-    if(Cookies.get('token') == undefined){
-      window.location.href ='/'
+    if (Cookies.get('token') == undefined) {
+      window.location.href = '/'
     }
   }, [])
 
@@ -63,11 +67,11 @@ function UserManagement() {
     // console.log(Cookies.get('token'));
   });
   React.useEffect(() => {
-    var paramSearch={page: pageIndex}
+    var paramSearch = { page: pageIndex }
     var path = window.location.pathname;
     api.get(`/api/v1/managements/users`, paramSearch).then(res => {
       console.log(res.data.total)
-      var totalPage = Math.ceil(res.data.total/25)
+      var totalPage = Math.ceil(res.data.total / 25)
       setTotalPage(totalPage)
       setDataList(res.data)
     }).catch(error => {
@@ -78,24 +82,46 @@ function UserManagement() {
     })
   }, [])
 
-  function reloadListClient(pgIndex) {
+  function search(){
     var path = window.location.pathname;
     // setPageIndex(pgIndex)
-    api.get(`/api/v1/managements/users?name=&page=${pgIndex}&client_id=`).then(res => {
-      var totalPage = Math.ceil(res.data.data.total / 25)
-      if (pgIndex > totalPage) {
-        api.get(`/api/v1/managements/users?name=&page=${totalPage}&client_id=`).then(resp => {
-          setDataList(resp.data.data)
+    var seachVal = document.getElementById("searchUser").value
+    api.get(`/api/v1/managements/users?name=${seachVal}&page=${pageIndex}&client_id=`).then(res => {
+      var totalPage = Math.ceil(res.data.total / 25)
+      if (pageIndex > totalPage) {
+        api.get(`/api/v1/managements/users?name=${seachVal}&page=${totalPage}&client_id=`).then(resp => {
+          setDataList(resp.data)
         })
       } else {
-        setDataList(res.data.data)
+        setDataList(res.data)
       }
       setTotalPage(totalPage)
     }).catch(error => {
       console.log(error)
-      if (error.response.data.code === 3) {
-        requestNewToken(path)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+  }
+
+  function reloadListClient(pgIndex) {
+    var path = window.location.pathname;
+    // setPageIndex(pgIndex)
+    api.get(`/api/v1/managements/users?name=${namesearch}&page=${pgIndex}&client_id=`).then(res => {
+      var totalPage = Math.ceil(res.data.total / 25)
+      if (pgIndex > totalPage) {
+        api.get(`/api/v1/managements/users?name=${namesearch}&page=${totalPage}&client_id=`).then(resp => {
+          setDataList(resp.data)
+        })
+      } else {
+        setDataList(res.data)
       }
+      setTotalPage(totalPage)
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
     })
   }
 
@@ -237,6 +263,10 @@ function UserManagement() {
     reloadListClient(ef)
   }
 
+  function detailUser(id) {
+    console.log("userId: ", id)
+    setIsOpenDetailUser(true)
+  }
 
   return (
     <>
@@ -245,9 +275,10 @@ function UserManagement() {
           <Col md="12">
             <Card>
               <CardHeader>
-                <div className="swap">
+                <div className="swap" style={{display:"flex"}}>
                   {/* <div className="div_left"><CardTitle tag="h4">Client Management</CardTitle></div> */}
-                  <div className="div_right"><Button onClick={() => setIsOpenAddUser(true)}>ユーザー追加</Button></div>
+                  <div style={{width:"50%"}}><input id="searchUser" name="searchUser" style={{height:"38px", width:"200px", border:"1px solid #dee2e6", paddingTop:"-10px", borderRadius:"3px"}}></input> <Button onClick={() => search()} style={{backgroundColor:"#66615b"}}>Search</Button></div>
+                  <div className="div_right"><Button onClick={() => setIsOpenAddUser(true)} style={{backgroundColor:"#66615b"}}>ユーザー追加</Button></div>
                 </div>
               </CardHeader>
               <CardBody>
@@ -264,7 +295,7 @@ function UserManagement() {
                     {
                       items && items.map(item => (
                         <tr key={item.id}>
-                          <td>{item.full_name}</td>
+                          <td>{item.full_name}</td>{/* onClick={() => detailUser(item.id)} */}
                           <td>{item.email}</td>
                           <td>{item.role}</td>
                           <td className="actionList">
@@ -292,7 +323,38 @@ function UserManagement() {
             </Card>
 
           </Col>
-
+          <ModalDetail open={isOpenDetailUser} onClose={() => setIsOpenDetailUser(false)}>
+            <div style={{ width: "400", height: "100%", textAlign: "center", padding: "0" }}>
+              <div style={{ display: "flex", width: "100%", height: "100%" }}>
+                <div style={{ width: "30% ", height: "100%", position:"absolute", borderRight: "1px solid #dddddd" }}>
+                  <div style={{ width: "100% ", height: "30%" }}>
+                    <img src={ava} style={{ objectFit: "cover", borderRadius: "50%", width: "150px", height: "150px" }}></img>
+                  </div>
+                  <div style={{ width: "100%", position:"relative" }}>
+                    <div style={{ height: "3px", width: "75%", position:"absolute", margin: "35px 12.5% 0% 12.5%", backgroundColor: "gray" }}></div>
+                    <div style={{  width: "100%", display:"grid", marginLeft:"-2%", position:"absolute", gridTemplateColumns:"auto auto auto auto", textAlign:"center" }}>
+                    {/* <div style={{ display: "flex" }}> */}
+                      <div style={{paddingLeft:"0%"}}><span>電話番号</span>
+                      <div style={{ width: "35px", height: "35px", margin:"auto", backgroundColor: "gray", borderRadius: "50%", display: "table" }}><span style={{ verticalAlign: "middle",display: "table-cell"  }}>1</span></div>
+                      </div>
+                      <div style={{paddingLeft:"0%"}}><span>メール</span>
+                      <div style={{ width: "35px", height: "35px", margin:"auto", backgroundColor: "gray", borderRadius: "50%", display: "table" }}><span style={{ verticalAlign: "middle",display: "table-cell"  }}>2</span></div>
+                      </div>
+                      <div style={{paddingLeft:"0%"}}><span>タグ</span>
+                      <div style={{ width: "35px", height: "35px", margin:"auto", backgroundColor: "gray", borderRadius: "50%", display: "table" }}><span style={{ verticalAlign: "middle",display: "table-cell"  }}>3</span></div>
+                      </div>
+                      <div style={{paddingLeft:"0%"}}><span>顧客データ</span>
+                      <div style={{ width: "35px", height: "35px", margin:"auto", backgroundColor: "gray", borderRadius: "50%", display: "table" }}><span style={{ verticalAlign: "middle",display: "table-cell"  }}>4</span></div>
+                      </div>
+                    </div>
+                    {/* </div> */}
+                    
+                  </div>
+                </div>
+                <div style={{ width: "70%", height: "100%" }}>asdasdas</div>
+              </div>
+            </div>
+          </ModalDetail>
         </Row>
         <Modal key={detailData.id} open={isOpen} onClose={() => setIsOpen(false)}>
           <div style={{ width: "500px" }}>
@@ -398,6 +460,7 @@ function UserManagement() {
             <h4>{msgNoti}</h4>
           </div>
         </ModalNoti>
+
       </div>
     </>
   );

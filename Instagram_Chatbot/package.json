@@ -28,6 +28,7 @@
     "fs": "^0.0.1-security",
     "jquery": "^3.6.0",
     "js-cookie": "^3.0.1",
+    "js-cookie-remove-all": "^1.0.3",
     "mdbreact": "^5.2.0",
     "moment": "^2.29.4",
     "pagination": "^0.4.6",
