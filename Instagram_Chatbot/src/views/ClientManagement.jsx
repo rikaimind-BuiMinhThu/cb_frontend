@@ -70,9 +70,24 @@ function ClientManagement() {
   const [isOpen, setIsOpen] = useState(false)
   const [isOpenNoti, setIsOpenNoti] = useState(false)
   const [isOpenAddUser, setIsOpenAddUser] = useState(false)
+
+  React.useEffect(() => {
+    var cook = Cookies.get("user_role")
+    if (cook == "admin_deel") {
+
+    } else if (cook == "admin_client") {
+      window.location.href ='/admin/dashboard'
+      // var elem = document.getElementById('sidebarClient');
+      // elem.parentNode.removeChild(elem);
+    } else if (cook == "client") {
+      window.location.href ='/admin/dashboard'
+    }
+  })
+
+
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'))
-    if(Cookies.get('token') == undefined){
+    if(Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == ""){
       window.location.href ='/'
     }
   }, [])

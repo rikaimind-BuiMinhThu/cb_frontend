@@ -44,10 +44,12 @@ class Login extends React.Component {
       const loginInfo = { user: { email: nameValue, password: password } }
       axios.post(`https://ec-chatbot-test.com/api/v1/sign_in`, loginInfo)
         .then(res => {
+
           const persons = res.data;
           if (persons.code === 1 || persons.code === "1") {
             setToken(persons.token)
             Cookies.set('refreshToken', persons.refresh_token); // {path: '/'}
+            Cookies.set('user_role', persons.user.role); // {path: '/'}
             // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
             axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
             getToDashboard();
@@ -93,10 +95,12 @@ class Login extends React.Component {
       const loginInfo = { user: { email: nameValue, password: password } }
       axios.post(`https://ec-chatbot-test.com/api/v1/sign_in`, loginInfo)
         .then(res => {
+          console.log(res)
           const persons = res.data;
           if (persons.code === 1 || persons.code === "1") {
             setToken(persons.token)
             Cookies.set('refreshToken', persons.refresh_token); // {path: '/'}
+            Cookies.set('user_role', persons.user.role);
             // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
             axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
             getToDashboard();

@@ -66,9 +66,6 @@ function Keyword() {
             setInstaSetting(res.data.data[0].id)
         }).catch(error => {
             console.log(error)
-            if (error.response.data.code === 3) {
-                requestNewToken(path)
-            }
         })
     }, [])
 

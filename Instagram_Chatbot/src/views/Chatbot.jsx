@@ -33,11 +33,17 @@ function Chatbot() {
   const [idMsgDeleteGr, setIdDeleteMsgGr] = useState()
   const [bagId, setBagId] = useState()
   var [customDiv, setCustomDiv] = useState([])
+  const [isAddOpenSingleChoice, setIsAddOpenSingleChoice] = useState(false)
+  const [isUpdateOpenSingleChoice, setIsUpdateOpenSingleChoice] = useState(false)
+  const [isAddOpenThreeChoice, setIsAddOpenThreeChoice] = useState(false)
+  const [isUpdateOpenThreeChoice, setIsUpdateOpenThreeChoice] = useState(false)
+  const [isAddOpenFreeInput, setIsAddOpenFreeInput] = useState(false)
+  const [isUpdateOpenFreeInput, setIsUpdateOpenFreeInput] = useState(false)
 
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'))
-    if(Cookies.get('token') == undefined){
-      window.location.href ='/'
+    if (Cookies.get('token') == undefined) {
+      window.location.href = '/'
     }
   }, [])
 
@@ -173,18 +179,180 @@ function Chatbot() {
       // var totalPage = Math.ceil(res.data.data.total / 25)
       // setTotalPage(totalPage)
       var bagMsg = res.data.data.messages
-      // console.log("bagMsg: ",res.data.data.messages)
+      var bagId = res.data.data.message_bag.id
+      console.log("bagMsg ne: ", res.data.data.messages)
       setMsgCBNum(bagMsg[bagMsg.length - 1].id)
       setImgCBNum(bagMsg[bagMsg.length - 1].id)
       setImgCBNum(bagMsg[bagMsg.length - 1].id)
       bagMsg.forEach((item) => {
+
+
+        // Case message type is msg
+
         if (item.message_type == "msg") {
+
+          var updateItem = ""
+          var choiceHTML = ""
+          if (typeof item.free_input !== "undefined" && item.free_input !== null) {
+            // console.log("free input")
+            choiceHTML =
+              `
+                <div id="itemFI${item.id}" >
+                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check}</div>
+                <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                    Delete
+                  </button>
+                </div>
+                <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
+                <input id="formatCheckSelect${item.free_input.message_id}" hidden type=text value=${item.free_input.format_check} />
+                <input id="formatCheckMSG${item.free_input.message_id}" hidden type=text value="${item.free_input.format_check_message}" />
+                
+              </div>
+              `
+            updateItem = "free_input"
+          } else if (item.message_buttons != []) {
+            if (item.message_buttons.length == 1) {
+              if (item.message_buttons[0].button_type == "mess") {
+                choiceHTML =
+                  `
+                    <div id="itemSC${item.message_buttons[0].message_id}">
+                    <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>
+                    <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                    <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                    <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                    <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                  
+                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                  </div>
+                  `
+                updateItem = "single_choice_msg"
+              } else if (item.message_buttons[0].button_type == "web_url") {
+                if(item.message_buttons[0] != undefined){
+                  choiceHTML =
+                `
+                    <div >
+                    <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>  
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].content}</div>
+                      
+
+                    <input id="titleUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                    <input id="typeUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                    <input id="webUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                      
+                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                    </div>
+                    `
+                    updateItem = "single_choice_web"
+                }else{
+                  
+                }
+                
+              }
+            } else if (item.message_buttons.length > 1) {
+              console.log("nhieu item hon ne")
+              for (var i = 0; i < item.message_buttons.length; i++) {
+                if (item.message_buttons[i].button_type == "mess") {
+                  console.log("mess ne")
+                  choiceHTML = choiceHTML.concat(
+                    `
+                  <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length-1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
+                  <div style="padding:10px 5px 0px 5px">${item.message_buttons[i].title}</div>  
+                  <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                    <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
+                  <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
+                  <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
+                    
+                  <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
+                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                    Delete
+                  </button>
+                </div>
+                  <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
+                  <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
+                  </div>
+                  `
+                  )
+                  // <input id="groupAddFI${item.id}" hidden type=text value=${`group value here`} />
+                } else if (item.message_buttons[i].button_type == "web_url") {
+                  console.log("web ne")
+                  choiceHTML = choiceHTML.concat(
+                    `
+                    <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length-1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
+                    <div style="padding:10px 5px 0px 5px;">${item.message_buttons[i].title}</div>  
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[i].content}</div>
+                    <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
+                    <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
+                    <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
+                    <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
+                    </div>
+                    `
+                  )
+                }
+              }
+              
+              updateItem = "three_choice"
+            }
+
+          }
+
+
+
           var abc = document.createElement("div")
           document.getElementById("div_custom").appendChild(abc)
           abc.innerHTML =
             `<div id="chatbot_message${item.id}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
               
               <div><textarea name="messagesVa${item.id}" class="mgsChatbot" id="mgsCustomSaved${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
+              
+
+
+              <div id="choice${item.id}">
+    
+              </div>
+
+              
+              <div id="msgChoice${item.id}" style="display:none">
+                <div style="display: flex">
+                  <div id="singleChoice${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+                  </div>
+                  <div id="threeChoice${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+                  </div>
+                  <div id="freeInput${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+                  </div>
+                </div>
+              </div>
+              </br>
+              <div style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+                <div id="choiceOption${item.id}" style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+                
+                </div>
+                <div id="choiceThree${item.id}" style="display:none;border-radius:10px"></div>
+              </div>
+
+
+
               <div id="btnDelMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
                 font-weight:800">削除</button>
@@ -196,7 +364,82 @@ function Chatbot() {
             </div>`
           // document.getElementById(`mgsCustomKey${item.id}`).textContent = item.received_message
           document.getElementById(`mgsCustomSaved${item.id}`).textContent = item.message_value
+          var choiceNe = document.createElement("div")
+          document.getElementById(`choiceOption${item.id}`).appendChild(choiceNe)
+          
+          document.getElementById(`singleChoice${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            updateMsgSC(item.id)
+          })
+          document.getElementById(`threeChoice${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            updateMsgTC(item.id)
+          })
+          document.getElementById(`freeInput${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            updateMsgFI(item.id)
+          })
 
+          //This one use to delete choice deleteChoice
+          document.getElementById(`choiceOption${item.id}`).addEventListener("click", (e) => {
+            e.preventDefault()
+
+            if(updateItem == "three_choice"){
+              var idThreeChoiceDelete = item.message_buttons.length-1
+              document.getElementById(`deleteChoice${item.id}_${idThreeChoiceDelete}`).style.display = "block"
+              document.getElementById(`deleteChoice${item.id}_${idThreeChoiceDelete}`).addEventListener('click', (e)=>{
+                e.preventDefault()
+                var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
+              api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+                console.log(res)
+                setTimeout(() => {  
+                  setIsOpenNoti(true)
+                  setMsgNoti("更新しました。")
+                }, 1500)
+                setTimeout(function () {
+                  setIsOpenNoti(false)
+                }, 2000);
+                // getBagMsg(group, id)
+                getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
+              }).catch(error => {
+                console.log(error)
+              })
+              })
+            }
+            
+
+
+
+            if(document.getElementById(`deleteChoice${item.id}`) != null){
+              document.getElementById(`deleteChoice${item.id}`).style.display = "block"
+              document.getElementById(`deleteChoice${item.id}`).addEventListener("click", (event) => {
+              event.preventDefault()
+              // alert("delete ne")
+              var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
+              api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+                console.log(res)
+                setTimeout(() => {
+                  setIsOpenNoti(true)
+                  setMsgNoti("更新しました。")
+                }, 1500)
+                setTimeout(function () {
+                  setIsOpenNoti(false)
+                }, 2000);
+                getBagMsg(group, id)
+              }).catch(error => {
+                console.log(error)
+              })
+            })
+            }
+          })
+
+          // Update item down here
+          if(updateItem == ""){
+            document.getElementById(`msgChoice${item.id}`).style.display = "block"
+          }
+
+
+          choiceNe.innerHTML = choiceHTML
           document.getElementById(`mgsCustomSaved${item.id}`).addEventListener('change', (e) => msgOVSaved(e.target.value, item.id))
           // <div><textarea name="messageKey${item.id}" class="mgsChatbot" id="mgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
           // document.getElementById(`mgsCustomKey${item.id}`).addEventListener('change', (e) => msgOVkey(e.target.value))
@@ -220,9 +463,150 @@ function Chatbot() {
             })
           })
           document.getElementById(`btnUpdateMsg${item.id}`).addEventListener('click', (event) => {
+            // setIdUpdateItemMsg(item.id)
             event.preventDefault()
+
+
+
             var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
-            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+
+            var add
+            if (document.getElementById(`bagAddSC${item.id}`) != null || document.getElementById(`groupAddSC${item.id}`) != null || document.getElementById(`titleAddSC${item.id}`) != null) {
+              var titlea = document.getElementById(`titleAddSC${item.id}`).value
+              var groupva = document.getElementById(`groupAddSC${item.id}`).value
+              var group_name = document.getElementById(`groupNameAddSC${item.id}`).value
+              var bag_name = document.getElementById(`groupAddSC${item.id}`).value
+              var bag = document.getElementById(`bagNameAddSC${item.id}`).value
+              var type = document.getElementById(`typeAddSC${item.id}`).value
+              var web = document.getElementById(`webAddSC${item.id}`).value
+              var lbl = document.getElementById(`lblAddSC${item.id}_${bagAddSC}`).value
+              console.log("lbl: ", lbl)
+              var listLbl = lbl.substring(2, lbl.length).split(", ")
+              var lastListLBL = []
+              for (var i = 0; i < listLbl.length; i++) {
+                lastListLBL.push({ label_name: listLbl[i] })
+              }
+              if (type == "mess") {
+                add = {
+                  message: { 
+                    message_bag_id: bagId,
+                    message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, 
+                    message_type: "msg", 
+                    img_value: "",
+                    message_buttons: [
+                      { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+                    ] }
+      
+                }
+              } else if (type == "web_url") {
+                add = {
+                  message: {
+                    message_bag_id: bagId,
+                    message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, 
+                    message_type: "msg",
+                    img_value: "",
+                    message_buttons: [
+                      { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
+                    ]
+                  }
+      
+                }
+              }
+            } else if (document.getElementById(`titleAddTC${item.id}_${totalItemTC}`) != null) {
+              var message_buttons = []
+              console.log("totalItemTC: ", totalItemTC)
+              var totalTCItem = document.getElementById(`totalItemTC${item.id}`).value
+
+              console.log("mb ne: ", totalTCItem)
+              for (var i = 1; i <= totalTCItem; i++) {
+      
+                var titlea = document.getElementById(`titleAddTC${item.id}_${i}`).value
+                var groupva = document.getElementById(`groupAddTC${item.id}_${i}`).value
+                var group_name = document.getElementById(`groupNameAddTC${item.id}_${i}`).value
+                var bag_name = document.getElementById(`bagNameAddTC${item.id}_${i}`).value
+                var bag = document.getElementById(`bagAddTC${item.id}_${i}`).value
+                var type = document.getElementById(`typeAddTC${item.id}_${i}`).value
+                var web = document.getElementById(`webAddTC${item.id}_${i}`).value
+                var lbl = document.getElementById(`lblAddTCItem${item.id}_${i}`).value
+                // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+                var listLbl = lbl.substring(2, lbl.length).split(", ")
+                var lastListLBL = []
+                for (var j = 0; j < listLbl.length; j++) {
+                  lastListLBL.push({ label_name: listLbl[j] })
+                }
+                if (type == "mess") {
+      
+                  // add = {
+                  //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                  //   message_button: [
+                  //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
+                  //   ]
+                  // }
+      
+                  message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
+                } else if (type == "web_url") {
+                  // add = {
+                  //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                  //   message_button: [
+                  //     { button_type: "web_url", title: titlea, content: web }
+                  //   ]
+                  // }
+      
+                  message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
+                }
+              }
+              add = {
+                message: {
+                  message_bag_id: bagId,
+                  message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, 
+                  message_type: "msg",
+                  img_value: "",
+                  message_buttons
+                },
+      
+              }
+            } else if (document.getElementById(`formatCheckSelect${item.id}`) != null || document.getElementById(`formatCheckMSG${item.id}`) != null) {
+              // var group = document.getElementById(`groupAddFI${idSC}`).value
+              // var bag = document.getElementById(`bagAddFI${idSC}`).value
+              var lbl = document.getElementById(`lblAddFI${item.id}_${bagAddSC}`).value
+              var formatCheckSelect = document.getElementById(`formatCheckSelect${item.id}`).value
+              var formatCheckMSG = document.getElementById(`formatCheckMSG${item.id}`).value
+              console.log("lbl: ", lbl)
+              var listLbl = lbl.substring(2, lbl.length).split(", ")
+              var lastListLBL = []
+              for (var i = 0; i < listLbl.length; i++) {
+                lastListLBL.push({ label_name: listLbl[i] })
+              }
+              add = {
+                message: {
+                  message_bag_id: bagId,
+                  message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, 
+                  message_type: "msg",
+                  img_value: "",
+                  free_input: {
+                    message_bag_id: `1`,
+                    free_input_labels: lastListLBL,
+                    format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+                    format_check_message: formatCheckMSG
+                  }
+                }
+                // message_button: [
+                //   { button_type: "format", title: '', content: `+message_bag_id_${bag}`, label: listLbl, format: formatCheckSelect, format_msg: formatCheckMSG }
+                // ]
+              }
+            }
+            else {
+              add = {
+                message: { message_bag_id: bagId, message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" }
+              }
+            }
+      
+            console.log(add)
+
+            setTotalItemTC(1)
+
+
+            api.patch(`/api/v1/message_managements/messages/${item.id}`, add).then(res => {
               console.log(res)
 
               setTimeout(() => {
@@ -237,6 +621,8 @@ function Chatbot() {
             }).catch(error => {
               console.log(error)
             })
+
+
           })
 
 
@@ -268,7 +654,141 @@ function Chatbot() {
             document.getElementById(`msgOVI${item.id}`).value = item.message_value
 
           }
+
+
+
+
+          
         } else if (item.message_type == "img") {
+
+          var updateItem = ""
+          var choiceHTML = ""
+          if (typeof item.free_input !== "undefined" && item.free_input !== null) {
+            // if (typeof item.free_input !== "undefined" && item.free_input !== null) {
+            // console.log("free input")
+            choiceHTML =
+              `
+                <div id="itemFI${item.id}" >
+                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check}</div>
+                <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                    Delete
+                  </button>
+                </div>
+                <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
+                <input id="formatCheckSelect${item.free_input.message_id}" hidden type=text value=${item.free_input.format_check} />
+                <input id="formatCheckMSG${item.free_input.message_id}" hidden type=text value="${item.free_input.format_check_message}" />
+                
+              </div>
+              `
+            updateItem = "free_input"
+          } else if (item.message_buttons != []) {
+            if (item.message_buttons.length == 1) {
+              if (item.message_buttons[0].button_type == "mess") {
+                choiceHTML =
+                  `
+                    <div id="itemSC${item.message_buttons[0].message_id}">
+                    <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>
+                    <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                    <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                    <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                    <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                  
+                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                  </div>
+                  `
+                updateItem = "single_choice_msg"
+              } else if (item.message_buttons[0].button_type == "web_url") {
+                // if(item.message_buttons[0] != undefined){
+                  choiceHTML =
+                `
+                    <div >
+                    <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>  
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].content}</div>
+                      
+
+                    <input id="titleUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                    <input id="typeUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                    <input id="webUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                      
+                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                    </div>
+                    `
+                    updateItem = "single_choice_web"
+                // }else{
+                  
+                // }
+                
+              }
+            } else if (item.message_buttons.length > 1) {
+              console.log("nhieu item hon ne")
+              for (var i = 0; i < item.message_buttons.length; i++) {
+                if (item.message_buttons[i].button_type == "mess") {
+                  console.log("mess ne")
+                  choiceHTML = choiceHTML.concat(
+                    `
+                  <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length-1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
+                  <div style="padding:10px 5px 0px 5px">${item.message_buttons[i].title}</div>  
+                  <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                    <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
+                  <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
+                  <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
+                    
+                  <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
+                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                    Delete
+                  </button>
+                </div>
+                  <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
+                  <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
+                  </div>
+                  `
+                  )
+                  // <input id="groupAddFI${item.id}" hidden type=text value=${`group value here`} />
+                } else if (item.message_buttons[i].button_type == "web_url") {
+                  console.log("web ne")
+                  choiceHTML = choiceHTML.concat(
+                    `
+                    <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length-1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
+                    <div style="padding:10px 5px 0px 5px;">${item.message_buttons[i].title}</div>  
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[i].content}</div>
+                    <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
+                    <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
+                    <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
+                    <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
+                    </div>
+                    `
+                  )
+                }
+              }
+              
+              updateItem = "three_choice"
+            }
+
+          }
+
+
+
+
+
           var abc = document.createElement("div")
           document.getElementById("div_custom").appendChild(abc)
           abc.innerHTML =
@@ -279,6 +799,37 @@ function Chatbot() {
           <div style=" text-align: center">
             <img id="output${item.id}" style=" max-height: 200px; max-width: 40%"  />
           </div>
+
+
+          <div id="choice${item.id}">
+    
+              </div>
+
+              
+              <div id="msgChoice${item.id}" style="display:none">
+                <div style="display: flex">
+                  <div id="singleChoice${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+                  </div>
+                  <div id="threeChoice${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+                  </div>
+                  <div id="freeInput${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+                  </div>
+                </div>
+              </div>
+              </br>
+              <div style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+                <div id="choiceOption${item.id}" style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+                
+                </div>
+                <div id="choiceThree${item.id}" style="display:none;border-radius:10px"></div>
+              </div>
+
+
+
+
           <div id="btnDelImg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
               font-weight:800">削除</button>
@@ -288,9 +839,98 @@ function Chatbot() {
               font-weight:800">更新</button>
             </div>
         </div>`
+        var choiceNe = document.createElement("div")
+          document.getElementById(`choiceOption${item.id}`).appendChild(choiceNe)
+          choiceNe.innerHTML = choiceHTML
+
           document.getElementById(`imgCustomKey${item.id}`).value = item.received_message
           document.getElementById(`imgNumSaved${item.id}`).addEventListener('change', (e) => loadFileSaved(e, item.id))
           document.getElementById(`output${item.id}`).src = `https://ec-chatbot-test.com${item.img_value.url}`
+
+
+          
+
+          document.getElementById(`singleChoice${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            updateMsgSC(item.id)
+          })
+          document.getElementById(`threeChoice${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            updateMsgTC(item.id)
+          })
+          document.getElementById(`freeInput${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            updateMsgFI(item.id)
+          })
+
+
+
+
+          // Update item down here
+          if(updateItem == ""){
+            document.getElementById(`msgChoice${item.id}`).style.display = "block"
+          }
+
+          //This one use to delete choice deleteChoice
+          document.getElementById(`choiceOption${item.id}`).addEventListener("click", (e) => {
+            e.preventDefault()
+
+            if(updateItem == "three_choice"){
+              var idThreeChoiceDelete = item.message_buttons.length-1
+              document.getElementById(`deleteChoice${item.id}_${idThreeChoiceDelete}`).style.display = "block"
+              document.getElementById(`deleteChoice${item.id}_${idThreeChoiceDelete}`).addEventListener('click', (e)=>{
+                e.preventDefault()
+                var upd = { message: { message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNumSaved${item.id}`).value } }
+              api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+                console.log(res)
+                setTimeout(() => {  
+                  setIsOpenNoti(true)
+                  setMsgNoti("更新しました。")
+                }, 1500)
+                setTimeout(function () {
+                  setIsOpenNoti(false)
+                }, 2000);
+                getBagMsg(id, id)
+              }).catch(error => {
+                console.log(error)
+              })
+              })
+            }
+
+            if(document.getElementById(`deleteChoice${item.id}`) != null){
+              document.getElementById(`deleteChoice${item.id}`).style.display = "block"
+              document.getElementById(`deleteChoice${item.id}`).addEventListener("click", (event) => {
+              event.preventDefault()
+              // alert("delete ne")
+              var upd = { message: { message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNumSaved${item.id}`).value } }
+              api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+                console.log(res)
+                setTimeout(() => {
+                  setIsOpenNoti(true)
+                  setMsgNoti("更新しました。")
+                }, 1500)
+                setTimeout(function () {
+                  setIsOpenNoti(false)
+                }, 2000);
+                getBagMsg(id, id)
+              }).catch(error => {
+                console.log(error)
+              })
+            })
+            }
+          })
+
+          // // Update item down here
+          // if(updateItem == ""){
+          //   document.getElementById(`msgChoice${item.id}`).style.display = "block"
+          // }
+
+
+
+
+
+
+
           document.getElementById(`btnDelImg${item.id}`).addEventListener("click", (event) => {
             event.preventDefault()
             api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
@@ -309,14 +949,158 @@ function Chatbot() {
               console.log(error)
             })
           })
+
+
           document.getElementById(`btnUpdateImg${item.id}`).addEventListener("click", (event) => {
             event.preventDefault()
-            var upd = {
-              message: { message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNumSaved${item.id}`).value }
+
+
+            // var upd = {
+            //   message: { message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNumSaved${item.id}`).value }
+            // }
+
+
+
+
+            var add
+            if (document.getElementById(`bagAddSC${item.id}`) != null || document.getElementById(`groupAddSC${item.id}`) != null || document.getElementById(`titleAddSC${item.id}`) != null) {
+              var titlea = document.getElementById(`titleAddSC${item.id}`).value
+              var groupva = document.getElementById(`groupAddSC${item.id}`).value
+              var group_name = document.getElementById(`groupNameAddSC${item.id}`).value
+              var bag_name = document.getElementById(`groupAddSC${item.id}`).value
+              var bag = document.getElementById(`bagNameAddSC${item.id}`).value
+              var type = document.getElementById(`typeAddSC${item.id}`).value
+              var web = document.getElementById(`webAddSC${item.id}`).value
+              var lbl = document.getElementById(`lblAddSC${item.id}_${bagAddSC}`).value
+              console.log("lbl: ", lbl)
+              var listLbl = lbl.substring(2, lbl.length).split(", ")
+              var lastListLBL = []
+              for (var i = 0; i < listLbl.length; i++) {
+                lastListLBL.push({ label_name: listLbl[i] })
+              }
+              if (type == "mess") {
+                add = {
+                  message: { 
+                    message_bag_id: bagId,
+                    message_value: "", 
+                    message_type: "img", 
+                    img_value: document.getElementById(`imgDataNumSaved${item.id}`).value,
+                    message_buttons: [
+                      { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+                    ] }
+      
+                }
+              } else if (type == "web_url") {
+                add = {
+                  message: {
+                    message_bag_id: bagId,
+                    message_value: "", 
+                    message_type: "img", 
+                    img_value: document.getElementById(`imgDataNumSaved${item.id}`).value,
+                    message_buttons: [
+                      { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
+                    ]
+                  }
+      
+                }
+              }
+            } else if (document.getElementById(`titleAddTC${item.id}_${totalItemTC}`) != null) {
+              var message_buttons = []
+              console.log("totalItemTC: ", totalItemTC)
+              var totalTCItem = document.getElementById(`totalItemTC${item.id}`).value
+
+              console.log("mb ne: ", totalTCItem)
+              for (var i = 1; i <= totalTCItem; i++) {
+      
+                var titlea = document.getElementById(`titleAddTC${item.id}_${i}`).value
+                var groupva = document.getElementById(`groupAddTC${item.id}_${i}`).value
+                var group_name = document.getElementById(`groupNameAddTC${item.id}_${i}`).value
+                var bag_name = document.getElementById(`bagNameAddTC${item.id}_${i}`).value
+                var bag = document.getElementById(`bagAddTC${item.id}_${i}`).value
+                var type = document.getElementById(`typeAddTC${item.id}_${i}`).value
+                var web = document.getElementById(`webAddTC${item.id}_${i}`).value
+                var lbl = document.getElementById(`lblAddTCItem${item.id}_${i}`).value
+                // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+                var listLbl = lbl.substring(2, lbl.length).split(", ")
+                var lastListLBL = []
+                for (var j = 0; j < listLbl.length; j++) {
+                  lastListLBL.push({ label_name: listLbl[j] })
+                }
+                if (type == "mess") {
+      
+                  // add = {
+                  //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                  //   message_button: [
+                  //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
+                  //   ]
+                  // }
+      
+                  message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
+                } else if (type == "web_url") {
+                  // add = {
+                  //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                  //   message_button: [
+                  //     { button_type: "web_url", title: titlea, content: web }
+                  //   ]
+                  // }
+      
+                  message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
+                }
+              }
+              add = {
+                message: {
+                  message_bag_id: bagId,
+                    message_value: "", 
+                    message_type: "img", 
+                    img_value: document.getElementById(`imgDataNumSaved${item.id}`).value,
+                  message_buttons
+                },
+      
+              }
+            } else if (document.getElementById(`formatCheckSelect${item.id}`) != null) {
+              // var group = document.getElementById(`groupAddFI${idSC}`).value
+              // var bag = document.getElementById(`bagAddFI${idSC}`).value
+              var lbl = document.getElementById(`lblAddFI${item.id}_${bagAddSC}`).value
+              var formatCheckSelect = document.getElementById(`formatCheckSelect${item.id}`).value
+              var formatCheckMSG = document.getElementById(`formatCheckMSG${item.id}`).value
+              console.log("lbl: ", lbl)
+              var listLbl = lbl.substring(2, lbl.length).split(", ")
+              var lastListLBL = []
+              for (var i = 0; i < listLbl.length; i++) {
+                lastListLBL.push({ label_name: listLbl[i] })
+              }
+              add = {
+                message: {
+                  message_bag_id: bagId,
+                  message_value: "", 
+                  message_type: "img", 
+                  img_value: document.getElementById(`imgDataNumSaved${item.id}`).value,
+                  free_input: {
+                    message_bag_id: `1`,
+                    free_input_labels: lastListLBL,
+                    format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+                    format_check_message: formatCheckMSG
+                  }
+                },
+                // message_button: [
+                //   { button_type: "format", title: '', content: `+message_bag_id_${bag}`, label: listLbl, format: formatCheckSelect, format_msg: formatCheckMSG }
+                // ]
+              }
             }
-            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
-              // alert("Delete Successfully")
+            else {
+              add = {
+                message: { message_bag_id: bagId, message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" }
+              }
+            }
+      
+            console.log(add)
+
+            setTotalItemTC(1)
+
+
+            api.patch(`/api/v1/message_managements/messages/${item.id}`, add).then(res => {
               console.log(res)
+
               setTimeout(() => {
                 setIsOpenNoti(true)
                 setMsgNoti("更新しました。")
@@ -325,10 +1109,27 @@ function Chatbot() {
               setTimeout(function () {
                 setIsOpenNoti(false)
               }, 2000);
-              getBagMsg(group, id)
+              getBagMsg(id, id)
             }).catch(error => {
               console.log(error)
             })
+
+
+            // api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+            //   // alert("Delete Successfully")
+            //   console.log(res)
+            //   setTimeout(() => {
+            //     setIsOpenNoti(true)
+            //     setMsgNoti("更新しました。")
+            //   }, 1500)
+
+            //   setTimeout(function () {
+            //     setIsOpenNoti(false)
+            //   }, 2000);
+            //   getBagMsg(group, id)
+            // }).catch(error => {
+            //   console.log(error)
+            // })
           })
 
 
@@ -455,6 +1256,134 @@ function Chatbot() {
           }
 
         } else if (item.message_type == "img_msg") {
+
+
+          var updateItem = ""
+          var choiceHTML = ""
+          if (typeof item.free_input !== "undefined" && item.free_input !== null) {
+            // if (typeof item.free_input !== "undefined" && item.free_input !== null) {
+            // console.log("free input")
+            choiceHTML =
+              `
+                <div id="itemFI${item.id}" >
+                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check}</div>
+                <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                    Delete
+                  </button>
+                </div>
+                <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
+                <input id="formatCheckSelect${item.free_input.message_id}" hidden type=text value=${item.free_input.format_check} />
+                <input id="formatCheckMSG${item.free_input.message_id}" hidden type=text value="${item.free_input.format_check_message}" />
+                
+              </div>
+              `
+            updateItem = "free_input"
+          } else if (item.message_buttons != []) {
+            if (item.message_buttons.length == 1) {
+              if (item.message_buttons[0].button_type == "mess") {
+                choiceHTML =
+                  `
+                    <div id="itemSC${item.message_buttons[0].message_id}">
+                    <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>
+                    <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                    <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                    <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                    <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                  
+                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                  </div>
+                  `
+                updateItem = "single_choice_msg"
+              } else if (item.message_buttons[0].button_type == "web_url") {
+                // if(item.message_buttons[0] != undefined){
+                  choiceHTML =
+                `
+                    <div >
+                    <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>  
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].content}</div>
+                      
+
+                    <input id="titleUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                    <input id="typeUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                    <input id="webUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                      
+                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                    </div>
+                    `
+                    updateItem = "single_choice_web"
+                // }else{
+                  
+                // }
+                
+              }
+            } else if (item.message_buttons.length > 1) {
+              console.log("nhieu item hon ne")
+              for (var i = 0; i < item.message_buttons.length; i++) {
+                if (item.message_buttons[i].button_type == "mess") {
+                  console.log("mess ne")
+                  choiceHTML = choiceHTML.concat(
+                    `
+                  <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length-1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
+                  <div style="padding:10px 5px 0px 5px">${item.message_buttons[i].title}</div>  
+                  <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                    <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
+                  <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
+                  <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
+                    
+                  <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
+                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                    Delete
+                  </button>
+                </div>
+                  <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
+                  <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
+                  </div>
+                  `
+                  )
+                  // <input id="groupAddFI${item.id}" hidden type=text value=${`group value here`} />
+                } else if (item.message_buttons[i].button_type == "web_url") {
+                  console.log("web ne")
+                  choiceHTML = choiceHTML.concat(
+                    `
+                    <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length-1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
+                    <div style="padding:10px 5px 0px 5px;">${item.message_buttons[i].title}</div>  
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[i].content}</div>
+                    <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
+                    <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
+                    <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
+                    <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
+                    </div>
+                    `
+                  )
+                }
+              }
+              
+              updateItem = "three_choice"
+            }
+
+          }
+
+
+
           var abc = document.createElement("div")
           document.getElementById("div_custom").appendChild(abc)
           abc.innerHTML =
@@ -468,6 +1397,40 @@ function Chatbot() {
           <div style="text-align: center">
           <textarea class="mgsChatbot" id="imgMgsCustomSaved${item.id}" name="imgMsgValueChatbot${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea>
           </div>
+
+
+
+
+
+          <div id="choice${item.id}">
+    
+              </div>
+
+              <div id="msgChoice${item.id}" style="display:none">
+                <div style="display: flex">
+                  <div id="singleChoice${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+                  </div>
+                  <div id="threeChoice${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+                  </div>
+                  <div id="freeInput${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+                  </div>
+                </div>
+              </div>
+              </br>
+              <div style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+                <div id="choiceOption${item.id}" style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+                
+                </div>
+                <div id="choiceThree${item.id}" style="display:none;border-radius:10px"></div>
+              </div>
+
+
+
+
+
           <div id="btnDelImgMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
               font-weight:800">削除</button>
@@ -477,9 +1440,85 @@ function Chatbot() {
               font-weight:800">更新</button>
             </div>
         </div>`
+        var choiceNe = document.createElement("div")
+        document.getElementById(`choiceOption${item.id}`).appendChild(choiceNe)
+        choiceNe.innerHTML = choiceHTML
+
           document.getElementById(`imgMgsCustomKey${item.id}`).value = item.received_message
           document.getElementById(`imgMgsCustomSaved${item.id}`).value = item.message_value
           document.getElementById(`outputImgMsgSaved${item.id}`).src = `https://ec-chatbot-test.com${item.img_value.url}`
+
+
+
+
+          document.getElementById(`singleChoice${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            updateMsgSC(item.id)
+          })
+          document.getElementById(`threeChoice${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            updateMsgTC(item.id)
+          })
+          document.getElementById(`freeInput${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            updateMsgFI(item.id)
+          })
+
+          // Update item down here
+          if(updateItem == ""){
+            document.getElementById(`msgChoice${item.id}`).style.display = "block"
+          }
+
+
+          //This one use to delete choice deleteChoice
+          document.getElementById(`choiceOption${item.id}`).addEventListener("click", (e) => {
+            e.preventDefault()
+
+            if(updateItem == "three_choice"){
+              var idThreeChoiceDelete = item.message_buttons.length-1
+              document.getElementById(`deleteChoice${item.id}_${idThreeChoiceDelete}`).style.display = "block"
+              document.getElementById(`deleteChoice${item.id}_${idThreeChoiceDelete}`).addEventListener('click', (e)=>{
+                e.preventDefault()
+                var upd = { message: { message_value: document.getElementById(`imgMgsCustomSaved${item.id}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNumSaved${item.id}`).value } }
+              api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+                console.log(res)
+                setTimeout(() => {  
+                  setIsOpenNoti(true)
+                  setMsgNoti("更新しました。")
+                }, 1500)
+                setTimeout(function () {
+                  setIsOpenNoti(false)
+                }, 2000);
+                getBagMsg(id, id)
+              }).catch(error => {
+                console.log(error)
+              })
+              })
+            }
+
+            if(document.getElementById(`deleteChoice${item.id}`) != null){
+              document.getElementById(`deleteChoice${item.id}`).style.display = "block"
+              document.getElementById(`deleteChoice${item.id}`).addEventListener("click", (event) => {
+              event.preventDefault()
+              // alert("delete ne")
+              var upd = { message: { message_value: document.getElementById(`imgMgsCustomSaved${item.id}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNumSaved${item.id}`).value } }
+              api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+                console.log(res)
+                setTimeout(() => {
+                  setIsOpenNoti(true)
+                  setMsgNoti("更新しました。")
+                }, 1500)
+                setTimeout(function () {
+                  setIsOpenNoti(false)
+                }, 2000);
+                getBagMsg(id, id)
+              }).catch(error => {
+                console.log(error)
+              })
+            })
+            }
+          })
+
 
 
           // document.getElementById(`imgMsgNum${item.id}`).addEventListener('change', (e) => loadFileImgMsg(e))
@@ -505,15 +1544,156 @@ function Chatbot() {
             })
           })
 
+
+
           document.getElementById(`btnUpImgMsg${item.id}`).addEventListener('click', (event) => {
             event.preventDefault()
-            var upd = {
-              message: { message_value: document.getElementById(`imgMgsCustomSaved${item.id}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNumSaved${item.id}`).value }
-            }
 
-            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
-              // alert("Delete Successfully")
+
+            // var upd = {
+            //   message: { message_value: document.getElementById(`imgMgsCustomSaved${item.id}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNumSaved${item.id}`).value }
+            // }
+
+
+            var add
+            if (document.getElementById(`bagAddSC${item.id}`) != null || document.getElementById(`groupAddSC${item.id}`) != null || document.getElementById(`titleAddSC${item.id}`) != null) {
+              var titlea = document.getElementById(`titleAddSC${item.id}`).value
+              var groupva = document.getElementById(`groupAddSC${item.id}`).value
+              var group_name = document.getElementById(`groupNameAddSC${item.id}`).value
+              var bag_name = document.getElementById(`groupAddSC${item.id}`).value
+              var bag = document.getElementById(`bagNameAddSC${item.id}`).value
+              var type = document.getElementById(`typeAddSC${item.id}`).value
+              var web = document.getElementById(`webAddSC${item.id}`).value
+              var lbl = document.getElementById(`lblAddSC${item.id}_${bagAddSC}`).value
+              console.log("lbl: ", lbl)
+              var listLbl = lbl.substring(2, lbl.length).split(", ")
+              var lastListLBL = []
+              for (var i = 0; i < listLbl.length; i++) {
+                lastListLBL.push({ label_name: listLbl[i] })
+              }
+              if (type == "mess") {
+                add = {
+                  message: { 
+                    message_bag_id: bagId,
+                    message_value: document.getElementById(`imgMgsCustomSaved${item.id}`).value, 
+                    message_type: "img_msg", 
+                    img_value: document.getElementById(`imgValueMsgNumSaved${item.id}`).value,
+                    message_buttons: [
+                      { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+                    ] }
+      
+                }
+              } else if (type == "web_url") {
+                add = {
+                  message: {
+                    message_bag_id: bagId,
+                    message_value: document.getElementById(`imgMgsCustomSaved${item.id}`).value, 
+                    message_type: "img_msg", 
+                    img_value: document.getElementById(`imgValueMsgNumSaved${item.id}`).value,
+                    message_buttons: [
+                      { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
+                    ]
+                  }
+      
+                }
+              }
+            } else if (document.getElementById(`titleAddTC${item.id}_${totalItemTC}`) != null) {
+              var message_buttons = []
+              console.log("totalItemTC: ", totalItemTC)
+              var totalTCItem = document.getElementById(`totalItemTC${item.id}`).value
+
+              console.log("mb ne: ", totalTCItem)
+              for (var i = 1; i <= totalTCItem; i++) {
+      
+                var titlea = document.getElementById(`titleAddTC${item.id}_${i}`).value
+                var groupva = document.getElementById(`groupAddTC${item.id}_${i}`).value
+                var group_name = document.getElementById(`groupNameAddTC${item.id}_${i}`).value
+                var bag_name = document.getElementById(`bagNameAddTC${item.id}_${i}`).value
+                var bag = document.getElementById(`bagAddTC${item.id}_${i}`).value
+                var type = document.getElementById(`typeAddTC${item.id}_${i}`).value
+                var web = document.getElementById(`webAddTC${item.id}_${i}`).value
+                var lbl = document.getElementById(`lblAddTCItem${item.id}_${i}`).value
+                // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+                var listLbl = lbl.substring(2, lbl.length).split(", ")
+                var lastListLBL = []
+                for (var j = 0; j < listLbl.length; j++) {
+                  lastListLBL.push({ label_name: listLbl[j] })
+                }
+                if (type == "mess") {
+      
+                  // add = {
+                  //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                  //   message_button: [
+                  //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
+                  //   ]
+                  // }
+      
+                  message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
+                } else if (type == "web_url") {
+                  // add = {
+                  //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                  //   message_button: [
+                  //     { button_type: "web_url", title: titlea, content: web }
+                  //   ]
+                  // }
+      
+                  message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
+                }
+              }
+              add = {
+                message: {
+                  message_bag_id: bagId,
+                    message_value: document.getElementById(`imgMgsCustomSaved${item.id}`).value, 
+                    message_type: "img_msg", 
+                    img_value: document.getElementById(`imgValueMsgNumSaved${item.id}`).value,
+                  message_buttons
+                },
+      
+              }
+            } else if (document.getElementById(`formatCheckSelect${item.id}`) != null) {
+              // var group = document.getElementById(`groupAddFI${idSC}`).value
+              // var bag = document.getElementById(`bagAddFI${idSC}`).value
+              var lbl = document.getElementById(`lblAddFI${item.id}_${bagAddSC}`).value
+              var formatCheckSelect = document.getElementById(`formatCheckSelect${item.id}`).value
+              var formatCheckMSG = document.getElementById(`formatCheckMSG${item.id}`).value
+              console.log("lbl: ", lbl)
+              var listLbl = lbl.substring(2, lbl.length).split(", ")
+              var lastListLBL = []
+              for (var i = 0; i < listLbl.length; i++) {
+                lastListLBL.push({ label_name: listLbl[i] })
+              }
+              add = {
+                message: {
+                  message_bag_id: bagId,
+                    message_value: document.getElementById(`imgMgsCustomSaved${item.id}`).value, 
+                    message_type: "img_msg", 
+                    img_value: document.getElementById(`imgValueMsgNumSaved${item.id}`).value,
+                  free_input: {
+                    message_bag_id: `1`,
+                    free_input_labels: lastListLBL,
+                    format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+                    format_check_message: formatCheckMSG
+                  }
+                },
+                // message_button: [
+                //   { button_type: "format", title: '', content: `+message_bag_id_${bag}`, label: listLbl, format: formatCheckSelect, format_msg: formatCheckMSG }
+                // ]
+              }
+            }
+            else {
+              add = {
+                message: { message_bag_id: bagId, message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" }
+              }
+            }
+      
+            console.log(add)
+
+            setTotalItemTC(1)
+
+
+            api.patch(`/api/v1/message_managements/messages/${item.id}`, add).then(res => {
               console.log(res)
+
               setTimeout(() => {
                 setIsOpenNoti(true)
                 setMsgNoti("更新しました。")
@@ -522,10 +1702,28 @@ function Chatbot() {
               setTimeout(function () {
                 setIsOpenNoti(false)
               }, 2000);
-              getBagMsg(group, id)
+              getBagMsg(id, id)
             }).catch(error => {
               console.log(error)
             })
+
+
+
+            // api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+            //   // alert("Delete Successfully")
+            //   console.log(res)
+            //   setTimeout(() => {
+            //     setIsOpenNoti(true)
+            //     setMsgNoti("更新しました。")
+            //   }, 1500)
+
+            //   setTimeout(function () {
+            //     setIsOpenNoti(false)
+            //   }, 2000);
+            //   getBagMsg(group, id)
+            // }).catch(error => {
+            //   console.log(error)
+            // })
           })
 
           var element1 = document.getElementById(`imgMsgOVI${item.id}`)
@@ -552,6 +1750,133 @@ function Chatbot() {
           }
         } else if (item.message_type == "past_post") {
           // alert ("PP roi")
+
+          var updateItem = ""
+          var choiceHTML = ""
+          if (typeof item.free_input !== "undefined" && item.free_input !== null) {
+            // if (typeof item.free_input !== "undefined" && item.free_input !== null) {
+            // console.log("free input")
+            choiceHTML =
+              `
+                <div id="itemFI${item.id}" >
+                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check}</div>
+                <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                    Delete
+                  </button>
+                </div>
+                <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
+                <input id="formatCheckSelect${item.free_input.message_id}" hidden type=text value=${item.free_input.format_check} />
+                <input id="formatCheckMSG${item.free_input.message_id}" hidden type=text value="${item.free_input.format_check_message}" />
+                
+              </div>
+              `
+            updateItem = "free_input"
+          } else if (item.message_buttons != []) {
+            if (item.message_buttons.length == 1) {
+              if (item.message_buttons[0].button_type == "mess") {
+                choiceHTML =
+                  `
+                    <div id="itemSC${item.message_buttons[0].message_id}">
+                    <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>
+                    <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                    <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                    <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                    <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                  
+                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                  </div>
+                  `
+                updateItem = "single_choice_msg"
+              } else if (item.message_buttons[0].button_type == "web_url") {
+                // if(item.message_buttons[0] != undefined){
+                  choiceHTML =
+                `
+                    <div >
+                    <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>  
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].content}</div>
+                      
+
+                    <input id="titleUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                    <input id="typeUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                    <input id="webUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                      
+                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                    </div>
+                    `
+                    updateItem = "single_choice_web"
+                // }else{
+                  
+                // }
+                
+              }
+            } else if (item.message_buttons.length > 1) {
+              console.log("nhieu item hon ne")
+              for (var i = 0; i < item.message_buttons.length; i++) {
+                if (item.message_buttons[i].button_type == "mess") {
+                  console.log("mess ne")
+                  choiceHTML = choiceHTML.concat(
+                    `
+                  <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length-1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
+                  <div style="padding:10px 5px 0px 5px">${item.message_buttons[i].title}</div>  
+                  <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                    <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
+                  <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
+                  <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
+                    
+                  <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
+                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                    Delete
+                  </button>
+                </div>
+                  <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
+                  <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
+                  </div>
+                  `
+                  )
+                  // <input id="groupAddFI${item.id}" hidden type=text value=${`group value here`} />
+                } else if (item.message_buttons[i].button_type == "web_url") {
+                  console.log("web ne")
+                  choiceHTML = choiceHTML.concat(
+                    `
+                    <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length-1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
+                    <div style="padding:10px 5px 0px 5px;">${item.message_buttons[i].title}</div>  
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[i].content}</div>
+                    <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
+                    <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
+                    <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
+                    <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
+                    </div>
+                    `
+                  )
+                }
+              }
+              
+              updateItem = "three_choice"
+            }
+
+          }
+
+
+
           var abc = document.createElement("div")
           document.getElementById("div_custom").appendChild(abc)
           abc.innerHTML =
@@ -561,6 +1886,37 @@ function Chatbot() {
             <img id="imgUpPP${item.id}" src="${item.preview_past_post_url}" style="margin: auto; max-height:200px; max-width:200px" /></div>
 
           <br />
+
+
+
+          <div id="choice${item.id}">
+    
+              </div>
+
+              <div id="msgChoice${item.id}" style="display:none">
+                <div style="display: flex">
+                  <div id="singleChoice${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+                  </div>
+                  <div id="threeChoice${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+                  </div>
+                  <div id="freeInput${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+                  </div>
+                </div>
+              </div>
+              </br>
+              <div style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+                <div id="choiceOption${item.id}" style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+                
+                </div>
+                <div id="choiceThree${item.id}" style="display:none;border-radius:10px"></div>
+              </div>
+
+
+
+
           <div id="btnDeletePP${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
               font-weight:800">削除</button>
@@ -583,6 +1939,86 @@ function Chatbot() {
           //   </div> 
 
           // document.getElementById(`ppCustomSaved${item.id}`).value = item.message_value
+
+        var choiceNe = document.createElement("div")
+        document.getElementById(`choiceOption${item.id}`).appendChild(choiceNe)
+        choiceNe.innerHTML = choiceHTML
+
+
+        document.getElementById(`singleChoice${item.id}`).addEventListener('click', (event) => {
+          event.preventDefault()
+          updateMsgSC(item.id)
+        })
+        document.getElementById(`threeChoice${item.id}`).addEventListener('click', (event) => {
+          event.preventDefault()
+          updateMsgTC(item.id)
+        })
+        document.getElementById(`freeInput${item.id}`).addEventListener('click', (event) => {
+          event.preventDefault()
+          updateMsgFI(item.id)
+        })
+
+        //This one use to delete choice deleteChoice
+        document.getElementById(`choiceOption${item.id}`).addEventListener("click", (e) => {
+          e.preventDefault()
+
+          if(updateItem == "three_choice"){
+            var idThreeChoiceDelete = item.message_buttons.length-1
+            document.getElementById(`deleteChoice${item.id}_${idThreeChoiceDelete}`).style.display = "block"
+            document.getElementById(`deleteChoice${item.id}_${idThreeChoiceDelete}`).addEventListener('click', (e)=>{
+              e.preventDefault()
+              var upd = { message: { message_value: item.message_value, message_type: "past_post", img_value: "", preview_past_post_url:item.preview_past_post_url } }
+            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+              console.log(res)
+              setTimeout(() => {  
+                setIsOpenNoti(true)
+                setMsgNoti("更新しました。")
+              }, 1500)
+              setTimeout(function () {
+                setIsOpenNoti(false)
+              }, 2000);
+              // getBagMsg(group, id)
+              getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
+            }).catch(error => {
+              console.log(error)
+            })
+            })
+          }
+          
+
+
+
+          if(document.getElementById(`deleteChoice${item.id}`) != null){
+            document.getElementById(`deleteChoice${item.id}`).style.display = "block"
+            document.getElementById(`deleteChoice${item.id}`).addEventListener("click", (event) => {
+            event.preventDefault()
+            // alert("delete ne")
+            var upd = { message: { message_value: item.message_value, message_type: "past_post", img_value: "", preview_past_post_url:item.preview_past_post_url } }
+            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+              console.log(res)
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("更新しました。")
+              }, 1500)
+              setTimeout(function () {
+                setIsOpenNoti(false)
+              }, 2000);
+              getBagMsg(group, id)
+            }).catch(error => {
+              console.log(error)
+            })
+          })
+          }
+        })
+
+        
+
+// Update item down here
+if(updateItem == ""){
+  document.getElementById(`msgChoice${item.id}`).style.display = "block"
+}
+
+
 
           document.getElementById(`btnDeletePP${item.id}`).addEventListener('click', (event) => {
             event.preventDefault()
@@ -626,10 +2062,12 @@ function Chatbot() {
               `
           // document.getElementById(`PPUpOV${item.id}`).style.display = "none"
 
-
-
+          // setIdPPUP(item.id)
+          // setTotalItemPP(item.message_buttons.length-1)
+          // setUpdateItemPP(updateItem)
           document.getElementById(`btnChangePP${item.id}`).addEventListener('click', (event) => {
             event.preventDefault()
+            setBagUpPP(bagId)
             setIdPPUP(item.id)
             selectPastPostUp()
             // document.getElementById(`PPUpOV${item.id}`).style.display = "block"
@@ -721,12 +2159,162 @@ function Chatbot() {
       setImgCBNum(bagMsg[bagMsg.length - 1].id)
       bagMsg.forEach((item) => {
         if (item.message_type == "msg") {
+
+          var updateItem = ""
+          var choiceHTML = ""
+          if (typeof item.free_input !== "undefined" && item.free_input !== null) {
+            // console.log("free input")
+            choiceHTML =
+              `
+                <div id="itemFI${item.id}" >
+                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check}</div>
+                <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                    Delete
+                  </button>
+                </div>
+                <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
+                <input id="formatCheckSelect${item.free_input.message_id}" hidden type=text value=${item.free_input.format_check} />
+                <input id="formatCheckMSG${item.free_input.message_id}" hidden type=text value="${item.free_input.format_check_message}" />
+                
+              </div>
+              `
+            updateItem = "free_input"
+          } else if (item.message_buttons != []) {
+            if (item.message_buttons.length == 1) {
+              if (item.message_buttons[0].button_type == "mess") {
+                choiceHTML =
+                  `
+                    <div id="itemSC${item.message_buttons[0].message_id}">
+                    <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>
+                    <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                    <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                    <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                    <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                  
+                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                  </div>
+                  `
+                updateItem = "single_choice_msg"
+              } 
+              else if (item.message_buttons[0].button_type == "web_url") {  
+                if(item.message_buttons[0].message_id != undefined){
+                  choiceHTML =
+                `
+                    <div >
+                    <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>  
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].content}</div>
+                      
+
+                    <input id="titleUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                    <input id="typeUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                    <input id="webUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                      
+                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
+                    </div>
+                    `
+                    updateItem = "single_choice_web"
+                }
+                
+              }
+            } else if (item.message_buttons.length > 1) {
+              console.log("nhieu item hon ne")
+              for (var i = 0; i < item.message_buttons.length; i++) {
+                if (item.message_buttons[i].button_type == "mess") {
+                  console.log("mess ne")
+                  choiceHTML = choiceHTML.concat(
+                    `
+                  <div id="itemTCUP${item.id}_${i}" style="border-bottom:1px solid black; margin:auto; width:90%; text-align:center">
+                  <div style="padding:10px 5px 0px 5px">${item.message_buttons[i].title}</div>  
+                  <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                    <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
+                  <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
+                  <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
+                    
+                  <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
+                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                    Delete
+                  </button>
+                </div>
+                  <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
+                  <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
+                  </div>
+                  `
+                  )
+                  // <input id="groupAddFI${item.id}" hidden type=text value=${`group value here`} />
+                } else if (item.message_buttons[i].button_type == "web_url") {
+                  console.log("web ne")
+                  choiceHTML = choiceHTML.concat(
+                    `
+                    <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length-1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
+                    <div style="padding:10px 5px 0px 5px;">${item.message_buttons[i].title}</div>  
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[i].content}</div>
+                    <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
+                    <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
+                    <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
+                    <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>
+                    <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
+                    <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
+                    </div>
+                    `
+                  )
+                }
+              }
+              updateItem = "three_choice"
+            }
+
+          }
+
+
+
           var abc = document.createElement("div")
           document.getElementById("div_custom").appendChild(abc)
           abc.innerHTML =
             `<div id="chatbot_message${item.id}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
               
               <div><textarea name="messagesVa${item.id}" class="mgsChatbot" id="mgsCustomSaved${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
+              
+              <div id="choice${item.id}">
+    
+              </div>
+              
+              <div id="msgChoice${item.id}" style="display:none">
+                <div style="display: flex">
+                  <div id="singleChoice${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+                  </div>
+                  <div id="threeChoice${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+                  </div>
+                  <div id="freeInput${item.id}" style=" padding:5px">
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+                  </div>
+                </div>
+              </div>
+              </br>
+              <div style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+                <div id="choiceOption${item.id}" style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+                
+                </div>
+                <div id="choiceThree${item.id}" style="display:none;border-radius:10px"></div>
+              </div>
+
               <div id="btnDelMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
                 font-weight:800">削除</button>
@@ -738,6 +2326,80 @@ function Chatbot() {
             </div>`
           // document.getElementById(`mgsCustomKey${item.id}`).textContent = item.received_message
           document.getElementById(`mgsCustomSaved${item.id}`).textContent = item.message_value
+          var choiceNe = document.createElement("div")
+          document.getElementById(`choiceOption${item.id}`).appendChild(choiceNe)
+          
+          document.getElementById(`singleChoice${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            updateMsgSC(item.id)
+          })
+          document.getElementById(`threeChoice${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            updateMsgTC(item.id)
+          })
+          document.getElementById(`freeInput${item.id}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            updateMsgFI(item.id)
+          })
+
+          //This one use to delete choice deleteChoice
+          document.getElementById(`choiceOption${item.id}`).addEventListener("click", (e) => {
+            e.preventDefault()
+
+            if(updateItem == "three_choice"){
+              var idThreeChoiceDelete = item.message_buttons.length-1
+              document.getElementById(`deleteChoice${item.id}_${idThreeChoiceDelete}`).style.display = "block"
+              document.getElementById(`deleteChoice${item.id}_${idThreeChoiceDelete}`).addEventListener('click', (e)=>{
+                e.preventDefault()
+                var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
+              api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+                console.log(res)
+                setTimeout(() => {  
+                  setIsOpenNoti(true)
+                  setMsgNoti("更新しました。")
+                }, 1500)
+                setTimeout(function () {
+                  setIsOpenNoti(false)
+                }, 2000);
+                getBagMsg(id, id)
+              }).catch(error => {
+                console.log(error)
+              })
+              })
+            }
+
+            if(document.getElementById(`deleteChoice${item.id}`) != null){
+              document.getElementById(`deleteChoice${item.id}`).style.display = "block"
+              document.getElementById(`deleteChoice${item.id}`).addEventListener("click", (event) => {
+              event.preventDefault()
+              // alert("delete ne")
+              var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
+              api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+                console.log(res)
+                setTimeout(() => {
+                  setIsOpenNoti(true)
+                  setMsgNoti("更新しました。")
+                }, 1500)
+                setTimeout(function () {
+                  setIsOpenNoti(false)
+                }, 2000);
+                getBagMsg(id, id)
+              }).catch(error => {
+                console.log(error)
+              })
+            })
+            }
+          })
+
+          // Update item down here
+          if(updateItem == ""){
+            document.getElementById(`msgChoice${item.id}`).style.display = "block"
+          }
+
+
+          choiceNe.innerHTML = choiceHTML
+
+
 
           document.getElementById(`mgsCustomSaved${item.id}`).addEventListener('change', (e) => msgOVSaved(e.target.value, item.id))
           // <div><textarea name="messageKey${item.id}" class="mgsChatbot" id="mgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
@@ -747,11 +2409,12 @@ function Chatbot() {
             event.preventDefault()
             api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
               console.log(res)
+
+
               setTimeout(() => {
                 setIsOpenNoti(true)
-                setMsgNoti("更新しました。")
+                setMsgNoti("削除しました。")
               }, 1500)
-
               setTimeout(function () {
                 setIsOpenNoti(false)
               }, 2000);
@@ -761,10 +2424,152 @@ function Chatbot() {
             })
           })
           document.getElementById(`btnUpdateMsg${item.id}`).addEventListener('click', (event) => {
+            // setIdUpdateItemMsg(item.id)
             event.preventDefault()
+
+
+
             var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
-            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+
+            var add
+            if (document.getElementById(`bagAddSC${item.id}`) != null || document.getElementById(`groupAddSC${item.id}`) != null || document.getElementById(`titleAddSC${item.id}`) != null) {
+              var titlea = document.getElementById(`titleAddSC${item.id}`).value
+              var groupva = document.getElementById(`groupAddSC${item.id}`).value
+              var group_name = document.getElementById(`groupNameAddSC${item.id}`).value
+              var bag_name = document.getElementById(`groupAddSC${item.id}`).value
+              var bag = document.getElementById(`bagNameAddSC${item.id}`).value
+              var type = document.getElementById(`typeAddSC${item.id}`).value
+              var web = document.getElementById(`webAddSC${item.id}`).value
+              var lbl = document.getElementById(`lblAddSC${item.id}_${bagAddSC}`).value
+              console.log("lbl: ", lbl)
+              var listLbl = lbl.substring(2, lbl.length).split(", ")
+              var lastListLBL = []
+              for (var i = 0; i < listLbl.length; i++) {
+                lastListLBL.push({ label_name: listLbl[i] })
+              }
+              if (type == "mess") {
+                add = {
+                  message: { 
+                    message_bag_id: bagId,
+                    message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, 
+                    message_type: "msg", 
+                    img_value: "",
+                    message_buttons: [
+                      { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+                    ] }
+      
+                }
+              } else if (type == "web_url") {
+                add = {
+                  message: {
+                    message_bag_id: bagId,
+                    message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, 
+                    message_type: "msg",
+                    img_value: "",
+                    message_buttons: [
+                      { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
+                    ]
+                  }
+      
+                }
+              }
+            } else if (document.getElementById(`titleAddTC${item.id}_${totalItemTC}`) != null) {
+              var message_buttons = []
+              console.log("totalItemTC: ", totalItemTC)
+              var totalTCItem = document.getElementById(`totalItemTC${item.id}`).value
+
+              console.log("mb ne: ", totalTCItem)
+              for (var i = 1; i <= totalTCItem; i++) {
+      
+                var titlea = document.getElementById(`titleAddTC${item.id}_${i}`).value
+                var groupva = document.getElementById(`groupAddTC${item.id}_${i}`).value
+                var group_name = document.getElementById(`groupNameAddTC${item.id}_${i}`).value
+                var bag_name = document.getElementById(`bagNameAddTC${item.id}_${i}`).value
+                var bag = document.getElementById(`bagAddTC${item.id}_${i}`).value
+                var type = document.getElementById(`typeAddTC${item.id}_${i}`).value
+                var web = document.getElementById(`webAddTC${item.id}_${i}`).value
+                var lbl = document.getElementById(`lblAddTCItem${item.id}_${i}`).value
+                // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+                var listLbl = lbl.substring(2, lbl.length).split(", ")
+                var lastListLBL = []
+                for (var j = 0; j < listLbl.length; j++) {
+                  lastListLBL.push({ label_name: listLbl[j] })
+                }
+                if (type == "mess") {
+      
+                  // add = {
+                  //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                  //   message_button: [
+                  //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
+                  //   ]
+                  // }
+      
+                  message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
+                } else if (type == "web_url") {
+                  // add = {
+                  //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                  //   message_button: [
+                  //     { button_type: "web_url", title: titlea, content: web }
+                  //   ]
+                  // }
+      
+                  message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
+                }
+              }
+              add = {
+                message: {
+                  message_bag_id: bagId,
+                  message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, 
+                  message_type: "msg",
+                  img_value: "",
+                  message_buttons
+                },
+      
+              }
+            } else if (document.getElementById(`formatCheckSelect${item.id}`) != null) {
+              // var group = document.getElementById(`groupAddFI${idSC}`).value
+              // var bag = document.getElementById(`bagAddFI${idSC}`).value
+              var lbl = document.getElementById(`lblAddFI${item.id}_${bagAddSC}`).value
+              var formatCheckSelect = document.getElementById(`formatCheckSelect${item.id}`).value
+              var formatCheckMSG = document.getElementById(`formatCheckMSG${item.id}`).value
+              console.log("lbl: ", lbl)
+              var listLbl = lbl.substring(2, lbl.length).split(", ")
+              var lastListLBL = []
+              for (var i = 0; i < listLbl.length; i++) {
+                lastListLBL.push({ label_name: listLbl[i] })
+              }
+              add = {
+                message: {
+                  message_bag_id: bagId,
+                  message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, 
+                  message_type: "msg",
+                  img_value: "",
+                  free_input: {
+                    message_bag_id: `1`,
+                    free_input_labels: lastListLBL,
+                    format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+                    format_check_message: formatCheckMSG
+                  }
+                },
+                // message_button: [
+                //   { button_type: "format", title: '', content: `+message_bag_id_${bag}`, label: listLbl, format: formatCheckSelect, format_msg: formatCheckMSG }
+                // ]
+              }
+            }
+            else {
+              add = {
+                message: { message_bag_id: bagId, message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" }
+              }
+            }
+      
+            console.log(add)
+
+            setTotalItemTC(1)
+
+
+            api.patch(`/api/v1/message_managements/messages/${item.id}`, add).then(res => {
               console.log(res)
+
               setTimeout(() => {
                 setIsOpenNoti(true)
                 setMsgNoti("更新しました。")
@@ -777,6 +2582,8 @@ function Chatbot() {
             }).catch(error => {
               console.log(error)
             })
+
+
           })
 
 
@@ -1163,7 +2970,7 @@ function Chatbot() {
           // document.getElementById(`PPUpOV${item.id}`).style.display = "none"
 
 
-
+          
           document.getElementById(`btnChangePP${item.id}`).addEventListener('click', (event) => {
             event.preventDefault()
             setIdPPUP(item.id)
@@ -1886,6 +3693,7 @@ function Chatbot() {
     // setMsgCBNum(num)
   }
 
+  const [idSC, setIdSC] = useState(1)
   function addImgChatbot() {
     var numIndex = parseInt(imgCBNum) + 1
     var abc = document.createElement("div")
@@ -1898,6 +3706,30 @@ function Chatbot() {
     <div style=" text-align: center" }}>
       <img id="output${numIndex}" style=" max-height: 200px; max-width: 40%" }} />
     </div>
+    <div id="choice${numIndex}">
+    
+    </div>
+    
+    <div id="msgChoice${idSC}">
+      <div style="display: flex">
+        <div id="singleChoice${idSC}" style=" padding:5px">
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+        </div>
+        <div id="threeChoice${idSC}" style=" padding:5px">
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+        </div>
+        <div id="freeInput${idSC}" style=" padding:5px">
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+        </div>
+      </div>
+    </div>
+    </br>
+    <div style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+      <div id="choiceOption${idSC}" style="text-align:center">
+      
+      </div>
+      <div id="choiceThree${idSC}" style="display:none;border-radius:10px"></div>
+    </div>
     <div id="btnDelImg${numIndex}" style="float:right;">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
         font-weight:800">削除</button>
@@ -1909,16 +3741,172 @@ function Chatbot() {
   </div>`
     // document.getElementById(`btnDelImg${numIndex}`).style.display='none'
     document.getElementById(`imgNum${numIndex}`).addEventListener('change', (e) => loadFile(e))
+    document.getElementById(`singleChoice${idSC}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      setIsAddOpenSingleChoice(true)
+    })
+    document.getElementById(`threeChoice${idSC}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      setIsAddOpenThreeChoice(true)
+    })
+    document.getElementById(`freeInput${idSC}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      setIsAddOpenFreeInput(true)
+    }) //setIsAddOpenFreeInput
     // document.getElementById(`imgNum${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelImg${numIndex}`).style.display = 'block' })
     document.getElementById(`btnDelImg${numIndex}`).addEventListener('click', () => deleteImgCB(numIndex))
     document.getElementById(`btnAddEachImg${numIndex}`).addEventListener('click', (event) => {
       event.preventDefault()
       // console.log(bagId)
-      var add = {
-        message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value }
+
+      // document.getElementById("underlineSCNextMsg")
+
+      var add
+      if (document.getElementById(`bagAddSC${idSC}`) != null || document.getElementById(`groupAddSC${idSC}`) != null || document.getElementById(`titleAddSC${idSC}`) != null) {
+        var titlea = document.getElementById(`titleAddSC${idSC}`).value
+        var group = document.getElementById(`groupAddSC${idSC}`).value
+        var group_name = document.getElementById(`groupNameAddSC${idSC}`).value
+        var bag_name = document.getElementById(`bagNameAddSC${idSC}`).value
+        var bag = document.getElementById(`bagAddSC${idSC}`).value
+        var type = document.getElementById(`typeAddSC${idSC}`).value
+        var web = document.getElementById(`webAddSC${idSC}`).value
+        var lbl = document.getElementById(`lblAddSC${idSC}_${bagAddSC}`).value
+        console.log("lbl: ", lbl)
+        var listLbl = lbl.substring(2, lbl.length).split(", ")
+        var lastListLBL = []
+        for (var i = 0; i < listLbl.length; i++) {
+          lastListLBL.push({ label_name: listLbl[i] })
+        }
+        if (type == "mess") {
+          add = {
+            message: {
+              message_bag_id: bagId,
+              message_value: "", message_type: "img",
+              img_value: document.getElementById(`imgDataNum${numIndex}`).value,
+              message_buttons: [
+                { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+              ]
+            },
+
+          }
+        } else if (type == "web_url") {
+          add = {
+            message: {
+              message_bag_id: bagId,
+              message_value: "", message_type: "img",
+              img_value: document.getElementById(`imgDataNum${numIndex}`).value,
+              message_buttons: [
+                { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
+              ]
+            },
+
+          }
+        }
+      } else if (document.getElementById(`bagAddTC${idSC}_${totalItemTC}`) != null || document.getElementById(`groupAddTC${numIndex}_${totalItemTC}`) != null || document.getElementById(`titleAddTC${idSC}_${totalItemTC}`) != null) {
+        var message_buttons = []
+        // console.log("totalItemTC: ", totalItemTC)
+        var totalTCItem = document.getElementById(`totalItemTC${idSC}`).value
+
+
+        console.log("mb ne: ", totalTCItem)
+        for (var i = 1; i <= totalTCItem; i++) {
+
+          var titlea = document.getElementById(`titleAddTC${idSC}_${i}`).value
+          var group = document.getElementById(`groupAddTC${idSC}_${i}`).value
+          var group_name = document.getElementById(`groupNameAddTC${idSC}_${i}`).value
+          var bag_name = document.getElementById(`bagNameAddTC${idSC}_${i}`).value
+          var bag = document.getElementById(`bagAddTC${idSC}_${i}`).value
+          var type = document.getElementById(`typeAddTC${idSC}_${i}`).value
+          var web = document.getElementById(`webAddTC${idSC}_${i}`).value
+          var lbl = document.getElementById(`lblAddTCItem${idSC}_${i}`).value
+
+          // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+          var listLbl = lbl.substring(2, lbl.length).split(", ")
+          var lastListLBL = []
+          for (var j = 0; j < listLbl.length; j++) {
+            lastListLBL.push({ label_name: listLbl[j] })
+          }
+          if (type == "mess") {
+
+            // add = {
+            //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+            //   message_button: [
+            //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
+            //   ]
+            // }
+
+            message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
+          } else if (type == "web_url") {
+            // add = {
+            //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+            //   message_button: [
+            //     { button_type: "web_url", title: titlea, content: web }
+            //   ]
+            // }
+
+            message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
+          }
+        }
+        add = {
+          message: {
+            message_bag_id: bagId,
+            message_value: "", message_type: "img",
+            img_value: document.getElementById(`imgDataNum${numIndex}`).value,
+            message_buttons
+          },
+
+
+        }
+      } else if (document.getElementById(`formatCheckSelect${idSC}`).value!= null || document.getElementById(`formatCheckMSG${idSC}`).value != null) {
+        // var group = document.getElementById(`groupAddFI${idSC}`).value
+        // var bag = document.getElementById(`bagAddFI${idSC}`).value
+        var lbl = document.getElementById(`lblAddFI${idSC}_${bagAddSC}`).value
+        var formatCheckSelect = document.getElementById(`formatCheckSelect${idSC}`).value
+        var formatCheckMSG = document.getElementById(`formatCheckMSG${idSC}`).value
+        console.log("lbl: ", lbl)
+
+        var listLbl = lbl.substring(2, lbl.length).split(", ")
+        var lastListLBL = []
+        for (var i = 0; i < listLbl.length; i++) {
+          lastListLBL.push({ label_name: listLbl[i] })
+        }
+        add = {
+          message: {
+            message_bag_id: bagId,
+            message_value: "", message_type: "img",
+            img_value: document.getElementById(`imgDataNum${numIndex}`).value,
+            free_input: {
+              message_bag_id: `1`,
+              free_input_labels: lastListLBL,
+              format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+              format_check_message: formatCheckMSG
+            }
+          },
+          // message_button: [
+          //   { button_type: "format", title: '', content: `+message_bag_id_${bag}`, label: lastListLBL, format: formatCheckSelect, format_msg: formatCheckMSG }
+          // ],
+          // free_input: {
+          //   message_bag_id: `${bag}`,
+          //   free_input_labels: lastListLBL,
+          //   format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+          //   format_check_message: formatCheckMSG
+          // }
+        }
       }
+      else {
+        add = {
+          message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value }
+        }
+      }
+
+      console.log(add)
+      setIdSC(idSC + 1)
+      setTotalItemTC(1)
+
+      ///Uncomment below to add
+
       api.post(`/api/v1/message_managements/messages`, add).then(res => {
-        // console.log(res)
+        console.log("add ne: ", res)
         setTimeout(() => {
           setIsOpenNoti(true)
           setMsgNoti("追加しました。")
@@ -1927,25 +3915,57 @@ function Chatbot() {
         setTimeout(function () {
           setIsOpenNoti(true)
         }, 2000);
-        reloadMessMsgBag()
+        // reloadMessMsgBag()
+        getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
       }).catch(error => {
         console.log(error)
         // if (error.response.data.code === 3) {
         //     requestNewToken(path)
         // }
       })
+
+
+
     })
     // document.getElementById(`imgCustomKey${numIndex}`).addEventListener('change', (e) => imgOVkey(e.target.value))
   }
 
   function addMsgChatbot() {
+    var id = idForReloadMsgBag
+    // var idIn
+    if (idForReloadMsgBag === undefined) {
+      id = idReloadMsgBagFromGetMSG
+    } else {
+      id = idForReloadMsgBag
+    }
     var numIndex = parseInt(msgCBNum) + 1
+    // setIdSC(idSC + 1)
     var abc = document.createElement("div")
     document.getElementById("div_custom").appendChild(abc)
     abc.innerHTML =
       `<div id="chatbot_message${numIndex}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
     
     <div><textarea name="messagesVa${numIndex}" class="mgsChatbot" id="mgsCustom${numIndex}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
+    <div  id="msgChoice${idSC}">
+      <div style="display: flex">
+        <div id="singleChoice${idSC}" style=" padding:5px">
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+        </div>
+        <div id="threeChoice${idSC}" style=" padding:5px">
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+        </div>
+        <div id="freeInput${idSC}" style=" padding:5px">
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+        </div>
+      </div>
+    </div>
+    </br>
+    <div style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+      <div id="choiceOption${idSC}" style="text-align:center">
+      
+      </div>
+      <div id="choiceThree${idSC}" style="display:none;border-radius:10px"></div>
+    </div>
     <div id="btnDelMsg${numIndex}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
         font-weight:800">削除</button>
@@ -1955,17 +3975,167 @@ function Chatbot() {
       font-weight:800">追加</button>
     </div>
     </div>`
+    document.getElementById(`singleChoice${idSC}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      setIsAddOpenSingleChoice(true)
+    })
+    document.getElementById(`threeChoice${idSC}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      setIsAddOpenThreeChoice(true)
+    })
+    document.getElementById(`freeInput${idSC}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      setIsAddOpenFreeInput(true)
+    })
     document.getElementById(`btnAddEachMsg${numIndex}`).addEventListener('click', (event) => {
       event.preventDefault()
       var element = document.getElementById(`mgsCustom${numIndex}`).value
       // alert(bagId)
-      var add = {
-        message: { message_bag_id: bagId, message_value: element, message_type: "msg", img_value: "" }
+      // var add = {
+      //   message: { message_bag_id: bagId, message_value: element, message_type: "msg", img_value: "" }
+      // }
+      var add
+      if (document.getElementById(`bagAddSC${idSC}`) != null || document.getElementById(`groupAddSC${idSC}`) != null || document.getElementById(`titleAddSC${idSC}`) != null) {
+        var titlea = document.getElementById(`titleAddSC${idSC}`).value
+        var group = document.getElementById(`groupAddSC${idSC}`).value
+        var group_name = document.getElementById(`groupNameAddSC${idSC}`).value
+        var bag_name = document.getElementById(`bagNameAddSC${idSC}`).value
+        var bag = document.getElementById(`bagAddSC${idSC}`).value
+        var type = document.getElementById(`typeAddSC${idSC}`).value
+        var web = document.getElementById(`webAddSC${idSC}`).value
+        var lbl = document.getElementById(`lblAddSC${idSC}_${bagAddSC}`).value
+        console.log("lbl: ", lbl)
+        var listLbl = lbl.substring(2, lbl.length).split(", ")
+        var lastListLBL = []
+        for (var i = 0; i < listLbl.length; i++) {
+          lastListLBL.push({ label_name: listLbl[i] })
+        }
+        if (type == "mess") {
+          add = {
+            message: {
+              message_bag_id: bagId,
+              message_value: element,
+              message_type: "msg",
+              img_value: "",
+              message_buttons: [
+                { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+              ]
+            }
+
+          }
+        } else if (type == "web_url") {
+          add = {
+            message: {
+              message_bag_id: bagId,
+              message_value: element,
+              message_type: "msg",
+              img_value: "",
+              message_buttons: [
+                { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
+              ]
+            }
+
+          }
+        }
+      } else if (document.getElementById(`bagAddTC${idSC}_${totalItemTC}`) != null || document.getElementById(`groupAddTC${numIndex}_${totalItemTC}`) != null || document.getElementById(`titleAddTC${idSC}_${totalItemTC}`) != null) {
+        var message_buttons = []
+        // console.log("totalItemTC: ", totalItemTC)
+        var totalTCItem = document.getElementById(`totalItemTC${idSC}`).value
+
+
+        console.log("mb ne: ", totalTCItem)
+        for (var i = 1; i <= totalTCItem; i++) {
+
+          var titlea = document.getElementById(`titleAddTC${idSC}_${i}`).value
+          var group = document.getElementById(`groupAddTC${idSC}_${i}`).value
+          var group_name = document.getElementById(`groupNameAddTC${idSC}_${i}`).value
+          var bag_name = document.getElementById(`bagNameAddTC${idSC}_${i}`).value
+          var bag = document.getElementById(`bagAddTC${idSC}_${i}`).value
+          var type = document.getElementById(`typeAddTC${idSC}_${i}`).value
+          var web = document.getElementById(`webAddTC${idSC}_${i}`).value
+          var lbl = document.getElementById(`lblAddTCItem${idSC}_${i}`).value
+          // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+          var listLbl = lbl.substring(2, lbl.length).split(", ")
+          var lastListLBL = []
+          for (var j = 0; j < listLbl.length; j++) {
+            lastListLBL.push({ label_name: listLbl[j] })
+          }
+          if (type == "mess") {
+
+            // add = {
+            //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+            //   message_button: [
+            //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
+            //   ]
+            // }
+
+            message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
+          } else if (type == "web_url") {
+            // add = {
+            //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+            //   message_button: [
+            //     { button_type: "web_url", title: titlea, content: web }
+            //   ]
+            // }
+
+            message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
+          }
+        }
+        add = {
+          message: {
+            message_bag_id: bagId,
+            message_value: element,
+            message_type: "msg",
+            img_value: "",
+            message_buttons
+          },
+
+        }
+      } else if (document.getElementById(`formatCheckSelect${idSC}`) != null) {
+        // var group = document.getElementById(`groupAddFI${idSC}`).value
+        // var bag = document.getElementById(`bagAddFI${idSC}`).value
+        var lbl = document.getElementById(`lblAddFI${idSC}_${bagAddSC}`).value
+        var formatCheckSelect = document.getElementById(`formatCheckSelect${idSC}`).value
+        var formatCheckMSG = document.getElementById(`formatCheckMSG${idSC}`).value
+        console.log("lbl: ", lbl)
+        var listLbl = lbl.substring(2, lbl.length).split(", ")
+        var lastListLBL = []
+        for (var i = 0; i < listLbl.length; i++) {
+          lastListLBL.push({ label_name: listLbl[i] })
+        }
+        add = {
+          message: {
+            message_bag_id: bagId,
+            message_value: element,
+            message_type: "msg",
+            img_value: "",
+            free_input: {
+              message_bag_id: `1`,
+              free_input_labels: lastListLBL,
+              format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+              format_check_message: formatCheckMSG
+            }
+          },
+          // message_button: [
+          //   { button_type: "format", title: '', content: `+message_bag_id_${bag}`, label: listLbl, format: formatCheckSelect, format_msg: formatCheckMSG }
+          // ]
+        }
       }
+      else {
+        add = {
+          message: { message_bag_id: bagId, message_value: element, message_type: "msg", img_value: "" }
+        }
+      }
+
+      console.log(add)
+
+
 
       api.post(`/api/v1/message_managements/messages`, add).then(res => {
         // alert("Add Successfully")
         console.log(res)
+        setIdSC(idSC + 1)
+        setTotalItemTC(1)
         setTimeout(() => {
           setIsOpenNoti(true)
           setMsgNoti("追加しました。")
@@ -1974,7 +4144,9 @@ function Chatbot() {
         setTimeout(function () {
           setIsOpenNoti(false)
         }, 2000);
-        reloadMessMsgBag()
+        // reloadMessMsgBag()
+        getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
+        // getBagMsg(id, id)
 
       }).catch(error => {
         console.log(error)
@@ -1997,6 +4169,28 @@ function Chatbot() {
      <img style="max-width:200px; max-height:200px" src=${url} />
      <input name="pp_value${numIndex}" value=${id} type=hidden />
    </div>
+
+   <div  id="msgChoice${idSC}">
+      <div style="display: flex">
+        <div id="singleChoice${idSC}" style=" padding:5px">
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+        </div>
+        <div id="threeChoice${idSC}" style=" padding:5px">
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+        </div>
+        <div id="freeInput${idSC}" style=" padding:5px">
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+        </div>
+      </div>
+    </div>
+    </br>
+    <div style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+      <div id="choiceOption${idSC}" style="text-align:center">
+      
+      </div>
+      <div id="choiceThree${idSC}" style="display:none;border-radius:10px"></div>
+    </div>
+
    <div id="btnDelPP${numIndex}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
         font-weight:800">削除</button>
@@ -2012,13 +4206,166 @@ function Chatbot() {
     ppOV(url)
     // document.getElementById(`mgsCustom${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelMsg${numIndex}`).style.display = 'block' })
     document.getElementById(`btnDelPP${numIndex}`).addEventListener('click', () => deletePPCB(numIndex))
+    document.getElementById(`singleChoice${idSC}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      setIsAddOpenSingleChoice(true)
+    })
+    document.getElementById(`threeChoice${idSC}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      setIsAddOpenThreeChoice(true)
+    })
+    document.getElementById(`freeInput${idSC}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      setIsAddOpenFreeInput(true)
+    })
     document.getElementById(`btnAddPP${numIndex}`).addEventListener('click', (event) => {
       event.preventDefault()
-      var add = {
-        message: { message_bag_id: bagId, message_value: id.toString(), message_type: "past_post", img_value: "", preview_past_post_url: url }
+      // var add = {
+      //   message: { message_bag_id: bagId, message_value: id.toString(), message_type: "past_post", img_value: "", preview_past_post_url: url }
+      // }
+
+      var add
+      if (document.getElementById(`bagAddSC${idSC}`) != null || document.getElementById(`groupAddSC${idSC}`) != null || document.getElementById(`titleAddSC${idSC}`) != null) {
+        var titlea = document.getElementById(`titleAddSC${idSC}`).value
+        var group = document.getElementById(`groupAddSC${idSC}`).value
+        var group_name = document.getElementById(`groupNameAddSC${idSC}`).value
+        var bag_name = document.getElementById(`bagNameAddSC${idSC}`).value
+        var bag = document.getElementById(`bagAddSC${idSC}`).value
+        var type = document.getElementById(`typeAddSC${idSC}`).value
+        var web = document.getElementById(`webAddSC${idSC}`).value
+        var lbl = document.getElementById(`lblAddSC${idSC}_${bagAddSC}`).value
+        console.log("lbl: ", lbl)
+        var listLbl = lbl.substring(2, lbl.length).split(", ")
+        var lastListLBL = []
+        for (var i = 0; i < listLbl.length; i++) {
+          lastListLBL.push({ label_name: listLbl[i] })
+        }
+        if (type == "mess") {
+          add = {
+            message: {
+              message_bag_id: bagId,
+              message_value: id.toString(),
+              message_type: "past_post",
+              img_value: "",
+              preview_past_post_url: url,
+              message_buttons: [
+                { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+              ]
+            }
+          }
+        } else if (type == "web_url") {
+          add = {
+            message: {
+              message_bag_id: bagId,
+              message_value: id.toString(),
+              message_type: "past_post",
+              img_value: "",
+              preview_past_post_url: url,
+              message_buttons: [
+                { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
+              ]
+            }
+          }
+        }
+      } else if (document.getElementById(`bagAddTC${idSC}_${totalItemTC}`) != null || document.getElementById(`groupAddTC${numIndex}_${totalItemTC}`) != null || document.getElementById(`titleAddTC${idSC}_${totalItemTC}`) != null) {
+        var message_buttons = []
+        // console.log("totalItemTC: ", totalItemTC)
+        var totalTCItem = document.getElementById(`totalItemTC${idSC}`).value
+
+
+        console.log("mb ne: ", totalTCItem)
+        for (var i = 1; i <= totalTCItem; i++) {
+
+          var titlea = document.getElementById(`titleAddTC${idSC}_${i}`).value
+          var group = document.getElementById(`groupAddTC${idSC}_${i}`).value
+          var group_name = document.getElementById(`groupNameAddTC${idSC}_${i}`).value
+          var bag_name = document.getElementById(`bagNameAddTC${idSC}_${i}`).value
+          var bag = document.getElementById(`bagAddTC${idSC}_${i}`).value
+          var type = document.getElementById(`typeAddTC${idSC}_${i}`).value
+          var web = document.getElementById(`webAddTC${idSC}_${i}`).value
+          var lbl = document.getElementById(`lblAddTCItem${idSC}_${i}`).value
+          // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+          var listLbl = lbl.substring(2, lbl.length).split(", ")
+          var lastListLBL = []
+          for (var j = 0; j < listLbl.length; j++) {
+            lastListLBL.push({ label_name: listLbl[j] })
+          }
+          if (type == "mess") {
+
+            // add = {
+            //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+            //   message_button: [
+            //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
+            //   ]
+            // }
+
+            message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
+          } else if (type == "web_url") {
+            // add = {
+            //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+            //   message_button: [
+            //     { button_type: "web_url", title: titlea, content: web }
+            //   ]
+            // }
+
+            message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
+          }
+        }
+        add = {
+          message: {
+            message_bag_id: bagId,
+            message_value: id.toString(),
+            message_type: "past_post",
+            img_value: "",
+            preview_past_post_url: url,
+            message_buttons
+          }
+        }
+      } else if (document.getElementById(`bagAddFI${idSC}`) != null || document.getElementById(`groupAddFI${idSC}_${totalItemTC}`) != null) {
+        // var group = document.getElementById(`groupAddFI${idSC}`).value
+        // var bag = document.getElementById(`bagAddFI${idSC}`).value
+        var lbl = document.getElementById(`lblAddFI${idSC}_${bagAddSC}`).value
+        var formatCheckSelect = document.getElementById(`formatCheckSelect${idSC}`).value
+        var formatCheckMSG = document.getElementById(`formatCheckMSG${idSC}`).value
+        console.log("lbl: ", lbl)
+        var listLbl = lbl.substring(2, lbl.length).split(", ")
+        var lastListLBL = []
+        for (var i = 0; i < listLbl.length; i++) {
+          lastListLBL.push({ label_name: listLbl[i] })
+        }
+
+        add = {
+          message: {
+            message_bag_id: bagId,
+            message_value: id.toString(),
+            message_type: "past_post",
+            img_value: "",
+            preview_past_post_url: url,
+            free_input: {
+              message_bag_id: `1`,
+              free_input_labels: lastListLBL,
+              format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+              format_check_message: formatCheckMSG
+            }
+          }
+        }
       }
+      else {
+        add = {
+          message: { message_bag_id: bagId, message_value: id.toString(), message_type: "past_post", img_value: "", preview_past_post_url: url }
+        }
+      }
+
+      console.log(add)
+
+
+
+
+
       api.post(`/api/v1/message_managements/messages`, add).then(res => {
         console.log(res)
+        setIdSC(idSC + 1)
+        setTotalItemTC(1)
         setTimeout(() => {
           setIsOpenNoti(true)
           setMsgNoti("追加しました。")
@@ -2027,7 +4374,8 @@ function Chatbot() {
         setTimeout(function () {
           setIsOpenNoti(false)
         }, 2000);
-        reloadMessMsgBag()
+        // reloadMessMsgBag()
+        getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
       }).catch(error => {
         console.log(error)
         // if (error.response.data.code === 3) {
@@ -2039,7 +4387,11 @@ function Chatbot() {
 
   const [idUpdatePastPost, setIdUpdatePastPost] = useState()
   const [urlUpdatePastPost, setURLUpdatePastPost] = useState()
+  const [totalItemPP, setTotalItemPP ] = useState()
+  const [updateItemPP, setUpdateItemPP ] = useState()
+  const [bagUpPP, setBagUpPP] = useState()
   function upPP(ppurl, id) {
+
     // if(document.getElementById(`lbOvPP${idPPUP}`)!== null){
     //   document.getElementById(`lbOvPP${idPPUP}`).style.display = "none"
     // document.getElementById(`ppCustomSavedOvi${idPPUP}`).style.display = "none"
@@ -2052,33 +4404,200 @@ function Chatbot() {
     document.getElementById(`PPUpOV${idPPUP}`).src = ppurl
     // setIdUpdatePastPost(id)
     // setURLUpdatePastPost(ppurl)
+    
+
+
     setIsOpenSelectPastPostUp(false)
     document.getElementById(`btnUpdatePP${idPPUP}`).addEventListener('click', (event) => {
       event.preventDefault()
       document.getElementById(`btnUpdatePP${idPPUP}`).style.display = "none"
       document.getElementById(`btnChangePP${idPPUP}`).style.display = "block"
-      var update = { message: { message_value: id, message_type: "past_post", img_value: "", preview_past_post_url: ppurl } }
-      api.patch(`/api/v1/message_managements/messages/${idPPUP}`, update).then(res => {
-        console.log("Update post response: ", res)
 
 
-        setTimeout(() => {
-          setIsOpenNoti(true)
-          setMsgNoti("更新しました。")
-        }, 1500)
-        setTimeout(function () {
-          setIsOpenNoti(false)
-        }, 2000);
 
-        getBagMsg(idForReloadMsgBag, idForReloadMsgBag)
-      }).catch(error => {
-        console.log(error)
-      })
+      // var update = { message: { message_value: id, message_type: "past_post", img_value: "", preview_past_post_url: ppurl } }
+
+
+      var add
+            if (document.getElementById(`bagAddSC${idPPUP}`) != null || document.getElementById(`groupAddSC${idPPUP}`) != null || document.getElementById(`titleAddSC${idPPUP}`) != null) {
+              var titlea = document.getElementById(`titleAddSC${idPPUP}`).value
+              var groupva = document.getElementById(`groupAddSC${idPPUP}`).value
+              var group_name = document.getElementById(`groupNameAddSC${idPPUP}`).value
+              var bag_name = document.getElementById(`groupAddSC${idPPUP}`).value
+              var bag = document.getElementById(`bagNameAddSC${idPPUP}`).value
+              var type = document.getElementById(`typeAddSC${idPPUP}`).value
+              var web = document.getElementById(`webAddSC${idPPUP}`).value
+              var lbl = document.getElementById(`lblAddSC${idPPUP}_${bagAddSC}`).value
+              console.log("lbl: ", lbl)
+              var listLbl = lbl.substring(2, lbl.length).split(", ")
+              var lastListLBL = []
+              for (var i = 0; i < listLbl.length; i++) {
+                lastListLBL.push({ label_name: listLbl[i] })
+              }
+              if (type == "mess") {
+                add = {
+                  message: { 
+                    message_bag_id: bagUpPP,
+                    message_value: id, 
+                    message_type: "past_post", 
+                    img_value: "",
+                    preview_past_post_url: ppurl,
+                    message_buttons: [
+                      { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+                    ] }
+      
+                }
+              } else if (type == "web_url") {
+                add = {
+                  message: {
+                    message_bag_id: bagUpPP,
+                    message_value: id, 
+                    message_type: "past_post", 
+                    img_value: "",
+                    preview_past_post_url: ppurl,
+                    message_buttons: [
+                      { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
+                    ]
+                  }
+      
+                }
+              }
+            } else if (document.getElementById(`titleAddTC${idPPUP}_${totalItemTC}`) != null) {
+              var message_buttons = []
+              console.log("totalItemTC: ", totalItemTC)
+              var totalTCItem = document.getElementById(`totalItemTC${idPPUP}`).value
+
+              console.log("mb ne: ", totalTCItem)
+              for (var i = 1; i <= totalTCItem; i++) {
+      
+                var titlea = document.getElementById(`titleAddTC${idPPUP}_${i}`).value
+                var groupva = document.getElementById(`groupAddTC${idPPUP}_${i}`).value
+                var group_name = document.getElementById(`groupNameAddTC${idPPUP}_${i}`).value
+                var bag_name = document.getElementById(`bagNameAddTC${idPPUP}_${i}`).value
+                var bag = document.getElementById(`bagAddTC${idPPUP}_${i}`).value
+                var type = document.getElementById(`typeAddTC${idPPUP}_${i}`).value
+                var web = document.getElementById(`webAddTC${idPPUP}_${i}`).value
+                var lbl = document.getElementById(`lblAddTCItem${idPPUP}_${i}`).value
+                // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+                var listLbl = lbl.substring(2, lbl.length).split(", ")
+                var lastListLBL = []
+                for (var j = 0; j < listLbl.length; j++) {
+                  lastListLBL.push({ label_name: listLbl[j] })
+                }
+                if (type == "mess") {
+      
+                  // add = {
+                  //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                  //   message_button: [
+                  //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
+                  //   ]
+                  // }
+      
+                  message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
+                } else if (type == "web_url") {
+                  // add = {
+                  //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                  //   message_button: [
+                  //     { button_type: "web_url", title: titlea, content: web }
+                  //   ]
+                  // }
+      
+                  message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
+                }
+              }
+              add = {
+                message: {
+                  message_bag_id: bagUpPP,
+                  message_value: id, 
+                  message_type: "past_post", 
+                  img_value: "",
+                  preview_past_post_url: ppurl,
+                  message_buttons
+                },
+      
+              }
+            } else if (document.getElementById(`formatCheckSelect${idPPUP}`) != null) {
+              // var group = document.getElementById(`groupAddFI${idSC}`).value
+              // var bag = document.getElementById(`bagAddFI${idSC}`).value
+              var lbl = document.getElementById(`lblAddFI${idPPUP}_${bagAddSC}`).value
+              var formatCheckSelect = document.getElementById(`formatCheckSelect${idPPUP}`).value
+              var formatCheckMSG = document.getElementById(`formatCheckMSG${idPPUP}`).value
+              console.log("lbl: ", lbl)
+              var listLbl = lbl.substring(2, lbl.length).split(", ")
+              var lastListLBL = []
+              for (var i = 0; i < listLbl.length; i++) {
+                lastListLBL.push({ label_name: listLbl[i] })
+              }
+              add = {
+                message: {
+                  message_bag_id: "1",
+                    message_value: id, 
+                    message_type: "past_post", 
+                    img_value: "",
+                    preview_past_post_url: ppurl,
+                  free_input: {
+                    message_bag_id: `1`,
+                    free_input_labels: lastListLBL,
+                    format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+                    format_check_message: formatCheckMSG
+                  }
+                },
+                // message_button: [
+                //   { button_type: "format", title: '', content: `+message_bag_id_${bag}`, label: listLbl, format: formatCheckSelect, format_msg: formatCheckMSG }
+                // ]
+              }
+            }
+            else {
+              add = {
+                message: { message_value: id, message_type: "past_post", img_value: "", preview_past_post_url: ppurl }
+              }
+            }
+      
+            console.log(add)
+
+            setTotalItemTC(1)
+
+
+            api.patch(`/api/v1/message_managements/messages/${idPPUP}`, add).then(res => {
+              console.log(res)
+
+              setTimeout(() => {
+                setIsOpenNoti(true)
+                setMsgNoti("更新しました。")
+              }, 1500)
+
+              setTimeout(function () {
+                setIsOpenNoti(false)
+              }, 2000);
+              // getBagMsg(id, id)
+              getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
+            }).catch(error => {
+              console.log(error)
+            })
+
+
+      // api.patch(`/api/v1/message_managements/messages/${idPPUP}`, update).then(res => {
+      //   console.log("Update post response: ", res)
+
+
+      //   setTimeout(() => {
+      //     setIsOpenNoti(true)
+      //     setMsgNoti("更新しました。")
+      //   }, 1500)
+      //   setTimeout(function () {
+      //     setIsOpenNoti(false)
+      //   }, 2000);
+
+      //   getBagMsg(idForReloadMsgBag, idForReloadMsgBag)
+      // }).catch(error => {
+      //   console.log(error)
+      // })
     })
   }
 
   function addImgMsgChatbot() {
     var numIndex = parseInt(imgMsgCBNum) + 1
+
     var abc = document.createElement("div")
     document.getElementById("div_custom").appendChild(abc)
     abc.innerHTML =
@@ -2092,6 +4611,28 @@ function Chatbot() {
     <div style="text-align: center">
     <textarea class="mgsChatbot" id="imgMgsCustom${numIndex}" name="imgMsgValueChatbot${numIndex}" placeholder="返事入力..." type="text" rows="3"></textarea>
     </div>
+
+    <div  id="msgChoice${idSC}">
+      <div style="display: flex">
+        <div id="singleChoice${idSC}" style=" padding:5px">
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+        </div>
+        <div id="threeChoice${idSC}" style=" padding:5px">
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+        </div>
+        <div id="freeInput${idSC}" style=" padding:5px">
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+        </div>
+      </div>
+    </div>
+    </br>
+    <div style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+      <div id="choiceOption${idSC}" style="text-align:center">
+      
+      </div>
+      <div id="choiceThree${idSC}" style="display:none;border-radius:10px"></div>
+    </div>
+
     <div id="btnDelImgMsg${numIndex}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
         font-weight:800">削除</button>
@@ -2105,16 +4646,166 @@ function Chatbot() {
     // console.log(document.getElementById(`outputImgMsg${numIndex}`))
     document.getElementById(`imgMsgNum${numIndex}`).addEventListener('change', (e) => loadFileImgMsg(e))
     document.getElementById(`imgMgsCustom${numIndex}`).addEventListener('change', (e) => imgMsgOV(e.target.value))
+
+    document.getElementById(`singleChoice${idSC}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      setIsAddOpenSingleChoice(true)
+    })
+    document.getElementById(`threeChoice${idSC}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      setIsAddOpenThreeChoice(true)
+    })
+    document.getElementById(`freeInput${idSC}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      setIsAddOpenFreeInput(true)
+    })
     // document.getElementById(`imgMsgNum${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${numIndex}`).style.display = 'block' })
     // document.getElementById(`imgMgsCustom${numIndex}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${numIndex}`).style.display = 'block' })
     document.getElementById(`btnDelImgMsg${numIndex}`).addEventListener('click', () => deleteImgMsgCB(numIndex))
     document.getElementById(`btnAddImgMsg${numIndex}`).addEventListener('click', (event) => {
       event.preventDefault()
-      var add = {
-        message: { message_bag_id: bagId, message_value: document.getElementById(`imgMgsCustom${numIndex}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value }
+      // var add = {
+      //   message: { message_bag_id: bagId, message_value: document.getElementById(`imgMgsCustom${numIndex}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value }
+      // }
+
+      var add
+      if (document.getElementById(`bagAddSC${idSC}`) != null || document.getElementById(`groupAddSC${idSC}`) != null || document.getElementById(`titleAddSC${idSC}`) != null) {
+        var titlea = document.getElementById(`titleAddSC${idSC}`).value
+        var group = document.getElementById(`groupAddSC${idSC}`).value
+        var group_name = document.getElementById(`groupNameAddSC${idSC}`).value
+        var bag_name = document.getElementById(`bagNameAddSC${idSC}`).value
+        var bag = document.getElementById(`bagAddSC${idSC}`).value
+        var type = document.getElementById(`typeAddSC${idSC}`).value
+        var web = document.getElementById(`webAddSC${idSC}`).value
+        var lbl = document.getElementById(`lblAddSC${idSC}_${bagAddSC}`).value
+        console.log("lbl: ", lbl)
+        var listLbl = lbl.substring(2, lbl.length).split(", ")
+        var lastListLBL = []
+        for (var i = 0; i < listLbl.length; i++) {
+          lastListLBL.push({ label_name: listLbl[i] })
+        }
+        if (type == "mess") {
+          add = {
+            message: {
+              message_bag_id: bagId,
+              message_value: document.getElementById(`imgMgsCustom${numIndex}`).value,
+              message_type: "img_msg",
+              img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value,
+              message_buttons: [
+                { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+              ]
+            },
+          }
+        } else if (type == "web_url") {
+          add = {
+            message: {
+              message_bag_id: bagId,
+              message_value: document.getElementById(`imgMgsCustom${numIndex}`).value,
+              message_type: "img_msg",
+              img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value.Button,
+              message_buttons: [
+                { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
+              ]
+            }
+          }
+        }
+      } else if (document.getElementById(`bagAddTC${idSC}_${totalItemTC}`) != null || document.getElementById(`groupAddTC${numIndex}_${totalItemTC}`) != null || document.getElementById(`titleAddTC${idSC}_${totalItemTC}`) != null) {
+        var message_buttons = []
+        // console.log("totalItemTC: ", totalItemTC)
+        var totalTCItem = document.getElementById(`totalItemTC${idSC}`).value
+
+
+        console.log("mb ne: ", totalTCItem)
+        for (var i = 1; i <= totalTCItem; i++) {
+
+          var titlea = document.getElementById(`titleAddTC${idSC}_${i}`).value
+          var group = document.getElementById(`groupAddTC${idSC}_${i}`).value
+          var group_name = document.getElementById(`groupNameAddTC${idSC}_${i}`).value
+          var bag_name = document.getElementById(`bagNameAddTC${idSC}_${i}`).value
+          var bag = document.getElementById(`bagAddTC${idSC}_${i}`).value
+          var type = document.getElementById(`typeAddTC${idSC}_${i}`).value
+          var web = document.getElementById(`webAddTC${idSC}_${i}`).value
+          var lbl = document.getElementById(`lblAddTCItem${idSC}_${i}`).value
+          // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+          var listLbl = lbl.substring(2, lbl.length).split(", ")
+          var lastListLBL = []
+          for (var j = 0; j < listLbl.length; j++) {
+            lastListLBL.push({ label_name: listLbl[j] })
+          }
+          if (type == "mess") {
+
+            // add = {
+            //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+            //   message_button: [
+            //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
+            //   ]
+            // }
+
+            message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
+          } else if (type == "web_url") {
+            // add = {
+            //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+            //   message_button: [
+            //     { button_type: "web_url", title: titlea, content: web }
+            //   ]
+            // }
+
+            message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
+          }
+        }
+        add = {
+          message: {
+            message_bag_id: bagId,
+            message_value: document.getElementById(`imgMgsCustom${numIndex}`).value,
+            message_type: "img_msg",
+            img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value,
+            message_buttons
+          },
+
+        }
+      } else if (document.getElementById(`bagAddFI${idSC}`) != null || document.getElementById(`groupAddFI${idSC}_${totalItemTC}`) != null) {
+        // var group = document.getElementById(`groupAddFI${idSC}`).value
+        // var bag = document.getElementById(`bagAddFI${idSC}`).value
+        var lbl = document.getElementById(`lblAddFI${idSC}_${bagAddSC}`).value
+        var formatCheckSelect = document.getElementById(`formatCheckSelect${idSC}`).value
+        var formatCheckMSG = document.getElementById(`formatCheckMSG${idSC}`).value
+        console.log("lbl: ", lbl)
+        var listLbl = lbl.substring(2, lbl.length).split(", ")
+        var lastListLBL = []
+        for (var i = 0; i < listLbl.length; i++) {
+          lastListLBL.push({ label_name: listLbl[i] })
+        }
+        add = {
+          message: {
+            message_bag_id: bagId,
+            message_value: document.getElementById(`imgMgsCustom${numIndex}`).value,
+            message_type: "img_msg",
+            img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value,
+
+            free_input: {
+              message_bag_id: `1`,
+              free_input_labels: lastListLBL,
+              format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+              format_check_message: formatCheckMSG
+            }
+          }
+        }
       }
+      else {
+        add = {
+          message: { message_bag_id: bagId, message_value: document.getElementById(`imgMgsCustom${numIndex}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value }
+        }
+      }
+
+      console.log(add)
+
+      setIdSC(idSC + 1)
+      setTotalItemTC(1)
+
       api.post(`/api/v1/message_managements/messages`, add).then(res => {
         console.log(res)
+        setIdSC(idSC + 1)
+        setTotalItemTC(1)
         setIsOpenNoti(true)
         setTimeout(() => {
           setMsgNoti("追加しました。")
@@ -2123,17 +4814,20 @@ function Chatbot() {
         setTimeout(function () {
           setIsOpenNoti(false)
         }, 2000);
-        reloadMessMsgBag()
+        // reloadMessMsgBag()
+        getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
       }).catch(error => {
         console.log(error)
         // if (error.response.data.code === 3) {
         //     requestNewToken(path)
         // }
       })
+
     })
 
 
   }
+
 
   function deleteImgCB(idDelete) {
     var element = document.getElementById(`chatbot_image${idDelete}`)
@@ -2619,9 +5313,810 @@ function Chatbot() {
     }, 1500)
   }
 
-  function setUpPP() {
-
+  function removeOptions(selectElement) {
+    var i, L = selectElement.options.length - 1;
+    for (i = L; i >= 0; i--) {
+      selectElement.remove(i);
+    }
   }
+
+  function selectGroupNextMSG(value) {
+    if (value != "") {
+      document.getElementById("grBagSC").style.display = "none"
+      document.getElementById("grBagSC").innerHTML = ""
+    }
+    api.get(`/api/v1/message_managements/message_groups/${value}`).then(res => {
+      // console.log(res.data.data.message_bags)
+      // setListBag(res.data.data.message_bags)
+      var group = document.getElementById(`listNextMSGBagSC`)
+      removeOptions(group)
+      for (var i = 0; i < res.data.data.message_bags.length; i++) {
+        var option = document.createElement("option");
+        option.value = res.data.data.message_bags[i].id;
+        option.text = res.data.data.message_bags[i].bag_name;
+        group.add(option)
+
+      }
+      // const myOpts = document.getElementById(`listReplyBag`).options
+      // console.log('myOpts: ', myOpts)
+      // for (var i = 0; i < myOpts.length; i++) {
+      //   if (i > 0) {
+      //     if (myOpts[i].value == myOpts[i - 1].value) {
+      //       // alert('same')
+      //       myOpts.remove(i);
+      //     }
+      //   }
+      // }
+      // console.log(group)
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+  }
+
+  function selectGroupNextMSGTC(value) {
+    if (value != "") {
+      document.getElementById("grBagTC").style.display = "none"
+      document.getElementById("grBagTC").innerHTML = ""
+    }
+    api.get(`/api/v1/message_managements/message_groups/${value}`).then(res => {
+      // console.log(res.data.data.message_bags)
+      // setListBag(res.data.data.message_bags)
+      var group = document.getElementById(`listNextMSGBagTC`)
+      removeOptions(group)
+      for (var i = 0; i < res.data.data.message_bags.length; i++) {
+        var option = document.createElement("option");
+        option.value = res.data.data.message_bags[i].id;
+        option.text = res.data.data.message_bags[i].bag_name;
+        group.add(option)
+
+      }
+      // const myOpts = document.getElementById(`listReplyBag`).options
+      // console.log('myOpts: ', myOpts)
+      // for (var i = 0; i < myOpts.length; i++) {
+      //   if (i > 0) {
+      //     if (myOpts[i].value == myOpts[i - 1].value) {
+      //       // alert('same')
+      //       myOpts.remove(i);
+      //     }
+      //   }
+      // }
+      // console.log(group)
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+  }
+
+  function selectGroupNextMSGFI(value) {
+    api.get(`/api/v1/message_managements/message_groups/${value}`).then(res => {
+      // console.log(res.data.data.message_bags)
+      // setListBag(res.data.data.message_bags)
+      var group = document.getElementById(`listNextMSGBagFI`)
+      removeOptions(group)
+      for (var i = 0; i < res.data.data.message_bags.length; i++) {
+        var option = document.createElement("option");
+        option.value = res.data.data.message_bags[i].id;
+        option.text = res.data.data.message_bags[i].bag_name;
+        group.add(option)
+
+      }
+      // const myOpts = document.getElementById(`listReplyBag`).options
+      // console.log('myOpts: ', myOpts)
+      // for (var i = 0; i < myOpts.length; i++) {
+      //   if (i > 0) {
+      //     if (myOpts[i].value == myOpts[i - 1].value) {
+      //       // alert('same')
+      //       myOpts.remove(i);
+      //     }
+      //   }
+      // }
+      // console.log(group)
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+  }
+
+
+
+  function selectBagNextMSG(val) {
+    alert(val)
+  }
+
+  function selectBagNextMSGTC(val) {
+    alert(val)
+  }
+  function selectBagNextMSGFI(val) {
+    alert(val)
+  }
+  function displaySCNextMSG() {
+    document.getElementById("underlineSCNextMsg").style.display = "block"
+    document.getElementById("underlineSCWebsite").style.display = "none"
+    document.getElementById("nextMessageSC").style.display = "block"
+    document.getElementById("websiteURLSC").style.display = "none"
+  }
+
+  function displayTCNextMSG() {
+    document.getElementById("underlineTCNextMsg").style.display = "block"
+    document.getElementById("underlineTCWebsite").style.display = "none"
+    document.getElementById("nextMessageTC").style.display = "block"
+    document.getElementById("websiteURLTC").style.display = "none"
+  }
+
+  function displaySCWebsite() {
+    document.getElementById("underlineSCNextMsg").style.display = "none"
+    document.getElementById("underlineSCWebsite").style.display = "block"
+    document.getElementById("nextMessageSC").style.display = "none"
+    document.getElementById("websiteURLSC").style.display = "block"
+  }
+  function displayTCWebsite() {
+    document.getElementById("underlineTCNextMsg").style.display = "none"
+    document.getElementById("underlineTCWebsite").style.display = "block"
+    document.getElementById("nextMessageTC").style.display = "none"
+    document.getElementById("websiteURLTC").style.display = "block"
+  }
+
+  const [labelInputSCNum, setLabelInputSCNum] = useState(1)
+  const [labelInputSCAll, setLabelInputSCAll] = useState("")
+  function checkInputedLabelSC(event, value) {
+    // document.getElementById("labelLSC").addEventListener("keypress", (event)=>{
+    // event.preventDefault()
+    if (event.key === "Enter") {
+      setLabelInputSCAll(`${labelInputSCAll}, ${value}`)
+      event.preventDefault()
+      // alert("entered")
+      var labelInputed = document.createElement('div')
+      labelInputed.setAttribute('id', `spLabelInputed${labelInputSCNum}`)
+      labelInputed.innerHTML = `
+        <div style="margin:0px 5px 0px 0px; border-radius:5px; background-color:#e0e0e0; display:flex"><span>${value}</span>&ensp; <span id="deletelabelSC${labelInputSCNum}">X</span></div>
+        `
+
+      document.getElementById('labelLSCInputed').appendChild(labelInputed)
+      document.getElementById(`deletelabelSC${labelInputSCNum}`).addEventListener('click', () => {
+        var element = document.getElementById(`spLabelInputed${labelInputSCNum}`);
+        element.parentNode.removeChild(element);
+        if (document.getElementById("labelLSCInputed").innerHTML == "") {
+          document.getElementById("labeltoCheckInputLabelSC").style.display = "block"
+        } else {
+          document.getElementById("labeltoCheckInputLabelSC").style.display = "none"
+
+        }
+      })
+      if (document.getElementById("labelLSCInputed").innerHTML == "") {
+        document.getElementById("labeltoCheckInputLabelSC").style.display = "block"
+      } else {
+        document.getElementById("labeltoCheckInputLabelSC").style.display = "none"
+
+      }
+      document.getElementById("labelLSC").value = ""
+      setLabelInputSCNum(labelInputSCNum + 1)
+    }
+
+    // })
+  }
+
+  function selectFormatCheck(value) {
+    if (value == "email" || value == "phone_number") {
+      document.getElementById("formatCheckFI").style.display = "block"
+    } else {
+      document.getElementById("formatCheckFI").style.display = "none"
+    }
+  }
+  const [labelInputTCNum, setLabelInputTCNum] = useState(1)
+  const [labelInputTCAll, setLabelInputTCAll] = useState("")
+  function checkInputedLabelTC(event, value) {
+    // document.getElementById("labelLSC").addEventListener("keypress", (event)=>{
+    // event.preventDefault()
+    var lblValue = ""
+    if (event.key === "Enter") {
+      setLabelInputTCAll(`${labelInputTCAll}, ${value}`)
+      // document.getElementById("lblTCAddALL").value = lblValue
+      event.preventDefault()
+      // alert("entered")
+      var labelInputed = document.createElement('div')
+      labelInputed.setAttribute('id', `spLabelInputed${labelInputTCNum}TC`)
+      labelInputed.innerHTML = `
+        <div style="margin:0px 5px 0px 0px; border-radius:5px; background-color:#e0e0e0; display:flex"><span>${value}</span>&ensp; <span id="deletelabelSC${labelInputTCNum}TC">X</span></div>
+        `
+
+      document.getElementById('labelLTCInputed').appendChild(labelInputed)
+      document.getElementById(`deletelabelSC${labelInputTCNum}TC`).addEventListener('click', () => {
+        var element = document.getElementById(`spLabelInputed${labelInputTCNum}TC`);
+        element.parentNode.removeChild(element);
+        if (document.getElementById("labelLTCInputed").innerHTML == "") {
+          document.getElementById("labeltoCheckInputLabelTC").style.display = "block"
+        } else {
+          document.getElementById("labeltoCheckInputLabelTC").style.display = "none"
+
+        }
+      })
+      if (document.getElementById("labelLTCInputed").innerHTML == "") {
+        document.getElementById("labeltoCheckInputLabelTC").style.display = "block"
+      } else {
+        document.getElementById("labeltoCheckInputLabelTC").style.display = "none"
+
+      }
+      document.getElementById("labelLTC").value = ""
+      setLabelInputTCNum(labelInputTCNum + 1)
+    }
+
+    // })
+  }
+
+  const [labelInputFINum, setLabelInputFINum] = useState(1)
+
+  const [labelInputFIAll, setLabelInputFIAll] = useState("")
+  function checkInputedLabelFI(event, value) {
+    // document.getElementById("labelLSC").addEventListener("keypress", (event)=>{
+    // event.preventDefault()
+    if (event.key === "Enter") {
+      setLabelInputFIAll(`${labelInputFIAll}, ${value}`)
+      event.preventDefault()
+      // alert("entered")
+      var labelInputed = document.createElement('div')
+      labelInputed.setAttribute('id', `spLabelInputed${labelInputFINum}FI`)
+      labelInputed.innerHTML = `
+        <div style="margin:0px 5px 0px 0px; border-radius:5px; background-color:#e0e0e0; display:flex"><span>${value}</span>&ensp; <span id="deletelabelSC${labelInputFINum}FI">X</span></div>
+        `
+
+      document.getElementById('labelLFIInputed').appendChild(labelInputed)
+      document.getElementById(`deletelabelSC${labelInputFINum}FI`).addEventListener('click', () => {
+        var element = document.getElementById(`spLabelInputed${labelInputFINum}FI`);
+        element.parentNode.removeChild(element);
+        if (document.getElementById("labelLFIInputed").innerHTML == "") {
+          document.getElementById("labeltoCheckInputLabelFI").style.display = "block"
+        } else {
+          document.getElementById("labeltoCheckInputLabelFI").style.display = "none"
+
+        }
+      })
+      if (document.getElementById("labelLFIInputed").innerHTML == "") {
+        document.getElementById("labeltoCheckInputLabelFI").style.display = "block"
+      } else {
+        document.getElementById("labeltoCheckInputLabelFI").style.display = "none"
+
+      }
+      document.getElementById("labelLFI").value = ""
+      setLabelInputFINum(labelInputFINum + 1)
+    }
+
+    // })
+  }
+  function checkInputTitleSC() {
+    var title = document.getElementById("titleNextMSG").value
+    if (title == "") {
+      document.getElementById("titleSC").style.display = "block"
+    } else {
+      document.getElementById("titleSC").style.display = "none"
+    }
+  }
+  function checkInputTitleTC() {
+    var title = document.getElementById("titleNextMSGTC").value
+    if (title == "") {
+      document.getElementById("titleTC").style.display = "block"
+    } else {
+      document.getElementById("titleTC").style.display = "none"
+    }
+  }
+
+  const [titleAddSC, setTitleAddSC] = useState("")
+  const [groupAddSC, setGroupAddSC] = useState()
+  const [bagAddSC, setBagAddSC] = useState(1)
+  function saveSC() {
+    var title = document.getElementById("titleNextMSG").value
+    var web_url = document.getElementById("websiteSC").value
+    var web = document.getElementById("underlineSCWebsite")
+    var group = document.getElementById('listNextMSGGroupSC')
+    var bag = document.getElementById('listNextMSGBagSC')
+    var lblas = document.getElementById(`lblSCAddALL_${bagAddSC}`).value
+    console.log(`lblas: `, lblas)
+    var type = ""
+    if (title == "") {
+      document.getElementById("titleSC").style.display = "block"
+    } else {
+      document.getElementById("titleSC").style.display = "none"
+    }
+    if (web.style.display == 'none') {
+
+      if (group.value == "") {
+        document.getElementById("grBagSC").style.display = "block"
+        document.getElementById("grBagSC").innerHTML = "Please choose group"
+      } else {
+        if (bag.value == "") {
+          document.getElementById("grBagSC").style.display = "block"
+          document.getElementById("grBagSC").innerHTML = "Please choose bag"
+        } else {
+          document.getElementById("grBagSC").style.display = "none"
+          document.getElementById("grBagSC").innerHTML = ""
+        }
+      }
+      console.log(group, bag)
+      type = "mess"
+    } else {
+
+      type = "web_url"
+      if (web_url == "") {
+        document.getElementById("webSC").style.display = "block"
+      } else {
+        document.getElementById("webSC").style.display = "none"
+      }
+    }
+    if (title != "" && group != "") {
+      // setTitleAddSC(title)
+      // setGroupAddSC(group.value)
+      // setBagAddSC(bag.value)
+      var abc = document.createElement("div")
+      document.getElementById(`choiceOption${idSC}`).appendChild(abc)
+      abc.innerHTML =
+        `
+      <div style="border:none; border-radius:10px; background-color:white; width:200px; text-align:center">
+        <div style="padding:10px 5px 0px 5px">${title}</div>
+        <input id="titleAddSC${idSC}" hidden type=text value="${title}" />
+        <input id="typeAddSC${idSC}" hidden type=text value="${type}" />
+        <input id="webAddSC${idSC}" hidden type=text value="${web_url}" />
+        <div style="padding:0px 5px 10px 5px">${group.options[group.selectedIndex].text}/${bag.options[bag.selectedIndex].text}</div>
+        <input id="groupAddSC${idSC}" hidden type=text value="${group.value}" />
+        <input id="groupNameAddSC${idSC}" hidden type=text value="${group.options[group.selectedIndex].text}" />
+        <input id="bagNameAddSC${idSC}" hidden type=text value="${bag.options[bag.selectedIndex].text}" />
+        <input id="bagAddSC${idSC}" hidden type=text value="${bag.value}" />
+        <input id="lblAddSC${idSC}_${bagAddSC}" hidden type=text value="${lblas}" />
+      </div>
+      `
+      document.getElementById(`msgChoice${idSC}`).style.display = "none"
+      setIsAddOpenSingleChoice(false)
+      setLabelInputSCAll("")
+
+    }
+  }
+
+  function updateMsgSC(id){
+    setIdUpdateItemMsg(id)
+    setIsUpdateOpenSingleChoice(true)
+  }
+  function updateMsgTC(id){
+    setIdUpdateItemMsg(id)
+    setIsUpdateOpenThreeChoice(true)
+  }
+
+  function updateMsgFI(id){
+    setIdUpdateItemMsg(id)
+    setIsUpdateOpenFreeInput(true)
+  }
+
+  function saveUpSC() {
+    var title = document.getElementById("titleNextMSG").value
+    var web_url = document.getElementById("websiteSC").value
+    var web = document.getElementById("underlineSCWebsite")
+    var group = document.getElementById('listNextMSGGroupSC')
+    var bag = document.getElementById('listNextMSGBagSC')
+    var lblas = document.getElementById(`lblSCAddALL_${bagAddSC}`).value
+    console.log(`lblas: `, lblas)
+    var type = ""
+    if (title == "") {
+      document.getElementById("titleSC").style.display = "block"
+    } else {
+      document.getElementById("titleSC").style.display = "none"
+    }
+    if (web.style.display == 'none') {
+
+      if (group.value == "") {
+        document.getElementById("grBagSC").style.display = "block"
+        document.getElementById("grBagSC").innerHTML = "Please choose group"
+      } else {
+        if (bag.value == "") {
+          document.getElementById("grBagSC").style.display = "block"
+          document.getElementById("grBagSC").innerHTML = "Please choose bag"
+        } else {
+          document.getElementById("grBagSC").style.display = "none"
+          document.getElementById("grBagSC").innerHTML = ""
+        }
+      }
+      console.log(group, bag)
+      type = "mess"
+    } else {
+
+      type = "web_url"
+      if (web_url == "") {
+        document.getElementById("webSC").style.display = "block"
+      } else {
+        document.getElementById("webSC").style.display = "none"
+      }
+    }
+    if (title != "" && group != "") {
+      // setTitleAddSC(title)
+      // setGroupAddSC(group.value)
+      // setBagAddSC(bag.value)
+      var abc = document.createElement("div")
+      document.getElementById(`choiceOption${idUpdateItemMsg}`).appendChild(abc)
+      abc.innerHTML =
+        `
+      <div style="border:none; border-radius:10px; background-color:white; width:200px; text-align:center">
+        <div style="padding:10px 5px 0px 5px">${title}</div>
+        <input id="titleAddSC${idUpdateItemMsg}" hidden type=text value="${title}" />
+        <input id="typeAddSC${idUpdateItemMsg}" hidden type=text value="${type}" />
+        <input id="webAddSC${idUpdateItemMsg}" hidden type=text value="${web_url}" />
+        <div style="padding:0px 5px 10px 5px">${group.options[group.selectedIndex].text}/${bag.options[bag.selectedIndex].text}</div>
+        <input id="groupAddSC${idUpdateItemMsg}" hidden type=text value="${group.value}" />
+        <input id="groupNameAddSC${idUpdateItemMsg}" hidden type=text value="${group.options[group.selectedIndex].text}" />
+        <input id="bagNameAddSC${idUpdateItemMsg}" hidden type=text value="${bag.options[bag.selectedIndex].text}" />
+        <input id="bagAddSC${idUpdateItemMsg}" hidden type=text value="${bag.value}" />
+        <input id="lblAddSC${idUpdateItemMsg}_${bagAddSC}" hidden type=text value="${lblas}" />
+      </div>
+      `
+      document.getElementById(`msgChoice${idUpdateItemMsg}`).style.display = "none"
+      setIsUpdateOpenSingleChoice(false)
+      setLabelInputSCAll("")
+
+    }
+  }
+
+  const [idUpdateItemMsg, setIdUpdateItemMsg] = useState()
+  const [titleAddTC, setTitleAddTC] = useState("")
+  const [groupAddTC, setGroupAddTC] = useState([])
+  const [bagAddTC, setBagAddTCC] = useState([])
+  const [totalItemTC, setTotalItemTC] = useState(1)
+  function saveTC() {
+    var title = document.getElementById("titleNextMSGTC").value
+    var web_url = document.getElementById("websiteTC").value
+    var web = document.getElementById("underlineTCWebsite")
+    var group = document.getElementById('listNextMSGGroupTC')
+    var bag = document.getElementById('listNextMSGBagTC')
+    var lbl = document.getElementById(`lblTCAddALL_${totalItemTC}`).value
+
+    console.log("labAddTC: ", lbl)
+    var type = ""
+    if (title == "") {
+      document.getElementById("titleTC").style.display = "block"
+    } else {
+      document.getElementById("titleTC").style.display = "none"
+    }
+    if (web.style.display == 'none') {
+
+      if (group.value == "") {
+        document.getElementById("grBagTC").style.display = "block"
+        document.getElementById("grBagTC").innerHTML = "Please choose group"
+      } else {
+        if (bag.value == "") {
+          document.getElementById("grBagTC").style.display = "block"
+          document.getElementById("grBagTC").innerHTML = "Please choose bag"
+        } else {
+          document.getElementById("grBagTC").style.display = "none"
+          document.getElementById("grBagTC").innerHTML = ""
+        }
+      }
+      console.log(group, bag)
+      type = "mess"
+    } else {
+
+      type = "web_url"
+      if (web_url == "") {
+        document.getElementById("webTC").style.display = "block"
+      } else {
+        document.getElementById("webTC").style.display = "none"
+      }
+    }
+    if (title != "" && group != "") {
+      var abc = document.createElement("div")
+      document.getElementById(`choiceOption${idSC}`).appendChild(abc)
+      if (type == "mess") {
+        abc.innerHTML =
+          `
+          <div id="itemTC${idSC}_${totalItemTC}" style="border-bottom:1px solid black; margin:auto; width:90%; overflow:hidden; text-align:center">
+            <div style="padding:10px 5px 0px 5px">${title}</div>
+            <input id="titleAddTC${idSC}_${totalItemTC}" hidden type=text value="${title}" />
+            <input id="typeAddTC${idSC}_${totalItemTC}" hidden type=text value="${type}" />
+            <input id="webAddTC${idSC}_${totalItemTC}" hidden type=text value="${web_url}" />
+            <div style="padding:0px 5px 10px 5px">${group.options[group.selectedIndex].text}/${bag.options[bag.selectedIndex].text}</div>
+            <input id="groupAddTC${idSC}_${totalItemTC}" hidden type=text value="${group.value}" />
+            <input id="groupNameAddTC${idSC}_${totalItemTC}" hidden type=text value="${group.options[group.selectedIndex].text}" />
+            <input id="bagNameAddTC${idSC}_${totalItemTC}" hidden type=text value="${bag.options[bag.selectedIndex].text}" />
+            <input id="bagAddTC${idSC}_${totalItemTC}" hidden type=text value="${bag.value}" />
+            <input id="lblAddTCItem${idSC}_${totalItemTC}" hidden type=text value="${lbl}" />
+          </div>
+          `
+        console.log("lbl add ne: ", lbl)
+      } else if (type == "web_url") {
+        abc.innerHTML =
+          `
+          <div id="itemTC${idSC}_${totalItemTC}" style="border-bottom:1px solid black; margin:auto; width:200px ; overflow:hidden; text-align:center">
+            <div style="padding:10px 5px 0px 5px">${title}</div>
+            <input id="titleAddTC${idSC}_${totalItemTC}" hidden type=text value="${title}" />
+            <input id="typeAddTC${idSC}_${totalItemTC}" hidden type=text value="${type}" />
+            <input id="webAddTC${idSC}_${totalItemTC}" hidden type=text value="${web_url}" />
+            <div style="padding:0px 5px 10px 5px">Website: ${web_url}</div>
+            <input id="groupAddTC${idSC}_${totalItemTC}" hidden type=text value="${group.value}" />
+            <input id="groupNameAddTC${idSC}_${totalItemTC}" hidden type=text value="${group.options[group.selectedIndex].text}" />
+            <input id="bagNameAddTC${idSC}_${totalItemTC}" hidden type=text value="${bag.options[bag.selectedIndex].text}" />
+            <input id="bagAddTC${idSC}_${totalItemTC}" hidden type=text value="${bag.value}" />
+            <input id="lblAddTCItem${idSC}_${totalItemTC}" hidden type=text value="${lbl}" />
+          </div>
+          `
+      }
+      // setTitleAddSC(title)
+      // setGroupAddSC(group.value)
+      // setBagAddSC(bag.value)
+      if (totalItemTC == 3) {
+        document.getElementById(`itemTC${idSC}_${totalItemTC}`).style.border = "none"
+      }
+
+      document.getElementById(`msgChoice${idSC}`).style.display = "none"
+      document.getElementById(`choiceThree${idSC}`).innerHTML =
+        `
+        <div>
+          <button style="background-color:white; border:none; border-radius:10px" id="tCAddItem${idSC}">Add an option</button>
+          <input id="totalItemTC${idSC}" type="number" value=${totalItemTC} hidden />
+        </div>
+      `
+      if (totalItemTC <= 2) {
+        document.getElementById(`choiceThree${idSC}`).style.display = "block"
+      } else {
+        document.getElementById(`choiceThree${idSC}`).style.display = "none"
+      }
+      document.getElementById(`tCAddItem${idSC}`).addEventListener('click', (e) => {
+        e.preventDefault()
+        setIsAddOpenThreeChoice(true)
+        setTotalItemTC(totalItemTC + 1)
+      })
+      setIsAddOpenThreeChoice(false)
+      setLabelInputTCAll("")
+    }
+  }
+
+  function saveUpTC() {
+    var title = document.getElementById("titleNextMSGTC").value
+    var web_url = document.getElementById("websiteTC").value
+    var web = document.getElementById("underlineTCWebsite")
+    var group = document.getElementById('listNextMSGGroupTC')
+    var bag = document.getElementById('listNextMSGBagTC')
+    var lbl = document.getElementById(`lblTCAddALL_${totalItemTC}`).value
+
+    console.log("labAddTC: ", lbl)
+    var type = ""
+    if (title == "") {
+      document.getElementById("titleTC").style.display = "block"
+    } else {
+      document.getElementById("titleTC").style.display = "none"
+    }
+    if (web.style.display == 'none') {
+
+      if (group.value == "") {
+        document.getElementById("grBagTC").style.display = "block"
+        document.getElementById("grBagTC").innerHTML = "Please choose group"
+      } else {
+        if (bag.value == "") {
+          document.getElementById("grBagTC").style.display = "block"
+          document.getElementById("grBagTC").innerHTML = "Please choose bag"
+        } else {
+          document.getElementById("grBagTC").style.display = "none"
+          document.getElementById("grBagTC").innerHTML = ""
+        }
+      }
+      console.log(group, bag)
+      type = "mess"
+    } else {
+
+      type = "web_url"
+      if (web_url == "") {
+        document.getElementById("webTC").style.display = "block"
+      } else {
+        document.getElementById("webTC").style.display = "none"
+      }
+    }
+    if (title != "" && group != "") {
+      var abc = document.createElement("div")
+      document.getElementById(`choiceOption${idUpdateItemMsg}`).appendChild(abc)
+      if (type == "mess") {
+        abc.innerHTML =
+          `
+          <div id="itemTC${idUpdateItemMsg}_${totalItemTC}" style="border-bottom:1px solid black; margin:auto; width:90%; text-align:center">
+            <div style="padding:10px 5px 0px 5px">${title}</div>
+            <input id="titleAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${title}" />
+            <input id="typeAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value=${type} />
+            <input id="webAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value=${web_url} />
+            <div style="padding:0px 5px 10px 5px">${group.options[group.selectedIndex].text}/${bag.options[bag.selectedIndex].text}</div>
+            <input id="groupAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value=${group.value} />
+            <input id="groupNameAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${group.options[group.selectedIndex].text}" />
+            <input id="bagNameAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${bag.options[bag.selectedIndex].text}" />
+            <input id="bagAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value=${bag.value} />
+            <input id="lblAddTCItem${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${lbl}" />
+          </div>
+          `
+        console.log("lbl add ne: ", lbl)
+      } else if (type == "web_url") {
+        abc.innerHTML =
+          `
+          <div id="itemTC${idUpdateItemMsg}_${totalItemTC}" style="border-bottom:1px solid black; margin:auto; width:200px ; text-align:center">
+            <div style="padding:10px 5px 0px 5px">${title}</div>
+            <input id="titleAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${title}" />
+            <input id="typeAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${type}" />
+            <input id="webAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${web_url}" />
+            <div style="padding:0px 5px 10px 5px">Website: ${web_url}</div>
+            <input id="groupAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${group.value}" />
+            <input id="groupNameAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${group.options[group.selectedIndex].text}" />
+            <input id="bagNameAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${bag.options[bag.selectedIndex].text}" />
+            <input id="bagAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${bag.value}" />
+            <input id="bagAddTC${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${bag.value}" />
+            <input id="lblAddTCItem${idUpdateItemMsg}_${totalItemTC}" hidden type=text value="${lbl}" />
+          </div>
+          `
+      }
+      // setTitleAddSC(title)
+      // setGroupAddSC(group.value)
+      // setBagAddSC(bag.value)
+      if (totalItemTC == 3) {
+        document.getElementById(`itemTC${idUpdateItemMsg}_${totalItemTC}`).style.border = "none"
+      }
+
+      document.getElementById(`msgChoice${idUpdateItemMsg}`).style.display = "none"
+      document.getElementById(`choiceThree${idUpdateItemMsg}`).innerHTML =
+        `
+        <div>
+          <button style="background-color:white; border:none; border-radius:10px" id="tCAddItem${idUpdateItemMsg}">Add an option</button>
+          <input id="totalItemTC${idUpdateItemMsg}" type="number" value=${totalItemTC} hidden />
+        </div>
+      `
+      if (totalItemTC <= 2) {
+        document.getElementById(`choiceThree${idUpdateItemMsg}`).style.display = "block"
+      } else {
+        document.getElementById(`choiceThree${idUpdateItemMsg}`).style.display = "none"
+      }
+      document.getElementById(`tCAddItem${idUpdateItemMsg}`).addEventListener('click', (e) => {
+        e.preventDefault()
+        setIsUpdateOpenThreeChoice(true)
+        setTotalItemTC(totalItemTC + 1)
+      })
+      setIsUpdateOpenThreeChoice(false)
+      setLabelInputTCAll("")
+    }
+  }
+
+
+  function saveUpFI() {
+    // var group = document.getElementById('listNextMSGGroupFI')
+    // var bag = document.getElementById('listNextMSGBagFI')
+    var formatCheckSelect = document.getElementById('formatCheckSelect')
+    var lblas = document.getElementById(`labelLFIAll_${labelInputFINum}`).value
+    var formatcheck = document.getElementById('formatCheckFIValue').value
+    console.log(`lblas: `, formatCheckSelect.value)
+
+
+    // if (group.value == "") {
+    //   document.getElementById("grBagFI").style.display = "block"
+    //   document.getElementById("grBagFI").innerHTML = "Please choose group"
+    // } else {
+    //   if (bag.value == "") {
+    //     document.getElementById("grBagFI").style.display = "block"
+    //     document.getElementById("grBagFI").innerHTML = "Please choose bag"
+    //   } else {
+    //     document.getElementById("grBagFI").style.display = "none"
+    //     document.getElementById("grBagFI").innerHTML = ""
+    //   }
+    // }
+
+    if (formatCheckSelect != "") {
+      // setTitleAddSC(title)
+      // setGroupAddSC(group.value)
+      // setBagAddSC(bag.value)
+      var abc = document.createElement("div")
+      document.getElementById(`choiceOption${idUpdateItemMsg}`).appendChild(abc)
+      abc.innerHTML =
+        `
+      <div style="border:none; border-radius:10px; background-color:white; width:max-content; text-align:center">
+        <div style="padding:0px 5px 10px 5px">Format check: ${formatCheckSelect.value}</div>
+
+        <input id="lblAddFI${idUpdateItemMsg}_${bagAddSC}" hidden type=text value="${lblas}" />
+        <input id="formatCheckSelect${idUpdateItemMsg}" hidden type=text value="${formatCheckSelect.value}" />
+        <input id="formatCheckMSG${idUpdateItemMsg}" hidden type=text value="${formatcheck}" />
+      </div>
+      `
+
+      // <input id="groupAddFI${idSC}" hidden type=text value=${group.value} />
+      // <input id="bagAddFI${idSC}" hidden type=text value=${bag.value} />
+
+
+      document.getElementById(`msgChoice${idUpdateItemMsg}`).style.display = "none"
+      setIsUpdateOpenFreeInput(false)
+      setLabelInputFIAll("")
+    }
+  }
+
+  function saveFI() {
+    // var group = document.getElementById('listNextMSGGroupFI')
+    // var bag = document.getElementById('listNextMSGBagFI')
+    var formatCheckSelect = document.getElementById('formatCheckSelect')
+    var lblas = document.getElementById(`labelLFIAll_${labelInputFINum}`).value
+    var formatcheck = document.getElementById('formatCheckFIValue').value
+    console.log(`lblas: `, formatCheckSelect.value)
+
+
+    // if (group.value == "") {
+    //   document.getElementById("grBagFI").style.display = "block"
+    //   document.getElementById("grBagFI").innerHTML = "Please choose group"
+    // } else {
+    //   if (bag.value == "") {
+    //     document.getElementById("grBagFI").style.display = "block"
+    //     document.getElementById("grBagFI").innerHTML = "Please choose bag"
+    //   } else {
+    //     document.getElementById("grBagFI").style.display = "none"
+    //     document.getElementById("grBagFI").innerHTML = ""
+    //   }
+    // }
+
+    if (formatCheckSelect != "") {
+      // setTitleAddSC(title)
+      // setGroupAddSC(group.value)
+      // setBagAddSC(bag.value)
+      var abc = document.createElement("div")
+      document.getElementById(`choiceOption${idSC}`).appendChild(abc)
+      abc.innerHTML =
+        `
+      <div style="border:none; border-radius:10px; background-color:white; width:max-content; text-align:center">
+        <div style="padding:0px 5px 10px 5px">Format check: ${formatCheckSelect.value}</div>
+
+        <input id="lblAddFI${idSC}_${bagAddSC}" hidden type=text value="${lblas}" />
+        <input id="formatCheckSelect${idSC}" hidden type=text value=${formatCheckSelect.value} />
+        <input id="formatCheckMSG${idSC}" hidden type=text value="${formatcheck}" />
+      </div>
+      `
+
+      // <input id="groupAddFI${idSC}" hidden type=text value=${group.value} />
+      // <input id="bagAddFI${idSC}" hidden type=text value=${bag.value} />
+
+
+      document.getElementById(`msgChoice${idSC}`).style.display = "none"
+      setIsAddOpenFreeInput(false)
+      setLabelInputFIAll("")
+    }
+  }
+
+
+
+
+  function checkFieldAddGroup(value) {
+    if (value === '') {
+      document.getElementById(`newChatbotErrMsg`).style.display = 'block'
+      document.getElementById(`newChatbotErrMsg`).innerHTML = `This field cannot be empty`
+      document.getElementById(`btnAddGroup`).disabled = true
+
+
+    } else if (value.length > 30) {
+      document.getElementById(`newChatbotErrMsg`).style.display = 'block'
+      document.getElementById(`newChatbotErrMsg`).innerHTML = `Maximum 30 characters`
+      document.getElementById(`btnAddGroup`).disabled = true
+    } else {
+      document.getElementById(`newChatbotErrMsg`).style.display = 'none'
+      document.getElementById(`newChatbotErrMsg`).innerHTML = ""
+      document.getElementById(`btnAddGroup`).disabled = false
+      return true
+    }
+  }
+
+  function checkFieldAddBag(value) {
+    if (value === '') {
+      document.getElementById(`newMsgBagErrMsg`).style.display = 'block'
+      document.getElementById(`newMsgBagErrMsg`).innerHTML = `This field cannot be empty`
+      document.getElementById(`btnAddBag`).disabled = true
+
+
+    } else if (value.length > 30) {
+      document.getElementById(`newMsgBagErrMsg`).style.display = 'block'
+      document.getElementById(`newMsgBagErrMsg`).innerHTML = `Maximum 30 characters`
+      document.getElementById(`btnAddBag`).disabled = true
+    } else {
+      document.getElementById(`newMsgBagErrMsg`).style.display = 'none'
+      document.getElementById(`newMsgBagErrMsg`).innerHTML = ""
+      document.getElementById(`btnAddBag`).disabled = false
+      return true
+    }
+  }
+
 
   return (
     <>
@@ -2638,7 +6133,7 @@ function Chatbot() {
                           <div style={{ width: "35%" }}>
                             <h5 id="jjjj">メッセージグループ</h5>
                             <div>
-                              <Button style={{ fontSize: "10px", marginTop: "-4%", padding:"10px" }} onClick={() => setIsOpenAddChatbot(true)}>グループ追加</Button><br />
+                              <Button style={{ fontSize: "10px", marginTop: "-4%", padding: "10px" }} onClick={() => setIsOpenAddChatbot(true)}>グループ追加</Button><br />
                               <Nav className="sidebar-wrapper">
                                 <ul style={{ listStyleType: "none", width: "100%" }}>
                                   {itemGroup.map((data, key) => {
@@ -2765,20 +6260,20 @@ function Chatbot() {
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
             <h4>グループ名入力</h4>
             <label style={{ width: "100%" }}>
-              <input id="new_chatbot" style={{ width: "100%" }} onBlur={(e) => utils.checkFieldAdd(e.target.value, "Chatbot")} name="chatbot_name"></input>
+              <input id="new_chatbot" style={{ width: "100%" }} onChange={(e) => checkFieldAddGroup(e.target.value)} name="chatbot_name"></input>
               <label id="newChatbotErrMsg" style={{ display: 'none', color: "red" }}></label>
             </label><br />
-            <Button onClick={() => addChatBot()}>グループ追加</Button>
+            <Button id="btnAddGroup" onClick={() => addChatBot()}>グループ追加</Button>
           </div>
         </ModalShort>
         <ModalShort open={isOpenAddMsgBag} onClose={() => setIsOpenAddMsgBag(false)}>
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
             <h4>メッセージ袋名入力</h4>
             <label style={{ width: "100%" }}>
-              <input id="new_bag" style={{ width: "100%" }} onBlur={(e) => utils.checkFieldAdd(e.target.value, "MsgBag")} name="chatbot_name"></input>
+              <input id="new_bag" style={{ width: "100%" }} onChange={(e) => checkFieldAddBag(e.target.value)} name="chatbot_name"></input>
               <label id="newMsgBagErrMsg" style={{ display: 'none', color: "red" }}></label>
             </label><br />
-            <Button onClick={() => addMagBag()}>メッセージ袋追加</Button>
+            <Button id="btnAddBag" onClick={() => addMagBag()}>メッセージ袋追加</Button>
           </div>
         </ModalShort>
         <ModalShort open={isOpenRenameMsgBag} onClose={() => setIsOpenRenameMsgBag(false)}>
@@ -2860,7 +6355,336 @@ function Chatbot() {
 
           </div>
         </Modal>
+        {/* *******************************Single choice */}
+        <ModalShort open={isAddOpenSingleChoice} onClose={() => setIsAddOpenSingleChoice(false)}>
+          <div style={{ width: "600px", height: "370px" }}>
+            <div style={{ padding: "15px", width: "100%" }}>
+              <input id="titleNextMSG" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }} onChange={() => checkInputTitleSC()} placeholder="Title..."></input>
+              <label id="titleSC" style={{ color: "red", display: "none" }}>Please input title</label>
+            </div><br />
+            <span style={{ padding: "15px" }}>Destination</span>
+            <br />
+            <div style={{ display: "flex", width: "100%" }}>
+              <div onClick={() => displaySCNextMSG()} style={{ width: "45%", margin: "auto" }}>
+                <div><span style={{ float: "right", fontSize: "18px", fontWeight: "500" }}>Next message</span></div>
+              </div>
+              <div onClick={() => displaySCWebsite()} style={{ width: "45%", margin: "auto" }}><span style={{ float: "left", fontSize: "18px", fontWeight: "500" }}>Website</span></div>
+            </div>
+            <div style={{ display: "flex", width: "100%" }}>
+              <div style={{ width: "45%", margin: "auto" }}>
+                <div id="underlineSCNextMsg" style={{ height: "2px", width: "45%", backgroundColor: "black", float: "right" }}></div>
+              </div>
+              <div style={{ width: "45%", margin: "auto" }}>
+                <div id="underlineSCWebsite" style={{ height: "2px", width: "45%", backgroundColor: "black", display: "none" }}></div>
+              </div>
+            </div>
+            <br />
+            <div id={`nextMessageSC`} style={{ textAlign: "center" }}>
+              <select id="listNextMSGGroupSC" style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectGroupNextMSG(e.target.value)} className="new-faq-q-so1" name="reply_group">
+                <option value="" disabled hidden>メッセージグループ選択 ...</option>
+                {groupList?.map((group, i) => {
+                  return (
+                    <option key={i} value={group.id}>
+                      {group.group_name}
+                    </option>
+                  )
+                })}
+              </select>
+              <select id={`listNextMSGBagSC`} style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectBagNextMSG(e.target.value)} className="new-faq-q-so1" name="reply_bag">
+                <option value="" disabled hidden>{ }</option>
+              </select>
+            </div>
+            <label id="grBagSC" style={{ color: "red", display: "none", width: "100%", textAlign: "center" }}></label>
+            <div id={`websiteURLSC`} style={{ padding: "15px", display: "none" }}>
+              <input id="websiteSC" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }}></input>
+              <label id="webSC" style={{ color: "red", display: "none" }}>Please input web</label>
+            </div>
+            <br />
+            <span>Label</span>
+            <div id={`labelSC`} style={{ padding: "15px 15px 0px 15px", display: "none", display: "flex" }}>
+              <div id="labelLSCInputed" style={{ display: "flex" }}></div>
+              <input id="labelLSC" onKeyPress={(e) => checkInputedLabelSC(e, e.target.value)} style={{ width: "100%", border: "none" }}></input>
+              <input id={`lblSCAddALL_${bagAddSC}`} defaultValue={labelInputSCAll} type="text" hidden></input>
+            </div>
+            <div id="underlineSCWebsite" style={{ height: "1px", width: "100%", backgroundColor: "black" }}></div>
+            <label id="labeltoCheckInputLabelSC">Enter label to add</label>
+            <br />
+            <div style={{ width: "100%", textAlign: "center" }}><Button onClick={() => saveSC()}>Save</Button></div>
+          </div>
+        </ModalShort>
+        {/* ********************************Update Single choice */}
+        <ModalShort open={isUpdateOpenSingleChoice} onClose={() => setIsUpdateOpenSingleChoice(false)}>
+          <div style={{ width: "600px", height: "370px" }}>
+            <div style={{ padding: "15px", width: "100%" }}>
+              <input id="titleNextMSG" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }} onChange={() => checkInputTitleSC()} placeholder="Title..."></input>
+              <label id="titleSC" style={{ color: "red", display: "none" }}>Please input title</label>
+            </div><br />
+            <span style={{ padding: "15px" }}>Destination</span>
+            <br />
+            <div style={{ display: "flex", width: "100%" }}>
+              <div onClick={() => displaySCNextMSG()} style={{ width: "45%", margin: "auto" }}>
+                <div><span style={{ float: "right", fontSize: "18px", fontWeight: "500" }}>Next message</span></div>
+              </div>
+              <div onClick={() => displaySCWebsite()} style={{ width: "45%", margin: "auto" }}><span style={{ float: "left", fontSize: "18px", fontWeight: "500" }}>Website</span></div>
+            </div>
+            <div style={{ display: "flex", width: "100%" }}>
+              <div style={{ width: "45%", margin: "auto" }}>
+                <div id="underlineSCNextMsg" style={{ height: "2px", width: "45%", backgroundColor: "black", float: "right" }}></div>
+              </div>
+              <div style={{ width: "45%", margin: "auto" }}>
+                <div id="underlineSCWebsite" style={{ height: "2px", width: "45%", backgroundColor: "black", display: "none" }}></div>
+              </div>
+            </div>
+            <br />
+            <div id={`nextMessageSC`} style={{ textAlign: "center" }}>
+              <select id="listNextMSGGroupSC" style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectGroupNextMSG(e.target.value)} className="new-faq-q-so1" name="reply_group">
+                <option value="" disabled hidden>メッセージグループ選択 ...</option>
+                {groupList?.map((group, i) => {
+                  return (
+                    <option key={i} value={group.id}>
+                      {group.group_name}
+                    </option>
+                  )
+                })}
+              </select>
+              <select id={`listNextMSGBagSC`} style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectBagNextMSG(e.target.value)} className="new-faq-q-so1" name="reply_bag">
+                <option value="" disabled hidden>{ }</option>
+              </select>
+            </div>
+            <label id="grBagSC" style={{ color: "red", display: "none", width: "100%", textAlign: "center" }}></label>
+            <div id={`websiteURLSC`} style={{ padding: "15px", display: "none" }}>
+              <input id="websiteSC" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }}></input>
+              <label id="webSC" style={{ color: "red", display: "none" }}>Please input web</label>
+            </div>
+            <br />
+            <span>Label</span>
+            <div id={`labelSC`} style={{ padding: "15px 15px 0px 15px", display: "none", display: "flex" }}>
+              <div id="labelLSCInputed" style={{ display: "flex" }}></div>
+              <input id="labelLSC" onKeyPress={(e) => checkInputedLabelSC(e, e.target.value)} style={{ width: "100%", border: "none" }}></input>
+              <input id={`lblSCAddALL_${bagAddSC}`} defaultValue={labelInputSCAll} type="text" hidden></input>
+            </div>
+            <div id="underlineSCWebsite" style={{ height: "1px", width: "100%", backgroundColor: "black" }}></div>
+            <label id="labeltoCheckInputLabelSC">Enter label to add</label>
+            <br />
+            <div style={{ width: "100%", textAlign: "center" }}><Button onClick={() => saveUpSC()}>Save</Button></div>
+          </div>
+        </ModalShort>
+        {/* Three Choice ********************************/}
+        <ModalShort open={isAddOpenThreeChoice} onClose={() => setIsAddOpenThreeChoice(false)}>
+          <div style={{ width: "600px", height: "370px" }}>
+            <div style={{ padding: "15px", width: "100%" }}>
+              <input id="titleNextMSGTC" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }} onChange={() => checkInputTitleTC()} placeholder="Title..."></input>
+              <label id="titleTC" style={{ color: "red", display: "none" }}>Please input title</label>
+            </div><br />
+            <span style={{ padding: "15px" }}>Destination</span>
+            <br />
+            <div style={{ display: "flex", width: "100%" }}>
+              <div onClick={() => displayTCNextMSG()} style={{ width: "45%", margin: "auto" }}>
+                <div><span style={{ float: "right", fontSize: "18px", fontWeight: "500" }}>Next message</span></div>
+              </div>
+              <div onClick={() => displayTCWebsite()} style={{ width: "45%", margin: "auto" }}><span style={{ float: "left", fontSize: "18px", fontWeight: "500" }}>Website</span></div>
+            </div>
+            <div style={{ display: "flex", width: "100%" }}>
+              <div style={{ width: "45%", margin: "auto" }}>
+                <div id="underlineTCNextMsg" style={{ height: "2px", width: "45%", backgroundColor: "black", float: "right", display: "block" }}></div>
+              </div>
+              <div style={{ width: "45%", margin: "auto" }}>
+                <div id="underlineTCWebsite" style={{ height: "2px", width: "45%", backgroundColor: "black", display: "none" }}></div>
+              </div>
+            </div>
+            <br />
+            <div id={`nextMessageTC`} style={{ textAlign: "center" }}>
+              <select id="listNextMSGGroupTC" style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectGroupNextMSGTC(e.target.value)} className="new-faq-q-so1" name="reply_group">
+                <option value="" disabled hidden>メッセージグループ選択 ...</option>
+                {groupList?.map((group, i) => {
+                  return (
+                    <option key={i} value={group.id}>
+                      {group.group_name}
+                    </option>
+                  )
+                })}
+              </select>
+              <select id={`listNextMSGBagTC`} style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectBagNextMSGTC(e.target.value)} className="new-faq-q-so1" name="reply_bag">
+                <option value="" disabled hidden>{ }</option>
+              </select>
+            </div>
+            <label id="grBagTC" style={{ color: "red", display: "none", width: "100%", textAlign: "center" }}></label>
+            <div id={`websiteURLTC`} style={{ padding: "15px", display: "none" }}>
+              <input id="websiteTC" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }}></input>
+              <label id="webTC" style={{ color: "red", display: "none" }}>Please input web</label>
+            </div>
+            <br />
+            <span>Label</span>
+            <div id={`labelSC`} style={{ padding: "15px 15px 0px 15px", display: "none", display: "flex" }}>
+              <div id="labelLTCInputed" style={{ display: "flex" }}></div>
+              <input id="labelLTC" onKeyPress={(e) => checkInputedLabelTC(e, e.target.value)} style={{ width: "100%", border: "none" }}></input>
+              <input id={`lblTCAddALL_${totalItemTC}`} defaultValue={labelInputTCAll} type="text" hidden></input>
+            </div>
+            <div id="underlineTCWebsite" style={{ height: "1px", width: "100%", backgroundColor: "black" }}></div>
+            <label id="labeltoCheckInputLabelTC">Enter label to add</label>
+            <br />
+            <div style={{ width: "100%", textAlign: "center" }}><Button onClick={() => saveTC()}>Save</Button></div>
+          </div>
+        </ModalShort>
+        {/* ***********************************Update Three choice */}
+        <ModalShort open={isUpdateOpenThreeChoice} onClose={() => setIsUpdateOpenThreeChoice(false)}>
+          <div style={{ width: "600px", height: "370px" }}>
+            <div style={{ padding: "15px", width: "100%" }}>
+              <input id="titleNextMSGTC" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }} onChange={() => checkInputTitleTC()} placeholder="Title..."></input>
+              <label id="titleTC" style={{ color: "red", display: "none" }}>Please input title</label>
+            </div><br />
+            <span style={{ padding: "15px" }}>Destination</span>
+            <br />
+            <div style={{ display: "flex", width: "100%" }}>
+              <div onClick={() => displayTCNextMSG()} style={{ width: "45%", margin: "auto" }}>
+                <div><span style={{ float: "right", fontSize: "18px", fontWeight: "500" }}>Next message</span></div>
+              </div>
+              <div onClick={() => displayTCWebsite()} style={{ width: "45%", margin: "auto" }}><span style={{ float: "left", fontSize: "18px", fontWeight: "500" }}>Website</span></div>
+            </div>
+            <div style={{ display: "flex", width: "100%" }}>
+              <div style={{ width: "45%", margin: "auto" }}>
+                <div id="underlineTCNextMsg" style={{ height: "2px", width: "45%", backgroundColor: "black", float: "right", display: "block" }}></div>
+              </div>
+              <div style={{ width: "45%", margin: "auto" }}>
+                <div id="underlineTCWebsite" style={{ height: "2px", width: "45%", backgroundColor: "black", display: "none" }}></div>
+              </div>
+            </div>
+            <br />
+            <div id={`nextMessageTC`} style={{ textAlign: "center" }}>
+              <select id="listNextMSGGroupTC" style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectGroupNextMSGTC(e.target.value)} className="new-faq-q-so1" name="reply_group">
+                <option value="" disabled hidden>メッセージグループ選択 ...</option>
+                {groupList?.map((group, i) => {
+                  return (
+                    <option key={i} value={group.id}>
+                      {group.group_name}
+                    </option>
+                  )
+                })}
+              </select>
+              <select id={`listNextMSGBagTC`} style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectBagNextMSGTC(e.target.value)} className="new-faq-q-so1" name="reply_bag">
+                <option value="" disabled hidden>{ }</option>
+              </select>
+            </div>
+            <label id="grBagTC" style={{ color: "red", display: "none", width: "100%", textAlign: "center" }}></label>
+            <div id={`websiteURLTC`} style={{ padding: "15px", display: "none" }}>
+              <input id="websiteTC" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }}></input>
+              <label id="webTC" style={{ color: "red", display: "none" }}>Please input web</label>
+            </div>
+            <br />
+            <span>Label</span>
+            <div id={`labelSC`} style={{ padding: "15px 15px 0px 15px", display: "none", display: "flex" }}>
+              <div id="labelLTCInputed" style={{ display: "flex" }}></div>
+              <input id="labelLTC" onKeyPress={(e) => checkInputedLabelTC(e, e.target.value)} style={{ width: "100%", border: "none" }}></input>
+              <input id={`lblTCAddALL_${totalItemTC}`} defaultValue={labelInputTCAll} type="text" hidden></input>
+            </div>
+            <div id="underlineTCWebsite" style={{ height: "1px", width: "100%", backgroundColor: "black" }}></div>
+            <label id="labeltoCheckInputLabelTC">Enter label to add</label>
+            <br />
+            <div style={{ width: "100%", textAlign: "center" }}><Button onClick={() => saveUpTC()}>Save</Button></div>
+          </div>
+        </ModalShort>
+        {/* Free Input *********************************************** */}
+        <ModalShort open={isAddOpenFreeInput} onClose={() => setIsAddOpenFreeInput(false)}>
+          <div style={{ width: "600px", height: "370px" }}>
 
+            {/* <span style={{ padding: "15 0px 15px 0px" }}>Transitive Destination</span>
+            <br />
+            <div id={`nextMessageFI`} style={{ textAlign: "center" }}>
+              <select id="listNextMSGGroupFI" style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectGroupNextMSGFI(e.target.value)} className="new-faq-q-so1" name="reply_group">
+                <option value="" disabled hidden>メッセージグループ選択 ...</option>
+                {groupList?.map((group, i) => {
+                  return (
+                    <option key={i} value={group.id}>
+                      {group.group_name}
+                    </option>
+                  )
+                })}
+              </select>
+              <select id={`listNextMSGBagFI`} style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectBagNextMSGFI(e.target.value)} className="new-faq-q-so1" name="reply_bag">
+                <option value="" disabled hidden>{ }</option>
+              </select>
+            </div> */}
+            <label id="grBagFI" style={{ color: "red", display: "none", width: "100%", textAlign: "center" }}></label>
+            <div id={`websiteURLFI`} style={{ padding: "15px", display: "none" }}>
+              <input id="websiteFI" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }}></input>
+            </div>
+            <br />
+            <span>Label</span>
+            <div id={`labelSC`} style={{ padding: "15px 15px 0px 15px", display: "flex" }}>
+              <div id="labelLFIInputed" style={{ display: "flex" }}></div>
+              <input id="labelLFI" onKeyPress={(e) => checkInputedLabelFI(e, e.target.value)} style={{ width: "100%", border: "none" }}></input>
+              <input id={`labelLFIAll_${labelInputFINum}`} defaultValue={labelInputFIAll} type="text" hidden></input>
+            </div>
+            <div id="underlineFIWebsite" style={{ height: "1px", width: "100%", backgroundColor: "black" }}></div>
+            <label id="labeltoCheckInputLabelFI">Enter label to add</label>
+            <br />
+            <span>Format Check</span>
+            <div id={`formatCheck`} style={{ padding: "15px 15px 0px 15px", display: "none", display: "flex" }}>
+              <div style={{ display: "flex" }}></div>
+              <select id="formatCheckSelect" style={{ width: "95%" }} defaultValue={"none"} onChange={(e) => selectFormatCheck(e.target.value)} className="new-faq-q-so1" name="format_check">
+                <option value="no_validate">No Validation</option>
+                <option value="email">Email Address</option>
+                <option value="phone_number">Phone Number</option>
+              </select>
+            </div>
+            <div id="formatCheckFI" style={{ display: "none", padding: "0px 15px 0px 15px", textAlign: "center" }}>
+              <label style={{ width: "100%", textAlign: "center" }}>Input error format message</label>
+              <input id="formatCheckFIValue" style={{ width: "95%", margin: "auto", marginLeft: "-5px", border: "1px solid black", borderRadius: "10px" }} type="text"></input>
+            </div>
+            <div style={{ width: "100%", textAlign: "center" }}><Button onClick={() => saveFI()}>Save</Button></div>
+          </div>
+        </ModalShort>
+        {/* Update Free Input *********************************************** */}
+        <ModalShort open={isUpdateOpenFreeInput} onClose={() => setIsUpdateOpenFreeInput(false)}>
+          <div style={{ width: "600px", height: "370px" }}>
+
+            {/* <span style={{ padding: "15 0px 15px 0px" }}>Transitive Destination</span>
+            <br />
+            <div id={`nextMessageFI`} style={{ textAlign: "center" }}>
+              <select id="listNextMSGGroupFI" style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectGroupNextMSGFI(e.target.value)} className="new-faq-q-so1" name="reply_group">
+                <option value="" disabled hidden>メッセージグループ選択 ...</option>
+                {groupList?.map((group, i) => {
+                  return (
+                    <option key={i} value={group.id}>
+                      {group.group_name}
+                    </option>
+                  )
+                })}
+              </select>
+              <select id={`listNextMSGBagFI`} style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectBagNextMSGFI(e.target.value)} className="new-faq-q-so1" name="reply_bag">
+                <option value="" disabled hidden>{ }</option>
+              </select>
+            </div> */}
+            <label id="grBagFI" style={{ color: "red", display: "none", width: "100%", textAlign: "center" }}></label>
+            <div id={`websiteURLFI`} style={{ padding: "15px", display: "none" }}>
+              <input id="websiteFI" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }}></input>
+            </div>
+            <br />
+            <span>Label</span>
+            <div id={`labelSC`} style={{ padding: "15px 15px 0px 15px", display: "flex" }}>
+              <div id="labelLFIInputed" style={{ display: "flex" }}></div>
+              <input id="labelLFI" onKeyPress={(e) => checkInputedLabelFI(e, e.target.value)} style={{ width: "100%", border: "none" }}></input>
+              <input id={`labelLFIAll_${labelInputFINum}`} defaultValue={labelInputFIAll} type="text" hidden></input>
+            </div>
+            <div id="underlineFIWebsite" style={{ height: "1px", width: "100%", backgroundColor: "black" }}></div>
+            <label id="labeltoCheckInputLabelFI">Enter label to add</label>
+            <br />
+            <span>Format Check</span>
+            <div id={`formatCheck`} style={{ padding: "15px 15px 0px 15px", display: "none", display: "flex" }}>
+              <div style={{ display: "flex" }}></div>
+              <select id="formatCheckSelect" style={{ width: "95%" }} defaultValue={"none"} onChange={(e) => selectFormatCheck(e.target.value)} className="new-faq-q-so1" name="format_check">
+                <option value="no_validate">No Validation</option>
+                <option value="email">Email Address</option>
+                <option value="phone_number">Phone Number</option>
+              </select>
+            </div>
+            <div id="formatCheckFI" style={{ display: "none", padding: "0px 15px 0px 15px", textAlign: "center" }}>
+              <label style={{ width: "100%", textAlign: "center" }}>Input error format message</label>
+              <input id="formatCheckFIValue" style={{ width: "95%", margin: "auto", marginLeft: "-5px", border: "1px solid black", borderRadius: "10px" }} type="text"></input>
+            </div>
+            <div style={{ width: "100%", textAlign: "center" }}><Button onClick={() => saveUpFI()}>Save</Button></div>
+          </div>
+        </ModalShort>
       </div>
     </>
   );

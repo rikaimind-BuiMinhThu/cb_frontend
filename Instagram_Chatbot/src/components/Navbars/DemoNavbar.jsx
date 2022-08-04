@@ -92,6 +92,7 @@ function Header(props) {
   }, [location]);
   const logout = () =>{
     Cookies.remove('token')
+    Cookies.remove('user_role')
     window.location.href ='/'
     // window.location.href ='/'
   }
