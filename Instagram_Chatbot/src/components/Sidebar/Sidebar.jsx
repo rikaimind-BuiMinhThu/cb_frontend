@@ -4,10 +4,26 @@ import { Nav, NavbarToggler } from "reactstrap";
 // javascript plugin used to create scrollbars on windows
 import PerfectScrollbar from "perfect-scrollbar";
 import logo from "./logoEC.jpg";
+import Cookies from 'js-cookie'
 
 var ps;
 
 function Sidebar(props) {
+
+  React.useEffect(() => {
+    var cook = Cookies.get("user_role")
+    if (cook == "admin_deel") {
+
+    } else if (cook == "admin_client") {
+      document.getElementById("sidebarClient").style.display = "none"
+      // var elem = document.getElementById('sidebarClient');
+      // elem.parentNode.removeChild(elem);
+    } else if (cook == "client") {
+      document.getElementById("sidebarClient").style.display = "none"
+      document.getElementById("sidebarUser").style.display = "none"
+    }
+  })
+
   const sidebar = React.useRef();
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
@@ -55,20 +71,20 @@ function Sidebar(props) {
                 <p>ホーム</p>
               </NavLink>
             </li>
-            <li className={activeRoute('client-management') + (true ? " active-pro" : "")} key={'client-management'}>
+            <li id="sidebarClient" className={activeRoute('client-management') + (true ? " active-pro" : "")} key={'client-management'}>
               <NavLink to="client-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-badge" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>クライアント管理</p>
               </NavLink>
             </li>
-            <li className={activeRoute('user-management') + (true ? " active-pro" : "")} key={'user-management'}>
+            <li id="sidebarUser" className={activeRoute('user-management') + (true ? " active-pro" : "")} key={'user-management'}>
               <NavLink to="user-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-circle-10" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>ユーザー管理
                 </p>
               </NavLink>
             </li>
-            
+
             <li className={activeRoute('chatbot') + (true ? " active-pro" : "")} key={'notifications'}>
               <NavLink to="chatbot" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-atom" style={{ color: "black" }} />
@@ -95,7 +111,7 @@ function Sidebar(props) {
                 <i className="nc-icon nc-single-02" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>データ分析{'>'}</p>
               </NavLink>
-              <ul id="userDropdown" style={{ display: "none",marginLeft:"-30px" }}>
+              <ul id="userDropdown" style={{ display: "none", marginLeft: "-30px" }}>
                 <li className={activeRoute('data-analyst') + (true ? " active-pro" : "")} key={'profile'}>
                   <NavLink to="data-analyst" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-bulb-63" style={{ color: "black" }} />

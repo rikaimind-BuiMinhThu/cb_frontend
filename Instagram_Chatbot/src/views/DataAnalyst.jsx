@@ -4,7 +4,7 @@ import { Card, CardHeader, CardBody, Row, Col, Table } from "reactstrap";
 import { Line } from "react-chartjs-2";
 import CanvasJSReact from '../components/canvasjs-3.6.6/canvasjs.react';
 import { VictoryPie } from "victory-pie";
-import { AgChartsReact } from "ag-charts-react";
+// import { AgChartsReact } from "ag-charts-react";
 import api from '../api/api-management'
 import ReactApexChart from 'react-apexcharts';
 import "../assets/css/general.css";
@@ -82,7 +82,7 @@ function DataAnalyst() {
     let year = d.getFullYear();
     // alert(year)
     api.get(`/api/v1/analytics/chatbot_usages/live?date=5d`).then(res => {
-      // console.log("live analytics: ", res.data.live_usages)
+      console.log("live analytics: ", res.data.live_usages)
       setLiveData(res.data.live_usages)
     }).catch(error => {
       console.log(error)
@@ -284,10 +284,12 @@ function DataAnalyst() {
   }
 
   const headers = [
-    { label: "ライブ日", key: "media_start_at" },
-    { label: "ユーザー数", key: "user_count" },
-    { label: "コメント数", key: "comment_count" },
-    { label: "コメント内容", key: "comment_lives" }
+    { label: "media_start_at", key: "media_start_at" },
+    { label: "user_count", key: "user_count" },
+    { label: "comment_count", key: "comment_count" },
+    { label: "user_comment", key: "user_comment" },
+    { label: "comment_lives", key: "comment_lives" },
+    { label: "time_comment", key: "time_comment" }
   ];
 
   const [dataEx, setDataEx] = useState([])
@@ -299,7 +301,9 @@ function DataAnalyst() {
         media_start_at: it.media_start_at,
         user_count: it.user_count,
         comment_count: it.comment_count,
-        comment_lives: it.comment_lives[0]
+        user_comment:it.comment_lives[0].full_name,
+        comment_lives : it.comment_lives[0].content,
+        time_comment : (it.comment_lives[0].created_at).slice(0, 19).replaceAll("-","/").replaceAll("T"," ")
       })
       for (var i = 1; i < it.comment_lives.length; i++) {
         const cm_live = it.comment_lives[i]
@@ -307,11 +311,14 @@ function DataAnalyst() {
           media_start_at: "",
           user_count: "",
           comment_count: "",
-          comment_lives: cm_live
+          user_comment: cm_live.full_name,
+          comment_lives: cm_live.content,
+          time_comment: (cm_live.created_at).slice(0, 19).replaceAll("-","/").replaceAll("T"," ")
+        // })
         })
       }
     })
-
+    console.log(data)
     // var datae = [item]
     setDataEx(data)
   }

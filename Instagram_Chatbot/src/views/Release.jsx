@@ -883,9 +883,29 @@ function Release() {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/ice_breakers`).then(res => {
       // console.log('ice_breakers: ', res.data.data)
-      setListFAQ(res.data.data)
-      console.log("faq item: ", res.data.data.length)
-      // console.log("faq data: ", res.data.data.length)
+      // setListFAQ(res.data.data)
+
+      var faw_item = res.data.data
+      var bag_name = []
+      // console.log("faq item: ", faw_item)
+      for (var i = 0; i < res.data.data.length; i++) {
+        api.get(`/api/v1/message_managements/message_bags/${res.data.data[i].message_bag_id}`).then(ress => {
+          // console.log("bag_name: ", ress.data.data.message_bag.bag_name)
+          bag_name.push(ress.data.data.message_bag.bag_name)
+
+        }).catch(error => {
+          console.log(error)
+        })
+      }
+      setTimeout(() => {
+        for (var i = 0; i < res.data.data.length; i++) {
+          faw_item[i].msg_bag_name = bag_name[i]
+        }
+        setListFAQ(faw_item)
+        // console.log("faq data: ", faw_item)
+      }, 2000)
+
+
       // var faqLength = res.data.data.length
       // if (faqLength >= 4) {
       //   // alert("too much")
@@ -933,8 +953,39 @@ function Release() {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/persistent_menus`).then(res => {
       // console.log('persistent_menus: ', res.data.data)
+      var fm_item = res.data.data
+      var bag_name = []
 
-      setListFixedMenu(res.data.data)
+      for (var i = 0; i < res.data.data.length; i++) {
+        api.get(`/api/v1/message_managements/message_bags/${res.data.data[i].message_bag_id}`).then(ress => {
+          console.log("bag_name: ", ress.data)
+          if(ress.data.code ==1){
+            bag_name.push(ress.data.data.message_bag.bag_name)
+            document.getElementById(`listGroupFixedMenu${ress.data.data.message_bag.id}`).style.display="block"
+            document.getElementById(`listBagFixedMenu${ress.data.data.message_bag.id}`).style.display="block"
+            document.getElementById(`answer-${ress.data.data.message_bag.id}`).style.display="none"
+          }else if(ress.data.code ==2){
+            bag_name.push("")
+            document.getElementById(`listGroupFixedMenu${ress.data.data.message_bag.id}`).style.display="none"
+            document.getElementById(`listBagFixedMenu${ress.data.data.message_bag.id}`).style.display="none"
+            document.getElementById(`answer-${ress.data.data.message_bag.id}`).style.display="block"
+          }
+        }).catch(error => {
+          console.log(error)
+        })
+      }
+
+      setTimeout(() => {
+        for (var i = 0; i < res.data.data.length; i++) {
+          fm_item[i].msg_bag_name = bag_name[i]
+        }
+        setListFixedMenu(fm_item)
+        console.log("faq data: ", fm_item)
+      }, 2000)
+
+
+      // setListFixedMenu(res.data.data)
+
     }).catch(error => {
       console.log(error)
       // if (error.response.data.code === 3) {
@@ -949,7 +1000,7 @@ function Release() {
     if (fixed !== undefined)
       for (var i = 0; i < fixed.length; i++) {
         var num = fixed[i].id
-        if (fixed[i].payload == null || fixed[i].payload == '') {
+        if (fixed[i].message_bag_id == null || fixed[i].message_bag_id == '') {
           document.getElementById(`fixed-mnl-type${num}`).value = "website"
           document.getElementById(`anw-mnl-type${num}`).value = fixed[i].url
           setFixedOp("website")
@@ -967,7 +1018,26 @@ function Release() {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/ice_breakers`).then(res => {
       // console.log('ice_breakers: ', res.data.data)
-      setListFAQ(res.data.data)
+      // setListFAQ(res.data.data)
+      var faw_item = res.data.data
+      var bag_name = []
+      // console.log("faq item: ", faw_item)
+      for (var i = 0; i < res.data.data.length; i++) {
+        api.get(`/api/v1/message_managements/message_bags/${res.data.data[i].message_bag_id}`).then(ress => {
+          // console.log("bag_name: ", ress.data.data.message_bag.bag_name)
+          bag_name.push(ress.data.data.message_bag.bag_name)
+
+        }).catch(error => {
+          console.log(error)
+        })
+      }
+      setTimeout(() => {
+        for (var i = 0; i < res.data.data.length; i++) {
+          faw_item[i].msg_bag_name = bag_name[i]
+        }
+        setListFAQ(faw_item)
+        // console.log("faq data: ", faw_item)
+      }, 2000)
       var faqLength = res.data.data.length
       if (faqLength >= 4) {
         document.getElementById("addFAQbtn").disabled = true
@@ -986,7 +1056,27 @@ function Release() {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/persistent_menus`).then(res => {
       // console.log('persistent_menus: ', res.data.data)
-      setListFixedMenu(res.data.data)
+      // setListFixedMenu(res.data.data)
+      var fm_item = res.data.data
+      var bag_name = []
+
+      for (var i = 0; i < res.data.data.length; i++) {
+        api.get(`/api/v1/message_managements/message_bags/${res.data.data[i].message_bag_id}`).then(ress => {
+          console.log("bag_name: ", ress.data.data.message_bag.bag_name)
+          bag_name.push(ress.data.data.message_bag.bag_name)
+
+        }).catch(error => {
+          console.log(error)
+        })
+      }
+
+      setTimeout(() => {
+        for (var i = 0; i < res.data.data.length; i++) {
+          fm_item[i].msg_bag_name = bag_name[i]
+        }
+        setListFixedMenu(fm_item)
+        // console.log("faq data: ", faw_item)
+      }, 2000)
       loadListFixed()
     }).catch(error => {
       console.log(error)
@@ -1101,7 +1191,7 @@ function Release() {
           }
         }
       }
-      console.log(group)
+      // console.log(group)
     }).catch(error => {
       console.log(error)
       // if (error.response.data.code === 3) {
@@ -1247,7 +1337,8 @@ function Release() {
     api.get(`/api/v1/message_managements/message_groups/${value}`).then(res => {
       // console.log(res.data.data.message_bags)
       // setListBag(res.data.data.message_bags)
-      var group = document.getElementById(`listGroupStory${3}`)
+      var group = document.getElementById(`listBagFixedMenu`)
+      removeOptions(group)
       for (var i = 0; i < res.data.data.message_bags.length; i++) {
         var option = document.createElement("option");
         option.value = res.data.data.message_bags[i].id;
@@ -1255,17 +1346,49 @@ function Release() {
         group.add(option)
 
       }
-      const myOpts = document.getElementById(`listGroup${key}`).options
-      // console.log('myOpts: ', myOpts)
-      for (var i = 0; i < myOpts.length; i++) {
-        if (i > 0) {
-          if (myOpts[i].value == myOpts[i - 1].value) {
-            // alert('same')
-            myOpts.remove(i);
-          }
-        }
+      // const myOpts = document.getElementById(`listGroup${key}`).options
+      // // console.log('myOpts: ', myOpts)
+      // for (var i = 0; i < myOpts.length; i++) {
+      //   if (i > 0) {
+      //     if (myOpts[i].value == myOpts[i - 1].value) {
+      //       // alert('same')
+      //       myOpts.remove(i);
+      //     }
+      //   }
+      // }
+      // console.log(group)
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+  }
+  function selectedGroupFMUP(value, key) {
+    var path = window.location.pathname;
+    api.get(`/api/v1/message_managements/message_groups/${value}`).then(res => {
+      // console.log(res.data.data.message_bags)
+      // setListBag(res.data.data.message_bags)
+      var group = document.getElementById(`listBagFixedMenu${key}`)
+      removeOptions(group)
+      for (var i = 0; i < res.data.data.message_bags.length; i++) {
+        var option = document.createElement("option");
+        option.value = res.data.data.message_bags[i].id;
+        option.text = res.data.data.message_bags[i].bag_name;
+        group.add(option)
+
       }
-      console.log(group)
+      // const myOpts = document.getElementById(`listGroup${key}`).options
+      // // console.log('myOpts: ', myOpts)
+      // for (var i = 0; i < myOpts.length; i++) {
+      //   if (i > 0) {
+      //     if (myOpts[i].value == myOpts[i - 1].value) {
+      //       // alert('same')
+      //       myOpts.remove(i);
+      //     }
+      //   }
+      // }
+      // console.log(group)
     }).catch(error => {
       console.log(error)
       // if (error.response.data.code === 3) {
@@ -1371,7 +1494,7 @@ function Release() {
           is_dm: setting.is_dm, is_story_comment: true, is_post_comment: setting.is_post_comment, is_live_comment: setting.is_live_comment, is_active: true
         }
       }
-      console.log("setStory_kw_setting: ", update)
+      // console.log("setStory_kw_setting: ", update)
       setStory_kw_setting(update)
     }).catch(error => {
       console.log(error)
@@ -1800,7 +1923,7 @@ function Release() {
   //editFAQInList
   function enableEdit(value) {
     document.getElementById(`faq-q-${value}`).readOnly = false;
-    document.getElementById(`faq-a-${value}`).readOnly = false;
+    // document.getElementById(`faq-a-${value}`).readOnly = false;
     document.getElementById(`ene-faq-${value}`).style.display = "none"
     document.getElementById(`sav-faq-${value}`).style.display = "block"
   }
@@ -1841,7 +1964,8 @@ function Release() {
 
     // var script = { ice_breaker: Object.values(obj) }
 
-    var script = { ice_breaker: { question: faq[0], answer: anw[0] } }
+    // var script = { ice_breaker: { question: faq[0], answer: anw[0], message_bag_id: bag[0] } }
+    var script = { ice_breaker: { question: faq[0], message_bag_id: bag[0] } }
 
     var newScript = JSON.stringify(script)
     // console.log(script)
@@ -1894,20 +2018,23 @@ function Release() {
       } else if (item.name.includes("answer")) {
         anw.push(item.value)
       }
+      else if (item.name.includes("msgbag_id")) {
+        bag.push(item.value)
+      }
       // obj[item.name] = item.value;
     }
 
     faq.forEach((ele, index) => {
       if (fix[index] == "message") {
-        anww.push(anw[index])
+        anww.push(bag[index])
         urll.push("")
       } else if (fix[index] == "website") {
         urll.push(anw[index])
         anww.push("")
       }
-      obj[ele] = { title: faq[index], payload: anww[index], url: urll[index] }
+      obj[ele] = { title: faq[index], message_bag_id: anww[index], url: urll[index] }
     })
-    var script = { persistent_menu: { title: faq[0], payload: anww[0], url: urll[0] } }
+    var script = { persistent_menu: { title: faq[0], message_bag_id: anww[0], url: urll[0] } }
     if (faq[0] == "") {
       setFixMnText("Please input title field")
       document.getElementById("validateFixedMenu").style.display = "block"
@@ -1993,10 +2120,11 @@ function Release() {
 
     var script = { ice_breaker: Object.values(obj) }
 
-    var script = { ice_breaker: { question: faq[0], answer: anw[0] } }
+    // var script = { ice_breaker: { question: faq[0], answer: anw[0], message_bag_id: bag[0] } }
+    var script = { ice_breaker: { question: faq[0], message_bag_id: bag[0] } }
 
     var newScript = JSON.stringify(script)
-    // console.log(script)
+    console.log(script)
 
     api.post(`/api/v1/message_managements/ice_breakers`, script).then(res => {
       // console.log(res)
@@ -2043,18 +2171,21 @@ function Release() {
       } else if (item.name.includes("answer")) {
         anw.push(item.value)
       }
+      else if (item.name.includes("msgbag_id")) {
+        bag.push(item.value)
+      }
       // obj[item.name] = item.value;
     }
 
     faq.forEach((ele, index) => {
       if (fix[index] == "message") {
-        anww.push(anw[index])
+        anww.push(bag[index])
         urll.push("")
       } else if (fix[index] == "website") {
         urll.push(anw[index])
         anww.push("")
       }
-      obj[ele] = { title: faq[index], payload: anww[index], url: urll[index] }
+      obj[ele] = { title: faq[index], message_bag_id: anww[index], url: urll[index] }
     })
     // faq.forEach((ele, index) => {
 
@@ -2069,7 +2200,8 @@ function Release() {
 
 
 
-    var script = { persistent_menu: { title: faq[0], payload: anww[0], url: urll[0] } }
+    var script = { persistent_menu: { title: faq[0], message_bag_id: anww[0], url: urll[0] } }
+    console.log(script)
 
     if (faq[0] == "") {
       setFixMnText("Please input title field")
@@ -2111,6 +2243,15 @@ function Release() {
   function selectFixedMenu(value) {
     setFixedOp(value)
 
+    if (value == "message") {
+      document.getElementById("listGroupFixedMenu").style.display = "block"
+      document.getElementById("listBagFixedMenu").style.display = "block"
+      document.getElementById("faqWeb").style.display = "none"
+    } else if (value == "website") {
+      document.getElementById("listGroupFixedMenu").style.display = "none"
+      document.getElementById("listBagFixedMenu").style.display = "none"
+      document.getElementById("faqWeb").style.display = "block"
+    }
     // This code using for select message bag and enter url. Uncomment to use later
 
     //   if (value === "website") {
@@ -2562,8 +2703,21 @@ function Release() {
 
                           <input id={`faq-q-${item.id}`} className="new-faq-q" defaultValue={item.question}
                             name={`faq_key${item.question}`} readOnly="readonly"></input>
-                          <input id={`faq-a-${item.id}`} className="new-faq-q" defaultValue={item.answer}
-                            name={`faq_answer${item.answer}`} readOnly="readonly"></input>
+                          {/* <input id={`faq-a-${item.id}`} className="new-faq-q" defaultValue={item.answer}
+                            name={`faq_answer${item.answer}`} readOnly="readonly"></input> */}
+                          <select id="listGroup" defaultValue={""} onChange={(e) => selectedGroup(e.target.value, listFAQ.id)} className="new-faq-q-so" name={`group_id_${numFAQ}`}>
+                            <option value="" disabled hidden>Choose a group ...</option>
+                            {listGroup?.map((group, i) => {
+                              return (
+                                <option key={i} value={group.id}>
+                                  {group.group_name}
+                                </option>
+                              )
+                            })}
+                          </select>
+                          <select id={`listGroup${listFAQ.id}`} className="new-faq-q-so" defaultValue={""} onChange={(e) => selectedBag(e.target.value)} name={`bag_id_${numFAQ}`}>
+                            <option value="" disabled hidden>{item.msg_bag_name}</option>
+                          </select>
                           <div id={`ene-faq-${item.id}`} onClick={() => enableEdit(item.id)} style={{ width: "5%" }}><i className="nc-icon nc-align-center nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
                           <div id={`sav-faq-${item.id}`} onClick={() => editFAQInList(item.id)} style={{ width: "5%", display: "none" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
                           <div id={`deleteFAQfromList${item.id}`} onClick={() => deleteFAQInList(item.id)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px" }}></i></div>
@@ -2588,7 +2742,7 @@ function Release() {
                                * select message bag
                                */}
 
-                              {/* <select defaultValue={""} onChange={(e) => selectedGroup(e.target.value, i)} className="new-faq-q-so" name={`group_id_${numFAQ}`}>
+                              <select id="listGroup" defaultValue={""} onChange={(e) => selectedGroup(e.target.value, i)} className="new-faq-q-so" name={`group_id_${numFAQ}`}>
                                 <option value="" disabled hidden>Choose a group ...</option>
                                 {listGroup?.map((group, i) => {
                                   return (
@@ -2600,13 +2754,13 @@ function Release() {
                               </select>
                               <select id={`listGroup${i}`} className="new-faq-q-so" defaultValue={""} onChange={(e) => selectedBag(e.target.value)} name={`bag_id_${numFAQ}`}>
                                 <option value="" disabled hidden>Choose a bag ...</option>
-                              </select> */}
+                              </select>
 
 
                               {/**Uncomment will stop here */}
 
-                              <input className="new-faq-q" placeholder="回答入力... "
-                                name={`faq_answer${numFAQ}`}></input>
+                              {/* <input className="new-faq-q" placeholder="回答入力... "
+                                name={`faq_answer${numFAQ}`}></input> */}
                               <div style={{ width: "5%" }}></div>
                               <div onClick={() => deleteFAQ(i)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px" }}></i></div>
                             </div>
@@ -2855,7 +3009,20 @@ function Release() {
                               <option value="message">メッセージ</option>
                               <option value="website">ウェブサイト</option>
                             </select>
-                            <input name={`answer-${item.id}`} id={`anw-mnl-type${item.id}`} className="new-faq-q-so" type="text" onBlur={(e) => onChangeAnwFM(e.target.value)} readOnly="readonly" style={{ width: "43%" }} />
+                            <select id={`listGroupFixedMenu${item.id}`} style={{ width: "20%", display:`${item.message_bag_id == null ? "none" :"block"}` }} defaultValue={""} onChange={(e) => selectedGroupFMUP(e.target.value, item.id)} className="new-faq-q-so" name="client_id">
+                                  <option value="" disabled hidden>Choose a group ...</option>
+                                  {listGroup?.map((group, i) => {
+                                    return (
+                                      <option key={i} value={group.id}>
+                                        {group.group_name}
+                                      </option>
+                                    )
+                                  })}
+                                </select>
+                                <select id={`listBagFixedMenu${item.id}`} style={{ width: "20%", display:`${item.message_bag_id == null ? "none" :"block"}` }} defaultValue={""} onChange={(e) => selectedBagFM(e.target.value)} className="new-faq-q-so" name="msgbag_id">
+                                  <option value="" disabled hidden>{item.msg_bag_name}</option>
+                                </select>
+                            <input name={`answer-${item.id}`} id={`anw-mnl-type${item.id}`} className="new-faq-q-so" type="text" onBlur={(e) => onChangeAnwFM(e.target.value)} readOnly="readonly" style={{ width: "43%", display:`${item.message_bag_id == null ? "block" :"none"}` }} />
                             <div style={{ width: "5%" }}></div>
                             <div id={`ene-fixed-${item.id}`} onClick={() => enableEditFixed(item.id)} style={{ width: "5%" }}><i className="nc-icon nc-align-center nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
                             <div id={`sav-fixed-${item.id}`} onClick={() => editFixedInList(item.id)} style={{ width: "5%", display: "none" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
@@ -2882,23 +3049,23 @@ function Release() {
                            * else user will enter url. Uncomment the code below
                           */}
 
-                                {/* <select id="group-fixed-menu" style={{ width: "20%" }} defaultValue={""} onChange={(e) => selectedGroupFM(e.target.value)} className="new-faq-q-so" name="client_id">
-                            <option value="" disabled hidden>Choose a group ...</option>
-                            {listGroup?.map((group, i) => {
-                              return (
-                                <option key={i} value={group.id}>
-                                  {group.group_name}
-                                </option>
-                              )
-                            })}
-                          </select>
-                          <select id={`listGroupStory${3}`} style={{ width: "20%" }} defaultValue={""} onChange={(e) => selectedBagFM(e.target.value)} className="new-faq-q-so" name="client_id">
-                            <option value="" disabled hidden>Choose a bag ...</option>
-                          </select>
-                          <input name="web-fixed-menu" id="web-fixed-menu" className="new-faq-q-so" type="text" placeholder="ecchatbot.com..." style={{ width: "30%", display: "none" }} /> */}
+                                <select id="listGroupFixedMenu" style={{ width: "20%", display:"block" }} defaultValue={""} onChange={(e) => selectedGroupFM(e.target.value)} className="new-faq-q-so" name="client_id">
+                                  <option value="" disabled hidden>Choose a group ...</option>
+                                  {listGroup?.map((group, i) => {
+                                    return (
+                                      <option key={i} value={group.id}>
+                                        {group.group_name}
+                                      </option>
+                                    )
+                                  })}
+                                </select>
+                                <select id={`listBagFixedMenu`} style={{ width: "20%", display:"block"  }} defaultValue={""} onChange={(e) => selectedBagFM(e.target.value)} className="new-faq-q-so" name="msgbag_id">
+                                  <option value="" disabled hidden>Choose a bag ...</option>
+                                </select>
+                                <input name="web-fixed-menu" id="web-fixed-menu" className="new-faq-q-so" type="text" placeholder="ecchatbot.com..." style={{ width: "30%", display: "none" }} />
 
                                 {/**Uncomment will stop here */}
-                                <input name={`answer-${i}`} className="new-faq-q-so" type="text" onBlur={(e) => onChangeAnwFM(e.target.value)} placeholder="https://ecchatbot.com..." style={{ width: "43%" }} />
+                                <input id="faqWeb" name={`answer-${i}`} className="new-faq-q-so" type="text" onBlur={(e) => onChangeAnwFM(e.target.value)} placeholder="https://ecchatbot.com..." style={{ width: "43%", display:"none" }} />
                                 <div style={{ width: "5%" }}></div>
                                 <div style={{ width: "5%" }}></div>
                                 <div onClick={() => deleteFixed(i)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px" }}></i></div>
