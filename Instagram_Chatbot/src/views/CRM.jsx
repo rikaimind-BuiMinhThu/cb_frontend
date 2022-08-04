@@ -20,7 +20,7 @@ function CRM() {
   React.useEffect(() => {
     // var path = window.location.pathname;
     api.get(`/api/v1/managements/instagram_users`).then(res => {
-      console.log(res.data.data.instagram_users)
+      console.log("instagram_users: ",res.data.data.instagram_users)
       setListInstagramUser(res.data.data.instagram_users)
     }).catch(error => {
       console.log(error)
@@ -33,7 +33,7 @@ function CRM() {
   function detailUser(id) {
     setIsOpenDetailUser(true)
     api.get(`/api/v1/managements/instagram_users/${id}`).then(res => {
-      console.log(res.data.data)
+      console.log("detail instagram_users: ",res.data.data)
       setInstagramUser(res.data.data.instagram_users)
       setLabelInstagramUser(res.data.data.labels)
       var listHistory = []
@@ -290,7 +290,7 @@ function CRM() {
 
                       {/* <span style={{ width: "73px" }}>{((item.created_at).slice(5,16)).replace("T"," ").replace("-","/")}</span> */}
                       {/* <span>&ensp;{item.action}:&ensp;{item.usage_type}</span> */}
-                      <span>&ensp;{item.usage_type == "dm_received" ? "Sent" : "Received"}:&ensp;{item.content}</span>
+                      <span style={{}}>&ensp;{item.usage_type == "dm_received" ? "Sent" : "Received"}:&ensp;{item.content}</span>
 
                     </div>
                   ))}
