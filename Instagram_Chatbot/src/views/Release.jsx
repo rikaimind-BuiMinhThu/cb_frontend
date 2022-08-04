@@ -2011,14 +2011,14 @@ function Release() {
     for (var i = 0; i < elements.length; i++) {
       var item = elements.item(i);
       // console.log(item)
-      if (item.name.includes("title-fixed-menu")) {
+      if (item.name.includes(`title-fixed-menu`)) {
         faq.push(item.value)
-      } else if (item.name.includes("fixed-option")) {
+      } else if (item.name.includes(`fixed-option-${value}`)) {
         fix.push(item.value)
-      } else if (item.name.includes("answer")) {
+      } else if (item.name.includes(`answer-${value}`)) {
         anw.push(item.value)
       }
-      else if (item.name.includes("msgbag_id")) {
+      else if (item.name.includes(`msgbag_id${value}`)) {
         bag.push(item.value)
       }
       // obj[item.name] = item.value;
@@ -2251,6 +2251,40 @@ function Release() {
       document.getElementById("listGroupFixedMenu").style.display = "none"
       document.getElementById("listBagFixedMenu").style.display = "none"
       document.getElementById("faqWeb").style.display = "block"
+    }
+    // This code using for select message bag and enter url. Uncomment to use later
+
+    //   if (value === "website") {
+    //     document.getElementById('group-fixed-menu').style.display = 'none'
+    //     document.getElementById(`listGroupStory${3}`).style.display = 'none'
+    //     document.getElementById('web-fixed-menu').style.display = 'block'
+    //   } else {
+    //     document.getElementById('group-fixed-menu').style.display = 'block'
+    //     document.getElementById(`listGroupStory${3}`).style.display = 'block'
+    //     document.getElementById('web-fixed-menu').style.display = 'none'
+
+    //   }
+
+    // Uncomment will stop here
+
+  }
+
+  function selectFixedMenuUP(value,id) {
+    // setFixedOp(value)
+
+    if (value == "message") {
+      document.getElementById(`listGroupFixedMenu${id}`).style.display = "block"
+      document.getElementById(`listBagFixedMenu${id}`).style.display = "block"
+      document.getElementById(`anw-mnl-type${id}`).style.display = "none"
+      document.getElementById(`anw-mnl-type${id}`).style.display = "none"
+      document.getElementById(`fixed-mnl-type${id}`).value = "message"
+      
+    } else if (value == "website") {
+      document.getElementById(`listGroupFixedMenu${id}`).style.display = "none"
+      document.getElementById(`listBagFixedMenu${id}`).style.display = "none"
+      document.getElementById(`anw-mnl-type${id}`).style.display = "block"
+      document.getElementById(`fixed-mnl-type${id}`).value = "website"
+      document.getElementById(`anw-mnl-type${id}`).value= ""
     }
     // This code using for select message bag and enter url. Uncomment to use later
 
@@ -3004,7 +3038,7 @@ function Release() {
                         <form key={item.id} id={`fixed-menu-${item.id}`}>
                           <div className="div-add-aq" style={{ display: "flex" }}>
                             <input name={`title-fixed-menu-${item.id}`} id={`title-fixed-menu-${item.id}`} className="new-faq-q-so" onChange={() => onChangeEditFM(`title-fixed-menu-${item.id}`)} defaultValue={item.title} type="text" readOnly="readonly" style={{ width: "20%" }} />
-                            <select style={{ width: "20%" }} id={`fixed-mnl-type${item.id}`} readOnly="readonly" className="new-faq-q-so" name={`fixed-option-${item.id}`}>
+                            <select style={{ width: "20%" }} id={`fixed-mnl-type${item.id}`} readOnly="readonly" onChange={(e) =>selectFixedMenuUP(e.target.value, item.id)} className="new-faq-q-so" name={`fixed-option-${item.id}`}>
                               <option value="" disabled hidden>メッセージタイプ選択 ...</option>
                               <option value="message">メッセージ</option>
                               <option value="website">ウェブサイト</option>
@@ -3019,10 +3053,11 @@ function Release() {
                                     )
                                   })}
                                 </select>
-                                <select id={`listBagFixedMenu${item.id}`} style={{ width: "20%", display:`${item.message_bag_id == null ? "none" :"block"}` }} defaultValue={""} onChange={(e) => selectedBagFM(e.target.value)} className="new-faq-q-so" name="msgbag_id">
+                                <select id={`listBagFixedMenu${item.id}`} style={{ width: "20%", display:`${item.message_bag_id == null ? "none" :"block"}` }} defaultValue={""} onChange={(e) => selectedBagFM(e.target.value)} className="new-faq-q-so" name={`msgbag_id${item.id}`}>
                                   <option value="" disabled hidden>{item.msg_bag_name}</option>
                                 </select>
-                            <input name={`answer-${item.id}`} id={`anw-mnl-type${item.id}`} className="new-faq-q-so" type="text" onBlur={(e) => onChangeAnwFM(e.target.value)} readOnly="readonly" style={{ width: "43%", display:`${item.message_bag_id == null ? "block" :"none"}` }} />
+                            <input name={`answer-${item.id}`} id={`anw-mnl-type${item.id}`} className="new-faq-q-so" type="text" readOnly="readonly" style={{ width: "43%", display:`${item.message_bag_id == null ? "block" :"none"}` }} />
+                            
                             <div style={{ width: "5%" }}></div>
                             <div id={`ene-fixed-${item.id}`} onClick={() => enableEditFixed(item.id)} style={{ width: "5%" }}><i className="nc-icon nc-align-center nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
                             <div id={`sav-fixed-${item.id}`} onClick={() => editFixedInList(item.id)} style={{ width: "5%", display: "none" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
