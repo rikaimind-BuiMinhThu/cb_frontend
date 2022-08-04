@@ -65,6 +65,7 @@ function LoginFacebook({ checkLogin }) {
         document.getElementById("btnLoginFB").style.display = "none"
         document.getElementById("listPage").style.display = "none"
         document.getElementById("profileFB").style.display = "block"
+        document.getElementById("logoutFB").style.display = 'block'
         setUrlImg(res.data.profile_picture_url)
         setUsername(res.data.username)
         // window.location.reload()

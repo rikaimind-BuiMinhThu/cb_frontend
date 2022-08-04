@@ -9,10 +9,11 @@ import ReactApexChart from 'react-apexcharts';
 // var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 // ChartJS.register(...registerables)
 import "../assets/css/general.css";
-import { AgChartsReact } from "ag-charts-react";
+// import { AgChartsReact } from "ag-charts-react";
 import api from '../api/api-management'
 import { Icon } from 'semantic-ui-react';
 import { MDBIcon } from 'mdbreact';
+import { CSVLink } from "react-csv";
 function ListUser() {
 
     const [dateECU, setDateECU] = useState([])
@@ -24,6 +25,7 @@ function ListUser() {
     const [userChatwithCBAll, setUserChatwithCBAll] = useState()
     const [userCB, setUserCB] = useState()
     const [userCBAll, setUserCBAll] = useState()
+    const [instaUser, setInstaUser] = useState([])
     React.useEffect(() => {
         var path = window.location.pathname;
         api.get(`/api/v1/analytics/chatbot_usages/user?date=5d`).then(res => {
@@ -118,6 +120,15 @@ function ListUser() {
         }).catch(error => {
             console.log(error)
         })
+
+
+        ///////////////////////////////////////////////
+        api.get(`/api/v1/managements/instagram_users`).then(res => {
+            // console.log("insta user: ", res.data.data.instagram_users)
+            setInstaUser(res.data.data.instagram_users)
+        }).catch(error => {
+            console.log(error)
+        })
     }, [])
 
     var percentNew = userChatwithCB / userChatwithCBAll * 100
@@ -184,7 +195,7 @@ function ListUser() {
             }]
         },
     };
-    
+
 
     const options2 = {
         data: [
@@ -360,14 +371,63 @@ function ListUser() {
 
     var totalMessage = messageECAll
     var kj = messageECAll - messageECA
-    var percentChangeMSG 
-    if(kj ==0){
-        percentChangeMSG =0
-    }else{
+    var percentChangeMSG
+    if (kj == 0) {
+        percentChangeMSG = 0
+    } else {
         percentChangeMSG = messageECA / (messageECAll - messageECA) * 100
     }
-     
+
     // window.dispatchEvent(new Event('resize'));
+
+    const headers = [
+        { label: "username", key: "username" },
+        { label: "full_name", key: "full_name" },
+        { label: "follower_count", key: "follower_count" },
+        { label: "instagram_id", key: "instagram_id" },
+        { label: "is_user_follow_business", key: "is_user_follow_business" },
+        { label: "is_business_follow_user", key: "is_business_follow_user" },
+        { label: "created_at", key: "created_at" }
+      ];
+
+    const [dataEx, setDataEx] = useState([])
+  function setDataExport() {
+    var data = []
+    var datae = instaUser
+    datae.forEach(it => {
+      data.push({
+        username: it.username,
+        full_name: it.full_name,
+        follower_count: it.follower_count,
+        instagram_id: it.instagram_id,
+        is_user_follow_business: it.is_user_follow_business,
+        is_business_follow_user: it.is_business_follow_user,
+        created_at : (it.created_at).slice(0, 19).replaceAll("-","/").replaceAll("T"," ")
+      })
+      for (var i = 1; i < it.length; i++) {
+        const cm_live = it[i]
+        data.push({
+          username: cm_live.username,
+          full_name: cm_live.full_name,
+          follower_count: cm_live.follower_count,
+          instagram_id: cm_live.instagram_id,
+          is_user_follow_business: cm_live.is_user_follow_business,
+          is_business_follow_user: cm_live.is_business_follow_user,
+          created_at: (cm_live.created_at).slice(0, 19).replaceAll("-","/").replaceAll("T"," ")
+        // })
+        })
+      }
+    })
+    console.log(data)
+    // var datae = [item]
+    setDataEx(data)
+  }
+
+  const csvReport = {
+    data: dataEx,
+    headers: headers,
+    filename: 'Livestream.csv'
+  };
 
     return (
         <>
@@ -375,22 +435,26 @@ function ListUser() {
                 <Row>
                     <Col md="12">
                         <Card style={{ width: "100%" }}>
-                        <div style={{ width: "100%", padding: "5px 20px 0px 20px" }}>
-                                <div style={{ float: "right" }}>
+                            <div style={{ width: "100%", padding: "5px 20px 0px 20px" }}>
+                                <div style={{ float: "right", display:"flex" }}>
+                                <div onClick={()=>setDataExport()} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800", marginRight:"10px" }}>
+
+                                <CSVLink {...csvReport}><span style={{color:"white"}}>Export Instagram User </span> <MDBIcon fas icon="arrow-circle-down" style={{ color: "white" }}></MDBIcon></CSVLink>
+                                    </div>
                                     <select onChange={(e) => selectDate(e.target.value)} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800" }} defaultValue={"5d"} name="days_num_ec_cb" id="days_num_ec_cb">
-                                    <option value="5d">５日間</option>
-                      <option value="10d">10日間</option>
-                      <option value="15d">15日間</option>
-                      <option value="30d">30日間</option>
-                      <option value="3m">3月間</option>
-                      <option value="6m">6月間</option>
+                                        <option value="5d">５日間</option>
+                                        <option value="10d">10日間</option>
+                                        <option value="15d">15日間</option>
+                                        <option value="30d">30日間</option>
+                                        <option value="3m">3月間</option>
+                                        <option value="6m">6月間</option>
                                     </select>
                                 </div>
                             </div>
                             <div style={{ display: "flex", width: "100%" }}>
                                 <CardBody style={{ width: "50%" }}>
                                     <CardBody>
-                                    <div style={{width:"100%", textAlign:"center"}}><h3>概要</h3></div>
+                                        <div style={{ width: "100%", textAlign: "center" }}><h3>概要</h3></div>
                                         <div style={{ display: "flex", width: "100%" }}>
                                         </div>
                                         <ReactApexChart options={dataAPC.options} series={dataAPC.series} type="line" height={350} />
@@ -418,7 +482,7 @@ function ListUser() {
                                     </div>
                                 </CardBody>
                             </div>
-                            
+
                         </Card>
                         <Card>
                             <CardBody>
@@ -429,8 +493,8 @@ function ListUser() {
                                         <div><h6>メッセージ数</h6></div>
                                     </div>
                                     <div style={{ width: "50%" }}>
-                                    <div style={{ width: "100%", display: "flex", textAlign: "center" }}><h5 style={{ margin: "auto" }}>{percentECold} &emsp;
-                                            <MDBIcon fas icon="angle-up" style={{ color: "#00e396" }} />&ensp;<span style={{ fontSize: "19px", color: "#00e396" }}>{parseFloat(percentECnew/(percentECold + percentECnew)*100).toFixed(1)}%</span></h5></div>
+                                        <div style={{ width: "100%", display: "flex", textAlign: "center" }}><h5 style={{ margin: "auto" }}>{percentECold} &emsp;
+                                            <MDBIcon fas icon="angle-up" style={{ color: "#00e396" }} />&ensp;<span style={{ fontSize: "19px", color: "#00e396" }}>{parseFloat(percentECnew / (percentECold + percentECnew) * 100).toFixed(1)}%</span></h5></div>
                                         <div><h6>ユーザー数</h6></div>
                                     </div>
 

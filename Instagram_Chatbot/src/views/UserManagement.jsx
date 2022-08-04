@@ -40,6 +40,16 @@ function UserManagement() {
 
   const [namesearch, setNamesearch] = useState("")
 
+
+  React.useEffect(() => {
+    var cook = Cookies.get("user_role")
+    if (cook == "admin_deel") {
+
+    } else if (cook == "client") {
+      window.location.href ='/admin/dashboard'
+    }
+  })
+
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'))
     if (Cookies.get('token') == undefined) {
@@ -211,7 +221,7 @@ function UserManagement() {
       var elements = document.getElementById("addForm").elements;
       var obj = {};
       for (var i = 0; i < elements.length - 1; i++) {
-        var item = elements.item(i);
+        var item = elements.item(i);              
         obj[item.name] = item.value;
       }
       // var client_id = 80
@@ -424,13 +434,13 @@ function UserManagement() {
                   <input className="input-field" onBlur={(e) => utils.checkInputEmail(e.target.value, "Email")} type="text" id="newEmail" name="email" />
                   <label id="newUserEmailErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
-                <label className="label-input"><label className="long-label">権限&nbsp;<span className="span-require">*必須</span></label>
+                {/* <label className="label-input"><label className="long-label">権限&nbsp;<span className="span-require">*必須</span></label>
                   <select style={{ padding: "3px 0px 3px 0px" }} className="input-field" defaultValue={'deel'} name="role" id="role">
                     <option value="deel">Deel Management</option>
                     <option value="client">Client Management</option>
                   </select>
                   <label id="newClientTikTokCreateErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
-                </label><br /><br />
+                </label><br /><br /> */}
                 <label className="label-input">パスワード&nbsp;<span className="span-require">*必須</span>
                   <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "Password")} type="password" id="newPassword" name="password" />
                   <label id="newUserPasswordErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
