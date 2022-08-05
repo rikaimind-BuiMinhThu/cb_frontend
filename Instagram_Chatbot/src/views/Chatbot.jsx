@@ -198,7 +198,7 @@ function Chatbot() {
             choiceHTML =
               `
                 <div id="itemFI${item.id}" >
-                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check}</div>
+                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check == "email"? "Email" : (item.free_input.format_check == "phone_number" ? "Phone Number" : "No validate")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
                     Delete
@@ -221,7 +221,7 @@ function Chatbot() {
                     <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
                     <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
                     <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
-                    <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].message_group_name}/${item.message_buttons[0].message_bag_name}</div>
                   
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
@@ -270,7 +270,7 @@ function Chatbot() {
                     `
                   <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length - 1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
                   <div style="padding:10px 5px 0px 5px">${item.message_buttons[i].title}</div>  
-                  <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                  <div style="padding:0px 5px 10px 5px">${item.message_buttons[i].message_group_name}/${item.message_buttons[i].message_bag_name}</div>
                     <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
                   <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
                   <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
@@ -670,7 +670,7 @@ function Chatbot() {
             choiceHTML =
               `
                 <div id="itemFI${item.id}" >
-                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check}</div>
+                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check == "email"? "Email" : (item.free_input.format_check == "phone_number" ? "Phone Number" : "No validate")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
                     Delete
@@ -693,7 +693,7 @@ function Chatbot() {
                     <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
                     <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
                     <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
-                    <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].message_group_name}/${item.message_buttons[0].message_bag_name}</div>
                   
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
@@ -742,7 +742,7 @@ function Chatbot() {
                     `
                   <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length - 1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
                   <div style="padding:10px 5px 0px 5px">${item.message_buttons[i].title}</div>  
-                  <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                  <div style="padding:0px 5px 10px 5px">${item.message_buttons[i].message_group_name}/${item.message_buttons[i].message_bag_name}</div>
                     <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
                   <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
                   <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
@@ -1268,7 +1268,7 @@ function Chatbot() {
             choiceHTML =
               `
                 <div id="itemFI${item.id}" >
-                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check}</div>
+                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check == "email"? "Email" : (item.free_input.format_check == "phone_number" ? "Phone Number" : "No validate")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
                     Delete
@@ -1291,7 +1291,7 @@ function Chatbot() {
                     <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
                     <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
                     <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
-                    <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].message_group_name}/${item.message_buttons[0].message_bag_name}</div>
                   
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
@@ -1340,7 +1340,7 @@ function Chatbot() {
                     `
                   <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length - 1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
                   <div style="padding:10px 5px 0px 5px">${item.message_buttons[i].title}</div>  
-                  <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                  <div style="padding:0px 5px 10px 5px">${item.message_buttons[i].message_group_name}/${item.message_buttons[i].message_bag_name}</div>
                     <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
                   <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
                   <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
@@ -1762,7 +1762,7 @@ function Chatbot() {
             choiceHTML =
               `
                 <div id="itemFI${item.id}" >
-                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check}</div>
+                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check == "email"? "Email" : (item.free_input.format_check == "phone_number" ? "Phone Number" : "No validate")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
                     Delete
@@ -1785,7 +1785,7 @@ function Chatbot() {
                     <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
                     <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
                     <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
-                    <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].message_group_name}/${item.message_buttons[0].message_bag_name}</div>
                   
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
@@ -1834,7 +1834,7 @@ function Chatbot() {
                     `
                   <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length - 1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
                   <div style="padding:10px 5px 0px 5px">${item.message_buttons[i].title}</div>  
-                  <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                  <div style="padding:0px 5px 10px 5px">${item.message_buttons[i].message_group_name}/${item.message_buttons[i].message_bag_name}</div>
                     <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
                   <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
                   <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
@@ -2170,7 +2170,7 @@ function Chatbot() {
             choiceHTML =
               `
                 <div id="itemFI${item.id}" >
-                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check}</div>
+                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check == "email"? "Email" : (item.free_input.format_check == "phone_number" ? "Phone Number" : "No validate")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
                     Delete
@@ -2193,7 +2193,7 @@ function Chatbot() {
                     <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
                     <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
                     <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
-                    <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].message_group_name}/${item.message_buttons[0].message_bag_name}</div>
                   
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
@@ -2241,7 +2241,7 @@ function Chatbot() {
                     `
                   <div id="itemTCUP${item.id}_${i}" style="border-bottom:1px solid black; margin:auto; width:90%; text-align:center">
                   <div style="padding:10px 5px 0px 5px">${item.message_buttons[i].title}</div>  
-                  <div style="padding:0px 5px 10px 5px">${`group here`}/${`bag here`}</div>
+                  <div style="padding:0px 5px 10px 5px">${item.message_buttons[i].message_group_name}/${item.message_buttons[i].message_bag_name}</div>
                     <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
                   <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
                   <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
@@ -6049,7 +6049,7 @@ function Chatbot() {
       abc.innerHTML =
         `
       <div style="border:none; border-radius:10px; background-color:white; width:max-content; text-align:center">
-        <div style="padding:0px 5px 10px 5px">Format check: ${formatCheckSelect.value}</div>
+        <div style="padding:0px 5px 10px 5px">Format check: ${formatCheckSelect.value == "email" ? "Email" : (formatCheckSelect.value == "phone_number" ? "Phone Number" : "No Validate")}</div>
 
         <input id="lblAddFI${idUpdateItemMsg}_${bagAddSC}" hidden type=text value="${lblas}" />
         <input id="formatCheckSelect${idUpdateItemMsg}" hidden type=text value="${formatCheckSelect.value}" />
@@ -6098,11 +6098,11 @@ function Chatbot() {
       abc.innerHTML =
         `
       <div style="border:none; border-radius:10px; background-color:white; width:max-content; text-align:center">
-        <div style="padding:0px 5px 10px 5px">Format check: ${formatCheckSelect.value}</div>
+        <div style="padding:0px 5px 10px 5px">Format check: ${formatCheckSelect.value == "email" ? "Email" : (formatCheckSelect.value == "phone_number" ? "Phone Number" : "No Validate")}</div>
 
         <input id="lblAddFI${idSC}_${bagAddSC}" hidden type=text value="${lblas}" />
         <input id="formatCheckSelect${idSC}" hidden type=text value=${formatCheckSelect.value} />
-        <input id="formatCheckMSG${idSC}" hidden type=text value="${formatcheck}" />
+        <input id="formatCheckMSG${idSC}" hidden type=text value="${(formatcheck)}" />
       </div>
       `
 
