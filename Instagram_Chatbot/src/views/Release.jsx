@@ -52,10 +52,21 @@ function Release() {
   const [msgNoti, setMsgNoti] = useState()
   const [listKeyword, setListKeyword] = useState([])
 
+  // React.useEffect(() => {
+  //   console.log('token in dashboard', Cookies.get('token'))
+  //   if (Cookies.get('token') == undefined) {
+  //     window.location.href = '/'
+  //   }
+  // }, [])
+
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'))
-    if (Cookies.get('token') == undefined) {
-      window.location.href = '/'
+    console.log('is_auth', Cookies.get('is_auth'))
+    if(Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == ""){
+      window.location.href ='/'
+    }
+    if(Cookies.get('is_auth') == 'false'){
+      window.location.href ='/'
     }
   }, [])
 
@@ -1793,7 +1804,12 @@ function Release() {
       setNumFAQ(numFAQ + 1)
       // console.log(customDiv)
       // newFAQ()
-      document.getElementById('actionFAQ').style.display = "block"
+
+
+      // document.getElementById('actionFAQ').style.display = "block"
+
+
+
       // if (document.getElementById('actionFAQ').style.display == "none") {
       //   document.getElementById('actionFAQ').style.display = "block"
       // }
@@ -1821,6 +1837,8 @@ function Release() {
       // console.log(customDivFixed)
       // newFAQ()
       document.getElementById('actionFixed').style.display = "block"
+
+      
       // if (document.getElementById('actionFAQ').style.display == "none") {
       //   document.getElementById('actionFAQ').style.display = "block"
       // }
@@ -2117,6 +2135,7 @@ function Release() {
 
     // console.log(obj)
 
+    
 
     var script = { ice_breaker: Object.values(obj) }
 
@@ -2126,7 +2145,11 @@ function Release() {
     var newScript = JSON.stringify(script)
     console.log(script)
 
-    api.post(`/api/v1/message_managements/ice_breakers`, script).then(res => {
+    if(bag[0] == ""){
+      document.getElementById("bagErrAddFAQ").style.display = "block"
+    }else{
+      document.getElementById("bagErrAddFAQ").style.display = "none"
+      api.post(`/api/v1/message_managements/ice_breakers`, script).then(res => {
       // console.log(res)
       cancelFAQ()
       reloadFAQ()
@@ -2147,6 +2170,9 @@ function Release() {
       //   requestNewToken(path)
       // }
     })
+    }
+
+    
 
   }
 
@@ -2795,18 +2821,20 @@ function Release() {
 
                               {/* <input className="new-faq-q" placeholder="回答入力... "
                                 name={`faq_answer${numFAQ}`}></input> */}
-                              <div style={{ width: "5%" }}></div>
-                              <div onClick={() => deleteFAQ(i)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px" }}></i></div>
+                              {/* <div style={{ width: "5%",marginRight: "1.5%"  }}></div> */}
+                              <div onClick={() => saveFAQ()} style={{ width: "5%" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
+                              <div style={{width:"5%"}} onClick={() => deleteFAQ(i)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px", width:"5%" }}></i></div>
                             </div>
                           </div>
                         ))}
                       </div>
+                      <div style={{width:"100%", textAlign:"center"}}><span id="bagErrAddFAQ" style={{color:"red", display:"none" }}>Please select bag to add FAQ</span></div>
                     </form>
-                    <div style={{ float: "right", display: "none" }} id="actionFAQ">
+                    {/* <div style={{ float: "right", display: "none" }} id="actionFAQ">
                       <Button style={{ marginRight: "10px" }}
                         onClick={() => cancelFAQ()}>キャンセル</Button>
                       <Button onClick={() => saveFAQ()}>保存</Button>
-                    </div>
+                    </div> */}
                     <div id="notiMsgFAQ" style={{ width: "100%", textAlign: "center", color: "red", display: "none" }}> FAQ設定をオンにしてから設定してください。</div>
                   </div>
                 </CardBody>

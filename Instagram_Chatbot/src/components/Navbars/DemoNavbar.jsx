@@ -38,8 +38,11 @@ import {
 } from "reactstrap";
 import Cookies from 'js-cookie'
 import routes from "routes.js";
+import { useCookies } from "react-cookie";
 var Cookiess = require('js-cookie-remove-all');
+
 function Header(props) {
+  const [cookie, setCookie,removeCookie] = useCookies(['token']);
   const [isOpen, setIsOpen] = React.useState(false);
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [color, setColor] = React.useState("transparent");
@@ -91,7 +94,13 @@ function Header(props) {
     }
   }, [location]);
   const logout = () =>{
-    Cookies.remove('token')
+    Cookies.set('is_auth', 'false');
+    Cookies.remove('token', '/')
+    // removeCookie('token', '/admin/client-management')
+    // removeCookie('token', '/admin/user-management')
+    // removeCookie('token', '/admin/keyword')
+    // removeCookie('token', '/admin/dashboard')
+    // removeCookie('token', '/admin/admin/chatbot')
     Cookies.remove('user_role')
     window.location.href ='/'
     // window.location.href ='/'

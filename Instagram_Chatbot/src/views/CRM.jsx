@@ -10,6 +10,7 @@ import api from '../api/api-management'
 
 import ModalShort from './Popup/ModalShort';
 import ModalDetailInstaUser from './Popup/ModalDetailInstaUser';
+import Cookies from "js-cookie";
 function CRM() {
   const [isOpenDetailUser, setIsOpenDetailUser] = useState(false)
 
@@ -17,6 +18,17 @@ function CRM() {
   const [isOpenAddLabel, setIsOpenAddLabel] = useState(false)
 
   const [listInstagramUser, setListInstagramUser] = useState([])
+
+  React.useEffect(() => {
+    console.log('token in dashboard', Cookies.get('token'))
+    console.log('is_auth', Cookies.get('is_auth'))
+    if(Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == ""){
+      window.location.href ='/'
+    }
+    if(Cookies.get('is_auth') == 'false'){
+      window.location.href ='/'
+    }
+  }, [])
 
   React.useEffect(() => {
     // var path = window.location.pathname;

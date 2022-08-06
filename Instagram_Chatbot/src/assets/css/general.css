@@ -34,9 +34,14 @@
     width: 100%;
     float: left;
 }
+
 .input-field {
     width: 70%;
     float: right;
+}
+.input-field-con {
+    /* width: 70%;   */
+    /* float: right; */
 }
 :-ms-input-placeholder { /* Internet Explorer 10-11 */
     color: black;

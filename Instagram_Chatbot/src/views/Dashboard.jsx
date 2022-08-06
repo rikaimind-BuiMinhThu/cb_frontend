@@ -18,12 +18,23 @@ import {
 
 function Dashboard() {
 
+
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'))
   }, [])
+  // React.useEffect(() => {
+  //   console.log('token in dashboard', Cookies.get('token'))
+  //   if(Cookies.get('token') == undefined){
+  //     window.location.href ='/'
+  //   }
+  // }, [])
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'))
-    if(Cookies.get('token') == undefined){
+    console.log('is_auth', Cookies.get('is_auth'))
+    if(Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == ""){
+      window.location.href ='/'
+    }
+    if(Cookies.get('is_auth') == 'false'){
       window.location.href ='/'
     }
   }, [])
