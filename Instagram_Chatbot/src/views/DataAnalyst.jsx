@@ -10,6 +10,7 @@ import ReactApexChart from 'react-apexcharts';
 import "../assets/css/general.css";
 import { CSVLink } from "react-csv";
 import { MDBIcon } from 'mdbreact';
+import Cookies from "js-cookie";
 // const categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
 
 function DataAnalyst() {
@@ -22,6 +23,19 @@ function DataAnalyst() {
   const [userChatwithCB, setUserChatwithCB] = useState([])
   const [userChatwithCBAll, setUserChatwithCBAll] = useState()
   const [userTotal, setUserTotal] = useState()
+
+  React.useEffect(() => {
+    console.log('token in dashboard', Cookies.get('token'))
+    console.log('is_auth', Cookies.get('is_auth'))
+    if(Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == ""){
+      window.location.href ='/'
+    }
+    if(Cookies.get('is_auth') == 'false'){
+      window.location.href ='/'
+    }
+  }, [])
+
+
   React.useEffect(() => {
     var path = window.location.pathname;
     api.get(`/api/v1/analytics/chatbot_usages/user?date=5d`).then(res => {

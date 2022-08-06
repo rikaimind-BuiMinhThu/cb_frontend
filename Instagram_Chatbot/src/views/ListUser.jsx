@@ -14,6 +14,7 @@ import api from '../api/api-management'
 import { Icon } from 'semantic-ui-react';
 import { MDBIcon } from 'mdbreact';
 import { CSVLink } from "react-csv";
+import Cookies from "js-cookie";
 function ListUser() {
 
     const [dateECU, setDateECU] = useState([])
@@ -26,6 +27,19 @@ function ListUser() {
     const [userCB, setUserCB] = useState()
     const [userCBAll, setUserCBAll] = useState()
     const [instaUser, setInstaUser] = useState([])
+
+    React.useEffect(() => {
+        console.log('token in dashboard', Cookies.get('token'))
+        console.log('is_auth', Cookies.get('is_auth'))
+        if(Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == ""){
+          window.location.href ='/'
+        }
+        if(Cookies.get('is_auth') == 'false'){
+          window.location.href ='/'
+        }
+      }, [])
+
+
     React.useEffect(() => {
         var path = window.location.pathname;
         api.get(`/api/v1/analytics/chatbot_usages/user?date=5d`).then(res => {

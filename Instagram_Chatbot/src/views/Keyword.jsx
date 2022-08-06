@@ -9,6 +9,7 @@ import { Card, CardHeader, CardBody, Row, Col } from "reactstrap";
 import Switch from "react-switch";
 import ModalNoti from "./Popup/ModalNoti";
 import Cookies from 'js-cookie'
+import ModalShort from "./Popup/ModalShort";
 function Keyword() {
 
     var [customDiv, setCustomDiv] = useState([])
@@ -19,15 +20,29 @@ function Keyword() {
     const [instaSetting, setInstaSetting] = useState()
     const [newKWBag, setNewKWBag] = useState()
     const [isOpenNoti, setIsOpenNoti] = useState(false)
+    const [isOpenDelete, setIsOpenDelete] = useState(false)
     const [msgNoti, setMsgNoti] = useState()
     // const [checked, setChecked] = useState([true, false, true])
 
+    // React.useEffect(() => {
+    //     console.log('token in dashboard', Cookies.get('token'))
+    //     if (Cookies.get('token') == undefined) {
+    //         window.location.href = '/'
+    //     }
+    // }, [])
+
+
     React.useEffect(() => {
         console.log('token in dashboard', Cookies.get('token'))
-        if (Cookies.get('token') == undefined) {
+        console.log('is_auth', Cookies.get('is_auth'))
+        if (Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == "") {
+            window.location.href = '/'
+        }
+        if (Cookies.get('is_auth') == 'false') {
             window.location.href = '/'
         }
     }, [])
+
     React.useEffect(() => {
         var path = window.location.pathname;
 
@@ -140,7 +155,7 @@ function Keyword() {
     }
 
     function addNewKeyword() {
-
+        // document.getElementById('')
         let cDivs = customDiv;
 
         cDivs.push(`newDiv${numKeyword}`)
@@ -332,10 +347,25 @@ function Keyword() {
 
 
     }
-    function deleteKeyword(value) {
-        api.delete(`/api/v1/message_managements/keyword_settings/${value}`).then(res => {
+
+    const [idDelete, setIdDelete] = useState()
+    function confirmDelete(id){
+        setIdDelete(id)
+        setIsOpenDelete(true)
+    }
+
+    function deleteKeyword() {
+        setIsOpenDelete(false)
+
+        api.delete(`/api/v1/message_managements/keyword_settings/${idDelete}`).then(res => {
             console.log(res);
             reloadListKW()
+            setIsOpenNoti(true)
+            setMsgNoti("Deleted successfully")
+            setTimeout(()=>{
+                setIsOpenNoti(false)
+                setMsgNoti("")
+            },1500)
         }).catch(error => {
             console.log(error)
         })
@@ -477,7 +507,7 @@ function Keyword() {
                                                         </select>
                                                         <div id={`ene-${i}`} onClick={() => enableEdit(i)} style={{ width: "5%" }}><i className="nc-icon nc-align-center nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
                                                         <div id={`sav-${i}`} onClick={() => editKeywordInList(cdiv.instagram_account_id, cdiv.is_dm, cdiv.is_story_comment, cdiv.is_post_comment, cdiv.is_live_comment, cdiv.is_active, cdiv.id, i)} style={{ width: "5%", display: "none" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
-                                                        <div onClick={() => deleteKeyword(cdiv.id)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px" }}></i></div>
+                                                        <div onClick={() => confirmDelete(cdiv.id)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px" }}></i></div>
                                                     </div>
                                                 </div>
                                             </form>
@@ -510,7 +540,7 @@ function Keyword() {
                                                     </div>))}
                                             </div>
                                         </form>
-                                        <div id="cancel_save" style={{ width: "100%", textAlign: "right", padding: "20px" }}>
+                                        <div id="cancel_save" style={{ width: "100%", textAlign: "right", padding: "20px", display: "none" }}>
                                             <Button style={{ marginRight: "10px" }}
                                                 onClick={() => cancelAdd()}>キャンセル</Button>
                                             <Button onClick={() => saveFixedMessage()}>保存</Button>
@@ -526,6 +556,13 @@ function Keyword() {
                         <h4>{msgNoti}</h4>
                     </div>
                 </ModalNoti>
+                <ModalShort open={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
+                    <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+                        <h4>Do you want to delete keyword?</h4>
+                        <Button onClick={() => deleteKeyword()}>Yes</Button>
+                        <Button onClick={() => setIsOpenDelete(false)}>No</Button>
+                    </div>
+                </ModalShort>
             </div>
         </>
     );
