@@ -2783,7 +2783,7 @@ function Release() {
                             name={`faq_key${item.question}`} readOnly="readonly"></input>
                           {/* <input id={`faq-a-${item.id}`} className="new-faq-q" defaultValue={item.answer}
                             name={`faq_answer${item.answer}`} readOnly="readonly"></input> */}
-                          <select id="listGroup" defaultValue={""} onChange={(e) => selectedGroup(e.target.value, i)} className="new-faq-q-so" name={`group_id_${numFAQ}`}>
+                          <select id="listGroup" defaultValue={""} onChange={(e) => selectedGroup(e.target.value, item.id)} className="new-faq-q-so" name={`group_id_${numFAQ}`}>
                             <option value="" disabled hidden>{item.message_group_name}</option>
                             {listGroup?.map((group, i) => {
                               return (
@@ -2793,7 +2793,7 @@ function Release() {
                               )
                             })}
                           </select>
-                          <select id={`listGroup${i}`} className="new-faq-q-so" defaultValue={""} onChange={(e) => selectedBag(e.target.value)} name={`bag_id_${numFAQ}`}>
+                          <select id={`listGroup${item.id}`} className="new-faq-q-so" defaultValue={""} onChange={(e) => selectedBag(e.target.value)} name={`bag_id_${numFAQ}`}>
                             <option value="" disabled hidden>{item.msg_bag_name}</option>
                           </select>
                           <div id={`ene-faq-${item.id}`} onClick={() => enableEdit(item.id)} style={{ width: "5%" }}><i className="nc-icon nc-align-center nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
