@@ -16,7 +16,7 @@ const MODAL_STYLES = {
   zIndex: 1000,
   border: '2px solid gray',
   borderRadius: '5px',
-  height: "50%",
+  height: "55%",
   maxHeight: '70%', 
   overflowY: 'hidden',
   overflowX: 'hidden',

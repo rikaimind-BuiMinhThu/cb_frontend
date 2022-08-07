@@ -195,14 +195,13 @@ function UserManagement() {
     var path = window.location.pathname;
     var name = document.getElementById('nameUpdate').value
     console.log('nameupdate: ', name)
-    if (checkFieldUpdate(name, 'name') === true) {
+    if (checkFieldUpdate(name, '名称') === true) {
       var elements = document.getElementById("detailUserClient").elements;
       var obj = {};
       for (var i = 0; i < elements.length; i++) {
         var item = elements.item(i);
         obj[item.name] = item.value;
       }
-      console.log("aaa", obj)
       var updateClient = { user: obj };
       console.log(updateClient);
       api.patch(`/api/v1/managements/users/${updateId}`, updateClient).then(res => {
@@ -223,7 +222,7 @@ function UserManagement() {
   function checkFieldUpdate(value, field) {
     if (value === '') {
       document.getElementById(`${field}ErrMsg`).style.display = 'block'
-      document.getElementById(`${field}ErrMsg`).innerHTML = `${field} cannot be empty`
+      document.getElementById(`${field}ErrMsg`).innerHTML = `${field} 入力してください。`
     } else {
       document.getElementById(`${field}ErrMsg`).style.display = 'none'
       document.getElementById(`${field}ErrMsg`).innerHTML = ""
@@ -246,14 +245,14 @@ function UserManagement() {
       namecheck = false
     }else{
       namecheck = true
-      document.getElementById("newUserNameErrMsg").style.display = "none"
-      document.getElementById("newUserNameErrMsg").innerHTML = ""
+      document.getElementById("newUser名称ErrMsg").style.display = "none"
+      document.getElementById("newUser名称ErrMsg").innerHTML = ""
     }
 
     var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
     if(email.match(mailformat)){
-      document.getElementById("newUserEmailErrMsg").style.display = "none"
-      document.getElementById("newUserEmailErrMsg").innerHTML = ""
+      document.getElementById("newUserメールアドレスErrMsg").style.display = "none"
+      document.getElementById("newUserメールアドレスErrMsg").innerHTML = ""
       emailCheck = true
     }else{
       //newClientEmailErrMsg
@@ -265,20 +264,20 @@ function UserManagement() {
       passCheckLen = false
     }else{
       //newUserPasswordErrMsg
-      document.getElementById("newUserPasswordErrMsg").style.display = "none"
-      document.getElementById("newUserPasswordErrMsg").innerHTML = ""
+      document.getElementById("newUserパスワードErrMsg").style.display = "none"
+      document.getElementById("newUserパスワードErrMsg").innerHTML = ""
       passCheckLen = true
     }
     if(password !== confirmPassword){
       
       passCheck = false
     }else{
-      document.getElementById("newUserConfirmPasswordErrMsg").style.display = "none"
-      document.getElementById("newUserConfirmPasswordErrMsg").innerHTML = ""
+      document.getElementById("newUserパスワード(確認用)ErrMsg").style.display = "none"
+      document.getElementById("newUserパスワード(確認用)ErrMsg").innerHTML = ""
       passCheck = true
     }
-    if (utils.checkFieldAdd(email, 'Email') === true && utils.checkFieldAdd(password, "Password") === true && utils.checkFieldAdd(name, "Name") === true 
-    && utils.checkFieldAdd(confirmPassword, "ConfirmPassword") === true && passCheck == true
+    if (utils.checkFieldAdd(email, 'メールアドレス') === true && utils.checkFieldAdd(password, "パスワード") === true && utils.checkFieldAdd(name, "名称") === true 
+    && utils.checkFieldAdd(confirmPassword, "パスワード(確認用)") === true && passCheck == true
     && passCheckLen == true && emailCheck == true && namecheck == true) {
       var elements = document.getElementById("addForm").elements;
       var obj = {};
@@ -307,20 +306,20 @@ function UserManagement() {
     
   }else{
     if(passCheck == false){
-      document.getElementById("newUserConfirmPasswordErrMsg").style.display = "block"
-      document.getElementById("newUserConfirmPasswordErrMsg").innerHTML = "Confirm password must match password"
+      document.getElementById("newUserパスワード(確認用)ErrMsg").style.display = "block"
+      document.getElementById("newUserパスワード(確認用)ErrMsg").innerHTML = "パスワード（確認用）はパスワードと同じの必要です。"
     }
     if(passCheckLen == false){
-      document.getElementById("newUserPasswordErrMsg").style.display = "block"
-      document.getElementById("newUserPasswordErrMsg").innerHTML = "Password must contains more than 6 character"
+      document.getElementById("newUserパスワードErrMsg").style.display = "block"
+      document.getElementById("newUserパスワードErrMsg").innerHTML = "パスワードは最低６つの文字の必要です。"
     }
     if(emailCheck == false){
-      document.getElementById("newUserEmailErrMsg").style.display = "block"
-      document.getElementById("newUserEmailErrMsg").innerHTML = "Please input email(ex:abc@abc.com)"
+      document.getElementById("newUserメールアドレスErrMsg").style.display = "block"
+      document.getElementById("newUserメールアドレスErrMsg").innerHTML = "メールを入力してください(例:abc＠abc.com)"
     }
     if(namecheck == false){
-      document.getElementById("newUserNameErrMsg").style.display = "block"
-      document.getElementById("newUserNameErrMsg").innerHTML = "Please input name"
+      document.getElementById("newUser名称ErrMsg").style.display = "block"
+      document.getElementById("newUser名称ErrMsg").innerHTML = "名称を入力してください。"
     }
   }
   }
@@ -374,7 +373,8 @@ function UserManagement() {
               <CardHeader>
                 <div className="swap" style={{display:"flex"}}>
                   {/* <div className="div_left"><CardTitle tag="h4">Client Management</CardTitle></div> */}
-                  <div style={{width:"50%"}}><input id="searchUser" name="searchUser" style={{height:"38px", width:"200px", border:"1px solid #dee2e6", paddingTop:"-10px", borderRadius:"3px"}}></input> <Button onClick={() => search()} style={{backgroundColor:"#66615b"}}>Search</Button></div>
+                  <div style={{width:"50%"}}><input id="searchUser" name="searchUser" style={{height:"38px", width:"200px", border:"1px solid #dee2e6", paddingTop:"-10px", borderRadius:"3px"}}></input>
+                  <Button onClick={() => search()} style={{backgroundColor:"#66615b"}}>検索</Button></div>
                   <div className="div_right"><Button onClick={() => setIsOpenAddUser(true)} style={{backgroundColor:"#66615b"}}>ユーザー追加</Button></div>
                 </div>
               </CardHeader>
@@ -489,8 +489,8 @@ function UserManagement() {
                 <br /><br /> */}
 
                 <label className="label-input">名称&nbsp;<span className="span-require">*必須</span>
-                  <input className="input-field" value={name} onChange={(e) => setName(e.target.value)} onBlur={(e) => checkFieldUpdate(e.target.value, "name")} type="text" id="nameUpdate" name="full_name" />
-                  <label id="nameErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" value={name} onChange={(e) => setName(e.target.value)} onBlur={(e) => checkFieldUpdate(e.target.value, "名称")} type="text" id="nameUpdate" name="full_name" />
+                  <label id="名称ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 {/* <label className="label-input">ログインID&nbsp;<span className="span-require">*必須</span>
                   <input className="input-field" value={email} onChange={(e) => setEmail(e.target.value)} onBlur={(e) => utils.checkInputEmail(e.target.value, "Email")} type="text" id="newEmail" name="email" />
@@ -514,12 +514,12 @@ function UserManagement() {
               <h4>ユーザー追加</h4>
               <form id="addForm" className="swap">
                 <label className="label-input">名称&nbsp;<span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "Name")} type="text" id="newName" name="full_name" />
-                  <label id="newUserNameErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "名称")} type="text" id="newName" name="full_name" />
+                  <label id="newUser名称ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">ログインID&nbsp;<span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => utils.checkInputEmail(e.target.value, "Email")} type="text" id="newEmail" name="email" />
-                  <label id="newUserEmailErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => utils.checkInputEmail(e.target.value, "メールアドレス")} type="text" id="newEmail" name="email" />
+                  <label id="newUserメールアドレスErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 {/* <label className="label-input"><label className="long-label">権限&nbsp;<span className="span-require">*必須</span></label>
                   <select style={{ padding: "3px 0px 3px 0px" }} className="input-field" defaultValue={'deel'} name="role" id="role">
@@ -529,12 +529,12 @@ function UserManagement() {
                   <label id="newClientTikTokCreateErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br /> */}
                 <label className="label-input">パスワード &nbsp;<span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "Password")} type="password" id="newPassword" name="password" />
-                  <label id="newUserPasswordErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "パスワード")} type="password" id="newPassword" name="password" />
+                  <label id="newUserパスワードErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">パスワード（確認用）<span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "ConfirmPassword")} type="password" id="newConfirmPassword" name="confirm_password" />
-                  <label id="newUserConfirmPasswordErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "パスワード(確認用)")} type="password" id="newConfirmPassword" name="confirm_password" />
+                  <label id="newUserパスワード(確認用)ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">クライアント<span className="span-require">*必須</span>
                   <select style={{ padding: "3px 0px 3px 0px" }} className="input-field" name="client_id">
