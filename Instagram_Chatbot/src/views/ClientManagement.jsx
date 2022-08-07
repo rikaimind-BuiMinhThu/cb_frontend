@@ -362,8 +362,8 @@ function ClientManagement() {
     if( document.getElementById('newEmail') != null && document.getElementById('newEmail').value.length !=0){
       emailCheckLen = true
       if (email.match(mailformat)) {
-        document.getElementById("newClientEmailErrMsg").style.display = "none"
-        document.getElementById("newClientEmailErrMsg").innerHTML = ""
+        document.getElementById("newClientメールアドレスErrMsg").style.display = "none"
+        document.getElementById("newClientメールアドレスErrMsg").innerHTML = ""
         emailCheck = true
       } else {
         //newClientEmailErrMsg
@@ -378,8 +378,8 @@ function ClientManagement() {
       nameKata = false
 
     } else {
-      document.getElementById("newClientNameKataErrMsg").style.display = "none"
-      document.getElementById("newClientNameKataErrMsg").innerHTML = ""
+      document.getElementById("newClient名称カナErrMsg").style.display = "none"
+      document.getElementById("newClient名称カナErrMsg").innerHTML = ""
       nameKata = true
     }
 
@@ -388,21 +388,36 @@ function ClientManagement() {
       managerKata = false
 
     } else {
-      document.getElementById("newClientManagerKataErrMsg").style.display = "none"
-      document.getElementById("newClientManagerKataErrMsg").innerHTML = ""
+      document.getElementById("newClient名称カナErrMsg").style.display = "none"
+      document.getElementById("newClient名称カナErrMsg").innerHTML = ""
       managerKata = true
     }
-
-    if (checkPickStatus() === true && checkInputNumber(price, 'Price') === true && checkFieldAdd(name, "Name") === true
-      && checkFieldAdd(nameKata, "NameKata") === true && checkFieldAdd(companyType, "CompanyType") === true
-      && checkFieldAdd(companyType2, "CompanyType2") === true && checkFieldAdd(department, "DepartmentName") === true
-      && checkFieldAdd(title, "Title") === true && checkFieldAdd(manager, "Manager") === true
-      && checkFieldAdd(managerKata, "ManagerKata") === true
+    checkFieldAdd(name, "名称")
+    checkFieldAdd(nameKata, "名称カナ")
+    checkFieldAdd(companyType, "CompanyType")
+    checkFieldAdd(companyType2, "CompanyType2")
+    checkFieldAdd(department, "部署名")
+    checkFieldAdd(title, "タイトル")
+    checkFieldAdd(manager, "担当者")
+    checkFieldAdd(managerKata, "担当者カナ")
+    checkFieldAdd(url, "URL")
+    checkFieldAdd(address, "住所")
+    checkFieldAdd(municipalities, "都道府県")
+    checkInputNumber(zipCode, "郵便番号")
+    checkFieldAdd(prefectures, "Prefectures")
+    checkFieldAdd(building, "建物名")
+    checkFieldAdd(email, "メールアドレス")
+    checkFieldAdd(phone, "電話番号")
+    if (checkFieldAdd(name, "名称") === true
+      && checkFieldAdd(nameKata, "名称カナ") === true && checkFieldAdd(companyType, "CompanyType") === true
+      && checkFieldAdd(companyType2, "CompanyType2") === true && checkFieldAdd(department, "部署名") === true
+      && checkFieldAdd(title, "タイトル") === true && checkFieldAdd(manager, "担当者") === true
+      && checkFieldAdd(managerKata, "担当者カナ") === true
       && checkFieldAdd(url, "URL") === true
-      && checkFieldAdd(address, "Address") === true && checkFieldAdd(municipalities, "Municipalities") === true
-      && checkFieldAdd(zipCode, "PostCode") === true && checkFieldAdd(prefectures, "Prefectures") === true
-      && checkFieldAdd(building, "BuildingName") === true && checkFieldAdd(emaill, "Email") === true
-      && checkFieldAdd(phone, "Phone") === true && nameKata == true && managerKata == true && emailCheck == true && emailCheckLen == true) {
+      && checkFieldAdd(address, "住所") === true && checkFieldAdd(municipalities, "都道府県") === true
+      && checkFieldAdd(zipCode, "郵便番号") === true && checkFieldAdd(prefectures, "Prefectures") === true
+      && checkFieldAdd(building, "建物名") === true && checkFieldAdd(emaill, "メールアドレス") === true
+      && checkFieldAdd(phone, "電話番号") === true && nameKata == true && managerKata == true && emailCheck == true && emailCheckLen == true) {
       var elements = document.getElementById("detailUserClient").elements;
       var obj = {};
       for (var i = 0; i < elements.length - 3; i++) {
@@ -436,20 +451,20 @@ function ClientManagement() {
       })
     } else {
       if (emailCheck == false) {
-        document.getElementById("newClientEmailErrMsg").style.display = "block"
-        document.getElementById("newClientEmailErrMsg").innerHTML = "Please input the email(ex:abc.com)"
+        document.getElementById("newClientメールアドレスErrMsg").style.display = "block"
+        document.getElementById("newClientメールアドレスErrMsg").innerHTML = "メールを入力してください(例:abc＠abc.com)"
       }
       if (nameKata == false) {
-        document.getElementById("newClientNameKataErrMsg").style.display = "block"
-        document.getElementById("newClientNameKataErrMsg").innerHTML = "Please input Kata character"
+        document.getElementById("newClient名称カナErrMsg").style.display = "block"
+        document.getElementById("newClient名称カナErrMsg").innerHTML = "名称カナを入力してください。"
       }
       if (managerKata == false) {
-        document.getElementById("newClientManagerKataErrMsg").style.display = "block"
-        document.getElementById("newClientManagerKataErrMsg").innerHTML = "Please input Kata character"
+        document.getElementById("newClient担当者カナErrMsg").style.display = "block"
+        document.getElementById("newClient担当者カナErrMsg").innerHTML = "名称カナを入力してください。"
       }
       if(emailCheckLen == false){
-        document.getElementById("newClientEmailErrMsg").style.display = "block"
-        document.getElementById("newClientEmailErrMsg").innerHTML = "Email cannot be blank"
+        document.getElementById("newClientメールアドレスErrMsg").style.display = "block"
+        document.getElementById("newClientメールアドレスErrMsg").innerHTML = "メールを入力してください(例:abc＠abc.com)"
       }
       console.log("Missing field")
     }
@@ -471,16 +486,9 @@ function ClientManagement() {
 
   function addClient() {
     var path = window.location.pathname;
-    // console.log(document.getElementById('newPlanPrice').style.display === "none")
     const reader = new FileReader()
 
-    // let files = document.getElementById('avatar_add').files
-    // reader.onload = async (event) => {
-    //     console.log(event.target.result)
-    // }
-    // // reader.readAsDataURL(files[0])
     var ava = document.getElementById('avatar_add').value
-    console.log(ava)
     var price = document.getElementById('newPlanPrice').value
     var startDate = document.getElementById('startDate').value
     var endDate = document.getElementById('endDate').value
@@ -514,8 +522,8 @@ function ClientManagement() {
 
     var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
     if (email.match(mailformat)) {
-      document.getElementById("newClientEmailErrMsg").style.display = "none"
-      document.getElementById("newClientEmailErrMsg").innerHTML = ""
+      document.getElementById("newClientメールアドレスErrMsg").style.display = "none"
+      document.getElementById("newClientメールアドレスErrMsg").innerHTML = ""
       emailCheck = true
     } else {
       //newClientEmailErrMsg
@@ -524,42 +532,60 @@ function ClientManagement() {
     if (password.length < 6) {
       passwdLengthCheck = false
     } else {
-      document.getElementById("newClientPasswordErrMsg").style.display = "none"
-      document.getElementById("newClientPasswordErrMsg").innerHTML = ""
+      document.getElementById("newClientパスワードErrMsg").style.display = "none"
+      document.getElementById("newClientパスワードErrMsg").innerHTML = ""
       passwdLengthCheck = true
     }
 
     if (ava === "") {
-      document.getElementById("newClientImgLogoErrMsg").innerHTML = "Please choose an image"
+      document.getElementById("newClientImgLogoErrMsg").innerHTML = "画像を選択してください。"
       document.getElementById("newClientImgLogoErrMsg").style.display = "block"
     }
 
     if (namekatabytes != nameKata.length * 3) {
       nameKata = false
     } else {
-      document.getElementById("newClientNameKataErrMsg").style.display = "none"
-      document.getElementById("newClientNameKataErrMsg").innerHTML = ""
+      document.getElementById("newClient名称カナErrMsg").style.display = "none"
+      document.getElementById("newClient名称カナErrMsg").innerHTML = ""
       nameKata = true
     }
 
-    if (managerkatabytes != managerKata.length * 3) {
+    if (managerkatabytes != managerKata.length * 3 || managerKata.length ==0) {
       managerKata = false
     } else {
-      document.getElementById("newClientManagerKataErrMsg").style.display = "none"
-      document.getElementById("newClientManagerKataErrMsg").innerHTML = ""
+      document.getElementById("newClient担当者カナErrMsg").style.display = "none"
+      document.getElementById("newClient担当者カナErrMsg").innerHTML = ""
       managerKata = true
     }
+    checkFieldAdd(name, "名称")
+    checkFieldAdd(nameKata, "名称カナ")
+    checkFieldAdd(companyType, "CompanyType")
+    checkFieldAdd(companyType2, "CompanyType2")
+    checkFieldAdd(department, "部署名")
+    checkFieldAdd(title, "タイトル")
+    checkFieldAdd(manager, "担当者")
+    checkFieldAdd(managerKata, "担当者カナ")
+    checkFieldAdd(password, "パスワード")
+    checkFieldAdd(cfPassword, "パスワード(確認用)")
+    checkFieldAdd(url, "URL")
+    checkFieldAdd(address, "住所")
+    checkFieldAdd(municipalities, "都道府県")
+    checkInputNumber(zipCode, "郵便番号")
+    checkFieldAdd(prefectures, "Prefectures")
+    checkFieldAdd(building, "建物名")
+    checkFieldAdd(email, "メールアドレス")
+    checkFieldAdd(phone, "電話番号")
     // console.log("nameKata: ", nameKata, ", managerKata: ", managerKata)
-    if (checkPickStatus() === true && checkInputNumber(price, 'Price') === true && checkFieldAdd(name, "Name") === true
-      && checkFieldAdd(nameKata, "NameKata") === true && checkFieldAdd(companyType, "CompanyType") === true
-      && checkFieldAdd(companyType2, "CompanyType2") === true && checkFieldAdd(department, "DepartmentName") === true
-      && checkFieldAdd(title, "Title") === true && checkFieldAdd(manager, "Manager") === true
-      && checkFieldAdd(managerKata, "ManagerKata") === true && checkFieldAdd(password, "Password") === true
-      && checkFieldAdd(cfPassword, "ConfirmPassword") === true && checkFieldAdd(url, "URL") === true
-      && checkFieldAdd(address, "Address") === true && checkFieldAdd(municipalities, "Municipalities") === true
-      && checkFieldAdd(zipCode, "PostCode") === true && checkFieldAdd(prefectures, "Prefectures") === true
-      && checkFieldAdd(building, "BuildingName") === true && checkFieldAdd(email, "Email") === true
-      && checkFieldAdd(phone, "Phone") === true && ava !== "" && nameKata == true && managerKata == true
+    if (checkPickStatus() === true && checkFieldAdd(name, "名称") === true
+      && checkFieldAdd(nameKata, "名称カナ") === true && checkFieldAdd(companyType, "CompanyType") === true
+      && checkFieldAdd(companyType2, "CompanyType2") === true && checkFieldAdd(department, "部署名") === true
+      && checkFieldAdd(title, "タイトル") === true && checkFieldAdd(manager, "担当者") === true
+      && checkFieldAdd(managerKata, "担当者カナ") === true && checkFieldAdd(password, "パスワード") === true
+      && checkFieldAdd(cfPassword, "パスワード(確認用)") === true && checkFieldAdd(url, "URL") === true
+      && checkFieldAdd(address, "住所") === true && checkFieldAdd(municipalities, "都道府県") === true
+      && checkInputNumber(zipCode, "郵便番号") === true && checkFieldAdd(prefectures, "Prefectures") === true
+      && checkFieldAdd(building, "建物名") === true && checkFieldAdd(email, "メールアドレス") === true
+      && checkFieldAdd(phone, "電話番号") === true && ava !== "" && nameKata == true && managerKata == true
       && passwdLengthCheck == true && emailCheck == true) {
 
 
@@ -604,22 +630,21 @@ function ClientManagement() {
       // }
     } else {
       if (emailCheck == false) {
-        document.getElementById("newClientEmailErrMsg").style.display = "block"
-        document.getElementById("newClientEmailErrMsg").innerHTML = "Please input the email(ex:abc.com)"
+        document.getElementById("newClientメールアドレスErrMsg").style.display = "block"
+        document.getElementById("newClientメールアドレスErrMsg").innerHTML = "メールを入力してください(例:abc＠abc.com)"
       }
       if (passwdLengthCheck == false) {
-        document.getElementById("newClientPasswordErrMsg").style.display = "block"
-        document.getElementById("newClientPasswordErrMsg").innerHTML = "Password must contains more than 6 characters"
+        document.getElementById("newClientパスワードErrMsg").style.display = "block"
+        document.getElementById("newClientパスワードErrMsg").innerHTML = "パスワードは最低6つの文字の必要です。"
       }
       if (nameKata == false) {
-        document.getElementById("newClientNameKataErrMsg").style.display = "block"
-        document.getElementById("newClientNameKataErrMsg").innerHTML = "Please input Kata character"
+        document.getElementById("newClient名称カナErrMsg").style.display = "block"
+        document.getElementById("newClient名称カナErrMsg").innerHTML = "名称カナを入力してください。"
       }
       if (managerKata == false) {
-        document.getElementById("newClientManagerKataErrMsg").style.display = "block"
-        document.getElementById("newClientManagerKataErrMsg").innerHTML = "Please input Kata character"
+        document.getElementById("newClient担当者カナErrMsg").style.display = "block"
+        document.getElementById("newClient担当者カナErrMsg").innerHTML = "名称カナを入力してください。"
       }
-      console.log('Missing field')
     }
   }
 
@@ -647,14 +672,14 @@ function ClientManagement() {
       return true
     } else {
       document.getElementById(`newClientStatusErrMsg`).style.display = 'block'
-      document.getElementById(`newClientStatusErrMsg`).innerHTML = `Status cannot be empty`
+      document.getElementById(`newClientStatusErrMsg`).innerHTML = `ステータスを選択してください。`
     }
   }
 
   function checkFieldAdd(value, field) {
     if (value === '') {
       document.getElementById(`newClient${field}ErrMsg`).style.display = 'block'
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} cannot be empty`
+      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} 入力してください。`
     } else {
       document.getElementById(`newClient${field}ErrMsg`).style.display = 'none'
       document.getElementById(`newClient${field}ErrMsg`).innerHTML = ""
@@ -694,7 +719,10 @@ function ClientManagement() {
     // var phoneRe = /^\d+$/;
     if (value === '') {
       document.getElementById(`newClient${field}ErrMsg`).style.display = 'block'
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} cannot be empty`
+      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} を入力してください。`
+    }else if(parseInt(value) == isNaN){
+      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block'
+      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} 番号になければなりません。`
     } else {
       document.getElementById(`newClient${field}ErrMsg`).style.display = 'none'
       document.getElementById(`newClient${field}ErrMsg`).innerHTML = ""
@@ -722,7 +750,7 @@ function ClientManagement() {
     setInputStartDate(inputdate)
     if (document.getElementById('startDate').value.toString() === '') {
       document.getElementById(`newClientStartErrMsg`).style.display = 'block'
-      document.getElementById(`newClientStartErrMsg`).innerHTML = `Start date cannot be empty`
+      document.getElementById(`newClientStartErrMsg`).innerHTML = `開始日を入力してください。`
     } else {
       document.getElementById(`newClientStartErrMsg`).style.display = 'none'
       document.getElementById(`newClientStartErrMsg`).innerHTML = ``
@@ -783,7 +811,8 @@ function ClientManagement() {
             <Card>
               <CardHeader>
                 <div className="swap" style={{ display: "flex", width: "100%" }}>
-                  <div style={{ width: "50%" }}><input id="searchUser" name="searchUser" style={{ height: "38px", width: "200px", border: "1px solid #dee2e6", paddingTop: "-10px", borderRadius: "3px" }}></input> <Button onClick={() => search()} style={{ backgroundColor: "#66615b" }}>Search</Button></div>
+                  <div style={{ width: "50%" }}><input id="searchUser" name="searchUser" style={{ height: "38px", width: "200px", border: "1px solid #dee2e6", paddingTop: "-10px", borderRadius: "3px" }}></input> 
+                  <Button onClick={() => search()} style={{ backgroundColor: "#66615b" }}>検索</Button></div>
                   <div className="div_right" style={{ float: "right" }}><Button type="text" onClick={() => addUserPopup()} style={{ backgroundColor: "#66615b" }}>クライアント追加</Button></div>
                 </div>
               </CardHeader>
@@ -817,7 +846,7 @@ function ClientManagement() {
                           <td>{item.id}</td>
                           <td style={{ margin: "0", padding: "0" }}><img src={`https://ec-chatbot-test.com${item.logo_url.url}`} style={{ maxHeight: "60px", maxWidth: "100px" }} alt="" /></td>
                           <td>{item.name}</td>
-                          <td>{item.plan}</td>
+                          <td>{item.plan == "startup" ? "スタートアップ" : (item.plan == "expert" ? "エキスパート" : (item.plan == "complete"? "完全成果報酬" : "プレミアム"))}</td>
                           <td>{item.price}</td>
                           <td id="dateStart">{(item.subscription_start_at == null) ? item.subscription_start_at : item.subscription_start_at.slice(0, 10)}</td>
                           {/* .slice(0, 10) */}
@@ -878,8 +907,8 @@ function ClientManagement() {
                   </select>
                 </label><br /><br />
                 <label className="label-input">プラン価格 {/**Plan price*/}
-                  <input className="input-field" value={price} disabled={disableInput == true ? true : false} onChange={(e) => setPrice(e.target.value)} onBlur={(e) => utils.checkInputNumber(e.target.value, "Price")} type="text" id="newPlanPrice" name="price" />
-                  <label id="newClientPriceErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" value={price} disabled={disableInput == true ? true : false} onChange={(e) => setPrice(e.target.value)} onBlur={(e) => utils.checkInputNumber(e.target.value, "プラン価格")} type="text" id="newPlanPrice" name="price" />
+                  <label id="newClientプラン価格ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">課金開始日 {/** Date start count price */}
                   <input style={{ position: "relative" }} disabled={disableInput == true ? true : false} type="date" id="startDate" name="subscription_start_at" value={inputStartDate} onChange={(e) => checkInputDate(e.target.value)} className="input-field" />
@@ -926,12 +955,12 @@ function ClientManagement() {
                   <label id="newClientNoteErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">名称 <span className="span-require">*必須</span>
-                  <input className="input-field" disabled={disableInput == true ? true : false} value={name} onChange={(e) => setName(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "Name")} type="text" id="newName" name="name" />
-                  <label id="newClientNameErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" disabled={disableInput == true ? true : false} value={name} onChange={(e) => setName(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "名称")} type="text" id="newName" name="name" />
+                  <label id="newClient名称ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">名称カナ <span className="span-require">*必須</span>
-                  <input className="input-field" disabled={disableInput == true ? true : false} value={nameKata} onChange={(e) => setNameKata(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "NameKata")} type="text" id="newNameKata" name="name_katakana" />
-                  <label id="newClientNameKataErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" disabled={disableInput == true ? true : false} value={nameKata} onChange={(e) => setNameKata(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "名称カナ")} type="text" id="newNameKata" name="name_katakana" />
+                  <label id="newClient名称カナErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">企業種別 <span className="span-require">*必須</span>
                   {/* <input className="input-field" value={companyType} onChange={(e) => setCompanyType(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "CompanyType")} type="text" id="newCompanyType" name="enterprise_type" /> */}
@@ -984,20 +1013,20 @@ function ClientManagement() {
                   <label id="newClientCompanyType2ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">部署名 <span className="span-require">*必須</span>
-                  <input className="input-field" value={departmentName} disabled={disableInput == true ? true : false} onChange={(e) => setDepartmentName(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "DepartmentName")} type="text" id="newDepartmentName" name="department_name" />
-                  <label id="newClientDepartmentNameErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" value={departmentName} disabled={disableInput == true ? true : false} onChange={(e) => setDepartmentName(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "部署名")} type="text" id="newDepartmentName" name="department_name" />
+                  <label id="newClient部署名ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">肩書 <span className="span-require">*必須</span>
-                  <input className="input-field" value={title} disabled={disableInput == true ? true : false} onChange={(e) => setTitle(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "Title")} type="text" id="newTitle" name="title" />
-                  <label id="newClientTitleErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" value={title} disabled={disableInput == true ? true : false} onChange={(e) => setTitle(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "タイトル")} type="text" id="newTitle" name="title" />
+                  <label id="newClientタイトルErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">担当者 <span className="span-require">*必須</span>
-                  <input className="input-field" value={manager} disabled={disableInput == true ? true : false} onChange={(e) => setManager(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "Manager")} type="text" id="newManager" name="responsible_person" />
-                  <label id="newClientManagerErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" value={manager} disabled={disableInput == true ? true : false} onChange={(e) => setManager(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "担当者")} type="text" id="newManager" name="responsible_person" />
+                  <label id="newClient担当者ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">担当者カナ <span className="span-require">*必須</span>
-                  <input className="input-field" value={managerKata} disabled={disableInput == true ? true : false} onChange={(e) => setManagerKata(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "ManagerKata")} type="text" id="newManagerKata" name="responsible_person_katakana" />
-                  <label id="newClientManagerKataErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" value={managerKata} disabled={disableInput == true ? true : false} onChange={(e) => setManagerKata(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "担当者カナ")} type="text" id="newManagerKata" name="responsible_person_katakana" />
+                  <label id="newClient担当者カナErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 {/* <label className="label-input">パスワード <span className="span-require">*必須</span>
                   <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "Password")} type="password" id="newPassword" name="password" />
@@ -1017,8 +1046,8 @@ function ClientManagement() {
                   <label id="newClientURLErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">郵便番号 <span className="span-require">*必須</span>
-                  <input className="input-field" disabled={disableInput == true ? true : false} value={zipCode} onChange={(e) => setZipCode(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "PostCode")} type="text" id="newPostCode" name="zip_code" />
-                  <label id="newClientPostCodeErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" disabled={disableInput == true ? true : false} value={zipCode} onChange={(e) => setZipCode(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "郵便番号")} type="text" id="newPostCode" name="zip_code" />
+                  <label id="newClient郵便番号ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">都道府県 <span className="span-require">*必須</span>
                   {/* <input className="input-field" value={prefecture} onChange={(e) => setPrefecture(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "Prefectures")} type="text" id="newPrefectures" name="prefecture" /> */}
@@ -1075,24 +1104,24 @@ function ClientManagement() {
                   <label id="newClientPrefecturesErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">市区町村 <span className="span-require">*必須</span>
-                  <input className="input-field" value={municipality} disabled={disableInput == true ? true : false} onChange={(e) => setMunicipality(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "Municipalities")} type="text" id="newMunicipalities" name="municipality" />
-                  <label id="newClientMunicipalitiesErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" value={municipality} disabled={disableInput == true ? true : false} onChange={(e) => setMunicipality(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "都道府県")} type="text" id="newMunicipalities" name="municipality" />
+                  <label id="newClient都道府県ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">住所 <span className="span-require">*必須</span>
-                  <input className="input-field" value={address} disabled={disableInput == true ? true : false} onChange={(e) => setAddress(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "Address")} type="text" id="newAddress" name="address" />
-                  <label id="newClientAddressErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" value={address} disabled={disableInput == true ? true : false} onChange={(e) => setAddress(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "住所")} type="text" id="newAddress" name="address" />
+                  <label id="newClient住所ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">建物名 <span className="span-require">*必須</span>
-                  <input className="input-field" value={buildingName} disabled={disableInput == true ? true : false} onChange={(e) => setBuildingName(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "BuildingName")} type="text" id="newBuildingName" name="building_name" />
-                  <label id="newClientBuildingNameErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" value={buildingName} disabled={disableInput == true ? true : false} onChange={(e) => setBuildingName(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "建物名")} type="text" id="newBuildingName" name="building_name" />
+                  <label id="newClient建物名ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">メールアドレス <span className="span-require">*必須</span>
-                  <input className="input-field" value={email} disabled={disableInput == true ? true : false} onChange={(e) => setEmail(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "Email")} type="text" id="newEmail" name="email" />
-                  <label id="newClientEmailErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" value={email} disabled={disableInput == true ? true : false} onChange={(e) => setEmail(e.target.value)} onBlur={(e) => checkFieldAdd(e.target.value, "メールアドレス")} type="text" id="newEmail" name="email" />
+                  <label id="newClientメールアドレスErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">電話番号 <span className="span-require">*必須</span>
-                  <input className="input-field" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={disableInput == true ? true : false} onBlur={(e) => utils.checkPhoneNumber(e.target.value, "Phone")} type="text" id="newPhone" name="phone_number" />
-                  <label id="newClientPhoneErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={disableInput == true ? true : false} onBlur={(e) => utils.checkPhoneNumber(e.target.value, "電話番号")} type="text" id="newPhone" name="phone_number" />
+                  <label id="newClient電話番号ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <Button id="btnUpdate" hidden={disableInput} onClick={updateClient}> 更新</Button>
               </form>
@@ -1131,8 +1160,8 @@ function ClientManagement() {
                   </select>
                 </label><br /><br />
                 <label className="label-input">プラン価格 {/**Plan price*/}
-                  <input className="input-field" onBlur={(e) => utils.checkInputNumber(e.target.value, "Price")} type="text" id="newPlanPrice" name="price" />
-                  <label id="newClientPriceErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => utils.checkInputNumber(e.target.value, "プラン価格")} type="text" id="newPlanPrice" name="price" />
+                  <label id="newClientプラン価格ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">課金開始日 {/** Date start count price */}
                   <input style={{ position: "relative" }} type="date" id="startDate" name="subscription_start_at" onChange={(e) => checkInputDate(e.target.value)} className="input-field" />
@@ -1179,12 +1208,12 @@ function ClientManagement() {
                   <label id="newClientNoteErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">名称 <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "Name")} type="text" id="newName" name="name" />
-                  <label id="newClientNameErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "名称")} type="text" id="newName" name="name" />
+                  <label id="newClient名称ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
-                <label className="label-input">名称カナ <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "NameKata")} type="text" id="newNameKata" name="name_katakana" />
-                  <label id="newClientNameKataErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                <label className="label-input">名称カナ<span className="span-require">*必須</span>
+                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "名称カナ")} type="text" id="newNameKata" name="name_katakana" />
+                  <label id="newClient名称カナErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">企業種別 <span className="span-require">*必須</span>
                   {/* <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "CompanyType")} type="text" id="newCompanyType" name="enterprise_type" /> */}
@@ -1237,31 +1266,31 @@ function ClientManagement() {
                   <label id="newClientCompanyType2ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">部署名 <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "DepartmentName")} type="text" id="newDepartmentName" name="department_name" />
-                  <label id="newClientDepartmentNameErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "部署名")} type="text" id="newDepartmentName" name="department_name" />
+                  <label id="newClient部署名ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">肩書 <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "Title")} type="text" id="newTitle" name="title" />
-                  <label id="newClientTitleErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "タイトル")} type="text" id="newTitle" name="title" />
+                  <label id="newClientタイトルErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">担当者 <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "Manager")} type="text" id="newManager" name="responsible_person" />
-                  <label id="newClientManagerErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "担当者")} type="text" id="newManager" name="responsible_person" />
+                  <label id="newClient担当者ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">担当者カナ <span className="span-require">*必須</span>
                   {/* waiting BE */}
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "ManagerKata")} type="text" id="newManagerKata" name="responsible_person_katakana" />
-                  <label id="newClientManagerKataErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "担当者カナ")} type="text" id="newManagerKata" name="responsible_person_katakana" />
+                  <label id="newClient担当者カナErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">パスワード <span className="span-require">*必須</span>
                   {/* waiting BE */}
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "Password")} type="password" id="newPassword" name="password" />
-                  <label id="newClientPasswordErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "パスワード")} type="password" id="newPassword" name="password" />
+                  <label id="newClientパスワードErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">パスワード(確認用) <span className="span-require">*必須</span>
                   {/* waiting BE */}
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "ConfirmPassword")} type="password" id="newConfirmPassword" name="password_confirmation" />
-                  <label id="newClientConfirmPasswordErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "パスワード(確認用)")} type="password" id="newConfirmPassword" name="password_confirmation" />
+                  <label id="newClientパスワード(確認用)ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">画像（ロゴ）<span className="span-require">*必須</span>
                   <input className="input-field" type="file" id="avatar_add" onChange={(e) => getBaseUrl()} name="img_logo" accept="image/png, image/jpeg" />
@@ -1272,8 +1301,8 @@ function ClientManagement() {
                   <label id="newClientURLErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">郵便番号 <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "PostCode")} type="text" id="newPostCode" name="zip_code" />
-                  <label id="newClientPostCodeErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => utils.checkInputNumber(e.target.value, "郵便番号")} type="text" id="newPostCode" name="zip_code" />
+                  <label id="newClient郵便番号ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">都道府県 <span className="span-require">*必須</span>
                   {/* <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "Prefectures")} type="text" id="newPrefectures" name="prefecture" /> */}
@@ -1330,43 +1359,25 @@ function ClientManagement() {
                   <label id="newClientPrefecturesErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">市区町村 <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "Municipalities")} type="text" id="newMunicipalities" name="municipality" />
-                  <label id="newClientMunicipalitiesErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "都道府県")} type="text" id="newMunicipalities" name="municipality" />
+                  <label id="newClient都道府県ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">住所 <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "Address")} type="text" id="newAddress" name="address" />
-                  <label id="newClientAddressErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "住所")} type="text" id="newAddress" name="address" />
+                  <label id="newClient住所ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">建物名 <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "BuildingName")} type="text" id="newBuildingName" name="building_name" />
-                  <label id="newClientBuildingNameErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "建物名")} type="text" id="newBuildingName" name="building_name" />
+                  <label id="newClient建物名ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">メールアドレス <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "Email")} type="text" id="newEmail" name="email" />
-                  <label id="newClientEmailErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => checkFieldAdd(e.target.value, "メールアドレス")} type="text" id="newEmail" name="email" />
+                  <label id="newClientメールアドレスErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
                 <label className="label-input">電話番号 <span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => utils.checkPhoneNumber(e.target.value, "Phone")} type="text" id="newPhone" name="phone_number" />
-                  <label id="newClientPhoneErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => utils.checkPhoneNumber(e.target.value, "電話番号")} type="text" id="newPhone" name="phone_number" />
+                  <label id="newClient電話番号ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label> <br /><br />
-                {/* <label className="label-input">
-                  Phone Number:
-                  <input className="input-field" onBlur={(e) => utils.checkInputNumber(e.target.value, "Phone")} type="text" id="newPhone" name="phone_number" />
-                  <label id="newClientPhoneErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
-                </label>
-                <br /><br />
-                <label className="label-input">
-                  Phone Number:
-                  <input className="input-field" onBlur={(e) => utils.checkInputNumber(e.target.value, "Phone")} type="text" id="newPhone" name="phone_number" />
-                  <label id="newClientPhoneErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
-                </label>
-                <br /><br />
-                <label className="label-input">
-                  Phone Number:
-                  <input className="input-field" onBlur={(e) => utils.checkInputNumber(e.target.value, "Phone")} type="text" id="newPhone" name="phone_number" />
-                  <label id="newClientPhoneErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
-                </label>
-                <br /><br /> */}
                 <Button id="btnSubmit" onClick={addClient}>追加</Button>
               </form>
             </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React , { useState } from "react";
 import { Line, Pie } from "react-chartjs-2";
 import {
   Card,
@@ -15,9 +15,19 @@ import {
   dashboardEmailStatisticsChart,
   dashboardNASDAQChart,
 } from "variables/charts.js";
+import ReactApexChart from "react-apexcharts";
+import api from '../api/api-management'
 
 function Dashboard() {
+  const [monthECUDisplay, setMonthECUDisplay] = useState(["1", "2", "3", "4"])
+  const [monthInstaUser, setMonthInstaUser] = useState([])
 
+  const [dateECU, setDateECU] = useState([])
+  const [userECC, setUserECC] = useState([])
+  const [messageEC, setMessageEC] = useState([])
+  const [userChatwithCB, setUserChatwithCB] = useState([])
+  const [userChatwithCBAll, setUserChatwithCBAll] = useState()
+  const [userTotal, setUserTotal] = useState()
 
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'))
@@ -38,6 +48,123 @@ function Dashboard() {
       window.location.href ='/'
     }
   }, [])
+
+
+  React.useEffect(() => {
+    var path = window.location.pathname;
+    api.get(`/api/v1/analytics/chatbot_usages/user?date=5d`).then(res => {
+      console.log("user EC: ", res.data.counts)
+      var useEC = res.data.counts
+      var dateEC = []
+      var user_count = []
+      for (var i = 0; i < useEC.length; i++) {
+        // useEC[i].log_date.slice(0,5)
+        dateEC.push(useEC[i].log_date.slice(0, 5))
+        user_count.push(useEC[i].user_count)
+      }
+      setDateECU(dateEC)
+      setUserECC(user_count)
+    }).catch(error => {
+      console.log(error)
+    })
+    ////////////////////////////////////////////////
+    api.get(`/api/v1/analytics/chatbot_usages/message?date=5d`).then(res => {
+      console.log("message EC: ", res.data.counts)
+      var messageECA = res.data.counts
+      var message_count = []
+      for (var i = 0; i < messageECA.length; i++) {
+        message_count.push(messageECA[i].message_count)
+      }
+      setMessageEC(message_count)
+    }).catch(error => {
+      console.log(error)
+    })
+    ///////////////////////////////////////////////
+    api.get(`/api/v1/analytics/users?date=5d`).then(res => {
+      var useEC = res.data.user_counts
+      var user_count_all = 0
+      for (var i = 0; i < useEC.length; i++) {
+        user_count_all = user_count_all + useEC[i].user_count
+      }
+      setUserChatwithCB(user_count_all)
+    }).catch(error => {
+      console.log(error)
+    })
+    ///////////////////////////////////////////////
+    api.get(`/api/v1/analytics/users?date=6m`).then(res => {
+      var useEC = res.data.user_counts
+      var user_count_alltime = 0
+      for (var i = 0; i < useEC.length; i++) {
+        user_count_alltime = user_count_alltime + useEC[i].user_count
+      }
+      setUserChatwithCBAll(user_count_alltime)
+    }).catch(error => {
+      console.log(error)
+    })
+  }, [])
+
+  var dataAPC = {
+    series: [{
+      name: 'Ec chatbotユーザー',
+      type: 'area',
+      data: userECC
+    }, {
+      name: '送信したメッセージ数',
+      type: 'line',
+      data: messageEC
+    }],
+    options: {
+      chart: {
+        height: 350,
+        type: 'line',
+      },
+      stroke: {
+        curve: 'smooth'
+      },
+      fill: {
+        type: 'solid',
+        opacity: [0.35, 1],
+      },
+      labels: dateECU,
+      markers: {
+        size: 0
+      },
+      yaxis: [
+        {
+          title: {
+            text: 'Ec chatbotユーザー',
+          },
+        },
+        {
+          opposite: true,
+          title: {
+            text: '送信したメッセージ数',
+          },
+        },
+      ],
+      tooltip: {
+        shared: true,
+        intersect: false,
+        enabled: false,
+      enabledOnSeries: undefined,
+      followCursor: false,
+      inverseOrder: false,
+      custom: undefined,
+      fillSeriesColor: false,
+      theme: false,
+        y: {
+          formatter: function (y) {
+            if (typeof y !== "undefined") {
+              return y.toFixed(0) + "";
+            }
+            return y;
+          }
+        }
+      }
+    }
+  }
+
+
   return (
     <>
       <div className="content">
@@ -54,7 +181,7 @@ function Dashboard() {
                     </Col>
                     <Col md="9" xs="7">
                       <div className="numbers">
-                        <CardTitle tag="p">クライアント管理</CardTitle>
+                        <CardTitle tag="p" style={{fontSize:"23px"}}>クライアント管理</CardTitle>
                         <p />
                       </div>
                     </Col>
@@ -80,7 +207,7 @@ function Dashboard() {
                     </Col>
                     <Col md="9" xs="7">
                       <div className="numbers">
-                        <CardTitle tag="p">ユーザー管理</CardTitle>
+                        <CardTitle tag="p" style={{fontSize:"23px"}}>ユーザー管理</CardTitle>
                         <p />
                       </div>
                     </Col>
@@ -95,18 +222,18 @@ function Dashboard() {
             </a>
           </Col>
           <Col lg="3" md="6" sm="6">
-            <a href="/admin/pricing">
+            <a href="/admin/keyword">
               <Card className="card-stats">
                 <CardBody>
                   <Row>
                     <Col md="4" xs="5">
                       <div className="icon-big text-center icon-warning">
-                        <i className="nc-icon nc-bulb-63 text-danger" />
+                        <i className="nc-icon nc-key-25 text-danger" />
                       </div>
                     </Col>
                     <Col md="8" xs="7">
                       <div className="numbers">
-                        <CardTitle tag="p">価格</CardTitle>
+                        <CardTitle tag="p" style={{fontSize:"23px"}}>価格</CardTitle>
                         <p />
                       </div>
                     </Col>
@@ -132,7 +259,7 @@ function Dashboard() {
                     </Col>
                     <Col md="8" xs="7">
                       <div className="numbers">
-                        <CardTitle tag="p">Chatbot</CardTitle>
+                        <CardTitle tag="p" style={{fontSize:"23px"}}>チャットボット</CardTitle>
                         <p />
                       </div>
                     </Col>
@@ -150,18 +277,13 @@ function Dashboard() {
         <Row>
           <Col md="12">
             <Card>
-              <CardHeader>
-                <CardTitle tag="h5">Users Behavior</CardTitle>
-                <p className="card-category">24 Hours performance</p>
-              </CardHeader>
               <CardBody>
-                <Line
-                  data={dashboard24HoursPerformanceChart.data}
-                  options={dashboard24HoursPerformanceChart.options}
-                  width={400}
-                  height={100}
-                />
-              </CardBody>
+                      <div style={{width:"100%", textAlign:"center"}}><h3>概要</h3></div>
+                      <div style={{ display: "flex", width: "100%" }}>
+                      </div>
+                      <ReactApexChart options={dataAPC.options} series={dataAPC.series} type="line" height={350} />
+
+                    </CardBody>
               <CardFooter>
                 <hr />
                 <div className="stats">
@@ -172,7 +294,7 @@ function Dashboard() {
           </Col>
         </Row>
         <Row>
-          <Col md="4">
+          {/* <Col md="4">
             <Card>
               <CardHeader>
                 <CardTitle tag="h5">Email Statistics</CardTitle>
@@ -197,8 +319,8 @@ function Dashboard() {
                 </div>
               </CardFooter>
             </Card>
-          </Col>
-          <Col md="8">
+          </Col> */}
+          {/* <Col md="8">
             <Card className="card-chart">
               <CardHeader>
                 <CardTitle tag="h5">NASDAQ: AAPL</CardTitle>
@@ -223,7 +345,7 @@ function Dashboard() {
                 </div>
               </CardFooter>
             </Card>
-          </Col>
+          </Col> */}
         </Row>
       </div>
     </>

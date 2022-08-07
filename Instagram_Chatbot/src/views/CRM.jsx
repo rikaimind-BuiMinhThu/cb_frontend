@@ -45,6 +45,7 @@ function CRM() {
   const [historyinstagramUser, setHistoryInstagramUser] = useState([])
   const [customTable, setCustomTable] = useState([])
   const [customLabel, setCustomLabel] = useState([])
+  const [customLabelLen, setCustomLabelLen] = useState()
   const [idInstaUser, setIdInstaUser] = useState()
   function detailUser(id) {
 
@@ -53,8 +54,16 @@ function CRM() {
       console.log("detail instagram_users: ", res.data.data)
       setInstagramUser(res.data.data.instagram_users)
       setLabelInstagramUser(res.data.data.labels)
+      // var listLab = 10
+      // var listLabRe = res.data.data.labels.length
+      // if(listLabRe<listLab){
+      //   setLabelInstagramUser(res.data.data.labels)
+      // }else{
+      //   setLabelInstagramUser(res.data.data.labels.slice(0,10))
+      // }
       setCustomTable(res.data.data.custom_items)
       setCustomLabel(res.data.data.labels)
+      setCustomLabelLen(res.data.data.labels.length)
       setIdInstaUser(res.data.data.instagram_users.id)
       var listHistory = []
       var historyLe
@@ -88,6 +97,9 @@ function CRM() {
       setLabelInstagramUser(res.data.data.labels)
       setCustomTable(res.data.data.custom_items)
       setCustomLabel(res.data.data.labels)
+      if(res.data.data.labels.length >10){
+        setCustomLabelLen(10)
+      }
       // setIdInstaUser(res.data.data.instagram_users.id)
       var listHistory = []
       var historyLe
@@ -173,11 +185,11 @@ function CRM() {
   function checkInputLabel(value) {
     if (value == "") {
       document.getElementById("newLabelErrMsg").style.display = "block"
-      document.getElementById("newLabelErrMsg").innerHTML = "This field cannot be empty"
+      document.getElementById("newLabelErrMsg").innerHTML = "入力してください。"
       document.getElementById("btnAddLbl").disabled = true
     } else if (value.length > 20) {
       document.getElementById("newLabelErrMsg").style.display = "block"
-      document.getElementById("newLabelErrMsg").innerHTML = "Maximum 20 character"
+      document.getElementById("newLabelErrMsg").innerHTML = "最大20つの文字"
       document.getElementById("btnAddLbl").disabled = true
     } else {
       document.getElementById("newLabelErrMsg").style.display = "none"
@@ -192,11 +204,11 @@ function CRM() {
   function checkInputItemTitle(value) {
     if (value == "") {
       document.getElementById("newItemTitleErrMsg").style.display = "block"
-      document.getElementById("newItemTitleErrMsg").innerHTML = "This field cannot be empty"
+      document.getElementById("newItemTitleErrMsg").innerHTML = "入力してください。"
       document.getElementById("btnAddItem").disabled = true
     } else if (value.length > 15) {
       document.getElementById("newItemTitleErrMsg").style.display = "block"
-      document.getElementById("newItemTitleErrMsg").innerHTML = "Maximum 15 character"
+      document.getElementById("newItemTitleErrMsg").innerHTML = "最大15つの文字"
       document.getElementById("btnAddItem").disabled = true
     } else {
       document.getElementById("newItemTitleErrMsg").style.display = "none"
@@ -209,11 +221,11 @@ function CRM() {
   function checkInputItemValue(value) {
     if (value == "") {
       document.getElementById("newItemValueErrMsg").style.display = "block"
-      document.getElementById("newItemValueErrMsg").innerHTML = "This field cannot be empty"
+      document.getElementById("newItemValueErrMsg").innerHTML = "入力してください。"
       document.getElementById("btnAddItem").disabled = true
     } else if (value.length > 15) {
       document.getElementById("newItemValueErrMsg").style.display = "block"
-      document.getElementById("newItemValueErrMsg").innerHTML = "Maximum 15 character"
+      document.getElementById("newItemValueErrMsg").innerHTML = "最大15つの文字"
       document.getElementById("btnAddItem").disabled = true
     } else {
       document.getElementById("newItemValueErrMsg").style.display = "none"
@@ -226,7 +238,9 @@ function CRM() {
   function editDetail() {
     document.getElementById(`btnSaveDetail`).style.display = "block"
     document.getElementById(`btnEditDetail`).style.display = "none"
-    for (var i = 0; i < customLabel.length; i++) {
+    document.getElementById(`addLabelItem`).style.display = "none"
+    document.getElementById(`AddTableButton`).style.display = "none"
+    for (var i = 0; i < customLabelLen; i++) {
       if (document.getElementById(`deleteLbl${customLabel[i].id}`) !== null) {
         document.getElementById(`deleteLbl${customLabel[i].id}`).style.display = "block"
       }
@@ -246,6 +260,8 @@ function CRM() {
   function saveDetail() {
     document.getElementById(`btnSaveDetail`).style.display = "none"
     document.getElementById(`btnEditDetail`).style.display = "block"
+    document.getElementById(`addLabelItem`).style.display = "block"
+    document.getElementById(`AddTableButton`).style.display = "block"
     for (var i = 0; i < customLabel.length; i++) {
       document.getElementById(`deleteLbl${customLabel[i].id}`).style.display = "none"
       // document.getElementById(`deleteTbl${lblList[i].id}`).style.display = "block"
@@ -263,6 +279,10 @@ function CRM() {
     api.delete(`/api/v1/instagram_users/labels/${id}`).then(res => {
       console.log(res)
       reloadInstaUser(idInstaUser)
+      setTimeout(()=>{
+        editDetail()
+      },5500)
+      
     }).catch(error => {
       console.log(error)
     })
@@ -273,6 +293,7 @@ function CRM() {
     api.delete(`/api/v1/instagram_users/custom_items/${id}`).then(res => {
       console.log(res)
       reloadInstaUser(idInstaUser)
+      document.getElementById("btnAddItem").style.display = "none"
     }).catch(error => {
       console.log(error)
     })
@@ -285,19 +306,19 @@ function CRM() {
           <Col>
             <Card>
               <CardHeader>
-                <h3>Instagram User</h3>
+                <h3>インスタグラムユーザー</h3>
               </CardHeader>
               <CardBody>
                 <Table style={{ textAlign: "center", tableLayout: "fixed", overflow: "hidden" }}>
                   <thead className="text-primary">
                     <tr>
-                      <th>Username</th>
-                      <th>Name</th>
-                      <th>Followed Business</th>
-                      <th>Followed by Business</th>
-                      <th>Created at</th>
-                      <th>Updated at</th>
-                      <th>View Detail</th>
+                      <th>ユーザー名</th>
+                      <th>名前</th>
+                      <th>フォローしている</th>
+                      <th>フォローされている</th>
+                      <th>作成日</th>
+                      <th>更新日</th>
+                      <th>詳細</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -305,11 +326,11 @@ function CRM() {
                       <tr key={item.id}>
                         <td>{item.username}</td>
                         <td>{item.full_name}</td>
-                        <td>{item.is_user_follow_business == true ? "Followed" : "Not followed"}</td>
-                        <td>{item.is_business_follow_user == true ? "Followed" : "Not followed"}</td>
+                        <td>{item.is_user_follow_business == true ? "あり" : "なし"}</td>
+                        <td>{item.is_business_follow_user == true ? "あり" : "なし"}</td>
                         <td>{((item.created_at).slice(0, 16)).replace("T", " ").replaceAll("-", "/")}</td>
                         <td>{((item.updated_at).slice(0, 16)).replace("T", " ").replaceAll("-", "/")}</td>
-                        <td><Button style={{ backgroundColor: "#51cbcd" }} onClick={() => detailUser(item.id)}>Deail</Button></td>
+                        <td><Button style={{ backgroundColor: "#51cbcd" }} onClick={() => detailUser(item.id)}>詳細</Button></td>
                       </tr>
                     ))}
                     {/* <tr>
@@ -364,22 +385,22 @@ function CRM() {
                   </div> */}
                   <div style={{ textAlign: "left", marginLeft: "15px" }}>
                     <div style={{ marginTop: "15px", display: `${instagramUser !== undefined ? (instagramUser.email == null ? "none" : "block") : "none"}` }}>
-                      <span>Email: {instagramUser !== undefined ? (instagramUser.email == null ? "" : instagramUser.email) : ""}</span>
+                      <span>メール: {instagramUser !== undefined ? (instagramUser.email == null ? "" : instagramUser.email) : ""}</span>
                     </div>
                     <div style={{ marginTop: "15px", display: `${instagramUser !== undefined ? (instagramUser.phone_number == null ? "none" : "block") : "none"}` }}>
-                      <span>Phone: {instagramUser !== undefined ? (instagramUser.phone_number == null ? "" : instagramUser.phone_number) : ""}</span>
+                      <span>電話番号: {instagramUser !== undefined ? (instagramUser.phone_number == null ? "" : instagramUser.phone_number) : ""}</span>
                     </div>
                     <div style={{ marginTop: "15px" }}>
-                      <span>Followed Business: {instagramUser !== undefined ? (instagramUser.is_user_follow_business == true ? "Yes" : "No") : ""}</span>
+                      <span>フォローしている: {instagramUser !== undefined ? (instagramUser.is_user_follow_business == true ? "あり" : "なし") : ""}</span>
                     </div>
                     <div style={{ marginTop: "15px" }}>
-                      <span>Followed by Business: {instagramUser !== undefined ? (instagramUser.is_business_follow_user == true ? "Yes" : "No") : ""}</span>
+                      <span>フォローされている: {instagramUser !== undefined ? (instagramUser.is_business_follow_user == true ? "あり" : "なし") : ""}</span>
                     </div>
                     <div style={{ marginTop: "15px" }}>
-                      <span>Start Interact: {instagramUser !== undefined ? (((instagramUser.created_at).slice(0, 16)).replace("T", " ").replaceAll("-", "/")) : ""} </span>
+                      <span>開始日: {instagramUser !== undefined ? (((instagramUser.created_at).slice(0, 16)).replace("T", " ").replaceAll("-", "/")) : ""} </span>
                     </div>
                     <div style={{ marginTop: "15px" }}>
-                      <span>Last update: {instagramUser !== undefined ? (((instagramUser.updated_at).slice(0, 16)).replace("T", " ").replaceAll("-", "/")) : ""}</span>
+                      <span>最終更新: {instagramUser !== undefined ? (((instagramUser.updated_at).slice(0, 16)).replace("T", " ").replaceAll("-", "/")) : ""}</span>
                     </div>
                   </div>
 
@@ -389,8 +410,8 @@ function CRM() {
               <div style={{ width: "74%", height: "100%", display: "flex", paddingBottom: "2.5%" }}>
                 <div style={{ width: "60%", height: "100%", borderRight: "1px solid #dddddd", paddingLeft: "0px" }}>
                   <br />
-                  <div id="btnEditDetail" style={{ float: "right", marginRight: "2%" }}><Button onClick={() => editDetail()}>Edit</Button></div>
-                  <div id='btnSaveDetail' style={{ float: "right", marginRight: "2%", display: "none" }}><Button onClick={() => saveDetail()}>Save</Button></div>
+                  <div id="btnEditDetail" style={{ float: "right", marginRight: "2%" }}><Button onClick={() => editDetail()}>編集</Button></div>
+                  <div id='btnSaveDetail' style={{ float: "right", marginRight: "2%", display: "none" }}><Button onClick={() => saveDetail()}>保存</Button></div>
                   <div style={{ display: "flex", marginLeft: "4%", marginTop: "3.5%" }}>
                     <h5>{instagramUser !== undefined ? instagramUser.username : ""}</h5>&ensp;&ensp;<img src={insta_img} style={{ width: "30px", height: "30px" }}></img>
                   </div>
@@ -403,20 +424,20 @@ function CRM() {
                           <button style={{ position: "absolute", marginLeft: "-8px", padding: "0px 0px 0.5px 0px", border: "1px solid gray", backgroundColor: "white", width: "20px", height: "20px", borderRadius: "20px" }}><span>X</span></button></span>
                       </div>
                     ))}
-                    <div style={{ marginTop: "12.5px", marginLeft: "14px", backgroundColor: "#1ba2b8", padding: "5px 10px 0px 10px", borderRadius: "5px", textAlign: "center" }} onClick={() => { setIsOpenAddLabel(true) }}><span style={{ color: "white" }}>
+                    <div id="addLabelItem" style={{ display:`${customLabelLen >=10 ?"none" :"block"}`, marginTop: "12.5px", marginLeft: "14px", backgroundColor: "#1ba2b8", padding: "5px 10px 0px 10px", borderRadius: "5px", textAlign: "center" }} onClick={() => { setIsOpenAddLabel(true) }}><span style={{ color: "white" }}>
                       <i className='nc-icon nc-simple-add' style={{ fontWeight: "800" }}></i></span></div>
                   </div>
                   <br />
                   <br />
                   <div style={{ textAlign: "left" }}>
-                    <span style={{ fontWeight: "700", fontSize: "18px", marginLeft: "4%", color: "#5f6368" }}>顧客 一夕</span>
+                    <span style={{ fontWeight: "700", fontSize: "18px", marginLeft: "4%", color: "#5f6368" }}>顧客データ</span>
                     <div style={{ width: "90%", marginLeft: "4%", height: "1px", backgroundColor: "#e4e4e4" }}></div>
                     <br />
 
                     <div className="grid-container-crm">
 
                       {(customTable == undefined ? [] : customTable).map((item) => (
-                        <div key={item.title} className="grid-item-crm" >
+                        <div key={item.id} className="grid-item-crm" >
                           <div style={{ display: "flex",overflow:"hidden", }}>
                             <div style={{ width: "50%", maxWidth:"200px", overflow:"hidden", borderRight: "1px solid #e4e4e4" }}><span>{item.title}</span></div>
                             <div style={{ width: "50%", maxWidth:"200px",overflow:"hidden", }}><span>{item.value}</span></div>
@@ -425,8 +446,8 @@ function CRM() {
                             <button style={{ position: "absolute", marginLeft: "-8px", padding: "0px 0px 0.5px 0px", border: "1px solid gray", backgroundColor: "white", width: "20px", height: "20px", borderRadius: "20px" }}><span>X</span></button></span>
                         </div>
                       ))}
-                      <div id="AddTableButton" className="grid-item-crm" style={{ color: "#5f6368"}}><button style={{ width: "100%", fontWeight:"600", border: "none", backgroundColor: "white", color: "#5f6368" }}
-                        onClick={() => { setIsOpenAddTable(true) }}>＋ 一夕追加 </button> </div>
+                      <div id="AddTableButton" className="grid-item-crm" style={{ color: "#5f6368", display:`${customTable.length >=8 ?"none" :"block"}`}}><button style={{ width: "100%", fontWeight:"600", border: "none", backgroundColor: "white", color: "#5f6368" }}
+                        onClick={() => { setIsOpenAddTable(true) }}>＋ データ追加 </button> </div>
                     </div>
                   </div>
                 </div>
@@ -441,7 +462,7 @@ function CRM() {
                       {/* <span style={{ width: "73px" }}>{((item.created_at).slice(5,16)).replace("T"," ").replace("-","/")}</span> */}
                       {/* <span>&ensp;{item.action}:&ensp;{item.usage_type}</span> */}
                       <div style={{ textAlign:"left", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", lineClamp: 1, WebkitLineClamp: 1, WebkitBoxOrient: "vertical", width: "95%" }}>
-                        <span>&ensp;{item.usage_type == "dm_received" ? "Sent" : "Received"}:&ensp;{item.content}</span></div>
+                        <span>&ensp;{item.usage_type == "dm_received" ? "送り" : "受け"}:&ensp;{item.content}</span></div>
 
                     </div>
                   ))}
@@ -452,25 +473,25 @@ function CRM() {
         </ModalDetailInstaUser>
         <ModalShort open={isOpenAddTable} onClose={() => setIsOpenAddTable(false)}>
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
-            <h4>Add item Table</h4>
-            <label style={{ width: "100%" }}>Title</label>
+            <h4>集客データ追加</h4>
+            <label style={{ width: "100%" }}>タイトル</label>
             <input id="newItemTitle" style={{ width: "100%" }} onChange={(e) => checkInputItemTitle(e.target.value)} name="item_table_title"></input>
             <label id="newItemTitleErrMsg" style={{ display: 'none', color: "red" }}></label>
-            <label style={{ width: "100%" }}>Value</label>
+            <label style={{ width: "100%" }}>値</label>
             <input id="newItemValue" style={{ width: "100%" }} onChange={(e) => checkInputItemValue(e.target.value)} name="item_table_value"></input>
             <label id="newItemValueErrMsg" style={{ display: 'none', color: "red" }}></label>
             {/* <label id="newMsgBagErrMsg" style={{ display: 'none', color: "red" }}></label> */}
             <br />
-            <Button id="btnAddItem" onClick={() => addTableItem()}>Add</Button>
+            <Button id="btnAddItem" onClick={() => addTableItem()}>追加</Button>
           </div>
         </ModalShort>
         <ModalShort open={isOpenAddLabel} onClose={() => setIsOpenAddLabel(false)}>
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
-            <h4>Add Label</h4>
+            <h4>ラベル追加</h4>
             <input id="newLabel" style={{ width: "100%" }} onChange={(e) => checkInputLabel(e.target.value)} name="item_label"></input>
             <label id="newLabelErrMsg" style={{ display: 'none', color: "red" }}></label>
             <br />
-            <Button id="btnAddLbl" onClick={() => addLabel()}>Add</Button>
+            <Button id="btnAddLbl" onClick={() => addLabel()}>追加</Button>
           </div>
         </ModalShort>
       </div>
