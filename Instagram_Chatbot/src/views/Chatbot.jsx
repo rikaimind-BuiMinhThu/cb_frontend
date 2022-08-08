@@ -224,7 +224,7 @@ function Chatbot() {
             choiceHTML =
               `
                 <div id="itemFI${item.id}" >
-                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check == "email" ? "Email" : (item.free_input.format_check == "phone_number" ? "Phone Number" : "No validate")}</div>
+                <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
                     Delete
@@ -737,7 +737,7 @@ function Chatbot() {
             choiceHTML =
               `
                 <div id="itemFI${item.id}" >
-                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check == "email" ? "Email" : (item.free_input.format_check == "phone_number" ? "Phone Number" : "No validate")}</div>
+                <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
                     Delete
@@ -1378,7 +1378,7 @@ function Chatbot() {
             choiceHTML =
               `
                 <div id="itemFI${item.id}" >
-                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check == "email" ? "Email" : (item.free_input.format_check == "phone_number" ? "Phone Number" : "No validate")}</div>
+                <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
                     Delete
@@ -1930,7 +1930,7 @@ function Chatbot() {
             choiceHTML =
               `
                 <div id="itemFI${item.id}" >
-                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check == "email" ? "Email" : (item.free_input.format_check == "phone_number" ? "Phone Number" : "No validate")}</div>
+                <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
                     Delete
@@ -2343,7 +2343,7 @@ function Chatbot() {
             choiceHTML =
               `
                 <div id="itemFI${item.id}" >
-                <div style="padding:0px 5px 10px 5px">Format check: ${item.free_input.format_check == "email" ? "Email" : (item.free_input.format_check == "phone_number" ? "Phone Number" : "No validate")}</div>
+                <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
                     Delete
@@ -6579,7 +6579,7 @@ function Chatbot() {
       abc.innerHTML =
         `
       <div style="border:none; border-radius:10px; background-color:white; width:max-content; text-align:center">
-        <div style="padding:0px 5px 10px 5px">Format check: ${formatCheckSelect.value == "email" ? "Email" : (formatCheckSelect.value == "phone_number" ? "Phone Number" : "No Validate")}</div>
+        <div style="padding:0px 5px 10px 5px">形式チェック: ${formatCheckSelect.value == "email" ? "メールアドレス" : (formatCheckSelect.value == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
 
         <input id="lblAddFI${idUpdateItemMsg}_${bagAddSC}" hidden type=text value="${lblas}" />
         <input id="formatCheckSelect${idUpdateItemMsg}" hidden type=text value="${formatCheckSelect.value}" />
@@ -6628,7 +6628,7 @@ function Chatbot() {
       abc.innerHTML =
         `
       <div style="border:none; border-radius:10px; background-color:white; width:max-content; text-align:center">
-        <div style="padding:0px 5px 10px 5px">Format check: ${formatCheckSelect.value == "email" ? "Email" : (formatCheckSelect.value == "phone_number" ? "Phone Number" : "No Validate")}</div>
+        <div style="padding:0px 5px 10px 5px">形式チェック: ${formatCheckSelect.value == "email" ? "メールアドレス" : (formatCheckSelect.value == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
 
         <input id="lblAddFI${idSC}_${bagAddSC}" hidden type=text value="${lblas}" />
         <input id="formatCheckSelect${idSC}" hidden type=text value=${formatCheckSelect.value} />
