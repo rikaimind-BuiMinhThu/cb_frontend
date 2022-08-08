@@ -3066,7 +3066,7 @@ function Release() {
                   <div style={{ width: "100%" }}>
                     <div style={{ width: "100%" }}>
                       <div style={{ width: "100%", display: "flex" }}>
-                        <div style={{ width: "50%" }}><br /><span>固定メッセージ設定<i className="nc-icon icon-question-sign"></i></span>
+                        <div style={{ width: "50%" }}><br /><span>固定メニュー<i className="nc-icon icon-question-sign"></i></span>
 
                         </div>
                         <div id="addFixMenubtn" style={{ width: "50%", textAlign: "right" }}>
