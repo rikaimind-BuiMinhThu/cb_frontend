@@ -515,8 +515,8 @@ function Chatbot() {
                 var titlea = document.getElementById(`titleAddSC${item.id}`).value
                 var groupva = document.getElementById(`groupAddSC${item.id}`).value
                 var group_name = document.getElementById(`groupNameAddSC${item.id}`).value
-                var bag_name = document.getElementById(`groupAddSC${item.id}`).value
-                var bag = document.getElementById(`bagNameAddSC${item.id}`).value
+                var bag_name = document.getElementById(`bagNameAddSC${item.id}`).value
+                var bag = document.getElementById(`bagAddSC${item.id}`).value
                 var type = document.getElementById(`typeAddSC${item.id}`).value
                 var web = document.getElementById(`webAddSC${item.id}`).value
                 var lbl = document.getElementById(`lblAddSC${item.id}_${bagAddSC}`).value
@@ -1043,8 +1043,8 @@ function Chatbot() {
                 var titlea = document.getElementById(`titleAddSC${item.id}`).value
                 var groupva = document.getElementById(`groupAddSC${item.id}`).value
                 var group_name = document.getElementById(`groupNameAddSC${item.id}`).value
-                var bag_name = document.getElementById(`groupAddSC${item.id}`).value
-                var bag = document.getElementById(`bagNameAddSC${item.id}`).value
+                var bag_name = document.getElementById(`bagNameAddSC${item.id}`).value
+                var bag = document.getElementById(`bagAddSC${item.id}`).value
                 var type = document.getElementById(`typeAddSC${item.id}`).value
                 var web = document.getElementById(`webAddSC${item.id}`).value
                 var lbl = document.getElementById(`lblAddSC${item.id}_${bagAddSC}`).value
@@ -1524,7 +1524,7 @@ function Chatbot() {
               <div id="msgChoice${item.id}" style="display:none">
                 <div style="display: flex">
                   <div id="singleChoice${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">単一選択/button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">単一選択</button>
                   </div>
                   <div id="threeChoice${item.id}" style=" padding:5px">
                     <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">三択+URL</button>
@@ -1693,8 +1693,8 @@ function Chatbot() {
                   var titlea = document.getElementById(`titleAddSC${item.id}`).value
                   var groupva = document.getElementById(`groupAddSC${item.id}`).value
                   var group_name = document.getElementById(`groupNameAddSC${item.id}`).value
-                  var bag_name = document.getElementById(`groupAddSC${item.id}`).value
-                  var bag = document.getElementById(`bagNameAddSC${item.id}`).value
+                  var bag_name = document.getElementById(`bagNameAddSC${item.id}`).value
+                  var bag = document.getElementById(`bagAddSC${item.id}`).value
                   var type = document.getElementById(`typeAddSC${item.id}`).value
                   var web = document.getElementById(`webAddSC${item.id}`).value
                   var lbl = document.getElementById(`lblAddSC${item.id}_${bagAddSC}`).value
