@@ -952,40 +952,50 @@ function Release() {
   React.useEffect(() => {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/persistent_menus`).then(res => {
-      // console.log('persistent_menus: ', res.data.data)
+      console.log('persistent_menus: ', res.data.data)
       var fm_item = res.data.data
       var bag_name = []
 
-      for (var i = 0; i < res.data.data.length; i++) {
-        api.get(`/api/v1/message_managements/message_bags/${res.data.data[i].message_bag_id}`).then(ress => {
-          console.log("bag_name: ", ress.data)
-          if (ress.data.code == 1) {
-            bag_name.push(ress.data.data.message_bag.bag_name)
-            document.getElementById(`listGroupFixedMenu${ress.data.data.message_bag.id}`).style.display = "block"
-            document.getElementById(`listBagFixedMenu${ress.data.data.message_bag.id}`).style.display = "block"
-            document.getElementById(`answer-${ress.data.data.message_bag.id}`).style.display = "none"
-          } else if (ress.data.code == 2) {
-            bag_name.push("")
-            document.getElementById(`listGroupFixedMenu${ress.data.data.message_bag.id}`).style.display = "none"
-            document.getElementById(`listBagFixedMenu${ress.data.data.message_bag.id}`).style.display = "none"
-            document.getElementById(`answer-${ress.data.data.message_bag.id}`).style.display = "block"
-          }
-        }).catch(error => {
-          console.log(error)
-        })
-      }
+      // for (var i = 0; i < res.data.data.length; i++) {
+      //   if (res.data.data[i].message_bag_id == null) {
+      //     bag_name.push("")
+          
+      //   } else if(res.data.data[i].message_bag_id != null) {
+      //     api.get(`/api/v1/message_managements/message_bags/${res.data.data[i].message_bag_id}`).then(ress => {
+      //       console.log("bag_name: ", ress.data)
+      //       console.log("bag_name: ", ress.data.data.message_bag.bag_name)
+      //       // bag_name.push(ress.data.data.message_bag.bag_name)
+      //       if (ress.data.code == 1) {
+      //         bag_name.push(ress.data.data.message_bag.bag_name)
+      //         // document.getElementById(`listGroupFixedMenu${ress.data.data.message_bag.id}`).style.display = "block"
+      //         // document.getElementById(`listBagFixedMenu${ress.data.data.message_bag.id}`).style.display = "block"
+      //         // document.getElementById(`anw-mnl-type${ress.data.data.message_bag.id}`).style.display = "none"
+      //       } else if (ress.data.code == 2) {
+      //         // bag_name.push("")
+      //         // document.getElementById(`listGroupFixedMenu${ress.data.data.message_bag.id}`).style.display = "none"
+      //         // document.getElementById(`listBagFixedMenu${ress.data.data.message_bag.id}`).style.display = "none"
+      //         // document.getElementById(`anw-mnl-type${ress.data.data.message_bag.id}`).style.display = "block"
+      //       }
+      //     }).catch(error => {
+      //       console.log(error)
+      //     })
+      //   }
 
-      setTimeout(() => {
-        for (var i = 0; i < res.data.data.length; i++) {
-          fm_item[i].msg_bag_name = bag_name[i]
-        }
-        setListFixedMenu(fm_item)
-        console.log("faq data: ", fm_item)
-      }, 2000)
+      // }
 
+      // setTimeout(() => {
+      //   for (var i = 0; i < res.data.data.length; i++) {
 
+      //     fm_item[i].msg_bag_name = bag_name[i]
+
+      //   }
+      //   setListFixedMenu(fm_item)
+      //   console.log("faq data: ", fm_item)
+      // }, 2000)
+
+      setListFixedMenu(fm_item)
       // setListFixedMenu(res.data.data)
-
+      loadListFixed()
     }).catch(error => {
       console.log(error)
       // if (error.response.data.code === 3) {
@@ -1055,28 +1065,43 @@ function Release() {
   function reloadFixedMenu() {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/persistent_menus`).then(res => {
-      // console.log('persistent_menus: ', res.data.data)
+      console.log('persistent_menus: ', res.data.data)
       // setListFixedMenu(res.data.data)
       var fm_item = res.data.data
       var bag_name = []
 
-      for (var i = 0; i < res.data.data.length; i++) {
-        api.get(`/api/v1/message_managements/message_bags/${res.data.data[i].message_bag_id}`).then(ress => {
-          console.log("bag_name: ", ress.data.data.message_bag.bag_name)
-          bag_name.push(ress.data.data.message_bag.bag_name)
+      // for (var i = 0; i < res.data.data.length; i++) {
+      //   if (res.data.data[i].message_bag_id != null) {
+      //     api.get(`/api/v1/message_managements/message_bags/${res.data.data[i].message_bag_id}`).then(ress => {
+      //       console.log("ress: ", ress.data)
+      //       console.log("bag_name: ", ress.data.data.message_bag.bag_name)
+      //       if (ress.data.code == 1) {
+      //         bag_name.push(ress.data.data.message_bag.bag_name)
+      //       } else if (ress.data.code == 2) {
+      //         bag_name.push("")
+      //       }
 
-        }).catch(error => {
-          console.log(error)
-        })
-      }
 
-      setTimeout(() => {
-        for (var i = 0; i < res.data.data.length; i++) {
-          fm_item[i].msg_bag_name = bag_name[i]
-        }
-        setListFixedMenu(fm_item)
-        // console.log("faq data: ", faw_item)
-      }, 2000)
+      //     }).catch(error => {
+      //       console.log(error)
+      //     })
+      //   } else {
+      //     bag_name.push("")
+      //   }
+      //   // else{
+      //   //   bag_name.push("none")
+      //   // }
+      //   setTimeout(() => {
+      //     for (var i = 0; i < res.data.data.length; i++) {
+      //       fm_item[i].msg_bag_name = bag_name[i]
+      //     }
+      //     setListFixedMenu(fm_item)
+
+      //     // console.log("faq data: ", faw_item)
+      //   }, 2000)
+      // }
+
+      setListFixedMenu(fm_item)
       loadListFixed()
     }).catch(error => {
       console.log(error)
@@ -2162,32 +2187,32 @@ function Release() {
       document.getElementById("qusErrAddFAQ").style.display = "none"
     }
 
-    if(checkbag == true && checkqus == true){
+    if (checkbag == true && checkqus == true) {
 
-    
-    api.post(`/api/v1/message_managements/ice_breakers`, script).then(res => {
-      // console.log(res)
-      cancelFAQ()
-      reloadFAQ()
-      api.get(`/api/v1/message_managements/ice_breakers_turn_on?ig_id=${ig_id_status}`).then(res => {
-        reloadFAQStatus()
+
+      api.post(`/api/v1/message_managements/ice_breakers`, script).then(res => {
+        // console.log(res)
+        cancelFAQ()
+        reloadFAQ()
+        api.get(`/api/v1/message_managements/ice_breakers_turn_on?ig_id=${ig_id_status}`).then(res => {
+          reloadFAQStatus()
+        }).catch(error => {
+          console.log(error)
+        })
+        setMsgNoti(" FAQを追加しました。")
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setMsgNoti("")
+          setIsOpenNoti(false)
+        }, 2000)
       }).catch(error => {
         console.log(error)
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       })
-      setMsgNoti(" FAQを追加しました。")
-      setIsOpenNoti(true)
-      setTimeout(() => {
-        setMsgNoti("")
-        setIsOpenNoti(false)
-      }, 2000)
-    }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
-    })
 
-  }
+    }
 
 
   }
@@ -2848,10 +2873,10 @@ function Release() {
                         ))}
                       </div>
                       <div style={{ width: "100%", textAlign: "center", display: "flex" }}>
-                        <div style={{width: "25%", textAlign:"center"}}><span id="qusErrAddFAQ" style={{ color: "red", display: "none" }}>質問を入力してください。</span></div>
-                        <div style={{width: "75%", textAlign:"center"}}><span id="bagErrAddFAQ" style={{ color: "red", display: "none", width: "65%" }}>メッセージ袋を選択してFAQを入力してください。</span></div></div>
-                        
-                        
+                        <div style={{ width: "25%", textAlign: "center" }}><span id="qusErrAddFAQ" style={{ color: "red", display: "none" }}>質問を入力してください。</span></div>
+                        <div style={{ width: "75%", textAlign: "center" }}><span id="bagErrAddFAQ" style={{ color: "red", display: "none", width: "65%" }}>メッセージ袋を選択してFAQを入力してください。</span></div></div>
+
+
                     </form>
                     {/* <div style={{ float: "right", display: "none" }} id="actionFAQ">
                       <Button style={{ marginRight: "10px" }}
@@ -3071,7 +3096,7 @@ function Release() {
                         </div>
                         <div id="addFixMenubtn" style={{ width: "50%", textAlign: "right" }}>
                           <Button
-                          id="btnAddFixedMenu"
+                            id="btnAddFixedMenu"
                             onClick={() => addnewFixedMenu()}
                             style={{ backgroundColor: "white", color: "#248eff", border: "1px solid #248eff" }}
                           >
@@ -3106,7 +3131,7 @@ function Release() {
                               })}
                             </select>
                             <select id={`listBagFixedMenu${item.id}`} style={{ width: "20%", display: `${item.message_bag_id == null ? "none" : "block"}` }} defaultValue={""} onChange={(e) => selectedBagFM(e.target.value)} className="new-faq-q-so" name={`msgbag_id${item.id}`}>
-                              <option value="" disabled hidden>{item.msg_bag_name}</option>
+                              <option value="" disabled hidden>{item.message_bag_name}</option>
                             </select>
                             <input name={`answer-${item.id}`} id={`anw-mnl-type${item.id}`} className="new-faq-q-so" type="text" readOnly="readonly" style={{ width: "43%", display: `${item.message_bag_id == null ? "block" : "none"}` }} />
 
