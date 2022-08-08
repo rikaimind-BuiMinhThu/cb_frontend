@@ -359,13 +359,13 @@ function Chatbot() {
               <div id="msgChoice${item.id}" style="display:none">
                 <div style="display: flex">
                   <div id="singleChoice${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">単一選択</button>
                   </div>
                   <div id="threeChoice${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">三択+URL</button>
                   </div>
                   <div id="freeInput${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">自由入力</button>
                   </div>
                 </div>
               </div>
@@ -864,7 +864,7 @@ function Chatbot() {
             <div><textarea name="imgKey${item.id}" class="mgsChatbot" style="display:none" id="imgCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
           <input id="imgNumSaved${item.id}" style="display:none" name="imageChatbot" type="file" accept="image/*" />
 
-          <button id="btnimgNumSaved${item.id}" style="background-color:white; border: 1px solid gray; border-radius:10px">Select image</button>
+          <button id="btnimgNumSaved${item.id}" style="background-color:white; border: 1px solid gray; border-radius:10px">画像選択</button>
           <input id="imgDataNumSaved${item.id}" name="imgchatbot${item.id}" type=hidden /> <br /><br />
           <div style=" text-align: center">
             <img id="output${item.id}" style=" max-height: 200px; max-width: 40%"  />
@@ -880,13 +880,13 @@ function Chatbot() {
               <div id="msgChoice${item.id}" style="display:none">
                 <div style="display: flex">
                   <div id="singleChoice${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">単一選択</button>
                   </div>
                   <div id="threeChoice${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">三択+URL</button>
                   </div>
                   <div id="freeInput${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">自由入力</button>
                   </div>
                 </div>
               </div>
@@ -1502,7 +1502,7 @@ function Chatbot() {
             `<div id="chatbot_image_msg${item.id}" style="border-radius: 20px; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
             <div><textarea name="imgMsgKey${item.id}" style="display:none" class="mgsChatbot" id="imgMgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
           <input id="imgMsgNumSaved${item.id}" style="display:none" type="file" accept="image/*" /> <br /><br />
-          <button id="btnimgMsgNumSaved${item.id}" style="background-color:white; border: 1px solid gray; border-radius:10px">Select image</button>
+          <button id="btnimgMsgNumSaved${item.id}" style="background-color:white; border: 1px solid gray; border-radius:10px">画像選択</button>
           <input id="imgValueMsgNumSaved${item.id}" name="imgValueMsgChatbot${item.id}" type=hidden /> <br /><br />
           <div style=" text-align: center" }}>
             <img id="outputImgMsgSaved${item.id}" style=" max-height: 200px; max-width: 40%" }} />
@@ -1524,13 +1524,13 @@ function Chatbot() {
               <div id="msgChoice${item.id}" style="display:none">
                 <div style="display: flex">
                   <div id="singleChoice${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">単一選択/button>
                   </div>
                   <div id="threeChoice${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">三択+URL</button>
                   </div>
                   <div id="freeInput${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">自由入力</button>
                   </div>
                 </div>
               </div>
@@ -2473,13 +2473,13 @@ function Chatbot() {
               <div id="msgChoice${item.id}" style="display:none">
                 <div style="display: flex">
                   <div id="singleChoice${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">単一選択</button>
                   </div>
                   <div id="threeChoice${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">三択+URL</button>
                   </div>
                   <div id="freeInput${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">自由入力</button>
                   </div>
                 </div>
               </div>
@@ -4147,7 +4147,7 @@ function Chatbot() {
       `<div id="chatbot_image${mulImgAdd}" style="border-radius: 20px; margin-top: 20px; display:block; background-color: rgb(244, 243, 239); padding: 40px; ">
       
     <input id="imgNum${numIndex}" style="display:none" name="imageChatbot" type="file" accept="image/*" />
-    <button id="btnimgNum${numIndex}" style="background-color:white; border: 1px solid gray; border-radius:10px">Select image</button>
+    <button id="btnimgNum${numIndex}" style="background-color:white; border: 1px solid gray; border-radius:10px">画像選択</button>
     <input id="imgDataNum${numIndex}" name="imgchatbot${numIndex}" type=hidden /> <br /><br />
     <div style=" text-align: center" }}>
       <img id="output${numIndex}" style=" max-height: 200px; max-width: 40%" }} />
@@ -4160,13 +4160,13 @@ function Chatbot() {
     <div id="msgChoice${idSC}">
       <div style="display: flex">
         <div id="singleChoice${idSC}" style=" padding:5px">
-          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">単一選択</button>
         </div>
         <div id="threeChoice${idSC}" style=" padding:5px">
-          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">三択+URL</button>
         </div>
         <div id="freeInput${idSC}" style=" padding:5px">
-          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">自由入力</button>
         </div>
       </div>
     </div>
@@ -4423,13 +4423,13 @@ function Chatbot() {
     <div  id="msgChoice${idSC}">
       <div style="display: flex">
         <div id="singleChoice${idSC}" style=" padding:5px">
-          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">単一選択</button>
         </div>
         <div id="threeChoice${idSC}" style=" padding:5px">
-          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">三択+URL</button>
         </div>
         <div id="freeInput${idSC}" style=" padding:5px">
-          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">自由入力</button>
         </div>
       </div>
     </div>
@@ -5132,7 +5132,7 @@ function Chatbot() {
       `<div id="chatbot_image_msg${mulImgMsgAdd}" style="border-radius: 20px; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
      
     <input id="imgMsgNum${numIndex}" type="file" style="display:none" accept="image/*" /> <br /><br />
-    <button id="btnimgMsgNum${numIndex}" style="background-color:white; border: 1px solid gray; border-radius:10px">Select image</button>
+    <button id="btnimgMsgNum${numIndex}" style="background-color:white; border: 1px solid gray; border-radius:10px">画像選択</button>
     <input id="imgValueMsgNum${numIndex}" name="imgValueMsgChatbot${numIndex}" type=hidden /> <br /><br />
     <div style=" text-align: center">
       <img id="outputImgMsg${numIndex}" style=" max-height: 200px; max-width: 40%" }} />
@@ -5146,13 +5146,13 @@ function Chatbot() {
     <div  id="msgChoice${idSC}">
       <div style="display: flex">
         <div id="singleChoice${idSC}" style=" padding:5px">
-          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Single choice</button>
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">単一選択</button>
         </div>
         <div id="threeChoice${idSC}" style=" padding:5px">
-          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Three choice</button>
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">三択+URL</button>
         </div>
         <div id="freeInput${idSC}" style=" padding:5px">
-          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">Free input</button>
+          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">自由入力</button>
         </div>
       </div>
     </div>
@@ -6711,8 +6711,14 @@ function Chatbot() {
                                     return (
                                       <li style={{ marginLeft: "-30px", display: "flex" }} key={key}>
                                         <Nav id="nav_option" style={{ width: "90%" }}>
-                                          <i className="nc-icon nc-bell-55" style={{ color: "black", marginTop: "1.15%" }} />
-                                          <div id="a_tag" style={{ fontSize: "15px", width: "60%" }}>&nbsp;&nbsp;<button id={`btn_a_tag${data.id}`} onClick={(event) => getMSGPV(event, data.id)} style={{ border: "none", backgroundColor: "white" }}>{data.group_name}</button></div>
+                                          <div style={{display:"flex", width:"62%"}}>
+                                          <i className="nc-icon nc-bell-55" style={{ color: "black", marginTop:"1.75%" }} />
+                                          <div id="a_tag" style={{ fontSize: "15px", width: "95%" }}>
+                                            <button id={`btn_a_tag${data.id}`} onClick={(event) => getMSGPV(event, data.id)} style={{ border: "none", backgroundColor: "white" }}>
+                                              {data.group_name}
+                                              </button>
+                                              </div>
+                                          </div>
                                           <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
                                             onClick={() => addMsgBagPop(data.id)}><i className="nc-icon nc-simple-add nc-3x" style={{ color: "black" }} /></Button>
                                           <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
