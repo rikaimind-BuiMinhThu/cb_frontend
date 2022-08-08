@@ -1,7 +1,7 @@
 export function checkFieldAdd(value, field) {
     if (value === '') {
       document.getElementById(`newUser${field}ErrMsg`).style.display = 'block'
-      document.getElementById(`newUser${field}ErrMsg`).innerHTML = `This field cannot be empty`
+      document.getElementById(`newUser${field}ErrMsg`).innerHTML = `入力してください。`
     } else {
       document.getElementById(`newUser${field}ErrMsg`).style.display = 'none'
       document.getElementById(`newUser${field}ErrMsg`).innerHTML = ""
@@ -13,10 +13,10 @@ export function checkFieldAdd(value, field) {
     var phoneRe = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
     if (value === '') {
       document.getElementById(`newUser${field}ErrMsg`).style.display = 'block'
-      document.getElementById(`newUser${field}ErrMsg`).innerHTML = `${field} cannot be empty`
+      document.getElementById(`newUser${field}ErrMsg`).innerHTML = `${field} を入力してください。`
     } else if (phoneRe.test(value) === false) {
       document.getElementById(`newUser${field}ErrMsg`).style.display = 'block'
-      document.getElementById(`newUser${field}ErrMsg`).innerHTML = "Please input right email format: abc@abc.com"
+      document.getElementById(`newUser${field}ErrMsg`).innerHTML = "メールの正しい形式で入力してください：abc@abc.com"
     } else {
       document.getElementById(`newUser${field}ErrMsg`).style.display = 'none'
       document.getElementById(`newUser${field}ErrMsg`).innerHTML = ""

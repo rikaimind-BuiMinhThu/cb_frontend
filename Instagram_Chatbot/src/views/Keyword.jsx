@@ -9,6 +9,7 @@ import { Card, CardHeader, CardBody, Row, Col } from "reactstrap";
 import Switch from "react-switch";
 import ModalNoti from "./Popup/ModalNoti";
 import Cookies from 'js-cookie'
+import ModalShort from "./Popup/ModalShort";
 function Keyword() {
 
     var [customDiv, setCustomDiv] = useState([])
@@ -19,15 +20,29 @@ function Keyword() {
     const [instaSetting, setInstaSetting] = useState()
     const [newKWBag, setNewKWBag] = useState()
     const [isOpenNoti, setIsOpenNoti] = useState(false)
+    const [isOpenDelete, setIsOpenDelete] = useState(false)
     const [msgNoti, setMsgNoti] = useState()
     // const [checked, setChecked] = useState([true, false, true])
 
+    // React.useEffect(() => {
+    //     console.log('token in dashboard', Cookies.get('token'))
+    //     if (Cookies.get('token') == undefined) {
+    //         window.location.href = '/'
+    //     }
+    // }, [])
+
+
     React.useEffect(() => {
         console.log('token in dashboard', Cookies.get('token'))
-        if (Cookies.get('token') == undefined) {
+        console.log('is_auth', Cookies.get('is_auth'))
+        if (Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == "") {
+            window.location.href = '/'
+        }
+        if (Cookies.get('is_auth') == 'false') {
             window.location.href = '/'
         }
     }, [])
+
     React.useEffect(() => {
         var path = window.location.pathname;
 
@@ -140,7 +155,7 @@ function Keyword() {
     }
 
     function addNewKeyword() {
-
+        // document.getElementById('')
         let cDivs = customDiv;
 
         cDivs.push(`newDiv${numKeyword}`)
@@ -230,6 +245,7 @@ function Keyword() {
 
             api.post(`/api/v1/message_managements/keyword_settings`, newKW).then(res => {
                 console.log(res)
+                document.getElementById("cancel_save").style.display = "none"
                 setIsOpenNoti(true)
                 setMsgNoti("キーワードを追加しました。")
                 setTimeout(() => {
@@ -332,10 +348,25 @@ function Keyword() {
 
 
     }
-    function deleteKeyword(value) {
-        api.delete(`/api/v1/message_managements/keyword_settings/${value}`).then(res => {
+
+    const [idDelete, setIdDelete] = useState()
+    function confirmDelete(id){
+        setIdDelete(id)
+        setIsOpenDelete(true)
+    }
+
+    function deleteKeyword() {
+        setIsOpenDelete(false)
+
+        api.delete(`/api/v1/message_managements/keyword_settings/${idDelete}`).then(res => {
             console.log(res);
             reloadListKW()
+            setIsOpenNoti(true)
+            setMsgNoti("削除しました。")
+            setTimeout(()=>{
+                setIsOpenNoti(false)
+                setMsgNoti("")
+            },1500)
         }).catch(error => {
             console.log(error)
         })
@@ -425,7 +456,7 @@ function Keyword() {
                                 <div style={{ width: "100%" }}>
                                     <div style={{ width: "100%" }}>
                                         <div style={{ width: "100%", display: "flex" }}>
-                                            <div style={{ width: "50%" }}><br /><span>固定メッセージ設定<i className="nc-icon icon-question-sign"></i></span>
+                                            <div style={{ width: "50%" }}><br /><span><i className="nc-icon icon-question-sign"></i></span>
 
                                             </div>
                                             <div id="addbtn" style={{ width: "50%", textAlign: "right" }}>
@@ -463,7 +494,7 @@ function Keyword() {
 
                                                         <input name={`l-answer-${i}`} defaultValue={cdiv.keyword.replaceAll("|", ", ")} className="new-faq-q-so" type="text" id={`l-answer-${i}`} placeholder="Keyword split by comma or space(key1, key2,...)" style={{ width: "53%" }} />
                                                         <select id={`listGroup${i}`} style={{ width: "25%" }} defaultValue={""} onChange={(e) => selectedGroup(e.target.value, i)} className="new-faq-q-so" name="l-group">
-                                                            <option value="" disabled hidden>メッセージグループ選択 ...</option>
+                                                            <option value="" disabled hidden>{cdiv.message_group_name}</option>
                                                             {listGroup?.map((group, i) => {
                                                                 return (
                                                                     <option key={i} value={group.id}>
@@ -475,9 +506,9 @@ function Keyword() {
                                                         <select id={`listBag${i}`} style={{ width: "25%" }} onLoad={getBgName(cdiv.message_bag_id, i)} onChange={(e) => selectedBag(e.target.value)} className="new-faq-q-so" name={`l-bag${i}`}>
                                                             {/* <option value="" disabled hidden></option> */}
                                                         </select>
-                                                        <div id={`ene-${i}`} onClick={() => enableEdit(i)} style={{ width: "5%" }}><i className="nc-icon nc-align-center nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
-                                                        <div id={`sav-${i}`} onClick={() => editKeywordInList(cdiv.instagram_account_id, cdiv.is_dm, cdiv.is_story_comment, cdiv.is_post_comment, cdiv.is_live_comment, cdiv.is_active, cdiv.id, i)} style={{ width: "5%", display: "none" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
-                                                        <div onClick={() => deleteKeyword(cdiv.id)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px" }}></i></div>
+                                                        <div id={`ene-${i}`} onClick={() => enableEdit(i)} style={{ width: "5%", cursor:"pointer" }}><i className="nc-icon nc-align-center nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
+                                                        <div id={`sav-${i}`} onClick={() => editKeywordInList(cdiv.instagram_account_id, cdiv.is_dm, cdiv.is_story_comment, cdiv.is_post_comment, cdiv.is_live_comment, cdiv.is_active, cdiv.id, i)} style={{ width: "5%", display: "none" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px", cursor:"pointer" }}></i></div>
+                                                        <div onClick={() => confirmDelete(cdiv.id)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px", cursor:"pointer" }}></i></div>
                                                     </div>
                                                 </div>
                                             </form>
@@ -505,12 +536,12 @@ function Keyword() {
                                                                 <option value="" disabled hidden>メッセージ袋選択 ...</option>
                                                             </select>
                                                             <div style={{ width: "90px" }}></div>
-                                                            <div><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px" }}></i></div>
+                                                            <div><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px", cursor:"pointer" }}></i></div>
                                                         </div>
                                                     </div>))}
                                             </div>
                                         </form>
-                                        <div id="cancel_save" style={{ width: "100%", textAlign: "right", padding: "20px" }}>
+                                        <div id="cancel_save" style={{ width: "100%", textAlign: "right", padding: "20px", display: "none" }}>
                                             <Button style={{ marginRight: "10px" }}
                                                 onClick={() => cancelAdd()}>キャンセル</Button>
                                             <Button onClick={() => saveFixedMessage()}>保存</Button>
@@ -526,6 +557,13 @@ function Keyword() {
                         <h4>{msgNoti}</h4>
                     </div>
                 </ModalNoti>
+                <ModalShort open={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
+                    <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+                        <h4>キーワードを削除しますか。</h4>
+                        <Button onClick={() => deleteKeyword()}>はい</Button>
+                        <Button onClick={() => setIsOpenDelete(false)}>いいえ</Button>
+                    </div>
+                </ModalShort>
             </div>
         </>
     );

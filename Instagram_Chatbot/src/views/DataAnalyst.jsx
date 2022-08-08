@@ -10,6 +10,7 @@ import ReactApexChart from 'react-apexcharts';
 import "../assets/css/general.css";
 import { CSVLink } from "react-csv";
 import { MDBIcon } from 'mdbreact';
+import Cookies from "js-cookie";
 // const categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
 
 function DataAnalyst() {
@@ -22,6 +23,19 @@ function DataAnalyst() {
   const [userChatwithCB, setUserChatwithCB] = useState([])
   const [userChatwithCBAll, setUserChatwithCBAll] = useState()
   const [userTotal, setUserTotal] = useState()
+
+  React.useEffect(() => {
+    console.log('token in dashboard', Cookies.get('token'))
+    console.log('is_auth', Cookies.get('is_auth'))
+    if(Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == ""){
+      window.location.href ='/'
+    }
+    if(Cookies.get('is_auth') == 'false'){
+      window.location.href ='/'
+    }
+  }, [])
+
+
   React.useEffect(() => {
     var path = window.location.pathname;
     api.get(`/api/v1/analytics/chatbot_usages/user?date=5d`).then(res => {
@@ -228,6 +242,13 @@ function DataAnalyst() {
       tooltip: {
         shared: true,
         intersect: false,
+        enabled: false,
+      enabledOnSeries: undefined,
+      followCursor: false,
+      inverseOrder: false,
+      custom: undefined,
+      fillSeriesColor: false,
+      theme: false,
         y: {
           formatter: function (y) {
             if (typeof y !== "undefined") {
@@ -284,13 +305,14 @@ function DataAnalyst() {
   }
 
   const headers = [
-    { label: "media_start_at", key: "media_start_at" },
-    { label: "user_count", key: "user_count" },
-    { label: "comment_count", key: "comment_count" },
-    { label: "user_comment", key: "user_comment" },
-    { label: "comment_lives", key: "comment_lives" },
-    { label: "time_comment", key: "time_comment" }
+    { label: "ライブ開始日", key: "media_start_at" },
+    { label: "ユーザー数", key: "user_count" },
+    { label: "コメント数", key: "comment_count" },
+    { label: "ユーザーコメント", key: "user_comment" },
+    { label: "ライブコメント", key: "comment_lives" },
+    { label: "コメント時間", key: "time_comment" }
   ];
+
 
   const [dataEx, setDataEx] = useState([])
   function setDataExport(item) {

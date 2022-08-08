@@ -11,6 +11,7 @@ import { Button } from "react-bootstrap";
 import Pagination from '@material-ui/lab/Pagination';
 import ModalDetail from "./Popup/ModalDetail";
 import ava from "./Popup/ava.png";
+import ModalShort from "./Popup/ModalShort";
 // import { Pagination } from "element-react";
 function UserManagement() {
   var [dataList, setDataList] = useState([])
@@ -50,10 +51,21 @@ function UserManagement() {
     }
   })
 
+  // React.useEffect(() => {
+  //   console.log('token in dashboard', Cookies.get('token'))
+  //   console.log('is_auth', Cookies.get('is_auth'))
+  //   if (Cookies.get('token') == undefined) {
+  //     window.location.href = '/'
+  //   }
+  // }, [])
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'))
-    if (Cookies.get('token') == undefined) {
-      window.location.href = '/'
+    console.log('is_auth', Cookies.get('is_auth'))
+    if(Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == ""){
+      window.location.href ='/'
+    }
+    if(Cookies.get('is_auth') == 'false'){
+      window.location.href ='/'
     }
   }, [])
 
@@ -105,6 +117,7 @@ function UserManagement() {
       } else {
         setDataList(res.data)
       }
+      setPage(1)
       setTotalPage(totalPage)
     }).catch(error => {
       console.log(error)
@@ -127,6 +140,7 @@ function UserManagement() {
         setDataList(res.data)
       }
       setTotalPage(totalPage)
+      // setPage(1)
     }).catch(error => {
       console.log(error)
       // if (error.response.data.code === 3) {
@@ -155,10 +169,17 @@ function UserManagement() {
     // setPassword(item.password)
     setIsOpen(true)
   }
+  const[idDeleteUser, setIdDeleteUser] = useState()
+  const [isOpenDeleteUser, setIsOpenDeleteUser] = useState(false)
+  function confirmDeleteUser(id){
+    setIsOpenDeleteUser(true)
+    setIdDeleteUser(id)
+  }
 
-  function deleteClientUser(id) {
+  function deleteClientUser() {
     var path = window.location.pathname;
-    api.delete(`/api/v1/managements/users/${id}`).then(res => {
+    setIsOpenDeleteUser(false)
+    api.delete(`/api/v1/managements/users/${idDeleteUser}`).then(res => {
       reloadListClient(pageIndex)
       setMsgNoti("削除しました!")
       setIsOpenNoti(true)
@@ -174,14 +195,13 @@ function UserManagement() {
     var path = window.location.pathname;
     var name = document.getElementById('nameUpdate').value
     console.log('nameupdate: ', name)
-    if (checkFieldUpdate(name, 'name') === true) {
+    if (checkFieldUpdate(name, '名称') === true) {
       var elements = document.getElementById("detailUserClient").elements;
       var obj = {};
       for (var i = 0; i < elements.length; i++) {
         var item = elements.item(i);
         obj[item.name] = item.value;
       }
-      console.log("aaa", obj)
       var updateClient = { user: obj };
       console.log(updateClient);
       api.patch(`/api/v1/managements/users/${updateId}`, updateClient).then(res => {
@@ -202,7 +222,7 @@ function UserManagement() {
   function checkFieldUpdate(value, field) {
     if (value === '') {
       document.getElementById(`${field}ErrMsg`).style.display = 'block'
-      document.getElementById(`${field}ErrMsg`).innerHTML = `${field} cannot be empty`
+      document.getElementById(`${field}ErrMsg`).innerHTML = `${field} 入力してください。`
     } else {
       document.getElementById(`${field}ErrMsg`).style.display = 'none'
       document.getElementById(`${field}ErrMsg`).innerHTML = ""
@@ -216,8 +236,49 @@ function UserManagement() {
     var name = document.getElementById('newName').value
     var confirmPassword = document.getElementById('newConfirmPassword').value
     var password = document.getElementById('newPassword').value
-    if (utils.checkFieldAdd(email, 'Email') === true && utils.checkFieldAdd(password, "Password") === true && utils.checkFieldAdd(name, "Name") === true &&
-      utils.checkFieldAdd(confirmPassword, "ConfirmPassword") === true) {
+    var passCheck
+    var passCheckLen
+
+    var emailCheck
+    var namecheck
+    if(name.length == 0){
+      namecheck = false
+    }else{
+      namecheck = true
+      document.getElementById("newUser名称ErrMsg").style.display = "none"
+      document.getElementById("newUser名称ErrMsg").innerHTML = ""
+    }
+
+    var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+    if(email.match(mailformat)){
+      document.getElementById("newUserメールアドレスErrMsg").style.display = "none"
+      document.getElementById("newUserメールアドレスErrMsg").innerHTML = ""
+      emailCheck = true
+    }else{
+      //newClientEmailErrMsg
+      emailCheck = false
+    }
+
+
+    if(password.length < 6){
+      passCheckLen = false
+    }else{
+      //newUserPasswordErrMsg
+      document.getElementById("newUserパスワードErrMsg").style.display = "none"
+      document.getElementById("newUserパスワードErrMsg").innerHTML = ""
+      passCheckLen = true
+    }
+    if(password !== confirmPassword){
+      
+      passCheck = false
+    }else{
+      document.getElementById("newUserパスワード(確認用)ErrMsg").style.display = "none"
+      document.getElementById("newUserパスワード(確認用)ErrMsg").innerHTML = ""
+      passCheck = true
+    }
+    if (utils.checkFieldAdd(email, 'メールアドレス') === true && utils.checkFieldAdd(password, "パスワード") === true && utils.checkFieldAdd(name, "名称") === true 
+    && utils.checkFieldAdd(confirmPassword, "パスワード(確認用)") === true && passCheck == true
+    && passCheckLen == true && emailCheck == true && namecheck == true) {
       var elements = document.getElementById("addForm").elements;
       var obj = {};
       for (var i = 0; i < elements.length - 1; i++) {
@@ -242,7 +303,25 @@ function UserManagement() {
           requestNewToken(path)
         }
       })
+    
+  }else{
+    if(passCheck == false){
+      document.getElementById("newUserパスワード(確認用)ErrMsg").style.display = "block"
+      document.getElementById("newUserパスワード(確認用)ErrMsg").innerHTML = "パスワード（確認用）はパスワードと同じの必要です。"
     }
+    if(passCheckLen == false){
+      document.getElementById("newUserパスワードErrMsg").style.display = "block"
+      document.getElementById("newUserパスワードErrMsg").innerHTML = "パスワードは最低６つの文字の必要です。"
+    }
+    if(emailCheck == false){
+      document.getElementById("newUserメールアドレスErrMsg").style.display = "block"
+      document.getElementById("newUserメールアドレスErrMsg").innerHTML = "メールを入力してください(例:abc＠abc.com)"
+    }
+    if(namecheck == false){
+      document.getElementById("newUser名称ErrMsg").style.display = "block"
+      document.getElementById("newUser名称ErrMsg").innerHTML = "名称を入力してください。"
+    }
+  }
   }
 
   const items = dataList.users
@@ -266,11 +345,18 @@ function UserManagement() {
   // }
 
   var [page, setPage] = useState(1)
-  function handleChangePage(ef) {
-    setPage(parseInt(ef))
-    console.log(ef)
-    setPageIndex(ef)
-    reloadListClient(ef)
+  // function handleChangePage(ef) {
+  //   setPage(parseInt(ef))
+  //   console.log(ef)
+  //   setPageIndex(ef)
+  //   reloadListClient(ef)
+  // }
+
+  function handleChange(event, value){
+    console.log("pageIndex: ",value)
+    setPage(parseInt(value))
+    setPageIndex(value)
+    reloadListClient(value)
   }
 
   function detailUser(id) {
@@ -287,7 +373,8 @@ function UserManagement() {
               <CardHeader>
                 <div className="swap" style={{display:"flex"}}>
                   {/* <div className="div_left"><CardTitle tag="h4">Client Management</CardTitle></div> */}
-                  <div style={{width:"50%"}}><input id="searchUser" name="searchUser" style={{height:"38px", width:"200px", border:"1px solid #dee2e6", paddingTop:"-10px", borderRadius:"3px"}}></input> <Button onClick={() => search()} style={{backgroundColor:"#66615b"}}>Search</Button></div>
+                  <div style={{width:"50%"}}><input id="searchUser" name="searchUser" style={{height:"38px", width:"200px", border:"1px solid #dee2e6", paddingTop:"-10px", borderRadius:"3px"}}></input>
+                  <Button onClick={() => search()} style={{backgroundColor:"#66615b"}}>検索</Button></div>
                   <div className="div_right"><Button onClick={() => setIsOpenAddUser(true)} style={{backgroundColor:"#66615b"}}>ユーザー追加</Button></div>
                 </div>
               </CardHeader>
@@ -295,9 +382,10 @@ function UserManagement() {
                 <Table style={{ textAlign: "center" }}>
                   <thead className="text-primary">
                     <tr>
-                      <th>名前</th>
-                      <th>メール</th>
-                      <th>役割</th>
+                      <th>ID</th>
+                      <th>名称</th>
+                      <th>ログインID</th>
+                      <th>権限</th>
                       <th className="actionList">アクション</th>
                     </tr>
                   </thead>
@@ -305,6 +393,7 @@ function UserManagement() {
                     {
                       items && items.map(item => (
                         <tr key={item.id}>
+                          <td>{item.id}</td>
                           <td>{item.full_name}</td>{/* onClick={() => detailUser(item.id)} */}
                           <td>{item.email}</td>
                           <td>{item.role}</td>
@@ -312,7 +401,7 @@ function UserManagement() {
                             <div>
                               {/* <Button onClick={() => getUserDetail(item)}>View Detail</Button> */}
                               <Button className="editBtn" onClick={() => updateClientUser(item)}>編集</Button>
-                              <Button className="deleteBtn" onClick={() => deleteClientUser(item.id)}>削除</Button>
+                              <Button className="deleteBtn" onClick={() => confirmDeleteUser(item.id)}>削除</Button>
                               {/* Modal key={item.id} */}
                             </div>
                           </td>
@@ -323,9 +412,7 @@ function UserManagement() {
                 </Table>
 
 
-                <Pagination count={totalPage} page={page} onChange={(e) => handleChangePage(e.target.textContent)} />
-
-
+                <Pagination count={totalPage} variant="outlined" page={page} onChange={handleChange} />
 
                 {/* <Pagination layout="prev, pager, next" total={50} small={true}/> */}
               </CardBody>
@@ -402,8 +489,8 @@ function UserManagement() {
                 <br /><br /> */}
 
                 <label className="label-input">名称&nbsp;<span className="span-require">*必須</span>
-                  <input className="input-field" value={name} onChange={(e) => setName(e.target.value)} onBlur={(e) => checkFieldUpdate(e.target.value, "name")} type="text" id="nameUpdate" name="full_name" />
-                  <label id="nameErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" value={name} onChange={(e) => setName(e.target.value)} onBlur={(e) => checkFieldUpdate(e.target.value, "名称")} type="text" id="nameUpdate" name="full_name" />
+                  <label id="名称ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 {/* <label className="label-input">ログインID&nbsp;<span className="span-require">*必須</span>
                   <input className="input-field" value={email} onChange={(e) => setEmail(e.target.value)} onBlur={(e) => utils.checkInputEmail(e.target.value, "Email")} type="text" id="newEmail" name="email" />
@@ -424,15 +511,15 @@ function UserManagement() {
         <Modal open={isOpenAddUser} onClose={() => setIsOpenAddUser(false)}>
           <div style={{ width: "100%" }}>
             <div style={{ marginTop: "-30px" }}>
-              <h4>Add User</h4>
+              <h4>ユーザー追加</h4>
               <form id="addForm" className="swap">
                 <label className="label-input">名称&nbsp;<span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "Name")} type="text" id="newName" name="full_name" />
-                  <label id="newUserNameErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "名称")} type="text" id="newName" name="full_name" />
+                  <label id="newUser名称ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">ログインID&nbsp;<span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => utils.checkInputEmail(e.target.value, "Email")} type="text" id="newEmail" name="email" />
-                  <label id="newUserEmailErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                  <input className="input-field" onBlur={(e) => utils.checkInputEmail(e.target.value, "メールアドレス")} type="text" id="newEmail" name="email" />
+                  <label id="newUserメールアドレスErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 {/* <label className="label-input"><label className="long-label">権限&nbsp;<span className="span-require">*必須</span></label>
                   <select style={{ padding: "3px 0px 3px 0px" }} className="input-field" defaultValue={'deel'} name="role" id="role">
@@ -441,13 +528,13 @@ function UserManagement() {
                   </select>
                   <label id="newClientTikTokCreateErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br /> */}
-                <label className="label-input">パスワード&nbsp;<span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "Password")} type="password" id="newPassword" name="password" />
-                  <label id="newUserPasswordErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                <label className="label-input">パスワード &nbsp;<span className="span-require">*必須</span>
+                  <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "パスワード")} type="password" id="newPassword" name="password" />
+                  <label id="newUserパスワードErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
-                <label className="label-input">パスワード（確認用&nbsp;<span className="span-require">*必須</span>
-                  <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "ConfirmPassword")} type="password" id="newConfirmPassword" name="confirm_password" />
-                  <label id="newUserConfirmPasswordErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                <label className="label-input">パスワード（確認用）<span className="span-require">*必須</span>
+                  <input className="input-field" onBlur={(e) => utils.checkFieldAdd(e.target.value, "パスワード(確認用)")} type="password" id="newConfirmPassword" name="confirm_password" />
+                  <label id="newUserパスワード(確認用)ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">クライアント<span className="span-require">*必須</span>
                   <select style={{ padding: "3px 0px 3px 0px" }} className="input-field" name="client_id">
@@ -467,10 +554,16 @@ function UserManagement() {
         </Modal>
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
-            <h4>{msgNoti}</h4>
+          <span style={{fontSize:"16px"}}>{msgNoti}</span>
           </div>
         </ModalNoti>
-
+        <ModalShort open={isOpenDeleteUser} onClose={() => setIsOpenDeleteUser(false)}>
+          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+            <h4>ユーザーを削除しますか。</h4>
+            <Button onClick={() => deleteClientUser()}>はい</Button>
+            <Button onClick={() => setIsOpenDeleteUser(false)}>いいえ</Button>
+          </div>
+        </ModalShort>
       </div>
     </>
   );

@@ -14,6 +14,7 @@ import api from '../api/api-management'
 import { Icon } from 'semantic-ui-react';
 import { MDBIcon } from 'mdbreact';
 import { CSVLink } from "react-csv";
+import Cookies from "js-cookie";
 function ListUser() {
 
     const [dateECU, setDateECU] = useState([])
@@ -26,6 +27,19 @@ function ListUser() {
     const [userCB, setUserCB] = useState()
     const [userCBAll, setUserCBAll] = useState()
     const [instaUser, setInstaUser] = useState([])
+
+    React.useEffect(() => {
+        console.log('token in dashboard', Cookies.get('token'))
+        console.log('is_auth', Cookies.get('is_auth'))
+        if(Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == ""){
+          window.location.href ='/'
+        }
+        if(Cookies.get('is_auth') == 'false'){
+          window.location.href ='/'
+        }
+      }, [])
+
+
     React.useEffect(() => {
         var path = window.location.pathname;
         api.get(`/api/v1/analytics/chatbot_usages/user?date=5d`).then(res => {
@@ -381,13 +395,13 @@ function ListUser() {
     // window.dispatchEvent(new Event('resize'));
 
     const headers = [
-        { label: "username", key: "username" },
-        { label: "full_name", key: "full_name" },
-        { label: "follower_count", key: "follower_count" },
-        { label: "instagram_id", key: "instagram_id" },
-        { label: "is_user_follow_business", key: "is_user_follow_business" },
-        { label: "is_business_follow_user", key: "is_business_follow_user" },
-        { label: "created_at", key: "created_at" }
+        { label: "ユーザー名", key: "username" },
+        { label: "名前", key: "full_name" },
+        { label: "フォロワー数", key: "follower_count" },
+        { label: "インスタグラムID", key: "instagram_id" },
+        { label: "インスタグラムアカウントをフォローしているか", key: "is_user_follow_business" },
+        { label: "ユーザーをフォローしているか", key: "is_business_follow_user" },
+        { label: "作成日", key: "created_at" }
       ];
 
     const [dataEx, setDataEx] = useState([])
@@ -439,7 +453,7 @@ function ListUser() {
                                 <div style={{ float: "right", display:"flex" }}>
                                 <div onClick={()=>setDataExport()} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800", marginRight:"10px" }}>
 
-                                <CSVLink {...csvReport}><span style={{color:"white"}}>Export Instagram User </span> <MDBIcon fas icon="arrow-circle-down" style={{ color: "white" }}></MDBIcon></CSVLink>
+                                <CSVLink {...csvReport}><span style={{color:"white"}}>インスタグラムユーザー出力</span> <MDBIcon fas icon="arrow-circle-down" style={{ color: "white" }}></MDBIcon></CSVLink>
                                     </div>
                                     <select onChange={(e) => selectDate(e.target.value)} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800" }} defaultValue={"5d"} name="days_num_ec_cb" id="days_num_ec_cb">
                                         <option value="5d">５日間</option>
