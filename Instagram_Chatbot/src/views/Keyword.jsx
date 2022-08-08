@@ -490,9 +490,9 @@ function Keyword() {
                                                     <div id={`fixed-div-${i}`} className="div-add-aq" style={{ display: "flex", width: "100%" }}>
                                                         <Switch id={`check${i}`} onChange={(e) => changeKWOnOff(cdiv.title, cdiv.keyword, cdiv.instagram_account_id, cdiv.message_bag_id, cdiv.is_dm,
                                                             cdiv.is_story_comment, cdiv.is_post_comment, cdiv.is_live_comment, cdiv.is_active, cdiv.id, i)} onColor="#64c1ff" checked={cdiv.is_active = null ? false : cdiv.is_active} />
-                                                        <input name={`l-title-keyword-${i}`} defaultValue={cdiv.title} id={`l-title-keyword-${i}`} className="new-faq-q-so" placeholder="Keyword group..." type="text" style={{ width: "20%" }} />
+                                                        <input name={`l-title-keyword-${i}`} defaultValue={cdiv.title} id={`l-title-keyword-${i}`} className="new-faq-q-so" placeholder="キーワードグループ..." type="text" style={{ width: "20%" }} />
 
-                                                        <input name={`l-answer-${i}`} defaultValue={cdiv.keyword.replaceAll("|", ", ")} className="new-faq-q-so" type="text" id={`l-answer-${i}`} placeholder="Keyword split by comma or space(key1, key2,...)" style={{ width: "53%" }} />
+                                                        <input name={`l-answer-${i}`} defaultValue={cdiv.keyword.replaceAll("|", ", ")} className="new-faq-q-so" type="text" id={`l-answer-${i}`} placeholder="コマーまたはスペースで区別(例:key1, key2,...)" style={{ width: "53%" }} />
                                                         <select id={`listGroup${i}`} style={{ width: "25%" }} defaultValue={""} onChange={(e) => selectedGroup(e.target.value, i)} className="new-faq-q-so" name="l-group">
                                                             <option value="" disabled hidden>{cdiv.message_group_name}</option>
                                                             {listGroup?.map((group, i) => {
@@ -519,9 +519,9 @@ function Keyword() {
                                                     <div key={cdiv}>
                                                         <div id={`fixed-div-${i}`} className="div-add-aq" style={{ display: "flex", width: "100%" }}>
                                                             <div style={{ width: "90px", position: "relative", display: "inline-block", opacity: "1", direction: "ltr", transition: "opacity 0.25s ease 0s" }}></div>
-                                                            <input name={`title-keyword-${i}`} id={`title-keyword-${i}`} className="new-faq-q-so" placeholder="Keyword group..." type="text" style={{ width: "20%" }} />
+                                                            <input name={`title-keyword-${i}`} id={`title-keyword-${i}`} className="new-faq-q-so" placeholder="キーワードグループ..." type="text" style={{ width: "20%" }} />
 
-                                                            <input name={`answer-${i}`} className="new-faq-q-so" type="text" placeholder="Keyword split by space or comma (key1,key2,...)" style={{ width: "53%" }} />
+                                                            <input name={`answer-${i}`} className="new-faq-q-so" type="text" placeholder="コマーまたはスペースで区別(例:key1, key2,...)" style={{ width: "53%" }} />
                                                             <select id="listGroup" style={{ width: "25%" }} defaultValue={""} onChange={(e) => selectedGroupNew(e.target.value, i)} className="new-faq-q-so" name="group">
                                                                 <option value="" disabled hidden>メッセージグループ選択 ...</option>
                                                                 {listGroup?.map((group, i) => {
