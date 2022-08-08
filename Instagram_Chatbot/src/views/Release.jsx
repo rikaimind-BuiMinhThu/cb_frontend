@@ -2821,7 +2821,7 @@ function Release() {
                                */}
 
                               <select id="listGroup" defaultValue={""} onChange={(e) => selectedGroup(e.target.value, i)} className="new-faq-q-so" name={`group_id_${numFAQ}`}>
-                                <option value="" disabled hidden>Choose a group ...</option>
+                                <option value="" disabled hidden>グループ選択 ...</option>
                                 {listGroup?.map((group, i) => {
                                   return (
                                     <option key={i} value={group.id}>
@@ -2831,7 +2831,7 @@ function Release() {
                                 })}
                               </select>
                               <select id={`listGroup${i}`} className="new-faq-q-so" defaultValue={""} onChange={(e) => selectedBag(e.target.value)} name={`bag_id_${numFAQ}`}>
-                                <option value="" disabled hidden>Choose a bag ...</option>
+                                <option value="" disabled hidden>メッセージ袋選択 ...</option>
                               </select>
 
 
@@ -2900,7 +2900,7 @@ function Release() {
                         <select id="replyStory" defaultValue={"direct_message"} style={{ width: "30%" }} onChange={(e) => selectedReply(e.target.value)} className="new-faq-q-so" name="reply">
                           {/* <option value="" disabled hidden>返事タイプ選択 ...</option> */}
                           <option value="direct_message">DM</option>
-                          <option value="keyword">keyword</option>
+                          <option value="keyword">キーワード</option>
                           {/* <option value="keyword">Keywords</option> */}
                         </select>
                         <select id="listReplyGroup" style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectedGroupStoryRe(e.target.value)} className="new-faq-q-so" name="reply_group">
@@ -2919,7 +2919,7 @@ function Release() {
 
 
                         <select id={`listkeyword`} style={{ display: "none", width: "30%" }} defaultValue={""} onChange={(e) => selectedKeyWordStory(e.target.value)} className="new-faq-q-so" name="keyword">
-                          <option value="" disabled hidden>Choose keyword...</option>
+                          <option value="" disabled hidden>キーワード選択...</option>
                           {listKeyword?.map((kw, i) => {
                             return (
                               <option key={i} value={kw.id}>
@@ -2954,7 +2954,7 @@ function Release() {
                         <select id="replyLive" defaultValue={"direct_message"} style={{ width: "30%" }} onChange={(e) => selectedLive(e.target.value)} className="new-faq-q-so" name="live-setting">
                           <option value="" disabled hidden>返事タイプ選択...</option>
                           <option value="direct_message">DM</option>
-                          <option value="keyword">Keyword</option>
+                          <option value="keyword">キーワード</option>
                           {/* <option value="keyword">Keywords</option> */}
                         </select>
 
@@ -2977,7 +2977,7 @@ function Release() {
 
 
                         <select id={`listkeywordLive`} style={{ display: "none", width: "30%" }} defaultValue={""} onChange={(e) => selectedKeyWordLive(e.target.value)} className="new-faq-q-so" name="live_keyword">
-                          <option value="" disabled hidden>Choose keyword...</option>
+                          <option value="" disabled hidden>キーワード選択...</option>
                           {listKeyword?.map((kw, i) => {
                             return (
                               <option key={i} value={kw.id}>
@@ -3013,7 +3013,7 @@ function Release() {
                         <select id="replyCMPost" defaultValue={"direct_message"} style={{ width: "30%" }} onChange={(e) => selectedComment(e.target.value)} className="new-faq-q-so" name="comment-setting">
                           <option value="" disabled hidden>返事タイプ選択 ...</option>
                           <option value="direct_message">DM</option>
-                          <option value="keyword">Keyword</option>
+                          <option value="keyword">キーワード</option>
                           {/* <option value="keyword">Keywords</option> */}
                         </select>
 
@@ -3037,7 +3037,7 @@ function Release() {
 
 
                         <select id={`listkeywordCM`} style={{ display: "none", width: "30%" }} defaultValue={""} onChange={(e) => selectedKeyWordCM(e.target.value)} className="new-faq-q-so" name="live_keyword">
-                          <option value="" disabled hidden>Choose keyword...</option>
+                          <option value="" disabled hidden>キーワード選択...</option>
                           {listKeyword?.map((kw, i) => {
                             return (
                               <option key={i} value={kw.id}>
@@ -3124,7 +3124,7 @@ function Release() {
                           {customDivFixed.map((cdiv, i) => (
                             <div key={cdiv}>
                               <div id={`fixed-div-${i}`} className="div-add-aq" style={{ display: "flex", width: "100%" }}>
-                                <input name={`title-fixed-menu-${i}`} id={`title-fixed-menu-${i}`} className="new-faq-q-so" placeholder="Title..." type="text" style={{ width: "20%" }} />
+                                <input name={`title-fixed-menu-${i}`} id={`title-fixed-menu-${i}`} className="new-faq-q-so" placeholder="タイトル..." type="text" style={{ width: "20%" }} />
                                 <select defaultValue={""} style={{ width: "20%" }} onChange={(e) => selectFixedMenu(e.target.value)} className="new-faq-q-so" name={`fixed-option-${i}`}>
                                   <option value="" disabled hidden>メッセージタイプ選択 ...</option>
                                   <option value="message">メッセージ</option>
@@ -3137,7 +3137,7 @@ function Release() {
                           */}
 
                                 <select id="listGroupFixedMenu" style={{ width: "20%", display: "block" }} defaultValue={""} onChange={(e) => selectedGroupFM(e.target.value)} className="new-faq-q-so" name="client_id">
-                                  <option value="" disabled hidden>Choose a group ...</option>
+                                  <option value="" disabled hidden>グループ選択  ...</option>
                                   {listGroup?.map((group, i) => {
                                     return (
                                       <option key={i} value={group.id}>
@@ -3147,12 +3147,12 @@ function Release() {
                                   })}
                                 </select>
                                 <select id={`listBagFixedMenu`} style={{ width: "20%", display: "block" }} defaultValue={""} onChange={(e) => selectedBagFM(e.target.value)} className="new-faq-q-so" name="msgbag_id">
-                                  <option value="" disabled hidden>Choose a bag ...</option>
+                                  <option value="" disabled hidden>メッセージ袋選択 ...</option>
                                 </select>
-                                <input name="web-fixed-menu" id="web-fixed-menu" className="new-faq-q-so" type="text" placeholder="ecchatbot.com..." style={{ width: "30%", display: "none" }} />
+                                <input name="web-fixed-menu" id="web-fixed-menu" className="new-faq-q-so" type="text" placeholder="https://ec-chatbot.com/..." style={{ width: "30%", display: "none" }} />
 
                                 {/**Uncomment will stop here */}
-                                <input id="faqWeb" name={`answer-${i}`} className="new-faq-q-so" type="text" onBlur={(e) => onChangeAnwFM(e.target.value)} placeholder="https://ecchatbot.com..." style={{ width: "43%", display: "none" }} />
+                                <input id="faqWeb" name={`answer-${i}`} className="new-faq-q-so" type="text" onBlur={(e) => onChangeAnwFM(e.target.value)} placeholder="https://ec-chatbot.com/..." style={{ width: "43%", display: "none" }} />
                                 <div style={{ width: "5%" }}></div>
                                 <div onClick={() => saveFixedMessage()} style={{ width: "5%" }}><i className="nc-icon nc-cloud-download-93 nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
                                 <div onClick={() => deleteFixed(i)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px" }}></i></div>
