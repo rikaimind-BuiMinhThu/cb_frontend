@@ -85,6 +85,13 @@ function Sidebar(props) {
               </NavLink>
             </li>
 
+            {/* <li className={activeRoute('template') + (true ? " active-pro" : "")} key={'notifications'}>
+              <NavLink to="template" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-atom" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>チャットボット作成</p>
+              </NavLink>
+            </li> */}
+
             <li className={activeRoute('chatbot') + (true ? " active-pro" : "")} key={'notifications'}>
               <NavLink to="chatbot" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-atom" style={{ color: "black" }} />

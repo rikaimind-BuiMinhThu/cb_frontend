@@ -17,7 +17,13 @@ import ChatbotOption from "./ChatbotElement/ChatbotOption.jsx";
 import ModalNoti from "./Popup/ModalNoti";
 import axios from "axios";
 import Modal from "./Popup/Modal";
-import { contains } from "jquery";
+import { Helmet } from "react-helmet";
+import Sortable, { MultiDrag, Swap } from 'sortablejs';
+import Template from "./Template";
+import ModalShortTem from "./Popup/ModalShortTem";
+import workingtable from "../views/Popup/workingtable.jpg"
+import registration from "../views/Popup/registration.jpeg"
+import chatbot from "../views/Popup/chatbot.png"
 
 function Chatbot() {
   const [groupList, setGroupList] = useState([])
@@ -25,6 +31,7 @@ function Chatbot() {
   const [idMsgB, setIdmsgB] = useState()
   const [isOpenNoti, setIsOpenNoti] = useState()
   const [isOpenSelectPastPost, setIsOpenSelectPastPost] = useState()
+  const [isOpenAddProfileMsg, setIsOpenAddProfileMsg] = useState()
   const [isOpenSelectPastPostUp, setIsOpenSelectPastPostUp] = useState()
   const [msgNoti, setMsgNoti] = useState()
   const [idList, setIdList] = useState([])
@@ -40,6 +47,23 @@ function Chatbot() {
   const [isUpdateOpenThreeChoice, setIsUpdateOpenThreeChoice] = useState(false)
   const [isAddOpenFreeInput, setIsAddOpenFreeInput] = useState(false)
   const [isUpdateOpenFreeInput, setIsUpdateOpenFreeInput] = useState(false)
+
+  React.useEffect(() => {
+    var cook = Cookies.get("user_role")
+    if (cook == "admin_deel") {
+      document.getElementById("btnTemplateSetting").style.display = "block" //
+      document.getElementById("btnTemplateDetailSetting").style.display = "none" //
+    } else if (cook == "admin_client") {
+      // window.location.href = '/admin/dashboard'
+      // var elem = document.getElementById('sidebarClient');
+      // elem.parentNode.removeChild(elem);
+      document.getElementById("btnTemplateSetting").style.display = "none" //
+      document.getElementById("btnTemplateDetailSetting").style.display = "block" //
+    } else if (cook == "client") {
+      document.getElementById("btnTemplateSetting").style.display = "none" //
+      document.getElementById("btnTemplateDetailSetting").style.display = "block" //
+    }
+  })
 
   // React.useEffect(() => {
   //   console.log('token in dashboard', Cookies.get('token'))
@@ -87,8 +111,7 @@ function Chatbot() {
     // var paramSearch = { page: pageIndex }
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups`).then(res => {
-      // var totalPage = Math.ceil(res.data.data.total / 25)
-      // setTotalPage(totalPage)
+      console.log("message_groups: ", res.data.data.length)
       var idli = []
       for (var i = 0; i < res.data.data.length; i++) {
         idli.push(res.data.data[i].id)
@@ -175,10 +198,27 @@ function Chatbot() {
     })
   }
 
+  const [hotTem, setHotTem] = useState([])
+  React.useEffect(() => {
+    api.get(`/api/v1/message_managements/hot_templates`).then(res => {
+      // console.log("hot_templates: ", res.data.data)
+      var imgUrl = [workingtable, chatbot, registration]
+      var tem = res.data.data
+      for (var i = 0; i < res.data.data.length; i++) {
+        tem[i].src = imgUrl[i]
+      }
+      setHotTem(tem)
 
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+  }, [])
 
   const [idForReloadMsgBag, setIdForReloadMsgBag] = useState()
-  function getBagMsg(group, id) {//
+  function getBagMsg(group, id) {
 
     // document.getElementById(`msg_group${group}_id${id}`).disabled = true
     // setTimeout(() => {
@@ -216,7 +256,6 @@ function Chatbot() {
         // Case message type is msg
 
         if (item.message_type == "msg") {
-
           var updateItem = ""
           var choiceHTML = ""
           if (typeof item.free_input !== "undefined" && item.free_input !== null) {
@@ -313,7 +352,6 @@ function Chatbot() {
                   )
                   // <input id="groupAddFI${item.id}" hidden type=text value=${`group value here`} />
                 } else if (item.message_buttons[i].button_type == "web_url") {
-                  console.log("web ne")
                   choiceHTML = choiceHTML.concat(
                     `
                     <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length - 1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
@@ -344,6 +382,58 @@ function Chatbot() {
 
           var abc = document.createElement("div")
           document.getElementById("div_custom").appendChild(abc)
+          abc.setAttribute("id", `msgIdIs${item.id}`)
+          console.log("item.free_input: ", item.free_input.format_check)
+          if(item.free_input.format_check!= "no_validate" || item.free_input.format_check!= "email" || item.free_input.format_check!= "phone_number"){
+            abc.innerHTML =
+            `<div id="chatbot_message${item.id}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
+              
+              <div><textarea name="messagesVa${item.id}" class="mgsChatbot" id="mgsCustomSaved${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
+              <label id="addUpMessErr${item.id}" style="color:red; display:none; font-size:14px"></label>
+
+
+              <div id="choice${item.id}">
+    
+              </div>
+
+              
+
+
+
+              <div id="btnDelMsg${item.id}" style="float:right;">
+              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+                font-weight:800">削除</button>
+              </div>
+              
+            </div>`
+
+            // <div id="btnUpdateMsg${item.id}" style="float:right;">
+            //   <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+            //     font-weight:800">更新</button>
+            //   </div>
+            
+            document.getElementById(`mgsCustomSaved${item.id}`).textContent = item.message_value
+            document.getElementById(`btnDelMsg${item.id}`).addEventListener('click', (event) => {
+              event.preventDefault()
+              api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
+                console.log(res)
+  
+  
+                setTimeout(() => {
+                  setIsOpenNoti(true)
+                  setMsgNoti("削除しました。")
+                }, 1500)
+                setTimeout(function () {
+                  setIsOpenNoti(false)
+                }, 2000);
+                getBagMsg(group, id)
+              }).catch(error => {
+                console.log(error)
+              })
+            })
+          }else{
+
+          
           abc.innerHTML =
             `<div id="chatbot_message${item.id}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
               
@@ -693,7 +783,7 @@ function Chatbot() {
             }
           })
 
-
+        }
           // var element2 = document.getElementById(`msgOVIKey${item.id}`)
           // if (typeof (element2) != 'undefined' && element2 != null) {
           //   // Exists.
@@ -723,8 +813,45 @@ function Chatbot() {
 
           }
 
+          // document.getElementById(`msgIdIs${item.id}`).draggable = true          
+
+          // document.getElementById(`msgIdIs${item.id}`).ondragstart = ()=>{
+          //   console.log("idd change above: ", item.id);
+          // }
+
+          // document.getElementById(`msgIdIs${item.id}`).ondrop = ()=>{
+          //   console.log("drop id ne ", item.id);
+          // }
+
+          // document.getElementById(`msgIdIs${item.id}`).ondragover = (event)=>{
+          //   event.preventDefault();
+          //   // console.log("idd after below ne: ", item.id);
+          // }
 
 
+          // Sortable.create(document.getElementById(`chatbot_message${item.id}`), {
+          //   animation: 350 ,
+          //   // onChoose: function() {
+          //   //   // Snapshot the list before dragging starts
+          //   //   console.log("idd ne: ", id);
+          //   //  },
+          //    onEnd: function() {
+          //     // Add undo state
+          //     console.log("idd after below ne: ", id);
+          //    }
+
+          // });
+
+          //   document.getElementById(`chatbot_message${item.id}`).draggable = true
+          // document.getElementById(`chatbot_message${item.id}`).ondragstart = (e) =>{
+          //   // e.preventDefault()
+          //   console.log("id mgs bag change: ", item.id) 
+          // }
+
+          // document.getElementById(`chatbot_message${item.id}`).ondrop = (e) =>{
+          //   // e.preventDefault()
+          //   console.log("id mgs bag change: ", item.id) 
+          // }
 
 
         } else if (item.message_type == "img") {
@@ -859,6 +986,7 @@ function Chatbot() {
 
           var abc = document.createElement("div")
           document.getElementById("div_custom").appendChild(abc)
+          abc.setAttribute("id", `msgIdIs${item.id}`)
           abc.innerHTML =
             `<div id="chatbot_image${item.id}" style="border-radius: 20px; margin-top: 20px; display:block; background-color: rgb(244, 243, 239); padding: 40px; ">
             <div><textarea name="imgKey${item.id}" class="mgsChatbot" style="display:none" id="imgCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
@@ -1498,6 +1626,7 @@ function Chatbot() {
 
           var abc = document.createElement("div")
           document.getElementById("div_custom").appendChild(abc)
+          abc.setAttribute("id", `msgIdIs${item.id}`)
           abc.innerHTML =
             `<div id="chatbot_image_msg${item.id}" style="border-radius: 20px; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
             <div><textarea name="imgMsgKey${item.id}" style="display:none" class="mgsChatbot" id="imgMgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
@@ -1914,6 +2043,10 @@ function Chatbot() {
             document.getElementById(`imgMsgOVI${item.id}`).value = item.message_value
 
           }
+
+          document.getElementById(`chatbot_image_msg${item.id}`).onDrop = () => {
+            console.log("id of the place below new bag: ", item.id)
+          }
         } else if (item.message_type == "past_post") {
           // alert ("PP roi")
           setMessBtnPP(item.message_buttons)
@@ -2050,6 +2183,7 @@ function Chatbot() {
 
           var abc = document.createElement("div")
           document.getElementById("div_custom").appendChild(abc)
+          abc.setAttribute("id", `msgIdIs${item.id}`)
           abc.innerHTML =
             `<div id="chatbot_pp${item.id}" style="border-radius: 20px; text-align:center; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
             
@@ -2077,7 +2211,7 @@ function Chatbot() {
               <button style="width:110px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
               font-weight:800">変更</button>
             </div>
-        </div>`
+          </div>`
 
           //paste to above
           // <input id="imgMsgNumSaved${item.id}" type="file" accept="image/*" /> <br /><br />
@@ -2250,6 +2384,9 @@ function Chatbot() {
             // document.getElementById(`imgUpPP${item.id}`).style.display = "block"
             document.getElementById(`btnUpdatePP${item.id}`).style.display = "block"
             document.getElementById(`btnChangePP${item.id}`).style.display = "none"
+            document.getElementById(`chatbot_pp${item.id}`).onDrop = () => {
+              console.log("id of the place below new bag: ", item.id)
+            }
             // document.getElementById(`ppCustomSavedOvi${item.id}`).style.display = "none"
             // if (document.getElementById(`lbOvPP${item.id}}`) !== null) {
 
@@ -2260,28 +2397,45 @@ function Chatbot() {
 
 
           })
-
-
-          // }
-          // document.getElementById(`ppCustomSaved${item.id}`).addEventListener('click', () => {
-          //   setIdPPUP(item.id)
-          //   selectPastPostUp()
-          //   // document.getElementById(`PPUpOV${item.id}`).style.display = "block"
-          //   // document.getElementById(`imgUpPP${item.id}`).style.display = "block"
-          //   document.getElementById(`btnUpdatePP${item.id}`).style.display = "block"
-          //   document.getElementById(`PPUpOV${item.id}`).style.display = "none"
-          //   // document.getElementById(`ppCustomSavedOvi${item.id}`).style.display = "none"
-          //   // if (document.getElementById(`lbOvPP${item.id}}`) !== null) {
-
-          //   // } //
-          //   // document.getElementById(`PPUpOV${item.id}`).url = urlUpdatePastPost
-          //   // document.getElementById(`imgUpPP${item.id}`).style.display="block"
-          //   // document.getElementById(`imgUpPP${item.id}`).src = urlUpdatePastPost
-
-
-          // })
-
         }
+        // document.getElementById(`msgIdIs${item.id}`).on('ondrop',(event)=>{
+        //     event.preventDefault();
+        //     console.log("drop id ne ", item.id);
+        //   })
+
+        document.getElementById(`msgIdIs${item.id}`).draggable = true
+
+        document.getElementById(`msgIdIs${item.id}`).ondragstart = (event) => {
+          // event.preventDefault();
+          console.log("idd change above: ", item.id);
+        }
+        document.getElementById(`msgIdIs${item.id}`).ondragover = function (e) {
+          e.preventDefault()
+        }
+        document.getElementById(`msgIdIs${item.id}`).ondrop = (event) => {
+          event.preventDefault();
+          console.log("drop id ne ", item.id);
+        }
+
+
+
+        // document.getElementById(`msgIdIs${item.id}`).ondragend = (event) => {
+        //   event.preventDefault();
+        //   document.getElementById(`msgIdIs${item.id}`).ondrop = (event) => {
+        //     event.preventDefault();
+        //     console.log("drop id ne ", item.id);
+        //   }
+        // }
+
+        // document.getElementById(`msgIdIs${item.id}`).ondrop = (event)=>{
+        //   event.preventDefault();
+        //   console.log("drop id ne ", item.id);
+        // }
+
+        // document.getElementById(`msgIdIs${item.id}`).ondragover = (event)=>{
+        //   event.preventDefault();
+        //   // console.log("idd after below ne: ", item.id);
+        // }
 
 
         // document.getElementById(`outputImgMsgSaved${item.id}`).src = `https://ec-chatbot-test.com/${item.img_value.url}`
@@ -2303,913 +2457,24 @@ function Chatbot() {
       //   requestNewToken(path)
       // }
     })
-  }
 
-  function reloadMessMsgBag() {
-    var id = idForReloadMsgBag
-    // var idIn
-    if (idForReloadMsgBag === undefined) {
-      id = idReloadMsgBagFromGetMSG
-    } else {
-      id = idForReloadMsgBag
-    }
-    console.log("iddddddd: ", id)
-    console.log("idReloadMsgBagFromGetMSG: ", idReloadMsgBagFromGetMSG)
-    console.log("idForReloadMsgBag: ", id)
-    var path = window.location.pathname;
-    const list = document.getElementById("div_custom");
-    while (list.hasChildNodes()) {
-      list.removeChild(list.firstChild);
-    }
-    const list2 = document.getElementById("logUserDiv");
-    while (list2.hasChildNodes()) {
-      list2.removeChild(list2.firstChild);
-    }
-    api.get(`/api/v1/message_managements/message_bags/${id}`).then(res => {
-      // var totalPage = Math.ceil(res.data.data.total / 25)
-      // setTotalPage(totalPage)
-      var bagMsg = res.data.data.messages
-      // console.log("bagMsg: ",res.data.data.messages)
-      setMsgCBNum(bagMsg[bagMsg.length - 1].id)
-      setImgCBNum(bagMsg[bagMsg.length - 1].id)
-      setImgCBNum(bagMsg[bagMsg.length - 1].id)
-      bagMsg.forEach((item) => {
-        if (item.message_type == "msg") {
+    // Sortable.create(document.getElementById("div_custom"), {
+    //   // animation: 350 ,
+    //   onChoose: function (e) {
+    //     e.preventDefault()
+    //     // Snapshot the list before dragging starts
+    //     // console.log("idd ne: ", id);
+    //   },
+    //   onDragOver: function (e) {
+    //     e.preventDefault()
+    //   },
+    //   onUpdate: function (e) {
+    //     e.preventDefault()
+    //     // Add undo state
+    //     // console.log("idd after ne: ", id);
+    //   }
+    // });
 
-          var updateItem = ""
-          var choiceHTML = ""
-          if (typeof item.free_input !== "undefined" && item.free_input !== null) {
-            // console.log("free input")
-            choiceHTML =
-              `
-                <div id="itemFI${item.id}" >
-                <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
-                <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
-                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                    Delete
-                  </button>
-                </div>
-                <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
-                <input id="formatCheckSelect${item.free_input.message_id}" hidden type=text value=${item.free_input.format_check} />
-                <input id="formatCheckMSG${item.free_input.message_id}" hidden type=text value="${item.free_input.format_check_message}" />
-                
-              </div>
-              `
-            updateItem = "free_input"
-          } else if (item.message_buttons != []) {
-            if (item.message_buttons.length == 1) {
-              if (item.message_buttons[0].button_type == "mess") {
-                choiceHTML =
-                  `
-                    <div id="itemSC${item.message_buttons[0].message_id}">
-                    <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>
-                    <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
-                    <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
-                    <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
-                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].message_group_name}/${item.message_buttons[0].message_bag_name}</div>
-                  
-                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
-                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
-                    </button>
-                  </div>
-                    <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
-                    <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
-                  </div>
-                  `
-                updateItem = "single_choice_msg"
-              }
-              else if (item.message_buttons[0].button_type == "web_url") {
-                if (item.message_buttons[0].message_id != undefined) {
-                  choiceHTML =
-                    `
-                    <div >
-                    <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>  
-                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].content}</div>
-                      
-
-                    <input id="titleUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
-                    <input id="typeUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
-                    <input id="webUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
-                      
-                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
-                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
-                    </button>
-                  </div>
-                    <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
-                    <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
-                    </div>
-                    `
-                  updateItem = "single_choice_web"
-                }
-
-              }
-            } else if (item.message_buttons.length > 1) {
-              console.log("nhieu item hon ne")
-              for (var i = 0; i < item.message_buttons.length; i++) {
-                if (item.message_buttons[i].button_type == "mess") {
-                  console.log("mess ne")
-                  choiceHTML = choiceHTML.concat(
-                    `
-                  <div id="itemTCUP${item.id}_${i}" style="border-bottom:1px solid black; margin:auto; width:90%; text-align:center">
-                  <div style="padding:10px 5px 0px 5px">${item.message_buttons[i].title}</div>  
-                  <div style="padding:0px 5px 10px 5px">${item.message_buttons[i].message_group_name}/${item.message_buttons[i].message_bag_name}</div>
-                    <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
-                  <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
-                  <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
-                    
-                  <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
-                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                    Delete
-                  </button>
-                </div>
-                  <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
-                  <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
-                  </div>
-                  `
-                  )
-                  // <input id="groupAddFI${item.id}" hidden type=text value=${`group value here`} />
-                } else if (item.message_buttons[i].button_type == "web_url") {
-                  console.log("web ne")
-                  choiceHTML = choiceHTML.concat(
-                    `
-                    <div id="itemTCUP${item.id}_${i}" style="border-bottom:${i == item.message_buttons.length - 1 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
-                    <div style="padding:10px 5px 0px 5px;">${item.message_buttons[i].title}</div>  
-                    <div style="padding:0px 5px 10px 5px">${item.message_buttons[i].content}</div>
-                    <input id="titleUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].title} />
-                    <input id="typeUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].button_type} />
-                    <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
-                    <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
-                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
-                    </button>
-                  </div>
-                    <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
-                    <input id="lblUPTCItem${item.message_buttons[i].message_id}" hidden type=text value="${item.message_buttons[i].message_button_labels}" />
-                    </div>
-                    `
-                  )
-                }
-              }
-              updateItem = "three_choice"
-            }
-
-          }
-
-
-
-          var abc = document.createElement("div")
-          document.getElementById("div_custom").appendChild(abc)
-          abc.innerHTML =
-            `<div id="chatbot_message${item.id}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
-              
-              <div><textarea name="messagesVa${item.id}" class="mgsChatbot" id="mgsCustomSaved${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
-              
-              <div id="choice${item.id}">
-    
-              </div>
-              
-              <div id="msgChoice${item.id}" style="display:none">
-                <div style="display: flex">
-                  <div id="singleChoice${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">単一選択</button>
-                  </div>
-                  <div id="threeChoice${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">三択+URL</button>
-                  </div>
-                  <div id="freeInput${item.id}" style=" padding:5px">
-                    <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">自由入力</button>
-                  </div>
-                </div>
-              </div>
-              </br>
-              <div style=" border-radius:10px; background-color:white; width:200px; text-align:center">
-                <div id="choiceOption${item.id}" style=" border-radius:10px; background-color:white; width:200px; text-align:center">
-                
-                </div>
-                <div id="choiceThree${item.id}" style="display:none;border-radius:10px"></div>
-              </div>
-
-              <div id="btnDelMsg${item.id}" style="float:right;">
-              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-                font-weight:800">削除</button>
-              </div>
-              <div id="btnUpdateMsg${item.id}" style="float:right;">
-              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-                font-weight:800">更新</button>
-              </div>
-            </div>`
-          // document.getElementById(`mgsCustomKey${item.id}`).textContent = item.received_message
-          document.getElementById(`mgsCustomSaved${item.id}`).textContent = item.message_value
-          var choiceNe = document.createElement("div")
-          document.getElementById(`choiceOption${item.id}`).appendChild(choiceNe)
-
-          document.getElementById(`singleChoice${item.id}`).addEventListener('click', (event) => {
-            event.preventDefault()
-            updateMsgSC(item.id)
-          })
-          document.getElementById(`threeChoice${item.id}`).addEventListener('click', (event) => {
-            event.preventDefault()
-            updateMsgTC(item.id)
-          })
-          document.getElementById(`freeInput${item.id}`).addEventListener('click', (event) => {
-            event.preventDefault()
-            updateMsgFI(item.id)
-          })
-
-          //This one use to delete choice deleteChoice
-          document.getElementById(`choiceOption${item.id}`).addEventListener("click", (e) => {
-            e.preventDefault()
-
-            if (updateItem == "three_choice") {
-              var idThreeChoiceDelete = item.message_buttons.length - 1
-              document.getElementById(`deleteChoice${item.id}_${idThreeChoiceDelete}`).style.display = "block"
-              document.getElementById(`deleteChoice${item.id}_${idThreeChoiceDelete}`).addEventListener('click', (e) => {
-                e.preventDefault()
-                var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
-                api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
-                  console.log(res)
-                  setTimeout(() => {
-                    setIsOpenNoti(true)
-                    setMsgNoti("更新しました。")
-                  }, 1500)
-                  setTimeout(function () {
-                    setIsOpenNoti(false)
-                  }, 2000);
-                  getBagMsg(id, id)
-                }).catch(error => {
-                  console.log(error)
-                })
-              })
-            }
-
-            if (document.getElementById(`deleteChoice${item.id}`) != null) {
-              document.getElementById(`deleteChoice${item.id}`).style.display = "block"
-              document.getElementById(`deleteChoice${item.id}`).addEventListener("click", (event) => {
-                event.preventDefault()
-                // alert("delete ne")
-                var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
-                api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
-                  console.log(res)
-                  setTimeout(() => {
-                    setIsOpenNoti(true)
-                    setMsgNoti("更新しました。")
-                  }, 1500)
-                  setTimeout(function () {
-                    setIsOpenNoti(false)
-                  }, 2000);
-                  getBagMsg(id, id)
-                }).catch(error => {
-                  console.log(error)
-                })
-              })
-            }
-          })
-
-          // Update item down here
-          if (updateItem == "") {
-            document.getElementById(`msgChoice${item.id}`).style.display = "block"
-          }
-
-
-          choiceNe.innerHTML = choiceHTML
-
-
-
-          document.getElementById(`mgsCustomSaved${item.id}`).addEventListener('change', (e) => msgOVSaved(e.target.value, item.id))
-          // <div><textarea name="messageKey${item.id}" class="mgsChatbot" id="mgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
-          // document.getElementById(`mgsCustomKey${item.id}`).addEventListener('change', (e) => msgOVkey(e.target.value))
-          // document.getElementById(`mgsCustom${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelMsg${item.id}`).style.display = 'block' })
-          document.getElementById(`btnDelMsg${item.id}`).addEventListener('click', (event) => {
-            event.preventDefault()
-            api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
-              console.log(res)
-
-
-              setTimeout(() => {
-                setIsOpenNoti(true)
-                setMsgNoti("削除しました。")
-              }, 1500)
-              setTimeout(function () {
-                setIsOpenNoti(false)
-              }, 2000);
-              getBagMsg(id, id)
-            }).catch(error => {
-              console.log(error)
-            })
-          })
-          document.getElementById(`btnUpdateMsg${item.id}`).addEventListener('click', (event) => {
-            // setIdUpdateItemMsg(item.id)
-            event.preventDefault()
-
-
-
-            var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
-
-            var add
-            if (document.getElementById(`bagAddSC${item.id}`) != null || document.getElementById(`groupAddSC${item.id}`) != null || document.getElementById(`titleAddSC${item.id}`) != null) {
-              var titlea = document.getElementById(`titleAddSC${item.id}`).value
-              var groupva = document.getElementById(`groupAddSC${item.id}`).value
-              var group_name = document.getElementById(`groupNameAddSC${item.id}`).value
-              var bag_name = document.getElementById(`groupAddSC${item.id}`).value
-              var bag = document.getElementById(`bagNameAddSC${item.id}`).value
-              var type = document.getElementById(`typeAddSC${item.id}`).value
-              var web = document.getElementById(`webAddSC${item.id}`).value
-              var lbl = document.getElementById(`lblAddSC${item.id}_${bagAddSC}`).value
-              // console.log("lbl: ", lbl)
-              var listLbl = lbl.substring(2, lbl.length).split(", ")
-              var lastListLBL = []
-              for (var i = 0; i < listLbl.length; i++) {
-                lastListLBL.push({ label_name: listLbl[i] })
-              }
-              if (type == "mess") {
-                add = {
-                  message: {
-                    message_bag_id: bagId,
-                    message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
-                    message_type: "msg",
-                    img_value: "",
-                    message_buttons: [
-                      { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
-                    ]
-                  }
-
-                }
-              } else if (type == "web_url") {
-                add = {
-                  message: {
-                    message_bag_id: bagId,
-                    message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
-                    message_type: "msg",
-                    img_value: "",
-                    message_buttons: [
-                      { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
-                    ]
-                  }
-
-                }
-              }
-            } else if (document.getElementById(`titleAddTC${item.id}_${totalItemTC}`) != null) {
-              var message_buttons = []
-              console.log("totalItemTC: ", totalItemTC)
-              var totalTCItem = document.getElementById(`totalItemTC${item.id}`).value
-
-              console.log("mb ne: ", totalTCItem)
-              for (var i = 1; i <= totalTCItem; i++) {
-
-                var titlea = document.getElementById(`titleAddTC${item.id}_${i}`).value
-                var groupva = document.getElementById(`groupAddTC${item.id}_${i}`).value
-                var group_name = document.getElementById(`groupNameAddTC${item.id}_${i}`).value
-                var bag_name = document.getElementById(`bagNameAddTC${item.id}_${i}`).value
-                var bag = document.getElementById(`bagAddTC${item.id}_${i}`).value
-                var type = document.getElementById(`typeAddTC${item.id}_${i}`).value
-                var web = document.getElementById(`webAddTC${item.id}_${i}`).value
-                var lbl = document.getElementById(`lblAddTCItem${item.id}_${i}`).value
-                // console.log("lbl ne: ", lbl.substring(2, lbl.length))
-                var listLbl = lbl.substring(2, lbl.length).split(", ")
-                var lastListLBL = []
-                for (var j = 0; j < listLbl.length; j++) {
-                  lastListLBL.push({ label_name: listLbl[j] })
-                }
-                if (type == "mess") {
-
-                  // add = {
-                  //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
-                  //   message_button: [
-                  //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
-                  //   ]
-                  // }
-
-                  message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
-                } else if (type == "web_url") {
-                  // add = {
-                  //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
-                  //   message_button: [
-                  //     { button_type: "web_url", title: titlea, content: web }
-                  //   ]
-                  // }
-
-                  message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
-                }
-              }
-              add = {
-                message: {
-                  message_bag_id: bagId,
-                  message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
-                  message_type: "msg",
-                  img_value: "",
-                  message_buttons
-                },
-
-              }
-            } else if (document.getElementById(`formatCheckSelect${item.id}`) != null) {
-              // var group = document.getElementById(`groupAddFI${idSC}`).value
-              // var bag = document.getElementById(`bagAddFI${idSC}`).value
-              var lbl = document.getElementById(`lblAddFI${item.id}_${bagAddSC}`).value
-              var formatCheckSelect = document.getElementById(`formatCheckSelect${item.id}`).value
-              var formatCheckMSG = document.getElementById(`formatCheckMSG${item.id}`).value
-              // console.log("lbl: ", lbl)
-              var listLbl = lbl.substring(2, lbl.length).split(", ")
-              var lastListLBL = []
-              for (var i = 0; i < listLbl.length; i++) {
-                lastListLBL.push({ label_name: listLbl[i] })
-              }
-              add = {
-                message: {
-                  message_bag_id: bagId,
-                  message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
-                  message_type: "msg",
-                  img_value: "",
-                  free_input: {
-                    message_bag_id: `1`,
-                    free_input_labels: lastListLBL,
-                    format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
-                    format_check_message: formatCheckMSG
-                  }
-                },
-                // message_button: [
-                //   { button_type: "format", title: '', content: `+message_bag_id_${bag}`, label: listLbl, format: formatCheckSelect, format_msg: formatCheckMSG }
-                // ]
-              }
-            }
-            else {
-              add = {
-                message: { message_bag_id: bagId, message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" }
-              }
-            }
-
-            console.log(add)
-
-            setTotalItemTC(1)
-
-
-            api.patch(`/api/v1/message_managements/messages/${item.id}`, add).then(res => {
-              console.log(res)
-
-              setTimeout(() => {
-                setIsOpenNoti(true)
-                setMsgNoti("更新しました。")
-              }, 1500)
-
-              setTimeout(function () {
-                setIsOpenNoti(false)
-              }, 2000);
-              getBagMsg(id, id)
-            }).catch(error => {
-              console.log(error)
-            })
-
-
-          })
-
-
-          // var element2 = document.getElementById(`msgOVIKey${item.id}`)
-          // if (typeof (element2) != 'undefined' && element2 != null) {
-          //   // Exists.
-          //   document.getElementById(`msgOVIKey${item.id}`).value = item.received_message
-          // } else if (element2 === null) {
-          //   var abc = document.createElement(`div`)
-          //   document.getElementById('logUserDiv').appendChild(abc)
-          //   abc.innerHTML =
-          //     `<div id="ovMsgKey${item.id}" style="width: 70%; background-color: #51cbce; padding: 10px; float:left; margin:5px; display:block; border-radius: 10px">
-          //       <input type="text" id="msgOVIKey${item.id}" style="background-color: #51cbce; border: none" readonly/>
-          //      </div>`
-          //   document.getElementById(`msgOVIKey${item.id}`).value = item.received_message;
-          // }
-
-          var element1 = document.getElementById(`msgOVI${item.id}`)
-          if (typeof (element1) != 'undefined' && element1 != null) {
-            // Exists.
-            document.getElementById(`msgOVI${item.id}`).value = item.message_value
-          } else if (element1 === null) {
-            var abc = document.createElement(`div`)
-            document.getElementById('logUserDiv').appendChild(abc)
-            abc.innerHTML =
-              `<div id="ovMsg${item.id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
-                <textarea type="text" id="msgOVI${item.id}" style="width:90%; text-align: right; background-color: #51cbce; border: none; overflow-y:auto" readonly/>
-               </div> `
-            document.getElementById(`msgOVI${item.id}`).value = item.message_value
-
-          }
-        } else if (item.message_type == "img") {
-          var abc = document.createElement("div")
-          document.getElementById("div_custom").appendChild(abc)
-          abc.innerHTML =
-            `<div id="chatbot_image${item.id}" style="border-radius: 20px; margin-top: 20px; display:block; background-color: rgb(244, 243, 239); padding: 40px; ">
-            <div><textarea name="imgKey${item.id}" class="mgsChatbot" style="display:none" id="imgCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
-          <input id="imgNumSaved${item.id}" name="imageChatbot" type="file" accept="image/*" />
-          <input id="imgDataNumSaved${item.id}" name="imgchatbot${item.id}" type=hidden /> <br /><br />
-          <div style=" text-align: center">
-            <img id="output${item.id}" style=" max-height: 200px; max-width: 40%"  />
-          </div>
-          <div id="btnDelImg${item.id}" style="float:right;">
-              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">削除</button>
-            </div>
-            <div id="btnUpdateImg${item.id}" style="float:right;">
-              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">更新</button>
-            </div>
-        </div>`
-          document.getElementById(`imgCustomKey${item.id}`).value = item.received_message
-          document.getElementById(`imgNumSaved${item.id}`).addEventListener('change', (e) => loadFileSaved(e, item.id))
-          document.getElementById(`output${item.id}`).src = `https://ec-chatbot-test.com${item.img_value.url}`
-          document.getElementById(`btnDelImg${item.id}`).addEventListener("click", (event) => {
-            event.preventDefault()
-            api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
-              // alert("Delete Successfully")
-              console.log(res)
-              setTimeout(() => {
-                setIsOpenNoti(true)
-                setMsgNoti("削除しました。")
-              }, 1500)
-
-              setTimeout(function () {
-                setIsOpenNoti(false)
-              }, 2000);
-              getBagMsg(id, id)
-            }).catch(error => {
-              console.log(error)
-            })
-          })
-          document.getElementById(`btnUpdateImg${item.id}`).addEventListener("click", (event) => {
-            event.preventDefault()
-            var upd = {
-              message: { message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNumSaved${item.id}`).value }
-            }
-            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
-              // alert("Delete Successfully")
-              console.log(res)
-              setTimeout(() => {
-                setIsOpenNoti(true)
-                setMsgNoti("更新しました。")
-              }, 1500)
-
-              setTimeout(function () {
-                setIsOpenNoti(false)
-              }, 2000);
-              getBagMsg(id, id)
-            }).catch(error => {
-              console.log(error)
-            })
-          })
-
-
-          // console.log('value ne: ',document.getElementById(`output${item.id}`))
-          // document.getElementById(`imgNum${item.id}`).value = item.img_value.src
-
-          // getBaseUrlDis(item.id, item.img_value.url)
-
-
-
-          // const toDataURL = url => fetch(url)
-          //   .then(response => response.blob())
-          //   .then(blob => new Promise((resolve, reject) => {
-          //     const reader = new FileReader()
-          //     reader.onloadend = () => resolve(reader.result)
-          //     reader.onerror = reject
-          //     reader.readAsDataURL(blob)
-          //   }))
-
-
-          // toDataURL(`https://ec-chatbot-test.com/${item.img_value.url}`)
-          //   .then(dataUrl => {
-          //     console.log('RESULT:', dataUrl)
-          //   })
-
-          var src = document.getElementById(`output${item.id}`).src
-
-          const getEmergencyFoundImg = urlImg => {
-            var img = new Image();
-            img.src = urlImg;
-            img.crossOrigin = 'Anonymous';
-
-            var canvas = document.createElement('canvas'),
-              ctx = canvas.getContext('2d');
-
-            canvas.height = img.naturalHeight;
-            canvas.width = img.naturalWidth;
-            ctx.drawImage(img, 0, 0);
-
-            var b64 = canvas.toDataURL('image/png').replace(/^data:image.+;base64,/, '');
-            return b64;
-          };
-          // document.getElementById(`output${item.id}`).setAttribute('crossOrigin', 'anonymous')
-
-          // console.log(getEmergencyFoundImg(src))
-
-          // document.getElementById(`output${item.id}`).setAttribute('crossOrigin', 'anonymous')
-          //           var c = document.createElement('canvas');
-          //           var img = document.getElementById(`output${item.id}`);
-          //           c.height = img.naturalHeight;
-          //           c.width = img.naturalWidth;
-          //           var ctx = c.getContext('2d');
-
-          //           ctx.drawImage(img, 0, 0, c.width, c.height);
-          //           var base64String = c.toDataURL('image/jpeg');
-          // console.log('base: ',base64String)
-
-
-          // function toDataURL(src, callback){
-          //   var image = new Image();
-
-          //   image.onload = function(){
-          //     var canvas = document.createElement('canvas');
-          //     var context = canvas.getContext('2d');
-          //     canvas.height = this.naturalHeight;
-          //     canvas.width = this.naturalWidth;
-          //     context.drawImage(this, 0, 0);
-          //     var dataURL = canvas.toDataURL('image/jpeg');
-          //     callback(dataURL);
-          //   };
-          //   image.src = src;
-          // }
-          //     toDataURL(`https://ec-chatbot-test.com/${item.img_value.url}`, function(dataURL){
-          //       alert(dataURL);      
-          //   })
-
-          // function toDataURL(url, callback) {
-          //   var httpRequest = new XMLHttpRequest();
-
-          //   httpRequest.onload = function () {
-          //     var fileReader = new FileReader();
-          //     fileReader.onloadend = function () {
-          //       callback(fileReader.result);
-          //     }
-          //     fileReader.readAsDataURL(httpRequest.response);
-          //   };
-          //   httpRequest.open('GET', url);
-          //   httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencode');
-          //   httpRequest.setRequestHeader( 'Access-Control-Allow-Origin', '*');
-          //   httpRequest.responseType = 'blob';
-          //   httpRequest.send();
-          // }
-          // toDataURL(`https://ec-chatbot-test.com/${item.img_value.url}`, function (dataUrl) {
-          //   console.log('Result in string:', dataUrl)
-          // })
-
-
-
-
-
-          // console.log(encrypt(item.img_value.url))
-
-          // console.log(document.getElementById(`imgDataNum${item.id}`).value)
-          // document.getElementById(`imgDataNum${item.id}`).value = encrypt(item.img_value.url)
-          // document.getElementById(`imgNum${item.id}`).addEventListener('change', (e) => loadFile(e))
-          // document.getElementById(`btnDelImg${item.id}`).addEventListener('click', () => deleteImgCB(item.id))
-
-          var element1 = document.getElementById(`outputOV${item.id}`)
-          if (typeof (element1) != 'undefined' && element1 != null) {
-            // Exists.
-            document.getElementById(`outputOV${item.id}`).src = `https://ec-chatbot-test.com${item.img_value.url}`
-          } else if (element1 === null) {
-            var abc = document.createElement(`div`)
-            document.getElementById('logUserDiv').appendChild(abc)
-            abc.innerHTML =
-              `
-              <div style="width: 100%; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
-              <img id="outputOV${item.id}" style="max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" src="${`https://ec-chatbot-test.com${item.img_value.url}`}">
-               </div> 
-              `
-            // document.getElementById(`msgOVI${item.id}`).value = item.message_value
-
-          }
-
-        } else if (item.message_type == "img_msg") {
-          var abc = document.createElement("div")
-          document.getElementById("div_custom").appendChild(abc)
-          abc.innerHTML =
-            `<div id="chatbot_image_msg${item.id}" style="border-radius: 20px; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
-            <div><textarea name="imgMsgKey${item.id}" style="display:none" class="mgsChatbot" id="imgMgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
-          <input id="imgMsgNumSaved${item.id}" type="file" accept="image/*" /> <br /><br />
-          <input id="imgValueMsgNumSaved${item.id}" name="imgValueMsgChatbot${item.id}" type=hidden /> <br /><br />
-          <div style=" text-align: center" }}>
-            <img id="outputImgMsgSaved${item.id}" style=" max-height: 200px; max-width: 40%" }} />
-          </div>
-          <div style="text-align: center">
-          <textarea class="mgsChatbot" id="imgMgsCustomSaved${item.id}" name="imgMsgValueChatbot${item.id}" placeholder="返事入力..." type="text" rows="3"></textarea>
-          </div>
-          <div id="btnDelImgMsg${item.id}" style="float:right;">
-              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">削除</button>
-            </div>
-            <div id="btnUpImgMsg${item.id}" style="float:right;">
-              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">更新</button>
-            </div>
-        </div>`
-          document.getElementById(`imgMgsCustomKey${item.id}`).value = item.received_message
-          document.getElementById(`imgMgsCustomSaved${item.id}`).value = item.message_value
-          document.getElementById(`outputImgMsgSaved${item.id}`).src = `https://ec-chatbot-test.com${item.img_value.url}`
-
-
-          // document.getElementById(`imgMsgNum${item.id}`).addEventListener('change', (e) => loadFileImgMsg(e))
-          document.getElementById(`imgMgsCustomSaved${item.id}`).addEventListener('change', (e) => imgMsgOVSaved(e.target.value, item.id))
-          // document.getElementById(`imgMsgNum${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${item.id}`).style.display = 'block' })
-          // document.getElementById(`imgMgsCustom${item.id}`).addEventListener('change', () => { document.getElementById(`btnDelImgMsg${item.id}`).style.display = 'block' })
-          document.getElementById(`imgMsgNumSaved${item.id}`).addEventListener('change', (e) => loadFileImgMsgSaved(e, item.id))
-          document.getElementById(`btnDelImgMsg${item.id}`).addEventListener('click', (event) => {
-            event.preventDefault()
-            api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
-              console.log(res)
-              setTimeout(() => {
-                setIsOpenNoti(true)
-                setMsgNoti("削除しました。")
-              }, 1500)
-              setTimeout(function () {
-                setIsOpenNoti(false)
-              }, 2000);
-              getBagMsg(id, id)
-            }).catch(error => {
-              console.log(error)
-            })
-          })
-
-          document.getElementById(`btnUpImgMsg${item.id}`).addEventListener('click', (event) => {
-            event.preventDefault()
-            var upd = {
-              message: { message_value: document.getElementById(`imgMgsCustomSaved${item.id}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNumSaved${item.id}`).value }
-            }
-
-            api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
-              // alert("Delete Successfully")
-              console.log(res)
-              setTimeout(() => {
-                setIsOpenNoti(true)
-                setMsgNoti("更新しました。")
-              }, 1500)
-              setTimeout(function () {
-                setIsOpenNoti(false)
-              }, 2000);
-              getBagMsg(id, id)
-            }).catch(error => {
-              console.log(error)
-            })
-          })
-
-          var element1 = document.getElementById(`imgMsgOVI${item.id}`)
-          var element2 = document.getElementById(`outputImgMsgOV${item.id}`)
-
-          if ((typeof (element1) != 'undefined' && element1 != null) || (typeof (element2) != 'undefined' && element2 != null)) {
-            // Exists.
-            document.getElementById(`imgMsgOVI${item.id}`).value = item.message_value
-            document.getElementById(`outputImgMsgOV${item.id}`).src = `https://ec-chatbot-test.com${item.img_value.url}`
-          } else if (element1 === null) {
-            var abc = document.createElement(`div`)
-            document.getElementById('logUserDiv').appendChild(abc)
-            abc.innerHTML =
-              `
-              <div id="ovMsg${item.id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
-                <textarea type="text" id="imgMsgOVI${item.id}" style="width:90%; text-align: right; background-color: #51cbce; border: none; overflow-y:auto" readonly/>
-               </div> 
-              `
-            var abc1 = document.createElement(`div`)
-            document.getElementById('logUserDiv').appendChild(abc1)
-            abc1.innerHTML = `<br /><img id="outputImgMsgOV${item.id}" style="max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" src="${`https://ec-chatbot-test.com${item.img_value.url}`}">`
-            document.getElementById(`imgMsgOVI${item.id}`).value = item.message_value
-
-          }
-        } else if (item.message_type == "past_post") {
-          // alert ("PP roi")
-
-          var abc = document.createElement("div")
-          document.getElementById("div_custom").appendChild(abc)
-          abc.innerHTML =
-            `<div id="chatbot_pp${item.id}" style="border-radius: 20px; text-align:center; margin-top: 20px; background-color: rgb(244, 243, 239); padding: 40px; ">
-            
-            <div style="width:100%">
-            <img id="imgUpPP${item.id}" src="${item.preview_past_post_url}" style="margin: auto; max-height:200px; max-width:200px" /></div>
-
-          <br />
-          <div id="btnDeletePP${item.id}" style="float:right;">
-              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">削除</button>
-            </div>
-            <div id="btnUpdatePP${item.id}" style="float:right; display:none">
-              <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">更新</button>
-            </div>
-            <div id="btnChangePP${item.id}" style="float:right;">
-              <button style="width:110px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-              font-weight:800">変更</button>
-            </div>
-          </div>`
-
-          //paste to above
-          // <input id="imgMsgNumSaved${item.id}" type="file" accept="image/*" /> <br /><br />
-          //   <input id="imgValueMsgNumSaved${item.id}" name="imgValueMsgChatbot${item.id}" type=hidden /> <br /><br />
-          //   <div style=" text-align: center" }}>
-          //     <img id="outputImgMsgSaved${item.id}" style=" max-height: 200px; max-width: 40%" }} />
-          //   </div> 
-
-          // document.getElementById(`ppCustomSaved${item.id}`).value = item.message_value
-
-          document.getElementById(`btnDeletePP${item.id}`).addEventListener('click', (event) => {
-            event.preventDefault()
-            api.delete(`/api/v1/message_managements/messages/${item.id}`).then(res => {
-              console.log(res)
-              setTimeout(() => {
-                setIsOpenNoti(true)
-                setMsgNoti("削除しました。")
-              }, 1500)
-              setTimeout(function () {
-                setIsOpenNoti(false)
-              }, 2000);
-              getBagMsg(id, id)
-            }).catch(error => {
-              console.log(error)
-            })
-          })
-
-          // document.getElementById(`btnUpdatePP${item.id}`).addEventListener('click', () => {
-          //   var update = { message: { message_value: urlUpdatePastPost, message_type: "past_post", img_value: "" } }
-          //   api.patch(`/api/v1/message_managements/messages/${item.id}`, update).then(res => {
-          //     console.log(res)
-          //   }).catch(error => {
-          //     console.log(error)
-          //   })
-          // })
-
-
-          // var element1 = document.getElementById(`ppOVI${item.id}`)
-
-          // if (typeof (element1) != 'undefined' && element1 != null) {
-          var abc = document.createElement(`div`)
-          document.getElementById('logUserDiv').appendChild(abc)
-          abc.innerHTML =
-            `<br/>
-            <div style="width: 100%; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
-                <img id="PPUpOV${item.id}" src="${item.preview_past_post_url}" style="max-width:100px; max-height:100px; float:right" />
-               </div> 
-            
-              `
-          // document.getElementById(`PPUpOV${item.id}`).style.display = "none"
-
-
-
-          document.getElementById(`btnChangePP${item.id}`).addEventListener('click', (event) => {
-            event.preventDefault()
-            setIdPPUP(item.id)
-            selectPastPostUp()
-            // document.getElementById(`PPUpOV${item.id}`).style.display = "block"
-            // document.getElementById(`imgUpPP${item.id}`).style.display = "block"
-            document.getElementById(`btnUpdatePP${item.id}`).style.display = "block"
-            document.getElementById(`btnChangePP${item.id}`).style.display = "none"
-            // document.getElementById(`ppCustomSavedOvi${item.id}`).style.display = "none"
-            // if (document.getElementById(`lbOvPP${item.id}}`) !== null) {
-
-            // } //
-            // document.getElementById(`PPUpOV${item.id}`).url = urlUpdatePastPost
-            // document.getElementById(`imgUpPP${item.id}`).style.display="block"
-            // document.getElementById(`imgUpPP${item.id}`).src = urlUpdatePastPost
-
-
-          })
-
-
-          // }
-          // document.getElementById(`ppCustomSaved${item.id}`).addEventListener('click', () => {
-          //   setIdPPUP(item.id)
-          //   selectPastPostUp()
-          //   // document.getElementById(`PPUpOV${item.id}`).style.display = "block"
-          //   // document.getElementById(`imgUpPP${item.id}`).style.display = "block"
-          //   document.getElementById(`btnUpdatePP${item.id}`).style.display = "block"
-          //   document.getElementById(`PPUpOV${item.id}`).style.display = "none"
-          //   // document.getElementById(`ppCustomSavedOvi${item.id}`).style.display = "none"
-          //   // if (document.getElementById(`lbOvPP${item.id}}`) !== null) {
-
-          //   // } //
-          //   // document.getElementById(`PPUpOV${item.id}`).url = urlUpdatePastPost
-          //   // document.getElementById(`imgUpPP${item.id}`).style.display="block"
-          //   // document.getElementById(`imgUpPP${item.id}`).src = urlUpdatePastPost
-
-
-          // })
-
-        }
-
-
-        // document.getElementById(`outputImgMsgSaved${item.id}`).src = `https://ec-chatbot-test.com/${item.img_value.url}`
-
-
-        // bagMsg.forEach((item) => {
-
-        // })
-      })
-      // var bagItem = []
-      // for (var i = 0; i < bagMsg.length; i++) {
-      //   bagItem.push(res.data.data[i].id)
-      //   // 
-      // }
-      // console.log(bagMsg)
-    }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
-    })
   }
 
   const [idReloadMsgBag, setIdReloadMsgBag] = useState()
@@ -3239,6 +2504,15 @@ function Chatbot() {
       document.getElementById(`btn_a_tag${idIn}`).disabled = false
     }, 500)
     // document.getElementById("a_tag").setAttribute('disabled', 'disabled')
+  }
+
+  function changeBagtoGr(e, idGr) {
+    e.preventDefault()
+    console.log("group new for bag: ", idGr)
+  }
+  function changeBagtoGrDr(e, idGr) {
+    e.preventDefault()
+    // console.log("group new for bag: ", idGr)
   }
 
   function getMessage(idIn) {
@@ -3292,8 +2566,17 @@ function Chatbot() {
         console.log(idd)
 
         var abc = document.createElement('div')
-        abc.setAttribute('id', `msgBag_item_${idIn}_${idd}`)
+        // abc.setAttribute('id', `msgBag_item_${idIn}_${idd}`).addEventListener('ondrop',  ())
 
+        document.getElementById(`msg_group${idIn}_id${idd}`).draggable = true
+        document.getElementById(`msg_group${idIn}_id${idd}`).ondragstart = (e) => {
+          // e.preventDefault()
+          console.log("id mgs bag change: ", idd)
+        }
+        // document.getElementById(`msg_group${idIn}_id${idd}`).addEventListener('ondragend', (e, idd) =>{
+        //   e.preventDefault()
+        //   console.log("id mgs bag change: ", idd)
+        // })
         // console.log("setBagId: ", idd)
         document.getElementById(`msg_group${idIn}_id${idd}`).addEventListener('click', (e) => {
           e.preventDefault()
@@ -3668,6 +2951,8 @@ function Chatbot() {
 
 
   const [isOpenAddChatbot, setIsOpenAddChatbot] = useState(false)
+  const [isOpenTemplate, setIsOpenTemplate] = useState(false)
+  const [isOpenTemplateDetail, setIsOpenTemplateDetail] = useState(false)
   const [isOpenAddMsgBag, setIsOpenAddMsgBag] = useState(false)
   const [isOpenRenameMsgBag, setIsOpenRenameMsgBag] = useState(false)
   const [isOpenCopyMsgBag, setIsOpenCopyMsgBag] = useState(false)
@@ -4418,37 +3703,38 @@ function Chatbot() {
     abc.innerHTML =
       `<div id="chatbot_message${mulMsgAdd}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
     
-    <div><textarea name="messagesVa${numIndex}" class="mgsChatbot" id="mgsCustom${numIndex}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
-    <label id="addNewMessErr${numIndex}" style="color:red; display:none; font-size:14px"></label>
-    <div  id="msgChoice${idSC}">
-      <div style="display: flex">
-        <div id="singleChoice${idSC}" style=" padding:5px">
-          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">単一選択</button>
-        </div>
-        <div id="threeChoice${idSC}" style=" padding:5px">
-          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">三択+URL</button>
-        </div>
-        <div id="freeInput${idSC}" style=" padding:5px">
-          <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">自由入力</button>
+      <div><textarea name="messagesVa${numIndex}" class="mgsChatbot" id="mgsCustom${numIndex}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
+      <label id="addNewMessErr${numIndex}" style="color:red; display:none; font-size:14px"></label>
+      <div  id="msgChoice${idSC}">
+        <div style="display: flex">
+          <div id="singleChoice${idSC}" style=" padding:5px">
+            <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">単一選択</button>
+          </div>
+          <div id="threeChoice${idSC}" style=" padding:5px">
+            <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">三択+URL</button>
+          </div>
+          <div id="freeInput${idSC}" style=" padding:5px">
+            <button style="background-color:#FFFFFF; border: 1px solid #51cbce; border-radius:10px">自由入力</button>
+          </div>
         </div>
       </div>
-    </div>
-    </br>
-    <div style=" border-radius:10px; background-color:white; width:200px; text-align:center">
-      <div id="choiceOption${idSC}" style="text-align:center">
-      
+      </br>
+      <div style=" border-radius:10px; background-color:white; width:200px; text-align:center">
+        <div id="choiceOption${idSC}" style="text-align:center">
+        
+        </div>
+        <div id="choiceThree${idSC}" style="display:none;border-radius:10px"></div>
       </div>
-      <div id="choiceThree${idSC}" style="display:none;border-radius:10px"></div>
-    </div>
-    <div id="btnDelMsg${mulMsgAdd}" style="float:right; display:block">
+      <div id="btnDelMsg${mulMsgAdd}" style="float:right; display:block">
+          <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+          font-weight:800">削除</button>
+        </div>
+        <div id="btnAddEachMsg${mulMsgAdd}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-        font-weight:800">削除</button>
+        font-weight:800">追加</button>
       </div>
-      <div id="btnAddEachMsg${mulMsgAdd}" style="float:right; display:block">
-      <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-      font-weight:800">追加</button>
-    </div>
-    </div>`
+      </div>
+    `
     document.getElementById(`singleChoice${idSC}`).addEventListener('click', (event) => {
       event.preventDefault()
       setIsAddOpenSingleChoice(true)
@@ -5619,14 +4905,14 @@ function Chatbot() {
       var newCBAdd = { message_group: { group_name: newCB } }
       api.post(`/api/v1/message_managements/message_groups`, newCBAdd).then(res => {
         setIsOpenNoti(true)
-        if(res.data.code == 2){
+        if (res.data.code == 2) {
           setMsgNoti("Message group is existed")
-        }else{
+        } else {
           refreshMsgGroup()
-        setIsOpenAddChatbot(false)
-        setMsgNoti("メッセージグループを追加しました。")
+          setIsOpenAddChatbot(false)
+          setMsgNoti("メッセージグループを追加しました。")
         }
-         setTimeout(() => {
+        setTimeout(() => {
           setIsOpenNoti(false)
         }, 2500)
       }).catch(error => {
@@ -5682,6 +4968,55 @@ function Chatbot() {
       })
     }
   }
+
+
+  function saveTemplate() {
+    var docRe = document.getElementById("docResuestBotTitle").value
+    var ecChat = document.getElementById("ecChatbotBotTitle").value
+    var regis = document.getElementById("registrationTitle").value
+
+    var docReGr = document.getElementById("docResuestBot").value
+    var ecChatGr = document.getElementById("ecChatbotBotBot").value
+    var regisGr = document.getElementById("registrationBot").value
+
+
+    var docDes = document.getElementById("docResuestBotDes").value
+    var ecDes = document.getElementById("ecChatbotBotDes").value
+    var regisDes = document.getElementById("registrationDes").value
+
+    // var docTag = document.getElementById("docResuestBotTag").value.split(/[, ]+/)
+    // var ecTag = document.getElementById("ecChatbotBotTag").value.split(/[, ]+/)
+    // var regisTag = document.getElementById("registrationTag").value.split(/[, ]+/)
+    var tem =
+    {
+      hot_templates: [
+        { title: docRe, description: docDes, message_group_id: docReGr },
+        { title: ecChat, description: ecDes, message_group_id: ecChatGr },
+        { title: regis, description: regisDes, message_group_id: regisGr }
+      ]
+    }
+
+    api.post(`/api/v1/message_managements/hot_templates`, tem).then(res => {
+      setIsOpenTemplate(false)
+      console.log(res)
+      setMsgNoti("Save Hot Template successfully")
+      setIsOpenNoti(true)
+      setTimeout(() => {
+        setIsOpenNoti(false)
+      }, 1500)
+      refreshMsgGroup()
+      // setTimeout(() => {
+      //   window.location.reload()
+      // }, 1500)
+
+    }).catch(error => {
+      console.log(error)
+    })
+
+
+
+  }
+
 
   function renameMagBag() {
     var path = window.location.pathname;
@@ -5873,6 +5208,10 @@ function Chatbot() {
       setIsOpenSelectPastPost(true)
       // console.log("getPP: ", pastPostList)
     }, 1500)
+  }
+
+  function addProfileMsg() {
+    setIsOpenAddProfileMsg(true)
   }
 
   function selectPastPostUp() {
@@ -6604,7 +5943,7 @@ function Chatbot() {
     var lblas = document.getElementById(`labelLFIAll_${labelInputFINum}`).value
     var formatcheck = document.getElementById('formatCheckFIValue').value
     console.log(`lblas: `, formatCheckSelect.value)
-    
+
 
     // if (group.value == "") {
     //   document.getElementById("grBagFI").style.display = "block"
@@ -6668,6 +6007,25 @@ function Chatbot() {
     }
   }
 
+  function checkFieldDocRB(value, field) {
+    if (value === '') {
+      document.getElementById(`${field}`).style.display = 'block'
+      document.getElementById(`${field}`).innerHTML = `This field cannot be empty`
+      document.getElementById(`btnSaveTem`).disabled = true
+
+
+    } else if (value.length > 20) {
+      document.getElementById(`${field}`).style.display = 'block'
+      document.getElementById(`${field}`).innerHTML = `Maximum 20 characters`
+      document.getElementById(`btnSaveTem`).disabled = true
+    } else {
+      document.getElementById(`${field}`).style.display = 'none'
+      document.getElementById(`${field}`).innerHTML = ""
+      document.getElementById(`btnSaveTem`).disabled = false
+      return true
+    }
+  }
+
   function checkFieldAddBag(value) {
     if (value === '') {
       document.getElementById(`newMsgBagErrMsg`).style.display = 'block'
@@ -6686,12 +6044,335 @@ function Chatbot() {
       return true
     }
   }
+  // window.Sortable = require('sortablejs')
+  // const dragArea = document.getElementById("div_custom");
+  // new Sortable(dragArea, {
+  //   animation: 350
+  // });
 
+  function addNewNamePM() {
+    var newName = document.createElement("div")
+
+    if (document.getElementById("profileMsgSelected").innerHTML == '') {
+      newName.setAttribute("id", "newNamePM")
+      newName.innerHTML =
+        `
+        <div style="width:100%; padding:10px 5px 10px 20px; background-color:#f4f3ef; display:flex">
+          <div style="width:95%">
+            <span>Profile message: Name</span>
+            <div>Message content: Please input name.</div>
+          </div>
+          
+          <div id="deleteNameItem" style="5%">X</div>
+        </div>
+        <input name="new_name_pm" value="name" hidden />
+        <br />
+        `
+      document.getElementById("profileMsgSelected").appendChild(newName)
+      document.getElementById("deleteNameItem").addEventListener("click", () => {
+        document.getElementById("slectMorePMErr").style.display = "none"
+        const element = document.getElementById("newNamePM");
+        element.remove();
+
+      })
+    } else {
+      document.getElementById("slectMorePMErr").style.display = "block"
+
+    }
+
+  }
+
+  function addNewCompanyPM() {
+    var newName = document.createElement("div")
+    if (document.getElementById("profileMsgSelected").innerHTML == '') {
+      newName.setAttribute("id", "newCompanyPM")
+      newName.innerHTML =
+        `
+        <div style="width:100%; padding:10px 5px 10px 20px; background-color:#f4f3ef; display:flex">
+        <div style="width:95%">
+          <span>Profile message: Company</span>
+          <div>Message content: Please input company.</div>
+        </div>
+        <div id="deleteComItem" style="5%">X</div>
+        </div>
+        <input name="new_company_pm" value="company" hidden />
+        <br />
+        `
+      document.getElementById("profileMsgSelected").appendChild(newName)
+      document.getElementById("deleteComItem").addEventListener("click", () => {
+        document.getElementById("slectMorePMErr").style.display = "none"
+        const element = document.getElementById("newCompanyPM");
+        element.remove();
+
+      })
+    } else {
+      document.getElementById("slectMorePMErr").style.display = "block"
+    }
+  }
+
+  function addNewPositionPM() {
+    var newName = document.createElement("div")
+    if (document.getElementById("profileMsgSelected").innerHTML == '') {
+      newName.setAttribute("id", "newPositionPM")
+      newName.innerHTML =
+        `
+        <div style="width:100%; padding:10px 5px 10px 20px; background-color:#f4f3ef; display:flex">
+            <div style="width:95%">
+            <span>Profile message: Position</span>
+            <div>Message content: Please input position.</div>
+          </div>
+          <div id="deletePosItem" style="5%">X</div>
+        </div>
+        <input name="new_position_pm" value="position" hidden />
+        <br />
+        `
+      document.getElementById("profileMsgSelected").appendChild(newName)
+      document.getElementById("deletePosItem").addEventListener("click", () => {
+        document.getElementById("slectMorePMErr").style.display = "none"
+        const element = document.getElementById("newPositionPM");
+        element.remove();
+
+      })
+    } else {
+      document.getElementById("slectMorePMErr").style.display = "block"
+    }
+  }
+
+  function addNewWebsitePM() {
+    var newName = document.createElement("div")
+    if (document.getElementById("profileMsgSelected").innerHTML == '') {
+      newName.setAttribute("id", "newWebsitePM")
+      newName.innerHTML =
+        `
+        <div style="width:100%; padding:10px 5px 10px 20px; background-color:#f4f3ef; display:flex">
+            <div style="width:95%">
+            <span>Profile message: Website</span>
+            <div>Message content: Please input website.</div>
+          </div>
+          <div id="deletePosItem" style="5%">X</div>
+        </div>
+        <input name="new_position_pm" value="website" hidden />
+        <br />
+        `
+      document.getElementById("profileMsgSelected").appendChild(newName)
+      document.getElementById("deletePosItem").addEventListener("click", () => {
+        document.getElementById("slectMorePMErr").style.display = "none"
+        const element = document.getElementById("newWebsitePM");
+        element.remove();
+
+      })
+    } else {
+      document.getElementById("slectMorePMErr").style.display = "block"
+    }
+  }
+
+  function addNewReasonPM() {
+    var newName = document.createElement("div")
+    if (document.getElementById("profileMsgSelected").innerHTML == '') {
+      newName.setAttribute("id", "newReasonPM")
+      newName.innerHTML =
+        `
+        <div style="width:100%; padding:10px 5px 10px 20px; background-color:#f4f3ef; display:flex">
+        <div style="width:95%">
+          <span>Profile message: Reason</span>
+          <div>Message content: Please input reason.</div>
+        </div>
+        <div id="deleteReaItem" style="5%">X</div>
+        </div>
+        <input name="new_reason_pm" value="reason" hidden />
+        <br />
+        `
+      document.getElementById("profileMsgSelected").appendChild(newName)
+      document.getElementById("deleteReaItem").addEventListener("click", () => {
+        document.getElementById("slectMorePMErr").style.display = "none"
+        const element = document.getElementById("newReasonPM");
+        element.remove();
+
+      })
+    } else {
+      document.getElementById("slectMorePMErr").style.display = "block"
+    }
+  }
+
+  function addNewKnowFromPM() {
+    var newName = document.createElement("div")
+    if (document.getElementById("profileMsgSelected").innerHTML == '') {
+      newName.setAttribute("id", "newKATBPM")
+      newName.innerHTML =
+        `
+      <div style="width:100%; padding:10px 5px 10px 20px; background-color:#f4f3ef; display:flex">
+      <div style="width:95%">
+        <span>Profile message: Know of...</span>
+        <div>Message content: Please input know of...</div>
+      </div>
+      <div id="deleteKATFItem" style="5%">X</div>
+      </div>
+      <input name="new_katb_pm" value="katb" hidden />
+      <br />
+      `
+      document.getElementById("profileMsgSelected").appendChild(newName)
+      document.getElementById("deleteKATFItem").addEventListener("click", () => {
+        document.getElementById("slectMorePMErr").style.display = "none"
+        const element = document.getElementById("newKATBPM");
+        element.remove();
+
+      })
+    } else {
+      document.getElementById("slectMorePMErr").style.display = "block"
+    }
+  }
+  const [mulPmAdd, setMulPmAdd] = useState(1)
+
+  function saveProMsg() {
+    setIsOpenAddProfileMsg(false)
+    setMulPmAdd(mulPmAdd + 1)
+    var numIndex = parseInt(imgCBNum) + 1
+    var abc = document.createElement("div")
+    abc.setAttribute("id", `profileMsg${mulPmAdd}`)
+    document.getElementById("div_custom").appendChild(abc)
+    var elements = document.getElementById("profileMsgSelected").elements;
+    var obj = {};
+    var itemPm = []
+    var msgPm = []
+    for (var i = 0; i < elements.length; i++) {
+      var item = elements.item(i);
+      obj[item.name] = item.value;
+      if (item.value == "name") {
+        itemPm.push("real_name")
+        msgPm.push("Profile message name")
+      } else if (item.value == "company") {
+        itemPm.push("company_name")
+        msgPm.push("Profile message company")
+      } else if (item.value == "position") {
+        itemPm.push("company_role")
+        msgPm.push("Profile message company role")
+      } else if (item.value == "website") {
+        itemPm.push("website")
+        msgPm.push("Profile message website")
+      } else if (item.value == "reason") {
+        itemPm.push("propose")
+      } else if (item.value == "katb") {
+        itemPm.push("know_product_in")
+        msgPm.push("Profile message know product in")
+      }
+    }
+    console.log("itemPm: ", itemPm[0])
+    abc.innerHTML =
+      `
+    <div id="chatbot_pro_message${mulMsgAdd}" style=" border-radius: 20px; display:block; background-color: #f4f3ef; padding: 40px; margin-top: 20px; text-align: center" >
+    <div><textarea name="proMesVa${numIndex}" class="mgsChatbot" id="proMgsCustom${numIndex}" placeholder="返事入力..." type="text" rows="3"></textarea></div>
+    <label id="addNewProMessErr${numIndex}" style="color:red; display:none; font-size:14px"></label>
+
+    <div id="btnDelProMsg${mulMsgAdd}" style="float:right; display:block">
+    <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+    font-weight:800">削除</button>
+    </div>
+
+    <div id="btnAddEachProMsg${mulMsgAdd}" style="float:right; display:block">
+    <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
+    font-weight:800">追加</button>
+    </div>
+
+
+    </div>
+    `
+    console.log("itemPm[0]: ", itemPm[0] )
+    document.getElementById(`proMgsCustom${numIndex}`).value = msgPm[0]
+    document.getElementById(`btnAddEachProMsg${mulMsgAdd}`).addEventListener('click', (event) => {
+      event.preventDefault()
+      document.getElementById(`btnAddEachProMsg${mulMsgAdd}`).style.pointerEvents = 'none'
+      setTimeout(() => {
+        if (document.getElementById(`btnAddEachProMsg${mulMsgAdd}`) != null) {
+          document.getElementById(`btnAddEachProMsg${mulMsgAdd}`).style.pointerEvents = 'auto'
+        }
+      }, 1500)
+
+      var add
+
+      var element = document.getElementById(`proMgsCustom${numIndex}`).value
+      if (element == "" || element == null || element == undefined) {
+        document.getElementById(`addNewProMessErr${numIndex}`).style.display = "block"
+        document.getElementById(`addNewProMessErr${numIndex}`).innerHTML = "メッセージを入力してください。"
+      } else {
+        document.getElementById(`addNewProMessErr${numIndex}`).style.display = "none"
+        document.getElementById(`addNewProMessErr${numIndex}`).innerHTML = ""
+
+
+        add = {
+          message: {
+            message_bag_id: bagId,
+            message_value: element,
+            message_type: "msg",
+            img_value: "",
+            free_input: {
+              message_bag_id: `1`,
+              free_input_labels: "",
+              format_check: itemPm[0], //nhan 3 gia tri "no_validate", "email", "phone_number" 
+              format_check_message: ""
+            }
+          },
+
+        }
+      }
+
+
+
+      // console.log(JSON.stringify(obj))
+      // console.log("addProfile message: ", add)
+      api.post(`/api/v1/message_managements/messages`, add).then(res => {
+        // alert("Add Successfully")
+        console.log(res)
+        setIdSC(idSC + 1)
+        setTotalItemTC(1)
+        setTimeout(() => {
+          setIsOpenNoti(true)
+          setMsgNoti("追加しました。")
+        }, 1500)
+
+        setTimeout(function () {
+          setIsOpenNoti(false)
+        }, 3000);
+        // reloadMessMsgBag()
+        enableAddNewMsg()
+        getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
+        // getBagMsg(id, id)
+
+      }).catch(error => {
+        console.log(error)
+      })
+    })
+  }
+
+  function slectedHotTem(id) {
+    // message_managements/message_groups/2/copy
+    api.post(`/api/v1/message_managements/message_groups/${id}/copy`).then(res => {
+      setIsOpenTemplateDetail(false)
+      console.log(res)
+      setMsgNoti("Copy Hot Template successfully")
+      setIsOpenNoti(true)
+      setTimeout(() => {
+        setIsOpenNoti(false)
+      }, 1500)
+      refreshMsgGroup()
+      // setTimeout(() => {
+      //   window.location.reload()
+      // }, 1500)
+
+    }).catch(error => {
+      console.log(error)
+    })
+  }
 
   return (
     <>
       <div className="content">
-        <Row>
+        {/* <Helmet>
+            <script src="https://kit.fontawesome.com/a076d05399.js" type="text/javascript" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.10.2/Sortable.min.js" type="text/javascript" />
+
+          </Helmet> */}
+        {/* <div id="templateSettingDis" style={{ display: "none" }}><Template></Template></div> */}
+        <Row id="chatbotSettingDis" >
           <Col md="12">
             <Card>
               <CardBody>
@@ -6704,20 +6385,25 @@ function Chatbot() {
                             <h5 id="jjjj">メッセージグループ</h5>
                             <br />
                             <div>
-                              <Button style={{ fontSize: "10px", marginTop: "-4%", padding: "10px" }} onClick={() => setIsOpenAddChatbot(true)}>グループ追加</Button><br />
+                              <div style={{ display: "flex" }}>
+                                <Button style={{ fontSize: "10px", marginTop: "-4%", padding: "10px" }} onClick={() => setIsOpenAddChatbot(true)}>グループ追加</Button>
+                                <Button id="btnTemplateSetting" style={{ fontSize: "10px", marginTop: "-4%", padding: "10px" }} onClick={() => setIsOpenTemplate(true)}>Setting Template</Button>
+                                <Button id="btnTemplateDetailSetting" style={{ fontSize: "10px", marginTop: "-4%", padding: "10px" }} onClick={() => setIsOpenTemplateDetail(true)}>Detail Template</Button>
+                              </div>
+                              <br />
                               <Nav className="sidebar-wrapper">
                                 <ul style={{ listStyleType: "none", width: "100%" }}>
                                   {itemGroup.map((data, key) => {
                                     return (
-                                      <li style={{ marginLeft: "-30px", display: "flex" }} key={key}>
+                                      <li onDrop={(e) => changeBagtoGr(e, data.id)} onDragOver={(e) => changeBagtoGrDr(e, data.id)} style={{ marginLeft: "-30px", display: "flex" }} key={key}>
                                         <Nav id="nav_option" style={{ width: "90%" }}>
-                                          <div style={{display:"flex", width:"62%"}}>
-                                          <i className="nc-icon nc-bell-55" style={{ color: "black", marginTop:"1.75%" }} />
-                                          <div id="a_tag" style={{ fontSize: "15px", width: "95%" }}>
-                                            <button id={`btn_a_tag${data.id}`} onClick={(event) => getMSGPV(event, data.id)} style={{ border: "none", backgroundColor: "white" }}>
-                                              {data.group_name}
+                                          <div style={{ display: "flex", width: "62%" }}>
+                                            <i className="nc-icon nc-bell-55" style={{ color: "black", marginTop: "1.75%" }} />
+                                            <div id="a_tag" style={{ fontSize: "15px", width: "95%" }}>
+                                              <button id={`btn_a_tag${data.id}`} onClick={(event) => getMSGPV(event, data.id)} style={{ border: "none", backgroundColor: "white" }}>
+                                                {data.group_name}
                                               </button>
-                                              </div>
+                                            </div>
                                           </div>
                                           <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
                                             onClick={() => addMsgBagPop(data.id)}><i className="nc-icon nc-simple-add nc-3x" style={{ color: "black" }} /></Button>
@@ -6785,7 +6471,8 @@ function Chatbot() {
                                 <i className="nc-icon nc-box" style={{ color: "black", fontSize: "20px", fontWeight: "100", paddingTop: "5px", paddingBottom: "10px" }} /><br />
                                 過去の投稿
                               </button>
-                              <button id="btnAddNewHistory" style={{ width: "100px", height: "80px", backgroundColor: "#f4f3ef", borderRadius: "20px", textAlign: "center", marginLeft: "10px" }}>
+                              <button id="btnAddNewHistory" style={{ width: "100px", height: "80px", backgroundColor: "#f4f3ef", borderRadius: "20px", textAlign: "center", marginLeft: "10px" }}
+                                onClick={() => addProfileMsg()}>
                                 <i className="nc-icon nc-layout-11" style={{ color: "black", fontSize: "20px", fontWeight: "100", paddingTop: "5px", paddingBottom: "10px" }} /><br />
                                 プロファイルメッセージ
                               </button>
@@ -6844,16 +6531,151 @@ function Chatbot() {
             <Button id="btnAddGroup" onClick={() => addChatBot()}>グループ追加</Button>
           </div>
         </ModalShort>
-        <ModalShort open={isOpenAddMsgBag} onClose={() => setIsOpenAddMsgBag(false)}>
-          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
-            <h4>メッセージ袋名入力</h4>
+        <ModalShort open={isOpenTemplate} onClose={() => setIsOpenTemplate(false)}>
+          <div style={{ width: "500px", height: "400px", textAlign: "center" }}>
+            <h5>メッセージ袋名入力</h5>
+            <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>資料請求ボット</div>
             <label style={{ width: "100%" }}>
-              <input id="new_bag" style={{ width: "100%" }} onChange={(e) => checkFieldAddBag(e.target.value)} name="chatbot_name"></input>
-              <label id="newMsgBagErrMsg" style={{ display: 'none', color: "red" }}></label>
+              <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
+              <input value={hotTem[0] != undefined ? hotTem[0].title : ""} id="docResuestBotTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "docResuestBotTitleErr")} name="chatbot_name"></input>
+              &nbsp;
+              <select id="docResuestBot" style={{ width: "46%" }} defaultValue={""} className="new-faq-q-so1">
+                <option value="" disabled hidden>{hotTem[0] != undefined ? hotTem[0].group_name : "メッセージグループ選択 ..."}</option>
+                {groupList?.map((group, i) => {
+                  return (
+                    <option key={i} value={group.id}>
+                      {group.group_name}
+                    </option>
+                  )
+                })}
+              </select>
+              <div>
+                <label style={{ width: "70px" }}>詳細: &nbsp;</label>
+                <input value={hotTem[0] != undefined ? hotTem[0].description : ""} id="docResuestBotDes" style={{ width: "84.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input>
+                {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="docResuestBotTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
+              </div>
+              <label id="docResuestBotTitleErr" style={{ display: 'none', color: "red" }}></label>
+            </label><br /><br />
+
+            <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>EC-chatbotボット</div>
+            <label style={{ width: "100%" }}>
+              <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
+              <input value={hotTem[1] != undefined ? hotTem[1].title : ""} id="ecChatbotBotTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "ecChatbotBotTitleErr")} name="chatbot_name"></input>
+              &nbsp;
+              <select id="ecChatbotBotBot" style={{ width: "46%" }} defaultValue={""} className="new-faq-q-so1">
+                <option value="" disabled hidden>{hotTem[1] != undefined ? hotTem[1].group_name : "メッセージグループ選択 ..."}</option>
+                {groupList?.map((group, i) => {
+                  return (
+                    <option key={i} value={group.id}>
+                      {group.group_name}
+                    </option>
+                  )
+                })}
+              </select>
+              <div>
+                <label style={{ width: "70px" }}>詳細: &nbsp;</label>
+                <input value={hotTem[1] != undefined ? hotTem[1].description : ""} id="ecChatbotBotDes" style={{ width: "84.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input>
+                {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="ecChatbotBotTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
+              </div>
+              <label id="ecChatbotBotTitleErr" style={{ display: 'none', color: "red" }}></label>
+            </label><br /><br />
+
+            <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>会員登録</div>
+            <label style={{ width: "100%" }}>
+              <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
+              <input value={hotTem[2] != undefined ? hotTem[2].title : ""} id="registrationTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")} name="chatbot_name"></input>
+              &nbsp;
+              <select id="registrationBot" style={{ width: "46%" }} defaultValue={""} className="new-faq-q-so1">
+                <option value="" disabled hidden>{hotTem[2] != undefined ? hotTem[2].group_name : "メッセージグループ選択 ..."}</option>
+                {groupList?.map((group, i) => {
+                  return (
+                    <option key={i} value={group.id}>
+                      {group.group_name}
+                    </option>
+                  )
+                })}
+              </select>
+              <div>
+                <label style={{ width: "70px" }}>詳細: &nbsp;</label>
+                <input value={hotTem[2] != undefined ? hotTem[2].description : ""} id="registrationDes" style={{ width: "84.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input>
+                {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="registrationTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
+              </div>
+              <label id="registrationTitleErr" style={{ display: 'none', color: "red" }}></label>
             </label><br />
-            <Button id="btnAddBag" onClick={() => addMagBag()}>メッセージ袋追加</Button>
+
+
+            <div style={{ width: "100%", textAlign: "center" }}>
+              <Button id="btnSaveTem" onClick={() => saveTemplate()}>Save Template</Button>
+            </div>
           </div>
         </ModalShort>
+        <ModalShortTem open={isOpenTemplateDetail} onClose={() => setIsOpenTemplateDetail(false)}>
+          <div style={{ width: "700px" }}>
+            {hotTem.map((item) => (
+              <div key={item.id} style={{ width: "100%", display: "flex" }}>
+                <div style={{ width: "40%" }}>
+                  <img src={item.src} style={{ width: "100%" }}></img>
+                </div>
+                <div style={{ width: "60%", paddingLeft: "20px" }}>
+                  <div style={{ marginTop: "10px" }}>
+                    <h5>{item.title}</h5>
+                    <h6 style={{ marginTop: "-10px" }}>{item.description}</h6>
+                    <Button onClick={(e) => slectedHotTem(item.message_group_id)}>Select</Button>
+                  </div>
+
+                </div>
+              </div>
+            ))}
+
+            {/* <div style={{ width: "100%", display: "flex" }}>
+              <div style={{ width: "40%" }}>
+                <img src={registration} style={{ width: "100%" }}></img>
+              </div>
+              <div style={{ width: "60%", paddingLeft: "20px" }}>
+                <div style={{ marginTop: "10px" }}>
+                  <h5>{hotTem[1].title}</h5>
+                  <h6 style={{ marginTop: "-10px" }}>{hotTem[1].description}</h6>
+
+                  <Button>Select</Button>
+                </div>
+
+              </div>
+            </div>
+            <div style={{ width: "100%", display: "flex" }}>
+              <div style={{ width: "40%" }}>
+                <img src={chatbot} style={{ width: "100%" }}></img>
+              </div>
+              <div style={{ width: "60%", paddingLeft: "20px" }}>
+                <div style={{ marginTop: "10px" }}>
+                  <h5>{hotTem[2].title}</h5>
+                  <h6 style={{ marginTop: "-10px" }}>{hotTem[2].description}</h6>
+                  <Button>Select</Button>
+                </div>
+              </div>
+            </div> */}
+          </div>
+        </ModalShortTem>
+        <ModalShortTem open={isOpenAddProfileMsg} onClose={() => setIsOpenAddProfileMsg(false)}>
+          <div style={{ width: "800px", color: "#51cbce" }}>
+            <h4>Add Profile Message</h4>
+            <div style={{ width: "100%", display: "flex" }}>
+              <div style={{ width: "50%", padding: "5px", borderRight: "1px solid black" }}>
+                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewNamePM()}>Name</div><br />
+                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewCompanyPM()}>Company</div><br />
+                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewPositionPM()}>Position</div><br />
+                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewWebsitePM()}>Website</div><br />
+                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewReasonPM()}>Reason</div><br />
+                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewKnowFromPM()}>Know of...</div>
+              </div>
+
+              <div style={{ width: "50%", padding: "5px" }}>
+                <form id="profileMsgSelected"></form>
+                <span id="slectMorePMErr" style={{ color: "red", display: "none" }}>Please select only one type of profile message</span>
+              </div>
+            </div>
+          </div>
+          <Button onClick={() => saveProMsg()}>Save</Button>
+        </ModalShortTem>
         <ModalShort open={isOpenRenameMsgBag} onClose={() => setIsOpenRenameMsgBag(false)}>
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
             <h4>メッセージグループ名変更</h4>
@@ -6939,7 +6761,7 @@ function Chatbot() {
             <div style={{ padding: "15px", width: "100%" }}>
               <input id="titleNextMSG" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }} onChange={() => checkInputTitleSC()} placeholder="タイトル…"></input>
               <label id="titleSC" style={{ color: "red", display: "none" }}>タイトルを入力してください。</label>
-            </div>  
+            </div>
             <span style={{ padding: "15px" }}>遷移先</span>
             <div style={{ display: "flex", width: "100%" }}>
               <div onClick={() => displaySCNextMSG()} style={{ width: "45%", margin: "auto" }}>
@@ -7255,6 +7077,17 @@ function Chatbot() {
             <div style={{ width: "100%", textAlign: "center" }}><Button onClick={() => saveUpFI()}>保存</Button></div>
           </div>
         </ModalShort>
+        <ModalShort open={isOpenAddMsgBag} onClose={() => setIsOpenAddMsgBag(false)}>
+          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+            <h4>メッセージ袋名入力</h4>
+            <label style={{ width: "100%" }}>
+              <input id="new_bag" style={{ width: "100%" }} onChange={(e) => checkFieldAddBag(e.target.value)} name="chatbot_name"></input>
+              <label id="newMsgBagErrMsg" style={{ display: 'none', color: "red" }}></label>
+            </label><br />
+            <Button id="btnAddBag" onClick={() => addMagBag()}>メッセージ袋追加</Button>
+          </div>
+        </ModalShort>
+
       </div>
     </>
   );
