@@ -31,6 +31,7 @@ import DataAnalyst from "views/DataAnalyst";
 import listUser from "views/ListUser";
 import AttractedCusomer from "views/AttractedCusomer";
 import CRM from "views/CRM";
+import Template from "views/Template";
 // import Cookies from 'js-cookie'
 
 var routes = [
@@ -109,6 +110,13 @@ var routes = [
     name: "集客",
     // icon: "nc-icon nc-bell-55",
     component: AttractedCusomer,
+    layout: "/admin",
+  },
+  {
+    path: "/template",
+    name: "集客",
+    // icon: "nc-icon nc-bell-55",
+    component: Template,
     layout: "/admin",
   },
   // {
