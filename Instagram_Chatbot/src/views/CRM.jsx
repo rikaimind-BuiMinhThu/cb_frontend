@@ -61,6 +61,18 @@ function CRM() {
       // }else{
       //   setLabelInstagramUser(res.data.data.labels.slice(0,10))
       // }
+      // var status = res.data.data.instagram_users.status
+      // if(status == "archive"){
+
+      // }else if(status == "lead"){
+        
+      // }else if(status == "progression"){
+        
+      // }else if(status == "progression"){
+        
+      // }else if(status == null){
+        
+      // }
       setCustomTable(res.data.data.custom_items)
       setCustomLabel(res.data.data.labels)
       setCustomLabelLen(res.data.data.labels.length)
@@ -299,6 +311,25 @@ function CRM() {
     })
   }
 
+  function changeStatus(value, id){
+    var val = {instagram_user: {status: value}}
+    api.patch(`/api/v1/managements/instagram_users/${id}`, val).then(res => {
+                  console.log(res)
+                  // setTimeout(() => {
+                  //   setIsOpenNoti(true)
+                  //   setMsgNoti("Change status successfully")
+                  // }, 500)
+                  // setTimeout(function () {
+                  //   setIsOpenNoti(false)
+                  // }, 2000);
+                  // getBagMsg(group, id)
+                  detailUser(id)
+                  // getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
+                }).catch(error => {
+                  console.log(error)
+                })
+  }
+
   return (
     <>
       <div className='content'>
@@ -324,7 +355,7 @@ function CRM() {
                   <tbody>
                     {listInstagramUser.map((item) => (
                       <tr key={item.id}>
-                        <td>{item.username}</td>
+                        <td><a href={`https://www.instagram.com/${item.username}/`} style={{color:"black"}}>{item.username}</a></td>
                         <td>{item.full_name}</td>
                         <td>{item.is_user_follow_business == true ? "あり" : "なし"}</td>
                         <td>{item.is_business_follow_user == true ? "あり" : "なし"}</td>
@@ -365,25 +396,29 @@ function CRM() {
                   <div style={{ width: "100% ", height: "30%" }}>
                     <img src={ava} style={{ objectFit: "cover", borderRadius: "50%", width: "100px", height: "100px" }}></img>
                   </div>
-                  {/* <div style={{ width: "100%", position: "relative" }}>
+                  <div style={{ width: "100%", position: "relative" }}>
                     <div style={{ height: "3px", width: "75%", position: "absolute", margin: "35px 12.5% 0% 12.5%", backgroundColor: "gray" }}></div>
                     <div style={{ width: "100%", display: "grid", marginLeft: "-2%", position: "absolute", gridTemplateColumns: "auto auto auto auto", textAlign: "center" }}>
-                      <div style={{ paddingLeft: "0%" }}><span>電話番号</span>
-                        <div style={{ width: "35px", height: "35px", margin: "auto", backgroundColor: "gray", borderRadius: "50%", display: "table" }}><span style={{ verticalAlign: "middle", display: "table-cell" }}>1</span></div>
+                      <div style={{ paddingLeft: "0%" }}><span>アーカイブ</span>
+                        <div onClick={()=>changeStatus("archive",instagramUser.id )} style={{ width: "35px", height: "35px", margin: "auto", 
+                        backgroundColor: instagramUser !== undefined ?( instagramUser.status == "archive"? "#51cbce" :"gray"):"gray", borderRadius: "50%", display: "table" }}><span style={{ verticalAlign: "middle", display: "table-cell" }}>1</span></div>
                       </div>
-                      <div style={{ paddingLeft: "0%" }}><span>メール</span>
-                        <div style={{ width: "35px", height: "35px", margin: "auto", backgroundColor: "gray", borderRadius: "50%", display: "table" }}><span style={{ verticalAlign: "middle", display: "table-cell" }}>2</span></div>
+                      <div style={{ paddingLeft: "0%" }}><span>リード</span>
+                        <div onClick={()=>changeStatus("lead",instagramUser.id )} style={{ width: "35px", height: "35px", margin: "auto", 
+                        backgroundColor: instagramUser !== undefined ?( instagramUser.status == "lead"? "#51cbce" :"gray"):"gray", borderRadius: "50%", display: "table" }}><span style={{ verticalAlign: "middle", display: "table-cell" }}>2</span></div>
                       </div>
-                      <div style={{ paddingLeft: "0%" }}><span>タグ</span>
-                        <div style={{ width: "35px", height: "35px", margin: "auto", backgroundColor: "gray", borderRadius: "50%", display: "table" }}><span style={{ verticalAlign: "middle", display: "table-cell" }}>3</span></div>
+                      <div style={{ paddingLeft: "0%" }}><span>進行中</span>
+                        <div onClick={()=>changeStatus("progression",instagramUser.id )} style={{ width: "35px", height: "35px", margin: "auto",
+                        backgroundColor: instagramUser !== undefined ?(instagramUser.status == "progression"? "#51cbce" :"gray"):"gray", borderRadius: "50%", display: "table" }}><span style={{ verticalAlign: "middle", display: "table-cell" }}>3</span></div>
                       </div>
-                      <div style={{ paddingLeft: "0%" }}><span>顧客データ</span>
-                        <div style={{ width: "35px", height: "35px", margin: "auto", backgroundColor: "gray", borderRadius: "50%", display: "table" }}><span style={{ verticalAlign: "middle", display: "table-cell" }}>4</span></div>
+                      <div style={{ paddingLeft: "0%" }}><span>成立</span>
+                        <div onClick={()=>changeStatus("completion", instagramUser.id )} style={{ width: "35px", height: "35px", margin: "auto", 
+                        backgroundColor: instagramUser !== undefined ?(instagramUser.status =="completion"? "#51cbce" :"gray"):"gray", borderRadius: "50%", display: "table" }}><span style={{ verticalAlign: "middle", display: "table-cell" }}>4</span></div>
                       </div>
                     </div>
 
-                  </div> */}
-                  <div style={{ textAlign: "left", marginLeft: "15px" }}>
+                  </div>
+                  <div style={{ textAlign: "left", marginLeft: "15px", marginTop:"80px" }}>
                     <div style={{ marginTop: "15px", display: `${instagramUser !== undefined ? (instagramUser.email == null ? "none" : "block") : "none"}` }}>
                       <span>メール: {instagramUser !== undefined ? (instagramUser.email == null ? "" : instagramUser.email) : ""}</span>
                     </div>
@@ -419,7 +454,7 @@ function CRM() {
                     <img src={tag_icon} style={{ width: "30px", height: "30px", marginTop: "10px" }}></img>
                     {(customLabel == undefined ? [] : customLabel).map((item) => (
                       <div key={item.id} style={{ marginTop: "15px", marginLeft: "8px", display: "flex", display: `${item.name == null ? "none" : "block"}`, position: "relative" }}>&ensp;
-                        <span style={{ backgroundColor: "#1ba2b8", color: "white", borderRadius: "5px", padding: "5px 10px 5px 10px", position: "" }}>{item.name == null ? "" : item.name}</span>
+                        <span style={{ backgroundColor: item.is_admin_add == false ? "#1ba2b8" : "#ffc107", color: "white", borderRadius: "5px", padding: "5px 10px 5px 10px", position: "" }}>{item.name == null ? "" : item.name}</span>
                         <span id={`deleteLbl${item.id}`} onClick={() => deleteLabel(item.id)} style={{ float: "right", marginLeft: "-8px", marginTop: "-6px", display: "none" }}>
                           <button style={{ position: "absolute", marginLeft: "-8px", padding: "0px 0px 0.5px 0px", border: "1px solid gray", backgroundColor: "white", width: "20px", height: "20px", borderRadius: "20px" }}><span>X</span></button></span>
                       </div>
