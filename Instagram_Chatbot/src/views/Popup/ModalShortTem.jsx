@@ -5,7 +5,7 @@ import { Button } from "react-bootstrap";
 
 const MODAL_STYLES = {
   position: 'fixed',
-  top: '41.5%',
+  top: '46.5%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
   backgroundColor: '#FFF',

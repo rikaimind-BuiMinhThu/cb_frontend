@@ -6,6 +6,7 @@ import { margin } from '@mui/system';
 import api from '../../api/api-management'
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import { event } from 'jquery';
 
 function LoginFacebook({ checkLogin }) {
 
@@ -36,8 +37,7 @@ function LoginFacebook({ checkLogin }) {
     }
   }
 
-  function checkIsExisted() {
-
+  function checkIsExisted(event) {
     // window.FB.init({
     //   appId: '1733245763691008',
     //   cookie: true,
@@ -200,7 +200,10 @@ function LoginFacebook({ checkLogin }) {
   }
   setTimeout(() => {
     if (document.getElementById("divLoginFB") != null) {
-      document.getElementById("divLoginFB").onload = checkIsExisted()
+      document.getElementById("divLoginFB").onload =(e)=>{
+e.preventDefault()
+        checkIsExisted()
+      } 
     } else {
       checkIsExisted()
     }
