@@ -6570,7 +6570,7 @@ function Chatbot() {
   function checkFieldAddGroup(value) {
     if (value === '') {
       document.getElementById(`newChatbotErrMsg`).style.display = 'block'
-      document.getElementById(`newChatbotErrMsg`).innerHTML = `This field cannot be empty`
+      document.getElementById(`newChatbotErrMsg`).innerHTML = `入力してください`
       document.getElementById(`btnAddGroup`).disabled = true
 
 
@@ -6589,7 +6589,7 @@ function Chatbot() {
   function checkFieldDocRB(value, field) {
     if (value === '') {
       document.getElementById(`${field}`).style.display = 'block'
-      document.getElementById(`${field}`).innerHTML = `This field cannot be empty`
+      document.getElementById(`${field}`).innerHTML = `入力してください`
       document.getElementById(`btnSaveTem`).disabled = true
 
 
@@ -6608,7 +6608,7 @@ function Chatbot() {
   function checkFieldAddBag(value) {
     if (value === '') {
       document.getElementById(`newMsgBagErrMsg`).style.display = 'block'
-      document.getElementById(`newMsgBagErrMsg`).innerHTML = `This field cannot be empty`
+      document.getElementById(`newMsgBagErrMsg`).innerHTML = `入力してください`
       document.getElementById(`btnAddBag`).disabled = true
 
 
@@ -6638,8 +6638,8 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
         `
         <div style="width:100%; padding:10px 5px 10px 20px; background-color:#f4f3ef; display:flex">
           <div style="width:95%">
-            <span>Profile message: Name</span>
-            <div>Message content: Please input name.</div>
+            <span>プロファイルメッセージ: 名前</span>
+            <div>メッセージ内容: 名前を入力してください。</div>
           </div>
           
           <div id="deleteNameItem" style="5%">X</div>
@@ -6663,14 +6663,15 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
 
   function addNewCompanyPM() {
     var newName = document.createElement("div")
+    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto" 
     if (document.getElementById("profileMsgSelected").innerHTML == '') {
       newName.setAttribute("id", "newCompanyPM")
       newName.innerHTML =
         `
         <div style="width:100%; padding:10px 5px 10px 20px; background-color:#f4f3ef; display:flex">
         <div style="width:95%">
-          <span>Profile message: Company</span>
-          <div>Message content: Please input company.</div>
+        <span>プロファイルメッセージ: 企業</span>
+        <div>メッセージ内容: 企業を入力してください。</div>
         </div>
         <div id="deleteComItem" style="5%">X</div>
         </div>
@@ -6682,7 +6683,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
         document.getElementById("slectMorePMErr").style.display = "none"
         const element = document.getElementById("newCompanyPM");
         element.remove();
-
+        document.getElementById("btnSaveProMsg").style.pointerEvents = "none"
       })
     } else {
       document.getElementById("slectMorePMErr").style.display = "block"
@@ -6691,14 +6692,15 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
 
   function addNewPositionPM() {
     var newName = document.createElement("div")
+    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto" 
     if (document.getElementById("profileMsgSelected").innerHTML == '') {
       newName.setAttribute("id", "newPositionPM")
       newName.innerHTML =
         `
         <div style="width:100%; padding:10px 5px 10px 20px; background-color:#f4f3ef; display:flex">
             <div style="width:95%">
-            <span>Profile message: Position</span>
-            <div>Message content: Please input position.</div>
+            <span>プロファイルメッセージ: 役割</span>
+            <div>メッセージ内容: 役割を入力してください。</div>
           </div>
           <div id="deletePosItem" style="5%">X</div>
         </div>
@@ -6710,7 +6712,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
         document.getElementById("slectMorePMErr").style.display = "none"
         const element = document.getElementById("newPositionPM");
         element.remove();
-
+        document.getElementById("btnSaveProMsg").style.pointerEvents = "none"
       })
     } else {
       document.getElementById("slectMorePMErr").style.display = "block"
@@ -6719,14 +6721,15 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
 
   function addNewWebsitePM() {
     var newName = document.createElement("div")
+    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto" 
     if (document.getElementById("profileMsgSelected").innerHTML == '') {
       newName.setAttribute("id", "newWebsitePM")
       newName.innerHTML =
         `
         <div style="width:100%; padding:10px 5px 10px 20px; background-color:#f4f3ef; display:flex">
             <div style="width:95%">
-            <span>Profile message: Website</span>
-            <div>Message content: Please input website.</div>
+            <span>プロファイルメッセージ: ウェブサイト</span>
+            <div>メッセージ内容: ウェブサイトを入力してください。</div>
           </div>
           <div id="deletePosItem" style="5%">X</div>
         </div>
@@ -6738,7 +6741,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
         document.getElementById("slectMorePMErr").style.display = "none"
         const element = document.getElementById("newWebsitePM");
         element.remove();
-
+        document.getElementById("btnSaveProMsg").style.pointerEvents = "none"
       })
     } else {
       document.getElementById("slectMorePMErr").style.display = "block"
@@ -6747,14 +6750,15 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
 
   function addNewReasonPM() {
     var newName = document.createElement("div")
+    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto" 
     if (document.getElementById("profileMsgSelected").innerHTML == '') {
       newName.setAttribute("id", "newReasonPM")
       newName.innerHTML =
         `
         <div style="width:100%; padding:10px 5px 10px 20px; background-color:#f4f3ef; display:flex">
         <div style="width:95%">
-          <span>Profile message: Reason</span>
-          <div>Message content: Please input reason.</div>
+        <span>プロファイルメッセージ: 用途</span>
+        <div>メッセージ内容: 用途を入力してください。</div>
         </div>
         <div id="deleteReaItem" style="5%">X</div>
         </div>
@@ -6766,7 +6770,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
         document.getElementById("slectMorePMErr").style.display = "none"
         const element = document.getElementById("newReasonPM");
         element.remove();
-
+        document.getElementById("btnSaveProMsg").style.pointerEvents = "none"
       })
     } else {
       document.getElementById("slectMorePMErr").style.display = "block"
@@ -6775,14 +6779,15 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
 
   function addNewKnowFromPM() {
     var newName = document.createElement("div")
+    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto" 
     if (document.getElementById("profileMsgSelected").innerHTML == '') {
       newName.setAttribute("id", "newKATBPM")
       newName.innerHTML =
         `
       <div style="width:100%; padding:10px 5px 10px 20px; background-color:#f4f3ef; display:flex">
       <div style="width:95%">
-        <span>Profile message: Know of...</span>
-        <div>Message content: Please input know of...</div>
+      <span>プロファイルメッセージ: 認知経路</span>
+      <div>メッセージ内容: 認知経路を入力してください。</div>
       </div>
       <div id="deleteKATFItem" style="5%">X</div>
       </div>
@@ -6794,7 +6799,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
         document.getElementById("slectMorePMErr").style.display = "none"
         const element = document.getElementById("newKATBPM");
         element.remove();
-
+        document.getElementById("btnSaveProMsg").style.pointerEvents = "none"
       })
     } else {
       document.getElementById("slectMorePMErr").style.display = "block"
@@ -6819,22 +6824,22 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
       obj[item.name] = item.value;
       if (item.value == "name") {
         itemPm.push("real_name")
-        msgPm.push("Profile message name")
+        msgPm.push("名前を入力してください。")
       } else if (item.value == "company") {
         itemPm.push("company_name")
-        msgPm.push("Profile message company")
+        msgPm.push("企業を入力してください。")
       } else if (item.value == "position") {
         itemPm.push("company_role")
-        msgPm.push("Profile message company role")
+        msgPm.push("役割を入力してください。")
       } else if (item.value == "website") {
         itemPm.push("website")
-        msgPm.push("Profile message website")
+        msgPm.push("ウェブサイトを入力してください。")
       } else if (item.value == "reason") {
         itemPm.push("propose")
-        msgPm.push("Profile message Purpose")
+        msgPm.push("用途を入力してください。")
       } else if (item.value == "katb") {
         itemPm.push("know_product_in")
-        msgPm.push("Profile message know product in")
+        msgPm.push("認知経路を入力してください。")
       }
     }
     console.log("itemPm: ", itemPm[0])
@@ -6974,8 +6979,8 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
                             <div>
                               <div style={{ display: "flex" }}>
                                 <Button style={{ fontSize: "10px", marginTop: "-4%", padding: "10px" }} onClick={() => setIsOpenAddChatbot(true)}>グループ追加</Button>
-                                <Button id="btnTemplateSetting" style={{ fontSize: "10px", marginTop: "-4%", padding: "10px" }} onClick={() => setIsOpenTemplate(true)}>Setting Template</Button>
-                                <Button id="btnTemplateDetailSetting" style={{ fontSize: "10px", marginTop: "-4%", padding: "10px" }} onClick={() => setIsOpenTemplateDetail(true)}>Detail Template</Button>
+                                <Button id="btnTemplateSetting" style={{ fontSize: "10px", marginTop: "-4%", padding: "10px" }} onClick={() => setIsOpenTemplate(true)}>テンプレート設定</Button>
+                                <Button id="btnTemplateDetailSetting" style={{ fontSize: "10px", marginTop: "-4%", padding: "10px" }} onClick={() => setIsOpenTemplateDetail(true)}>テンプレート詳細</Button>
                               </div>
                               <br />
                               <Nav className="sidebar-wrapper">
@@ -7119,12 +7124,12 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
           </div>
         </ModalShort>
         <ModalShortTem open={isOpenTemplate} onClose={() => setIsOpenTemplate(false)}>
-          <div style={{ width: "500px", height: "400px", textAlign: "center" }}>
+          <div style={{ width: "500px", height: "500px", textAlign: "center" }}>
             <h5>メッセージ袋名入力</h5>
             <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>資料請求ボット</div>
             <label style={{ width: "100%" }}>
               <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
-              <input placeholder={hotTem[0] != undefined ? hotTem[0].title : ""} id="docResuestBotTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "docResuestBotTitleErr")} name="chatbot_name"></input>
+              <input defaultValue={hotTem[0] != undefined ? hotTem[0].title : ""} id="docResuestBotTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "docResuestBotTitleErr")} name="chatbot_name"></input>
               &nbsp;
               <select id="docResuestBot" style={{ width: "46%" }} defaultValue={""} className="new-faq-q-so1">
                 <option value="" disabled hidden>{hotTem[0] != undefined ? hotTem[0].group_name : "メッセージグループ選択 ..."}</option>
@@ -7138,7 +7143,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
               </select>
               <div>
                 <label style={{ width: "70px" }}>詳細: &nbsp;</label>
-                <input placeholder={hotTem[0] != undefined ? hotTem[0].description : ""} id="docResuestBotDes" style={{ width: "84.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input>
+                <input defaultValue={hotTem[0] != undefined ? hotTem[0].description : ""} id="docResuestBotDes" style={{ width: "84.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "docResuestBotTitleErr")}></input>
                 {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="docResuestBotTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
               </div>
               <label id="docResuestBotTitleErr" style={{ display: 'none', color: "red" }}></label>
@@ -7147,7 +7152,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
             <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>EC-chatbotボット</div>
             <label style={{ width: "100%" }}>
               <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
-              <input placeholder={hotTem[1] != undefined ? hotTem[1].title : ""} id="ecChatbotBotTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "ecChatbotBotTitleErr")} name="chatbot_name"></input>
+              <input defaultValue={hotTem[1] != undefined ? hotTem[1].title : ""} id="ecChatbotBotTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "ecChatbotBotTitleErr")} name="chatbot_name"></input>
               &nbsp;
               <select id="ecChatbotBotBot" style={{ width: "46%" }} defaultValue={""} className="new-faq-q-so1">
                 <option value="" disabled hidden>{hotTem[1] != undefined ? hotTem[1].group_name : "メッセージグループ選択 ..."}</option>
@@ -7161,7 +7166,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
               </select>
               <div>
                 <label style={{ width: "70px" }}>詳細: &nbsp;</label>
-                <input placeholder={hotTem[1] != undefined ? hotTem[1].description : ""} id="ecChatbotBotDes" style={{ width: "84.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input>
+                <input defaultValue={hotTem[1] != undefined ? hotTem[1].description : ""} id="ecChatbotBotDes" style={{ width: "84.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "ecChatbotBotTitleErr")}></input>
                 {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="ecChatbotBotTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
               </div>
               <label id="ecChatbotBotTitleErr" style={{ display: 'none', color: "red" }}></label>
@@ -7170,7 +7175,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
             <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>会員登録</div>
             <label style={{ width: "100%" }}>
               <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
-              <input placeholder={hotTem[2] != undefined ? hotTem[2].title : ""} id="registrationTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")} name="chatbot_name"></input>
+              <input defaultValue={hotTem[2] != undefined ? hotTem[2].title : ""} id="registrationTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")} name="chatbot_name"></input>
               &nbsp;
               <select id="registrationBot" style={{ width: "46%" }} defaultValue={""} className="new-faq-q-so1">
                 <option value="" disabled hidden>{hotTem[2] != undefined ? hotTem[2].group_name : "メッセージグループ選択 ..."}</option>
@@ -7184,7 +7189,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
               </select>
               <div>
                 <label style={{ width: "70px" }}>詳細: &nbsp;</label>
-                <input placeholder={hotTem[2] != undefined ? hotTem[2].description : ""} id="registrationDes" style={{ width: "84.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input>
+                <input defaultValue={hotTem[2] != undefined ? hotTem[2].description : ""} id="registrationDes" style={{ width: "84.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input>
                 {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="registrationTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
               </div>
               <label id="registrationTitleErr" style={{ display: 'none', color: "red" }}></label>
@@ -7192,7 +7197,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
 
 
             <div style={{ width: "100%", textAlign: "center" }}>
-              <Button id="btnSaveTem" onClick={() => saveTemplate()}>Save Template</Button>
+              <Button id="btnSaveTem" onClick={() => saveTemplate()}>テンプレート保存</Button>
             </div>
           </div>
         </ModalShortTem>
@@ -7207,7 +7212,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
                   <div style={{ marginTop: "10px" }}>
                     <h5>{item.title}</h5>
                     <h6 style={{ marginTop: "-10px" }}>{item.description}</h6>
-                    <Button onClick={(e) => slectedHotTem(item.message_group_id)}>Select</Button>
+                    <Button onClick={(e) => slectedHotTem(item.message_group_id)}>選択</Button>
                   </div>
 
                 </div>
@@ -7244,20 +7249,20 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
         </ModalShortTem>
         <ModalShortTem open={isOpenAddProfileMsg} onClose={() => setIsOpenAddProfileMsg(false)}>
           <div style={{ width: "800px", color: "#51cbce" }}>
-            <h4>Add Profile Message</h4>
+            <h4>プロファイルメッセージ追加</h4>
             <div style={{ width: "100%", display: "flex" }}>
               <div style={{ width: "50%", padding: "5px", borderRight: "1px solid black" }}>
-                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewNamePM()}>Name</div><br />
-                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewCompanyPM()}>Company</div><br />
-                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewPositionPM()}>Position</div><br />
-                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewWebsitePM()}>Website</div><br />
-                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewReasonPM()}>Reason</div><br />
-                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewKnowFromPM()}>Know of...</div>
+                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewNamePM()}>名前</div><br />
+                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewCompanyPM()}>企業</div><br />
+                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewPositionPM()}>役割</div><br />
+                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewWebsitePM()}>ウェブサイト</div><br />
+                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewReasonPM()}>用途（ニーズ）</div><br />
+                <div style={{ width: "100%", padding: "5px 5px 5px 20px", backgroundColor: "#f4f3ef" }} onClick={(e) => addNewKnowFromPM()}>認知経路</div>
               </div>
 
               <div style={{ width: "50%", padding: "5px" }}>
                 <form id="profileMsgSelected"></form>
-                <span id="slectMorePMErr" style={{ color: "red", display: "none" }}>Please select only one type of profile message</span>
+                <span id="slectMorePMErr" style={{ color: "red", display: "none" }}>1つの項目のみを選択してください。</span>
               </div>
             </div>
           </div>
