@@ -15,8 +15,13 @@ import { Icon } from 'semantic-ui-react';
 import { MDBIcon } from 'mdbreact';
 import { CSVLink } from "react-csv";
 import Cookies from "js-cookie";
+import DatePicker from "react-datepicker";
+
+import "react-datepicker/dist/react-datepicker.css";
 function ListUser() {
 
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
     const [dateECU, setDateECU] = useState([])
     const [userECC, setUserECC] = useState([])
     const [messageEC, setMessageEC] = useState([])
@@ -31,18 +36,27 @@ function ListUser() {
     React.useEffect(() => {
         console.log('token in dashboard', Cookies.get('token'))
         console.log('is_auth', Cookies.get('is_auth'))
-        if(Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == ""){
-          window.location.href ='/'
+        if (Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == "") {
+            window.location.href = '/'
         }
-        if(Cookies.get('is_auth') == 'false'){
-          window.location.href ='/'
+        if (Cookies.get('is_auth') == 'false') {
+            window.location.href = '/'
         }
-      }, [])
+    }, [])
 
 
     React.useEffect(() => {
-        var path = window.location.pathname;
-        api.get(`/api/v1/analytics/chatbot_usages/user?date=5d`).then(res => {
+        var date = new Date()
+        var startD = date.toISOString().slice(0, 10)
+        console.log(startD)
+        console.log(typeof (startD))
+        var month = date.toISOString().slice(5, 7) - 1
+        if (month < 10) {
+            month = `0${month}`
+        } else {
+            month = month
+        }
+        api.get(`/api/v1/analytics/chatbot_usages/user?begin_date=${date.toISOString().slice(0, 5)}${month}-15&end_date=${startD}`).then(res => {
             console.log("user EC: ", res.data.counts)
             var useEC = res.data.counts
             var dateEC = []
@@ -61,7 +75,7 @@ function ListUser() {
             console.log(error)
         })
         ////////////////////////////////////////////////
-        api.get(`/api/v1/analytics/chatbot_usages/message?date=5d`).then(res => {
+        api.get(`/api/v1/analytics/chatbot_usages/message?begin_date=${date.toISOString().slice(0, 5)}${month}-15&end_date=${startD}`).then(res => {
             console.log("message EC: ", res.data.counts)
             var messageECA = res.data.counts
             var message_count = []
@@ -76,7 +90,7 @@ function ListUser() {
             console.log(error)
         })
         ////////////////////////////////////////////////
-        api.get(`/api/v1/analytics/chatbot_usages/message?date=6m`).then(res => {
+        api.get(`/api/v1/analytics/chatbot_usages/message?begin_date=${date.toISOString().slice(0, 5)}${month}-15&end_date=${startD}`).then(res => {
             console.log("message EC: ", res.data.counts)
             var messageECA = res.data.counts
             var message_count = 0
@@ -88,7 +102,7 @@ function ListUser() {
             console.log(error)
         })
         ///////////////////////////////////////////////
-        api.get(`/api/v1/analytics/users?date=5d`).then(res => {
+        api.get(`/api/v1/analytics/users?begin_date=${date.toISOString().slice(0, 5)}${month}-15&end_date=${startD}`).then(res => {
             var useEC = res.data.user_counts
             var user_count_all = 0
             for (var i = 0; i < useEC.length; i++) {
@@ -99,7 +113,7 @@ function ListUser() {
             console.log(error)
         })
         ///////////////////////////////////////////////
-        api.get(`/api/v1/analytics/users?date=6m`).then(res => {
+        api.get(`/api/v1/analytics/users?begin_date=${date.toISOString().slice(0, 5)}${month}-15&end_date=${startD}`).then(res => {
             var useEC = res.data.user_counts
             var user_count_alltime = 0
             for (var i = 0; i < useEC.length; i++) {
@@ -112,7 +126,7 @@ function ListUser() {
 
 
         ///////////////////////////////////////////////
-        api.get(`/api/v1/analytics/chatbot_usages/user?date=6m`).then(res => {
+        api.get(`/api/v1/analytics/chatbot_usages/user?begin_date=${date.toISOString().slice(0, 5)}${month}-15&end_date=${startD}`).then(res => {
             var useEC = res.data.counts
             var user_count_alltime = 0
             for (var i = 0; i < useEC.length; i++) {
@@ -124,7 +138,7 @@ function ListUser() {
             console.log(error)
         })
         ///////////////////////////////////////////////
-        api.get(`/api/v1/analytics/chatbot_usages/user?date=5d`).then(res => {
+        api.get(`/api/v1/analytics/chatbot_usages/user?begin_date=${date.toISOString().slice(0, 5)}${month}-15&end_date=${startD}`).then(res => {
             var useEC = res.data.counts
             var user_count_alltime = 0
             for (var i = 0; i < useEC.length; i++) {
@@ -245,18 +259,20 @@ function ListUser() {
 
 
 
-    function selectDate(value) {
-        api.get(`/api/v1/analytics/chatbot_usages/user?date=${value}`).then(res => {
+    function selectDate(end) {
+        var startD = startDate.toISOString().slice(0, 10)
+        var endD = end.toISOString().slice(0, 10)
+        api.get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`).then(res => {
             var useEC = res.data.counts
             var dateEC = []
             var user_count = []
             for (var i = 0; i < useEC.length; i++) {
                 // useEC[i].log_date.slice(0,5)
-                if (value == "3m" || value == "6m") {
-                    dateEC.push(useEC[i].log_date.slice(0, 7))
-                } else {
-                    dateEC.push(useEC[i].log_date.slice(0, 5))
-                }
+                // if (value == "3m" || value == "6m") {
+                //     dateEC.push(useEC[i].log_date.slice(0, 7))
+                // } else {
+                //     dateEC.push(useEC[i].log_date.slice(0, 5))
+                // }
                 user_count.push(useEC[i].user_count)
             }
             setDateECU(dateEC)
@@ -265,7 +281,7 @@ function ListUser() {
             console.log(error)
         })
         ////////////////////////////////////////////////
-        api.get(`/api/v1/analytics/chatbot_usages/message?date=${value}`).then(res => {
+        api.get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`).then(res => {
             var messageECA = res.data.counts
             var message_count = []
             var totalM = 0
@@ -279,7 +295,7 @@ function ListUser() {
             console.log(error)
         })
         ///////////////////////////////////////////////
-        api.get(`/api/v1/analytics/users?date=${value}`).then(res => {
+        api.get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`).then(res => {
             var useEC = res.data.user_counts
             var user_count_all = 0
             for (var i = 0; i < useEC.length; i++) {
@@ -290,7 +306,7 @@ function ListUser() {
             console.log(error)
         })
         ///////////////////////////////////////////////
-        api.get(`/api/v1/analytics/chatbot_usages/user?date=${value}`).then(res => {
+        api.get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`).then(res => {
             var useEC = res.data.counts
             var user_count_alltime = 0
             for (var i = 0; i < useEC.length; i++) {
@@ -402,46 +418,46 @@ function ListUser() {
         { label: "インスタグラムアカウントをフォローしているか", key: "is_user_follow_business" },
         { label: "ユーザーをフォローしているか", key: "is_business_follow_user" },
         { label: "作成日", key: "created_at" }
-      ];
+    ];
 
     const [dataEx, setDataEx] = useState([])
-  function setDataExport() {
-    var data = []
-    var datae = instaUser
-    datae.forEach(it => {
-      data.push({
-        username: it.username,
-        full_name: it.full_name,
-        follower_count: it.follower_count,
-        instagram_id: it.instagram_id,
-        is_user_follow_business: it.is_user_follow_business,
-        is_business_follow_user: it.is_business_follow_user,
-        created_at : (it.created_at).slice(0, 19).replaceAll("-","/").replaceAll("T"," ")
-      })
-      for (var i = 1; i < it.length; i++) {
-        const cm_live = it[i]
-        data.push({
-          username: cm_live.username,
-          full_name: cm_live.full_name,
-          follower_count: cm_live.follower_count,
-          instagram_id: cm_live.instagram_id,
-          is_user_follow_business: cm_live.is_user_follow_business,
-          is_business_follow_user: cm_live.is_business_follow_user,
-          created_at: (cm_live.created_at).slice(0, 19).replaceAll("-","/").replaceAll("T"," ")
-        // })
+    function setDataExport() {
+        var data = []
+        var datae = instaUser
+        datae.forEach(it => {
+            data.push({
+                username: it.username,
+                full_name: it.full_name,
+                follower_count: it.follower_count,
+                instagram_id: it.instagram_id,
+                is_user_follow_business: it.is_user_follow_business,
+                is_business_follow_user: it.is_business_follow_user,
+                created_at: (it.created_at).slice(0, 19).replaceAll("-", "/").replaceAll("T", " ")
+            })
+            for (var i = 1; i < it.length; i++) {
+                const cm_live = it[i]
+                data.push({
+                    username: cm_live.username,
+                    full_name: cm_live.full_name,
+                    follower_count: cm_live.follower_count,
+                    instagram_id: cm_live.instagram_id,
+                    is_user_follow_business: cm_live.is_user_follow_business,
+                    is_business_follow_user: cm_live.is_business_follow_user,
+                    created_at: (cm_live.created_at).slice(0, 19).replaceAll("-", "/").replaceAll("T", " ")
+                    // })
+                })
+            }
         })
-      }
-    })
-    console.log(data)
-    // var datae = [item]
-    setDataEx(data)
-  }
+        console.log(data)
+        // var datae = [item]
+        setDataEx(data)
+    }
 
-  const csvReport = {
-    data: dataEx,
-    headers: headers,
-    filename: 'Livestream.csv'
-  };
+    const csvReport = {
+        data: dataEx,
+        headers: headers,
+        filename: 'Livestream.csv'
+    };
 
     return (
         <>
@@ -450,19 +466,23 @@ function ListUser() {
                     <Col md="12">
                         <Card style={{ width: "100%" }}>
                             <div style={{ width: "100%", padding: "5px 20px 0px 20px" }}>
-                                <div style={{ float: "right", display:"flex" }}>
-                                <div onClick={()=>setDataExport()} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800", marginRight:"10px" }}>
+                                <div style={{ float: "right", display: "flex" }}>
+                                    <div onClick={() => setDataExport()} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800", marginRight: "10px" }}>
 
-                                <CSVLink {...csvReport}><span style={{color:"white"}}>インスタグラムユーザー出力</span> <MDBIcon fas icon="arrow-circle-down" style={{ color: "white" }}></MDBIcon></CSVLink>
+                                        <CSVLink {...csvReport}><span style={{ color: "white" }}>インスタグラムユーザー出力</span> <MDBIcon fas icon="arrow-circle-down" style={{ color: "white" }}></MDBIcon></CSVLink>
                                     </div>
-                                    <select onChange={(e) => selectDate(e.target.value)} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800" }} defaultValue={"5d"} name="days_num_ec_cb" id="days_num_ec_cb">
+                                    <div style={{ display: "flex" }}>
+                                        <DatePicker style={{ borderRadius: "5px", padding: "5px" }} selected={startDate} onChange={(date) => setStartDate(date)} />
+                                        <DatePicker style={{ borderRadius: "5px", padding: "5px" }} selected={endDate} onChange={(date) => selectDate(date)} />
+                                    </div>
+                                    {/* <select onChange={(e) => selectDate(e.target.value)} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800" }} defaultValue={"5d"} name="days_num_ec_cb" id="days_num_ec_cb">
                                         <option value="5d">５日間</option>
                                         <option value="10d">10日間</option>
                                         <option value="15d">15日間</option>
                                         <option value="30d">30日間</option>
                                         <option value="3m">3月間</option>
                                         <option value="6m">6月間</option>
-                                    </select>
+                                    </select> */}
                                 </div>
                             </div>
                             <div style={{ display: "flex", width: "100%" }}>

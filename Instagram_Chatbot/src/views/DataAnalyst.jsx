@@ -11,11 +11,16 @@ import "../assets/css/general.css";
 import { CSVLink } from "react-csv";
 import { MDBIcon } from 'mdbreact';
 import Cookies from "js-cookie";
+import DatePicker from "react-datepicker";
+
+import "react-datepicker/dist/react-datepicker.css";
 // const categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
 
 function DataAnalyst() {
   const [monthECUDisplay, setMonthECUDisplay] = useState(["1", "2", "3", "4"])
   const [monthInstaUser, setMonthInstaUser] = useState([])
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
 
   const [dateECU, setDateECU] = useState([])
   const [userECC, setUserECC] = useState([])
@@ -37,8 +42,18 @@ function DataAnalyst() {
 
 
   React.useEffect(() => {
-    var path = window.location.pathname;
-    api.get(`/api/v1/analytics/chatbot_usages/user?date=5d`).then(res => {
+    var date = new Date()
+    var startD = date.toISOString().slice(0, 10)
+    console.log(startD)
+    console.log(typeof(startD))
+    var month = date.toISOString().slice(5, 7) -1
+    if(month<10){
+      month = `0${month}`
+    }else{
+      month = month
+    }
+    // ?begin_date=${startD}&end_date=${date.toISOString().slice(0, 5)}${month}-01
+    api.get(`/api/v1/analytics/chatbot_usages/user?begin_date=${date.toISOString().slice(0, 5)}${month}-15&end_date=${startD}`).then(res => {
       console.log("user EC: ", res.data.counts)
       var useEC = res.data.counts
       var dateEC = []
@@ -53,8 +68,9 @@ function DataAnalyst() {
     }).catch(error => {
       console.log(error)
     })
+    
     ////////////////////////////////////////////////
-    api.get(`/api/v1/analytics/chatbot_usages/message?date=5d`).then(res => {
+    api.get(`/api/v1/analytics/chatbot_usages/message?begin_date=${date.toISOString().slice(0, 5)}${month}-15&end_date=${startD}`).then(res => {
       console.log("message EC: ", res.data.counts)
       var messageECA = res.data.counts
       var message_count = []
@@ -66,7 +82,7 @@ function DataAnalyst() {
       console.log(error)
     })
     ///////////////////////////////////////////////
-    api.get(`/api/v1/analytics/users?date=5d`).then(res => {
+    api.get(`/api/v1/analytics/users?begin_date=${date.toISOString().slice(0, 5)}${month}-15&end_date=${startD}`).then(res => {
       var useEC = res.data.user_counts
       var user_count_all = 0
       for (var i = 0; i < useEC.length; i++) {
@@ -77,7 +93,7 @@ function DataAnalyst() {
       console.log(error)
     })
     ///////////////////////////////////////////////
-    api.get(`/api/v1/analytics/users?date=6m`).then(res => {
+    api.get(`/api/v1/analytics/users?begin_date=${date.toISOString().slice(0, 5)}${month}-15&end_date=${startD}`).then(res => {
       var useEC = res.data.user_counts
       var user_count_alltime = 0
       for (var i = 0; i < useEC.length; i++) {
@@ -90,12 +106,15 @@ function DataAnalyst() {
   }, [])
 
   const [liveData, setLiveData] = useState([])
-  React.useEffect(() => {
-    var path = window.location.pathname;
-    const d = new Date();
-    let year = d.getFullYear();
-    // alert(year)
-    api.get(`/api/v1/analytics/chatbot_usages/live?date=5d`).then(res => {
+  React.useEffect(() => { 
+    var month = startDate.toISOString().slice(5, 7) -1
+    if(month<10){
+      month = `0${month}`
+    }else{
+      month = month
+    }
+    // alert()
+    api.get(`/api/v1/analytics/chatbot_usages/live?begin_date=${startDate.toISOString().slice(0, 5)}${month}-15&end_date=${startDate.toISOString().slice(0, 10)}`).then(res => {
       console.log("live analytics: ", res.data.live_usages)
       setLiveData(res.data.live_usages)
     }).catch(error => {
@@ -261,18 +280,20 @@ function DataAnalyst() {
     }
   }
 
-  function selectDate(value) {
-    api.get(`/api/v1/analytics/chatbot_usages/user?date=${value}`).then(res => {
+  function selectDate(end) {
+    var startD = startDate.toISOString().slice(0, 10)
+    var endD = end.toISOString().slice(0, 10)
+    api.get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`).then(res => {
       var useEC = res.data.counts
       var dateEC = []
       var user_count = []
       for (var i = 0; i < useEC.length; i++) {
         // useEC[i].log_date.slice(0,5)
-        if (value == "3m" || value == "6m") {
-          dateEC.push(useEC[i].log_date.slice(0, 7))
-        } else {
-          dateEC.push(useEC[i].log_date.slice(0, 5))
-        }
+        // if (value == "3m" || value == "6m") {
+        //   dateEC.push(useEC[i].log_date.slice(0, 7))
+        // } else {
+        //   dateEC.push(useEC[i].log_date.slice(0, 5))
+        // }
         user_count.push(useEC[i].user_count)
       }
       setDateECU(dateEC)
@@ -281,7 +302,7 @@ function DataAnalyst() {
       console.log(error)
     })
     ////////////////////////////////////////////////
-    api.get(`/api/v1/analytics/chatbot_usages/message?date=${value}`).then(res => {
+    api.get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`).then(res => {
       var messageECA = res.data.counts
       var message_count = []
       for (var i = 0; i < messageECA.length; i++) {
@@ -292,7 +313,7 @@ function DataAnalyst() {
       console.log(error)
     })
     ///////////////////////////////////////////////
-    api.get(`/api/v1/analytics/users?date=${value}`).then(res => {
+    api.get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`).then(res => {
       var useEC = res.data.user_counts
       var user_count_all = 0
       for (var i = 0; i < useEC.length; i++) {
@@ -350,6 +371,7 @@ function DataAnalyst() {
     headers: headers,
     filename: 'Livestream.csv'
   };
+  
 
   return (
     <>
@@ -377,15 +399,17 @@ function DataAnalyst() {
                   </div>
                 </div>
                 <div style={{ width: "100%" }}>
-                  <div style={{ float: "right" }}> 
-                    <select onChange={(e) => selectDate(e.target.value)} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800" }} defaultValue={"5d"} name="days_num_ec_cb" id="days_num_ec_cb">
+                  <div style={{ float: "right", display:"flex" }}> 
+                  <DatePicker style={{borderRadius:"5px", padding:"5px"}} selected={startDate} onChange={(date) => setStartDate(date)} />
+                  <DatePicker style={{borderRadius:"5px", padding:"5px"}} selected={endDate} onChange={(date) => selectDate(date)} />
+                    {/* <select onChange={(e) => selectDate(e.target.value)} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800" }} defaultValue={"5d"} name="days_num_ec_cb" id="days_num_ec_cb">
                       <option value="5d">５日間</option>
                       <option value="10d">10日間</option>
                       <option value="15d">15日間</option>
                       <option value="30d">30日間</option>
                       <option value="3m">3月間</option>
                       <option value="6m">6月間</option>
-                    </select>
+                    </select> */}
                   </div>
                 </div>
               </CardBody>
