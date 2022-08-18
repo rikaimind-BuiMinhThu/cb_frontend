@@ -1,26 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardBody, Row, Col, Table } from 'reactstrap';
 import ReactApexChart from 'react-apexcharts';
 import api from '../api/api-management';
 
 function AttractedCustomer() {
   // states
-  const [startChatbotIn, setStartChatbotIn] = React.useState([]);
-  const [dmData, setDmData] = React.useState({
+  const [startChatbotIn, setStartChatbotIn] = useState([]);
+  const [dmData, setDmData] = useState({
     totalUser: 0,
     totalMessages: 0,
+    totalPurchase: 0,
   });
-  const [scData, setScData] = React.useState({
+  const [scData, setScData] = useState({
     totalUser: 0,
     totalMessages: 0,
+    totalPurchase: 0,
   });
-  const [lcData, setLcData] = React.useState({
+  const [lcData, setLcData] = useState({
     totalUser: 0,
     totalMessages: 0,
+    totalPurchase: 0,
   });
 
   // mounted
-  React.useEffect(() => {
+  useEffect(() => {
     api
       .get('/api/v1/managements/instagram_users')
       .then((res) => {
@@ -29,28 +32,55 @@ function AttractedCustomer() {
         let dmCount = 0;
         let scCount = 0;
         let lcCount = 0;
+        let dmMessageSent = 0;
+        let scMessageSent = 0;
+        let lcMessageSent = 0;
+        let dmPurchaseCount = 0;
+        let scPurchaseCount = 0;
+        let lcPurchaseCount = 0;
 
         if (dataStartChatbotIn) {
           for (let i = 0; i < dataStartChatbotIn.length; i++) {
             if (dataStartChatbotIn[i].start_chatbot_in === 'dm') {
               dmCount++;
+              dmMessageSent += dataStartChatbotIn[i].num_of_messages_sent;
+              dmPurchaseCount += dataStartChatbotIn[i].num_of_conversions;
             } else if (
               dataStartChatbotIn[i].start_chatbot_in === 'story_comment'
             ) {
               scCount++;
+              scMessageSent += dataStartChatbotIn[i].num_of_messages_sent;
+              scPurchaseCount += dataStartChatbotIn[i].num_of_conversions;
             } else {
               lcCount++;
+              lcMessageSent += dataStartChatbotIn[i].num_of_messages_sent;
+              lcPurchaseCount += dataStartChatbotIn[i].num_of_conversions;
             }
           }
           setStartChatbotIn([dmCount, scCount, lcCount]);
           setDmData((prev) => {
-            return { ...prev, totalUser: dmCount, totalMessages: 0 };
+            return {
+              ...prev,
+              totalUser: dmCount,
+              totalMessages: dmMessageSent,
+              totalPurchase: dmPurchaseCount,
+            };
           });
           setScData((prev) => {
-            return { ...prev, totalUser: scCount, totalMessages: 0 };
+            return {
+              ...prev,
+              totalUser: scCount,
+              totalMessages: scMessageSent,
+              totalPurchase: scPurchaseCount,
+            };
           });
           setLcData((prev) => {
-            return { ...prev, totalUser: lcCount, totalMessages: 0 };
+            return {
+              ...prev,
+              totalUser: lcCount,
+              totalMessages: lcMessageSent,
+              totalPurchase: lcPurchaseCount,
+            };
           });
         }
       })
@@ -190,7 +220,7 @@ function AttractedCustomer() {
                 <CardBody style={{ width: '33.33333%' }}>
                   <div style={{ width: '100%' }}>
                     <div style={{ width: '100%', textAlign: 'center' }}>
-                      <h3>Title</h3>
+                      <h3>Source</h3>
                     </div>
                     <div style={{ paddingTop: '10%' }}>
                       <div
@@ -213,17 +243,15 @@ function AttractedCustomer() {
                 </CardBody>
 
                 <CardBody style={{ width: '66.66666%' }}>
-                  <CardBody>
-                    <div style={{ width: '100%', textAlign: 'center' }}>
-                      <h3>Title</h3>
-                    </div>
-                    <ReactApexChart
-                      options={dataLine.options}
-                      series={dataLine.series}
-                      type="line"
-                      height={350}
-                    />
-                  </CardBody>
+                  <div style={{ width: '100%', textAlign: 'center' }}>
+                    <h3>Title</h3>
+                  </div>
+                  <ReactApexChart
+                    options={dataLine.options}
+                    series={dataLine.series}
+                    type="line"
+                    height={350}
+                  />
                 </CardBody>
               </div>
             </Card>
@@ -253,7 +281,7 @@ function AttractedCustomer() {
                             ? dmData.totalMessages / dmData.totalUser
                             : 0}
                         </td>
-                        <td>1</td>
+                        <td>{dmData.totalPurchase}</td>
                         <td>1</td>
                       </tr>
                       <tr style={{ overflow: 'hidden', height: '14px' }}>
@@ -265,7 +293,7 @@ function AttractedCustomer() {
                             ? scData.totalMessages / scData.totalUser
                             : 0}
                         </td>
-                        <td>1</td>
+                        <td>{scData.totalPurchase}</td>
                         <td>1</td>
                       </tr>
                       <tr style={{ overflow: 'hidden', height: '14px' }}>
@@ -277,7 +305,7 @@ function AttractedCustomer() {
                             ? lcData.totalMessages / lcData.totalUser
                             : 0}
                         </td>
-                        <td>1</td>
+                        <td>{lcData.totalPurchase}</td>
                         <td>1</td>
                       </tr>
                     </tbody>
