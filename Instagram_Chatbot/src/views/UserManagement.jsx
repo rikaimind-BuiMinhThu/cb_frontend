@@ -150,7 +150,7 @@ function UserManagement() {
   }
 
   function getUserDetail(item) {
-    setDetailUpdateTitle("Detail User")
+    setDetailUpdateTitle("ユーザー詳細")
     setDetailData(item)
     setIsOpen(true)
     setDisableInput(true)
@@ -158,7 +158,7 @@ function UserManagement() {
 
   function updateClientUser(item) {
     setDisableInput(false)
-    setDetailUpdateTitle("Edit User")
+    setDetailUpdateTitle("ユーザー編集")
     setDetailData(item)
     // setInputValueFullName(item.full_name)
     setName(item.full_name)
