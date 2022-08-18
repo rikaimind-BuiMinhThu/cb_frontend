@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardBody, Row, Col, Table } from 'reactstrap';
 import ReactApexChart from 'react-apexcharts';
 import api from '../api/api-management';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 function AttractedCustomer() {
   // states
@@ -21,13 +23,16 @@ function AttractedCustomer() {
     totalMessages: 0,
     totalPurchase: 0,
   });
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [userECC, setUserECC] = useState([]);
+  const [dataECU, setDataECU] = useState([]);
 
   // mounted
   useEffect(() => {
     api
       .get('/api/v1/managements/instagram_users')
       .then((res) => {
-        console.log('Data: ', res.data?.data?.instagram_users);
         const dataStartChatbotIn = res.data?.data?.instagram_users;
         let dmCount = 0;
         let scCount = 0;
@@ -89,6 +94,49 @@ function AttractedCustomer() {
       });
   }, []);
 
+  useEffect(() => {
+    setStartDate((prev) => {
+      let date = new Date(prev.setMonth(prev.getMonth() - 1));
+      date = date.setDate(15);
+      return new Date(date);
+    });
+  }, []);
+
+  useEffect(() => {
+    let dateStart = new Date();
+    dateStart = dateStart.setMonth(dateStart.getMonth() - 1);
+    dateStart = new Date(dateStart);
+    dateStart = dateStart.toISOString().slice(0, 10);
+    let dateEnd = new Date();
+    let month = dateEnd.toISOString().slice(5, 7) - 1;
+    dateEnd = dateEnd.toISOString().slice(0, 10);
+    if (month < 10) {
+      month = `0${month}`;
+    }
+
+    api
+      .get(
+        `/api/v1/analytics/chatbot_usages/user?begin_date=${dateStart.slice(
+          0,
+          5
+        )}${month}-15&end_date=${dateEnd}`
+      )
+      .then((res) => {
+        let useEC = res.data.counts;
+        let dataEC = [];
+        let user_count = [];
+        for (let i = 0; i < useEC.length; i++) {
+          dataEC.push(useEC[i].log_date.slice(0, 5));
+          user_count.push(useEC[i].user_count);
+        }
+        setDataECU(dataEC);
+        setUserECC(user_count);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   // data pie chart
   let dataPie = {
     series: startChatbotIn,
@@ -123,7 +171,7 @@ function AttractedCustomer() {
       {
         name: 'Ec chatbotユーザー',
         type: 'area',
-        data: [1, 2, 3, 4, 5, 6, 7],
+        data: userECC,
       },
     ],
     options: {
@@ -138,7 +186,7 @@ function AttractedCustomer() {
         type: 'solid',
         opacity: 0,
       },
-      labels: [1, 2, 3, 4, 5, 6, 7],
+      labels: dataECU,
       markers: {
         size: 0,
       },
@@ -166,7 +214,27 @@ function AttractedCustomer() {
 
   // select date on change
   const selectDate = (value) => {
-    console.log(value);
+    setEndDate(value);
+    let startD = startDate.toISOString().slice(0, 10);
+    let endD = value.toISOString().slice(0, 10);
+    api
+      .get(
+        `/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`
+      )
+      .then((res) => {
+        let useEC = res.data.counts;
+        let dataEC = [];
+        let user_count = [];
+        for (let i = 0; i < useEC.length; i++) {
+          dataEC.push(useEC[i].log_date.slice(0, 5));
+          user_count.push(useEC[i].user_count);
+        }
+        setDataECU(dataEC);
+        setUserECC(user_count);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -180,11 +248,31 @@ function AttractedCustomer() {
                 width: '100%',
                 display: 'flex',
                 justifyContent: 'flex-end',
-                paddingBottom: '10px',
+                position: 'relative',
+                minHeight: '50px',
               }}
             >
-              <div>
-                <select
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  position: 'absolute',
+                  zIndex: '15',
+                }}
+              >
+                <div style={{ borderRadius: '5px', padding: '5px' }}>
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                  />
+                </div>
+                <div style={{ borderRadius: '5px', padding: '5px' }}>
+                  <DatePicker
+                    selected={endDate}
+                    onChange={(date) => selectDate(date)}
+                  />
+                </div>
+                {/* <select
                   style={{
                     padding: '5px 10px 5px 10px',
                     border: 'none',
@@ -204,7 +292,7 @@ function AttractedCustomer() {
                   <option value="30d">30日間</option>
                   <option value="3m">3月間</option>
                   <option value="6m">6月間</option>
-                </select>
+                </select> */}
               </div>
             </div>
 
@@ -244,7 +332,7 @@ function AttractedCustomer() {
 
                 <CardBody style={{ width: '66.66666%' }}>
                   <div style={{ width: '100%', textAlign: 'center' }}>
-                    <h3>Title</h3>
+                    <h3>EC Chatbot User</h3>
                   </div>
                   <ReactApexChart
                     options={dataLine.options}
@@ -278,11 +366,20 @@ function AttractedCustomer() {
                         <td>{dmData.totalMessages}</td>
                         <td>
                           {dmData.totalUser !== 0
-                            ? dmData.totalMessages / dmData.totalUser
+                            ? (dmData.totalMessages / dmData.totalUser).toFixed(
+                                2
+                              )
                             : 0}
                         </td>
                         <td>{dmData.totalPurchase}</td>
-                        <td>1</td>
+                        <td>
+                          {dmData.totalMessages !== 0
+                            ? (
+                                dmData.totalPurchase / dmData.totalMessages
+                              ).toFixed(2)
+                            : `0.00`}
+                          %
+                        </td>
                       </tr>
                       <tr style={{ overflow: 'hidden', height: '14px' }}>
                         <td>Story comment</td>
@@ -290,11 +387,20 @@ function AttractedCustomer() {
                         <td>{scData.totalMessages}</td>
                         <td>
                           {scData.totalUser !== 0
-                            ? scData.totalMessages / scData.totalUser
+                            ? (scData.totalMessages / scData.totalUser).toFixed(
+                                2
+                              )
                             : 0}
                         </td>
                         <td>{scData.totalPurchase}</td>
-                        <td>1</td>
+                        <td>
+                          {scData.totalMessages !== 0
+                            ? (
+                                scData.totalPurchase / scData.totalMessages
+                              ).toFixed(2)
+                            : `0.00`}
+                          %
+                        </td>
                       </tr>
                       <tr style={{ overflow: 'hidden', height: '14px' }}>
                         <td>Live comment</td>
@@ -306,7 +412,14 @@ function AttractedCustomer() {
                             : 0}
                         </td>
                         <td>{lcData.totalPurchase}</td>
-                        <td>1</td>
+                        <td>
+                          {lcData.totalMessages !== 0
+                            ? (
+                                lcData.totalPurchase / lcData.totalMessages
+                              ).toFixed(2)
+                            : `0.00`}
+                          %
+                        </td>
                       </tr>
                     </tbody>
                   </Table>
