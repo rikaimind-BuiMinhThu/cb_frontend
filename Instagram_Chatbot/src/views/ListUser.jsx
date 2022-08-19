@@ -78,7 +78,10 @@ function ListUser() {
         var totalEC = 0;
         for (var i = 0; i < useEC.length; i++) {
           // useEC[i].log_date.slice(0,5)
-          dateEC.push(useEC[i].log_date.slice(0, 5));
+          // dateEC.push(useEC[i].log_date.slice(0, 5));
+          dateEC.push(
+            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
+          );
           user_count.push(useEC[i].user_count);
           totalEC = totalEC + useEC[i].user_count;
         }
@@ -230,6 +233,18 @@ function ListUser() {
     });
   }, []);
 
+  React.useEffect(() => {
+    const datePickerInputs = document.querySelectorAll(
+      '.react-datepicker__input-container > input'
+    );
+    datePickerInputs[0].style.padding = '2px 6px';
+    datePickerInputs[0].style.borderColor = '#51cbce';
+    datePickerInputs[0].style.borderRadius = '5px';
+    datePickerInputs[1].style.padding = '2px 6px';
+    datePickerInputs[1].style.borderColor = '#51cbce';
+    datePickerInputs[1].style.borderRadius = '5px';
+  }, []);
+
   var percentNew = (userChatwithCB / userChatwithCBAll) * 100;
   var percentold =
     ((userChatwithCBAll - userChatwithCB) / userChatwithCBAll) * 100;
@@ -335,8 +350,11 @@ function ListUser() {
           // if (value == "3m" || value == "6m") {
           //     dateEC.push(useEC[i].log_date.slice(0, 7))
           // } else {
-          dateEC.push(useEC[i].log_date.slice(0, 5));
+          // dateEC.push(useEC[i].log_date.slice(0, 5));
           // }
+          dateEC.push(
+            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
+          );
           user_count.push(useEC[i].user_count);
         }
         setDateECU(dateEC);
@@ -586,12 +604,14 @@ function ListUser() {
                       <DatePicker
                         selected={startDate}
                         onChange={(date) => setStartDate(date)}
+                        dateFormat="yyyy/MM/dd"
                       />
                     </div>
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
                       <DatePicker
                         selected={endDate}
                         onChange={(date) => selectDate(date)}
+                        dateFormat="yyyy/MM/dd"
                       />
                     </div>
                   </div>
