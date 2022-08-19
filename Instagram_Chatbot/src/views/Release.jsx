@@ -373,7 +373,7 @@ function Release() {
           optionSelectedTypeStory.hidden = true
           optionSelectedTypeStory.selected = true
           optionSelectedTypeStory.value = "keyword"
-          optionSelectedTypeStory.text = "keyword"
+          optionSelectedTypeStory.text = "キーワード"
           selectedTypeStory.add(optionSelectedTypeStory)
           api.get(`/api/v1/message_managements/keyword_settings/${story[0]}`).then(res => {
             console.log("story_comment_KW_id: ", res.data.data)
@@ -405,7 +405,7 @@ function Release() {
           optionSelectedTypeStory.hidden = true
           optionSelectedTypeStory.selected = true
           optionSelectedTypeStory.value = "keyword"
-          optionSelectedTypeStory.text = "keyword"
+          optionSelectedTypeStory.text = "キーワード"
           selectedTypeStory.add(optionSelectedTypeStory)
           api.get(`/api/v1/message_managements/keyword_settings/${live[0]}`).then(res => {
             console.log("story_comment_KW_id: ", res.data.data)
@@ -437,7 +437,7 @@ function Release() {
           optionSelectedTypeStory.hidden = true
           optionSelectedTypeStory.selected = true
           optionSelectedTypeStory.value = "keyword"
-          optionSelectedTypeStory.text = "keyword"
+          optionSelectedTypeStory.text = "キーワード"
           selectedTypeStory.add(optionSelectedTypeStory)
           api.get(`/api/v1/message_managements/keyword_settings/${cm[0]}`).then(res => {
             console.log("story_comment_KW_id: ", res.data.data)
