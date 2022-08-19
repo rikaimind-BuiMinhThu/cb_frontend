@@ -13,6 +13,7 @@ import { MDBIcon } from 'mdbreact';
 import Cookies from 'js-cookie';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import requestNewToken from 'api/request-new-token';
 // const categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
 
 function DataAnalyst() {
@@ -27,6 +28,7 @@ function DataAnalyst() {
   const [userChatwithCB, setUserChatwithCB] = useState([]);
   const [userChatwithCBAll, setUserChatwithCBAll] = useState();
   const [userTotal, setUserTotal] = useState();
+  const [listGroup, setListGroup] = useState([]);
 
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'));
@@ -70,7 +72,9 @@ function DataAnalyst() {
         var user_count = [];
         for (var i = 0; i < useEC.length; i++) {
           // useEC[i].log_date.slice(0,5)
-          dateEC.push(useEC[i].log_date.slice(0, 5));
+          dateEC.push(
+            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
+          );
           user_count.push(useEC[i].user_count);
         }
         setDateECU(dateEC);
@@ -147,6 +151,35 @@ function DataAnalyst() {
       date = date.setDate(15);
       return new Date(date);
     });
+  }, []);
+
+  React.useEffect(() => {
+    const datePickerInputs = document.querySelectorAll(
+      '.react-datepicker__input-container > input'
+    );
+    datePickerInputs[0].style.padding = '2px 6px';
+    datePickerInputs[0].style.borderColor = '#51cbce';
+    datePickerInputs[0].style.borderRadius = '5px';
+    datePickerInputs[1].style.padding = '2px 6px';
+    datePickerInputs[1].style.borderColor = '#51cbce';
+    datePickerInputs[1].style.borderRadius = '5px';
+  }, []);
+
+  // get list message groups
+  React.useEffect(() => {
+    var path = window.location.pathname;
+    api
+      .get(`/api/v1/message_managements/message_groups`)
+      .then((res) => {
+        console.log('message groups: ', res.data.data);
+        setListGroup(res.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response.data.code === 3) {
+          requestNewToken(path);
+        }
+      });
   }, []);
 
   const [liveData, setLiveData] = useState([]);
@@ -348,8 +381,10 @@ function DataAnalyst() {
         for (var i = 0; i < useEC.length; i++) {
           // useEC[i].log_date.slice(0,5)
 
-          dateEC.push(useEC[i].log_date.slice(0, 5));
-
+          // dateEC.push(useEC[i].log_date.slice(0, 5));
+          dateEC.push(
+            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
+          );
           user_count.push(useEC[i].user_count);
         }
         setDateECU(dateEC);
@@ -443,6 +478,17 @@ function DataAnalyst() {
     filename: 'Livestream.csv',
   };
 
+  // export message group data
+  const csvMessageGroupReport = {
+    data: [],
+    headers: [],
+    filename: 'message-group.csv',
+  };
+
+  const setMessageGroupDataExport = (item) => {
+    console.log(item);
+  };
+
   return (
     <>
       <div className="content">
@@ -490,12 +536,14 @@ function DataAnalyst() {
                       <DatePicker
                         selected={startDate}
                         onChange={(date) => setStartDate(date)}
+                        dateFormat="yyyy/MM/dd"
                       />
                     </div>
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
                       <DatePicker
                         selected={endDate}
                         onChange={(date) => selectDate(date)}
+                        dateFormat="yyyy/MM/dd"
                       />
                     </div>
                     {/* <select onChange={(e) => selectDate(e.target.value)} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800" }} defaultValue={"5d"} name="days_num_ec_cb" id="days_num_ec_cb">
@@ -570,6 +618,75 @@ function DataAnalyst() {
                       </div>
                     </CardBody>
                   </div>
+                </div>
+              </CardBody>
+            </Card>
+
+            {/* message groups */}
+            <Card>
+              <CardBody>
+                <div
+                  style={{
+                    width: '100%',
+                    textAlign: 'center',
+                  }}
+                >
+                  <h3>Message Groups</h3>
+                </div>
+                <div style={{ width: '100%' }}>
+                  <Table
+                    style={{
+                      textAlign: 'center',
+                      tableLayout: 'fixed',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <thead className="text-primary">
+                      <tr>
+                        <td>
+                          <h6>Group name</h6>
+                        </td>
+                        <td>
+                          <h6>Created/Updated date</h6>
+                        </td>
+                        <td>
+                          <h6>Total user</h6>
+                        </td>
+                        <td>
+                          <h6>Answer results</h6>
+                        </td>
+                        <td>
+                          <h6>CSV download</h6>
+                        </td>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {listGroup.map((item) => (
+                        <tr
+                          key={item?.id}
+                          style={{ overflow: 'hidden', height: '14px' }}
+                        >
+                          <td>{item?.group_name}</td>
+                          <td>{item?.updated_at?.slice(0, 10)}</td>
+                          <td>???</td>
+                          <td>???</td>
+                          <td>
+                            <span
+                              onClick={() => setMessageGroupDataExport(item)}
+                            >
+                              <CSVLink {...csvMessageGroupReport}>
+                                <MDBIcon
+                                  fas
+                                  icon="arrow-circle-down"
+                                  style={{ color: '#51cbce' }}
+                                ></MDBIcon>
+                              </CSVLink>
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
                 </div>
               </CardBody>
             </Card>
