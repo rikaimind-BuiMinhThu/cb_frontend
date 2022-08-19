@@ -103,6 +103,18 @@ function AttractedCustomer() {
   }, []);
 
   useEffect(() => {
+    const datePickerInputs = document.querySelectorAll(
+      '.react-datepicker__input-container > input'
+    );
+    datePickerInputs[0].style.padding = '2px 6px';
+    datePickerInputs[0].style.borderColor = '#51cbce';
+    datePickerInputs[0].style.borderRadius = '5px';
+    datePickerInputs[1].style.padding = '2px 6px';
+    datePickerInputs[1].style.borderColor = '#51cbce';
+    datePickerInputs[1].style.borderRadius = '5px';
+  }, []);
+
+  useEffect(() => {
     let dateStart = new Date();
     dateStart = dateStart.setMonth(dateStart.getMonth() - 1);
     dateStart = new Date(dateStart);
@@ -126,7 +138,10 @@ function AttractedCustomer() {
         let dataEC = [];
         let user_count = [];
         for (let i = 0; i < useEC.length; i++) {
-          dataEC.push(useEC[i].log_date.slice(0, 5));
+          // dataEC.push(useEC[i].log_date.slice(0, 5));
+          dataEC.push(
+            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
+          );
           user_count.push(useEC[i].user_count);
         }
         setDataECU(dataEC);
@@ -226,7 +241,10 @@ function AttractedCustomer() {
         let dataEC = [];
         let user_count = [];
         for (let i = 0; i < useEC.length; i++) {
-          dataEC.push(useEC[i].log_date.slice(0, 5));
+          // dataEC.push(useEC[i].log_date.slice(0, 5));
+          dataEC.push(
+            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
+          );
           user_count.push(useEC[i].user_count);
         }
         setDataECU(dataEC);
@@ -260,16 +278,18 @@ function AttractedCustomer() {
                   zIndex: '15',
                 }}
               >
-                <div style={{ borderRadius: '5px', padding: '5px' }}>
+                <div style={{ padding: '5px' }}>
                   <DatePicker
                     selected={startDate}
                     onChange={(date) => setStartDate(date)}
+                    dateFormat="yyyy/MM/dd"
                   />
                 </div>
-                <div style={{ borderRadius: '5px', padding: '5px' }}>
+                <div style={{ padding: '5px' }}>
                   <DatePicker
                     selected={endDate}
                     onChange={(date) => selectDate(date)}
+                    dateFormat="yyyy/MM/dd"
                   />
                 </div>
                 {/* <select
