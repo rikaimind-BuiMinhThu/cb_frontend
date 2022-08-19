@@ -187,9 +187,11 @@ function DataAnalyst() {
     let dateStart = new Date();
     dateStart = dateStart.setMonth(dateStart.getMonth() - 1);
     dateStart = new Date(dateStart);
-    var month = dateStart.toISOString().slice(5, 7) - 1;
+    var month = dateStart.toISOString().slice(5, 7) - 6;
     if (month < 10) {
       month = `0${month}`;
+    }else if(month <=0){
+      month = "01"
     }
     // alert()
     api
@@ -623,7 +625,7 @@ function DataAnalyst() {
             </Card>
 
             {/* message groups */}
-            <Card>
+            {/* <Card>
               <CardBody>
                 <div
                   style={{
@@ -689,7 +691,7 @@ function DataAnalyst() {
                   </Table>
                 </div>
               </CardBody>
-            </Card>
+            </Card> */}
           </Col>
         </Row>
       </div>
