@@ -1189,7 +1189,7 @@ function Chatbot() {
                   setIsOpenNoti(true)
                   setMsgNoti("更新しました。")
                 }, 1500)
-
+                enableAddNewMsg()
                 setTimeout(function () {
                   setIsOpenNoti(false)
                 }, 2000);
@@ -1421,7 +1421,7 @@ function Chatbot() {
             <div><textarea name="imgKey${item.id}" class="mgsChatbot" style="display:none" id="imgCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
           <input id="imgNumSaved${item.id}" style="display:none" name="imageChatbot" type="file" accept="image/*" />
 
-          <button id="btnimgNumSaved${item.id}" style="background-color:white; border: 1px solid gray; border-radius:10px">画像選択</button>
+          <button id="btnimgNumSaved${item.id}" style="background-color:white; border: 1px solid gray; border-radius:10px">画像変更</button>
           <input id="imgDataNumSaved${item.id}" name="imgchatbot${item.id}" type=hidden /> <br /><br />
           <div style=" text-align: center">
             <img id="output${item.id}" style=" max-height: 200px; max-width: 40%"  />
@@ -1765,7 +1765,7 @@ function Chatbot() {
                   setIsOpenNoti(true)
                   setMsgNoti("更新しました。")
                 }, 1500)
-
+                enableAddNewMsg()
                 setTimeout(function () {
                   setIsOpenNoti(false)
                 }, 2000);
@@ -2061,7 +2061,7 @@ function Chatbot() {
             <input id="idOfIndex${item.id}" name="idIndex${item.id}" value="${item.id}" hidden>
             <div><textarea name="imgMsgKey${item.id}" style="display:none" class="mgsChatbot" id="imgMgsCustomKey${item.id}" placeholder="キーワード入力..." type="text" rows="3"></textarea></div><br />
           <input id="imgMsgNumSaved${item.id}" style="display:none" type="file" accept="image/*" /> <br /><br />
-          <button id="btnimgMsgNumSaved${item.id}" style="background-color:white; border: 1px solid gray; border-radius:10px">画像選択</button>
+          <button id="btnimgMsgNumSaved${item.id}" style="background-color:white; border: 1px solid gray; border-radius:10px">画像変更</button>
           <input id="imgValueMsgNumSaved${item.id}" name="imgValueMsgChatbot${item.id}" type=hidden /> <br /><br />
           <div style=" text-align: center" }}>
             <img id="outputImgMsgSaved${item.id}" style=" max-height: 200px; max-width: 40%" }} />
@@ -2419,7 +2419,7 @@ function Chatbot() {
                     setIsOpenNoti(true)
                     setMsgNoti("更新しました。")
                   }, 1500)
-
+                  enableAddNewMsg()
                   setTimeout(function () {
                     setIsOpenNoti(false)
                   }, 2000);
@@ -3587,7 +3587,7 @@ function Chatbot() {
 
   function loadFile(event, id) {
     //checkImgAddEmpty
-    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg')) {
+    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') || event.target.files[0].name.includes('jpg')) {
       document.getElementById(`checkImgAddEmpty${id}`).style.display = "none"
       document.getElementById(`checkImgAddEmpty${id}`).innerHTML = ""
       var num = parseInt(imgCBNum) + 1
@@ -3627,7 +3627,7 @@ function Chatbot() {
     // var num = parseInt(id) + 1
     //imgNumSavedCheck
 
-    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg')) {
+    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') || event.target.files[0].name.includes('jpg')) {
       document.getElementById(`imgNumSavedCheck${id}`).style.display = "none"
       document.getElementById(`imgNumSavedCheck${id}`).innerHTML = ""
       getBaseUrlSaved(id)
@@ -3657,7 +3657,7 @@ function Chatbot() {
     } else {
       setChooseImgSaved("notImg")
       document.getElementById(`imgNumSavedCheck${id}`).style.display = "block"
-      document.getElementById(`imgNumSavedCheck${id}`).innerHTML = "Please select an image"
+      document.getElementById(`imgNumSavedCheck${id}`).innerHTML = "画像を選択してください。"
     }
 
   };
@@ -3666,7 +3666,7 @@ function Chatbot() {
     // console.log(event.target.files[0].name)
 
 
-    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg')) {
+    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') || event.target.files[0].name.includes('jpg')) {
       document.getElementById(`checkImgMsgAddEmpty${id}`).style.display = "none"
       document.getElementById(`checkImgMsgAddEmpty${id}`).innerHTML = ""
 
@@ -3709,7 +3709,7 @@ function Chatbot() {
   function loadFileImgMsgSaved(event, id) {
     // var num = parseInt(imgMsgCBNum) + 1
 
-    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg')) {
+    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') || event.target.files[0].name.includes('jpg')) {
       document.getElementById(`checkImgMsgCheck${id}`).style.display = "none"
       document.getElementById(`checkImgMsgCheck${id}`).innerHTML = ""
       getBaseUrlImgMsgSaved(id)
@@ -3737,7 +3737,7 @@ function Chatbot() {
       setImgMsgCBNum(id)
     } else {
       document.getElementById(`checkImgMsgCheck${id}`).style.display = "block"
-      document.getElementById(`checkImgMsgCheck${id}`).innerHTML = "Please select an image"
+      document.getElementById(`checkImgMsgCheck${id}`).innerHTML = "画像を選択してください。"
     }
 
 
@@ -4939,7 +4939,7 @@ function Chatbot() {
           setIsOpenNoti(true)
           setMsgNoti("更新しました。")
         }, 1500)
-
+        enableAddNewMsg()
         setTimeout(function () {
           setIsOpenNoti(false)
         }, 2000);
@@ -5516,7 +5516,7 @@ function Chatbot() {
     setIdDeleteMsgGr(id)
   }
 
-  function addMagBag() {
+  function addMagBag(event) {
     var path = window.location.pathname;
     var newBag = document.getElementById("new_bag").value
     if (utils.checkFieldAdd(newBag, "MsgBag") == true) {
@@ -5529,7 +5529,9 @@ function Chatbot() {
         setIsOpenNoti(true)
         setTimeout(() => {
           setIsOpenNoti(false)
+          refreshMsgGroup()
           reloadMsgBag()
+          getMSGPV(event, idMsgGr)
           // refreshMsgGroup()
         }, 1500)
       }).catch(error => {
@@ -6125,7 +6127,10 @@ function Chatbot() {
       type = "mess"
     } else {
       type = "web_url"
-      document.getElementById(`isPurchaseCof${idSC}`).style.display = "none"
+      if(document.getElementById(`isPurchaseCof${idSC}`)!= null){
+        document.getElementById(`isPurchaseCof${idSC}`).style.display = "none"
+      }
+      
       if (web_url == "") {
         document.getElementById("webSC").style.display = "block"
       } else {
@@ -6205,7 +6210,10 @@ function Chatbot() {
       console.log(group, bag)
       type = "mess"
     } else {
-      document.getElementById(`isPurchase${idUpdateItemMsg}`).style.display = "none"
+      if(document.getElementById(`isPurchase${idUpdateItemMsg}`)!= null){
+        document.getElementById(`isPurchase${idUpdateItemMsg}`).style.display = "none"
+      }
+      
       type = "web_url"
       if (web_url == "") {
         document.getElementById("webSC").style.display = "block"
@@ -6279,7 +6287,10 @@ function Chatbot() {
       type = "mess"
     } else {
 
-      document.getElementById(`isPurchaseCof${idSC}`).style.display = "none"
+      if(document.getElementById(`isPurchaseCof${idSC}`)!= null){
+        document.getElementById(`isPurchaseCof${idSC}`).style.display = "none"
+      }
+      
       type = "web_url"
       if (web_url == "") {
         document.getElementById("webTC").style.display = "block"
@@ -6386,7 +6397,10 @@ function Chatbot() {
       console.log(group, bag)
       type = "mess"
     } else {
-      document.getElementById(`isPurchase${idUpdateItemMsg}`).style.display = "none"
+      if(document.getElementById(`isPurchase${idUpdateItemMsg}`)!= null){
+        document.getElementById(`isPurchase${idUpdateItemMsg}`).style.display = "none"
+      }
+      
       type = "web_url"
       if (web_url == "") {
         document.getElementById("webTC").style.display = "block"
@@ -6489,7 +6503,9 @@ function Chatbot() {
       // setTitleAddSC(title)
       // setGroupAddSC(group.value)
       // setBagAddSC(bag.value)
-      document.getElementById(`isPurchase${idUpdateItemMsg}`).style.display = "none"
+      if(document.getElementById(`isPurchase${idUpdateItemMsg}`)!= null){
+        document.getElementById(`isPurchase${idUpdateItemMsg}`).style.display = "none"
+      }
       var abc = document.createElement("div")
       document.getElementById(`choiceOption${idUpdateItemMsg}`).appendChild(abc)
       abc.innerHTML =
@@ -6540,7 +6556,10 @@ function Chatbot() {
       // setGroupAddSC(group.value)
       // setBagAddSC(bag.value)
       // document.getElementById(`isPurchase${idSC}`).style.display = "none"
-      document.getElementById(`isPurchaseCof${idSC}`).style.display = "none"
+      if(document.getElementById(`isPurchaseCof${idSC}`)!= null){
+        document.getElementById(`isPurchaseCof${idSC}`).style.display = "none"
+      }
+      
       var abc = document.createElement("div")
       document.getElementById(`choiceOption${idSC}`).appendChild(abc)
       abc.innerHTML =
@@ -7676,7 +7695,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
               <input id="new_bag" style={{ width: "100%" }} onChange={(e) => checkFieldAddBag(e.target.value)} name="chatbot_name"></input>
               <label id="newMsgBagErrMsg" style={{ display: 'none', color: "red" }}></label>
             </label><br />
-            <Button id="btnAddBag" onClick={() => addMagBag()}>メッセージ袋追加</Button>
+            <Button id="btnAddBag" onClick={(e) => addMagBag(e)}>メッセージ袋追加</Button>
           </div>
         </ModalShort>
         <ModalShort open={isOpenChangeIndexMsg} onClose={() => setIsOpenChangeIndexMsg(false)}>

@@ -37,7 +37,7 @@ function LoginFacebook({ checkLogin }) {
     }
   }
 
-  function checkIsExisted(event) {
+  function checkIsExisted() {
     // window.FB.init({
     //   appId: '1733245763691008',
     //   cookie: true,
@@ -200,10 +200,7 @@ function LoginFacebook({ checkLogin }) {
   }
   setTimeout(() => {
     if (document.getElementById("divLoginFB") != null) {
-      document.getElementById("divLoginFB").onload =(e)=>{
-e.preventDefault()
-        checkIsExisted()
-      } 
+      document.getElementById("divLoginFB").onload = checkIsExisted()
     } else {
       checkIsExisted()
     }
