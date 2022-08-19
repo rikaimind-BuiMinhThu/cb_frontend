@@ -359,7 +359,7 @@ function ClientManagement() {
 
 
     var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
-    if( document.getElementById('newEmail') != null && document.getElementById('newEmail').value.length !=0){
+    if (document.getElementById('newEmail') != null && document.getElementById('newEmail').value.length != 0) {
       emailCheckLen = true
       if (email.match(mailformat)) {
         document.getElementById("newClientメールアドレスErrMsg").style.display = "none"
@@ -369,7 +369,7 @@ function ClientManagement() {
         //newClientEmailErrMsg
         emailCheck = false
       }
-    }else{
+    } else {
       emailCheckLen = false
     }
 
@@ -462,7 +462,7 @@ function ClientManagement() {
         document.getElementById("newClient担当者カナErrMsg").style.display = "block"
         document.getElementById("newClient担当者カナErrMsg").innerHTML = "名称カナを入力してください。"
       }
-      if(emailCheckLen == false){
+      if (emailCheckLen == false) {
         document.getElementById("newClientメールアドレスErrMsg").style.display = "block"
         document.getElementById("newClientメールアドレスErrMsg").innerHTML = "メールを入力してください(例:abc＠abc.com)"
       }
@@ -550,7 +550,7 @@ function ClientManagement() {
       nameKata = true
     }
 
-    if (managerkatabytes != managerKata.length * 3 || managerKata.length ==0) {
+    if (managerkatabytes != managerKata.length * 3 || managerKata.length == 0) {
       managerKata = false
     } else {
       document.getElementById("newClient担当者カナErrMsg").style.display = "none"
@@ -720,7 +720,7 @@ function ClientManagement() {
     if (value === '') {
       document.getElementById(`newClient${field}ErrMsg`).style.display = 'block'
       document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} を入力してください。`
-    }else if(parseInt(value) == isNaN){
+    } else if (parseInt(value) == isNaN) {
       document.getElementById(`newClient${field}ErrMsg`).style.display = 'block'
       document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} 番号になければなりません。`
     } else {
@@ -793,8 +793,8 @@ function ClientManagement() {
 
   var [page, setPage] = useState(1)
 
-  function handleChange(event, value){
-    console.log("pageIndex: ",value)
+  function handleChange(event, value) {
+    console.log("pageIndex: ", value)
     setPage(parseInt(value))
     setPageIndex(value)
     reloadListClient(value)
@@ -811,8 +811,8 @@ function ClientManagement() {
             <Card>
               <CardHeader>
                 <div className="swap" style={{ display: "flex", width: "100%" }}>
-                  <div style={{ width: "50%" }}><input id="searchUser" name="searchUser" style={{ height: "38px", width: "200px", border: "1px solid #dee2e6", paddingTop: "-10px", borderRadius: "3px" }}></input> 
-                  <Button onClick={() => search()} style={{ backgroundColor: "#66615b" }}>検索</Button></div>
+                  <div style={{ width: "50%" }}><input id="searchUser" name="searchUser" style={{ height: "38px", width: "200px", border: "1px solid #dee2e6", paddingTop: "-10px", borderRadius: "3px" }}></input>
+                    <Button onClick={() => search()} style={{ backgroundColor: "#66615b" }}>検索</Button></div>
                   <div className="div_right" style={{ float: "right" }}><Button type="text" onClick={() => addUserPopup()} style={{ backgroundColor: "#66615b" }}>クライアント追加</Button></div>
                 </div>
               </CardHeader>
@@ -844,9 +844,9 @@ function ClientManagement() {
                       items && items.map(item => (
                         <tr key={item.id} style={{ overflow: "hidden", height: "14px", }}>
                           <td>{item.id}</td>
-                          <td style={{ margin: "0", padding: "0" }}><img src={`https://ec-chatbot-test.com${item.logo_url.url}`} style={{ maxHeight: "60px", maxWidth: "100px" }} alt="" /></td>
+                          <td style={{ margin: "0", padding: "0" }}><img src={`https://ec-chatbot-test.com${item.logo_url.url}`} style={{ height: "60px", width: "60px", objectFit: 'cover' }} alt="" /></td>
                           <td>{item.name}</td>
-                          <td>{item.plan == "startup" ? "スタートアップ" : (item.plan == "expert" ? "エキスパート" : (item.plan == "complete"? "完全成果報酬" : "プレミアム"))}</td>
+                          <td>{item.plan == "startup" ? "スタートアップ" : (item.plan == "expert" ? "エキスパート" : (item.plan == "complete" ? "完全成果報酬" : "プレミアム"))}</td>
                           <td>{item.price}</td>
                           <td id="dateStart">{(item.subscription_start_at == null) ? item.subscription_start_at : item.subscription_start_at.slice(0, 10)}</td>
                           {/* .slice(0, 10) */}
@@ -870,7 +870,7 @@ function ClientManagement() {
                 </Table>
 
 
-                <Pagination count={totalPage} variant="outlined" page={page} onChange={handleChange}  />
+                <Pagination count={totalPage} variant="outlined" page={page} onChange={handleChange} />
               </CardBody>
             </Card>
           </Col>
@@ -881,9 +881,9 @@ function ClientManagement() {
               <h4>{detailUpdateTitle}</h4>
               <div style={{ width: "100%", height: "2px", backgroundColor: "#bbb", marginBottom: "15px" }}></div>
               <form id="detailUserClient" className="swap">
-                <div style={{display:"flex"}}>
-                <label  style={{width:"30%"}}>ステータス {/*Status*/}<span className="span-require">*必須</span></label>
-                  <span  value={contract}>
+                <div style={{ display: "flex" }}>
+                  <label style={{ width: "30%" }}>ステータス {/*Status*/}<span className="span-require">*必須</span></label>
+                  <span value={contract}>
                     <input name="status" type="radio" disabled={disableInput == true ? true : false} id="in_contract" value={contract} onClick={(e) => setContract('active')} />
                     <label htmlFor="in_contract" className="radioButtonAddClient" >契約</label>
                     <input name="status" type="radio" disabled={disableInput == true ? true : false} id="pause_contract" value={contract} onClick={(e) => setContract('pause')} />
@@ -894,8 +894,8 @@ function ClientManagement() {
                     <label htmlFor="trial_contract" className="radioButtonAddClient">お試し</label>
                   </span>
                 </div>
-                  <label id="newClientStatusErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
-                
+                <label id="newClientStatusErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+
                 <br />
                 <label className="label-input"> プラン名 {/*Plan*/}<span className="span-require">*必須</span>
                   <select style={{ padding: "3px 0px 3px 0px" }} disabled={disableInput == true ? true : false} className="input-field" defaultValue={plan} name="plan" id="plan">
@@ -1134,18 +1134,18 @@ function ClientManagement() {
               <h4>クライアント追加</h4>
               <div style={{ width: "100%", height: "2px", backgroundColor: "#bbb", marginBottom: "15px" }}></div>
               <form id="addForm" className="swap">
-                <div style={{display: "flex"}}>
-                <label style={{width:"30%"}}>ステータス {/*Status*/}<span className="span-require">*必須</span></label>
-                <span>
-                  <input name="status" type="radio" id="in_contract" value={contract} onClick={(e) => setContract('active')} />
-                  <label htmlFor="in_contract" className="radioButtonAddClient" >契約</label>
-                  <input name="status" type="radio" id="pause_contract" value={contract} onClick={(e) => setContract('pause')} />
-                  <label htmlFor="pause_contract" className="radioButtonAddClient">休止</label>
-                  <input name="status" type="radio" id="finished_contract" value={contract} onClick={(e) => setContract('ended')} />
-                  <label htmlFor="finished_contract" className="radioButtonAddClient">解約</label>
-                  <input name="status" type="radio" id="trial_contract" value={contract} onClick={(e) => setContract('trial')} />
-                  <label htmlFor="trial_contract" className="radioButtonAddClient">お試し</label>
-                </span>
+                <div style={{ display: "flex" }}>
+                  <label style={{ width: "30%" }}>ステータス {/*Status*/}<span className="span-require">*必須</span></label>
+                  <span>
+                    <input name="status" type="radio" id="in_contract" value={contract} onClick={(e) => setContract('active')} />
+                    <label htmlFor="in_contract" className="radioButtonAddClient" >契約</label>
+                    <input name="status" type="radio" id="pause_contract" value={contract} onClick={(e) => setContract('pause')} />
+                    <label htmlFor="pause_contract" className="radioButtonAddClient">休止</label>
+                    <input name="status" type="radio" id="finished_contract" value={contract} onClick={(e) => setContract('ended')} />
+                    <label htmlFor="finished_contract" className="radioButtonAddClient">解約</label>
+                    <input name="status" type="radio" id="trial_contract" value={contract} onClick={(e) => setContract('trial')} />
+                    <label htmlFor="trial_contract" className="radioButtonAddClient">お試し</label>
+                  </span>
                 </div>
                 <label id="newClientStatusErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
 
