@@ -227,11 +227,39 @@ function AttractedCustomer() {
     },
   };
 
-  // select date on change
-  const selectDate = (value) => {
+  // select date end on change
+  const selectDateEnd = (value) => {
     setEndDate(value);
     let startD = startDate.toISOString().slice(0, 10);
     let endD = value.toISOString().slice(0, 10);
+    api
+      .get(
+        `/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`
+      )
+      .then((res) => {
+        let useEC = res.data.counts;
+        let dataEC = [];
+        let user_count = [];
+        for (let i = 0; i < useEC.length; i++) {
+          // dataEC.push(useEC[i].log_date.slice(0, 5));
+          dataEC.push(
+            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
+          );
+          user_count.push(useEC[i].user_count);
+        }
+        setDataECU(dataEC);
+        setUserECC(user_count);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  // select date start
+  const selectDateStart = (value) => {
+    setStartDate(value);
+    let startD = value.toISOString().slice(0, 10);
+    let endD = endDate.toISOString().slice(0, 10);
     api
       .get(
         `/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`
@@ -281,14 +309,14 @@ function AttractedCustomer() {
                 <div style={{ padding: '5px' }}>
                   <DatePicker
                     selected={startDate}
-                    onChange={(date) => setStartDate(date)}
+                    onChange={(date) => selectDateStart(date)}
                     dateFormat="yyyy/MM/dd"
                   />
                 </div>
                 <div style={{ padding: '5px' }}>
                   <DatePicker
                     selected={endDate}
-                    onChange={(date) => selectDate(date)}
+                    onChange={(date) => selectDateEnd(date)}
                     dateFormat="yyyy/MM/dd"
                   />
                 </div>
@@ -387,16 +415,16 @@ function AttractedCustomer() {
                         <td>
                           {dmData.totalUser !== 0
                             ? (dmData.totalMessages / dmData.totalUser).toFixed(
-                                2
-                              )
+                              2
+                            )
                             : 0}
                         </td>
                         <td>{dmData.totalPurchase}</td>
                         <td>
                           {dmData.totalMessages !== 0
                             ? (
-                                dmData.totalPurchase / dmData.totalMessages
-                              ).toFixed(2)
+                              dmData.totalPurchase / dmData.totalMessages
+                            ).toFixed(2)
                             : `0.00`}
                           %
                         </td>
@@ -408,16 +436,16 @@ function AttractedCustomer() {
                         <td>
                           {scData.totalUser !== 0
                             ? (scData.totalMessages / scData.totalUser).toFixed(
-                                2
-                              )
+                              2
+                            )
                             : 0}
                         </td>
                         <td>{scData.totalPurchase}</td>
                         <td>
                           {scData.totalMessages !== 0
                             ? (
-                                scData.totalPurchase / scData.totalMessages
-                              ).toFixed(2)
+                              scData.totalPurchase / scData.totalMessages
+                            ).toFixed(2)
                             : `0.00`}
                           %
                         </td>
@@ -435,8 +463,8 @@ function AttractedCustomer() {
                         <td>
                           {lcData.totalMessages !== 0
                             ? (
-                                lcData.totalPurchase / lcData.totalMessages
-                              ).toFixed(2)
+                              lcData.totalPurchase / lcData.totalMessages
+                            ).toFixed(2)
                             : `0.00`}
                           %
                         </td>
