@@ -19,6 +19,7 @@ import api from '../api/api-management';
 import ModalShort from './Popup/ModalShort';
 import ModalDetailInstaUser from './Popup/ModalDetailInstaUser';
 import Cookies from 'js-cookie';
+import ModalNoti from './Popup/ModalNoti';
 function CRM() {
   const [isOpenDetailUser, setIsOpenDetailUser] = useState(false);
 
@@ -26,6 +27,8 @@ function CRM() {
   const [isOpenAddLabel, setIsOpenAddLabel] = useState(false);
 
   const [listInstagramUser, setListInstagramUser] = useState([]);
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [isChangeStatus, setIsChangeStatus] = useState(false);
 
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'));
@@ -62,6 +65,7 @@ function CRM() {
   const [customLabel, setCustomLabel] = useState([]);
   const [customLabelLen, setCustomLabelLen] = useState();
   const [idInstaUser, setIdInstaUser] = useState();
+
   function detailUser(id) {
     setIsOpenDetailUser(true);
     api
@@ -353,6 +357,7 @@ function CRM() {
   }
 
   function changeStatus(value, id) {
+    setIsChangeStatus(true);
     var val = { instagram_user: { status: value } };
     api
       .patch(`/api/v1/managements/instagram_users/${id}`, val)
@@ -367,6 +372,10 @@ function CRM() {
         // }, 2000);
         // getBagMsg(group, id)
         detailUser(id);
+        setTimeout(() => {
+          setIsChangeStatus(false);
+          setIsOpenNoti(true);
+        }, 1500)
         // getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
       })
       .catch((error) => {
@@ -658,13 +667,12 @@ function CRM() {
                     <div
                       style={{
                         marginTop: '15px',
-                        display: `${
-                          instagramUser !== undefined
-                            ? instagramUser.email == null
-                              ? 'none'
-                              : 'block'
-                            : 'none'
-                        }`,
+                        display: `${instagramUser !== undefined
+                          ? instagramUser.email == null
+                            ? 'none'
+                            : 'block'
+                          : 'none'
+                          }`,
                       }}
                     >
                       <span>
@@ -679,13 +687,12 @@ function CRM() {
                     <div
                       style={{
                         marginTop: '15px',
-                        display: `${
-                          instagramUser !== undefined
-                            ? instagramUser.phone_number == null
-                              ? 'none'
-                              : 'block'
-                            : 'none'
-                        }`,
+                        display: `${instagramUser !== undefined
+                          ? instagramUser.phone_number == null
+                            ? 'none'
+                            : 'block'
+                          : 'none'
+                          }`,
                       }}
                     >
                       <span>
@@ -722,9 +729,9 @@ function CRM() {
                         開始日:{' '}
                         {instagramUser !== undefined
                           ? instagramUser.created_at
-                              .slice(0, 16)
-                              .replace('T', ' ')
-                              .replaceAll('-', '/')
+                            .slice(0, 16)
+                            .replace('T', ' ')
+                            .replaceAll('-', '/')
                           : ''}{' '}
                       </span>
                     </div>
@@ -733,9 +740,9 @@ function CRM() {
                         最終更新:{' '}
                         {instagramUser !== undefined
                           ? instagramUser.updated_at
-                              .slice(0, 16)
-                              .replace('T', ' ')
-                              .replaceAll('-', '/')
+                            .slice(0, 16)
+                            .replace('T', ' ')
+                            .replaceAll('-', '/')
                           : ''}
                       </span>
                     </div>
@@ -831,7 +838,9 @@ function CRM() {
                               borderRadius: '5px',
                               padding: '5px 10px 5px 10px',
                               position: '',
+                              cursor: 'pointer',
                             }}
+                            className="custom-label"
                           >
                             {item.name == null ? '' : item.name}
                           </span>
@@ -971,9 +980,8 @@ function CRM() {
                         className="grid-item-crm"
                         style={{
                           color: '#5f6368',
-                          display: `${
-                            customTable.length >= 8 ? 'none' : 'block'
-                          }`,
+                          display: `${customTable.length >= 8 ? 'none' : 'block'
+                            }`,
                         }}
                       >
                         <button
@@ -1110,9 +1118,25 @@ function CRM() {
             </Button>
           </div>
         </ModalShort>
+        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+            <h4>ステータスを変更しました。</h4>
+          </div>
+        </ModalNoti>
+        <ModalLoading open={isChangeStatus} />
       </div>
     </>
   );
+}
+
+const ModalLoading = ({ open }) => {
+  if (open) {
+    return <div style={{ position: 'fixed', top: '0', left: '0', right: '0', bottom: '0', backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: '10000' }}>
+      <div className='loading-animation'></div>
+    </div>
+  }
+
+  return <></>
 }
 
 export default CRM;

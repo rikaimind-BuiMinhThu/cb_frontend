@@ -1,20 +1,20 @@
 export function checkInputNumber(value, field) {
   var numRe = /^\d+$/;
- if(value === "") {
+  if (value === "") {
+    document.getElementById(`newClient${field}ErrMsg`).style.display = 'none'
+    document.getElementById(`newClient${field}ErrMsg`).innerHTML = ""
+    return true
+  }
+  else {
+    if (numRe.test(value) === false) {
+      document.getElementById(`newClient${field}ErrMsg`).style.display = 'block'
+      document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} は整数の必要です。`
+    } else if (numRe.test(value) === true) {
       document.getElementById(`newClient${field}ErrMsg`).style.display = 'none'
       document.getElementById(`newClient${field}ErrMsg`).innerHTML = ""
       return true
     }
-    else {
-      if (numRe.test(value) === false) {
-        document.getElementById(`newClient${field}ErrMsg`).style.display = 'block'
-        document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} は整数の必要です。`
-      }else if(numRe.test(value) === true){
-        document.getElementById(`newClient${field}ErrMsg`).style.display = 'none'
-      document.getElementById(`newClient${field}ErrMsg`).innerHTML = ""
-      return true
-      }
-    }
+  }
 }
 
 export function checkPhoneNumber(value, field) {
@@ -22,7 +22,7 @@ export function checkPhoneNumber(value, field) {
   if (value === '') {
     document.getElementById(`newClient${field}ErrMsg`).style.display = 'block'
     document.getElementById(`newClient${field}ErrMsg`).innerHTML = `${field} を入力してください。`
-  } else if (phoneRe.test(value) === false) {
+  } else if (phoneRe.test(value) === false || parseInt(Number(value)) !== Number(value)) {
     document.getElementById(`newClient${field}ErrMsg`).style.display = 'block'
     document.getElementById(`newClient${field}ErrMsg`).innerHTML = "電話番号の形式で入力してください。"
   } else {
