@@ -16,6 +16,7 @@ function Sidebar(props) {
 
     } else if (cook == "admin_client") {
       document.getElementById("sidebarClient").style.display = "none"
+      document.getElementById("sidebarUser").style.display = "none"
       // var elem = document.getElementById('sidebarClient');
       // elem.parentNode.removeChild(elem);
     } else if (cook == "client") {

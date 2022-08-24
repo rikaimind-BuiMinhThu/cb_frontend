@@ -47,7 +47,9 @@ function UserManagement() {
 
   React.useEffect(() => {
     var cook = Cookies.get("user_role")
-    if (cook == "admin_deel") {
+    if (cook == "admin_client") {
+      window.location.href = '/admin/dashboard'
+    } else if (cook == "admin_deel") {
 
     } else if (cook == "client") {
       window.location.href = '/admin/dashboard'
@@ -200,11 +202,11 @@ function UserManagement() {
     var path = window.location.pathname;
     var nameUpdate = document.getElementById('nameUpdate').value
     const emailUpdate = document.getElementById('updateEmail').value;
-    const passwordUpdate = document.getElementById('updatePassword').value;
-    const confirmPasswordUpdate = document.getElementById('updateConfirmPassword').value;
+    // const passwordUpdate = document.getElementById('updatePassword').value;
+    // const confirmPasswordUpdate = document.getElementById('updateConfirmPassword').value;
 
-    let passCheck = false;
-    let passCheckLen = false;
+    // let passCheck = false;
+    // let passCheckLen = false;
     let emailCheck = false;
     let nameCheck = false;
 
@@ -225,26 +227,30 @@ function UserManagement() {
       emailCheck = false
     }
 
-    if (passwordUpdate.length < 6) {
-      passCheckLen = false
-    } else {
-      document.getElementById("パスワードErrMsg").style.display = "none"
-      document.getElementById("パスワードErrMsg").innerHTML = ""
-      passCheckLen = true
-    }
-    if (passwordUpdate !== confirmPasswordUpdate) {
-      passCheck = false
-    } else {
-      document.getElementById("パスワード(確認用)ErrMsg").style.display = "none"
-      document.getElementById("パスワード(確認用)ErrMsg").innerHTML = ""
-      passCheck = true
-    }
+    // if (passwordUpdate.length < 6) {
+    //   passCheckLen = false
+    // } else {
+    //   document.getElementById("パスワードErrMsg").style.display = "none"
+    //   document.getElementById("パスワードErrMsg").innerHTML = ""
+    //   passCheckLen = true
+    // }
+
+    // if (passwordUpdate !== confirmPasswordUpdate) {
+    //   passCheck = false
+    // } else {
+    //   document.getElementById("パスワード(確認用)ErrMsg").style.display = "none"
+    //   document.getElementById("パスワード(確認用)ErrMsg").innerHTML = ""
+    //   passCheck = true
+    // }
 
     if (checkFieldUpdate(name, '名称') === true
       && utils.checkFieldAdd(email, 'メールアドレス') === true
-      && checkFieldUpdate(password, "パスワード") === true
-      && checkFieldUpdate(confirmPasswordUpdate, "パスワード(確認用)") === true && passCheck === true
-      && passCheckLen === true && emailCheck === true && nameCheck === true) {
+      // && checkFieldUpdate(passwordUpdate, "パスワード") === true
+      // && checkFieldUpdate(confirmPasswordUpdate, "パスワード(確認用)") === true
+      // && passCheck === true
+      // && passCheckLen === true
+      && emailCheck === true
+      && nameCheck === true) {
       var elements = document.getElementById("detailUserClient").elements;
       var obj = {};
       for (var i = 0; i < elements.length; i++) {
@@ -254,28 +260,28 @@ function UserManagement() {
       delete obj.confirm_password;
       var updateClient = { user: obj };
       console.log(updateClient);
-      // api.patch(`/api/v1/managements/users/${updateId}`, updateClient).then(res => {
-      //   reloadListClient(pageIndex)
-      //   setMsgNoti("ユーザーを更新しました!")
-      //   setIsOpen(false)
-      //   setIsOpenNoti(true)
-      // }).catch(error => {
-      //   alert(error)
-      //   console.log(error)
-      //   if (error.response.data.code === 3) {
-      //     requestNewToken(path)
-      //   }
-      // })
+      api.patch(`/api/v1/managements/users/${updateId}`, updateClient).then(res => {
+        reloadListClient(pageIndex)
+        setMsgNoti("ユーザーを更新しました!")
+        setIsOpen(false)
+        setIsOpenNoti(true)
+      }).catch(error => {
+        alert(error)
+        console.log(error)
+        if (error.response.data.code === 3) {
+          requestNewToken(path)
+        }
+      })
     }
     else {
-      if (passCheck === false) {
-        document.getElementById("パスワード(確認用)ErrMsg").style.display = "block"
-        document.getElementById("パスワード(確認用)ErrMsg").innerHTML = "パスワード（確認用）はパスワードと同じの必要です。"
-      }
-      if (passCheckLen === false) {
-        document.getElementById("パスワードErrMsg").style.display = "block"
-        document.getElementById("パスワードErrMsg").innerHTML = "パスワードは最低６つの文字の必要です。"
-      }
+      // if (passCheck === false) {
+      //   document.getElementById("パスワード(確認用)ErrMsg").style.display = "block"
+      //   document.getElementById("パスワード(確認用)ErrMsg").innerHTML = "パスワード（確認用）はパスワードと同じの必要です。"
+      // }
+      // if (passCheckLen === false) {
+      //   document.getElementById("パスワードErrMsg").style.display = "block"
+      //   document.getElementById("パスワードErrMsg").innerHTML = "パスワードは最低６つの文字の必要です。"
+      // }
       if (emailCheck === false) {
         document.getElementById("newUserメールアドレスErrMsg").style.display = "block"
         document.getElementById("newUserメールアドレスErrMsg").innerHTML = "メールを入力してください(例:abc＠abc.com)"
@@ -359,18 +365,18 @@ function UserManagement() {
       delete obj.confirm_password
       var newUser = { user: obj };
       console.log(newUser)
-      // api.post(`/api/v1/users/registrations`, newUser).then(res => {
-      //   reloadListClient(pageIndex)
-      //   setMsgNoti("ユーザーを追加しました!")
-      //   setIsOpenAddUser(false)
-      //   setIsOpenNoti(true)
-      // }).catch(error => {
-      //   alert(error)
-      //   console.log(error)
-      //   if (error.response.data.code === 3) {
-      //     requestNewToken(path)
-      //   }
-      // })
+      api.post(`/api/v1/users/registrations`, newUser).then(res => {
+        reloadListClient(pageIndex)
+        setMsgNoti("ユーザーを追加しました!")
+        setIsOpenAddUser(false)
+        setIsOpenNoti(true)
+      }).catch(error => {
+        alert(error)
+        console.log(error)
+        if (error.response.data.code === 3) {
+          requestNewToken(path)
+        }
+      })
 
     } else {
       if (passCheck == false) {
@@ -470,7 +476,7 @@ function UserManagement() {
                           <td>{item.id}</td>
                           <td>{item.full_name}</td>{/* onClick={() => detailUser(item.id)} */}
                           <td>{item.email}</td>
-                          <td>{item.role}</td>
+                          <td>{item.role === 'admin_client' ? 'クライアント' : 'ユーザー'}</td>
                           <td className="actionList">
                             <div>
                               {/* <Button onClick={() => getUserDetail(item)}>View Detail</Button> */}
@@ -579,7 +585,7 @@ function UserManagement() {
                   <label id="newUserメールアドレスErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
 
-                <label className="label-input">パスワード &nbsp;<span className="span-require">*必須</span>
+                {/* <label className="label-input">パスワード &nbsp;<span className="span-require">*必須</span>
                   <input className="input-field" value={password}
                     onChange={e => {
                       setPassword(e.target.value)
@@ -590,7 +596,7 @@ function UserManagement() {
                 <label className="label-input">パスワード（確認用）<span className="span-require">*必須</span>
                   <input className="input-field" onChange={() => onChangeInputWarning('パスワード(確認用)')} onBlur={(e) => checkFieldUpdate(e.target.value, "パスワード(確認用)")} type="password" id="updateConfirmPassword" name="confirm_password" />
                   <label id="パスワード(確認用)ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
-                </label><br /><br />
+                </label><br /><br /> */}
 
                 <label className="label-input">クライアント<span className="span-require">*必須</span>
                   <select style={{ padding: "3px 0px 3px 0px" }} value={clientName} onChange={(e) => setClientName(e.target.value)} className="input-field" name="client_id">
@@ -606,8 +612,8 @@ function UserManagement() {
 
                 <label className="label-input"><label className="long-label">権限&nbsp;<span className="span-require">*必須</span></label>
                   <select style={{ padding: "3px 0px 3px 0px" }} className="input-field" defaultValue={role} onChange={e => setRole(e.target.value)} name="role" id="role">
-                    <option value="client">Client</option>
-                    <option value="user">User</option>
+                    <option value="admin_client">クライアント</option>
+                    <option value="client">ユーザー</option>
                   </select>
                   <label id="newClientTikTokCreateErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
@@ -651,9 +657,9 @@ function UserManagement() {
                 </label>
 
                 <label className="label-input"><label className="long-label">権限&nbsp;<span className="span-require">*必須</span></label>
-                  <select style={{ padding: "3px 0px 3px 0px" }} className="input-field" defaultValue={'client'} name="role" id="role" >
-                    <option value="client">Client</option>
-                    <option value="user">User</option>
+                  <select style={{ padding: "3px 0px 3px 0px" }} className="input-field" defaultValue={'admin_client'} name="role" id="role" >
+                    <option value="admin_client">クライアント</option>
+                    <option value="client">ユーザー</option>
                   </select>
                   <label id="newClientTikTokCreateErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
