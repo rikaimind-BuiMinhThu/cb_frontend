@@ -127,8 +127,7 @@ function DataAnalyst() {
     ///////////////////////////////////////////////
     api
       .get(
-        `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${
-          month - 6
+        `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${month - 6
         }-15&end_date=${dateEnd}`
       )
       .then((res) => {
@@ -190,7 +189,7 @@ function DataAnalyst() {
     var month = dateStart.toISOString().slice(5, 7) - 6;
     if (month < 10) {
       month = `0${month}`;
-    }else if(month <=0){
+    } else if (month <= 0) {
       month = "01"
     }
     // alert()
@@ -199,8 +198,8 @@ function DataAnalyst() {
         `/api/v1/analytics/chatbot_usages/live?begin_date=${dateStart
           .toISOString()
           .slice(0, 5)}${month}-15&end_date=${dateStart
-          .toISOString()
-          .slice(0, 10)}`
+            .toISOString()
+            .slice(0, 10)}`
       )
       .then((res) => {
         console.log('live analytics: ', res.data.live_usages);
@@ -367,7 +366,7 @@ function DataAnalyst() {
     },
   };
 
-  function selectDate(end) {
+  function selectDateEnd(end) {
     setEndDate(end);
     var startD = startDate.toISOString().slice(0, 10);
     var endD = end.toISOString().slice(0, 10);
@@ -491,6 +490,68 @@ function DataAnalyst() {
     console.log(item);
   };
 
+  // select date start
+  const selectDateStart = (start) => {
+    setStartDate(start);
+    var startD = start.toISOString().slice(0, 10);
+    var endD = endDate.toISOString().slice(0, 10);
+    api
+      .get(
+        `/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`
+      )
+      .then((res) => {
+        console.log(res.data.counts);
+        var useEC = res.data.counts;
+        var dateEC = [];
+        var user_count = [];
+        for (var i = 0; i < useEC.length; i++) {
+          // useEC[i].log_date.slice(0,5)
+
+          // dateEC.push(useEC[i].log_date.slice(0, 5));
+          dateEC.push(
+            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
+          );
+          user_count.push(useEC[i].user_count);
+        }
+        setDateECU(dateEC);
+        setUserECC(user_count);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    ////////////////////////////////////////////////
+    api
+      .get(
+        `/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`
+      )
+      .then((res) => {
+        console.log('message: ', res.data.counts);
+        var messageECA = res.data.counts;
+        var message_count = [];
+        for (var i = 0; i < messageECA.length; i++) {
+          message_count.push(messageECA[i].message_count);
+        }
+        setMessageEC(message_count);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    ///////////////////////////////////////////////
+    api
+      .get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`)
+      .then((res) => {
+        var useEC = res.data.user_counts;
+        var user_count_all = 0;
+        for (var i = 0; i < useEC.length; i++) {
+          user_count_all = user_count_all + useEC[i].user_count;
+        }
+        setUserChatwithCB(user_count_all);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   return (
     <>
       <div className="content">
@@ -537,14 +598,14 @@ function DataAnalyst() {
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
                       <DatePicker
                         selected={startDate}
-                        onChange={(date) => setStartDate(date)}
+                        onChange={(date) => selectDateStart(date)}
                         dateFormat="yyyy/MM/dd"
                       />
                     </div>
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
                       <DatePicker
                         selected={endDate}
-                        onChange={(date) => selectDate(date)}
+                        onChange={(date) => selectDateEnd(date)}
                         dateFormat="yyyy/MM/dd"
                       />
                     </div>
