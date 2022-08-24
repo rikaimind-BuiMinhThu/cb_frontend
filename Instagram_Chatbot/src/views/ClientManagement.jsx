@@ -115,6 +115,10 @@ function ClientManagement() {
     })
   }, [])
 
+  React.useEffect(() => {
+    console.log(inputStartDate)
+  }, [inputStartDate])
+
   function search() {
     var searchVal = document.getElementById("searchUser").value
     setNamesearch(searchVal)
@@ -174,12 +178,14 @@ function ClientManagement() {
       if (data.subscription_start_at != null) {
         setInputStartDate(data.subscription_start_at.slice(0, 10))
       } else {
-        setInputStartDate(data.subscription_start_at)
+        // setInputStartDate(data.subscription_start_at)
+        setInputStartDate('')
       }
       if (data.subscription_end_at != null) {
         setInputEndDate(data.subscription_end_at.slice(0, 10))
       } else {
-        setInputEndDate(data.subscription_end_at)
+        // setInputEndDate(data.subscription_end_at)
+        setInputEndDate('')
       }
       // setInputStartDate(data.subscription_start_at) //.slice(0, 10)
       // setInputEndDate(data.subscription_end_at) //.slice(0, 10)
@@ -243,12 +249,14 @@ function ClientManagement() {
       if (data.subscription_start_at != null) {
         setInputStartDate(data.subscription_start_at.slice(0, 10))
       } else {
-        setInputStartDate(data.subscription_start_at)
+        // setInputStartDate(data.subscription_start_at)
+        setInputStartDate('')
       }
       if (data.subscription_end_at != null) {
         setInputEndDate(data.subscription_end_at.slice(0, 10))
       } else {
-        setInputEndDate(data.subscription_end_at)
+        // setInputEndDate(data.subscription_end_at)
+        setInputEndDate('')
       }
       //.slice(0, 10)
       // setInputEndDate(data.subscription_end_at)// .slice(0, 10)
@@ -407,7 +415,7 @@ function ClientManagement() {
     checkFieldAdd(prefectures, "Prefectures")
     checkFieldAdd(building, "建物名")
     checkFieldAdd(email, "メールアドレス")
-    checkFieldAdd(phone, "電話番号")
+    utils.checkPhoneNumber(phone, "電話番号")
     if (checkFieldAdd(name, "名称") === true
       && checkFieldAdd(nameKata, "名称カナ") === true && checkFieldAdd(companyType, "CompanyType") === true
       && checkFieldAdd(companyType2, "CompanyType2") === true && checkFieldAdd(department, "部署名") === true
@@ -417,7 +425,7 @@ function ClientManagement() {
       && checkFieldAdd(address, "住所") === true && checkFieldAdd(municipalities, "都道府県") === true
       && checkFieldAdd(zipCode, "郵便番号") === true && checkFieldAdd(prefectures, "Prefectures") === true
       && checkFieldAdd(building, "建物名") === true && checkFieldAdd(emaill, "メールアドレス") === true
-      && checkFieldAdd(phone, "電話番号") === true && nameKata == true && managerKata == true && emailCheck == true && emailCheckLen == true) {
+      && utils.checkPhoneNumber(phone, "電話番号") === true && nameKata == true && managerKata == true && emailCheck == true && emailCheckLen == true) {
       var elements = document.getElementById("detailUserClient").elements;
       var obj = {};
       for (var i = 0; i < elements.length - 3; i++) {
@@ -465,6 +473,9 @@ function ClientManagement() {
       if (emailCheckLen == false) {
         document.getElementById("newClientメールアドレスErrMsg").style.display = "block"
         document.getElementById("newClientメールアドレスErrMsg").innerHTML = "メールを入力してください(例:abc＠abc.com)"
+      }
+      if (utils.checkPhoneNumber(phone, "電話番号") !== true) {
+        utils.checkPhoneNumber(phone, "電話番号")
       }
       console.log("Missing field")
     }
@@ -585,7 +596,7 @@ function ClientManagement() {
       && checkFieldAdd(address, "住所") === true && checkFieldAdd(municipalities, "都道府県") === true
       && checkInputNumber(zipCode, "郵便番号") === true && checkFieldAdd(prefectures, "Prefectures") === true
       && checkFieldAdd(building, "建物名") === true && checkFieldAdd(email, "メールアドレス") === true
-      && checkFieldAdd(phone, "電話番号") === true && ava !== "" && nameKata == true && managerKata == true
+      && utils.checkPhoneNumber(phone, "電話番号") === true && ava !== "" && nameKata == true && managerKata == true
       && passwdLengthCheck == true && emailCheck == true) {
 
 
@@ -644,6 +655,9 @@ function ClientManagement() {
       if (managerKata == false) {
         document.getElementById("newClient担当者カナErrMsg").style.display = "block"
         document.getElementById("newClient担当者カナErrMsg").innerHTML = "名称カナを入力してください。"
+      }
+      if (utils.checkPhoneNumber(phone, "電話番号") !== true) {
+        utils.checkPhoneNumber(phone, "電話番号")
       }
     }
   }
@@ -833,7 +847,7 @@ function ClientManagement() {
                       <th>プラン価格</th>{/**Plan price */}
                       <th>課金開始日</th>{/**Date start count price */}
                       <th style={{ width: '10%' }}>最低利用期間終了日</th>{/**Date end using */}
-                      <th>住所</th>{/**Address */}
+                      <th style={{ minWidth: '200px', width: '200px' }}>住所</th>{/**Address */}
                       <th style={{ width: '10%' }}>最終ログイン日時</th>
                       {/**Last login date_time */}
                       <th className="actionList">アクション</th>
@@ -852,7 +866,7 @@ function ClientManagement() {
                           {/* .slice(0, 10) */}
                           <td id="dateEnd">{(item.subscription_end_at == null) ? item.subscription_end_at : item.subscription_end_at.slice(0, 10)}</td>
                           {/* .slice(0, 10) */}
-                          <td>{item.address}</td>
+                          <td style={{ minWidth: '200px', width: '200px' }}><div >{item.prefecture} {item.address} {item.building_name}</div></td>
                           <td>{item.last_sign_in_at}</td>
                           <td className="actionList">
                             <div>
@@ -911,11 +925,13 @@ function ClientManagement() {
                   <label id="newClientプラン価格ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">課金開始日 {/** Date start count price */}
-                  <input style={{ position: "relative" }} disabled={disableInput == true ? true : false} type="date" id="startDate" name="subscription_start_at" value={inputStartDate} onChange={(e) => checkInputDate(e.target.value)} className="input-field" />
+                  <input type="text" defaultValue={inputStartDate !== '' ? inputStartDate?.replace(/-/g, '/') : 'yyyy/mm/dd'} onChange={() => { }} className="input-field" disabled={disableInput === true ? true : false} readOnly />
+                  <input style={{ position: "absolute", right: "0", opacity: "0", zIndex: "1" }} disabled={disableInput == true ? true : false} type="date" id="startDate" name="subscription_start_at" value={inputStartDate} onChange={(e) => checkInputDate(e.target.value)} className="input-field" />
                   <label id="newClientStartErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">最低利用期間終了日
-                  <input style={{ position: "relative" }} disabled={disableInput == true ? true : false} type="date" id="endDate" value={inputEndDate} name="subscription_end_at" onChange={(e) => checkEndDate(e.target.value)} className="input-field" />
+                  <input type="text" defaultValue={inputEndDate !== '' ? inputEndDate?.replace(/-/g, '/') : 'yyyy/mm/dd'} onChange={() => { }} className="input-field" disabled={disableInput === true ? true : false} readOnly />
+                  <input style={{ position: "absolute", right: "0", opacity: "0", zIndex: "1" }} disabled={disableInput == true ? true : false} type="date" id="endDate" value={inputEndDate} name="subscription_end_at" onChange={(e) => checkEndDate(e.target.value)} className="input-field" />
                   <label id="newClientEndErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input"><label className="long-label">Instagramチャットボット機能</label>
@@ -1164,11 +1180,13 @@ function ClientManagement() {
                   <label id="newClientプラン価格ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">課金開始日 {/** Date start count price */}
-                  <input style={{ position: "relative" }} type="date" id="startDate" name="subscription_start_at" onChange={(e) => checkInputDate(e.target.value)} className="input-field" />
+                  <input type="text" defaultValue={inputStartDate ? inputStartDate?.replace(/-/g, '/') : 'yyyy/mm/dd'} onChange={() => { }} className="input-field" readOnly />
+                  <input style={{ position: "absolute", right: "0", opacity: "0", zIndex: "1" }} type="date" id="startDate" name="subscription_start_at" onChange={(e) => checkInputDate(e.target.value)} className="input-field" />
                   <label id="newClientStartErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input">最低利用期間終了日
-                  <input style={{ position: "relative" }} type="date" id="endDate" value={inputEndDate} name="subscription_end_at" onChange={(e) => checkEndDate(e.target.value)} className="input-field" />
+                  <input type="text" defaultValue={inputEndDate ? inputEndDate?.replace(/-/g, '/') : 'yyyy/mm/dd'} onChange={() => { }} className="input-field" readOnly />
+                  <input style={{ position: "absolute", right: "0", opacity: "0", zIndex: "1" }} type="date" id="endDate" value={inputEndDate} name="subscription_end_at" onChange={(e) => checkEndDate(e.target.value)} className="input-field" />
                   <label id="newClientEndErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
                 <label className="label-input"><label className="long-label">Instagramチャットボット機能</label>
