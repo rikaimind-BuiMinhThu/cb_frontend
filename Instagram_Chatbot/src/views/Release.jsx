@@ -959,7 +959,7 @@ function Release() {
       // for (var i = 0; i < res.data.data.length; i++) {
       //   if (res.data.data[i].message_bag_id == null) {
       //     bag_name.push("")
-          
+
       //   } else if(res.data.data[i].message_bag_id != null) {
       //     api.get(`/api/v1/message_managements/message_bags/${res.data.data[i].message_bag_id}`).then(ress => {
       //       console.log("bag_name: ", ress.data)
@@ -2439,7 +2439,12 @@ function Release() {
             }
           }
           api.patch(`/api/v1/message_managements/keyword_settings/${id}`, update).then(res => {
-
+            setMsgNoti("ストーリー設定を保存しました。")
+            setIsOpenNoti(true)
+            setTimeout(() => {
+              setMsgNoti("")
+              setIsOpenNoti(false)
+            }, 2000)
           }).catch(error => {
             console.log(error)
           })
@@ -2518,6 +2523,12 @@ function Release() {
             }
           }
           api.patch(`/api/v1/message_managements/keyword_settings/${id}`, update).then(res => {
+            setMsgNoti("ライブ設定を保存しました。")
+            setIsOpenNoti(true)
+            setTimeout(() => {
+              setMsgNoti("")
+              setIsOpenNoti(false)
+            }, 2000)
           }).catch(error => {
             console.log(error)
           })
@@ -2924,8 +2935,8 @@ function Release() {
                       <div id="divStorySetting" style={{ width: "85%", display: "flex" }}>
                         <select id="replyStory" defaultValue={"direct_message"} style={{ width: "30%" }} onChange={(e) => selectedReply(e.target.value)} className="new-faq-q-so" name="reply">
                           {/* <option value="" disabled hidden>返事タイプ選択 ...</option> */}
-                          <option value="direct_message">DM</option>
-                          <option value="keyword">キーワード</option>
+                          <option value="direct_message">すべてのDM/コメント</option>
+                          <option value="keyword">任意のキーワード</option>
                           {/* <option value="keyword">Keywords</option> */}
                         </select>
                         <select id="listReplyGroup" style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectedGroupStoryRe(e.target.value)} className="new-faq-q-so" name="reply_group">
@@ -2978,8 +2989,8 @@ function Release() {
 
                         <select id="replyLive" defaultValue={"direct_message"} style={{ width: "30%" }} onChange={(e) => selectedLive(e.target.value)} className="new-faq-q-so" name="live-setting">
                           <option value="" disabled hidden>返事タイプ選択...</option>
-                          <option value="direct_message">DM</option>
-                          <option value="keyword">キーワード</option>
+                          <option value="direct_message">すべてのDM/コメント</option>
+                          <option value="keyword">任意のキーワード</option>
                           {/* <option value="keyword">Keywords</option> */}
                         </select>
 
@@ -3037,8 +3048,8 @@ function Release() {
 
                         <select id="replyCMPost" defaultValue={"direct_message"} style={{ width: "30%" }} onChange={(e) => selectedComment(e.target.value)} className="new-faq-q-so" name="comment-setting">
                           <option value="" disabled hidden>返事タイプ選択 ...</option>
-                          <option value="direct_message">DM</option>
-                          <option value="keyword">キーワード</option>
+                          <option value="direct_message">すべてのDM/コメント</option>
+                          <option value="keyword">任意のキーワード</option>
                           {/* <option value="keyword">Keywords</option> */}
                         </select>
 

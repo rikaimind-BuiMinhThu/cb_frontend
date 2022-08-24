@@ -49,6 +49,8 @@ function Chatbot() {
   const [isUpdateOpenFreeInput, setIsUpdateOpenFreeInput] = useState(false)
   const [isOpenChangeIndexMsg, setIsOpenChangeIndexMsg] = useState(false)
 
+  const [isUpdateOpenSingleChoiceGet, setIsUpdateOpenSingleChoiceGet] = useState(false)
+
   React.useEffect(() => {
     var cook = Cookies.get("user_role")
     if (cook == "admin_deel") {
@@ -175,20 +177,21 @@ function Chatbot() {
         idli.push(res.data.data[i].id)
         // 
       }
-      document.getElementById('ulMesBag').innerHTML = ""
-      for (var i = 0; i < idli.length; i++) {
-        var liMesBag = document.createElement('li')
-        liMesBag.setAttribute('id', 'liMesBag')
 
-        document.getElementById('ulMesBag').appendChild(liMesBag)
+      for (var i = 0; i < idli.length; i++) {
+        document.getElementById(`ulMesBag${idli[i]}`).innerHTML = ""
+        var liMesBag = document.createElement('li')
+        liMesBag.setAttribute('id', `liMesBag${idli[i]}`)
+
+        document.getElementById(`ulMesBag${idli[i]}`).appendChild(liMesBag)
         setIdList(idli)
         // console.log(idli)
         setGroupList(res.data.data)
-        setTimeout(() => {
-          var i = idli.length - 1
-          document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
+        // setTimeout(() => {
+        //   var i = idli.length - 1
+        //   document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
 
-        }, 1000)
+        // }, 1000)
       }
 
     }).catch(error => {
@@ -237,8 +240,10 @@ function Chatbot() {
   }
 
   const [idForReloadMsgBag, setIdForReloadMsgBag] = useState()
+  const [itemChoiceUpdate, setItemChoiceUpdate] = useState()
+  const [idItemChoiceUpdate, setIdItemChoiceUpdate] = useState()
   function getBagMsg(group, id) {
-
+    enableAddNewMsg()
     // document.getElementById(`msg_group${group}_id${id}`).disabled = true
     // setTimeout(() => {
     //   document.getElementById(`msg_group${group}_id${id}`).disabled = false
@@ -263,16 +268,26 @@ function Chatbot() {
     api.get(`/api/v1/message_managements/message_bags/${id}`).then(res => {
       // var totalPage = Math.ceil(res.data.data.total / 25)
       // setTotalPage(totalPage)
+      console.log("bagMsg ne: ", res.data)
       var bagMsg = res.data.data.messages
       var bagId = res.data.data.message_bag.id
-      console.log("bagMsg ne: ", res.data.data.messages)
+      
+      // if (bagMsg[bagMsg.length - 1] != undefined) {
+      //   setMsgCBNum(bagMsg[bagMsg.length - 1].id)
+      // }
+
       setMsgCBNum(bagMsg[bagMsg.length - 1].id)
       setImgCBNum(bagMsg[bagMsg.length - 1].id)
       setImgCBNum(bagMsg[bagMsg.length - 1].id)
+
+      // setImgCBNum(bagMsg[bagMsg.length - 1].id)
+      // setImgCBNum(bagMsg[bagMsg.length - 1].id)
       bagMsg.forEach((item) => {
 
         // console.log("each msg ne: ", item)
         // Case message type is msg
+        // console.log("item message ne: ", item)
+        // setItemChoiceUpdate(item)
 
         if (item.message_type == "msg") {
           var updateItem = ""
@@ -284,20 +299,44 @@ function Chatbot() {
               `
                 <div id="itemFI${item.id}" >
                 <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
-                <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
-                  <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                    Delete
-                  </button>
-                </div>
+                <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none">
+                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                      Delete
+                    </button>
+                  </div>           
                 <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
                 <input id="formatCheckSelect${item.free_input.message_id}" hidden type=text value=${item.free_input.format_check} />
                 <input id="formatCheckMSG${item.free_input.message_id}" hidden type=text value="${item.free_input.format_check_message}" />
                 
               </div>
               `
+
+              //HTML update choice below here
+
+              // <div id="itemFI${item.id}" >
+              //   <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
+              //   <div style="display:flex">
+              //     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
+              //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+              //         Delete
+              //       </button>
+              //     </div>
+              //     <div id="updateChoiceFI${item.id}" style="width:100%; padding:5px; display:none;"> 
+              //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+              //         Update
+              //       </button>
+              //     </div>
+              //   </div>
+              //   <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
+              //   <input id="formatCheckSelect${item.free_input.message_id}" hidden type=text value=${item.free_input.format_check} />
+              //   <input id="formatCheckMSG${item.free_input.message_id}" hidden type=text value="${item.free_input.format_check_message}" />
+                
+              // </div>
+
             isWeb = true
             updateItem = "free_input"
           } else if (item.message_buttons != []) {
+            // if (item.message_buttons.length <= 2) {
             if (item.message_buttons.length == 1) {
               if (item.message_buttons[0].button_type == "mess" && (item.message_buttons[0].is_purchase_button == undefined)) {
                 choiceHTML =
@@ -310,14 +349,41 @@ function Chatbot() {
                     <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].message_group_name}/${item.message_buttons[0].message_bag_name}</div>
                   
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
-                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
-                    </button>
-                  </div>
+                        <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                          Delete
+                        </button>
+                      </div>
                     <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
                     <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
                   </div>
                   `
+
+
+                  //HTML update choice below here
+
+                  // <div id="itemSC${item.message_buttons[0].message_id}">
+                  //   <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>
+                  //   <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                  //   <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                  //   <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                  //   <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].message_group_name}/${item.message_buttons[0].message_bag_name}</div>
+                  
+                  //   <div style="display:flex">
+                  //     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
+                  //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                  //         Delete
+                  //       </button>
+                  //     </div>
+                  //     <div id="updateChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
+                  //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                  //         Update
+                  //       </button>
+                  //     </div>
+                  //   </div>
+                  //   <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                  //   <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                  // </div>
+
                 updateItem = "single_choice_msg"
               } else if (item.message_buttons[0].button_type == "web_url" && (item.message_buttons[0].is_purchase_button == undefined)) {
                 if (item.message_buttons[0] != undefined) {
@@ -332,15 +398,43 @@ function Chatbot() {
                     <input id="typeUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
                     <input id="webUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
                       
-                    <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
-                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
-                    </button>
-                  </div>
+                      <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
+                        <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                          Delete
+                        </button>
+                      </div>
                     <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
                     <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
                     </div>
                     `
+
+                    //HTML update choice here
+
+                    // <div >
+                    // <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>  
+                    // <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].content}</div>
+                      
+
+                    // <input id="titleUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                    // <input id="typeUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                    // <input id="webUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                      
+                    // <div style="display:flex">
+                    //   <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
+                    //     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                    //       Delete
+                    //     </button>
+                    //   </div>
+                    //   <div id="updateChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
+                    //     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                    //       Update
+                    //     </button>
+                    //   </div>
+                    // </div>
+                    // <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                    // <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                    // </div>
+
                   isWeb = true
                   updateItem = "single_choice_web"
                 } else {
@@ -352,64 +446,104 @@ function Chatbot() {
               for (var j = 0; j < item.message_buttons.length; j++) {
                 if (item.message_buttons[j].button_type == "mess" && (item.message_buttons[j].is_purchase_button == undefined)) {
                   // for (var j = 0; j < item.message_buttons.length ; j++) {
-                    choiceHTML = choiceHTML.concat(
-                      `
+                  choiceHTML = choiceHTML.concat(
+                    `
                   <div id="itemTCUP${item.id}_${j}" style="border-top:${j == 0 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
                   <div style="padding:10px 5px 0px 5px">${item.message_buttons[j].title}</div>  
                   <div style="padding:0px 5px 10px 5px">${item.message_buttons[j].message_group_name}/${item.message_buttons[j].message_bag_name}</div>
                     <input id="titleUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].title} />
                   <input id="typeUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].button_type} />
                   <input id="webUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].content == null ? "" : item.message_buttons[j].content} />
-                    
                   <input id="bagUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].message_bag_id} />
                   <input id="lblUPTCItem${item.message_buttons[j].message_id}" hidden type=text value="${item.message_buttons[j].message_button_labels}" />
                   </div>  
                   `
-                    )
+                  )
+
+                  //HTML Update choice below here
+
+                  // <div id="itemTCUP${item.id}_${j}" style="border-top:${j == 0 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
+                  // <div style="padding:10px 5px 0px 5px">${item.message_buttons[j].title}</div>  
+                  // <div style="padding:0px 5px 10px 5px">${item.message_buttons[j].message_group_name}/${item.message_buttons[j].message_bag_name}</div>
+                  //   <input id="titleUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].title} />
+                  // <input id="typeUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].button_type} />
+                  // <input id="webUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].content == null ? "" : item.message_buttons[j].content} />
+                  // <div id="updateChoiceMsg${item.id}_${j}" style="width:100%; padding:5px; display:none; border-bottom:${j == item.message_buttons.length - 2 ? "1px solid black" : "none"}"> 
+                  //   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                  //     Update
+                  //   </button>
+                  // </div>
+                  // <input id="bagUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].message_bag_id} />
+                  // <input id="lblUPTCItem${item.message_buttons[j].message_id}" hidden type=text value="${item.message_buttons[j].message_button_labels}" />
+                  // </div>  
+
+
                   // }
 
                   // <input id="groupAddFI${item.id}" hidden type=text value=${`group value here`} />
                 } else if (item.message_buttons[j].button_type == "web_url" && (item.message_buttons[j].is_purchase_button == undefined)) {
                   // for (var j = 0; j < item.message_buttons.length -1; j++) {
-                    choiceHTML = choiceHTML.concat(
-                      `
+                  choiceHTML = choiceHTML.concat(
+                    `
                     <div id="itemTCUP${item.id}_${j}" style="border-top:${j == 0 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
                     <div style="padding:10px 5px 0px 5px;">${item.message_buttons[j].title}</div>  
                     <div style="padding:0px 5px 10px 5px">${item.message_buttons[j].content}</div>
                     <input id="titleUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].title} />
                     <input id="typeUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].button_type} />
                     <input id="webUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].content == null ? "" : item.message_buttons[j].content} />
-
                     <input id="bagUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].message_bag_id} />
                     <input id="lblUPTCItem${item.message_buttons[j].message_id}" hidden type=text value="${item.message_buttons[j].message_button_labels}" />
                     </div>
                     `
-                    )
+                  )
+
+                  //HTML Update choice below here
+
+                  // <div id="itemTCUP${item.id}_${j}" style="border-top:${j == 0 ? "none" : "1px solid black"}; margin:auto; width:90%; text-align:center">
+                  //   <div style="padding:10px 5px 0px 5px;">${item.message_buttons[j].title}</div>  
+                  //   <div style="padding:0px 5px 10px 5px">${item.message_buttons[j].content}</div>
+                  //   <input id="titleUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].title} />
+                  //   <input id="typeUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].button_type} />
+                  //   <input id="webUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].content == null ? "" : item.message_buttons[j].content} />
+                  //   <div id="updateChoiceMsg${item.id}_${j}" style="width:100%; padding:5px; display:none;"> 
+                  //     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                  //       Update
+                  //     </button>
+                  //   </div>
+                  //   <input id="bagUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].message_bag_id} />
+                  //   <input id="lblUPTCItem${item.message_buttons[j].message_id}" hidden type=text value="${item.message_buttons[j].message_button_labels}" />
+                  //   </div>
+
                   // }
                   isWeb = true
                 }
-                if(j == item.message_buttons.length -1){
+                if (j == item.message_buttons.length - 1){
                   choiceHTML = choiceHTML.concat(
                     `
-                    <div id="deleteChoiceMsg${item.id}" style="width:100%; padding:5px; display:none"> 
-                    <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
-                    </button>
-                    </div>
+                      <div id="deleteChoiceMsg${item.id}" style="width:100%; padding:5px; display:none"> 
+                        <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                          Delete
+                        </button>
+                      </div>
                     `
                   )
+                  // <div id="addChoiceMsg${item.id}" style="width:100%; padding:5px; display:none;"> 
+                  //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                  //         Add new choice
+                  //       </button>
+                  //     </div>
                 }
               }
-            //   choiceHTML = choiceHTML.concat(
-            //     `
-            //     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-            //     Delete
-            //   </button>
-            // </div>
-            //   <input id="bagUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].message_bag_id} />
-            //   <input id="lblUPTCItem${item.message_buttons[j].message_id}" hidden type=text value="${item.message_buttons[j].message_button_labels}" />
-            //     `
-            //   )
+              //   choiceHTML = choiceHTML.concat(
+              //     `
+              //     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+              //     Delete
+              //   </button>
+              // </div>
+              //   <input id="bagUPTC${item.message_buttons[j].message_id}" hidden type=text value=${item.message_buttons[j].message_bag_id} />
+              //   <input id="lblUPTCItem${item.message_buttons[j].message_id}" hidden type=text value="${item.message_buttons[j].message_button_labels}" />
+              //     `
+              //   )
 
               updateItem = "three_choice"
             }
@@ -496,7 +630,7 @@ function Chatbot() {
 
               <div id="isPurchase${item.id}" style="float:left">
               <input type="checkbox" id="purchase${item.id}" name="purchase" value="is_purchase">
-              <label for="purchase"> Is Purchase(Not available for choise WebURL)</label><br>
+              <label for="purchase">注文用（ウェブURL利用不可）</label><br>
               </div>
 
               <div id="btnDelMsg${item.id}" style="float:right;">
@@ -898,6 +1032,27 @@ function Chatbot() {
             if (updateItem == "three_choice") {
               var idThreeChoiceDelete = item.message_buttons.length - 1
               document.getElementById(`deleteChoiceMsg${item.id}`).style.display = "block"
+              // if (item.message_buttons.length < 4) {
+              //   document.getElementById(`addChoiceMsg${item.id}`).style.display = "block"
+              // }
+              // document.getElementById(`deleteChoiceMsg${item.id}`).style.display = "block"
+              // item.message_buttons.forEach((index, i) => {
+              //   console.log(index)
+              //   console.log(i)
+              //   if (document.getElementById(`updateChoiceMsg${item.id}_${i}`) != null) {
+              //     document.getElementById(`updateChoiceMsg${item.id}_${i}`).style.display = "block"
+              //     document.getElementById(`updateChoiceMsg${item.id}_${i}`).addEventListener("click", (event) => {
+              //       event.preventDefault()
+              //       setItemChoiceUpdate(item)
+              //       setIdItemChoiceUpdate(i)
+              //       console.log("detail item: ", item)
+              //       console.log("detail index: ", i)
+              //       setIsUpdateOpenSingleChoiceGet(true)
+              //     })
+              //   }
+              // })
+
+              // document.getElementById(`updateChoiceMsg${item.id}`).style.display = "block"
               document.getElementById(`deleteChoiceMsg${item.id}`).addEventListener('click', (e) => {
                 e.preventDefault()
                 var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
@@ -910,8 +1065,8 @@ function Chatbot() {
                   setTimeout(function () {
                     setIsOpenNoti(false)
                   }, 2000);
-                  // getBagMsg(group, id)
-                  getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
+                  getBagMsg(group, id)
+                  // getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
                 }).catch(error => {
                   console.log(error)
                 })
@@ -941,7 +1096,39 @@ function Chatbot() {
                   console.log(error)
                 })
               })
+
+
+
+
             }
+
+            // if (document.getElementById(`updateChoice${item.id}`) != null) {
+            //   document.getElementById(`updateChoice${item.id}`).style.display = "block"
+            //   document.getElementById(`updateChoice${item.id}`).addEventListener("click", (event) => {
+            //     event.preventDefault()
+            //     console.log("clicked")
+            //     // setIsUpdateOpenSingleChoiceGet(true)
+            //   })
+
+            //   document.getElementById(`updateChoice${item.id}`).addEventListener("click", (event) => {
+            //     event.preventDefault()
+            //     // alert("delete ne")
+            //     var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
+            //     api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
+            //       console.log(res)
+            //       setTimeout(() => {
+            //         setIsOpenNoti(true)
+            //         setMsgNoti("更新しました。")
+            //       }, 1500)
+            //       setTimeout(function () {
+            //         setIsOpenNoti(false)
+            //       }, 2000);
+            //       getBagMsg(group, id)
+            //     }).catch(error => {
+            //       console.log(error)
+            //     })
+            //   })
+            // }
           })
 
           // Update item down here
@@ -3083,7 +3270,7 @@ function Chatbot() {
       if (document.getElementById(`liMesBag${idIn}`).outerHTML === `<li id="liMesBag${idIn}"></li>`) {
         document.getElementById(`liMesBag${idIn}`).appendChild(ulTag);
       }
-      idMsgbag.forEach((idd) => {
+      idMsgbag.forEach((idd, ind) => {
         console.log(idd)
 
         var abc = document.createElement('div')
@@ -3104,7 +3291,10 @@ function Chatbot() {
           e.preventDefault()
           document.getElementById(`msg_group${idIn}_id${idd}`).style.pointerEvents = "none"
           setTimeout(() => {
-            document.getElementById(`msg_group${idIn}_id${idd}`).style.pointerEvents = "auto"
+            if(document.getElementById(`msg_group${idIn}_id${idd}`)!= null){
+              document.getElementById(`msg_group${idIn}_id${idd}`).style.pointerEvents = "auto"
+            }
+            
           }, 1500)
           setIdReloadMsgBagFromGetMSG(idd)
           getBagMsg(idIn, idd)
@@ -3118,10 +3308,11 @@ function Chatbot() {
           while (list.hasChildNodes()) {
             list.removeChild(list.firstChild);
           }
-          for (var i = 0; i < bag.length; i++) {
-            document.getElementById(`msg_group${idIn}_id${idd}`).innerHTML = bag[i]
-            // document.getElementById(`msg_group${idIn}_id${idd}`).innerHTML = `<span style="cursor: pointer">${bag[i]}</span>`
-          }
+          document.getElementById(`msg_group${idIn}_id${idd}`).innerHTML = bag[ind]
+          // for (var i = 0; i < bag.length-1; i++) {
+            
+          //   // document.getElementById(`msg_group${idIn}_id${idd}`).innerHTML = `<span style="cursor: pointer">${bag[i]}</span>`
+          // }
           // if(document.getElementById(`msg_group${idIn}_id${idd}`) != null){
           //   document.getElementById(`msg_group${idIn}_id${idd}`).style.cursor = "pointer";
           // }
@@ -3134,7 +3325,10 @@ function Chatbot() {
               <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">キャンセル</button>
             </div>
           </div>`
-          document.getElementById(`msgBag_item_${idIn}_${idd}`).removeAttribute('hidden')
+          if (document.getElementById(`msgBag_item_${idIn}_${idd}`) != null) {
+            document.getElementById(`msgBag_item_${idIn}_${idd}`).removeAttribute('hidden')
+          }
+
           document.getElementById(`renameBtn${idIn}_${idd}`).addEventListener('click', (event) => {
             event.preventDefault()
             setIdMsgBagRename(idd)
@@ -3369,7 +3563,7 @@ function Chatbot() {
       if (document.getElementById(`liMesBag${idIn}`).outerHTML === `<li id="liMesBag${idIn}"></li>`) {
         document.getElementById(`liMesBag${idIn}`).appendChild(ulTag);
       }
-      idMsgbag.forEach((idd) => {
+      idMsgbag.forEach((idd, ind) => {
         console.log(idd)
 
         var abc = document.createElement('div')
@@ -3394,10 +3588,11 @@ function Chatbot() {
           while (list.hasChildNodes()) {
             list.removeChild(list.firstChild);
           }
-          for (var i = 0; i < bag.length; i++) {
-            document.getElementById(`msg_group${idIn}_id${idd}`).innerHTML = bag[i]
-            // document.getElementById(`msg_group${idIn}_id${idd}`).innerHTML = `<span style="cursor: pointer">${bag[i]}</span>`
-          }
+          document.getElementById(`msg_group${idIn}_id${idd}`).innerHTML = bag[ind]
+          // for (var i = 0; i < bag.length; i++) {
+            
+          //   // document.getElementById(`msg_group${idIn}_id${idd}`).innerHTML = `<span style="cursor: pointer">${bag[i]}</span>`
+          // }
           // if(document.getElementById(`msg_group${idIn}_id${idd}`) != null){
           //   document.getElementById(`msg_group${idIn}_id${idd}`).style.cursor = "pointer";
           // }
@@ -4271,7 +4466,7 @@ function Chatbot() {
       </div>
       <div id="isPurchaseCof${idSC}" style="float:left">
       <input type="checkbox" id="purchase${numIndex}" name="purchase" value="is_purchase">
-      <label for="purchase"> Is Purchase(Not available for choise WebURL)</label><br>
+      <label for="purchase">注文用（ウェブURL利用不可）</label><br>
       </div>
       <div id="btnDelMsg${mulMsgAdd}" style="float:right; display:block">
           <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
@@ -5527,9 +5722,10 @@ function Chatbot() {
 
         setMsgNoti("メッセージ袋を追加しました。")
         setIsOpenNoti(true)
+        refreshMsgGroup()
         setTimeout(() => {
           setIsOpenNoti(false)
-          refreshMsgGroup()
+          // refreshMsgGroup()
           reloadMsgBag()
           getMSGPV(event, idMsgGr)
           // refreshMsgGroup()
@@ -6127,10 +6323,10 @@ function Chatbot() {
       type = "mess"
     } else {
       type = "web_url"
-      if(document.getElementById(`isPurchaseCof${idSC}`)!= null){
+      if (document.getElementById(`isPurchaseCof${idSC}`) != null) {
         document.getElementById(`isPurchaseCof${idSC}`).style.display = "none"
       }
-      
+
       if (web_url == "") {
         document.getElementById("webSC").style.display = "block"
       } else {
@@ -6210,10 +6406,10 @@ function Chatbot() {
       console.log(group, bag)
       type = "mess"
     } else {
-      if(document.getElementById(`isPurchase${idUpdateItemMsg}`)!= null){
+      if (document.getElementById(`isPurchase${idUpdateItemMsg}`) != null) {
         document.getElementById(`isPurchase${idUpdateItemMsg}`).style.display = "none"
       }
-      
+
       type = "web_url"
       if (web_url == "") {
         document.getElementById("webSC").style.display = "block"
@@ -6287,10 +6483,10 @@ function Chatbot() {
       type = "mess"
     } else {
 
-      if(document.getElementById(`isPurchaseCof${idSC}`)!= null){
+      if (document.getElementById(`isPurchaseCof${idSC}`) != null) {
         document.getElementById(`isPurchaseCof${idSC}`).style.display = "none"
       }
-      
+
       type = "web_url"
       if (web_url == "") {
         document.getElementById("webTC").style.display = "block"
@@ -6397,10 +6593,10 @@ function Chatbot() {
       console.log(group, bag)
       type = "mess"
     } else {
-      if(document.getElementById(`isPurchase${idUpdateItemMsg}`)!= null){
+      if (document.getElementById(`isPurchase${idUpdateItemMsg}`) != null) {
         document.getElementById(`isPurchase${idUpdateItemMsg}`).style.display = "none"
       }
-      
+
       type = "web_url"
       if (web_url == "") {
         document.getElementById("webTC").style.display = "block"
@@ -6503,7 +6699,7 @@ function Chatbot() {
       // setTitleAddSC(title)
       // setGroupAddSC(group.value)
       // setBagAddSC(bag.value)
-      if(document.getElementById(`isPurchase${idUpdateItemMsg}`)!= null){
+      if (document.getElementById(`isPurchase${idUpdateItemMsg}`) != null) {
         document.getElementById(`isPurchase${idUpdateItemMsg}`).style.display = "none"
       }
       var abc = document.createElement("div")
@@ -6556,10 +6752,10 @@ function Chatbot() {
       // setGroupAddSC(group.value)
       // setBagAddSC(bag.value)
       // document.getElementById(`isPurchase${idSC}`).style.display = "none"
-      if(document.getElementById(`isPurchaseCof${idSC}`)!= null){
+      if (document.getElementById(`isPurchaseCof${idSC}`) != null) {
         document.getElementById(`isPurchaseCof${idSC}`).style.display = "none"
       }
-      
+
       var abc = document.createElement("div")
       document.getElementById(`choiceOption${idSC}`).appendChild(abc)
       abc.innerHTML =
@@ -6650,7 +6846,7 @@ function Chatbot() {
 
   function addNewNamePM() {
     var newName = document.createElement("div")
-document.getElementById("btnSaveProMsg").style.pointerEvents = "auto" 
+    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
     if (document.getElementById("profileMsgSelected").innerHTML == '') {
       newName.setAttribute("id", "newNamePM")
       newName.innerHTML =
@@ -6682,7 +6878,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
 
   function addNewCompanyPM() {
     var newName = document.createElement("div")
-    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto" 
+    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
     if (document.getElementById("profileMsgSelected").innerHTML == '') {
       newName.setAttribute("id", "newCompanyPM")
       newName.innerHTML =
@@ -6711,7 +6907,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
 
   function addNewPositionPM() {
     var newName = document.createElement("div")
-    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto" 
+    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
     if (document.getElementById("profileMsgSelected").innerHTML == '') {
       newName.setAttribute("id", "newPositionPM")
       newName.innerHTML =
@@ -6740,7 +6936,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
 
   function addNewWebsitePM() {
     var newName = document.createElement("div")
-    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto" 
+    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
     if (document.getElementById("profileMsgSelected").innerHTML == '') {
       newName.setAttribute("id", "newWebsitePM")
       newName.innerHTML =
@@ -6769,7 +6965,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
 
   function addNewReasonPM() {
     var newName = document.createElement("div")
-    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto" 
+    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
     if (document.getElementById("profileMsgSelected").innerHTML == '') {
       newName.setAttribute("id", "newReasonPM")
       newName.innerHTML =
@@ -6798,7 +6994,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
 
   function addNewKnowFromPM() {
     var newName = document.createElement("div")
-    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto" 
+    document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
     if (document.getElementById("profileMsgSelected").innerHTML == '') {
       newName.setAttribute("id", "newKATBPM")
       newName.innerHTML =
@@ -6974,6 +7170,48 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
     })
   }
 
+  function updateChoice() {
+    var titlea = document.getElementById("titleNextMSG").value
+    var web_url = document.getElementById("websiteSC").value
+    var web = document.getElementById("underlineSCWebsite")
+    var group = document.getElementById('listNextMSGGroupSC').value
+    var bag = document.getElementById('listNextMSGBagSC').value
+    var lbl = document.getElementById(`lblSCAddALL_${bagAddSC}`).value
+
+    var type = ""
+    if (web.style.display == 'none') {
+      type = "mess"
+    } else {
+      type = "web_url"
+    }
+
+    var listLbl = lbl.substring(2, lbl.length).split(", ")
+    var lastListLBL = []
+    for (var i = 0; i < listLbl.length; i++) {
+      lastListLBL.push({ label_name: listLbl[i] })
+    }
+    // console.log("title: ", titlea)
+    // console.log("web_url: ", web_url)
+    // // console.log("title: ", title)
+    // console.log("group: ", group)
+    // console.log("bag: ", bag)
+    // console.log("lblas: ", lastListLBL )
+    console.log("item update: ", itemChoiceUpdate)
+    console.log("id item update: ", idItemChoiceUpdate)
+    var itemUpdate = itemChoiceUpdate
+
+    var btnChoice
+    if (type == "mess") {
+      btnChoice = { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+    } else if (type == "web_url") {
+      btnChoice = { button_type: "web_url", title: titlea, content: web_url, message_button_labels: lastListLBL }
+    }
+
+    itemUpdate.message_buttons[idItemChoiceUpdate] = btnChoice
+
+    console.log("itemUpdate: ", itemUpdate)
+  }
+
   return (
     <>
       <div className="content">
@@ -7024,8 +7262,8 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
                                             onClick={() => renameMsgBagPop(data.id)}><i className="nc-icon nc-single-copy-04 nc-3x" style={{ color: "black" }} /></Button>
                                           <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
                                             onClick={() => deleteMsgBagPop(data.id)}><i className="nc-icon nc-box nc-3x" style={{ color: "black" }} /></Button>
-                                          <ul id="ulMesBag" style={{ listStyleType: "none", width: "200%", marginLeft: "-10%" }}>
-                                            <li id="liMesBag">
+                                          <ul id={`ulMesBag${data.id}`} style={{ listStyleType: "none", width: "200%", marginLeft: "-10%" }}>
+                                            <li id={`liMesBag${data.id}`}>
                                               {/* <Nav id="itemBag" >
                                                 {itemBbag.message_bags && itemBbag.message_bags.map((datagroup, key2) => {
                                                   return (
@@ -7285,7 +7523,7 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
               </div>
             </div>
           </div>
-          <Button id="btnSaveProMsg" style={{pointerEvents:"none"}} onClick={() => saveProMsg()}>Save</Button>
+          <Button id="btnSaveProMsg" style={{ pointerEvents: "none" }} onClick={() => saveProMsg()}>Save</Button>
         </ModalShortTem>
         <ModalShort open={isOpenRenameMsgBag} onClose={() => setIsOpenRenameMsgBag(false)}>
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
@@ -7704,6 +7942,67 @@ document.getElementById("btnSaveProMsg").style.pointerEvents = "auto"
             <br />
             <Button id="btnAddBag" onClick={() => changePosit()}>Yes</Button>
             <Button id="btnAddBag" onClick={() => setIsOpenChangeIndexMsg(false)}>No</Button>
+          </div>
+        </ModalShort>
+
+
+
+        {/* *******************************Update Single choice */}
+        <ModalShort open={isUpdateOpenSingleChoiceGet} onClose={() => setIsUpdateOpenSingleChoiceGet(false)}>
+          <div style={{ width: "600px", height: "370px" }}>
+            <div style={{ padding: "15px", width: "100%" }}>
+              <input id="titleNextMSG" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }}
+                defaultValue={(itemChoiceUpdate != undefined && itemChoiceUpdate.message_buttons[idItemChoiceUpdate] != undefined) ? itemChoiceUpdate.message_buttons[idItemChoiceUpdate].title : "ddda"} onChange={() => checkInputTitleSC()} placeholder="タイトル…"></input>
+              <label id="titleSC" style={{ color: "red", display: "none" }}>タイトルを入力してください。</label>
+            </div>
+            <span style={{ padding: "15px" }}>遷移先</span>
+            <div style={{ display: "flex", width: "100%" }}>
+              <div onClick={() => displaySCNextMSG()} style={{ width: "45%", margin: "auto" }}>
+                <div><span style={{ float: "right", fontSize: "18px", fontWeight: "500" }}>次のメッセージ</span></div>
+              </div>
+              <div onClick={() => displaySCWebsite()} style={{ width: "45%", margin: "auto" }}><span style={{ float: "left", fontSize: "18px", fontWeight: "500" }}>ウェブサイト</span></div>
+            </div>
+            <div style={{ display: "flex", width: "100%" }}>
+              <div style={{ width: "45%", margin: "auto" }}>
+                <div id="underlineSCNextMsg" style={{ height: "2px", width: "45%", backgroundColor: "black", float: "right" }}></div>
+              </div>
+              <div style={{ width: "45%", margin: "auto" }}>
+                <div id="underlineSCWebsite" style={{ height: "2px", width: "45%", backgroundColor: "black", display: "none" }}></div>
+              </div>
+            </div>
+            <br />
+            <div id={`nextMessageSC`} style={{ textAlign: "center" }}>
+              <select id="listNextMSGGroupSC" style={{ width: "30%" }} defaultValue={""} onChange={(e) => selectGroupNextMSG(e.target.value)} className="new-faq-q-so1" name="reply_group">
+                <option value="" disabled hidden>メッセージグループ選択 ...</option>
+                {groupList?.map((group, i) => {
+                  return (
+                    <option key={i} value={group.id}>
+                      {group.group_name}
+                    </option>
+                  )
+                })}
+
+              </select>
+              <select id={`listNextMSGBagSC`} style={{ width: "30%" }}
+                defaultValue={(itemChoiceUpdate != undefined && itemChoiceUpdate.message_buttons[idItemChoiceUpdate] != undefined) ? itemChoiceUpdate.message_buttons[idItemChoiceUpdate].message_bag_id : ""} onChange={(e) => selectBagNextMSG(e.target.value)} className="new-faq-q-so1" name="reply_bag">
+                <option value="" disabled hidden>{ }</option>
+              </select>
+            </div>
+            <label id="grBagSC" style={{ color: "red", display: "none", width: "100%", textAlign: "center" }}></label>
+            <div id={`websiteURLSC`} style={{ padding: "15px", display: "none" }}>
+              <input id="websiteSC" style={{ width: "100%", border: "1px solid gray", borderRadius: "10px" }}></input>
+              <label id="webSC" style={{ color: "red", display: "none" }}>ウェブサイトを入力してください。</label>
+            </div>
+            <span>ラベル</span>
+            <div id={`labelSC`} style={{ padding: "15px 15px 0px 15px", display: "none", display: "flex" }}>
+              <div id="labelLSCInputed" style={{ display: "flex" }}></div>
+              <input id="labelLSC" onKeyPress={(e) => checkInputedLabelSC(e, e.target.value)} style={{ width: "100%", border: "none" }}></input>
+              <input id={`lblSCAddALL_${bagAddSC}`} defaultValue={labelInputSCAll} type="text" hidden></input>
+            </div>
+            <div id="underlineSCWebsite" style={{ height: "1px", width: "100%", backgroundColor: "black" }}></div>
+            <label id="labeltoCheckInputLabelSC">エンターキーでラベルを入力してください。</label>
+            <br />
+            <div style={{ width: "100%", textAlign: "center" }}><Button onClick={() => updateChoice()}>保存</Button></div>
           </div>
         </ModalShort>
 
