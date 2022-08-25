@@ -187,6 +187,10 @@ function DataAnalyst() {
     dateStart = dateStart.setMonth(dateStart.getMonth() - 1);
     dateStart = new Date(dateStart);
     var month = dateStart.toISOString().slice(5, 7) - 6;
+    let dateLiveStart = new Date();
+    dateLiveStart = dateLiveStart.setMonth(dateStart.getMonth() - 6);
+    dateLiveStart = new Date(dateLiveStart);
+    let dateLiveEnd = new Date();
     if (month < 10) {
       month = `0${month}`;
     } else if (month <= 0) {
@@ -195,11 +199,8 @@ function DataAnalyst() {
     // alert()
     api
       .get(
-        `/api/v1/analytics/chatbot_usages/live?begin_date=${dateStart
-          .toISOString()
-          .slice(0, 5)}${month}-15&end_date=${dateStart
-            .toISOString()
-            .slice(0, 10)}`
+        `/api/v1/analytics/chatbot_usages/live?begin_date=${dateLiveStart.toISOString()}&end_date=${dateLiveEnd
+          .toISOString()}`
       )
       .then((res) => {
         console.log('live analytics: ', res.data.live_usages);
