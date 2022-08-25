@@ -271,7 +271,7 @@ function Chatbot() {
       console.log("bagMsg ne: ", res.data)
       var bagMsg = res.data.data.messages
       var bagId = res.data.data.message_bag.id
-      
+
       // if (bagMsg[bagMsg.length - 1] != undefined) {
       //   setMsgCBNum(bagMsg[bagMsg.length - 1].id)
       // }
@@ -311,27 +311,27 @@ function Chatbot() {
               </div>
               `
 
-              //HTML update choice below here
+            //HTML update choice below here
 
-              // <div id="itemFI${item.id}" >
-              //   <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
-              //   <div style="display:flex">
-              //     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
-              //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-              //         Delete
-              //       </button>
-              //     </div>
-              //     <div id="updateChoiceFI${item.id}" style="width:100%; padding:5px; display:none;"> 
-              //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-              //         Update
-              //       </button>
-              //     </div>
-              //   </div>
-              //   <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
-              //   <input id="formatCheckSelect${item.free_input.message_id}" hidden type=text value=${item.free_input.format_check} />
-              //   <input id="formatCheckMSG${item.free_input.message_id}" hidden type=text value="${item.free_input.format_check_message}" />
-                
-              // </div>
+            // <div id="itemFI${item.id}" >
+            //   <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
+            //   <div style="display:flex">
+            //     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
+            //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+            //         Delete
+            //       </button>
+            //     </div>
+            //     <div id="updateChoiceFI${item.id}" style="width:100%; padding:5px; display:none;"> 
+            //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+            //         Update
+            //       </button>
+            //     </div>
+            //   </div>
+            //   <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
+            //   <input id="formatCheckSelect${item.free_input.message_id}" hidden type=text value=${item.free_input.format_check} />
+            //   <input id="formatCheckMSG${item.free_input.message_id}" hidden type=text value="${item.free_input.format_check_message}" />
+
+            // </div>
 
             isWeb = true
             updateItem = "free_input"
@@ -359,30 +359,30 @@ function Chatbot() {
                   `
 
 
-                  //HTML update choice below here
+                //HTML update choice below here
 
-                  // <div id="itemSC${item.message_buttons[0].message_id}">
-                  //   <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>
-                  //   <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
-                  //   <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
-                  //   <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
-                  //   <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].message_group_name}/${item.message_buttons[0].message_bag_name}</div>
-                  
-                  //   <div style="display:flex">
-                  //     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
-                  //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                  //         Delete
-                  //       </button>
-                  //     </div>
-                  //     <div id="updateChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
-                  //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                  //         Update
-                  //       </button>
-                  //     </div>
-                  //   </div>
-                  //   <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
-                  //   <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
-                  // </div>
+                // <div id="itemSC${item.message_buttons[0].message_id}">
+                //   <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>
+                //   <input id="titleUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                //   <input id="typeUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                //   <input id="webUPSC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+                //   <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].message_group_name}/${item.message_buttons[0].message_bag_name}</div>
+
+                //   <div style="display:flex">
+                //     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
+                //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                //         Delete
+                //       </button>
+                //     </div>
+                //     <div id="updateChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
+                //       <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                //         Update
+                //       </button>
+                //     </div>
+                //   </div>
+                //   <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                //   <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                // </div>
 
                 updateItem = "single_choice_msg"
               } else if (item.message_buttons[0].button_type == "web_url" && (item.message_buttons[0].is_purchase_button == undefined)) {
@@ -408,32 +408,32 @@ function Chatbot() {
                     </div>
                     `
 
-                    //HTML update choice here
+                  //HTML update choice here
 
-                    // <div >
-                    // <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>  
-                    // <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].content}</div>
-                      
+                  // <div >
+                  // <div style="padding:10px 5px 0px 5px">${item.message_buttons[0].title}</div>  
+                  // <div style="padding:0px 5px 10px 5px">${item.message_buttons[0].content}</div>
 
-                    // <input id="titleUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
-                    // <input id="typeUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
-                    // <input id="webUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
-                      
-                    // <div style="display:flex">
-                    //   <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
-                    //     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                    //       Delete
-                    //     </button>
-                    //   </div>
-                    //   <div id="updateChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
-                    //     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                    //       Update
-                    //     </button>
-                    //   </div>
-                    // </div>
-                    // <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
-                    // <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
-                    // </div>
+
+                  // <input id="titleUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].title} />
+                  // <input id="typeUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].button_type} />
+                  // <input id="webUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].content == null ? "" : item.message_buttons[0].content} />
+
+                  // <div style="display:flex">
+                  //   <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
+                  //     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                  //       Delete
+                  //     </button>
+                  //   </div>
+                  //   <div id="updateChoice${item.id}" style="width:100%; padding:5px; display:none;"> 
+                  //     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
+                  //       Update
+                  //     </button>
+                  //   </div>
+                  // </div>
+                  // <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
+                  // <input id="lblUPTCItem${item.message_buttons[0].message_id}" hidden type=text value="${item.message_buttons[0].message_button_labels}" />
+                  // </div>
 
                   isWeb = true
                   updateItem = "single_choice_web"
@@ -517,7 +517,7 @@ function Chatbot() {
                   // }
                   isWeb = true
                 }
-                if (j == item.message_buttons.length - 1){
+                if (j == item.message_buttons.length - 1) {
                   choiceHTML = choiceHTML.concat(
                     `
                       <div id="deleteChoiceMsg${item.id}" style="width:100%; padding:5px; display:none"> 
@@ -3174,10 +3174,29 @@ function Chatbot() {
   function getMSGPV(event, idIn) {
 
     event.preventDefault()
+    // document.querySelectorAll("#btn_a_tag").style.color = 'black'
+
+    var nodeList = document.querySelectorAll(".btn_a_tag");
+    for (var i = 0; i < nodeList.length; i++) {
+      nodeList[i].style.color = 'black';
+      nodeList[i].style.textDecoration = 'none';
+    }
+    var bagNodeList = document.querySelectorAll(".msg_group_id");
+    for (i = 0; i < nodeList.length; i++) {
+      if(bagNodeList[i] != undefined){
+        bagNodeList[i].style.color = "black";
+      bagNodeList[i].style.textDecoration = "none";
+      }
+      
+    }
+
+    document.getElementById(`btn_a_tag${idIn}`).style.color = "#51cbce"
+    document.getElementById(`btn_a_tag${idIn}`).style.textDecoration = "underline"
+    // document.getElementById(`btn_a_tag${idIn}`).style.fontWeight= "800"
 
     document.getElementById(`btn_a_tag${idIn}`).disabled = true
 
-    console.log("mul click")
+    // console.log("mul click")
     getMessage(idIn)
     setTimeout(() => {
       document.getElementById(`btn_a_tag${idIn}`).disabled = false
@@ -3247,6 +3266,7 @@ function Chatbot() {
 
         const liTag = document.createElement('li');
         liTag.setAttribute("id", `msg_group${idIn}_id${idMsgbag[i]}`);
+        liTag.setAttribute("class", `msg_group_id`);
 
 
 
@@ -3289,12 +3309,21 @@ function Chatbot() {
         // console.log("setBagId: ", idd)
         document.getElementById(`msg_group${idIn}_id${idd}`).addEventListener('click', (e) => {
           e.preventDefault()
+
+          const nodeList = document.querySelectorAll(".msg_group_id");
+          for (i = 0; i < nodeList.length; i++) {
+            nodeList[i].style.color = "black";
+            nodeList[i].style.textDecoration = "none";
+          }
+
           document.getElementById(`msg_group${idIn}_id${idd}`).style.pointerEvents = "none"
+          document.getElementById(`msg_group${idIn}_id${idd}`).style.color = "#51cbce"
+          document.getElementById(`msg_group${idIn}_id${idd}`).style.textDecoration = "underline"
           setTimeout(() => {
-            if(document.getElementById(`msg_group${idIn}_id${idd}`)!= null){
+            if (document.getElementById(`msg_group${idIn}_id${idd}`) != null) {
               document.getElementById(`msg_group${idIn}_id${idd}`).style.pointerEvents = "auto"
             }
-            
+
           }, 1500)
           setIdReloadMsgBagFromGetMSG(idd)
           getBagMsg(idIn, idd)
@@ -3310,7 +3339,7 @@ function Chatbot() {
           }
           document.getElementById(`msg_group${idIn}_id${idd}`).innerHTML = bag[ind]
           // for (var i = 0; i < bag.length-1; i++) {
-            
+
           //   // document.getElementById(`msg_group${idIn}_id${idd}`).innerHTML = `<span style="cursor: pointer">${bag[i]}</span>`
           // }
           // if(document.getElementById(`msg_group${idIn}_id${idd}`) != null){
@@ -3590,7 +3619,7 @@ function Chatbot() {
           }
           document.getElementById(`msg_group${idIn}_id${idd}`).innerHTML = bag[ind]
           // for (var i = 0; i < bag.length; i++) {
-            
+
           //   // document.getElementById(`msg_group${idIn}_id${idd}`).innerHTML = `<span style="cursor: pointer">${bag[i]}</span>`
           // }
           // if(document.getElementById(`msg_group${idIn}_id${idd}`) != null){
@@ -3974,7 +4003,7 @@ function Chatbot() {
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML =
         `<div id="ovMsgCB${id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
-      <textarea type="text" id="imgMsgOVI${id}" style=" width: 70% ;text-align: right; background-color: #51cbce; border: none" readonly/>
+      <textarea type="text" id="imgMsgOVI${id}" style=" width: 80% ;text-align: right; background-color: #51cbce; border: none" readonly/>
       </div> `
       document.getElementById(`imgMsgOVI${id}`).value = msg;
       setImgMsgCBNum(id)
@@ -4014,7 +4043,7 @@ function Chatbot() {
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML =
         `
-        <div id="ovImgKey${num}" style="width: 70%; background-color: #51cbce; padding: 10px; float:left; margin:5px; display:block; border-radius: 10px">
+        <div id="ovImgKey${num}" style="width: 80%; background-color: #51cbce; padding: 10px; float:left; margin:5px; display:block; border-radius: 10px">
       <input type="text" id="imgOVIKey${num}" style="background-color: #51cbce; border: none" readonly/>
       </div>`
       document.getElementById(`imgOVIKey${num}`).value = msg;
@@ -4037,8 +4066,8 @@ function Chatbot() {
       var abc = document.createElement(`div`)
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML =
-        `<div id="ovMsg${num}" style="width: 70%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
-      <input type="text" id="msgOVI${num}" style=" width: 70%; text-align: right; background-color: #51cbce; border: none" readonly/>
+        `<div id="ovMsg${num}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+      <input type="text" id="msgOVI${num}" style=" width: 80%; text-align: right; background-color: #51cbce; border: none" readonly/>
       </div> `
       document.getElementById(`msgOVI${num}`).value = msg;
       document.getElementById(`mgsCustom${num}`).value = msg;
@@ -4059,8 +4088,8 @@ function Chatbot() {
       var abc = document.createElement(`div`)
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML =
-        `<div id="ovMsg${num}" style="width: 70%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
-      <input type="text" id="msgOVI${num}" style=" width: 70%; text-align: right; background-color: #51cbce; border: none" readonly/>
+        `<div id="ovMsg${num}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+      <textarea type="text" id="msgOVI${num}" style=" width: 80%; text-align: right; background-color: #51cbce; border: none" readonly/>
       </div> `
       document.getElementById(`msgOVI${num}`).value = msg;
       document.getElementById(`proMgsCustom${num}`).value = msg;
@@ -4207,7 +4236,7 @@ function Chatbot() {
       </div>
       <div id="btnAddEachImg${numIndex}" style="float:right; display:block">
       <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-      font-weight:800">追加</button>
+      font-weight:800">保存</button>
     </div>
   </div>`
     // document.getElementById(`btnDelImg${numIndex}`).style.display='none'
@@ -4474,7 +4503,7 @@ function Chatbot() {
         </div>
         <div id="btnAddEachMsg${mulMsgAdd}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-        font-weight:800">追加</button>
+        font-weight:800">保存</button>
       </div>
       </div>
     `
@@ -4710,7 +4739,7 @@ function Chatbot() {
       </div>
       <div id="btnAddPP${numIndex}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-        font-weight:800">追加</button>
+        font-weight:800">保存</button>
       </div>
     
     </div>
@@ -5214,7 +5243,7 @@ function Chatbot() {
       </div>
       <div id="btnAddImgMsg${numIndex}" style="float:right; display:block">
         <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-        font-weight:800">追加</button>
+        font-weight:800">保存</button>
       </div>
   </div>`
 
@@ -5254,173 +5283,192 @@ function Chatbot() {
         }
       }, 1500)
 
+      if (document.getElementById(`imgValueMsgNum${numIndex}`).value == "") {
+        document.getElementById(`checkImgMsgAddEmpty${numIndex}`).style.display = "block"
+        document.getElementById(`checkImgMsgAddEmpty${numIndex}`).innerHTML = "画像ファイルを選択してください。"
+      } else {
+        document.getElementById(`checkImgMsgAddEmpty${numIndex}`).style.display = "none"
+        document.getElementById(`checkImgMsgAddEmpty${numIndex}`).innerHTML = ""
+      }
+
+      if (document.getElementById(`imgMgsCustom${numIndex}`).value == "" || document.getElementById(`imgMgsCustom${numIndex}`).value == null || document.getElementById(`imgMgsCustom${numIndex}`).value == undefined) {
+        document.getElementById(`addNewImMessErr${numIndex}`).style.display = "block"
+        document.getElementById(`addNewImMessErr${numIndex}`).innerHTML = "メッセージを入力してください。"
+      } else {
+        document.getElementById(`addNewImMessErr${numIndex}`).style.display = "none"
+        document.getElementById(`addNewImMessErr${numIndex}`).innerHTML = ""
+      }
+
       if (document.getElementById(`checkImgMsgAddEmpty${numIndex}`).innerHTML == "") {
-        if (document.getElementById(`imgMgsCustom${numIndex}`).value == "" || document.getElementById(`imgMgsCustom${numIndex}`).value == null || document.getElementById(`imgMgsCustom${numIndex}`).value == undefined) {
-          document.getElementById(`addNewImMessErr${numIndex}`).style.display = "block"
-          document.getElementById(`addNewImMessErr${numIndex}`).innerHTML = "メッセージを入力してください。"
-        } else {
-          document.getElementById(`addNewImMessErr${numIndex}`).style.display = "none"
-          document.getElementById(`addNewImMessErr${numIndex}`).innerHTML = ""
 
 
 
-          var add
-          if (document.getElementById(`bagAddSC${idSC}`) != null || document.getElementById(`groupAddSC${idSC}`) != null || document.getElementById(`titleAddSC${idSC}`) != null) {
-            var titlea = document.getElementById(`titleAddSC${idSC}`).value
-            var group = document.getElementById(`groupAddSC${idSC}`).value
-            var group_name = document.getElementById(`groupNameAddSC${idSC}`).value
-            var bag_name = document.getElementById(`bagNameAddSC${idSC}`).value
-            var bag = document.getElementById(`bagAddSC${idSC}`).value
-            var type = document.getElementById(`typeAddSC${idSC}`).value
-            var web = document.getElementById(`webAddSC${idSC}`).value
-            var lbl = document.getElementById(`lblAddSC${idSC}_${bagAddSC}`).value
-            // console.log("lbl: ", lbl)
+        // if (document.getElementById(`imgMgsCustom${numIndex}`).value == "" || document.getElementById(`imgMgsCustom${numIndex}`).value == null || document.getElementById(`imgMgsCustom${numIndex}`).value == undefined) {
+        //   document.getElementById(`addNewImMessErr${numIndex}`).style.display = "block"
+        //   document.getElementById(`addNewImMessErr${numIndex}`).innerHTML = "メッセージを入力してください。"
+        // } else {
+        //   document.getElementById(`addNewImMessErr${numIndex}`).style.display = "none"
+        //   document.getElementById(`addNewImMessErr${numIndex}`).innerHTML = ""
+
+
+
+        var add
+        if (document.getElementById(`bagAddSC${idSC}`) != null || document.getElementById(`groupAddSC${idSC}`) != null || document.getElementById(`titleAddSC${idSC}`) != null) {
+          var titlea = document.getElementById(`titleAddSC${idSC}`).value
+          var group = document.getElementById(`groupAddSC${idSC}`).value
+          var group_name = document.getElementById(`groupNameAddSC${idSC}`).value
+          var bag_name = document.getElementById(`bagNameAddSC${idSC}`).value
+          var bag = document.getElementById(`bagAddSC${idSC}`).value
+          var type = document.getElementById(`typeAddSC${idSC}`).value
+          var web = document.getElementById(`webAddSC${idSC}`).value
+          var lbl = document.getElementById(`lblAddSC${idSC}_${bagAddSC}`).value
+          // console.log("lbl: ", lbl)
+          var listLbl = lbl.substring(2, lbl.length).split(", ")
+          var lastListLBL = []
+          for (var i = 0; i < listLbl.length; i++) {
+            lastListLBL.push({ label_name: listLbl[i] })
+          }
+          if (type == "mess") {
+            add = {
+              message: {
+                message_bag_id: bagId,
+                message_value: document.getElementById(`imgMgsCustom${numIndex}`).value,
+                message_type: "img_msg",
+                img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value,
+                message_buttons: [
+                  { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+                ]
+              },
+            }
+          } else if (type == "web_url") {
+            add = {
+              message: {
+                message_bag_id: bagId,
+                message_value: document.getElementById(`imgMgsCustom${numIndex}`).value,
+                message_type: "img_msg",
+                img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value,
+                message_buttons: [
+                  { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
+                ]
+              }
+            }
+          }
+        } else if (document.getElementById(`bagAddTC${idSC}_${totalItemTC}`) != null || document.getElementById(`groupAddTC${numIndex}_${totalItemTC}`) != null || document.getElementById(`titleAddTC${idSC}_${totalItemTC}`) != null) {
+          var message_buttons = []
+          // console.log("totalItemTC: ", totalItemTC)
+          var totalTCItem = document.getElementById(`totalItemTC${idSC}`).value
+
+
+          console.log("mb ne: ", totalTCItem)
+          for (var i = 1; i <= totalTCItem; i++) {
+
+            var titlea = document.getElementById(`titleAddTC${idSC}_${i}`).value
+            var group = document.getElementById(`groupAddTC${idSC}_${i}`).value
+            var group_name = document.getElementById(`groupNameAddTC${idSC}_${i}`).value
+            var bag_name = document.getElementById(`bagNameAddTC${idSC}_${i}`).value
+            var bag = document.getElementById(`bagAddTC${idSC}_${i}`).value
+            var type = document.getElementById(`typeAddTC${idSC}_${i}`).value
+            var web = document.getElementById(`webAddTC${idSC}_${i}`).value
+            var lbl = document.getElementById(`lblAddTCItem${idSC}_${i}`).value
+            // console.log("lbl ne: ", lbl.substring(2, lbl.length))
             var listLbl = lbl.substring(2, lbl.length).split(", ")
             var lastListLBL = []
-            for (var i = 0; i < listLbl.length; i++) {
-              lastListLBL.push({ label_name: listLbl[i] })
+            for (var j = 0; j < listLbl.length; j++) {
+              lastListLBL.push({ label_name: listLbl[j] })
             }
             if (type == "mess") {
-              add = {
-                message: {
-                  message_bag_id: bagId,
-                  message_value: document.getElementById(`imgMgsCustom${numIndex}`).value,
-                  message_type: "img_msg",
-                  img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value,
-                  message_buttons: [
-                    { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
-                  ]
-                },
-              }
+
+              // add = {
+              //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+              //   message_button: [
+              //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
+              //   ]
+              // }
+
+              message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
             } else if (type == "web_url") {
-              add = {
-                message: {
-                  message_bag_id: bagId,
-                  message_value: document.getElementById(`imgMgsCustom${numIndex}`).value,
-                  message_type: "img_msg",
-                  img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value,
-                  message_buttons: [
-                    { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
-                  ]
-                }
-              }
+              // add = {
+              //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+              //   message_button: [
+              //     { button_type: "web_url", title: titlea, content: web }
+              //   ]
+              // }
+
+              message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
             }
-          } else if (document.getElementById(`bagAddTC${idSC}_${totalItemTC}`) != null || document.getElementById(`groupAddTC${numIndex}_${totalItemTC}`) != null || document.getElementById(`titleAddTC${idSC}_${totalItemTC}`) != null) {
-            var message_buttons = []
-            // console.log("totalItemTC: ", totalItemTC)
-            var totalTCItem = document.getElementById(`totalItemTC${idSC}`).value
+          }
+          add = {
+            message: {
+              message_bag_id: bagId,
+              message_value: document.getElementById(`imgMgsCustom${numIndex}`).value,
+              message_type: "img_msg",
+              img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value,
+              message_buttons
+            },
 
+          }
+        } else if (document.getElementById(`bagAddFI${idSC}`) != null || document.getElementById(`groupAddFI${idSC}_${totalItemTC}`) != null) {
+          // var group = document.getElementById(`groupAddFI${idSC}`).value
+          // var bag = document.getElementById(`bagAddFI${idSC}`).value
+          var lbl = document.getElementById(`lblAddFI${idSC}_${bagAddSC}`).value
+          var formatCheckSelect = document.getElementById(`formatCheckSelect${idSC}`).value
+          var formatCheckMSG = document.getElementById(`formatCheckMSG${idSC}`).value
+          // console.log("lbl: ", lbl)
+          var listLbl = lbl.substring(2, lbl.length).split(", ")
+          var lastListLBL = []
+          for (var i = 0; i < listLbl.length; i++) {
+            lastListLBL.push({ label_name: listLbl[i] })
+          }
+          add = {
+            message: {
+              message_bag_id: bagId,
+              message_value: document.getElementById(`imgMgsCustom${numIndex}`).value,
+              message_type: "img_msg",
+              img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value,
 
-            console.log("mb ne: ", totalTCItem)
-            for (var i = 1; i <= totalTCItem; i++) {
-
-              var titlea = document.getElementById(`titleAddTC${idSC}_${i}`).value
-              var group = document.getElementById(`groupAddTC${idSC}_${i}`).value
-              var group_name = document.getElementById(`groupNameAddTC${idSC}_${i}`).value
-              var bag_name = document.getElementById(`bagNameAddTC${idSC}_${i}`).value
-              var bag = document.getElementById(`bagAddTC${idSC}_${i}`).value
-              var type = document.getElementById(`typeAddTC${idSC}_${i}`).value
-              var web = document.getElementById(`webAddTC${idSC}_${i}`).value
-              var lbl = document.getElementById(`lblAddTCItem${idSC}_${i}`).value
-              // console.log("lbl ne: ", lbl.substring(2, lbl.length))
-              var listLbl = lbl.substring(2, lbl.length).split(", ")
-              var lastListLBL = []
-              for (var j = 0; j < listLbl.length; j++) {
-                lastListLBL.push({ label_name: listLbl[j] })
-              }
-              if (type == "mess") {
-
-                // add = {
-                //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
-                //   message_button: [
-                //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
-                //   ]
-                // }
-
-                message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
-              } else if (type == "web_url") {
-                // add = {
-                //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
-                //   message_button: [
-                //     { button_type: "web_url", title: titlea, content: web }
-                //   ]
-                // }
-
-                message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
-              }
-            }
-            add = {
-              message: {
-                message_bag_id: bagId,
-                message_value: document.getElementById(`imgMgsCustom${numIndex}`).value,
-                message_type: "img_msg",
-                img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value,
-                message_buttons
-              },
-
-            }
-          } else if (document.getElementById(`bagAddFI${idSC}`) != null || document.getElementById(`groupAddFI${idSC}_${totalItemTC}`) != null) {
-            // var group = document.getElementById(`groupAddFI${idSC}`).value
-            // var bag = document.getElementById(`bagAddFI${idSC}`).value
-            var lbl = document.getElementById(`lblAddFI${idSC}_${bagAddSC}`).value
-            var formatCheckSelect = document.getElementById(`formatCheckSelect${idSC}`).value
-            var formatCheckMSG = document.getElementById(`formatCheckMSG${idSC}`).value
-            // console.log("lbl: ", lbl)
-            var listLbl = lbl.substring(2, lbl.length).split(", ")
-            var lastListLBL = []
-            for (var i = 0; i < listLbl.length; i++) {
-              lastListLBL.push({ label_name: listLbl[i] })
-            }
-            add = {
-              message: {
-                message_bag_id: bagId,
-                message_value: document.getElementById(`imgMgsCustom${numIndex}`).value,
-                message_type: "img_msg",
-                img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value,
-
-                free_input: {
-                  message_bag_id: `1`,
-                  free_input_labels: lastListLBL,
-                  format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
-                  format_check_message: formatCheckMSG
-                }
+              free_input: {
+                message_bag_id: `1`,
+                free_input_labels: lastListLBL,
+                format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+                format_check_message: formatCheckMSG
               }
             }
           }
-          else {
-            add = {
-              message: { message_bag_id: bagId, message_value: document.getElementById(`imgMgsCustom${numIndex}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value }
-            }
+        }
+        else {
+          add = {
+            message: { message_bag_id: bagId, message_value: document.getElementById(`imgMgsCustom${numIndex}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNum${numIndex}`).value }
           }
+        }
 
-          console.log(add)
+        console.log(add)
 
+        setIdSC(idSC + 1)
+        setTotalItemTC(1)
+        document.getElementById(`btnAddImgMsg${numIndex}`).style.pointerEvents = 'none'
+        api.post(`/api/v1/message_managements/messages`, add).then(res => {
+          console.log(res)
           setIdSC(idSC + 1)
           setTotalItemTC(1)
-          document.getElementById(`btnAddImgMsg${numIndex}`).style.pointerEvents = 'none'
-          api.post(`/api/v1/message_managements/messages`, add).then(res => {
-            console.log(res)
-            setIdSC(idSC + 1)
-            setTotalItemTC(1)
-            setIsOpenNoti(true)
-            setTimeout(() => {
-              setMsgNoti("追加しました。")
-            }, 1500)
+          setIsOpenNoti(true)
+          setTimeout(() => {
+            setMsgNoti("追加しました。")
+          }, 1500)
 
-            setTimeout(function () {
-              setIsOpenNoti(false)
-            }, 3000);
-            // reloadMessMsgBag()
+          setTimeout(function () {
+            setIsOpenNoti(false)
+          }, 3000);
+          // reloadMessMsgBag()
 
-            enableAddNewMsg()
-            getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
-          }).catch(error => {
-            console.log(error)
-            // if (error.response.data.code === 3) {
-            //     requestNewToken(path)
-            // }
-          })
-        }
+          enableAddNewMsg()
+          getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
+        }).catch(error => {
+          console.log(error)
+          // if (error.response.data.code === 3) {
+          //     requestNewToken(path)
+          // }
+        })
+        // }
       }
 
 
@@ -6338,7 +6386,10 @@ function Chatbot() {
       // setGroupAddSC(group.value)
       // setBagAddSC(bag.value)
       var abc = document.createElement("div")
-      document.getElementById(`choiceOption${idSC}`).appendChild(abc)
+      if (document.getElementById(`choiceOption${idSC}`) != null) {
+        document.getElementById(`choiceOption${idSC}`).appendChild(abc)
+      }
+
       abc.innerHTML =
         `
       <div style="border:none; border-radius:10px; background-color:white; width:200px; text-align:center">
@@ -6542,7 +6593,7 @@ function Chatbot() {
       document.getElementById(`choiceThree${idSC}`).innerHTML =
         `
         <div>
-          <button style="background-color:white; border:none; border-radius:10px" id="tCAddItem${idSC}">Add an option</button>
+          <button style="background-color:white; border:none; border-radius:10px" id="tCAddItem${idSC}">選択肢追加</button>
           <input id="totalItemTC${idSC}" type="number" value=${totalItemTC} hidden />
         </div>
       `
@@ -6653,7 +6704,7 @@ function Chatbot() {
       document.getElementById(`choiceThree${idUpdateItemMsg}`).innerHTML =
         `
         <div>
-          <button style="background-color:white; border:none; border-radius:10px" id="tCAddItem${idUpdateItemMsg}">Add an option</button>
+          <button style="background-color:white; border:none; border-radius:10px" id="tCAddItem${idUpdateItemMsg}">選択肢追加</button>
           <input id="totalItemTC${idUpdateItemMsg}" type="number" value=${totalItemTC} hidden />
         </div>
       `
@@ -7071,7 +7122,7 @@ function Chatbot() {
 
     <div id="btnAddEachProMsg${mulMsgAdd}" style="float:right; display:block">
     <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
-    font-weight:800">追加</button>
+    font-weight:800">保存</button>
     </div>
 
 
@@ -7249,7 +7300,7 @@ function Chatbot() {
                                           <div style={{ display: "flex", width: "62%" }}>
                                             <i className="nc-icon nc-bell-55" style={{ color: "black", marginTop: "1.75%" }} />
                                             <div id="a_tag" style={{ fontSize: "15px", width: "95%" }}>
-                                              <button id={`btn_a_tag${data.id}`} onClick={(event) => getMSGPV(event, data.id)} style={{ border: "none", backgroundColor: "white" }}>
+                                              <button id={`btn_a_tag${data.id}`} className="btn_a_tag" onClick={(event) => getMSGPV(event, data.id)} style={{ border: "none", backgroundColor: "white" }}>
                                                 {data.group_name}
                                               </button>
                                             </div>

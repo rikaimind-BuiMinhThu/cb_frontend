@@ -19,7 +19,7 @@ function LoginFacebook({ checkLogin }) {
   const [userName, setUserName] = useState();
   const [urlImg, setUrlImg] = useState();
   const [username, setUsername] = useState();
-
+  const [accessToken2, setAccessToken2] = useState()
 
   function logoutFB() {
     window.FB.logout(function (response) {   // See the onlogin handler
@@ -80,6 +80,8 @@ function LoginFacebook({ checkLogin }) {
 
   function checkLoginState() {
     window.FB.getLoginStatus(function (response) {
+      console.log(response.authResponse.accessToken)
+      setAccessToken2(response.authResponse.accessToken)
       statusChangeCallback(response);
     });
   }
@@ -170,7 +172,13 @@ function LoginFacebook({ checkLogin }) {
                   //
                   console.log(res.data)
                 }
-                var page_access_token = Cookies.get("page_access_token");
+                var page_access_token
+                if (Cookies.get("page_access_token") != undefined) {
+                  page_access_token = Cookies.get("page_access_token")
+                }else{
+                  page_access_token = accessToken2
+                }
+
                 //change this to come to releases move to code = 1
                 checkLogin(true, ig_id)
                 axios.get(`https://graph.facebook.com/v14.0/${ig_id}?fields=id,username,ig_id,name,profile_picture_url&access_token=${page_access_token}`).then(res => {
@@ -232,7 +240,7 @@ function LoginFacebook({ checkLogin }) {
             <div style={{ width: "70%", textAlign: "right" }}><Button onClick={() => selectPage(item.id)}>Select</Button></div>
           </div>
         )
-        )) :""}
+        )) : ""}
       </div>
       <div id='logoutFB' style={{ width: "100%", margin: "auto", textAlign: "center", display: "none" }}>
         <Button onClick={() => logoutFB()}>インスタグラムログアウト</Button>
