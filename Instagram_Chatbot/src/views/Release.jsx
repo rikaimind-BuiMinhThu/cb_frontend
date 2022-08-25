@@ -93,7 +93,7 @@ function Release() {
         .get(`/api/v1/instagram_settings`)
         .then((res) => {
           // console.log(res.data.data[0].page_access_token)
-          console.log('dang get pat');
+          // console.log('dang get pat');
           Cookies.set('page_access_token', res.data.data[0].page_access_token);
           Cookies.set('ig_id', res.data.data[0].ig_id);
         })
@@ -375,7 +375,7 @@ function Release() {
     var path = window.location.pathname;
 
     api
-      .get(`/api/v1/instagram_settings/1`)
+      .get(`/api/v1/instagram_settings/${Cookies.get('ig_id')}`)
       .then((res) => {
         console.log('insta setting ', res.data.data);
         var dataB = res.data.data;
@@ -572,7 +572,7 @@ function Release() {
     var path = window.location.pathname;
 
     api
-      .get(`/api/v1/instagram_settings/1`)
+      .get(`/api/v1/instagram_settings/${Cookies.get('ig_id')}`)
       .then((res) => {
         console.log('insta setting ', res.data.data);
         var dataB = res.data.data;

@@ -3170,7 +3170,7 @@ function Chatbot() {
       clicked = false;
     }, 1000);
   }
-
+  const [idGrHighLight, setIdGrHightLight] = useState()
   function getMSGPV(event, idIn) {
 
     event.preventDefault()
@@ -3183,13 +3183,13 @@ function Chatbot() {
     }
     var bagNodeList = document.querySelectorAll(".msg_group_id");
     for (i = 0; i < nodeList.length; i++) {
-      if(bagNodeList[i] != undefined){
+      if (bagNodeList[i] != undefined) {
         bagNodeList[i].style.color = "black";
-      bagNodeList[i].style.textDecoration = "none";
+        bagNodeList[i].style.textDecoration = "none";
       }
-      
-    }
 
+    }
+    setIdGrHightLight(idIn)
     document.getElementById(`btn_a_tag${idIn}`).style.color = "#51cbce"
     document.getElementById(`btn_a_tag${idIn}`).style.textDecoration = "underline"
     // document.getElementById(`btn_a_tag${idIn}`).style.fontWeight= "800"
@@ -3316,6 +3316,15 @@ function Chatbot() {
             nodeList[i].style.textDecoration = "none";
           }
 
+          if (idGrHighLight != idIn) {
+            var nodeListt = document.querySelectorAll(".btn_a_tag");
+            for (var i = 0; i < nodeListt.length; i++) {
+              nodeListt[i].style.color = 'black';
+              nodeListt[i].style.textDecoration = 'none';
+            }
+            document.getElementById(`btn_a_tag${idIn}`).style.color = "#51cbce"
+            document.getElementById(`btn_a_tag${idIn}`).style.textDecoration = "underline"
+          }
           document.getElementById(`msg_group${idIn}_id${idd}`).style.pointerEvents = "none"
           document.getElementById(`msg_group${idIn}_id${idd}`).style.color = "#51cbce"
           document.getElementById(`msg_group${idIn}_id${idd}`).style.textDecoration = "underline"
@@ -5722,7 +5731,7 @@ function Chatbot() {
       api.post(`/api/v1/message_managements/message_groups`, newCBAdd).then(res => {
         setIsOpenNoti(true)
         if (res.data.code == 2) {
-          setMsgNoti("Message group is existed")
+          setMsgNoti("メッセージグループが存在します。")
         } else {
           refreshMsgGroup()
           setIsOpenAddChatbot(false)

@@ -107,6 +107,15 @@ function ClientManagement() {
       var totalPage = Math.ceil(res.data.data.total / 25)
       setTotalPage(totalPage)
       setDataList(res.data.data)
+      document.getElementById("searchUser").addEventListener("keypress", (e)=>{
+        // e.preventDefault()
+        if (e.key === "Enter") {
+          // Cancel the default action, if needed
+          e.preventDefault();
+          // Trigger the button element with a click
+          search()
+        }
+      })
     }).catch(error => {
       console.log(error)
       // if (error.response.data.code === 3) {
@@ -625,7 +634,12 @@ function ClientManagement() {
           setIsOpenAddUser(false)
           setIsOpenNoti(true)
         } else {
-          setMsgNoti(res.data.message)
+          
+          if(res.data.message.includes(`Client name has`)){
+            setMsgNoti("クライアント名は一意です。")
+          }else{
+            setMsgNoti(res.data.message)
+          }
           setIsOpenAddUser(false)
           setIsOpenNoti(true)
         }
@@ -812,7 +826,9 @@ function ClientManagement() {
     setPage(parseInt(value))
     setPageIndex(value)
     reloadListClient(value)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
 
 
 

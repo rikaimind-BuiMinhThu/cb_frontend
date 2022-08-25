@@ -79,6 +79,18 @@ function UserManagement() {
     api.get(`/api/v1/managements/clients`).then(res => {
       // console.log(res.data.data)
       setListClient(res.data.data)
+
+      document.getElementById("searchUser").addEventListener("keypress", (e)=>{
+        // e.preventDefault()
+        if (e.key === "Enter") {
+          // Cancel the default action, if needed
+          e.preventDefault();
+          // Trigger the button element with a click
+          search()
+        }
+      })
+
+
     }).catch(error => {
       console.log(error)
       if (error.response.data.code === 3) {
@@ -434,6 +446,7 @@ function UserManagement() {
     setPage(parseInt(value))
     setPageIndex(value)
     reloadListClient(value)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function detailUser(id) {
