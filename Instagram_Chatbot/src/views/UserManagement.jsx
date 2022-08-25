@@ -97,7 +97,7 @@ function UserManagement() {
     var paramSearch = { page: pageIndex }
     var path = window.location.pathname;
     api.get(`/api/v1/managements/users`, paramSearch).then(res => {
-      console.log(res.data.total)
+      // console.log(res.data)
       var totalPage = Math.ceil(res.data.total / 25)
       setTotalPage(totalPage)
       setDataList(res.data)
@@ -202,11 +202,11 @@ function UserManagement() {
     var path = window.location.pathname;
     var nameUpdate = document.getElementById('nameUpdate').value
     const emailUpdate = document.getElementById('updateEmail').value;
-    // const passwordUpdate = document.getElementById('updatePassword').value;
-    // const confirmPasswordUpdate = document.getElementById('updateConfirmPassword').value;
+    const passwordUpdate = document.getElementById('updatePassword').value;
+    const confirmPasswordUpdate = document.getElementById('updateConfirmPassword').value;
 
-    // let passCheck = false;
-    // let passCheckLen = false;
+    let passCheck = false;
+    let passCheckLen = false;
     let emailCheck = false;
     let nameCheck = false;
 
@@ -227,28 +227,28 @@ function UserManagement() {
       emailCheck = false
     }
 
-    // if (passwordUpdate.length < 6) {
-    //   passCheckLen = false
-    // } else {
-    //   document.getElementById("パスワードErrMsg").style.display = "none"
-    //   document.getElementById("パスワードErrMsg").innerHTML = ""
-    //   passCheckLen = true
-    // }
+    if (passwordUpdate.length > 0 && passwordUpdate.length < 6) {
+      passCheckLen = false
+    } else {
+      document.getElementById("パスワードErrMsg").style.display = "none"
+      document.getElementById("パスワードErrMsg").innerHTML = ""
+      passCheckLen = true
+    }
 
-    // if (passwordUpdate !== confirmPasswordUpdate) {
-    //   passCheck = false
-    // } else {
-    //   document.getElementById("パスワード(確認用)ErrMsg").style.display = "none"
-    //   document.getElementById("パスワード(確認用)ErrMsg").innerHTML = ""
-    //   passCheck = true
-    // }
+    if (passwordUpdate !== confirmPasswordUpdate) {
+      passCheck = false
+    } else {
+      document.getElementById("パスワード(確認用)ErrMsg").style.display = "none"
+      document.getElementById("パスワード(確認用)ErrMsg").innerHTML = ""
+      passCheck = true
+    }
 
     if (checkFieldUpdate(name, '名称') === true
       && utils.checkFieldAdd(email, 'メールアドレス') === true
       // && checkFieldUpdate(passwordUpdate, "パスワード") === true
       // && checkFieldUpdate(confirmPasswordUpdate, "パスワード(確認用)") === true
-      // && passCheck === true
-      // && passCheckLen === true
+      && passCheck === true
+      && passCheckLen === true
       && emailCheck === true
       && nameCheck === true) {
       var elements = document.getElementById("detailUserClient").elements;
@@ -256,6 +256,9 @@ function UserManagement() {
       for (var i = 0; i < elements.length; i++) {
         var item = elements.item(i);
         obj[item.name] = item.value;
+      }
+      if (passwordUpdate === '') {
+        delete obj.password;
       }
       delete obj.confirm_password;
       var updateClient = { user: obj };
@@ -274,14 +277,14 @@ function UserManagement() {
       })
     }
     else {
-      // if (passCheck === false) {
-      //   document.getElementById("パスワード(確認用)ErrMsg").style.display = "block"
-      //   document.getElementById("パスワード(確認用)ErrMsg").innerHTML = "パスワード（確認用）はパスワードと同じの必要です。"
-      // }
-      // if (passCheckLen === false) {
-      //   document.getElementById("パスワードErrMsg").style.display = "block"
-      //   document.getElementById("パスワードErrMsg").innerHTML = "パスワードは最低６つの文字の必要です。"
-      // }
+      if (passCheck === false) {
+        document.getElementById("パスワード(確認用)ErrMsg").style.display = "block"
+        document.getElementById("パスワード(確認用)ErrMsg").innerHTML = "パスワード（確認用）はパスワードと同じの必要です。"
+      }
+      if (passCheckLen === false) {
+        document.getElementById("パスワードErrMsg").style.display = "block"
+        document.getElementById("パスワードErrMsg").innerHTML = "パスワードは最低６つの文字の必要です。"
+      }
       if (emailCheck === false) {
         document.getElementById("newUserメールアドレスErrMsg").style.display = "block"
         document.getElementById("newUserメールアドレスErrMsg").innerHTML = "メールを入力してください(例:abc＠abc.com)"
@@ -466,6 +469,7 @@ function UserManagement() {
                       <th>名称</th>
                       <th>ログインID</th>
                       <th>権限</th>
+                      <th>クライアント</th>
                       <th className="actionList">アクション</th>
                     </tr>
                   </thead>
@@ -477,6 +481,7 @@ function UserManagement() {
                           <td>{item.full_name}</td>{/* onClick={() => detailUser(item.id)} */}
                           <td>{item.email}</td>
                           <td>{item.role === 'admin_client' ? 'クライアント' : 'ユーザー'}</td>
+                          <td>{item.client_name}</td>
                           <td className="actionList">
                             <div>
                               {/* <Button onClick={() => getUserDetail(item)}>View Detail</Button> */}
@@ -585,19 +590,6 @@ function UserManagement() {
                   <label id="newUserメールアドレスErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
 
-                {/* <label className="label-input">パスワード &nbsp;<span className="span-require">*必須</span>
-                  <input className="input-field" value={password}
-                    onChange={e => {
-                      setPassword(e.target.value)
-                      onChangeInputWarning('パスワード')
-                    }} onBlur={(e) => checkFieldUpdate(e.target.value, "パスワード")} type="password" id="updatePassword" name="password" />
-                  <label id="パスワードErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
-                </label><br /><br />
-                <label className="label-input">パスワード（確認用）<span className="span-require">*必須</span>
-                  <input className="input-field" onChange={() => onChangeInputWarning('パスワード(確認用)')} onBlur={(e) => checkFieldUpdate(e.target.value, "パスワード(確認用)")} type="password" id="updateConfirmPassword" name="confirm_password" />
-                  <label id="パスワード(確認用)ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
-                </label><br /><br /> */}
-
                 <label className="label-input">クライアント<span className="span-require">*必須</span>
                   <select style={{ padding: "3px 0px 3px 0px" }} value={clientName} onChange={(e) => setClientName(e.target.value)} className="input-field" name="client_id">
                     {listClient?.clients?.map((client, i) => {
@@ -608,7 +600,7 @@ function UserManagement() {
                       )
                     })}
                   </select>
-                </label>
+                </label><br /><br />
 
                 <label className="label-input"><label className="long-label">権限&nbsp;<span className="span-require">*必須</span></label>
                   <select style={{ padding: "3px 0px 3px 0px" }} className="input-field" defaultValue={role} onChange={e => setRole(e.target.value)} name="role" id="role">
@@ -617,6 +609,25 @@ function UserManagement() {
                   </select>
                   <label id="newClientTikTokCreateErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
                 </label><br /><br />
+
+                <label className="label-input">パスワード &nbsp;
+                  <input className="input-field" value={password}
+                    onChange={e => {
+                      setPassword(e.target.value)
+                      onChangeInputWarning('パスワード')
+                    }}
+                    // onBlur={(e) => checkFieldUpdate(e.target.value, "パスワード")} 
+                    type="password" id="updatePassword" name="password" />
+                  <label id="パスワードErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                </label><br /><br />
+
+                <label className="label-input">パスワード（確認用）
+                  <input className="input-field" onChange={() => onChangeInputWarning('パスワード(確認用)')}
+                    // onBlur={(e) => checkFieldUpdate(e.target.value, "パスワード(確認用)")} 
+                    type="password" id="updateConfirmPassword" name="confirm_password" />
+                  <label id="パスワード(確認用)ErrMsg" className="input-field" style={{ display: 'none', color: "red" }}></label>
+                </label><br /><br />
+
                 <Button id="btnUpdate" hidden={disableInput} onClick={updateClient}> 更新</Button>
               </form>
             </div>
