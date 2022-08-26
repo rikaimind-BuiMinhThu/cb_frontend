@@ -628,11 +628,6 @@ function Chatbot() {
                 <div id="choiceThree${item.id}" style="display:none;border-radius:10px"></div>
               </div>
 
-              <div id="isPurchase${item.id}" style="float:left">
-              <input type="checkbox" id="purchase${item.id}" name="purchase" value="is_purchase">
-              <label for="purchase">注文用（ウェブURL利用不可）</label><br>
-              </div>
-
               <div id="btnDelMsg${item.id}" style="float:right;">
               <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
                 font-weight:800">削除</button>
@@ -644,15 +639,15 @@ function Chatbot() {
             </div>`
           // document.getElementById(`mgsCustomKey${item.id}`).textContent = item.received_message
 
-          for (var i = 0; i < item.message_buttons.length; i++) {
-            if (item.message_buttons[i].is_purchase_button != undefined || item.message_buttons[i].is_purchase_button != null || item.message_buttons[i].is_purchase_button != "") {
-              if (item.message_buttons[i].is_purchase_button == "yes") {
-                document.getElementById(`purchase${item.id}`).checked = true
-              } else {
-                document.getElementById(`purchase${item.id}`).checked = false
-              }
-            }
-          }
+          // for (var i = 0; i < item.message_buttons.length; i++) {
+          //   if (item.message_buttons[i].is_purchase_button != undefined || item.message_buttons[i].is_purchase_button != null || item.message_buttons[i].is_purchase_button != "") {
+          //     if (item.message_buttons[i].is_purchase_button == "yes") {
+          //       document.getElementById(`purchase${item.id}`).checked = true
+          //     } else {
+          //       document.getElementById(`purchase${item.id}`).checked = false
+          //     }
+          //   }
+          // }
 
 
           // if (item.free_input != undefined) {
@@ -996,9 +991,6 @@ function Chatbot() {
           document.getElementById(`choiceOption${item.id}`).appendChild(choiceNe)
           choiceNe.innerHTML = choiceHTML
 
-          if (isWeb == true) {
-            document.getElementById(`isPurchase${item.id}`).style.display = "none"
-          }
           if (item.free_input == undefined) {
 
           } else {
@@ -1179,12 +1171,10 @@ function Chatbot() {
             } else {
               document.getElementById(`addUpMessErr${item.id}`).style.display = "none"
               document.getElementById(`addUpMessErr${item.id}`).innerHTML = ""
-              var purchase_btn_up = document.getElementById(`purchase${item.id}`).checked
 
 
               var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
               // var purchase_btn = document.getElementById(`purchase${item.id}`).checked
-              console.log("checked ne: ", purchase_btn_up)
               var add
               if (document.getElementById(`bagAddSC${item.id}`) != null || document.getElementById(`groupAddSC${item.id}`) != null || document.getElementById(`titleAddSC${item.id}`) != null) {
                 var titlea = document.getElementById(`titleAddSC${item.id}`).value
@@ -1209,8 +1199,7 @@ function Chatbot() {
                       message_type: "msg",
                       img_value: "",
                       message_buttons: [
-                        { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL },
-                        { button_type: "mess", title: "", is_purchase_button: purchase_btn_up != true ? "no" : "yes", message_bag_id: `1` }
+                        { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
                       ]
                     }
 
@@ -1273,16 +1262,6 @@ function Chatbot() {
                   }
                 }
 
-                var isWebUp = false
-                for (var j = 0; j < message_buttons.length; j++) {
-                  if (message_buttons[j].button_type == "web_url") {
-                    isWebUp = true
-                  }
-                }
-                if (isWebUp == false) {
-                  message_buttons.push({ button_type: "mess", title: "", is_purchase_button: purchase_btn_up != true ? "no" : "yes", message_bag_id: `1` })
-                }
-
                 add = {
                   message: {
                     message_bag_id: bagId,
@@ -1334,8 +1313,6 @@ function Chatbot() {
                 if (item.free_input != null || item.free_input != "" || item.free_input != undefined) {
                   var new_msg_btn = []
                   new_msg_btn = item.message_buttons
-                  new_msg_btn.pop()
-                  new_msg_btn.push({ button_type: "mess", title: "", is_purchase_button: purchase_btn_up != true ? "no" : "yes", message_bag_id: `1` })
                   add = {
                     message: {
                       message_bag_id: bagId,
@@ -1349,8 +1326,6 @@ function Chatbot() {
                 } else {
                   var new_msg_btn = []
                   new_msg_btn = item.message_buttons
-                  new_msg_btn.pop()
-                  new_msg_btn.push({ button_type: "mess", title: "", is_purchase_button: purchase_btn_up != true ? "no" : "yes", message_bag_id: `1` })
                   add = {
                     message: {
                       message_bag_id: bagId,
@@ -4502,10 +4477,6 @@ function Chatbot() {
         </div>
         <div id="choiceThree${idSC}" style="display:none;border-radius:10px"></div>
       </div>
-      <div id="isPurchaseCof${idSC}" style="float:left">
-      <input type="checkbox" id="purchase${numIndex}" name="purchase" value="is_purchase">
-      <label for="purchase">注文用（ウェブURL利用不可）</label><br>
-      </div>
       <div id="btnDelMsg${mulMsgAdd}" style="float:right; display:block">
           <button style="width:75px; border-radius:10px; background-color: #f17e5d; border: none; color: #fff;
           font-weight:800">削除</button>
@@ -4544,7 +4515,7 @@ function Chatbot() {
         document.getElementById(`addNewMessErr${numIndex}`).style.display = "none"
         document.getElementById(`addNewMessErr${numIndex}`).innerHTML = ""
 
-        var purchase_btn = document.getElementById(`purchase${numIndex}`).checked
+        // var purchase_btn = document.getElementById(`purchase${numIndex}`).checked
         // alert(bagId)
         // var add = {
         //   message: { message_bag_id: bagId, message_value: element, message_type: "msg", img_value: "" }
@@ -4573,8 +4544,7 @@ function Chatbot() {
                 message_type: "msg",
                 img_value: "",
                 message_buttons: [
-                  { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL },
-                  { button_type: "mess", title: "Test mess 2", is_purchase_button: purchase_btn != true ? "no" : "yes", message_bag_id: `1` }
+                  { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
                 ]
               }
 
@@ -4644,9 +4614,6 @@ function Chatbot() {
               isWeb = true
             }
           }
-          if (isWeb == false) {
-            message_buttons.push({ button_type: "mess", title: "Test mess 2", is_purchase_button: purchase_btn != true ? "no" : "yes", message_bag_id: `1` })
-          }
           add = {
             message: {
               message_bag_id: bagId,
@@ -4690,8 +4657,7 @@ function Chatbot() {
         else {
           add = {
             message: {
-              message_bag_id: bagId, message_value: element, message_type: "msg", img_value: "",
-              message_buttons: [{ button_type: "mess", title: "Test mess 2", is_purchase_button: purchase_btn != true ? "no" : "yes", message_bag_id: '1' }]
+              message_bag_id: bagId, message_value: element, message_type: "msg", img_value: ""
             }
           }
         }
