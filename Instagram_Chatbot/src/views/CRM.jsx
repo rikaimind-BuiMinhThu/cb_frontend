@@ -295,7 +295,7 @@ function CRM() {
       // document.getElementById(`deleteTbl${lblList[i].id}`).style.display = "block"
     }
     for (let i = 0; i < customTable.length; i++) {
-      if (document.getElementById(`deleteTbl${customTable[i``]?.id}`) !== null) {
+      if (document.getElementById(`deleteTbl${customTable[i]?.id}`) !== null) {
         document.getElementById(`deleteTbl${customTable[i]?.id}`).style.display = 'block';
       }
     }

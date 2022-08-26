@@ -487,8 +487,17 @@ function DataAnalyst() {
     filename: 'message-group.csv',
   };
 
-  const setMessageGroupDataExport = (item) => {
-    console.log(item);
+  const setMessageGroupDataExport = (id) => {
+    console.log("id gr: ",id);
+    api
+      .get(`/api/v1/message_managements/message_groups/${id}/export_csv`)
+      .then((res) => {
+        console.log("gr content: ",res.data.data)
+
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   // select date start
@@ -687,7 +696,7 @@ function DataAnalyst() {
             </Card>
 
             {/* message groups */}
-            {/* <Card>
+            <Card>
               <CardBody>
                 <div
                   style={{
@@ -713,12 +722,12 @@ function DataAnalyst() {
                         <td>
                           <h6>Created/Updated date</h6>
                         </td>
-                        <td>
+                        {/* <td>
                           <h6>Total user</h6>
                         </td>
                         <td>
                           <h6>Answer results</h6>
-                        </td>
+                        </td> */}
                         <td>
                           <h6>CSV download</h6>
                         </td>
@@ -732,11 +741,11 @@ function DataAnalyst() {
                         >
                           <td>{item?.group_name}</td>
                           <td>{item?.updated_at?.slice(0, 10)}</td>
-                          <td>???</td>
-                          <td>???</td>
+                          {/* <td>???</td>
+                          <td>???</td> */}
                           <td>
                             <span
-                              onClick={() => setMessageGroupDataExport(item)}
+                              onClick={() => setMessageGroupDataExport(item.id)}
                             >
                               <CSVLink {...csvMessageGroupReport}>
                                 <MDBIcon
@@ -753,7 +762,7 @@ function DataAnalyst() {
                   </Table>
                 </div>
               </CardBody>
-            </Card> */}
+            </Card>
           </Col>
         </Row>
       </div>
