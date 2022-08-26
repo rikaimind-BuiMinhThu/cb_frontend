@@ -160,7 +160,7 @@ function AttractedCustomer() {
         width: 400,
         type: 'pie',
       },
-      labels: ['Direct message', 'Story comment', 'Live comment'],
+      labels: ['DM', 'ストーリー', 'ライブ'],
       responsive: [
         {
           breakpoint: undefined,
@@ -356,7 +356,7 @@ function AttractedCustomer() {
                 <CardBody style={{ width: '33.33333%' }}>
                   <div style={{ width: '100%' }}>
                     <div style={{ width: '100%', textAlign: 'center' }}>
-                      <h3>Source</h3>
+                      <h3>流入元</h3>
                     </div>
                     <div style={{ paddingTop: '10%' }}>
                       <div
@@ -380,7 +380,7 @@ function AttractedCustomer() {
 
                 <CardBody style={{ width: '66.66666%' }}>
                   <div style={{ width: '100%', textAlign: 'center' }}>
-                    <h3>EC Chatbot User</h3>
+                    <h3>EC Chatbotユーザー</h3>
                   </div>
                   <ReactApexChart
                     options={dataLine.options}
@@ -399,17 +399,17 @@ function AttractedCustomer() {
                   <Table>
                     <thead>
                       <tr>
-                        <th>Title</th>
-                        <th>Total user</th>
-                        <th>Total message</th>
-                        <th>Avg message</th>
-                        <th>Is purchase</th>
-                        <th>Percent</th>
+                        <th>タイトル</th>
+                        <th>ユーザー数</th>
+                        <th>メッセージ数</th>
+                        <th>平均メッセージ数</th>
+                        <th>注文</th>
+                        <th>コンバージョン率</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr style={{ overflow: 'hidden', height: '14px' }}>
-                        <td>Direct message</td>
+                        <td>DM</td>
                         <td>{dmData.totalUser}</td>
                         <td>{dmData.totalMessages}</td>
                         <td>
@@ -430,7 +430,7 @@ function AttractedCustomer() {
                         </td>
                       </tr>
                       <tr style={{ overflow: 'hidden', height: '14px' }}>
-                        <td>Story comment</td>
+                        <td>ストーリー</td>
                         <td>{scData.totalUser}</td>
                         <td>{scData.totalMessages}</td>
                         <td>
@@ -451,7 +451,7 @@ function AttractedCustomer() {
                         </td>
                       </tr>
                       <tr style={{ overflow: 'hidden', height: '14px' }}>
-                        <td>Live comment</td>
+                        <td>ライブ</td>
                         <td>{lcData.totalUser}</td>
                         <td>{lcData.totalMessages}</td>
                         <td>

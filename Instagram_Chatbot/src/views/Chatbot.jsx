@@ -3795,7 +3795,8 @@ function Chatbot() {
 
   function loadFile(event, id) {
     //checkImgAddEmpty
-    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') || event.target.files[0].name.includes('jpg')) {
+    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') 
+    || event.target.files[0].name.includes('jpg') || event.target.files[0].name.includes('gif')) {
       document.getElementById(`checkImgAddEmpty${id}`).style.display = "none"
       document.getElementById(`checkImgAddEmpty${id}`).innerHTML = ""
       var num = parseInt(imgCBNum) + 1
@@ -3835,7 +3836,8 @@ function Chatbot() {
     // var num = parseInt(id) + 1
     //imgNumSavedCheck
 
-    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') || event.target.files[0].name.includes('jpg')) {
+    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') 
+    || event.target.files[0].name.includes('jpg') || event.target.files[0].name.includes('gif')) {
       document.getElementById(`imgNumSavedCheck${id}`).style.display = "none"
       document.getElementById(`imgNumSavedCheck${id}`).innerHTML = ""
       getBaseUrlSaved(id)
@@ -3874,7 +3876,8 @@ function Chatbot() {
     // console.log(event.target.files[0].name)
 
 
-    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') || event.target.files[0].name.includes('jpg')) {
+    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') 
+    || event.target.files[0].name.includes('jpg') || event.target.files[0].name.includes('gif')) {
       document.getElementById(`checkImgMsgAddEmpty${id}`).style.display = "none"
       document.getElementById(`checkImgMsgAddEmpty${id}`).innerHTML = ""
 
@@ -3917,7 +3920,8 @@ function Chatbot() {
   function loadFileImgMsgSaved(event, id) {
     // var num = parseInt(imgMsgCBNum) + 1
 
-    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') || event.target.files[0].name.includes('jpg')) {
+    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') 
+    || event.target.files[0].name.includes('jpg') || event.target.files[0].name.includes('gif')) {
       document.getElementById(`checkImgMsgCheck${id}`).style.display = "none"
       document.getElementById(`checkImgMsgCheck${id}`).innerHTML = ""
       getBaseUrlImgMsgSaved(id)
