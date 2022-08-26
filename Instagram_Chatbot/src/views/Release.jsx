@@ -58,6 +58,38 @@ function Release() {
   //   }
   // }, [])
 
+  const [idInstaSetting, setIdInstaSetting] = useState();
+  const [postGroupname, setPostGroupName] = useState();
+  const [storyGroupname, setStoryGroupName] = useState();
+  const [liveGroupname, setLiveGroupName] = useState();
+  const [postGroupId, setPostGroupId] = useState();
+  const [postGroupBagId, setPostGroupBagId] = useState();
+  const [storyGroupId, setStoryGroupId] = useState();
+  const [storyGroupBagId, setStoryGroupBagId] = useState();
+  const [liveGroupId, setLiveGroupId] = useState();
+  const [liveGroupBagId, setLiveGroupBagId] = useState();
+  React.useEffect(() => {
+    api
+      .get(`/api/v1/instagram_settings`)
+      .then((res) => {
+        console.log("setIdInstaSetting: ", res.data.data[0].id)
+        setIdInstaSetting(res.data.data[0].id);
+        setPostGroupName(res.data.data[0].post_comment_group_name);
+        setStoryGroupName(res.data.data[0].story_comment_group_name);
+        setLiveGroupName(res.data.data[0].live_comment_group_name);
+        setPostGroupId(res.data.data[0]?.post_comment_group_id);
+        setStoryGroupId(res.data.data[0]?.story_comment_group_id);
+        setLiveGroupId(res.data.data[0]?.live_comment_group_id);
+        setPostGroupBagId(res.data.data[0]?.post_comment_bag_id);
+        setStoryGroupBagId(res.data.data[0]?.story_comment_bag_id);
+        setLiveGroupBagId(res.data.data[0]?.live_comment_bag_id);
+        console.log(res.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'));
     console.log('is_auth', Cookies.get('is_auth'));
@@ -103,6 +135,23 @@ function Release() {
     }
   }, []);
 
+  const [instaSettingFirst, setInstaSettingFirst] = useState()
+  React.useEffect(() => {
+    api
+      .get(`/api/v1/instagram_settings`)
+      .then((res) => {
+
+        setInstaSettingFirst(res.data.data[0].ig_id)
+
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+  }, []);
+
+
+
   function setPATAL() {
     var access_token = Cookies.get('page_access_token');
     if (access_token == '' || access_token == undefined || access_token == null) {
@@ -119,41 +168,13 @@ function Release() {
     }
   }
 
-  const [idInstaSetting, setIdInstaSetting] = useState();
-  const [postGroupname, setPostGroupName] = useState();
-  const [storyGroupname, setStoryGroupName] = useState();
-  const [liveGroupname, setLiveGroupName] = useState();
-  const [postGroupId, setPostGroupId] = useState();
-  const [postGroupBagId, setPostGroupBagId] = useState();
-  const [storyGroupId, setStoryGroupId] = useState();
-  const [storyGroupBagId, setStoryGroupBagId] = useState();
-  const [liveGroupId, setLiveGroupId] = useState();
-  const [liveGroupBagId, setLiveGroupBagId] = useState();
-  React.useEffect(() => {
-    api
-      .get(`/api/v1/instagram_settings`)
-      .then((res) => {
-        setIdInstaSetting(res.data.data[0].id);
-        setPostGroupName(res.data.data[0].post_comment_group_name);
-        setStoryGroupName(res.data.data[0].story_comment_group_name);
-        setLiveGroupName(res.data.data[0].live_comment_group_name);
-        setPostGroupId(res.data.data[0]?.post_comment_group_id);
-        setStoryGroupId(res.data.data[0]?.story_comment_group_id);
-        setLiveGroupId(res.data.data[0]?.live_comment_group_id);
-        setPostGroupBagId(res.data.data[0]?.post_comment_bag_id);
-        setStoryGroupBagId(res.data.data[0]?.story_comment_bag_id);
-        setLiveGroupBagId(res.data.data[0]?.live_comment_bag_id);
-        console.log(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+
 
   function setIgIDS() {
     api
       .get(`/api/v1/instagram_settings`)
       .then((res) => {
+
         setIdInstaSetting(res.data.data[0].id);
       })
       .catch((error) => {
@@ -375,204 +396,216 @@ function Release() {
     var path = window.location.pathname;
 
     api
-      .get(`/api/v1/instagram_settings/${Cookies.get('ig_id')}`)
-      .then((res) => {
-        console.log('insta setting ', res.data.data);
-        var dataB = res.data.data;
-        setInstaSetting(res.data.data);
-        setInstaSettingId(res.data.data.id);
-        setStoryOnOff(res.data.data.story_comment_bag_status);
-        if (res.data.data.story_comment_bag_status == 'off') {
-          falseConfigStory();
-        } else {
-          trueConfigStory();
-        }
-        setLiveOnOff(res.data.data.live_comment_bag_status);
-        if (res.data.data.live_comment_bag_status == 'off') {
-          falseConfigLive();
-        } else {
-          trueConfigLive();
-        }
-        setCmPostOnOff(res.data.data.post_comment_bag_status);
-        if (res.data.data.post_comment_bag_status == 'off') {
-          falseConfigCmPost();
-        } else {
-          trueConfigCmPost();
-        }
-        var story = [];
-        var live = [];
-        var cm = [];
+      .get(`/api/v1/instagram_settings`)
+      .then((resId) => {
+        
+        console.log("get the first idInstaSetting: ", resId.data.data[0].id)
         api
-          .get(`/api/v1/message_managements/keyword_settings`)
+          .get(`/api/v1/instagram_settings/${resId.data.data[0].id}`)
           .then((res) => {
-            setListKeyword(res.data.data);
-            var listkey = res.data.data;
-            for (var i = 0; i < listkey.length; i++) {
-              if (listkey[i].is_story_comment == true) {
-                story.push(listkey[i].id);
-              }
+            console.log('insta setting ', res.data.data);
+            var dataB = res.data.data;
+            setInstaSetting(res.data.data);
+            console.log("Instagram setting id: ", res)
+            setInstaSettingId(res.data.data.id);
+            setStoryOnOff(res.data.data.story_comment_bag_status);
+            if (res.data.data.story_comment_bag_status == 'off') {
+              falseConfigStory();
+            } else {
+              trueConfigStory();
             }
-            if (dataB.story_comment_bag_status === 'keyword') {
-              document.getElementById('listkeyword').style.display = 'block';
-              document.getElementById('listReplyBag').style.display = 'none';
-              document.getElementById('listReplyGroup').style.display = 'none';
-              var selectedTypeStory = document.getElementById('replyStory');
-              var optionSelectedTypeStory = document.createElement('option');
-              optionSelectedTypeStory.disabled = true;
-              optionSelectedTypeStory.hidden = true;
-              optionSelectedTypeStory.selected = true;
-              optionSelectedTypeStory.value = 'keyword';
-              optionSelectedTypeStory.text = '任意のキーワード';
-              selectedTypeStory.add(optionSelectedTypeStory);
-              api
-                .get(`/api/v1/message_managements/keyword_settings/${story[0]}`)
-                .then((res) => {
-                  console.log('story_comment_KW_id: ', res.data.data);
-                  var select, option;
-                  select = document.getElementById('listkeyword');
-                  option = document.createElement('option');
-                  option.disabled = true;
-                  option.hidden = true;
-                  option.selected = true;
-                  option.value = res.data.data.id;
-                  option.text = res.data.data.title;
-                  select.add(option);
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
+            setLiveOnOff(res.data.data.live_comment_bag_status);
+            if (res.data.data.live_comment_bag_status == 'off') {
+              falseConfigLive();
+            } else {
+              trueConfigLive();
             }
-            for (var i = 0; i < listkey.length; i++) {
-              if (listkey[i].is_live_comment == true) {
-                live.push(listkey[i].id);
-              }
+            setCmPostOnOff(res.data.data.post_comment_bag_status);
+            if (res.data.data.post_comment_bag_status == 'off') {
+              falseConfigCmPost();
+            } else {
+              trueConfigCmPost();
             }
-            if (dataB.live_comment_bag_status === 'keyword') {
-              document.getElementById('listkeywordLive').style.display = 'block';
-              document.getElementById('listLiveGroup').style.display = 'none';
-              document.getElementById('listLiveBag').style.display = 'none';
-              var selectedTypeStory = document.getElementById('replyLive');
-              var optionSelectedTypeStory = document.createElement('option');
-              optionSelectedTypeStory.disabled = true;
-              optionSelectedTypeStory.hidden = true;
-              optionSelectedTypeStory.selected = true;
-              optionSelectedTypeStory.value = 'keyword';
-              optionSelectedTypeStory.text = '任意のキーワード';
-              selectedTypeStory.add(optionSelectedTypeStory);
-              api
-                .get(`/api/v1/message_managements/keyword_settings/${live[0]}`)
-                .then((res) => {
-                  console.log('story_comment_KW_id: ', res.data.data);
-                  var select, option;
-                  select = document.getElementById('listkeywordLive');
-                  option = document.createElement('option');
-                  option.disabled = true;
-                  option.hidden = true;
-                  option.selected = true;
-                  option.value = res.data.data.id;
-                  option.text = res.data.data.title;
-                  select.add(option);
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
-            }
-            for (var i = 0; i < listkey.length; i++) {
-              if (listkey[i].is_post_comment == true) {
-                cm.push(listkey[i].id);
-              }
-            }
-            if (dataB.post_comment_bag_status === 'keyword') {
-              document.getElementById('listkeywordCM').style.display = 'block';
-              document.getElementById('listCommentGroup').style.display = 'none';
-              document.getElementById('listCommentBag').style.display = 'none';
-              var selectedTypeStory = document.getElementById('replyCMPost');
-              var optionSelectedTypeStory = document.createElement('option');
-              optionSelectedTypeStory.disabled = true;
-              optionSelectedTypeStory.hidden = true;
-              optionSelectedTypeStory.selected = true;
-              optionSelectedTypeStory.value = 'keyword';
-              optionSelectedTypeStory.text = '任意のキーワード';
-              selectedTypeStory.add(optionSelectedTypeStory);
-              api
-                .get(`/api/v1/message_managements/keyword_settings/${cm[0]}`)
-                .then((res) => {
-                  console.log('story_comment_KW_id: ', res.data.data);
-                  var select, option;
-                  select = document.getElementById('listkeywordCM');
-                  option = document.createElement('option');
-                  option.disabled = true;
-                  option.hidden = true;
-                  option.selected = true;
-                  option.value = res.data.data.id;
-                  option.text = res.data.data.title;
-                  select.add(option);
-                })
-                .catch((error) => {
-                  console.log(error);
-                });
-            }
+            var story = [];
+            var live = [];
+            var cm = [];
+            api
+              .get(`/api/v1/message_managements/keyword_settings`)
+              .then((res) => {
+                setListKeyword(res.data.data);
+                var listkey = res.data.data;
+                for (var i = 0; i < listkey.length; i++) {
+                  if (listkey[i].is_story_comment == true) {
+                    story.push(listkey[i].id);
+                  }
+                }
+                if (dataB.story_comment_bag_status === 'keyword') {
+                  document.getElementById('listkeyword').style.display = 'block';
+                  document.getElementById('listReplyBag').style.display = 'none';
+                  document.getElementById('listReplyGroup').style.display = 'none';
+                  var selectedTypeStory = document.getElementById('replyStory');
+                  var optionSelectedTypeStory = document.createElement('option');
+                  optionSelectedTypeStory.disabled = true;
+                  optionSelectedTypeStory.hidden = true;
+                  optionSelectedTypeStory.selected = true;
+                  optionSelectedTypeStory.value = 'keyword';
+                  optionSelectedTypeStory.text = '任意のキーワード';
+                  selectedTypeStory.add(optionSelectedTypeStory);
+                  api
+                    .get(`/api/v1/message_managements/keyword_settings/${story[0]}`)
+                    .then((res) => {
+                      console.log('story_comment_KW_id: ', res.data.data);
+                      var select, option;
+                      select = document.getElementById('listkeyword');
+                      option = document.createElement('option');
+                      option.disabled = true;
+                      option.hidden = true;
+                      option.selected = true;
+                      option.value = res.data.data.id;
+                      option.text = res.data.data.title;
+                      select.add(option);
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    });
+                }
+                for (var i = 0; i < listkey.length; i++) {
+                  if (listkey[i].is_live_comment == true) {
+                    live.push(listkey[i].id);
+                  }
+                }
+                if (dataB.live_comment_bag_status === 'keyword') {
+                  document.getElementById('listkeywordLive').style.display = 'block';
+                  document.getElementById('listLiveGroup').style.display = 'none';
+                  document.getElementById('listLiveBag').style.display = 'none';
+                  var selectedTypeStory = document.getElementById('replyLive');
+                  var optionSelectedTypeStory = document.createElement('option');
+                  optionSelectedTypeStory.disabled = true;
+                  optionSelectedTypeStory.hidden = true;
+                  optionSelectedTypeStory.selected = true;
+                  optionSelectedTypeStory.value = 'keyword';
+                  optionSelectedTypeStory.text = '任意のキーワード';
+                  selectedTypeStory.add(optionSelectedTypeStory);
+                  api
+                    .get(`/api/v1/message_managements/keyword_settings/${live[0]}`)
+                    .then((res) => {
+                      console.log('story_comment_KW_id: ', res.data.data);
+                      var select, option;
+                      select = document.getElementById('listkeywordLive');
+                      option = document.createElement('option');
+                      option.disabled = true;
+                      option.hidden = true;
+                      option.selected = true;
+                      option.value = res.data.data.id;
+                      option.text = res.data.data.title;
+                      select.add(option);
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    });
+                }
+                for (var i = 0; i < listkey.length; i++) {
+                  if (listkey[i].is_post_comment == true) {
+                    cm.push(listkey[i].id);
+                  }
+                }
+                if (dataB.post_comment_bag_status === 'keyword') {
+                  document.getElementById('listkeywordCM').style.display = 'block';
+                  document.getElementById('listCommentGroup').style.display = 'none';
+                  document.getElementById('listCommentBag').style.display = 'none';
+                  var selectedTypeStory = document.getElementById('replyCMPost');
+                  var optionSelectedTypeStory = document.createElement('option');
+                  optionSelectedTypeStory.disabled = true;
+                  optionSelectedTypeStory.hidden = true;
+                  optionSelectedTypeStory.selected = true;
+                  optionSelectedTypeStory.value = 'keyword';
+                  optionSelectedTypeStory.text = '任意のキーワード';
+                  selectedTypeStory.add(optionSelectedTypeStory);
+                  api
+                    .get(`/api/v1/message_managements/keyword_settings/${cm[0]}`)
+                    .then((res) => {
+                      console.log('story_comment_KW_id: ', res.data.data);
+                      var select, option;
+                      select = document.getElementById('listkeywordCM');
+                      option = document.createElement('option');
+                      option.disabled = true;
+                      option.hidden = true;
+                      option.selected = true;
+                      option.value = res.data.data.id;
+                      option.text = res.data.data.title;
+                      select.add(option);
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    });
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+    
+            setDmOnOff(res.data.data.dm_bag_status);
+            // if (res.data.data.dm_bag_status == false) {
+            //   falseConfigDM()
+            // } else {
+            //   trueConfigDM()
+            // }
+    
+            api
+              .get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`)
+              .then((res) => {
+                // console.log("story_comment_bag_id: ", res.data)
+                setStoryCommentBagName(res.data.data.message_bag.bag_name);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+            api
+              .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
+              .then((res) => {
+                // console.log("post_comment_bag_id: ", res.data)
+                setPostCommentBagName(res.data.data.message_bag.bag_name);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+            api
+              .get(`/api/v1/message_managements/message_bags/${res.data.data.live_comment_bag_id}`)
+              .then((res) => {
+                // console.log("live_comment_bag_id: ", res.data)
+                setLiveCommentBagName(res.data.data.message_bag.bag_name);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+            // api.get(`/api/v1/message_managements/message_bags/${res.data.data.dm_bag_id}`).then(res => {
+            //   // setLiveCommentBagName(res.data.data.message_bag.bag_name)
+            //   console.log("dm_bag_id: ", res.data)
+            //   // setDmCommentBagName(res.data.data.message_bag.bag_name)
+    
+            // }).catch(error => {
+            //   console.log(error)
+            // })
           })
           .catch((error) => {
             console.log(error);
+            // if (error.response.data.code === 3) {
+            //   requestNewToken(path)
+            // }
           });
-
-        setDmOnOff(res.data.data.dm_bag_status);
-        // if (res.data.data.dm_bag_status == false) {
-        //   falseConfigDM()
-        // } else {
-        //   trueConfigDM()
-        // }
-
-        api
-          .get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`)
-          .then((res) => {
-            // console.log("story_comment_bag_id: ", res.data)
-            setStoryCommentBagName(res.data.data.message_bag.bag_name);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        api
-          .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
-          .then((res) => {
-            // console.log("post_comment_bag_id: ", res.data)
-            setPostCommentBagName(res.data.data.message_bag.bag_name);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        api
-          .get(`/api/v1/message_managements/message_bags/${res.data.data.live_comment_bag_id}`)
-          .then((res) => {
-            // console.log("live_comment_bag_id: ", res.data)
-            setLiveCommentBagName(res.data.data.message_bag.bag_name);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-        // api.get(`/api/v1/message_managements/message_bags/${res.data.data.dm_bag_id}`).then(res => {
-        //   // setLiveCommentBagName(res.data.data.message_bag.bag_name)
-        //   console.log("dm_bag_id: ", res.data)
-        //   // setDmCommentBagName(res.data.data.message_bag.bag_name)
-
-        // }).catch(error => {
-        //   console.log(error)
-        // })
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
       });
+
+    
   }, []);
 
   function getAllN() {
     var path = window.location.pathname;
 
     api
-      .get(`/api/v1/instagram_settings/${Cookies.get('ig_id')}`)
+      .get(`/api/v1/instagram_settings/${idInstaSetting}`)
       .then((res) => {
         console.log('insta setting ', res.data.data);
         var dataB = res.data.data;
@@ -969,6 +1002,7 @@ function Release() {
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`)
           .then((res) => {
+            console.log("story_comment_bag_id: ", res.data)
             setStoryCommentBagName(res.data.data.message_bag.bag_name);
           })
           .catch((error) => {
@@ -977,6 +1011,7 @@ function Release() {
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
           .then((res) => {
+            console.log("story_comment_bag_id: ", res.data)
             setPostCommentBagName(res.data.data.message_bag.bag_name);
           })
           .catch((error) => {
@@ -2774,101 +2809,82 @@ function Release() {
   //     getAllN()
   // }
   function saveStorySetting() {
-    var reply = document.getElementById('replyStory').value; //replyStory
-    var msg_bag = document.getElementById('listReplyBag').value;
-    if (msg_bag == '') {
-      msg_bag = instaSetting.story_comment_bag_id;
+    var reply = document.getElementById("replyStory").value //replyStory
+    var msg_bag = document.getElementById("listReplyBag").value
+    if (msg_bag == "") {
+      msg_bag = instaSetting.story_comment_bag_id
     }
-    if (reply == 'direct_message') {
-      var update = {
-        instagram_setting: {
-          dm_bag_id: instaSetting.dm_bag_id,
-          post_comment_bag_id: instaSetting.post_comment_bag_id,
-          story_comment_bag_id: msg_bag,
-          live_comment_bag_id: instaSetting.live_comment_bag_id,
-        },
-      };
+    if (reply == "direct_message") {
+      var update = { instagram_setting: { dm_bag_id: instaSetting.dm_bag_id, post_comment_bag_id: instaSetting.post_comment_bag_id, story_comment_bag_id: msg_bag, live_comment_bag_id: instaSetting.live_comment_bag_id } }
       var path = window.location.pathname;
-      var ig_setting = {
-        instagram_setting: { story_comment_bag_status: 'direct_message' },
-      };
-      api
-        .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-        .then((res) => { })
-        .catch((error) => {
-          console.log(error);
-        });
-      api
-        .patch(`/api/v1/instagram_settings/${instaSettingId}`, update)
-        .then((res) => {
-          reloadUpdate();
-          setMsgNoti('ストーリー設定を保存しました。');
-          setIsOpenNoti(true);
-          setTimeout(() => {
-            setMsgNoti('');
-            setIsOpenNoti(false);
-          }, 2000);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else if (reply == 'keyword') {
+      var ig_setting = { instagram_setting: { story_comment_bag_status: "direct_message" } }
+      api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting).then(res => {
+
+      }).catch(error => {
+        console.log(error)
+      })
+      api.patch(`/api/v1/instagram_settings/${instaSettingId}`, update).then(res => {
+        reloadUpdate()
+        setMsgNoti("ストーリー設定を保存しました。")
+        setIsOpenNoti(true)
+        setTimeout(() => {
+          setMsgNoti("")
+          setIsOpenNoti(false)
+        }, 2000)
+      }).catch(error => {
+        console.log(error)
+      })
+    } else if (reply == "keyword") {
       for (var i = 0; i < story_actived.length; i++) {
-        console.log('story_actived: ', story_actived[i]);
-        var id = story_actived[i];
-        api
-          .get(`/api/v1/message_managements/keyword_settings/${story_actived[i]}`)
-          .then((res) => {
-            // console.log("kw actived: ", res.data.data)
-            var setting = res.data.data;
-            var update = {
-              keyword_setting: {
-                title: setting.title,
-                keyword: setting.keyword,
-                instagram_account_id: setting.instagram_account_id,
-                message_bag_id: setting.message_bag_id,
-                is_dm: setting.is_dm,
-                is_story_comment: false,
-                is_post_comment: setting.is_post_comment,
-                is_live_comment: setting.is_live_comment,
-                is_active: setting.is_active,
-              },
-            };
-            api
-              .patch(`/api/v1/message_managements/keyword_settings/${id}`, update)
-              .then((res) => { })
-              .catch((error) => {
-                console.log(error);
-              });
+        console.log("story_actived: ", story_actived[i])
+        var id = story_actived[i]
+        api.get(`/api/v1/message_managements/keyword_settings/${story_actived[i]}`).then(res => {
+          // console.log("kw actived: ", res.data.data)
+          var setting = res.data.data
+          var update = {
+            keyword_setting: {
+              title: setting.title, keyword: setting.keyword, instagram_account_id: setting.instagram_account_id, message_bag_id: setting.message_bag_id,
+              is_dm: setting.is_dm, is_story_comment: false, is_post_comment: setting.is_post_comment, is_live_comment: setting.is_live_comment, is_active: setting.is_active
+            }
+          }
+          api.patch(`/api/v1/message_managements/keyword_settings/${id}`, update).then(res => {
+            setMsgNoti("ストーリー設定を保存しました。")
+            setIsOpenNoti(true)
+            setTimeout(() => {
+              setMsgNoti("")
+              setIsOpenNoti(false)
+            }, 2000)
+          }).catch(error => {
+            console.log(error)
           })
-          .catch((error) => {
-            console.log(error);
-          });
+        }).catch(error => {
+          console.log(error)
+        })
       }
 
       setTimeout(function () {
-        var ig_setting = {
-          instagram_setting: { story_comment_bag_status: 'keyword' },
-        };
-        api
-          .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-          .then((res) => { })
-          .catch((error) => {
-            console.log(error);
-          });
-        api
-          .patch(`/api/v1/message_managements/keyword_settings/${new_story_kw_id}`, story_kw_setting)
-          .then((res) => {
-            console.log('res ne: ', res);
-            // reloadUpdate()
-            reloadKeyWord();
-          })
-          .catch((error) => {
-            console.log(error);
-            // }
-          });
+        var ig_setting = { instagram_setting: { story_comment_bag_status: "keyword" } }
+        api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting).then(res => {
+
+        }).catch(error => {
+          console.log(error)
+        })
+        api.patch(`/api/v1/message_managements/keyword_settings/${new_story_kw_id}`, story_kw_setting).then(res => {
+          console.log('res ne: ', res)
+          // reloadUpdate()
+          reloadKeyWord()
+
+        }).catch(error => {
+          console.log(error)
+          // }
+        })
       }, 1500);
+
+
     }
+
+
+
   }
 
   function saveLiveSetting() {
@@ -2939,7 +2955,15 @@ function Release() {
             };
             api
               .patch(`/api/v1/message_managements/keyword_settings/${id}`, update)
-              .then((res) => { })
+              .then((res) => {
+                reloadUpdate();
+          setMsgNoti('ライブ設定を保存しました。');
+          setIsOpenNoti(true);
+          setTimeout(() => {
+            setMsgNoti('');
+            setIsOpenNoti(false);
+          }, 2000);
+               })
               .catch((error) => {
                 console.log(error);
               });

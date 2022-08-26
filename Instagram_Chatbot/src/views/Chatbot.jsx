@@ -400,7 +400,7 @@ function Chatbot() {
                       
                       <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                         <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                          Delete
+                          削除
                         </button>
                       </div>
                     <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
@@ -522,7 +522,7 @@ function Chatbot() {
                     `
                       <div id="deleteChoiceMsg${item.id}" style="width:100%; padding:5px; display:none"> 
                         <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                          Delete
+                        削除
                         </button>
                       </div>
                     `
@@ -1457,7 +1457,7 @@ function Chatbot() {
                 <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                    Delete
+                  削除
                   </button>
                 </div>
                 <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
@@ -1481,7 +1481,7 @@ function Chatbot() {
                   
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
+                    削除
                     </button>
                   </div>
                     <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
@@ -1504,7 +1504,7 @@ function Chatbot() {
                       
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
+                    削除
                     </button>
                   </div>
                     <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
@@ -1533,7 +1533,7 @@ function Chatbot() {
                     
                   <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                    Delete
+                  削除
                   </button>
                 </div>
                   <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
@@ -1554,7 +1554,7 @@ function Chatbot() {
                     <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
                     <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
+                    削除
                     </button>
                   </div>
                     <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
@@ -2100,7 +2100,7 @@ function Chatbot() {
                 <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                    Delete
+                  削除
                   </button>
                 </div>
                 <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
@@ -2124,7 +2124,7 @@ function Chatbot() {
                   
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
+                    削除
                     </button>
                   </div>
                     <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
@@ -2147,7 +2147,7 @@ function Chatbot() {
                       
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
+                    削除
                     </button>
                   </div>
                     <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
@@ -2176,7 +2176,7 @@ function Chatbot() {
                     
                   <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                    Delete
+                  削除
                   </button>
                 </div>
                   <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
@@ -2197,7 +2197,7 @@ function Chatbot() {
                     <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
                     <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
+                    削除
                     </button>
                   </div>
                     <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
@@ -2658,7 +2658,7 @@ function Chatbot() {
                 <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                    Delete
+                  削除
                   </button>
                 </div>
                 <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
@@ -2682,7 +2682,7 @@ function Chatbot() {
                   
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
+                    削除
                     </button>
                   </div>
                     <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
@@ -2705,7 +2705,7 @@ function Chatbot() {
                       
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
+                    削除
                     </button>
                   </div>
                     <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
@@ -2734,7 +2734,7 @@ function Chatbot() {
                     
                   <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
                   <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                    Delete
+                  削除
                   </button>
                 </div>
                   <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
@@ -2755,7 +2755,7 @@ function Chatbot() {
                     <input id="webUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].content == null ? "" : item.message_buttons[i].content} />
                     <div id="deleteChoice${item.id}_${i}" style="width:100%; padding:5px; display:none"> 
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
+                    削除
                     </button>
                   </div>
                     <input id="bagUPTC${item.message_buttons[i].message_id}" hidden type=text value=${item.message_buttons[i].message_bag_id} />
