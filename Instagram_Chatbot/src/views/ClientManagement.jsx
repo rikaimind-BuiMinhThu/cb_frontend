@@ -224,7 +224,7 @@ function ClientManagement() {
         setTitle(data.title);
         setManager(data.responsible_person);
         setManagerKata(data.responsible_person_katakana);
-        setUrlLogo(`https://ec-chatbot-test.com/${data.logo_url.url}`);
+        setUrlLogo(`https://ec-chatbot-test1.com/${data.logo_url.url}`);
         setUrl(data.url);
         setZipCode(data.zip_code);
         // console.log('prefecture: ' ,data.prefecture)
@@ -306,7 +306,7 @@ function ClientManagement() {
         setTitle(data.title);
         setManager(data.responsible_person);
         setManagerKata(data.responsible_person_katakana);
-        setUrlLogo(`https://ec-chatbot-test.com/${data.logo_url.url}`);
+        setUrlLogo(`https://ec-chatbot-test1.com/${data.logo_url.url}`);
         setUrl(data.url);
         setZipCode(data.zip_code);
         // if (data.prefecture === null) {
@@ -1091,7 +1091,7 @@ function ClientManagement() {
                           <td>{item.id}</td>
                           <td style={{ margin: '0', padding: '0' }}>
                             <img
-                              src={`https://ec-chatbot-test.com${item.logo_url.url}`}
+                              src={`https://ec-chatbot-test1.com${item.logo_url.url}`}
                               style={{ height: '60px', width: '60px', objectFit: 'cover' }}
                               alt=""
                             />

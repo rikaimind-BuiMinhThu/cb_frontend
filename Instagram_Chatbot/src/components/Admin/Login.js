@@ -42,7 +42,7 @@ class Login extends React.Component {
       document.getElementById('passwordMessage').innerHTML = ""
       // const loginInfo = { username: nameValue, password: password };
       const loginInfo = { user: { email: nameValue, password: password } }
-      axios.post(`https://ec-chatbot-test.com/api/v1/sign_in`, loginInfo)
+      axios.post(`https://ec-chatbot-test1.com/api/v1/sign_in`, loginInfo)
         .then(res => {
           document.getElementById("loginErrorMsg").style.display= "none"
           const persons = res.data;
@@ -95,7 +95,7 @@ class Login extends React.Component {
       document.getElementById('passwordMessage').innerHTML = ""
       // const loginInfo = { username: nameValue, password: password };
       const loginInfo = { user: { email: nameValue, password: password } }
-      axios.post(`https://ec-chatbot-test.com/api/v1/sign_in`, loginInfo)
+      axios.post(`https://ec-chatbot-test1.com/api/v1/sign_in`, loginInfo)
         .then(res => {
           document.getElementById("loginErrorMsg").style.display= "none"
           console.log(res)
