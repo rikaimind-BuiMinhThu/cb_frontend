@@ -27,6 +27,15 @@ function AttractedCustomer() {
   const [endDate, setEndDate] = useState(new Date());
   const [userECC, setUserECC] = useState([]);
   const [dataECU, setDataECU] = useState([]);
+  const [CVAL, setCVAL] = useState({})
+  React.useEffect(() => {
+    api
+    .get('/api/v1/instagram_users/conversions')
+    .then((res) => {
+      console.log("res CV: ", res.data.data)
+      setCVAL(res.data.data)
+    })
+  }, []);
 
   // mounted
   useEffect(() => {
@@ -410,20 +419,28 @@ function AttractedCustomer() {
                     <tbody>
                       <tr style={{ overflow: 'hidden', height: '14px' }}>
                         <td>DM</td>
-                        <td>{dmData.totalUser}</td>
-                        <td>{dmData.totalMessages}</td>
+                        {/* <td>{dmData.totalUser}</td> */}
+                        <td>{CVAL.dm_instagram_user_count}</td>
+                        {/* <td>{dmData.totalMessages}</td> */}
+                        <td>{CVAL.dm_instagram_message_count}</td>
                         <td>
-                          {dmData.totalUser !== 0
+                          {/* {dmData.totalUser !== 0
                             ? (dmData.totalMessages / dmData.totalUser).toFixed(
+                              2
+                            )
+                            : 0} */}
+                            {CVAL.dm_instagram_user_count !== 0
+                            ? (CVAL.dm_instagram_message_count / CVAL.dm_instagram_user_count).toFixed(
                               2
                             )
                             : 0}
                         </td>
-                        <td>{dmData.totalPurchase}</td>
+                        {/* <td>{dmData.totalPurchase}</td> */}
+                        <td>{CVAL.dm_conversion_count}</td>
                         <td>
-                          {dmData.totalMessages !== 0
+                          {CVAL.dm_instagram_message_count !== 0
                             ? (
-                              dmData.totalPurchase / dmData.totalMessages
+                              CVAL.dm_conversion_count / CVAL.dm_instagram_message_count
                             ).toFixed(2)
                             : `0.00`}
                           %
@@ -431,20 +448,28 @@ function AttractedCustomer() {
                       </tr>
                       <tr style={{ overflow: 'hidden', height: '14px' }}>
                         <td>ストーリー</td>
-                        <td>{scData.totalUser}</td>
-                        <td>{scData.totalMessages}</td>
+                        {/* <td>{scData.totalUser}</td> */}
+                        <td>{CVAL.story_instagram_user_count}</td>
+                        {/* <td>{scData.totalMessages}</td> */}
+                        <td>{CVAL.story_instagram_message_count}</td>
                         <td>
-                          {scData.totalUser !== 0
+                          {/* {scData.totalUser !== 0
                             ? (scData.totalMessages / scData.totalUser).toFixed(
+                              2
+                            )
+                            : 0} */}
+                            {CVAL.story_instagram_user_count !== 0
+                            ? (CVAL.story_instagram_message_count / CVAL.story_instagram_user_count).toFixed(
                               2
                             )
                             : 0}
                         </td>
-                        <td>{scData.totalPurchase}</td>
+                        {/* <td>{scData.totalPurchase}</td> */}
+                        <td>{CVAL.story_conversion_count}</td>
                         <td>
-                          {scData.totalMessages !== 0
+                          {CVAL.story_instagram_message_count !== 0
                             ? (
-                              scData.totalPurchase / scData.totalMessages
+                              CVAL.story_conversion_count / CVAL.story_instagram_message_count
                             ).toFixed(2)
                             : `0.00`}
                           %
@@ -452,18 +477,29 @@ function AttractedCustomer() {
                       </tr>
                       <tr style={{ overflow: 'hidden', height: '14px' }}>
                         <td>ライブ</td>
-                        <td>{lcData.totalUser}</td>
-                        <td>{lcData.totalMessages}</td>
+                        {/* <td>{lcData.totalUser}</td> */}
+                        <td>{CVAL.live_instagram_user_count}</td>
+                        {/* <td>{lcData.totalMessages}</td> */}
+                        <td>{CVAL.live_instagram_message_count}</td>
                         <td>
-                          {lcData.totalUser !== 0
-                            ? lcData.totalMessages / lcData.totalUser
+                          {/* {CVAL.live_instagram_user_count !== 0
+                            ? CVAL.live_instagram_message_count / CVAL.live_instagram_user_count
+                            : 0} */}
+                            {CVAL.live_instagram_user_count !== 0
+                            ? CVAL.live_instagram_message_count / CVAL.live_instagram_user_count
                             : 0}
                         </td>
-                        <td>{lcData.totalPurchase}</td>
+                        {/* <td>{lcData.totalPurchase}</td> */}
+                        <td>{CVAL.live_conversion_count}</td>
                         <td>
-                          {lcData.totalMessages !== 0
+                          {/* {lcData.totalMessages !== 0
                             ? (
                               lcData.totalPurchase / lcData.totalMessages
+                            ).toFixed(2)
+                            : `0.00`} */}
+                             {CVAL.live_instagram_message_count !== 0
+                            ? (
+                              CVAL.live_conversion_count / CVAL.live_instagram_message_count
                             ).toFixed(2)
                             : `0.00`}
                           %

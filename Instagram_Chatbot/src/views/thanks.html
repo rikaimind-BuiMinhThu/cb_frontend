@@ -1,12 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thank you</title>
+    <script>
+        var purchase = { instagram_user_id: 1, message_bag_id: 407 }
+        fetch('https://ec-chatbot-test.com/api/v1/instagram_users/conversions', {
+            method: "POST",
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: JSON.stringify(purchase)
+        })
+            .then(response => {
+                console.log(response);
+            })
+    </script>
 </head>
+
 <body>
     <h1>Thank you for buying our item</h1>
 </body>
+
 </html>

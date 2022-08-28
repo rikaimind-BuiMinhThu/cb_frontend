@@ -12,6 +12,7 @@ import { Button } from 'react-bootstrap';
 import { Title } from 'chart.js';
 import { Pagination } from '@material-ui/lab';
 import ModalShort from './Popup/ModalShort';
+import $ from "jquery";
 
 function ClientManagement() {
   var [dataList, setDataList] = useState([]);
@@ -259,8 +260,14 @@ function ClientManagement() {
     // setIsOpen(true)
     // setDisableInput(true)
   }
-
+  $('#screenAll').keydown(function (event) {
+    if (event.keyCode == 9) {  //tab pressed
+      event.preventDefault(); // stops its action
+    }
+  })
   function updateClientUser(item) {
+    // document.getElementById("screenAll").disabled = true;
+
     var path = window.location.pathname;
     api
       .get(`/api/v1/managements/clients/${item.id}`)
@@ -574,6 +581,9 @@ function ClientManagement() {
   }
 
   function addClient() {
+
+
+
     var path = window.location.pathname;
     const reader = new FileReader();
 
@@ -606,6 +616,7 @@ function ClientManagement() {
     var nameKata;
     var managerKata;
     var passwdLengthCheck;
+    var cfPass;
     var emailCheck;
     let dateCheck = false;
     if (utils.checkDateEndIn(inputEndDate, inputStartDate) === true) {
@@ -630,6 +641,13 @@ function ClientManagement() {
       document.getElementById('newClientパスワードErrMsg').style.display = 'none';
       document.getElementById('newClientパスワードErrMsg').innerHTML = '';
       passwdLengthCheck = true;
+    }
+    if (cfPassword != password) {
+      cfPass = false;
+    } else {
+      document.getElementById('newClientパスワード(確認用)ErrMsg').style.display = 'none';
+      document.getElementById('newClientパスワード(確認用)ErrMsg').innerHTML = '';
+      cfPass = true;
     }
 
     if (ava === '') {
@@ -755,6 +773,11 @@ function ClientManagement() {
         document.getElementById('newClientパスワードErrMsg').style.display = 'block';
         document.getElementById('newClientパスワードErrMsg').innerHTML =
           '24文字以下入力してください。6文字以上入力してください。';
+      }
+      if (cfPass == false) {
+        document.getElementById('newClientパスワード(確認用)ErrMsg').style.display = 'block';
+        document.getElementById('newClientパスワード(確認用)ErrMsg').innerHTML =
+          '確認用パスワードが一致しません';
       }
       if (checkNameAdd(name, '名称') !== true) {
         checkNameAdd(name, '名称');
@@ -954,13 +977,17 @@ function ClientManagement() {
     setInputStartDate('');
     setInputEndDate('');
     setIsOpenAddUser(true);
+    //detailUserClient
   }
 
-  function getBaseUrl() {
+  function getBaseUrl(event) {
+    console.log("getNe")
     var file = document.querySelector('input[type=file]')['files'][0];
     if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
       var reader = new FileReader();
       var baseString;
+      var imgUrl = URL.createObjectURL(event.target.files[0]);
+      document.getElementById(`imgUpdatesrc`).src = imgUrl
       reader.onloadend = function () {
         baseString = reader.result;
         setInputImage(baseString);
@@ -988,11 +1015,16 @@ function ClientManagement() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  function selectImgUpdate(e){
+    e.preventDefault()
+    document.getElementById(`avatar`).click()
+  }
+
   const items = dataList.clients;
   return (
     <>
       <div className="content">
-        <Row>
+        <Row id="screenAll">
           <Col md="12">
             <Card>
               <CardHeader>
@@ -1029,7 +1061,7 @@ function ClientManagement() {
                   <thead className="text-primary">
                     <tr>
                       <th style={{ width: '5%' }}>ID</th>
-                      <th style={{ width: '7%' }}> 画像（ロゴ）</th>
+                      <th style={{ width: '7%' }}> 画像</th>
                       <th style={{ width: '10%' }}>名称</th>
                       <th style={{ width: '10%' }}>プラン</th>
                       {/* <th style={{ width: "10%" }}><select className="text-primary" style={{ border: "none", fontWeight: "bold" }} defaultValue={''}>
@@ -1046,9 +1078,10 @@ function ClientManagement() {
                       {/**Date end using */}
                       <th style={{ minWidth: '200px', width: '200px' }}>住所</th>
                       {/**Address */}
+                      <th style={{ width: '10%' }}>コンバージョン率</th>
                       <th style={{ width: '10%' }}>最終ログイン日時</th>
                       {/**Last login date_time */}
-                      <th className="actionList">アクション</th>
+                      <th className="actionListClient">アクション</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1068,10 +1101,10 @@ function ClientManagement() {
                             {item.plan == 'startup'
                               ? 'スタートアップ'
                               : item.plan == 'expert'
-                              ? 'エキスパート'
-                              : item.plan == 'complete'
-                              ? '完全成果報酬'
-                              : 'プレミアム'}
+                                ? 'エキスパート'
+                                : item.plan == 'complete'
+                                  ? '完全成果報酬'
+                                  : 'プレミアム'}
                           </td>
                           <td>{item.price}</td>
                           <td id="dateStart">
@@ -1091,19 +1124,27 @@ function ClientManagement() {
                               {item.prefecture} {item.address} {item.building_name}
                             </div>
                           </td>
+                          <td>{parseInt(item.instagram_message_count) !==0 
+                          ? (
+                            parseInt(item.instagram_conversion_count)/parseInt(item.instagram_message_count)
+                            ).toFixed(2)
+                            : `0.00`}%</td>
                           <td>{item.last_sign_in_at}</td>
-                          <td className="actionList">
-                            <div>
-                              <Button onClick={() => getUserDetail(item)}>詳細</Button>
-                              <Button className="editBtn" onClick={() => updateClientUser(item)}>
+                          <td className="actionListClient">
+                            <div style={{ display: "flex" }}>
+                              <div onClick={() => getUserDetail(item)}><i className="nc-icon nc-badge nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
+                              {/* <Button onClick={() => getUserDetail(item)}>詳細</Button> */}
+                              <div onClick={() => updateClientUser(item)}><i className="nc-icon nc-align-center nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
+                              {/* <Button className="editBtn" onClick={() => updateClientUser(item)}>
                                 編集
-                              </Button>
-                              <Button
+                              </Button> */}
+                              <div onClick={() => deleteClientPopup(item.id)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px", cursor: "pointer" }}></i></div>
+                              {/* <Button
                                 className="deleteBtn"
                                 onClick={() => deleteClientPopup(item.id)}
                               >
                                 削除
-                              </Button>
+                              </Button> */}
                             </div>
                           </td>
                         </tr>
@@ -1241,7 +1282,7 @@ function ClientManagement() {
                     value={
                       inputStartDate !== '' ? inputStartDate?.replace(/-/g, '/') : 'yyyy/mm/dd'
                     }
-                    onChange={() => {}}
+                    onChange={() => { }}
                     className="input-field"
                     disabled={disableInput === true ? true : false}
                     readOnly
@@ -1269,7 +1310,7 @@ function ClientManagement() {
                   <input
                     type="text"
                     value={inputEndDate !== '' ? inputEndDate?.replace(/-/g, '/') : 'yyyy/mm/dd'}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     className="input-field"
                     disabled={disableInput === true ? true : false}
                     readOnly
@@ -1682,22 +1723,36 @@ function ClientManagement() {
                 </label> <br /><br /> */}
                 <label className="label-input">
                   画像（ロゴ）<span className="span-require">*必須</span>
+
+                  
+                  
                   <input
                     className="input-field"
                     type="file"
                     id="avatar"
+                    style={{ display: disableInput == true ? "none" : "block" }}
                     onChange={(e) => {
-                      getBaseUrl();
+                      getBaseUrl(e);
                       setUpdateImageChange(true);
                     }}
                     disabled={disableInput == true ? true : false}
+                    hidden
                     name="logo_url"
                     accept="image/png, image/jpeg"
                   />
-                  <img
+                  <button id="btnimgNum" style={{
+                    backgroundColor: "white",
+                    border: "1px solid gray",
+                    marginLeft: '12%', marginTop: '-60px',
+                     borderRadius: "10px", width: "100px"
+                  }}
+                  onClick={(e) => selectImgUpdate(e)}>画像変更</button>
+                  <br />
+                  <img id="imgUpdatesrc"
                     src={urlLogo}
                     style={{ maxHeight: '200px', marginLeft: '30%', marginTop: '5px' }}
                   ></img>
+
                   <label
                     id="newClientImgLogoErrMsg"
                     className="input-field"
@@ -1733,7 +1788,7 @@ function ClientManagement() {
                     disabled={disableInput == true ? true : false}
                     value={zipCode}
                     onChange={(e) => setZipCode(e.target.value)}
-                    onBlur={(e) => checkFieldAdd(e.target.value, '郵便番号')}
+                    onBlur={(e) => utils.checkInputNumber(e.target.value, '郵便番号')}
                     type="text"
                     id="newPostCode"
                     name="zip_code"
@@ -2127,7 +2182,7 @@ function ClientManagement() {
                   <input
                     type="text"
                     value={inputStartDate ? inputStartDate?.replace(/-/g, '/') : 'yyyy/mm/dd'}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     className="input-field"
                     readOnly
                   />
@@ -2152,7 +2207,7 @@ function ClientManagement() {
                   <input
                     type="text"
                     value={inputEndDate ? inputEndDate?.replace(/-/g, '/') : 'yyyy/mm/dd'}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     className="input-field"
                     readOnly
                   />

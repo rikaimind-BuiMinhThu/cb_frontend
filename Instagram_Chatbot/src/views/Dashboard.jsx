@@ -273,7 +273,7 @@ function Dashboard() {
                     <Col md="8" xs="7">
                       <div className="numbers">
                         <CardTitle tag="p" style={{ fontSize: '23px' }}>
-                          価格
+                        キーワード設定
                         </CardTitle>
                         <p />
                       </div>

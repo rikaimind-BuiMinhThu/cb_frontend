@@ -301,7 +301,7 @@ function Chatbot() {
                 <div style="padding:0px 5px 10px 5px">形式チェック: ${item.free_input.format_check == "email" ? "メールアドレス" : (item.free_input.format_check == "phone_number" ? "電話番号" : "バーリデーションなし")}</div>
                 <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none">
                     <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                      Delete
+                    削除
                     </button>
                   </div>           
                 <input id="lblAddFI${item.free_input.message_id}" hidden type=text value="${item.free_input.free_input_labels}" />
@@ -350,7 +350,7 @@ function Chatbot() {
                   
                     <div id="deleteChoice${item.id}" style="width:100%; padding:5px; display:none"> 
                         <button style="border: none; background-color:#f17e5d; border-radius:5px; color:white; font-weight:700; font-size:12px">
-                          Delete
+                        削除
                         </button>
                       </div>
                     <input id="bagUPTC${item.message_buttons[0].message_id}" hidden type=text value=${item.message_buttons[0].message_bag_id} />
@@ -1172,194 +1172,202 @@ function Chatbot() {
               document.getElementById(`addUpMessErr${item.id}`).style.display = "none"
               document.getElementById(`addUpMessErr${item.id}`).innerHTML = ""
 
+              //100文字以下で入力してください。
+              if (document.getElementById(`mgsCustomSaved${item.id}`).value.length > 100) {
+                document.getElementById(`addUpMessErr${item.id}`).style.display = "block"
+                document.getElementById(`addUpMessErr${item.id}`).innerHTML = "100文字以下で入力してください。"
+              } else {
+                document.getElementById(`addUpMessErr${item.id}`).style.display = "none"
+                document.getElementById(`addUpMessErr${item.id}`).innerHTML = ""
 
-              var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
-              // var purchase_btn = document.getElementById(`purchase${item.id}`).checked
-              var add
-              if (document.getElementById(`bagAddSC${item.id}`) != null || document.getElementById(`groupAddSC${item.id}`) != null || document.getElementById(`titleAddSC${item.id}`) != null) {
-                var titlea = document.getElementById(`titleAddSC${item.id}`).value
-                var groupva = document.getElementById(`groupAddSC${item.id}`).value
-                var group_name = document.getElementById(`groupNameAddSC${item.id}`).value
-                var bag_name = document.getElementById(`bagNameAddSC${item.id}`).value
-                var bag = document.getElementById(`bagAddSC${item.id}`).value
-                var type = document.getElementById(`typeAddSC${item.id}`).value
-                var web = document.getElementById(`webAddSC${item.id}`).value
-                var lbl = document.getElementById(`lblAddSC${item.id}_${bagAddSC}`).value
-                // console.log("lbl: ", lbl)
-                var listLbl = lbl.substring(2, lbl.length).split(", ")
-                var lastListLBL = []
-                for (var i = 0; i < listLbl.length; i++) {
-                  lastListLBL.push({ label_name: listLbl[i] })
-                }
-                if (type == "mess") {
-                  add = {
-                    message: {
-                      message_bag_id: bagId,
-                      message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
-                      message_type: "msg",
-                      img_value: "",
-                      message_buttons: [
-                        { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
-                      ]
-                    }
 
-                  }
-                } else if (type == "web_url") {
-                  add = {
-                    message: {
-                      message_bag_id: bagId,
-                      message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
-                      message_type: "msg",
-                      img_value: "",
-                      message_buttons: [
-                        { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
-                      ]
-                    }
-
-                  }
-                }
-              } else if (document.getElementById(`titleAddTC${item.id}_${totalItemTC}`) != null) {
-                var message_buttons = []
-                console.log("totalItemTC: ", totalItemTC)
-                var totalTCItem = document.getElementById(`totalItemTC${item.id}`).value
-
-                console.log("mb ne: ", totalTCItem)
-                for (var i = 1; i <= totalTCItem; i++) {
-
-                  var titlea = document.getElementById(`titleAddTC${item.id}_${i}`).value
-                  var groupva = document.getElementById(`groupAddTC${item.id}_${i}`).value
-                  var group_name = document.getElementById(`groupNameAddTC${item.id}_${i}`).value
-                  var bag_name = document.getElementById(`bagNameAddTC${item.id}_${i}`).value
-                  var bag = document.getElementById(`bagAddTC${item.id}_${i}`).value
-                  var type = document.getElementById(`typeAddTC${item.id}_${i}`).value
-                  var web = document.getElementById(`webAddTC${item.id}_${i}`).value
-                  var lbl = document.getElementById(`lblAddTCItem${item.id}_${i}`).value
-                  // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+                var upd = { message: { message_value: document.getElementById(`mgsCustomSaved${item.id}`).value, message_type: "msg", img_value: "" } }
+                // var purchase_btn = document.getElementById(`purchase${item.id}`).checked
+                var add
+                if (document.getElementById(`bagAddSC${item.id}`) != null || document.getElementById(`groupAddSC${item.id}`) != null || document.getElementById(`titleAddSC${item.id}`) != null) {
+                  var titlea = document.getElementById(`titleAddSC${item.id}`).value
+                  var groupva = document.getElementById(`groupAddSC${item.id}`).value
+                  var group_name = document.getElementById(`groupNameAddSC${item.id}`).value
+                  var bag_name = document.getElementById(`bagNameAddSC${item.id}`).value
+                  var bag = document.getElementById(`bagAddSC${item.id}`).value
+                  var type = document.getElementById(`typeAddSC${item.id}`).value
+                  var web = document.getElementById(`webAddSC${item.id}`).value
+                  var lbl = document.getElementById(`lblAddSC${item.id}_${bagAddSC}`).value
+                  // console.log("lbl: ", lbl)
                   var listLbl = lbl.substring(2, lbl.length).split(", ")
                   var lastListLBL = []
-                  for (var j = 0; j < listLbl.length; j++) {
-                    lastListLBL.push({ label_name: listLbl[j] })
-                  }
-                  if (type == "mess") {
-
-                    // add = {
-                    //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
-                    //   message_button: [
-                    //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
-                    //   ]
-                    // }
-
-                    message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
-                  } else if (type == "web_url") {
-                    // add = {
-                    //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
-                    //   message_button: [
-                    //     { button_type: "web_url", title: titlea, content: web }
-                    //   ]
-                    // }
-
-                    message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
-                  }
-                }
-
-                add = {
-                  message: {
-                    message_bag_id: bagId,
-                    message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
-                    message_type: "msg",
-                    img_value: "",
-                    message_buttons
-                  },
-
-                }
-              } else if (document.getElementById(`formatCheckSelect${item.id}`) != null || document.getElementById(`formatCheckMSG${item.id}`) != null) {
-                // var group = document.getElementById(`groupAddFI${idSC}`).value
-                // var bag = document.getElementById(`bagAddFI${idSC}`).value
-                var lbl
-                var listLbl
-                var lastListLBL = []
-                if (document.getElementById(`lblAddFI${item.id}_${bagAddSC}`) != null) {
-                  lbl = document.getElementById(`lblAddFI${item.id}_${bagAddSC}`).value
-                  listLbl = lbl.substring(2, lbl.length).split(", ")
-
                   for (var i = 0; i < listLbl.length; i++) {
                     lastListLBL.push({ label_name: listLbl[i] })
                   }
-                }
+                  if (type == "mess") {
+                    add = {
+                      message: {
+                        message_bag_id: bagId,
+                        message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
+                        message_type: "msg",
+                        img_value: "",
+                        message_buttons: [
+                          { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+                        ]
+                      }
 
-                var formatCheckSelect = document.getElementById(`formatCheckSelect${item.id}`).value
-                var formatCheckMSG = document.getElementById(`formatCheckMSG${item.id}`).value
+                    }
+                  } else if (type == "web_url") {
+                    add = {
+                      message: {
+                        message_bag_id: bagId,
+                        message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
+                        message_type: "msg",
+                        img_value: "",
+                        message_buttons: [
+                          { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
+                        ]
+                      }
 
-
-                add = {
-                  message: {
-                    message_bag_id: bagId,
-                    message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
-                    message_type: "msg",
-                    img_value: "",
-                    free_input: {
-                      message_bag_id: `1`,
-                      free_input_labels: lastListLBL,
-                      format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
-                      format_check_message: formatCheckMSG
                     }
                   }
-                  // message_button: [
-                  //   { button_type: "format", title: '', content: `+message_bag_id_${bag}`, label: listLbl, format: formatCheckSelect, format_msg: formatCheckMSG }
-                  // ]
-                }
-              }
-              else {
-                if (item.free_input != null || item.free_input != "" || item.free_input != undefined) {
-                  var new_msg_btn = []
-                  new_msg_btn = item.message_buttons
+                } else if (document.getElementById(`titleAddTC${item.id}_${totalItemTC}`) != null) {
+                  var message_buttons = []
+                  console.log("totalItemTC: ", totalItemTC)
+                  var totalTCItem = document.getElementById(`totalItemTC${item.id}`).value
+
+                  console.log("mb ne: ", totalTCItem)
+                  for (var i = 1; i <= totalTCItem; i++) {
+
+                    var titlea = document.getElementById(`titleAddTC${item.id}_${i}`).value
+                    var groupva = document.getElementById(`groupAddTC${item.id}_${i}`).value
+                    var group_name = document.getElementById(`groupNameAddTC${item.id}_${i}`).value
+                    var bag_name = document.getElementById(`bagNameAddTC${item.id}_${i}`).value
+                    var bag = document.getElementById(`bagAddTC${item.id}_${i}`).value
+                    var type = document.getElementById(`typeAddTC${item.id}_${i}`).value
+                    var web = document.getElementById(`webAddTC${item.id}_${i}`).value
+                    var lbl = document.getElementById(`lblAddTCItem${item.id}_${i}`).value
+                    // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+                    var listLbl = lbl.substring(2, lbl.length).split(", ")
+                    var lastListLBL = []
+                    for (var j = 0; j < listLbl.length; j++) {
+                      lastListLBL.push({ label_name: listLbl[j] })
+                    }
+                    if (type == "mess") {
+
+                      // add = {
+                      //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                      //   message_button: [
+                      //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
+                      //   ]
+                      // }
+
+                      message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
+                    } else if (type == "web_url") {
+                      // add = {
+                      //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                      //   message_button: [
+                      //     { button_type: "web_url", title: titlea, content: web }
+                      //   ]
+                      // }
+
+                      message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
+                    }
+                  }
+
                   add = {
                     message: {
                       message_bag_id: bagId,
                       message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
                       message_type: "msg",
                       img_value: "",
-                      message_buttons: new_msg_btn,
-                      free_input: item.free_input
+                      message_buttons
+                    },
+
+                  }
+                } else if (document.getElementById(`formatCheckSelect${item.id}`) != null || document.getElementById(`formatCheckMSG${item.id}`) != null) {
+                  // var group = document.getElementById(`groupAddFI${idSC}`).value
+                  // var bag = document.getElementById(`bagAddFI${idSC}`).value
+                  var lbl
+                  var listLbl
+                  var lastListLBL = []
+                  if (document.getElementById(`lblAddFI${item.id}_${bagAddSC}`) != null) {
+                    lbl = document.getElementById(`lblAddFI${item.id}_${bagAddSC}`).value
+                    listLbl = lbl.substring(2, lbl.length).split(", ")
+
+                    for (var i = 0; i < listLbl.length; i++) {
+                      lastListLBL.push({ label_name: listLbl[i] })
                     }
                   }
-                } else {
-                  var new_msg_btn = []
-                  new_msg_btn = item.message_buttons
+
+                  var formatCheckSelect = document.getElementById(`formatCheckSelect${item.id}`).value
+                  var formatCheckMSG = document.getElementById(`formatCheckMSG${item.id}`).value
+
+
                   add = {
                     message: {
                       message_bag_id: bagId,
                       message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
                       message_type: "msg",
                       img_value: "",
-                      message_buttons: new_msg_btn
+                      free_input: {
+                        message_bag_id: `1`,
+                        free_input_labels: lastListLBL,
+                        format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+                        format_check_message: formatCheckMSG
+                      }
                     }
+                    // message_button: [
+                    //   { button_type: "format", title: '', content: `+message_bag_id_${bag}`, label: listLbl, format: formatCheckSelect, format_msg: formatCheckMSG }
+                    // ]
                   }
                 }
+                else {
+                  if (item.free_input != null || item.free_input != "" || item.free_input != undefined) {
+                    var new_msg_btn = []
+                    new_msg_btn = item.message_buttons
+                    add = {
+                      message: {
+                        message_bag_id: bagId,
+                        message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
+                        message_type: "msg",
+                        img_value: "",
+                        message_buttons: new_msg_btn,
+                        free_input: item.free_input
+                      }
+                    }
+                  } else {
+                    var new_msg_btn = []
+                    new_msg_btn = item.message_buttons
+                    add = {
+                      message: {
+                        message_bag_id: bagId,
+                        message_value: document.getElementById(`mgsCustomSaved${item.id}`).value,
+                        message_type: "msg",
+                        img_value: "",
+                        message_buttons: new_msg_btn
+                      }
+                    }
+                  }
 
+                }
+
+                console.log(add)
+
+                setTotalItemTC(1)
+
+
+                api.patch(`/api/v1/message_managements/messages/${item.id}`, add).then(res => {
+                  console.log(res)
+
+                  setTimeout(() => {
+                    setIsOpenNoti(true)
+                    setMsgNoti("更新しました。")
+                  }, 1500)
+                  enableAddNewMsg()
+                  setTimeout(function () {
+                    setIsOpenNoti(false)
+                  }, 2000);
+                  getBagMsg(group, id)
+                }).catch(error => {
+                  console.log(error)
+                })
               }
-
-              console.log(add)
-
-              setTotalItemTC(1)
-
-
-              api.patch(`/api/v1/message_managements/messages/${item.id}`, add).then(res => {
-                console.log(res)
-
-                setTimeout(() => {
-                  setIsOpenNoti(true)
-                  setMsgNoti("更新しました。")
-                }, 1500)
-                enableAddNewMsg()
-                setTimeout(function () {
-                  setIsOpenNoti(false)
-                }, 2000);
-                getBagMsg(group, id)
-              }).catch(error => {
-                console.log(error)
-              })
-
             }
           })
 
@@ -1396,7 +1404,7 @@ function Chatbot() {
             var abc = document.createElement(`div`)
             document.getElementById('logUserDiv').appendChild(abc)
             abc.innerHTML =
-              `<div id="ovMsg${item.id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+              `<div id="ovMsg${item.id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px 0px 5px 5px; display:block; float: right; border-radius: 10px">
                 <textarea type="text" id="msgOVI${item.id}" style="width:90%; text-align: right; background-color: #51cbce; border: none; overflow-y:auto" readonly/>
                </div> `
             document.getElementById(`msgOVI${item.id}`).value = item.message_value
@@ -2407,6 +2415,13 @@ function Chatbot() {
                 // var upd = {
                 //   message: { message_value: document.getElementById(`imgMgsCustomSaved${item.id}`).value, message_type: "img_msg", img_value: document.getElementById(`imgValueMsgNumSaved${item.id}`).value }
                 // }
+                if(document.getElementById(`imgMgsCustomSaved${item.id}`).value.length >100){
+                  document.getElementById(`addUpImMessErr${item.id}`).style.display = "block"
+                document.getElementById(`addUpImMessErr${item.id}`).innerHTML = "100文字以下で入力してください。"
+                }else{
+                  document.getElementById(`addUpImMessErr${item.id}`).style.display = "none"
+                document.getElementById(`addUpImMessErr${item.id}`).innerHTML = ""
+                
 
 
                 var add
@@ -2590,7 +2605,7 @@ function Chatbot() {
                   console.log(error)
                 })
 
-
+              }
 
                 // api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
                 //   // alert("Delete Successfully")
@@ -2625,7 +2640,7 @@ function Chatbot() {
             document.getElementById('logUserDiv').appendChild(abc)
             abc.innerHTML =
               `
-              <div id="ovMsg${item.id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+              <div id="ovMsg${item.id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px 0px 5px 5px; display:block; float: right; border-radius: 10px">
                 <textarea type="text" id="imgMsgOVI${item.id}" style="width:90%; text-align: right; background-color: #51cbce; border: none; overflow-y:auto" readonly/>
                </div> 
               `
@@ -3111,7 +3126,7 @@ function Chatbot() {
       console.log(res)
       setTimeout(() => {
         setIsOpenNoti(true)
-        setMsgNoti("Moved message successfully")
+        setMsgNoti("メッセージを移動しました。")
       }, 100)
 
       setTimeout(function () {
@@ -3188,7 +3203,7 @@ function Chatbot() {
     api.post(`/api/v1/message_managements/message_bags/${idMsgBagMove}/move`, gr).then(res => {
       setTimeout(() => {
         setIsOpenNoti(true)
-        setMsgNoti("Moved Bag successfully")
+        setMsgNoti("メッセージ袋を移動しました。")
       }, 100)
 
       setTimeout(function () {
@@ -3795,8 +3810,8 @@ function Chatbot() {
 
   function loadFile(event, id) {
     //checkImgAddEmpty
-    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') 
-    || event.target.files[0].name.includes('jpg') || event.target.files[0].name.includes('gif')) {
+    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg')
+      || event.target.files[0].name.includes('jpg') || event.target.files[0].name.includes('gif')) {
       document.getElementById(`checkImgAddEmpty${id}`).style.display = "none"
       document.getElementById(`checkImgAddEmpty${id}`).innerHTML = ""
       var num = parseInt(imgCBNum) + 1
@@ -3836,8 +3851,8 @@ function Chatbot() {
     // var num = parseInt(id) + 1
     //imgNumSavedCheck
 
-    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') 
-    || event.target.files[0].name.includes('jpg') || event.target.files[0].name.includes('gif')) {
+    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg')
+      || event.target.files[0].name.includes('jpg') || event.target.files[0].name.includes('gif')) {
       document.getElementById(`imgNumSavedCheck${id}`).style.display = "none"
       document.getElementById(`imgNumSavedCheck${id}`).innerHTML = ""
       getBaseUrlSaved(id)
@@ -3876,8 +3891,8 @@ function Chatbot() {
     // console.log(event.target.files[0].name)
 
 
-    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') 
-    || event.target.files[0].name.includes('jpg') || event.target.files[0].name.includes('gif')) {
+    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg')
+      || event.target.files[0].name.includes('jpg') || event.target.files[0].name.includes('gif')) {
       document.getElementById(`checkImgMsgAddEmpty${id}`).style.display = "none"
       document.getElementById(`checkImgMsgAddEmpty${id}`).innerHTML = ""
 
@@ -3920,8 +3935,8 @@ function Chatbot() {
   function loadFileImgMsgSaved(event, id) {
     // var num = parseInt(imgMsgCBNum) + 1
 
-    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg') 
-    || event.target.files[0].name.includes('jpg') || event.target.files[0].name.includes('gif')) {
+    if (event.target.files[0].name.includes('img') || event.target.files[0].name.includes('png') || event.target.files[0].name.includes('jpeg')
+      || event.target.files[0].name.includes('jpg') || event.target.files[0].name.includes('gif')) {
       document.getElementById(`checkImgMsgCheck${id}`).style.display = "none"
       document.getElementById(`checkImgMsgCheck${id}`).innerHTML = ""
       getBaseUrlImgMsgSaved(id)
@@ -3968,7 +3983,7 @@ function Chatbot() {
       var abc = document.createElement(`div`)
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML =
-        `<div id="ovMsgCB${num}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+        `<div id="ovMsgCB${num}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px 0px 5px 5px; display:block; float: right; border-radius: 10px">
       <textarea type="text" id="imgMsgOVI${num}" style=" width: 70% ;text-align: right; background-color: #51cbce; border: none" readonly/>
       </div> `
       document.getElementById(`imgMsgOVI${num}`).value = msg;
@@ -3990,7 +4005,7 @@ function Chatbot() {
       var abc = document.createElement(`div`)
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML =
-        `<div id="ovMsgCB${id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+        `<div id="ovMsgCB${id}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px 0px 5px 5px; display:block; float: right; border-radius: 10px">
       <textarea type="text" id="imgMsgOVI${id}" style=" width: 80% ;text-align: right; background-color: #51cbce; border: none" readonly/>
       </div> `
       document.getElementById(`imgMsgOVI${id}`).value = msg;
@@ -4054,7 +4069,7 @@ function Chatbot() {
       var abc = document.createElement(`div`)
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML =
-        `<div id="ovMsg${num}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+        `<div id="ovMsg${num}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px 0px 5px 5px; display:block; float: right; border-radius: 10px">
       <input type="text" id="msgOVI${num}" style=" width: 80%; text-align: right; background-color: #51cbce; border: none" readonly/>
       </div> `
       document.getElementById(`msgOVI${num}`).value = msg;
@@ -4076,7 +4091,7 @@ function Chatbot() {
       var abc = document.createElement(`div`)
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML =
-        `<div id="ovMsg${num}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+        `<div id="ovMsg${num}" style="width: 100%; background-color: #51cbce; padding: 10px; margin:5px 0px 5px 5px; display:block; float: right; border-radius: 10px">
       <textarea type="text" id="msgOVI${num}" style=" width: 80%; text-align: right; background-color: #51cbce; border: none" readonly/>
       </div> `
       document.getElementById(`msgOVI${num}`).value = msg;
@@ -4098,7 +4113,7 @@ function Chatbot() {
       var abc = document.createElement(`div`)
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML =
-        `<div id="ovMsg${id}" style="width: 70%; background-color: #51cbce; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
+        `<div id="ovMsg${id}" style="width: 70%; background-color: #51cbce; padding: 10px; margin:5px 0px 5px 5px; display:block; float: right; border-radius: 10px">
       <input type="text" id="msgOVI${id}" style=" width: 70%; text-align: right; background-color: #51cbce; border: none" readonly/>
       </div> `
       document.getElementById(`msgOVI${id}`).value = msg;
@@ -4121,7 +4136,7 @@ function Chatbot() {
       document.getElementById('logUserDiv').appendChild(abc)
       abc.innerHTML =
         `
-        <div id="ovMsgKey${num}" style="width: 70%; background-color: #51cbce; padding: 10px; float:left; margin:5px; display:block; border-radius: 10px">
+        <div id="ovMsgKey${num}" style="width: 70%; background-color: #51cbce; padding: 10px; float:left; margin:5px 0px 5px 5px; display:block; border-radius: 10px">
       <input type="text" id="msgOVIKey${num}" style="width: 70%; background-color: #51cbce; border: none" readonly/>
       </div>`
       document.getElementById(`msgOVIKey${num}`).value = msg;
@@ -4524,173 +4539,183 @@ function Chatbot() {
         // var add = {
         //   message: { message_bag_id: bagId, message_value: element, message_type: "msg", img_value: "" }
         // }
-        var add
-        if (document.getElementById(`bagAddSC${idSC}`) != null || document.getElementById(`groupAddSC${idSC}`) != null || document.getElementById(`titleAddSC${idSC}`) != null) {
-          var titlea = document.getElementById(`titleAddSC${idSC}`).value
-          var group = document.getElementById(`groupAddSC${idSC}`).value
-          var group_name = document.getElementById(`groupNameAddSC${idSC}`).value
-          var bag_name = document.getElementById(`bagNameAddSC${idSC}`).value
-          var bag = document.getElementById(`bagAddSC${idSC}`).value
-          var type = document.getElementById(`typeAddSC${idSC}`).value
-          var web = document.getElementById(`webAddSC${idSC}`).value
-          var lbl = document.getElementById(`lblAddSC${idSC}_${bagAddSC}`).value
-          // console.log("lbl: ", lbl)
-          var listLbl = lbl.substring(2, lbl.length).split(", ")
-          var lastListLBL = []
-          for (var i = 0; i < listLbl.length; i++) {
-            lastListLBL.push({ label_name: listLbl[i] })
-          }
-          if (type == "mess") {
-            add = {
-              message: {
-                message_bag_id: bagId,
-                message_value: element,
-                message_type: "msg",
-                img_value: "",
-                message_buttons: [
-                  { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
-                ]
-              }
+        console.log(element.length)
 
-            }
-          } else if (type == "web_url") {
-            add = {
-              message: {
-                message_bag_id: bagId,
-                message_value: element,
-                message_type: "msg",
-                img_value: "",
-                message_buttons: [
-                  { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
-                ]
-              }
+        if (element.length > 100) {
+          document.getElementById(`addNewMessErr${numIndex}`).style.display = "block"
+          document.getElementById(`addNewMessErr${numIndex}`).innerHTML = "100文字以下で入力してください。"
+        } else {
+          document.getElementById(`addNewMessErr${numIndex}`).style.display = "none"
+          document.getElementById(`addNewMessErr${numIndex}`).innerHTML = ""
 
-            }
-          }
-        } else if (document.getElementById(`bagAddTC${idSC}_${totalItemTC}`) != null || document.getElementById(`groupAddTC${numIndex}_${totalItemTC}`) != null || document.getElementById(`titleAddTC${idSC}_${totalItemTC}`) != null) {
-          var message_buttons = []
-          // console.log("totalItemTC: ", totalItemTC)
-          var totalTCItem = document.getElementById(`totalItemTC${idSC}`).value
-
-
-          console.log("mb ne: ", totalTCItem)
-          for (var i = 1; i <= totalTCItem; i++) {
-
-            var titlea = document.getElementById(`titleAddTC${idSC}_${i}`).value
-            var group = document.getElementById(`groupAddTC${idSC}_${i}`).value
-            var group_name = document.getElementById(`groupNameAddTC${idSC}_${i}`).value
-            var bag_name = document.getElementById(`bagNameAddTC${idSC}_${i}`).value
-            var bag = document.getElementById(`bagAddTC${idSC}_${i}`).value
-            var type = document.getElementById(`typeAddTC${idSC}_${i}`).value
-            var web = document.getElementById(`webAddTC${idSC}_${i}`).value
-            var lbl = document.getElementById(`lblAddTCItem${idSC}_${i}`).value
-            // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+          var add
+          if (document.getElementById(`bagAddSC${idSC}`) != null || document.getElementById(`groupAddSC${idSC}`) != null || document.getElementById(`titleAddSC${idSC}`) != null) {
+            var titlea = document.getElementById(`titleAddSC${idSC}`).value
+            var group = document.getElementById(`groupAddSC${idSC}`).value
+            var group_name = document.getElementById(`groupNameAddSC${idSC}`).value
+            var bag_name = document.getElementById(`bagNameAddSC${idSC}`).value
+            var bag = document.getElementById(`bagAddSC${idSC}`).value
+            var type = document.getElementById(`typeAddSC${idSC}`).value
+            var web = document.getElementById(`webAddSC${idSC}`).value
+            var lbl = document.getElementById(`lblAddSC${idSC}_${bagAddSC}`).value
+            // console.log("lbl: ", lbl)
             var listLbl = lbl.substring(2, lbl.length).split(", ")
             var lastListLBL = []
-            for (var j = 0; j < listLbl.length; j++) {
-              lastListLBL.push({ label_name: listLbl[j] })
+            for (var i = 0; i < listLbl.length; i++) {
+              lastListLBL.push({ label_name: listLbl[i] })
             }
             if (type == "mess") {
+              add = {
+                message: {
+                  message_bag_id: bagId,
+                  message_value: element,
+                  message_type: "msg",
+                  img_value: "",
+                  message_buttons: [
+                    { button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL }
+                  ]
+                }
 
-              // add = {
-              //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
-              //   message_button: [
-              //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
-              //   ]
-              // }
-
-              message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
-            } else if (type == "web_url") {
-              // add = {
-              //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
-              //   message_button: [
-              //     { button_type: "web_url", title: titlea, content: web }
-              //   ]
-              // }
-
-              message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
-            }
-          }
-
-          var isWeb = false
-          for (var j = 0; j < message_buttons.length; j++) {
-            if (message_buttons[j].button_type == "web_url") {
-              isWeb = true
-            }
-          }
-          add = {
-            message: {
-              message_bag_id: bagId,
-              message_value: element,
-              message_type: "msg",
-              img_value: "",
-              message_buttons
-            },
-
-          }
-        } else if (document.getElementById(`formatCheckSelect${idSC}`) != null) {
-          // var group = document.getElementById(`groupAddFI${idSC}`).value
-          // var bag = document.getElementById(`bagAddFI${idSC}`).value
-          var lbl = document.getElementById(`lblAddFI${idSC}_${bagAddSC}`).value
-          var formatCheckSelect = document.getElementById(`formatCheckSelect${idSC}`).value
-          var formatCheckMSG = document.getElementById(`formatCheckMSG${idSC}`).value
-          // console.log("lbl: ", lbl)
-          var listLbl = lbl.substring(2, lbl.length).split(", ")
-          var lastListLBL = []
-          for (var i = 0; i < listLbl.length; i++) {
-            lastListLBL.push({ label_name: listLbl[i] })
-          }
-          add = {
-            message: {
-              message_bag_id: bagId,
-              message_value: element,
-              message_type: "msg",
-              img_value: "",
-              free_input: {
-                message_bag_id: `1`,
-                free_input_labels: lastListLBL,
-                format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
-                format_check_message: formatCheckMSG
               }
-            },
-            // message_button: [
-            //   { button_type: "format", title: '', content: `+message_bag_id_${bag}`, label: listLbl, format: formatCheckSelect, format_msg: formatCheckMSG }
-            // ]
-          }
-        }
-        else {
-          add = {
-            message: {
-              message_bag_id: bagId, message_value: element, message_type: "msg", img_value: ""
+            } else if (type == "web_url") {
+              add = {
+                message: {
+                  message_bag_id: bagId,
+                  message_value: element,
+                  message_type: "msg",
+                  img_value: "",
+                  message_buttons: [
+                    { button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL }
+                  ]
+                }
+
+              }
+            }
+          } else if (document.getElementById(`bagAddTC${idSC}_${totalItemTC}`) != null || document.getElementById(`groupAddTC${numIndex}_${totalItemTC}`) != null || document.getElementById(`titleAddTC${idSC}_${totalItemTC}`) != null) {
+            var message_buttons = []
+            // console.log("totalItemTC: ", totalItemTC)
+            var totalTCItem = document.getElementById(`totalItemTC${idSC}`).value
+
+
+            console.log("mb ne: ", totalTCItem)
+            for (var i = 1; i <= totalTCItem; i++) {
+
+              var titlea = document.getElementById(`titleAddTC${idSC}_${i}`).value
+              var group = document.getElementById(`groupAddTC${idSC}_${i}`).value
+              var group_name = document.getElementById(`groupNameAddTC${idSC}_${i}`).value
+              var bag_name = document.getElementById(`bagNameAddTC${idSC}_${i}`).value
+              var bag = document.getElementById(`bagAddTC${idSC}_${i}`).value
+              var type = document.getElementById(`typeAddTC${idSC}_${i}`).value
+              var web = document.getElementById(`webAddTC${idSC}_${i}`).value
+              var lbl = document.getElementById(`lblAddTCItem${idSC}_${i}`).value
+              // console.log("lbl ne: ", lbl.substring(2, lbl.length))
+              var listLbl = lbl.substring(2, lbl.length).split(", ")
+              var lastListLBL = []
+              for (var j = 0; j < listLbl.length; j++) {
+                lastListLBL.push({ label_name: listLbl[j] })
+              }
+              if (type == "mess") {
+
+                // add = {
+                //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                //   message_button: [
+                //     { button_type: "mess", title: titlea, content: `+message_bag_id_${bag}` }
+                //   ]
+                // }
+
+                message_buttons.push({ button_type: "mess", title: titlea, message_bag_id: `${bag}`, message_button_labels: lastListLBL })
+              } else if (type == "web_url") {
+                // add = {
+                //   message: { message_bag_id: bagId, message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNum${numIndex}`).value },
+                //   message_button: [
+                //     { button_type: "web_url", title: titlea, content: web }
+                //   ]
+                // }
+
+                message_buttons.push({ button_type: "web_url", title: titlea, content: web, message_button_labels: lastListLBL })
+              }
+            }
+
+            var isWeb = false
+            for (var j = 0; j < message_buttons.length; j++) {
+              if (message_buttons[j].button_type == "web_url") {
+                isWeb = true
+              }
+            }
+            add = {
+              message: {
+                message_bag_id: bagId,
+                message_value: element,
+                message_type: "msg",
+                img_value: "",
+                message_buttons
+              },
+
+            }
+          } else if (document.getElementById(`formatCheckSelect${idSC}`) != null) {
+            // var group = document.getElementById(`groupAddFI${idSC}`).value
+            // var bag = document.getElementById(`bagAddFI${idSC}`).value
+            var lbl = document.getElementById(`lblAddFI${idSC}_${bagAddSC}`).value
+            var formatCheckSelect = document.getElementById(`formatCheckSelect${idSC}`).value
+            var formatCheckMSG = document.getElementById(`formatCheckMSG${idSC}`).value
+            // console.log("lbl: ", lbl)
+            var listLbl = lbl.substring(2, lbl.length).split(", ")
+            var lastListLBL = []
+            for (var i = 0; i < listLbl.length; i++) {
+              lastListLBL.push({ label_name: listLbl[i] })
+            }
+            add = {
+              message: {
+                message_bag_id: bagId,
+                message_value: element,
+                message_type: "msg",
+                img_value: "",
+                free_input: {
+                  message_bag_id: `1`,
+                  free_input_labels: lastListLBL,
+                  format_check: formatCheckSelect, //nhan 3 gia tri "no_validate", "email", "phone_number" 
+                  format_check_message: formatCheckMSG
+                }
+              },
+              // message_button: [
+              //   { button_type: "format", title: '', content: `+message_bag_id_${bag}`, label: listLbl, format: formatCheckSelect, format_msg: formatCheckMSG }
+              // ]
             }
           }
+          else {
+            add = {
+              message: {
+                message_bag_id: bagId, message_value: element, message_type: "msg", img_value: ""
+              }
+            }
+          }
+
+          console.log(add)
+
+
+
+          api.post(`/api/v1/message_managements/messages`, add).then(res => {
+            // alert("Add Successfully")
+            console.log(res)
+            setIdSC(idSC + 1)
+            setTotalItemTC(1)
+            setTimeout(() => {
+              setIsOpenNoti(true)
+              setMsgNoti("追加しました。")
+            }, 1500)
+
+            setTimeout(function () {
+              setIsOpenNoti(false)
+            }, 3000);
+            // reloadMessMsgBag()
+            enableAddNewMsg()
+            getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
+            // getBagMsg(id, id)
+
+          }).catch(error => {
+            console.log(error)
+          })
         }
-
-        console.log(add)
-
-
-
-        api.post(`/api/v1/message_managements/messages`, add).then(res => {
-          // alert("Add Successfully")
-          console.log(res)
-          setIdSC(idSC + 1)
-          setTotalItemTC(1)
-          setTimeout(() => {
-            setIsOpenNoti(true)
-            setMsgNoti("追加しました。")
-          }, 1500)
-
-          setTimeout(function () {
-            setIsOpenNoti(false)
-          }, 3000);
-          // reloadMessMsgBag()
-          enableAddNewMsg()
-          getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
-          // getBagMsg(id, id)
-
-        }).catch(error => {
-          console.log(error)
-        })
       }
     })
     document.getElementById(`mgsCustom${numIndex}`).addEventListener('change', (e) => msgOV(e.target.value))
@@ -5288,8 +5313,15 @@ function Chatbot() {
         // } else {
         //   document.getElementById(`addNewImMessErr${numIndex}`).style.display = "none"
         //   document.getElementById(`addNewImMessErr${numIndex}`).innerHTML = ""
+        //100文字以下で入力してください。
 
-
+        if (document.getElementById(`imgMgsCustom${numIndex}`).value.length > 100) {
+          document.getElementById(`addNewImMessErr${numIndex}`).style.display = "block"
+          document.getElementById(`addNewImMessErr${numIndex}`).innerHTML = "100文字以下で入力してください。"
+        } else {
+          document.getElementById(`addNewImMessErr${numIndex}`).style.display = "none"
+          document.getElementById(`addNewImMessErr${numIndex}`).innerHTML = ""
+        
 
         var add
         if (document.getElementById(`bagAddSC${idSC}`) != null || document.getElementById(`groupAddSC${idSC}`) != null || document.getElementById(`titleAddSC${idSC}`) != null) {
@@ -5449,7 +5481,7 @@ function Chatbot() {
         })
         // }
       }
-
+    }
 
     })
 
@@ -5798,7 +5830,7 @@ function Chatbot() {
     api.post(`/api/v1/message_managements/hot_templates`, tem).then(res => {
       setIsOpenTemplate(false)
       console.log(res)
-      setMsgNoti("Save Hot Template successfully")
+      setMsgNoti("テンプレートが保存されました！")
       setIsOpenNoti(true)
       setTimeout(() => {
         setIsOpenNoti(false)
@@ -7968,10 +8000,10 @@ function Chatbot() {
         </ModalShort>
         <ModalShort open={isOpenChangeIndexMsg} onClose={() => setIsOpenChangeIndexMsg(false)}>
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
-            <h4>Change message position</h4>
+            <h4>メッセージを移動しますか。</h4>
             <br />
-            <Button id="btnAddBag" onClick={() => changePosit()}>Yes</Button>
-            <Button id="btnAddBag" onClick={() => setIsOpenChangeIndexMsg(false)}>No</Button>
+            <Button id="btnAddBag" onClick={() => changePosit()}>はい</Button>
+            <Button id="btnAddBag" onClick={() => setIsOpenChangeIndexMsg(false)}>いいえ</Button>
           </div>
         </ModalShort>
 

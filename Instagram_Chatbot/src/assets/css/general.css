@@ -30,6 +30,14 @@
   width: 300px;
   min-width: 300px;
 }
+.actionListUser{
+  width: 105px;
+  min-width:105px;
+}
+.actionListClient {
+  width: 170px;
+  min-width:170px;
+}
 .label-input {
   width: 100%;
   float: left;

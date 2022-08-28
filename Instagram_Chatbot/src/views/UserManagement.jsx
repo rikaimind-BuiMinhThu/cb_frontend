@@ -13,6 +13,8 @@ import ModalDetail from './Popup/ModalDetail';
 import ava from './Popup/ava.png';
 import ModalShort from './Popup/ModalShort';
 // import { Pagination } from "element-react";
+import $ from "jquery";
+
 
 function UserManagement() {
   var [dataList, setDataList] = useState([]);
@@ -181,6 +183,11 @@ function UserManagement() {
         // }
       });
   }
+  $('#screenAll').keydown(function (event) {
+    if (event.keyCode == 9) {  //tab pressed
+      event.preventDefault(); // stops its action
+    }
+  })
 
   function getUserDetail(item) {
     setDetailUpdateTitle('ユーザー詳細');
@@ -484,11 +491,14 @@ function UserManagement() {
   // }
 
   function handleChange(event, value) {
-    console.log('pageIndex: ', value);
+    if(totalPage > 1){
+      console.log('pageIndex: ', value);
     setPage(parseInt(value));
     setPageIndex(value);
     reloadListClient(value);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
   }
 
   function detailUser(id) {
@@ -505,7 +515,7 @@ function UserManagement() {
   return (
     <>
       <div className="content">
-        <Row>
+        <Row id="screenAll">
           <Col md="12">
             <Card>
               <CardHeader>
@@ -546,7 +556,7 @@ function UserManagement() {
                       <th>ログインID</th>
                       <th>権限</th>
                       <th>クライアント</th>
-                      <th className="actionList">アクション</th>
+                      <th className="actionListUser">アクション</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -559,18 +569,20 @@ function UserManagement() {
                           <td>{item.email}</td>
                           <td>{item.role === 'admin_client' ? 'クライアント' : 'ユーザー'}</td>
                           <td>{item.client_name}</td>
-                          <td className="actionList">
-                            <div>
+                          <td className="actionListUser">
+                            <div style={{display: "flex"}}>
                               {/* <Button onClick={() => getUserDetail(item)}>View Detail</Button> */}
-                              <Button className="editBtn" onClick={() => updateClientUser(item)}>
+                              <div onClick={() => updateClientUser(item)}><i className="nc-icon nc-align-center nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
+                              {/* <Button className="editBtn" onClick={() => updateClientUser(item)}>
                                 編集
-                              </Button>
-                              <Button
+                              </Button> */}
+                              <div onClick={() => confirmDeleteUser(item.id)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px", cursor: "pointer" }}></i></div>
+                              {/* <Button
                                 className="deleteBtn"
                                 onClick={() => confirmDeleteUser(item.id)}
                               >
                                 削除
-                              </Button>
+                              </Button> */}
                               {/* Modal key={item.id} */}
                             </div>
                           </td>

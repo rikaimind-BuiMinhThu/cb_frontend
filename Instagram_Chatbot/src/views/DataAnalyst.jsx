@@ -45,6 +45,190 @@ function DataAnalyst() {
     }
   }, []);
 
+  var testMsgEx =
+    [
+      {
+        "id": 1,
+        "instagram_id": "5105085919538441",
+        "username": "linhvu9740",
+        "full_name": "Linh Vu",
+        "follower_count": 0,
+        "is_verified_user": null,
+        "is_user_follow_business": true,
+        "is_business_follow_user": false,
+        "instagram_account_id": 1,
+        "created_at": "2022-07-31T09:58:36.678Z",
+        "updated_at": "2022-08-26T17:34:21.215Z",
+        "pending_message_id": null,
+        "email": "Hha@gmail.com",
+        "phone_number": "03111111111",
+        "real_name": "Haha",
+        "company_name": "haha@gmail.com",
+        "company_role": null,
+        "website": null,
+        "propose": null,
+        "know_product_in": null,
+        "status": "completion",
+        "start_chatbot_in": "dm",
+        "start_chatbot_at": "2022-08-15T17:55:49.293Z",
+        "chatbot_usages": [
+          {
+            "id": 24591,
+            "usage_type": "dm_received",
+            "content": "Kaka",
+            "media_id": "",
+            "media_start_at": null,
+            "instagram_account_id": 1,
+            "created_at": "2022-08-26T16:57:23.874Z",
+            "updated_at": "2022-08-26T16:57:23.874Z",
+            "instagram_user_id": 1
+          },
+          {
+            "id": 24592,
+            "usage_type": "dm_sent",
+            "content": "ssd",
+            "media_id": null,
+            "media_start_at": null,
+            "instagram_account_id": 1,
+            "created_at": "2022-08-26T16:57:25.616Z",
+            "updated_at": "2022-08-26T16:57:25.616Z",
+            "instagram_user_id": 1
+          },
+          {
+            "id": 24593,
+            "usage_type": "dm_sent",
+            "content": "ssdd",
+            "media_id": null,
+            "media_start_at": null,
+            "instagram_account_id": 1,
+            "created_at": "2022-08-26T16:57:26.578Z",
+            "updated_at": "2022-08-26T16:57:26.578Z",
+            "instagram_user_id": 1
+          }
+        ]
+      },
+      {
+        "id": 1,
+        "instagram_id": "5105085919538441",
+        "username": "linhvu9740",
+        "full_name": "Linh Vu",
+        "follower_count": 0,
+        "is_verified_user": null,
+        "is_user_follow_business": true,
+        "is_business_follow_user": false,
+        "instagram_account_id": 1,
+        "created_at": "2022-07-31T09:58:36.678Z",
+        "updated_at": "2022-08-26T17:34:21.215Z",
+        "pending_message_id": null,
+        "email": "Hha@gmail.com",
+        "phone_number": "03111111111",
+        "real_name": "Haha",
+        "company_name": "haha@gmail.com",
+        "company_role": null,
+        "website": null,
+        "propose": null,
+        "know_product_in": null,
+        "status": "completion",
+        "start_chatbot_in": "dm",
+        "start_chatbot_at": "2022-08-15T17:55:49.293Z",
+        "chatbot_usages": [
+          {
+            "id": 24591,
+            "usage_type": "dm_received",
+            "content": "Kaka",
+            "media_id": "",
+            "media_start_at": null,
+            "instagram_account_id": 1,
+            "created_at": "2022-08-26T16:57:23.874Z",
+            "updated_at": "2022-08-26T16:57:23.874Z",
+            "instagram_user_id": 1
+          },
+          {
+            "id": 24592,
+            "usage_type": "dm_sent",
+            "content": "ssd",
+            "media_id": null,
+            "media_start_at": null,
+            "instagram_account_id": 1,
+            "created_at": "2022-08-26T16:57:25.616Z",
+            "updated_at": "2022-08-26T16:57:25.616Z",
+            "instagram_user_id": 1
+          },
+          {
+            "id": 24593,
+            "usage_type": "dm_sent",
+            "content": "ssdd",
+            "media_id": null,
+            "media_start_at": null,
+            "instagram_account_id": 1,
+            "created_at": "2022-08-26T16:57:26.578Z",
+            "updated_at": "2022-08-26T16:57:26.578Z",
+            "instagram_user_id": 1
+          }
+        ]
+      },
+      {
+        "id": 1,
+        "instagram_id": "5105085919538441",
+        "username": "linhvu9740",
+        "full_name": "Linh Vu",
+        "follower_count": 0,
+        "is_verified_user": null,
+        "is_user_follow_business": true,
+        "is_business_follow_user": false,
+        "instagram_account_id": 1,
+        "created_at": "2022-07-31T09:58:36.678Z",
+        "updated_at": "2022-08-26T17:34:21.215Z",
+        "pending_message_id": null,
+        "email": "Hha@gmail.com",
+        "phone_number": "03111111111",
+        "real_name": "Haha",
+        "company_name": "haha@gmail.com",
+        "company_role": null,
+        "website": null,
+        "propose": null,
+        "know_product_in": null,
+        "status": "completion",
+        "start_chatbot_in": "dm",
+        "start_chatbot_at": "2022-08-15T17:55:49.293Z",
+        "chatbot_usages": [
+          {
+            "id": 24591,
+            "usage_type": "dm_received",
+            "content": "Kaka",
+            "media_id": "",
+            "media_start_at": null,
+            "instagram_account_id": 1,
+            "created_at": "2022-08-26T16:57:23.874Z",
+            "updated_at": "2022-08-26T16:57:23.874Z",
+            "instagram_user_id": 1
+          },
+          {
+            "id": 24592,
+            "usage_type": "dm_sent",
+            "content": "ssd",
+            "media_id": null,
+            "media_start_at": null,
+            "instagram_account_id": 1,
+            "created_at": "2022-08-26T16:57:25.616Z",
+            "updated_at": "2022-08-26T16:57:25.616Z",
+            "instagram_user_id": 1
+          },
+          {
+            "id": 24593,
+            "usage_type": "dm_sent",
+            "content": "ssdd",
+            "media_id": null,
+            "media_start_at": null,
+            "instagram_account_id": 1,
+            "created_at": "2022-08-26T16:57:26.578Z",
+            "updated_at": "2022-08-26T16:57:26.578Z",
+            "instagram_user_id": 1
+          }
+        ]
+      }
+    ]
+
   React.useEffect(() => {
     let dateStart = new Date();
     dateStart = dateStart.setMonth(dateStart.getMonth() - 1);
@@ -165,19 +349,29 @@ function DataAnalyst() {
   }, []);
 
   // get list message groups
+  const [msgExDataAll, setMsgExDataAll] = useState([])
   React.useEffect(() => {
     var path = window.location.pathname;
     api
       .get(`/api/v1/message_managements/message_groups`)
       .then((res) => {
-        console.log('message groups: ', res.data.data);
         setListGroup(res.data.data);
+        var msgDataAll = []
+        for (var i = 0; i < res.data.data.length; i++) {
+          api
+            .get(`/api/v1/message_managements/message_groups/${res.data.data[i].id}/export_csv`)
+            .then((ress) => {
+              msgDataAll.push(ress.data.data.instagram_users)
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+        console.log("msgDataAll: ", msgDataAll)
+        setMsgExDataAll(msgDataAll)
       })
       .catch((error) => {
         console.log(error);
-        if (error.response.data.code === 3) {
-          requestNewToken(path);
-        }
       });
   }, []);
 
@@ -188,7 +382,8 @@ function DataAnalyst() {
     dateStart = new Date(dateStart);
     var month = dateStart.toISOString().slice(5, 7) - 6;
     let dateLiveStart = new Date();
-    dateLiveStart = dateLiveStart.setMonth(dateStart.getMonth() - 6);
+    // dateLiveStart = dateLiveStart.setDate(1);
+    dateLiveStart = dateLiveStart.setMonth(dateStart.getMonth() - 6)
     dateLiveStart = new Date(dateLiveStart);
     let dateLiveEnd = new Date();
     if (month < 10) {
@@ -199,8 +394,8 @@ function DataAnalyst() {
     // alert()
     api
       .get(
-        `/api/v1/analytics/chatbot_usages/live?begin_date=${dateLiveStart.toISOString()}&end_date=${dateLiveEnd
-          .toISOString()}`
+        `/api/v1/analytics/chatbot_usages/live?begin_date=${dateLiveStart.toISOString().slice(0,10)}&end_date=${dateLiveEnd
+          .toISOString().slice(0,10)}`
       )
       .then((res) => {
         console.log('live analytics: ', res.data.live_usages);
@@ -346,7 +541,7 @@ function DataAnalyst() {
         },
       ],
       tooltip: {
-        shared: true,
+        shared: false,
         intersect: false,
         enabled: false,
         enabledOnSeries: undefined,
@@ -364,6 +559,14 @@ function DataAnalyst() {
           },
         },
       },
+      toolbar: {
+        show: false,
+        offsetX: 0,
+        offsetY: 0,
+        tools: {
+         
+        }
+      }
     },
   };
 
@@ -480,25 +683,95 @@ function DataAnalyst() {
     filename: 'Livestream.csv',
   };
 
+  const headerMsgGr = [
+    { label: 'ユーザー名', key: 'username' },
+    { label: '名称', key: 'full_name' },
+    { label: 'メール', key: 'email' },
+    { label: '電話番号', key: 'phone_number' },
+    { label: 'フォローしている', key: 'is_user_follow_business'},
+    { label: 'フォローされている', key: 'is_business_follow_user'},
+    { label: 'タイプ', key: 'type' },
+    { label: 'チャット内容', key: 'conversation' },
+    { label: '時間', key: 'time' },
+  ]
+
+  const headerMsgGrUser = [
+    { label: 'ユーザー名', key: 'username' },
+    { label: '名称', key: 'full_name' },
+    { label: 'メール', key: 'email' },
+    { label: '電話番号', key: 'phone_number' },
+    { label: 'フォローしている', key: 'is_user_follow_business'},
+    { label: 'フォローされている', key: 'is_business_follow_user'},
+  ]
+
+
+  const [dataExMsgGr, setDataExMsgGr] = useState([])
+  const setMessageGroupDataExport = (value) => {
+    var data = [];
+    var datae = value //use testMsgEx to test export all
+    console.log("dataedatae: ", datae)
+    datae.forEach((it) => {
+      data.push({
+        username: it.username,
+        full_name: it.full_name,
+        email: it.email,
+        phone_number: it.phone_number,
+        is_user_follow_business: it.is_user_follow_business　== "true" ? "はい" : "いいえ",
+        is_business_follow_user: it.is_business_follow_user == "true" ? "はい" : "いいえ",
+        type: it.chatbot_usages[0].usage_type == "dm_received" ? "受け" : "送り",
+        conversation: it.chatbot_usages[0].content,
+        time: it.chatbot_usages[0].created_at.slice(0, 19).replaceAll("T", " ")
+      });
+      for (var i = 1; i < it.chatbot_usages.length; i++) {
+        const chat = it.chatbot_usages[i];
+        data.push({
+          username: "",
+          full_name: "",
+          email: "",
+          phone_number: "",
+          is_user_follow_business: "",
+          is_business_follow_user: "",
+          type: chat.usage_type == "dm_received" ? "受け" : "送り",
+          conversation: chat.content,
+          time: chat.created_at.slice(0, 19).replaceAll("T", " ")
+        });
+      }
+    })
+    setDataExMsgGr(data)
+  };
+
   // export message group data
   const csvMessageGroupReport = {
-    data: [],
-    headers: [],
+    data: dataExMsgGr,
+    headers: headerMsgGr,
     filename: 'message-group.csv',
   };
 
-  const setMessageGroupDataExport = (id) => {
-    console.log("id gr: ",id);
-    api
-      .get(`/api/v1/message_managements/message_groups/${id}/export_csv`)
-      .then((res) => {
-        console.log("gr content: ",res.data.data)
 
-      })
-      .catch((error) => {
-        console.log(error);
+  const [dataExMsgGrUser, setDataExMsgGrUser] = useState([])
+  const setMsgGrUser = (value) => {
+    var data = [];
+    var datae = value //use testMsgEx to test export all
+    console.log("dataedatae: ", datae)
+    datae.forEach((it) => {
+      data.push({
+        username: it.username,
+        full_name: it.full_name,
+        email: it.email,
+        phone_number: it.phone_number,
+        is_user_follow_business: it.is_user_follow_business　== "true" ? "はい" : "いいえ",
+        is_business_follow_user: it.is_business_follow_user　== "true" ? "はい" : "いいえ",
       });
+    })
+    setDataExMsgGrUser(data)
   };
+
+  const csvMessageGroupUserReport = {
+    data: dataExMsgGrUser,
+    headers: headerMsgGrUser,
+    filename: 'message-group-user.csv',
+  };
+
 
   // select date start
   const selectDateStart = (start) => {
@@ -704,7 +977,7 @@ function DataAnalyst() {
                     textAlign: 'center',
                   }}
                 >
-                  <h3>Message Groups</h3>
+                  <h3>メッセージグループ</h3>
                 </div>
                 <div style={{ width: '100%' }}>
                   <Table
@@ -717,10 +990,10 @@ function DataAnalyst() {
                     <thead className="text-primary">
                       <tr>
                         <td>
-                          <h6>Group name</h6>
+                          <h6>グループ名</h6>
                         </td>
                         <td>
-                          <h6>Created/Updated date</h6>
+                          <h6>作成/日付更新</h6>
                         </td>
                         {/* <td>
                           <h6>Total user</h6>
@@ -729,12 +1002,15 @@ function DataAnalyst() {
                           <h6>Answer results</h6>
                         </td> */}
                         <td>
-                          <h6>CSV download</h6>
+                          <h6>チャット内容</h6>
+                        </td>
+                        <td>
+                          <h6>インスタグラムユーザー詳細</h6>
                         </td>
                       </tr>
                     </thead>
                     <tbody>
-                      {listGroup.map((item) => (
+                      {listGroup.map((item, i) => (
                         <tr
                           key={item?.id}
                           style={{ overflow: 'hidden', height: '14px' }}
@@ -745,9 +1021,22 @@ function DataAnalyst() {
                           <td>???</td> */}
                           <td>
                             <span
-                              onClick={() => setMessageGroupDataExport(item.id)}
+                              onClick={() => setMessageGroupDataExport(msgExDataAll[i])}
                             >
                               <CSVLink {...csvMessageGroupReport}>
+                                <MDBIcon
+                                  fas
+                                  icon="arrow-circle-down"
+                                  style={{ color: '#51cbce' }}
+                                ></MDBIcon>
+                              </CSVLink>
+                            </span>
+                          </td>
+                          <td>
+                            <span
+                              onClick={() => setMsgGrUser(msgExDataAll[i])}
+                            >
+                              <CSVLink {...csvMessageGroupUserReport}>
                                 <MDBIcon
                                   fas
                                   icon="arrow-circle-down"
@@ -771,3 +1060,6 @@ function DataAnalyst() {
 }
 
 export default DataAnalyst;
+
+
+
