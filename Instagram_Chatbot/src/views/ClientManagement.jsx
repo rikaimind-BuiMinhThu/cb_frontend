@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from '../api/api-management';
 import requestNewToken from 'api/request-new-token';
@@ -12,7 +12,7 @@ import { Button } from 'react-bootstrap';
 import { Title } from 'chart.js';
 import { Pagination } from '@material-ui/lab';
 import ModalShort from './Popup/ModalShort';
-import $ from "jquery";
+import $ from 'jquery';
 
 function ClientManagement() {
   var [dataList, setDataList] = useState([]);
@@ -261,10 +261,11 @@ function ClientManagement() {
     // setDisableInput(true)
   }
   $('#screenAll').keydown(function (event) {
-    if (event.keyCode == 9) {  //tab pressed
+    if (event.keyCode == 9) {
+      //tab pressed
       event.preventDefault(); // stops its action
     }
-  })
+  });
   function updateClientUser(item) {
     // document.getElementById("screenAll").disabled = true;
 
@@ -560,8 +561,8 @@ function ClientManagement() {
       if (dateCheck === false) {
         utils.checkDateEndIn(inputEndDate, inputStartDate);
       }
-      if (updateImageChange && getBaseUrl() === false) {
-        getBaseUrl();
+      if (updateImageChange && getBaseUrlAdd() === false) {
+        getBaseUrlAdd();
       }
       console.log('Missing field');
     }
@@ -581,9 +582,6 @@ function ClientManagement() {
   }
 
   function addClient() {
-
-
-
     var path = window.location.pathname;
     const reader = new FileReader();
 
@@ -710,12 +708,14 @@ function ClientManagement() {
       checkNameAdd(email, 'メールアドレス') === true &&
       utils.checkPhoneNumber(phone, '電話番号') === true &&
       ava !== '' &&
-      getBaseUrl() === true &&
+      getBaseUrlAdd() === true &&
       nameKata == true &&
       managerKata == true &&
       passwdLengthCheck == true &&
       emailCheck == true &&
-      dateCheck === true
+      dateCheck === true &&
+      price > 0 &&
+      zipCode > 0
     ) {
       // if (checkFieldAdd(name, 'Name') === true && checkFieldAdd(address, "Address") === true && utils.checkInputNumber(phone, "Phone") === true) {
       var elements = document.getElementById('addForm').elements;
@@ -807,8 +807,16 @@ function ClientManagement() {
       if (dateCheck === false) {
         utils.checkDateEndIn(inputEndDate, inputStartDate);
       }
-      if (getBaseUrl() === false) {
-        getBaseUrl();
+      if (getBaseUrlAdd() === false) {
+        getBaseUrlAdd();
+      }
+      if (price <= 0) {
+        document.getElementById('newClientプラン価格ErrMsg').style.display = 'block';
+        document.getElementById('newClientプラン価格ErrMsg').innerHTML = '正数を入力してください。';
+      }
+      if (zipCode <= 0) {
+        document.getElementById('newClient郵便番号ErrMsg').style.display = 'block';
+        document.getElementById('newClient郵便番号ErrMsg').innerHTML = '正数を入力してください。';
       }
     }
   }
@@ -980,14 +988,37 @@ function ClientManagement() {
     //detailUserClient
   }
 
+  function getBaseUrlAdd() {
+    console.log('getNe');
+    var file = document.querySelector('input[type=file]')['files'][0];
+    if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
+      var reader = new FileReader();
+      var baseString;
+      reader.onloadend = function () {
+        baseString = reader.result;
+        setInputImage(baseString);
+        console.log(baseString);
+        if (baseString !== undefined || baseString !== '') {
+          document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
+        }
+      };
+      reader.readAsDataURL(file);
+      return true;
+    } else {
+      document.getElementById('newClientImgLogoErrMsg').innerHTML = '画像を選択してください。';
+      document.getElementById('newClientImgLogoErrMsg').style.display = 'block';
+      return false;
+    }
+  }
+
   function getBaseUrl(event) {
-    console.log("getNe")
+    console.log('getNe');
     var file = document.querySelector('input[type=file]')['files'][0];
     if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
       var reader = new FileReader();
       var baseString;
       var imgUrl = URL.createObjectURL(event.target.files[0]);
-      document.getElementById(`imgUpdatesrc`).src = imgUrl
+      document.getElementById(`imgUpdatesrc`).src = imgUrl;
       reader.onloadend = function () {
         baseString = reader.result;
         setInputImage(baseString);
@@ -1012,12 +1043,13 @@ function ClientManagement() {
     setPage(parseInt(value));
     setPageIndex(value);
     reloadListClient(value);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelector('.main-panel').scrollTop = 0;
   }
 
-  function selectImgUpdate(e){
-    e.preventDefault()
-    document.getElementById(`avatar`).click()
+  function selectImgUpdate(e) {
+    e.preventDefault();
+    document.getElementById(`avatar`).click();
   }
 
   const items = dataList.clients;
@@ -1101,10 +1133,10 @@ function ClientManagement() {
                             {item.plan == 'startup'
                               ? 'スタートアップ'
                               : item.plan == 'expert'
-                                ? 'エキスパート'
-                                : item.plan == 'complete'
-                                  ? '完全成果報酬'
-                                  : 'プレミアム'}
+                              ? 'エキスパート'
+                              : item.plan == 'complete'
+                              ? '完全成果報酬'
+                              : 'プレミアム'}
                           </td>
                           <td>{item.price}</td>
                           <td id="dateStart">
@@ -1124,21 +1156,48 @@ function ClientManagement() {
                               {item.prefecture} {item.address} {item.building_name}
                             </div>
                           </td>
-                          <td>{parseInt(item.instagram_message_count) !==0 
-                          ? (
-                            parseInt(item.instagram_conversion_count)/parseInt(item.instagram_message_count)
-                            ).toFixed(2)
-                            : `0.00`}%</td>
+                          <td>
+                            {parseInt(item.instagram_message_count) !== 0
+                              ? (
+                                  parseInt(item.instagram_conversion_count) /
+                                  parseInt(item.instagram_message_count)
+                                ).toFixed(2)
+                              : `0.00`}
+                            %
+                          </td>
                           <td>{item.last_sign_in_at}</td>
                           <td className="actionListClient">
-                            <div style={{ display: "flex" }}>
-                              <div onClick={() => getUserDetail(item)}><i className="nc-icon nc-badge nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
+                            <div style={{ display: 'flex' }}>
+                              <div onClick={() => getUserDetail(item)}>
+                                <i
+                                  className="nc-icon nc-badge nc-3x"
+                                  style={{
+                                    fontSize: '30px',
+                                    marginTop: '5px',
+                                    marginRight: '30px',
+                                  }}
+                                ></i>
+                              </div>
                               {/* <Button onClick={() => getUserDetail(item)}>詳細</Button> */}
-                              <div onClick={() => updateClientUser(item)}><i className="nc-icon nc-align-center nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
+                              <div onClick={() => updateClientUser(item)}>
+                                <i
+                                  className="nc-icon nc-align-center nc-3x"
+                                  style={{
+                                    fontSize: '30px',
+                                    marginTop: '5px',
+                                    marginRight: '30px',
+                                  }}
+                                ></i>
+                              </div>
                               {/* <Button className="editBtn" onClick={() => updateClientUser(item)}>
                                 編集
                               </Button> */}
-                              <div onClick={() => deleteClientPopup(item.id)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px", cursor: "pointer" }}></i></div>
+                              <div onClick={() => deleteClientPopup(item.id)}>
+                                <i
+                                  className="nc-icon nc-box nc-3x"
+                                  style={{ fontSize: '30px', marginTop: '5px', cursor: 'pointer' }}
+                                ></i>
+                              </div>
                               {/* <Button
                                 className="deleteBtn"
                                 onClick={() => deleteClientPopup(item.id)}
@@ -1282,7 +1341,7 @@ function ClientManagement() {
                     value={
                       inputStartDate !== '' ? inputStartDate?.replace(/-/g, '/') : 'yyyy/mm/dd'
                     }
-                    onChange={() => { }}
+                    onChange={() => {}}
                     className="input-field"
                     disabled={disableInput === true ? true : false}
                     readOnly
@@ -1310,7 +1369,7 @@ function ClientManagement() {
                   <input
                     type="text"
                     value={inputEndDate !== '' ? inputEndDate?.replace(/-/g, '/') : 'yyyy/mm/dd'}
-                    onChange={() => { }}
+                    onChange={() => {}}
                     className="input-field"
                     disabled={disableInput === true ? true : false}
                     readOnly
@@ -1723,14 +1782,11 @@ function ClientManagement() {
                 </label> <br /><br /> */}
                 <label className="label-input">
                   画像（ロゴ）<span className="span-require">*必須</span>
-
-                  
-                  
                   <input
                     className="input-field"
                     type="file"
                     id="avatar"
-                    style={{ display: disableInput == true ? "none" : "block" }}
+                    style={{ display: disableInput == true ? 'none' : 'block' }}
                     onChange={(e) => {
                       getBaseUrl(e);
                       setUpdateImageChange(true);
@@ -1740,19 +1796,26 @@ function ClientManagement() {
                     name="logo_url"
                     accept="image/png, image/jpeg"
                   />
-                  <button id="btnimgNum" style={{
-                    backgroundColor: "white",
-                    border: "1px solid gray",
-                    marginLeft: '12%', marginTop: '-60px',
-                     borderRadius: "10px", width: "100px"
-                  }}
-                  onClick={(e) => selectImgUpdate(e)}>画像変更</button>
+                  <button
+                    id="btnimgNum"
+                    style={{
+                      backgroundColor: 'white',
+                      border: '1px solid gray',
+                      marginLeft: '12%',
+                      marginTop: '-60px',
+                      borderRadius: '10px',
+                      width: '100px',
+                    }}
+                    onClick={(e) => selectImgUpdate(e)}
+                  >
+                    画像変更
+                  </button>
                   <br />
-                  <img id="imgUpdatesrc"
+                  <img
+                    id="imgUpdatesrc"
                     src={urlLogo}
                     style={{ maxHeight: '200px', marginLeft: '30%', marginTop: '5px' }}
                   ></img>
-
                   <label
                     id="newClientImgLogoErrMsg"
                     className="input-field"
@@ -2182,7 +2245,7 @@ function ClientManagement() {
                   <input
                     type="text"
                     value={inputStartDate ? inputStartDate?.replace(/-/g, '/') : 'yyyy/mm/dd'}
-                    onChange={() => { }}
+                    onChange={() => {}}
                     className="input-field"
                     readOnly
                   />
@@ -2207,7 +2270,7 @@ function ClientManagement() {
                   <input
                     type="text"
                     value={inputEndDate ? inputEndDate?.replace(/-/g, '/') : 'yyyy/mm/dd'}
-                    onChange={() => { }}
+                    onChange={() => {}}
                     className="input-field"
                     readOnly
                   />
@@ -2618,7 +2681,7 @@ function ClientManagement() {
                     className="input-field"
                     type="file"
                     id="avatar_add"
-                    onChange={(e) => getBaseUrl()}
+                    onChange={(e) => getBaseUrlAdd()}
                     name="img_logo"
                     accept="image/png, image/jpeg"
                   />
