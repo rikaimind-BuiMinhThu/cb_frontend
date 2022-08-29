@@ -127,10 +127,12 @@ function CRM() {
         console.log('detail instagram_users: ', res.data.data);
         setInstagramUser(res.data.data.instagram_users);
         setLabelInstagramUser(res.data.data.labels);
-        setCustomTable((prev) => (prev = res.data.data.custom_items));
+        setCustomTable(res.data.data.custom_items);
         setCustomLabel(res.data.data.labels);
         if (res.data.data.labels.length >= 10) {
           setCustomLabelLen(10);
+        } else {
+          setCustomLabelLen(res.data.data?.labels?.length);
         }
         // setIdInstaUser(res.data.data.instagram_users.id)
         var listHistory = [];
@@ -286,7 +288,7 @@ function CRM() {
     document.getElementById(`btnEditDetail`).style.display = 'none';
     document.getElementById(`addLabelItem`).style.display = 'none';
     document.getElementById(`AddTableButton`).style.display = 'none';
-    for (let i = 0; i < customLabelLen; i++) {
+    for (let i = 0; i < customLabel.length; i++) {
       if (document.getElementById(`deleteLbl${customLabel[i]?.id}`) !== null) {
         document.getElementById(`deleteLbl${customLabel[i]?.id}`).style.display = 'block';
       }
@@ -299,7 +301,7 @@ function CRM() {
         document.getElementById(`deleteTbl${customTable[i]?.id}`).style.display = 'block';
       }
     }
-    reloadInstaUser(idInstaUser);
+    // reloadInstaUser(idInstaUser);
     // console.log(customLabelLen, customTable?.length);
     // if (customLabelLen >= 10) {
     //   document.getElementById(`addLabelItem`).style.display = 'none';
@@ -313,8 +315,16 @@ function CRM() {
   function saveDetail() {
     document.getElementById(`btnSaveDetail`).style.display = 'none';
     document.getElementById(`btnEditDetail`).style.display = 'block';
-    document.getElementById(`addLabelItem`).style.display = 'block';
-    document.getElementById(`AddTableButton`).style.display = 'block';
+    if (customLabel?.length >= 10) {
+      document.getElementById(`addLabelItem`).style.display = 'none';
+    } else {
+      document.getElementById(`addLabelItem`).style.display = 'block';
+    }
+    if (customTable?.length >= 8) {
+      document.getElementById(`AddTableButton`).style.display = 'none';
+    } else {
+      document.getElementById(`AddTableButton`).style.display = 'block';
+    }
     for (let i = 0; i < customLabel.length; i++) {
       document.getElementById(`deleteLbl${customLabel[i]?.id}`).style.display = 'none';
       // document.getElementById(`deleteTbl${lblList[i].id}`).style.display = "block"
@@ -331,11 +341,14 @@ function CRM() {
     api
       .delete(`/api/v1/instagram_users/labels/${id}`)
       .then((res) => {
-        console.log(res);
-        reloadInstaUser(idInstaUser);
-        setTimeout(() => {
-          editDetail();
-        }, 5500);
+        // console.log(res);
+        // reloadInstaUser(idInstaUser);
+        // setTimeout(() => {
+        //   editDetail();
+        // }, 5500);
+        console.log(customLabel, id);
+        setCustomLabel(customLabel.filter((label) => label.id !== id));
+        document.getElementById(`addLabelItem`).style.display = 'none';
       })
       .catch((error) => {
         console.log(error);
@@ -347,8 +360,10 @@ function CRM() {
     api
       .delete(`/api/v1/instagram_users/custom_items/${id}`)
       .then((res) => {
-        console.log(res);
-        reloadInstaUser(idInstaUser);
+        // console.log(res);
+        // reloadInstaUser(idInstaUser);
+        console.log(customTable, id);
+        setCustomTable(customTable.filter((table) => table.id !== id));
         document.getElementById('AddTableButton').style.display = 'none';
       })
       .catch((error) => {
@@ -1234,7 +1249,7 @@ function CRM() {
         </ModalNoti>
         <ModalShort open={isOpenActiveChatbot} onClose={() => setIsOpenActiveChatbot(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-            <h4>Do you want to active chatbot?</h4>
+            <h4>チャットボットを有効にしますか。</h4>
             <Button onClick={() => activeChatbot()}>はい</Button>
             <Button onClick={() => setIsOpenActiveChatbot(false)}>いいえ</Button>
           </div>

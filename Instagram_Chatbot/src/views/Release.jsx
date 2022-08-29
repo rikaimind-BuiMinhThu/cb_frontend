@@ -23,6 +23,7 @@ import LoginFacebook from 'components/Admin/LoginFacebook';
 import ModalNoti from './Popup/ModalNoti';
 import axios from 'axios';
 import { useEffect } from 'react';
+import ModalShort from './Popup/ModalShort';
 
 function Release() {
   const [listGroup, setListGroup] = useState([]);
@@ -50,6 +51,8 @@ function Release() {
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState();
   const [listKeyword, setListKeyword] = useState([]);
+  const [fixedIdDelete, setFixedIdDelete] = useState();
+  const [faqIdDelete, setFaqIdDelete] = useState();
 
   // React.useEffect(() => {
   //   console.log('token in dashboard', Cookies.get('token'))
@@ -68,11 +71,13 @@ function Release() {
   const [storyGroupBagId, setStoryGroupBagId] = useState();
   const [liveGroupId, setLiveGroupId] = useState();
   const [liveGroupBagId, setLiveGroupBagId] = useState();
+  const [isOpenConfirm, setIsOpenConfirm] = useState(false);
+
   React.useEffect(() => {
     api
       .get(`/api/v1/instagram_settings`)
       .then((res) => {
-        console.log("setIdInstaSetting: ", res.data.data[0].id)
+        console.log('setIdInstaSetting: ', res.data.data[0].id);
         setIdInstaSetting(res.data.data[0].id);
         setPostGroupName(res.data.data[0].post_comment_group_name);
         setStoryGroupName(res.data.data[0].story_comment_group_name);
@@ -93,7 +98,11 @@ function Release() {
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'));
     console.log('is_auth', Cookies.get('is_auth'));
-    if (Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == '') {
+    if (
+      Cookies.get('token') == undefined ||
+      Cookies.get('token') == null ||
+      Cookies.get('token') == ''
+    ) {
       window.location.href = '/';
     }
     if (Cookies.get('is_auth') == 'false') {
@@ -135,22 +144,17 @@ function Release() {
     }
   }, []);
 
-  const [instaSettingFirst, setInstaSettingFirst] = useState()
+  const [instaSettingFirst, setInstaSettingFirst] = useState();
   React.useEffect(() => {
     api
       .get(`/api/v1/instagram_settings`)
       .then((res) => {
-
-        setInstaSettingFirst(res.data.data[0].ig_id)
-
+        setInstaSettingFirst(res.data.data[0].ig_id);
       })
       .catch((error) => {
         console.log(error);
       });
-
   }, []);
-
-
 
   function setPATAL() {
     var access_token = Cookies.get('page_access_token');
@@ -168,13 +172,10 @@ function Release() {
     }
   }
 
-
-
   function setIgIDS() {
     api
       .get(`/api/v1/instagram_settings`)
       .then((res) => {
-
         setIdInstaSetting(res.data.data[0].id);
       })
       .catch((error) => {
@@ -398,15 +399,14 @@ function Release() {
     api
       .get(`/api/v1/instagram_settings`)
       .then((resId) => {
-        
-        console.log("get the first idInstaSetting: ", resId.data.data[0].id)
+        console.log('get the first idInstaSetting: ', resId.data.data[0].id);
         api
           .get(`/api/v1/instagram_settings/${resId.data.data[0].id}`)
           .then((res) => {
             console.log('insta setting ', res.data.data);
             var dataB = res.data.data;
             setInstaSetting(res.data.data);
-            console.log("Instagram setting id: ", res)
+            console.log('Instagram setting id: ', res);
             setInstaSettingId(res.data.data.id);
             setStoryOnOff(res.data.data.story_comment_bag_status);
             if (res.data.data.story_comment_bag_status == 'off') {
@@ -543,14 +543,14 @@ function Release() {
               .catch((error) => {
                 console.log(error);
               });
-    
+
             setDmOnOff(res.data.data.dm_bag_status);
             // if (res.data.data.dm_bag_status == false) {
             //   falseConfigDM()
             // } else {
             //   trueConfigDM()
             // }
-    
+
             api
               .get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`)
               .then((res) => {
@@ -582,7 +582,7 @@ function Release() {
             //   // setLiveCommentBagName(res.data.data.message_bag.bag_name)
             //   console.log("dm_bag_id: ", res.data)
             //   // setDmCommentBagName(res.data.data.message_bag.bag_name)
-    
+
             // }).catch(error => {
             //   console.log(error)
             // })
@@ -597,8 +597,6 @@ function Release() {
       .catch((error) => {
         console.log(error);
       });
-
-    
   }, []);
 
   function getAllN() {
@@ -1002,7 +1000,7 @@ function Release() {
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`)
           .then((res) => {
-            console.log("story_comment_bag_id: ", res.data)
+            console.log('story_comment_bag_id: ', res.data);
             setStoryCommentBagName(res.data.data.message_bag.bag_name);
           })
           .catch((error) => {
@@ -1011,7 +1009,7 @@ function Release() {
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
           .then((res) => {
-            console.log("story_comment_bag_id: ", res.data)
+            console.log('story_comment_bag_id: ', res.data);
             setPostCommentBagName(res.data.data.message_bag.bag_name);
           })
           .catch((error) => {
@@ -1380,7 +1378,10 @@ function Release() {
       } else if (fixed[i].is_support == true) {
         document.getElementById(`fixed-mnl-type${num}`).value = 'support';
         document.getElementById(`anw-mnl-type${num}`).value = fixed[i].payload;
-      } else if ((fixed[i].payload == null || fixed[i].payload == '') && fixed[i].is_support == false) {
+      } else if (
+        (fixed[i].payload == null || fixed[i].payload == '') &&
+        fixed[i].is_support == false
+      ) {
         document.getElementById(`fixed-mnl-type${num}`).value = 'message';
         document.getElementById(`anw-mnl-type${num}`).value = fixed[i].payload;
       }
@@ -2232,79 +2233,14 @@ function Release() {
     ele.remove();
   }
   function deleteFAQInList(value) {
-    if (listFAQ.length <= 1) {
-      setMsgNoti('よくある質問が最低1つの選択がある必要です。');
-      setIsOpenNoti(true);
-      setTimeout(() => {
-        setMsgNoti('');
-        setIsOpenNoti(false);
-      }, 2000);
-    } else {
-      api
-        .delete(`/api/v1/message_managements/ice_breakers/${value}`)
-        .then((res) => {
-          reloadFAQ();
-          api
-            .get(`/api/v1/message_managements/ice_breakers_turn_on`)
-            .then((res) => {
-              reloadFAQStatus();
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          setMsgNoti('削除しました。');
-          setIsOpenNoti(true);
-          setTimeout(() => {
-            setMsgNoti('');
-            setIsOpenNoti(false);
-          }, 2000);
-        })
-        .catch((error) => {
-          console.log(error);
-          // if (error.response.data.code === 3) {
-          //   requestNewToken(path)
-          // }
-        });
-    }
+    setFaqIdDelete(value);
+    setIsOpenConfirm(true);
   }
 
   function deleteFixedInList(value) {
     // alert(value)
-    if (listFixedMenu.length <= 1) {
-      setMsgNoti('固定メッセージが最低1つの選択がある必要です。');
-      setIsOpenNoti(true);
-      setTimeout(() => {
-        setMsgNoti('');
-        setIsOpenNoti(false);
-      }, 2000);
-    } else {
-      api
-        .delete(`/api/v1/message_managements/persistent_menus/${value}`)
-        .then((res) => {
-          // console.log(res)
-          reloadFixedMenu();
-          api
-            .get(`/api/v1/message_managements/persistent_menus_turn_on`)
-            .then((res) => {
-              reloadFixedMessageStatus();
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          setMsgNoti('固定メッセージを削除しました。');
-          setIsOpenNoti(true);
-          setTimeout(() => {
-            setMsgNoti('');
-            setIsOpenNoti(false);
-          }, 2000);
-        })
-        .catch((error) => {
-          console.log(error);
-          // if (error.response.data.code === 3) {
-          //   requestNewToken(path)
-          // }
-        });
-    }
+    setIsOpenConfirm(true);
+    setFixedIdDelete(value);
   }
   //editFAQInList
   function enableEdit(value) {
@@ -2470,7 +2406,7 @@ function Release() {
       api
         .patch(`/api/v1/message_managements/persistent_menus/${value}`, script)
         .then((res) => {
-          // console.log(res)
+          console.log(res);
           document.getElementById(`title-fixed-menu-${value}`).readOnly = true;
           document.getElementById(`fixed-mnl-type${value}`).readOnly = true;
           document.getElementById(`anw-mnl-type${value}`).readOnly = true;
@@ -2664,7 +2600,7 @@ function Release() {
         title: faq[0],
         message_bag_id: anww[0],
         url: urll[0],
-        tyis_supportpe: typeFM,
+        is_support: typeFM,
       },
     };
     console.log(script);
@@ -2809,82 +2745,107 @@ function Release() {
   //     getAllN()
   // }
   function saveStorySetting() {
-    var reply = document.getElementById("replyStory").value //replyStory
-    var msg_bag = document.getElementById("listReplyBag").value
-    if (msg_bag == "") {
-      msg_bag = instaSetting.story_comment_bag_id
+    var reply = document.getElementById('replyStory').value; //replyStory
+    var msg_bag = document.getElementById('listReplyBag').value;
+    if (msg_bag == '') {
+      msg_bag = instaSetting.story_comment_bag_id;
     }
-    if (reply == "direct_message") {
-      var update = { instagram_setting: { dm_bag_id: instaSetting.dm_bag_id, post_comment_bag_id: instaSetting.post_comment_bag_id, story_comment_bag_id: msg_bag, live_comment_bag_id: instaSetting.live_comment_bag_id } }
+    if (reply == 'direct_message') {
+      var update = {
+        instagram_setting: {
+          dm_bag_id: instaSetting.dm_bag_id,
+          post_comment_bag_id: instaSetting.post_comment_bag_id,
+          story_comment_bag_id: msg_bag,
+          live_comment_bag_id: instaSetting.live_comment_bag_id,
+        },
+      };
       var path = window.location.pathname;
-      var ig_setting = { instagram_setting: { story_comment_bag_status: "direct_message" } }
-      api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting).then(res => {
-
-      }).catch(error => {
-        console.log(error)
-      })
-      api.patch(`/api/v1/instagram_settings/${instaSettingId}`, update).then(res => {
-        reloadUpdate()
-        setMsgNoti("ストーリー設定を保存しました。")
-        setIsOpenNoti(true)
-        setTimeout(() => {
-          setMsgNoti("")
-          setIsOpenNoti(false)
-        }, 2000)
-      }).catch(error => {
-        console.log(error)
-      })
-    } else if (reply == "keyword") {
-      for (var i = 0; i < story_actived.length; i++) {
-        console.log("story_actived: ", story_actived[i])
-        var id = story_actived[i]
-        api.get(`/api/v1/message_managements/keyword_settings/${story_actived[i]}`).then(res => {
-          // console.log("kw actived: ", res.data.data)
-          var setting = res.data.data
-          var update = {
-            keyword_setting: {
-              title: setting.title, keyword: setting.keyword, instagram_account_id: setting.instagram_account_id, message_bag_id: setting.message_bag_id,
-              is_dm: setting.is_dm, is_story_comment: false, is_post_comment: setting.is_post_comment, is_live_comment: setting.is_live_comment, is_active: setting.is_active
-            }
-          }
-          api.patch(`/api/v1/message_managements/keyword_settings/${id}`, update).then(res => {
-            setMsgNoti("ストーリー設定を保存しました。")
-            setIsOpenNoti(true)
-            setTimeout(() => {
-              setMsgNoti("")
-              setIsOpenNoti(false)
-            }, 2000)
-          }).catch(error => {
-            console.log(error)
-          })
-        }).catch(error => {
-          console.log(error)
+      var ig_setting = { instagram_setting: { story_comment_bag_status: 'direct_message' } };
+      api
+        .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
+        .then((res) => {})
+        .catch((error) => {
+          console.log(error);
+        });
+      api
+        .patch(`/api/v1/instagram_settings/${instaSettingId}`, update)
+        .then((res) => {
+          reloadUpdate();
+          setMsgNoti('ストーリー設定を保存しました。');
+          setIsOpenNoti(true);
+          setTimeout(() => {
+            setMsgNoti('');
+            setIsOpenNoti(false);
+          }, 2000);
         })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if (reply == 'keyword') {
+      for (var i = 0; i < story_actived.length; i++) {
+        console.log('story_actived: ', story_actived[i]);
+        var id = story_actived[i];
+        api
+          .get(`/api/v1/message_managements/keyword_settings/${story_actived[i]}`)
+          .then((res) => {
+            // console.log("kw actived: ", res.data.data)
+            var setting = res.data.data;
+            var update = {
+              keyword_setting: {
+                title: setting.title,
+                keyword: setting.keyword,
+                instagram_account_id: setting.instagram_account_id,
+                message_bag_id: setting.message_bag_id,
+                is_dm: setting.is_dm,
+                is_story_comment: false,
+                is_post_comment: setting.is_post_comment,
+                is_live_comment: setting.is_live_comment,
+                is_active: setting.is_active,
+              },
+            };
+            api
+              .patch(`/api/v1/message_managements/keyword_settings/${id}`, update)
+              .then((res) => {
+                setMsgNoti('ストーリー設定を保存しました。');
+                setIsOpenNoti(true);
+                setTimeout(() => {
+                  setMsgNoti('');
+                  setIsOpenNoti(false);
+                }, 2000);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
 
       setTimeout(function () {
-        var ig_setting = { instagram_setting: { story_comment_bag_status: "keyword" } }
-        api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting).then(res => {
-
-        }).catch(error => {
-          console.log(error)
-        })
-        api.patch(`/api/v1/message_managements/keyword_settings/${new_story_kw_id}`, story_kw_setting).then(res => {
-          console.log('res ne: ', res)
-          // reloadUpdate()
-          reloadKeyWord()
-
-        }).catch(error => {
-          console.log(error)
-          // }
-        })
+        var ig_setting = { instagram_setting: { story_comment_bag_status: 'keyword' } };
+        api
+          .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
+          .then((res) => {})
+          .catch((error) => {
+            console.log(error);
+          });
+        api
+          .patch(
+            `/api/v1/message_managements/keyword_settings/${new_story_kw_id}`,
+            story_kw_setting
+          )
+          .then((res) => {
+            console.log('res ne: ', res);
+            // reloadUpdate()
+            reloadKeyWord();
+          })
+          .catch((error) => {
+            console.log(error);
+            // }
+          });
       }, 1500);
-
-
     }
-
-
-
   }
 
   function saveLiveSetting() {
@@ -2908,7 +2869,7 @@ function Release() {
       };
       api
         .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-        .then((res) => { })
+        .then((res) => {})
         .catch((error) => {
           console.log(error);
         });
@@ -2957,13 +2918,13 @@ function Release() {
               .patch(`/api/v1/message_managements/keyword_settings/${id}`, update)
               .then((res) => {
                 reloadUpdate();
-          setMsgNoti('ライブ設定を保存しました。');
-          setIsOpenNoti(true);
-          setTimeout(() => {
-            setMsgNoti('');
-            setIsOpenNoti(false);
-          }, 2000);
-               })
+                setMsgNoti('ライブ設定を保存しました。');
+                setIsOpenNoti(true);
+                setTimeout(() => {
+                  setMsgNoti('');
+                  setIsOpenNoti(false);
+                }, 2000);
+              })
               .catch((error) => {
                 console.log(error);
               });
@@ -2978,7 +2939,7 @@ function Release() {
         };
         api
           .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-          .then((res) => { })
+          .then((res) => {})
           .catch((error) => {
             console.log(error);
           });
@@ -3020,7 +2981,7 @@ function Release() {
       };
       api
         .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-        .then((res) => { })
+        .then((res) => {})
         .catch((error) => {
           console.log(error);
         });
@@ -3092,7 +3053,7 @@ function Release() {
         };
         api
           .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-          .then((res) => { })
+          .then((res) => {})
           .catch((error) => {
             console.log(error);
           });
@@ -3167,11 +3128,11 @@ function Release() {
   function isURL(str) {
     var pattern = new RegExp(
       '^(https?:\\/\\/)?' + // protocol
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
-      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-      '(\\#[-a-z\\d_]*)?$',
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+        '(\\#[-a-z\\d_]*)?$',
       'i'
     ); // fragment locator
     return pattern.test(str);
@@ -3250,6 +3211,83 @@ function Release() {
     console.log(past_post);
   }
 
+  // confirm delete
+  const confirmDelete = () => {
+    setIsOpenConfirm(false);
+    if (fixedIdDelete) {
+      if (listFixedMenu.length <= 1) {
+        setMsgNoti('固定メッセージが最低1つの選択がある必要です。');
+        setIsOpenNoti(true);
+        setTimeout(() => {
+          setMsgNoti('');
+          setIsOpenNoti(false);
+        }, 2000);
+      } else {
+        api
+          .delete(`/api/v1/message_managements/persistent_menus/${fixedIdDelete}`)
+          .then((res) => {
+            // console.log(res)
+            reloadFixedMenu();
+            api
+              .get(`/api/v1/message_managements/persistent_menus_turn_on`)
+              .then((res) => {
+                reloadFixedMessageStatus();
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+            setMsgNoti('固定メッセージを削除しました。');
+            setIsOpenNoti(true);
+            setTimeout(() => {
+              setMsgNoti('');
+              setIsOpenNoti(false);
+            }, 2000);
+            setFixedIdDelete();
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    }
+    if (faqIdDelete) {
+      if (listFAQ.length <= 1) {
+        setMsgNoti('よくある質問が最低1つの選択がある必要です。');
+        setIsOpenNoti(true);
+        setTimeout(() => {
+          setMsgNoti('');
+          setIsOpenNoti(false);
+        }, 2000);
+      } else {
+        api
+          .delete(`/api/v1/message_managements/ice_breakers/${faqIdDelete}`)
+          .then((res) => {
+            reloadFAQ();
+            api
+              .get(`/api/v1/message_managements/ice_breakers_turn_on`)
+              .then((res) => {
+                reloadFAQStatus();
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+            setMsgNoti('削除しました。');
+            setIsOpenNoti(true);
+            setTimeout(() => {
+              setMsgNoti('');
+              setIsOpenNoti(false);
+            }, 2000);
+            setFaqIdDelete();
+          })
+          .catch((error) => {
+            console.log(error);
+            // if (error.response.data.code === 3) {
+            //   requestNewToken(path)
+            // }
+          });
+      }
+    }
+  };
+
   return (
     <>
       <div className="content">
@@ -3292,87 +3330,101 @@ function Release() {
                       </Button>
                     </div>
                     <div style={{ margin: '15px 0px 0px 20px' }}>
-                      <Switch onChange={() => changeFAQOnOff()} onColor="#64c1ff" checked={checkedFAQ} />
+                      <Switch
+                        onChange={() => changeFAQOnOff()}
+                        onColor="#64c1ff"
+                        checked={checkedFAQ}
+                      />
                     </div>
                   </div>
 
                   <div id="addFAQContent" style={{ width: '100%' }}>
                     {listFAQ != undefined
                       ? listFAQ.map((item, i) => (
-                        <form key={item.id} id={`form-faq-${item.id}`}>
-                          <div className="div-add-aq" style={{ display: 'flex' }} onLoad={loadFAQ(item)}>
-                            <input
-                              id={`faq-q-${item.id}`}
-                              className="new-faq-q"
-                              defaultValue={item.question}
-                              name={`faq_key${item.question}`}
-                              readOnly="readonly"
-                            ></input>
-                            {/* <input id={`faq-a-${item.id}`} className="new-faq-q" defaultValue={item.answer}
-                            name={`faq_answer${item.answer}`} readOnly="readonly"></input> */}
-                            <select
-                              id={`listGroupFAQ${item.id}`}
-                              // defaultValue={''}
-                              onChange={(e) => selectedGroup(e.target.value, item.id)}
-                              className="new-faq-q-so"
-                              name={`group_id_${numFAQ}`}
+                          <form key={item.id} id={`form-faq-${item.id}`}>
+                            <div
+                              className="div-add-aq"
+                              style={{ display: 'flex' }}
+                              onLoad={loadFAQ(item)}
                             >
-                              {/* <option value="" disabled hidden>
+                              <input
+                                id={`faq-q-${item.id}`}
+                                className="new-faq-q"
+                                defaultValue={item.question}
+                                name={`faq_key${item.question}`}
+                                readOnly="readonly"
+                              ></input>
+                              {/* <input id={`faq-a-${item.id}`} className="new-faq-q" defaultValue={item.answer}
+                            name={`faq_answer${item.answer}`} readOnly="readonly"></input> */}
+                              <select
+                                id={`listGroupFAQ${item.id}`}
+                                // defaultValue={''}
+                                onChange={(e) => selectedGroup(e.target.value, item.id)}
+                                className="new-faq-q-so"
+                                name={`group_id_${numFAQ}`}
+                              >
+                                {/* <option value="" disabled hidden>
                                 {item.message_group_name}
                               </option> */}
-                              {listGroup?.map((group, i) => {
-                                return (
-                                  <option key={i} value={group.id}>
-                                    {group.group_name}
-                                  </option>
-                                );
-                              })}
-                            </select>
-                            <select
-                              id={`listBagFAQ${item.id}`}
-                              className="new-faq-q-so"
-                              // defaultValue={''}
-                              onChange={(e) => selectedBag(e.target.value)}
-                              name={`bag_id_${numFAQ}`}
-                            >
-                              {/* <option value="" disabled hidden>
+                                {listGroup?.map((group, i) => {
+                                  return (
+                                    <option key={i} value={group.id}>
+                                      {group.group_name}
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                              <select
+                                id={`listBagFAQ${item.id}`}
+                                className="new-faq-q-so"
+                                // defaultValue={''}
+                                onChange={(e) => selectedBag(e.target.value)}
+                                name={`bag_id_${numFAQ}`}
+                              >
+                                {/* <option value="" disabled hidden>
                                 {item.msg_bag_name}
                               </option> */}
-                            </select>
-                            <div
-                              id={`ene-faq-${item.id}`}
-                              onClick={() => enableEdit(item.id)}
-                              style={{ width: '5%' }}
-                            >
-                              <i
-                                className="nc-icon nc-align-center nc-3x"
-                                style={{
-                                  fontSize: '30px',
-                                  marginTop: '5px',
-                                  marginRight: '30px',
-                                }}
-                              ></i>
+                              </select>
+                              <div
+                                id={`ene-faq-${item.id}`}
+                                onClick={() => enableEdit(item.id)}
+                                style={{ width: '5%' }}
+                              >
+                                <i
+                                  className="nc-icon nc-align-center nc-3x"
+                                  style={{
+                                    fontSize: '30px',
+                                    marginTop: '5px',
+                                    marginRight: '30px',
+                                  }}
+                                ></i>
+                              </div>
+                              <div
+                                id={`sav-faq-${item.id}`}
+                                onClick={() => editFAQInList(item.id)}
+                                style={{ width: '5%', display: 'none' }}
+                              >
+                                <i
+                                  className="nc-icon nc-cloud-download-93 nc-3x"
+                                  style={{
+                                    fontSize: '30px',
+                                    marginTop: '5px',
+                                    marginRight: '30px',
+                                  }}
+                                ></i>
+                              </div>
+                              <div
+                                id={`deleteFAQfromList${item.id}`}
+                                onClick={() => deleteFAQInList(item.id)}
+                              >
+                                <i
+                                  className="nc-icon nc-box nc-3x"
+                                  style={{ fontSize: '30px', marginTop: '5px' }}
+                                ></i>
+                              </div>
                             </div>
-                            <div
-                              id={`sav-faq-${item.id}`}
-                              onClick={() => editFAQInList(item.id)}
-                              style={{ width: '5%', display: 'none' }}
-                            >
-                              <i
-                                className="nc-icon nc-cloud-download-93 nc-3x"
-                                style={{
-                                  fontSize: '30px',
-                                  marginTop: '5px',
-                                  marginRight: '30px',
-                                }}
-                              ></i>
-                            </div>
-                            <div id={`deleteFAQfromList${item.id}`} onClick={() => deleteFAQInList(item.id)}>
-                              <i className="nc-icon nc-box nc-3x" style={{ fontSize: '30px', marginTop: '5px' }}></i>
-                            </div>
-                          </div>
-                        </form>
-                      ))
+                          </form>
+                        ))
                       : ''}
                     <form action="" id="new_FAQ">
                       <div style={{ width: '100%' }} id="faq_add">
@@ -3440,7 +3492,10 @@ function Release() {
                                 ></i>
                               </div>
                               <div onClick={() => deleteFAQ(i)}>
-                                <i className="nc-icon nc-box nc-3x" style={{ fontSize: '30px', marginTop: '5px' }}></i>
+                                <i
+                                  className="nc-icon nc-box nc-3x"
+                                  style={{ fontSize: '30px', marginTop: '5px' }}
+                                ></i>
                               </div>
                               {/* <div style={{width:"5%"}} onClick={() => deleteFAQ(i)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px", width:"5%" }}></i></div> */}
                             </div>
@@ -3607,7 +3662,11 @@ function Release() {
                       </div>
 
                       <div style={{ margin: '5px 0px 0px 0px' }}>
-                        <Switch onChange={() => changeStoryOnOff()} onColor="#64c1ff" checked={checked} />
+                        <Switch
+                          onChange={() => changeStoryOnOff()}
+                          onColor="#64c1ff"
+                          checked={checked}
+                        />
                       </div>
                     </div>
                     <div
@@ -3715,7 +3774,11 @@ function Release() {
                       </div>
 
                       <div style={{ margin: '5px 0px 0px 0px' }}>
-                        <Switch onChange={() => changeLiveOnOff()} onColor="#64c1ff" checked={checkedLive} />
+                        <Switch
+                          onChange={() => changeLiveOnOff()}
+                          onColor="#64c1ff"
+                          checked={checkedLive}
+                        />
                       </div>
                     </div>
                     <div
@@ -3832,7 +3895,11 @@ function Release() {
                         ></i>
                       </div>
                       <div style={{ margin: '5px 0px 0px 0px' }}>
-                        <Switch onChange={() => changeCMPostOnOff()} onColor="#64c1ff" checked={checkedCMPost} />
+                        <Switch
+                          onChange={() => changeCMPostOnOff()}
+                          onColor="#64c1ff"
+                          checked={checkedCMPost}
+                        />
                       </div>
                     </div>
                     <div
@@ -3888,123 +3955,127 @@ function Release() {
                     <div id="addFixedMenuContent" style={{ width: '100%' }}>
                       {listFixedMenu != undefined
                         ? listFixedMenu.map((item) => (
-                          <form key={item.id} id={`fixed-menu-${item.id}`}>
-                            <div className="div-add-aq" style={{ display: 'flex' }} onLoad={loadFixedMenu(item)}>
-                              <input
-                                name={`title-fixed-menu-${item.id}`}
-                                id={`title-fixed-menu-${item.id}`}
-                                className="new-faq-q-so"
-                                onChange={() => onChangeEditFM(`title-fixed-menu-${item.id}`)}
-                                defaultValue={item.title}
-                                type="text"
-                                readOnly="readonly"
-                                style={{ width: '20%' }}
-                              />
-                              <select
-                                style={{ width: '20%' }}
-                                id={`fixed-mnl-type${item.id}`}
-                                readOnly="readonly"
-                                onChange={(e) => selectFixedMenuUP(e.target.value, item.id)}
-                                className="new-faq-q-so"
-                                name={`fixed-option-${item.id}`}
+                            <form key={item.id} id={`fixed-menu-${item.id}`}>
+                              <div
+                                className="div-add-aq"
+                                style={{ display: 'flex' }}
+                                onLoad={loadFixedMenu(item)}
                               >
-                                <option value="" disabled hidden>
-                                  メッセージタイプ選択 ...
-                                </option>
-                                <option value="message">メッセージ</option>
-                                <option value="website">ウェブサイト</option>
-                                <option value="support">有人対応に切り替え</option>
-                              </select>
-                              <select
-                                id={`listGroupFixedMenu${item.id}`}
-                                style={{
-                                  width: '20%',
-                                  display: `${item.message_bag_id == null ? 'none' : 'block'}`,
-                                }}
-                                // defaultValue={''}
-                                onChange={(e) => selectedGroupFMUP(e.target.value, item.id)}
-                                className="new-faq-q-so"
-                                name="client_id"
-                              >
-                                {/* <option value="" disabled hidden>
+                                <input
+                                  name={`title-fixed-menu-${item.id}`}
+                                  id={`title-fixed-menu-${item.id}`}
+                                  className="new-faq-q-so"
+                                  onChange={() => onChangeEditFM(`title-fixed-menu-${item.id}`)}
+                                  defaultValue={item.title}
+                                  type="text"
+                                  readOnly="readonly"
+                                  style={{ width: '20%' }}
+                                />
+                                <select
+                                  style={{ width: '20%' }}
+                                  id={`fixed-mnl-type${item.id}`}
+                                  readOnly="readonly"
+                                  onChange={(e) => selectFixedMenuUP(e.target.value, item.id)}
+                                  className="new-faq-q-so"
+                                  name={`fixed-option-${item.id}`}
+                                >
+                                  <option value="" disabled hidden>
+                                    メッセージタイプ選択 ...
+                                  </option>
+                                  <option value="message">メッセージ</option>
+                                  <option value="website">ウェブサイト</option>
+                                  <option value="support">有人対応に切り替え</option>
+                                </select>
+                                <select
+                                  id={`listGroupFixedMenu${item.id}`}
+                                  style={{
+                                    width: '20%',
+                                    display: `${item.message_bag_id == null ? 'none' : 'block'}`,
+                                  }}
+                                  // defaultValue={''}
+                                  onChange={(e) => selectedGroupFMUP(e.target.value, item.id)}
+                                  className="new-faq-q-so"
+                                  name="client_id"
+                                >
+                                  {/* <option value="" disabled hidden>
                                   {item.message_group_name}
                                 </option> */}
-                                {listGroup?.map((group, i) => {
-                                  return (
-                                    <option key={i} value={group.id}>
-                                      {group.group_name}
-                                    </option>
-                                  );
-                                })}
-                              </select>
-                              <select
-                                id={`listBagFixedMenu${item.id}`}
-                                style={{
-                                  width: '20%',
-                                  display: `${item.message_bag_id == null ? 'none' : 'block'}`,
-                                }}
-                                // defaultValue={''}
-                                onChange={(e) => selectedBagFM(e.target.value)}
-                                className="new-faq-q-so"
-                                name={`msgbag_id${item.id}`}
-                              >
-                                {/* <option value="" disabled hidden>
+                                  {listGroup?.map((group, i) => {
+                                    return (
+                                      <option key={i} value={group.id}>
+                                        {group.group_name}
+                                      </option>
+                                    );
+                                  })}
+                                </select>
+                                <select
+                                  id={`listBagFixedMenu${item.id}`}
+                                  style={{
+                                    width: '20%',
+                                    display: `${item.message_bag_id == null ? 'none' : 'block'}`,
+                                  }}
+                                  // defaultValue={''}
+                                  onChange={(e) => selectedBagFM(e.target.value)}
+                                  className="new-faq-q-so"
+                                  name={`msgbag_id${item.id}`}
+                                >
+                                  {/* <option value="" disabled hidden>
                                   {item.message_bag_name}
                                 </option> */}
-                              </select>
-                              <input
-                                name={`answer-${item.id}`}
-                                id={`anw-mnl-type${item.id}`}
-                                className="new-faq-q-so"
-                                type="text"
-                                readOnly="readonly"
-                                style={{
-                                  width: '43%',
-                                  display: `${item.message_bag_id == null ? 'block' : 'none'}`,
-                                }}
-                              />
+                                </select>
+                                <input
+                                  name={`answer-${item.id}`}
+                                  id={`anw-mnl-type${item.id}`}
+                                  className="new-faq-q-so"
+                                  type="text"
+                                  readOnly="readonly"
+                                  style={{
+                                    width: '43%',
+                                    display: `${item.message_bag_id == null ? 'block' : 'none'}`,
+                                  }}
+                                />
 
-                              <div style={{ width: '5%' }}></div>
-                              <div
-                                id={`ene-fixed-${item.id}`}
-                                onClick={() => enableEditFixed(item.id)}
-                                style={{ width: '5%' }}
-                              >
-                                <i
-                                  className="nc-icon nc-align-center nc-3x"
-                                  style={{
-                                    fontSize: '30px',
-                                    marginTop: '5px',
-                                    marginRight: '30px',
-                                  }}
-                                ></i>
+                                <div style={{ width: '5%' }}></div>
+                                <div
+                                  id={`ene-fixed-${item.id}`}
+                                  onClick={() => enableEditFixed(item.id)}
+                                  style={{ width: '5%' }}
+                                >
+                                  <i
+                                    className="nc-icon nc-align-center nc-3x"
+                                    style={{
+                                      fontSize: '30px',
+                                      marginTop: '5px',
+                                      marginRight: '30px',
+                                    }}
+                                  ></i>
+                                </div>
+                                <div
+                                  id={`sav-fixed-${item.id}`}
+                                  onClick={() => editFixedInList(item.id)}
+                                  style={{ width: '5%', display: 'none' }}
+                                >
+                                  <i
+                                    className="nc-icon nc-cloud-download-93 nc-3x"
+                                    style={{
+                                      fontSize: '30px',
+                                      marginTop: '5px',
+                                      marginRight: '30px',
+                                    }}
+                                  ></i>
+                                </div>
+                                <div onClick={() => deleteFixedInList(item.id)}>
+                                  <i
+                                    className="nc-icon nc-box nc-3x"
+                                    style={{
+                                      fontSize: '30px',
+                                      marginTop: '5px',
+                                    }}
+                                  ></i>
+                                </div>
                               </div>
-                              <div
-                                id={`sav-fixed-${item.id}`}
-                                onClick={() => editFixedInList(item.id)}
-                                style={{ width: '5%', display: 'none' }}
-                              >
-                                <i
-                                  className="nc-icon nc-cloud-download-93 nc-3x"
-                                  style={{
-                                    fontSize: '30px',
-                                    marginTop: '5px',
-                                    marginRight: '30px',
-                                  }}
-                                ></i>
-                              </div>
-                              <div onClick={() => deleteFixedInList(item.id)}>
-                                <i
-                                  className="nc-icon nc-box nc-3x"
-                                  style={{
-                                    fontSize: '30px',
-                                    marginTop: '5px',
-                                  }}
-                                ></i>
-                              </div>
-                            </div>
-                          </form>
-                        ))
+                            </form>
+                          ))
                         : ''}
                       <form action="" id="fixed-menu">
                         <div style={{ width: '100%' }} id="fixed_add">
@@ -4159,6 +4230,13 @@ function Release() {
               <h4>{msgNoti}</h4>
             </div>
           </ModalNoti>
+          <ModalShort open={isOpenConfirm} onClose={() => setIsOpenConfirm(false)}>
+            <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+              <h4>これを削除しますか。</h4>
+              <Button onClick={() => confirmDelete()}>はい</Button>
+              <Button onClick={() => setIsOpenConfirm(false)}>いいえ</Button>
+            </div>
+          </ModalShort>
         </div>
       </div>
     </>
