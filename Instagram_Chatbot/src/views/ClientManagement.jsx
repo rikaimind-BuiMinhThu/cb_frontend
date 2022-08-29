@@ -1110,7 +1110,7 @@ function ClientManagement() {
                       {/**Date end using */}
                       <th style={{ minWidth: '200px', width: '200px' }}>住所</th>
                       {/**Address */}
-                      <th style={{ width: '10%' }}>コンバージョン率</th>
+                      <th style={{ width: '10%' }}>コンバージョン数</th>
                       <th style={{ width: '10%' }}>最終ログイン日時</th>
                       {/**Last login date_time */}
                       <th className="actionListClient">アクション</th>
@@ -1157,13 +1157,8 @@ function ClientManagement() {
                             </div>
                           </td>
                           <td>
-                            {parseInt(item.instagram_message_count) !== 0
-                              ? (
-                                  parseInt(item.instagram_conversion_count) /
-                                  parseInt(item.instagram_message_count)
-                                ).toFixed(2)
-                              : `0.00`}
-                            %
+                            {item.instagram_conversion_count}
+                            
                           </td>
                           <td>{item.last_sign_in_at}</td>
                           <td className="actionListClient">
