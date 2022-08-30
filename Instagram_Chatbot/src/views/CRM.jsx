@@ -412,7 +412,7 @@ function CRM() {
       .then((res) => {
         console.log(res);
         setIsOpenNotiActiveChatbot(true);
-        setMsgNoti('削除しました。');
+        setMsgNoti('自動応答に切り替えました！');
         setTimeout(() => {
           setIsOpenNotiActiveChatbot(false);
           setMsgNoti('');
@@ -494,7 +494,7 @@ function CRM() {
                                 style={{ backgroundColor: 'red' }}
                                 onClick={() => activeChatbotClick(item?.id)}
                               >
-                                有効する
+                                自動応答
                               </Button>
                             )}
                           </div>
@@ -1249,7 +1249,7 @@ function CRM() {
         </ModalNoti>
         <ModalShort open={isOpenActiveChatbot} onClose={() => setIsOpenActiveChatbot(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-            <h4>チャットボットを有効にしますか。</h4>
+            <h4>自動応答に切り替えますか？</h4>
             <Button onClick={() => activeChatbot()}>はい</Button>
             <Button onClick={() => setIsOpenActiveChatbot(false)}>いいえ</Button>
           </div>
