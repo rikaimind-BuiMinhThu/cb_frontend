@@ -27,14 +27,12 @@ function AttractedCustomer() {
   const [endDate, setEndDate] = useState(new Date());
   const [userECC, setUserECC] = useState([]);
   const [dataECU, setDataECU] = useState([]);
-  const [CVAL, setCVAL] = useState({})
+  const [CVAL, setCVAL] = useState({});
   React.useEffect(() => {
-    api
-    .get('/api/v1/instagram_users/conversions')
-    .then((res) => {
-      console.log("res CV: ", res.data.data)
-      setCVAL(res.data.data)
-    })
+    api.get('/api/v1/instagram_users/conversions').then((res) => {
+      console.log('res CV: ', res.data.data);
+      setCVAL(res.data.data);
+    });
   }, []);
 
   // mounted
@@ -59,9 +57,7 @@ function AttractedCustomer() {
               dmCount++;
               dmMessageSent += dataStartChatbotIn[i].num_of_messages_sent;
               dmPurchaseCount += dataStartChatbotIn[i].num_of_conversions;
-            } else if (
-              dataStartChatbotIn[i].start_chatbot_in === 'story_comment'
-            ) {
+            } else if (dataStartChatbotIn[i].start_chatbot_in === 'story_comment') {
               scCount++;
               scMessageSent += dataStartChatbotIn[i].num_of_messages_sent;
               scPurchaseCount += dataStartChatbotIn[i].num_of_conversions;
@@ -148,9 +144,7 @@ function AttractedCustomer() {
         let user_count = [];
         for (let i = 0; i < useEC.length; i++) {
           // dataEC.push(useEC[i].log_date.slice(0, 5));
-          dataEC.push(
-            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
-          );
+          dataEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
           user_count.push(useEC[i].user_count);
         }
         setDataECU(dataEC);
@@ -242,18 +236,14 @@ function AttractedCustomer() {
     let startD = startDate.toISOString().slice(0, 10);
     let endD = value.toISOString().slice(0, 10);
     api
-      .get(
-        `/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`
-      )
+      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
       .then((res) => {
         let useEC = res.data.counts;
         let dataEC = [];
         let user_count = [];
         for (let i = 0; i < useEC.length; i++) {
           // dataEC.push(useEC[i].log_date.slice(0, 5));
-          dataEC.push(
-            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
-          );
+          dataEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
           user_count.push(useEC[i].user_count);
         }
         setDataECU(dataEC);
@@ -270,18 +260,14 @@ function AttractedCustomer() {
     let startD = value.toISOString().slice(0, 10);
     let endD = endDate.toISOString().slice(0, 10);
     api
-      .get(
-        `/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`
-      )
+      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
       .then((res) => {
         let useEC = res.data.counts;
         let dataEC = [];
         let user_count = [];
         for (let i = 0; i < useEC.length; i++) {
           // dataEC.push(useEC[i].log_date.slice(0, 5));
-          dataEC.push(
-            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
-          );
+          dataEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
           user_count.push(useEC[i].user_count);
         }
         setDataECU(dataEC);
@@ -412,7 +398,7 @@ function AttractedCustomer() {
                         <th>ユーザー数</th>
                         <th>メッセージ数</th>
                         <th>平均メッセージ数</th>
-                        <th>注文</th>
+                        <th>コンバージョン数</th>
                         <th>コンバージョン率</th>
                       </tr>
                     </thead>
@@ -429,19 +415,19 @@ function AttractedCustomer() {
                               2
                             )
                             : 0} */}
-                            {CVAL.dm_instagram_user_count !== 0
-                            ? (CVAL.dm_instagram_message_count / CVAL.dm_instagram_user_count).toFixed(
-                              2
-                            )
+                          {CVAL.dm_instagram_user_count !== 0
+                            ? (
+                                CVAL.dm_instagram_message_count / CVAL.dm_instagram_user_count
+                              ).toFixed(2)
                             : 0}
                         </td>
                         {/* <td>{dmData.totalPurchase}</td> */}
                         <td>{CVAL.dm_conversion_count}</td>
                         <td>
                           {CVAL.dm_instagram_message_count !== 0
-                            ? (
-                              CVAL.dm_conversion_count / CVAL.dm_instagram_message_count
-                            ).toFixed(2)
+                            ? (CVAL.dm_conversion_count / CVAL.dm_instagram_message_count).toFixed(
+                                2
+                              )
                             : `0.00`}
                           %
                         </td>
@@ -458,10 +444,10 @@ function AttractedCustomer() {
                               2
                             )
                             : 0} */}
-                            {CVAL.story_instagram_user_count !== 0
-                            ? (CVAL.story_instagram_message_count / CVAL.story_instagram_user_count).toFixed(
-                              2
-                            )
+                          {CVAL.story_instagram_user_count !== 0
+                            ? (
+                                CVAL.story_instagram_message_count / CVAL.story_instagram_user_count
+                              ).toFixed(2)
                             : 0}
                         </td>
                         {/* <td>{scData.totalPurchase}</td> */}
@@ -469,8 +455,8 @@ function AttractedCustomer() {
                         <td>
                           {CVAL.story_instagram_message_count !== 0
                             ? (
-                              CVAL.story_conversion_count / CVAL.story_instagram_message_count
-                            ).toFixed(2)
+                                CVAL.story_conversion_count / CVAL.story_instagram_message_count
+                              ).toFixed(2)
                             : `0.00`}
                           %
                         </td>
@@ -485,7 +471,7 @@ function AttractedCustomer() {
                           {/* {CVAL.live_instagram_user_count !== 0
                             ? CVAL.live_instagram_message_count / CVAL.live_instagram_user_count
                             : 0} */}
-                            {CVAL.live_instagram_user_count !== 0
+                          {CVAL.live_instagram_user_count !== 0
                             ? CVAL.live_instagram_message_count / CVAL.live_instagram_user_count
                             : 0}
                         </td>
@@ -497,10 +483,10 @@ function AttractedCustomer() {
                               lcData.totalPurchase / lcData.totalMessages
                             ).toFixed(2)
                             : `0.00`} */}
-                             {CVAL.live_instagram_message_count !== 0
+                          {CVAL.live_instagram_message_count !== 0
                             ? (
-                              CVAL.live_conversion_count / CVAL.live_instagram_message_count
-                            ).toFixed(2)
+                                CVAL.live_conversion_count / CVAL.live_instagram_message_count
+                              ).toFixed(2)
                             : `0.00`}
                           %
                         </td>

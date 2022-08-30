@@ -13,8 +13,7 @@ import ModalDetail from './Popup/ModalDetail';
 import ava from './Popup/ava.png';
 import ModalShort from './Popup/ModalShort';
 // import { Pagination } from "element-react";
-import $ from "jquery";
-
+import $ from 'jquery';
 
 function UserManagement() {
   var [dataList, setDataList] = useState([]);
@@ -184,10 +183,11 @@ function UserManagement() {
       });
   }
   $('#screenAll').keydown(function (event) {
-    if (event.keyCode == 9) {  //tab pressed
+    if (event.keyCode == 9) {
+      //tab pressed
       event.preventDefault(); // stops its action
     }
-  })
+  });
 
   function getUserDetail(item) {
     setDetailUpdateTitle('ユーザー詳細');
@@ -299,10 +299,10 @@ function UserManagement() {
         var item = elements.item(i);
         obj[item.name] = item.value;
       }
-      if (passwordUpdate === '') {
+      if (passwordUpdate === '' && confirmPasswordUpdate === '') {
         delete obj.password;
+        delete obj.password_confirmation;
       }
-      delete obj.confirm_password;
       var updateClient = { user: obj };
       console.log(updateClient);
       api
@@ -491,14 +491,13 @@ function UserManagement() {
   // }
 
   function handleChange(event, value) {
-    if(totalPage > 1){
+    if (totalPage > 1) {
       console.log('pageIndex: ', value);
-    setPage(parseInt(value));
-    setPageIndex(value);
-    reloadListClient(value);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+      setPage(parseInt(value));
+      setPageIndex(value);
+      reloadListClient(value);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    
   }
 
   function detailUser(id) {
@@ -570,13 +569,27 @@ function UserManagement() {
                           <td>{item.role === 'admin_client' ? 'クライアント' : 'ユーザー'}</td>
                           <td>{item.client_name}</td>
                           <td className="actionListUser">
-                            <div style={{display: "flex"}}>
+                            <div style={{ display: 'flex' }}>
                               {/* <Button onClick={() => getUserDetail(item)}>View Detail</Button> */}
-                              <div onClick={() => updateClientUser(item)}><i className="nc-icon nc-align-center nc-3x" style={{ fontSize: "30px", marginTop: "5px", marginRight: "30px" }}></i></div>
+                              <div onClick={() => updateClientUser(item)}>
+                                <i
+                                  className="nc-icon nc-align-center nc-3x"
+                                  style={{
+                                    fontSize: '30px',
+                                    marginTop: '5px',
+                                    marginRight: '30px',
+                                  }}
+                                ></i>
+                              </div>
                               {/* <Button className="editBtn" onClick={() => updateClientUser(item)}>
                                 編集
                               </Button> */}
-                              <div onClick={() => confirmDeleteUser(item.id)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px", cursor: "pointer" }}></i></div>
+                              <div onClick={() => confirmDeleteUser(item.id)}>
+                                <i
+                                  className="nc-icon nc-box nc-3x"
+                                  style={{ fontSize: '30px', marginTop: '5px', cursor: 'pointer' }}
+                                ></i>
+                              </div>
                               {/* <Button
                                 className="deleteBtn"
                                 onClick={() => confirmDeleteUser(item.id)}
@@ -870,7 +883,7 @@ function UserManagement() {
                     // onBlur={(e) => checkFieldUpdate(e.target.value, "パスワード(確認用)")}
                     type="password"
                     id="updateConfirmPassword"
-                    name="confirm_password"
+                    name="password_confirmation"
                   />
                   <label
                     id="パスワード(確認用)ErrMsg"
