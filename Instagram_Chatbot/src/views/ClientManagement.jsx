@@ -1158,7 +1158,7 @@ function ClientManagement() {
                             </div>
                           </td>
                           <td>{item.instagram_conversion_count}</td>
-                          <td>{item.last_sign_in_at}</td>
+                          <td>{item.last_sign_in_at?.replaceAll('/', '-')}</td>
                           <td className="actionListClient">
                             <div style={{ display: 'flex' }}>
                               <div onClick={() => getUserDetail(item)}>
