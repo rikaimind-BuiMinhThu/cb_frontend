@@ -483,8 +483,9 @@ function ClientManagement() {
       dateCheck === true
     ) {
       var elements = document.getElementById('detailUserClient').elements;
+      // console.log(elements);
       var obj = {};
-      for (var i = 0; i < elements.length - 3; i++) {
+      for (var i = 0; i < elements.length; i++) {
         var item = elements.item(i);
         obj[item.name] = item.value;
       }
@@ -1156,10 +1157,7 @@ function ClientManagement() {
                               {item.prefecture} {item.address} {item.building_name}
                             </div>
                           </td>
-                          <td>
-                            {item.instagram_conversion_count}
-                            
-                          </td>
+                          <td>{item.instagram_conversion_count}</td>
                           <td>{item.last_sign_in_at}</td>
                           <td className="actionListClient">
                             <div style={{ display: 'flex' }}>
