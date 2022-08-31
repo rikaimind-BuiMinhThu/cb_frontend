@@ -236,7 +236,7 @@ function DataAnalyst() {
     let dateEnd = new Date();
     let month = dateEnd.toISOString().slice(5, 7) - 1;
     dateEnd = dateEnd.toISOString().slice(0, 10);
-    console.log(dateStart, dateEnd, month);
+    // console.log(dateStart, dateEnd, month);
     if (month < 10) {
       month = `0${month}`;
     }
@@ -249,7 +249,7 @@ function DataAnalyst() {
         )}${month}-15&end_date=${dateEnd}`
       )
       .then((res) => {
-        console.log('user EC: ', res.data.counts);
+        // console.log('user EC: ', res.data.counts);
         var useEC = res.data.counts;
         var dateEC = [];
         var user_count = [];
@@ -274,7 +274,7 @@ function DataAnalyst() {
         )}${month}-15&end_date=${dateEnd}`
       )
       .then((res) => {
-        console.log('message EC: ', res.data.counts);
+        // console.log('message EC: ', res.data.counts);
         var messageECA = res.data.counts;
         var message_count = [];
         for (var i = 0; i < messageECA.length; i++) {
@@ -291,7 +291,7 @@ function DataAnalyst() {
         `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${month}-15&end_date=${dateEnd}`
       )
       .then((res) => {
-        console.log(res.data.user_counts);
+        // console.log(res.data.user_counts);
         var useEC = res.data.user_counts;
         var user_count_all = 0;
         for (var i = 0; i < useEC.length; i++) {
@@ -310,7 +310,7 @@ function DataAnalyst() {
         }-15&end_date=${dateEnd}`
       )
       .then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         var useEC = res.data.user_counts;
         var user_count_alltime = 0;
         for (var i = 0; i < useEC.length; i++) {
@@ -362,7 +362,7 @@ function DataAnalyst() {
               console.log(error);
             });
         }
-        console.log('msgDataAll: ', msgDataAll);
+        // console.log('msgDataAll: ', msgDataAll);
         setMsgExDataAll(msgDataAll);
       })
       .catch((error) => {
@@ -396,7 +396,7 @@ function DataAnalyst() {
           .slice(0, 10)}&end_date=${dateLiveEnd.toISOString().slice(0, 10)}`
       )
       .then((res) => {
-        console.log('live analytics: ', res.data.live_usages);
+        // console.log('live analytics: ', res.data.live_usages);
         setLiveData(res.data.live_usages);
       })
       .catch((error) => {
@@ -572,7 +572,7 @@ function DataAnalyst() {
     api
       .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
       .then((res) => {
-        console.log(res.data.counts);
+        // console.log(res.data.counts);
         var useEC = res.data.counts;
         var dateEC = [];
         var user_count = [];
@@ -593,7 +593,7 @@ function DataAnalyst() {
     api
       .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`)
       .then((res) => {
-        console.log('message: ', res.data.counts);
+        // console.log('message: ', res.data.counts);
         var messageECA = res.data.counts;
         var message_count = [];
         for (var i = 0; i < messageECA.length; i++) {
@@ -658,7 +658,7 @@ function DataAnalyst() {
         });
       }
     });
-    console.log(data);
+    // console.log(data);
     // var datae = [item]
     setDataEx(data);
   }
@@ -694,7 +694,7 @@ function DataAnalyst() {
   const setMessageGroupDataExport = (value) => {
     var data = [];
     var datae = value; //use testMsgEx to test export all
-    console.log('dataedatae: ', datae);
+    // console.log('dataedatae: ', datae);
     datae.forEach((it) => {
       data.push({
         username: it.username,
@@ -736,7 +736,7 @@ function DataAnalyst() {
   const setMsgGrUser = (value) => {
     var data = [];
     var datae = value; //use testMsgEx to test export all
-    console.log('dataedatae: ', datae);
+    // console.log('dataedatae: ', datae);
     datae.forEach((it) => {
       data.push({
         username: it.username,
@@ -764,7 +764,7 @@ function DataAnalyst() {
     api
       .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
       .then((res) => {
-        console.log(res.data.counts);
+        // console.log(res.data.counts);
         var useEC = res.data.counts;
         var dateEC = [];
         var user_count = [];
@@ -785,7 +785,7 @@ function DataAnalyst() {
     api
       .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`)
       .then((res) => {
-        console.log('message: ', res.data.counts);
+        // console.log('message: ', res.data.counts);
         var messageECA = res.data.counts;
         var message_count = [];
         for (var i = 0; i < messageECA.length; i++) {

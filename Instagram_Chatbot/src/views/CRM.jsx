@@ -46,7 +46,7 @@ function CRM() {
     api
       .get(`/api/v1/managements/instagram_users`)
       .then((res) => {
-        console.log('instagram_users: ', res.data.data.instagram_users);
+        // console.log('instagram_users: ', res.data.data.instagram_users);
         setListInstagramUser(res.data.data.instagram_users);
       })
       .catch((error) => {
@@ -67,7 +67,7 @@ function CRM() {
     api
       .get(`/api/v1/managements/instagram_users/${id}`)
       .then((res) => {
-        console.log('detail instagram_users: ', res.data.data);
+        // console.log('detail instagram_users: ', res.data.data);
         setInstagramUser(res.data.data.instagram_users);
         setLabelInstagramUser(res.data.data.labels);
         // var listLab = 10
@@ -92,7 +92,7 @@ function CRM() {
         setCustomTable(res.data.data.custom_items);
         setCustomLabel(res.data.data.labels);
         setCustomLabelLen(res.data.data.labels.length);
-        console.log(res.data.data.labels.length);
+        // console.log(res.data.data.labels.length);
         setIdInstaUser(res.data.data.instagram_users.id);
         var listHistory = [];
         var historyLe;
@@ -120,11 +120,11 @@ function CRM() {
   }
 
   function reloadInstaUser(id) {
-    console.log('id reload: ', id);
+    // console.log('id reload: ', id);
     api
       .get(`/api/v1/managements/instagram_users/${id}`)
       .then((res) => {
-        console.log('detail instagram_users: ', res.data.data);
+        // console.log('detail instagram_users: ', res.data.data);
         setInstagramUser(res.data.data.instagram_users);
         setLabelInstagramUser(res.data.data.labels);
         setCustomTable(res.data.data.custom_items);
@@ -200,7 +200,7 @@ function CRM() {
       api
         .post(`/api/v1/instagram_users/custom_items`, add)
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           reloadInstaUser(idInstaUser);
           setIsOpenAddTable(false);
         })
@@ -218,7 +218,7 @@ function CRM() {
       api
         .post(`/api/v1/instagram_users/labels`, add)
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           reloadInstaUser(idInstaUser);
           setIsOpenAddLabel(false);
           // setListBag(res.data.data.message_bags)
@@ -346,7 +346,7 @@ function CRM() {
         // setTimeout(() => {
         //   editDetail();
         // }, 5500);
-        console.log(customLabel, id);
+        // console.log(customLabel, id);
         setCustomLabel(customLabel.filter((label) => label.id !== id));
         document.getElementById(`addLabelItem`).style.display = 'none';
       })
@@ -362,7 +362,7 @@ function CRM() {
       .then((res) => {
         // console.log(res);
         // reloadInstaUser(idInstaUser);
-        console.log(customTable, id);
+        // console.log(customTable, id);
         setCustomTable(customTable.filter((table) => table.id !== id));
         document.getElementById('AddTableButton').style.display = 'none';
       })
@@ -377,7 +377,7 @@ function CRM() {
     api
       .patch(`/api/v1/managements/instagram_users/${id}`, val)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         // setTimeout(() => {
         //   setIsOpenNoti(true)
         //   setMsgNoti("Change status successfully")
@@ -406,11 +406,11 @@ function CRM() {
 
   function activeChatbot() {
     setIsOpenActiveChatbot(false);
-    console.log(idActiveChatbot);
+    // console.log(idActiveChatbot);
     api
       .delete(`/api/v1/instagram_users/supporting_users/${idActiveChatbot}`)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         setIsOpenNotiActiveChatbot(true);
         setMsgNoti('自動応答に切り替えました！');
         setTimeout(() => {
