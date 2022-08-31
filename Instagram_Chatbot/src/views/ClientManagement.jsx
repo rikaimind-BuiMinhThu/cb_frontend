@@ -105,7 +105,7 @@ function ClientManagement() {
     api
       .get(`/api/v1/managements/clients`, paramSearch)
       .then((res) => {
-        console.log(res.data.data);
+        // console.log(res.data.data);
         var totalPage = Math.ceil(res.data.data.total / 25);
         setTotalPage(totalPage);
         setDataList(res.data.data);
@@ -126,10 +126,6 @@ function ClientManagement() {
         // }
       });
   }, []);
-
-  React.useEffect(() => {
-    console.log(inputStartDate);
-  }, [inputStartDate]);
 
   function search() {
     var searchVal = document.getElementById('searchUser').value;
@@ -191,7 +187,7 @@ function ClientManagement() {
       .get(`/api/v1/managements/clients/${item.id}`)
       .then((res) => {
         var data = res.data.data;
-        console.log(data);
+        // console.log(data);
         setUpdateId(data.id);
         setDetailUpdateTitle('詳細');
         setContract(data.status);
@@ -274,7 +270,7 @@ function ClientManagement() {
       .get(`/api/v1/managements/clients/${item.id}`)
       .then((res) => {
         var data = res.data.data;
-        console.log('managements/clients: ', data);
+        // console.log('managements/clients: ', data);
         setUpdateId(data.id);
         setDetailUpdateTitle('クライアント更新');
         setContract(data.status);
@@ -503,7 +499,7 @@ function ClientManagement() {
       // console.log(newClient)
 
       var updateClient = { client: obj };
-      console.log(updateClient);
+      // console.log(updateClient);
       api
         .patch(`/api/v1/managements/clients/${updateId}`, updateClient)
         .then((res) => {
@@ -565,7 +561,7 @@ function ClientManagement() {
       if (updateImageChange && getBaseUrlAdd() === false) {
         getBaseUrlAdd();
       }
-      console.log('Missing field');
+      // console.log('Missing field');
     }
 
     // }
@@ -732,7 +728,7 @@ function ClientManagement() {
       delete obj.password;
       obj.logo_url = inputImage;
       var newClient = { client: obj, user: usr };
-      console.log(newClient);
+      // console.log(newClient);
 
       api
         .post(`/api/v1/managements/clients`, newClient)
@@ -990,7 +986,7 @@ function ClientManagement() {
   }
 
   function getBaseUrlAdd() {
-    console.log('getNe');
+    // console.log('getNe');
     var file = document.querySelector('input[type=file]')['files'][0];
     if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
       var reader = new FileReader();
@@ -998,7 +994,7 @@ function ClientManagement() {
       reader.onloadend = function () {
         baseString = reader.result;
         setInputImage(baseString);
-        console.log(baseString);
+        // console.log(baseString);
         if (baseString !== undefined || baseString !== '') {
           document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
         }
@@ -1013,7 +1009,7 @@ function ClientManagement() {
   }
 
   function getBaseUrl(event) {
-    console.log('getNe');
+    // console.log('getNe');
     var file = document.querySelector('input[type=file]')['files'][0];
     if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
       var reader = new FileReader();
@@ -1023,7 +1019,7 @@ function ClientManagement() {
       reader.onloadend = function () {
         baseString = reader.result;
         setInputImage(baseString);
-        console.log(baseString);
+        // console.log(baseString);
         if (baseString !== undefined || baseString !== '') {
           document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
         }
@@ -1040,7 +1036,7 @@ function ClientManagement() {
   var [page, setPage] = useState(1);
 
   function handleChange(event, value) {
-    console.log('pageIndex: ', value);
+    // console.log('pageIndex: ', value);
     setPage(parseInt(value));
     setPageIndex(value);
     reloadListClient(value);

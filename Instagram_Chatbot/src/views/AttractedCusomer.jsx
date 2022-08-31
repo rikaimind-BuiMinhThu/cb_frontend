@@ -30,7 +30,7 @@ function AttractedCustomer() {
   const [CVAL, setCVAL] = useState({});
   React.useEffect(() => {
     api.get('/api/v1/instagram_users/conversions').then((res) => {
-      console.log('res CV: ', res.data.data);
+      // console.log('res CV: ', res.data.data);
       setCVAL(res.data.data);
     });
   }, []);

@@ -197,7 +197,7 @@ function UserManagement() {
   }
 
   function updateClientUser(item) {
-    console.log(item);
+    // console.log(item);
     setDisableInput(false);
     setDetailUpdateTitle('ユーザー編集');
     setDetailData(item);
@@ -304,7 +304,7 @@ function UserManagement() {
         delete obj.password_confirmation;
       }
       var updateClient = { user: obj };
-      console.log(updateClient);
+      // console.log(updateClient);
       api
         .patch(`/api/v1/managements/users/${updateId}`, updateClient)
         .then((res) => {
@@ -422,7 +422,7 @@ function UserManagement() {
       // obj.push(client_id)
       delete obj.confirm_password;
       var newUser = { user: obj };
-      console.log(newUser);
+      // console.log(newUser);
       api
         .post(`/api/v1/users/registrations`, newUser)
         .then((res) => {
@@ -492,7 +492,7 @@ function UserManagement() {
 
   function handleChange(event, value) {
     if (totalPage > 1) {
-      console.log('pageIndex: ', value);
+      // console.log('pageIndex: ', value);
       setPage(parseInt(value));
       setPageIndex(value);
       reloadListClient(value);
@@ -502,7 +502,7 @@ function UserManagement() {
   }
 
   function detailUser(id) {
-    console.log('userId: ', id);
+    // console.log('userId: ', id);
     setIsOpenDetailUser(true);
   }
 
