@@ -1103,13 +1103,13 @@ function ClientManagement() {
                         <option value={1}>プレミアムプラン</option>
                         <option value={2}>エキスパートプラン のいづれかを表示</option>
                       </select></th> */}
-                      <th>プラン価格</th>
+                      <th style={{ width: '10%' }}>プラン価格</th>
                       {/**Plan price */}
-                      <th>課金開始日</th>
+                      <th style={{ width: '10%' }}>課金開始日</th>
                       {/**Date start count price */}
                       <th style={{ width: '10%' }}>最低利用期間終了日</th>
                       {/**Date end using */}
-                      <th style={{ minWidth: '200px', width: '200px' }}>住所</th>
+                      <th style={{ minWidth: '175px', width: '175px' }}>住所</th>
                       {/**Address */}
                       <th style={{ width: '10%' }}>コンバージョン数</th>
                       <th style={{ width: '10%' }}>最終ログイン日時</th>
@@ -1141,9 +1141,11 @@ function ClientManagement() {
                           </td>
                           <td>{item.price}</td>
                           <td id="dateStart">
-                            {item.subscription_start_at == null
-                              ? item.subscription_start_at
-                              : item.subscription_start_at.slice(0, 10)}
+                            <div>
+                              {item.subscription_start_at == null
+                                ? item.subscription_start_at
+                                : item.subscription_start_at.slice(0, 10)}
+                            </div>
                           </td>
                           {/* .slice(0, 10) */}
                           <td id="dateEnd">
@@ -1154,7 +1156,7 @@ function ClientManagement() {
                           {/* .slice(0, 10) */}
                           <td style={{ minWidth: '200px', width: '200px' }}>
                             <div>
-                              {item.prefecture} {item.address} {item.building_name}
+                              {item.prefecture}、{item.address}、{item.building_name}
                             </div>
                           </td>
                           <td>{item.instagram_conversion_count}</td>
