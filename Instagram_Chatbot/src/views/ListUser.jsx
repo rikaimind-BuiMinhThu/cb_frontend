@@ -59,7 +59,7 @@ function ListUser() {
     let dateEnd = new Date();
     let month = dateEnd.toISOString().slice(5, 7) - 1;
     dateEnd = dateEnd.toISOString().slice(0, 10);
-    console.log(dateStart, dateEnd, month);
+    // console.log(dateStart, dateEnd, month);
     if (month < 10) {
       month = `0${month}`;
     }
@@ -71,7 +71,7 @@ function ListUser() {
         )}${month}-15&end_date=${dateEnd}`
       )
       .then((res) => {
-        console.log('user EC: ', res.data.counts);
+        // console.log('user EC: ', res.data.counts);
         var useEC = res.data.counts;
         var dateEC = [];
         var user_count = [];
@@ -79,15 +79,13 @@ function ListUser() {
         for (var i = 0; i < useEC.length; i++) {
           // useEC[i].log_date.slice(0,5)
           // dateEC.push(useEC[i].log_date.slice(0, 5));
-          dateEC.push(
-            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
-          );
+          dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
           user_count.push(useEC[i].user_count);
           totalEC = totalEC + useEC[i].user_count;
         }
         setDateECU(dateEC);
         setUserECC(user_count);
-        console.log('totalEC: ', totalEC);
+        // console.log('totalEC: ', totalEC);
       })
       .catch((error) => {
         console.log(error);
@@ -101,7 +99,7 @@ function ListUser() {
         )}${month}-15&end_date=${dateEnd}`
       )
       .then((res) => {
-        console.log('message EC: ', res.data.counts);
+        // console.log('message EC: ', res.data.counts);
         var messageECA = res.data.counts;
         var message_count = [];
         var totalM = 0;
@@ -124,7 +122,7 @@ function ListUser() {
         )}${month}-15&end_date=${dateEnd}`
       )
       .then((res) => {
-        console.log('message EC: ', res.data.counts);
+        // console.log('message EC: ', res.data.counts);
         var messageECA = res.data.counts;
         var message_count = 0;
         for (var i = 0; i < messageECA.length; i++) {
@@ -138,10 +136,7 @@ function ListUser() {
     ///////////////////////////////////////////////
     api
       .get(
-        `/api/v1/analytics/users?begin_date=${dateStart.slice(
-          0,
-          5
-        )}${month}-15&end_date=${dateEnd}`
+        `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${month}-15&end_date=${dateEnd}`
       )
       .then((res) => {
         var useEC = res.data.user_counts;
@@ -157,7 +152,8 @@ function ListUser() {
     ///////////////////////////////////////////////
     api
       .get(
-        `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${month - 6
+        `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${
+          month - 6
         }-15&end_date=${dateEnd}`
       )
       .then((res) => {
@@ -175,10 +171,9 @@ function ListUser() {
     ///////////////////////////////////////////////
     api
       .get(
-        `/api/v1/analytics/chatbot_usages/user?begin_date=${dateStart.slice(
-          0,
-          5
-        )}${month - 6}-15&end_date=${dateEnd}`
+        `/api/v1/analytics/chatbot_usages/user?begin_date=${dateStart.slice(0, 5)}${
+          month - 6
+        }-15&end_date=${dateEnd}`
       )
       .then((res) => {
         var useEC = res.data.counts;
@@ -187,7 +182,7 @@ function ListUser() {
           user_count_alltime = user_count_alltime + useEC[i].user_count;
         }
         setUserCBAll(user_count_alltime / useEC.length);
-        console.log('analytics/users: ', user_count_alltime / useEC.length);
+        // console.log('analytics/users: ', user_count_alltime / useEC.length);
       })
       .catch((error) => {
         console.log(error);
@@ -245,13 +240,12 @@ function ListUser() {
   }, []);
 
   var percentNew = (userChatwithCB / userChatwithCBAll) * 100;
-  var percentold =
-    ((userChatwithCBAll - userChatwithCB) / userChatwithCBAll) * 100;
+  var percentold = ((userChatwithCBAll - userChatwithCB) / userChatwithCBAll) * 100;
 
   var percentECnew = (Math.abs(userCB - userCBAll) / userCBAll) * 100;
   var percentECold = (userCB / userCBAll) * 100;
 
-  console.log('percentECnew: ', percentECnew);
+  // console.log('percentECnew: ', percentECnew);
 
   const options = {
     data: [
@@ -337,9 +331,7 @@ function ListUser() {
     var startD = startDate.toISOString().slice(0, 10);
     var endD = end.toISOString().slice(0, 10);
     api
-      .get(
-        `/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`
-      )
+      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
       .then((res) => {
         var useEC = res.data.counts;
         var dateEC = [];
@@ -351,9 +343,7 @@ function ListUser() {
           // } else {
           // dateEC.push(useEC[i].log_date.slice(0, 5));
           // }
-          dateEC.push(
-            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
-          );
+          dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
           user_count.push(useEC[i].user_count);
         }
         setDateECU(dateEC);
@@ -364,9 +354,7 @@ function ListUser() {
       });
     ////////////////////////////////////////////////
     api
-      .get(
-        `/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`
-      )
+      .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`)
       .then((res) => {
         var messageECA = res.data.counts;
         var message_count = [];
@@ -397,9 +385,7 @@ function ListUser() {
       });
     ///////////////////////////////////////////////
     api
-      .get(
-        `/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`
-      )
+      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
       .then((res) => {
         var useEC = res.data.counts;
         var user_count_alltime = 0;
@@ -407,7 +393,7 @@ function ListUser() {
           user_count_alltime = user_count_alltime + useEC[i].user_count;
         }
         setUserCB(user_count_alltime / useEC.length);
-        console.log('analytics/users: ', user_count_alltime / useEC.length);
+        // console.log('analytics/users: ', user_count_alltime / useEC.length);
       })
       .catch((error) => {
         console.log(error);
@@ -534,10 +520,7 @@ function ListUser() {
         instagram_id: it.instagram_id,
         is_user_follow_business: it.is_user_follow_business,
         is_business_follow_user: it.is_business_follow_user,
-        created_at: it.created_at
-          .slice(0, 19)
-          .replaceAll('-', '/')
-          .replaceAll('T', ' '),
+        created_at: it.created_at.slice(0, 19).replaceAll('-', '/').replaceAll('T', ' '),
       });
       for (var i = 1; i < it.length; i++) {
         const cm_live = it[i];
@@ -548,15 +531,12 @@ function ListUser() {
           instagram_id: cm_live.instagram_id,
           is_user_follow_business: cm_live.is_user_follow_business,
           is_business_follow_user: cm_live.is_business_follow_user,
-          created_at: cm_live.created_at
-            .slice(0, 19)
-            .replaceAll('-', '/')
-            .replaceAll('T', ' '),
+          created_at: cm_live.created_at.slice(0, 19).replaceAll('-', '/').replaceAll('T', ' '),
           // })
         });
       }
     });
-    console.log(data);
+    // console.log(data);
     // var datae = [item]
     setDataEx(data);
   }
@@ -573,9 +553,7 @@ function ListUser() {
     var startD = start.toISOString().slice(0, 10);
     var endD = endDate.toISOString().slice(0, 10);
     api
-      .get(
-        `/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`
-      )
+      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
       .then((res) => {
         var useEC = res.data.counts;
         var dateEC = [];
@@ -587,9 +565,7 @@ function ListUser() {
           // } else {
           // dateEC.push(useEC[i].log_date.slice(0, 5));
           // }
-          dateEC.push(
-            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
-          );
+          dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
           user_count.push(useEC[i].user_count);
         }
         setDateECU(dateEC);
@@ -600,9 +576,7 @@ function ListUser() {
       });
     ////////////////////////////////////////////////
     api
-      .get(
-        `/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`
-      )
+      .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`)
       .then((res) => {
         var messageECA = res.data.counts;
         var message_count = [];
@@ -633,9 +607,7 @@ function ListUser() {
       });
     ///////////////////////////////////////////////
     api
-      .get(
-        `/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`
-      )
+      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
       .then((res) => {
         var useEC = res.data.counts;
         var user_count_alltime = 0;
@@ -643,12 +615,12 @@ function ListUser() {
           user_count_alltime = user_count_alltime + useEC[i].user_count;
         }
         setUserCB(user_count_alltime / useEC.length);
-        console.log('analytics/users: ', user_count_alltime / useEC.length);
+        // console.log('analytics/users: ', user_count_alltime / useEC.length);
       })
       .catch((error) => {
         console.log(error);
       });
-  }
+  };
 
   return (
     <>
@@ -671,14 +643,8 @@ function ListUser() {
                     }}
                   >
                     <CSVLink {...csvReport}>
-                      <span style={{ color: 'white' }}>
-                        インスタグラムユーザー出力
-                      </span>{' '}
-                      <MDBIcon
-                        fas
-                        icon="arrow-circle-down"
-                        style={{ color: 'white' }}
-                      ></MDBIcon>
+                      <span style={{ color: 'white' }}>インスタグラムユーザー出力</span>{' '}
+                      <MDBIcon fas icon="arrow-circle-down" style={{ color: 'white' }}></MDBIcon>
                     </CSVLink>
                   </div>
                   <div style={{ display: 'flex' }}>
@@ -787,11 +753,7 @@ function ListUser() {
                     >
                       <h5 style={{ margin: 'auto' }}>
                         {totalMessage} &emsp;
-                        <MDBIcon
-                          fas
-                          icon="angle-up"
-                          style={{ color: '#00e396' }}
-                        />
+                        <MDBIcon fas icon="angle-up" style={{ color: '#00e396' }} />
                         &ensp;
                         <span style={{ fontSize: '19px', color: '#00e396' }}>
                           {parseFloat(percentChangeMSG).toFixed(1)}%
@@ -812,16 +774,12 @@ function ListUser() {
                     >
                       <h5 style={{ margin: 'auto' }}>
                         {percentECold.toFixed(2)} &emsp;
-                        <MDBIcon
-                          fas
-                          icon="angle-up"
-                          style={{ color: '#00e396' }}
-                        />
+                        <MDBIcon fas icon="angle-up" style={{ color: '#00e396' }} />
                         &ensp;
                         <span style={{ fontSize: '19px', color: '#00e396' }}>
-                          {parseFloat(
-                            (percentECnew / (percentECold + percentECnew)) * 100
-                          ).toFixed(1)}
+                          {parseFloat((percentECnew / (percentECold + percentECnew)) * 100).toFixed(
+                            1
+                          )}
                           %
                         </span>
                       </h5>

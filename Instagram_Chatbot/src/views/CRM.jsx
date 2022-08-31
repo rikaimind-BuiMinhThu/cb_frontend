@@ -46,7 +46,7 @@ function CRM() {
     api
       .get(`/api/v1/managements/instagram_users`)
       .then((res) => {
-        console.log('instagram_users: ', res.data.data.instagram_users);
+        // console.log('instagram_users: ', res.data.data.instagram_users);
         setListInstagramUser(res.data.data.instagram_users);
       })
       .catch((error) => {
@@ -67,7 +67,7 @@ function CRM() {
     api
       .get(`/api/v1/managements/instagram_users/${id}`)
       .then((res) => {
-        console.log('detail instagram_users: ', res.data.data);
+        // console.log('detail instagram_users: ', res.data.data);
         setInstagramUser(res.data.data.instagram_users);
         setLabelInstagramUser(res.data.data.labels);
         // var listLab = 10
@@ -92,7 +92,7 @@ function CRM() {
         setCustomTable(res.data.data.custom_items);
         setCustomLabel(res.data.data.labels);
         setCustomLabelLen(res.data.data.labels.length);
-        console.log(res.data.data.labels.length);
+        // console.log(res.data.data.labels.length);
         setIdInstaUser(res.data.data.instagram_users.id);
         var listHistory = [];
         var historyLe;
@@ -120,17 +120,19 @@ function CRM() {
   }
 
   function reloadInstaUser(id) {
-    console.log('id reload: ', id);
+    // console.log('id reload: ', id);
     api
       .get(`/api/v1/managements/instagram_users/${id}`)
       .then((res) => {
-        console.log('detail instagram_users: ', res.data.data);
+        // console.log('detail instagram_users: ', res.data.data);
         setInstagramUser(res.data.data.instagram_users);
         setLabelInstagramUser(res.data.data.labels);
-        setCustomTable((prev) => (prev = res.data.data.custom_items));
+        setCustomTable(res.data.data.custom_items);
         setCustomLabel(res.data.data.labels);
         if (res.data.data.labels.length >= 10) {
           setCustomLabelLen(10);
+        } else {
+          setCustomLabelLen(res.data.data?.labels?.length);
         }
         // setIdInstaUser(res.data.data.instagram_users.id)
         var listHistory = [];
@@ -198,7 +200,7 @@ function CRM() {
       api
         .post(`/api/v1/instagram_users/custom_items`, add)
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           reloadInstaUser(idInstaUser);
           setIsOpenAddTable(false);
         })
@@ -216,7 +218,7 @@ function CRM() {
       api
         .post(`/api/v1/instagram_users/labels`, add)
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           reloadInstaUser(idInstaUser);
           setIsOpenAddLabel(false);
           // setListBag(res.data.data.message_bags)
@@ -286,7 +288,7 @@ function CRM() {
     document.getElementById(`btnEditDetail`).style.display = 'none';
     document.getElementById(`addLabelItem`).style.display = 'none';
     document.getElementById(`AddTableButton`).style.display = 'none';
-    for (let i = 0; i < customLabelLen; i++) {
+    for (let i = 0; i < customLabel.length; i++) {
       if (document.getElementById(`deleteLbl${customLabel[i]?.id}`) !== null) {
         document.getElementById(`deleteLbl${customLabel[i]?.id}`).style.display = 'block';
       }
@@ -299,7 +301,7 @@ function CRM() {
         document.getElementById(`deleteTbl${customTable[i]?.id}`).style.display = 'block';
       }
     }
-    reloadInstaUser(idInstaUser);
+    // reloadInstaUser(idInstaUser);
     // console.log(customLabelLen, customTable?.length);
     // if (customLabelLen >= 10) {
     //   document.getElementById(`addLabelItem`).style.display = 'none';
@@ -313,8 +315,16 @@ function CRM() {
   function saveDetail() {
     document.getElementById(`btnSaveDetail`).style.display = 'none';
     document.getElementById(`btnEditDetail`).style.display = 'block';
-    document.getElementById(`addLabelItem`).style.display = 'block';
-    document.getElementById(`AddTableButton`).style.display = 'block';
+    if (customLabel?.length >= 10) {
+      document.getElementById(`addLabelItem`).style.display = 'none';
+    } else {
+      document.getElementById(`addLabelItem`).style.display = 'block';
+    }
+    if (customTable?.length >= 8) {
+      document.getElementById(`AddTableButton`).style.display = 'none';
+    } else {
+      document.getElementById(`AddTableButton`).style.display = 'block';
+    }
     for (let i = 0; i < customLabel.length; i++) {
       document.getElementById(`deleteLbl${customLabel[i]?.id}`).style.display = 'none';
       // document.getElementById(`deleteTbl${lblList[i].id}`).style.display = "block"
@@ -331,11 +341,14 @@ function CRM() {
     api
       .delete(`/api/v1/instagram_users/labels/${id}`)
       .then((res) => {
-        console.log(res);
-        reloadInstaUser(idInstaUser);
-        setTimeout(() => {
-          editDetail();
-        }, 5500);
+        // console.log(res);
+        // reloadInstaUser(idInstaUser);
+        // setTimeout(() => {
+        //   editDetail();
+        // }, 5500);
+        // console.log(customLabel, id);
+        setCustomLabel(customLabel.filter((label) => label.id !== id));
+        document.getElementById(`addLabelItem`).style.display = 'none';
       })
       .catch((error) => {
         console.log(error);
@@ -347,8 +360,10 @@ function CRM() {
     api
       .delete(`/api/v1/instagram_users/custom_items/${id}`)
       .then((res) => {
-        console.log(res);
-        reloadInstaUser(idInstaUser);
+        // console.log(res);
+        // reloadInstaUser(idInstaUser);
+        // console.log(customTable, id);
+        setCustomTable(customTable.filter((table) => table.id !== id));
         document.getElementById('AddTableButton').style.display = 'none';
       })
       .catch((error) => {
@@ -362,7 +377,7 @@ function CRM() {
     api
       .patch(`/api/v1/managements/instagram_users/${id}`, val)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         // setTimeout(() => {
         //   setIsOpenNoti(true)
         //   setMsgNoti("Change status successfully")
@@ -391,13 +406,13 @@ function CRM() {
 
   function activeChatbot() {
     setIsOpenActiveChatbot(false);
-    console.log(idActiveChatbot);
+    // console.log(idActiveChatbot);
     api
       .delete(`/api/v1/instagram_users/supporting_users/${idActiveChatbot}`)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         setIsOpenNotiActiveChatbot(true);
-        setMsgNoti('削除しました。');
+        setMsgNoti('自動応答に切り替えました！');
         setTimeout(() => {
           setIsOpenNotiActiveChatbot(false);
           setMsgNoti('');
@@ -479,7 +494,7 @@ function CRM() {
                                 style={{ backgroundColor: 'red' }}
                                 onClick={() => activeChatbotClick(item?.id)}
                               >
-                                有効する
+                                自動応答
                               </Button>
                             )}
                           </div>
@@ -1234,7 +1249,7 @@ function CRM() {
         </ModalNoti>
         <ModalShort open={isOpenActiveChatbot} onClose={() => setIsOpenActiveChatbot(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-            <h4>Do you want to active chatbot?</h4>
+            <h4>自動応答に切り替えますか？</h4>
             <Button onClick={() => activeChatbot()}>はい</Button>
             <Button onClick={() => setIsOpenActiveChatbot(false)}>いいえ</Button>
           </div>

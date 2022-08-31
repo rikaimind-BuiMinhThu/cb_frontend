@@ -23,6 +23,7 @@ import LoginFacebook from 'components/Admin/LoginFacebook';
 import ModalNoti from './Popup/ModalNoti';
 import axios from 'axios';
 import { useEffect } from 'react';
+import ModalShort from './Popup/ModalShort';
 
 function Release() {
   const [listGroup, setListGroup] = useState([]);
@@ -50,6 +51,8 @@ function Release() {
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState();
   const [listKeyword, setListKeyword] = useState([]);
+  const [fixedIdDelete, setFixedIdDelete] = useState();
+  const [faqIdDelete, setFaqIdDelete] = useState();
 
   // React.useEffect(() => {
   //   console.log('token in dashboard', Cookies.get('token'))
@@ -68,11 +71,13 @@ function Release() {
   const [storyGroupBagId, setStoryGroupBagId] = useState();
   const [liveGroupId, setLiveGroupId] = useState();
   const [liveGroupBagId, setLiveGroupBagId] = useState();
+  const [isOpenConfirm, setIsOpenConfirm] = useState(false);
+
   React.useEffect(() => {
     api
       .get(`/api/v1/instagram_settings`)
       .then((res) => {
-        console.log("setIdInstaSetting: ", res.data.data[0].id)
+        // console.log('setIdInstaSetting: ', res.data.data[0].id);
         setIdInstaSetting(res.data.data[0].id);
         setPostGroupName(res.data.data[0].post_comment_group_name);
         setStoryGroupName(res.data.data[0].story_comment_group_name);
@@ -83,7 +88,7 @@ function Release() {
         setPostGroupBagId(res.data.data[0]?.post_comment_bag_id);
         setStoryGroupBagId(res.data.data[0]?.story_comment_bag_id);
         setLiveGroupBagId(res.data.data[0]?.live_comment_bag_id);
-        console.log(res.data);
+        // console.log(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -93,7 +98,11 @@ function Release() {
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'));
     console.log('is_auth', Cookies.get('is_auth'));
-    if (Cookies.get('token') == undefined || Cookies.get('token') == null || Cookies.get('token') == '') {
+    if (
+      Cookies.get('token') == undefined ||
+      Cookies.get('token') == null ||
+      Cookies.get('token') == ''
+    ) {
       window.location.href = '/';
     }
     if (Cookies.get('is_auth') == 'false') {
@@ -135,22 +144,17 @@ function Release() {
     }
   }, []);
 
-  const [instaSettingFirst, setInstaSettingFirst] = useState()
+  const [instaSettingFirst, setInstaSettingFirst] = useState();
   React.useEffect(() => {
     api
       .get(`/api/v1/instagram_settings`)
       .then((res) => {
-
-        setInstaSettingFirst(res.data.data[0].ig_id)
-
+        setInstaSettingFirst(res.data.data[0].ig_id);
       })
       .catch((error) => {
         console.log(error);
       });
-
   }, []);
-
-
 
   function setPATAL() {
     var access_token = Cookies.get('page_access_token');
@@ -168,13 +172,10 @@ function Release() {
     }
   }
 
-
-
   function setIgIDS() {
     api
       .get(`/api/v1/instagram_settings`)
       .then((res) => {
-
         setIdInstaSetting(res.data.data[0].id);
       })
       .catch((error) => {
@@ -191,7 +192,7 @@ function Release() {
     api
       .get(`/api/v1/message_managements/keyword_settings`)
       .then((res) => {
-        console.log('keyword_settings: ', res.data.data);
+        // console.log('keyword_settings: ', res.data.data);
         setListKeyword(res.data.data);
         var listkey = res.data.data;
         var story = [];
@@ -398,15 +399,14 @@ function Release() {
     api
       .get(`/api/v1/instagram_settings`)
       .then((resId) => {
-        
-        console.log("get the first idInstaSetting: ", resId.data.data[0].id)
+        // console.log('get the first idInstaSetting: ', resId.data.data[0].id);
         api
           .get(`/api/v1/instagram_settings/${resId.data.data[0].id}`)
           .then((res) => {
-            console.log('insta setting ', res.data.data);
+            // console.log('insta setting ', res.data.data);
             var dataB = res.data.data;
             setInstaSetting(res.data.data);
-            console.log("Instagram setting id: ", res)
+            // console.log('Instagram setting id: ', res);
             setInstaSettingId(res.data.data.id);
             setStoryOnOff(res.data.data.story_comment_bag_status);
             if (res.data.data.story_comment_bag_status == 'off') {
@@ -454,7 +454,7 @@ function Release() {
                   api
                     .get(`/api/v1/message_managements/keyword_settings/${story[0]}`)
                     .then((res) => {
-                      console.log('story_comment_KW_id: ', res.data.data);
+                      // console.log('story_comment_KW_id: ', res.data.data);
                       var select, option;
                       select = document.getElementById('listkeyword');
                       option = document.createElement('option');
@@ -489,7 +489,7 @@ function Release() {
                   api
                     .get(`/api/v1/message_managements/keyword_settings/${live[0]}`)
                     .then((res) => {
-                      console.log('story_comment_KW_id: ', res.data.data);
+                      // console.log('story_comment_KW_id: ', res.data.data);
                       var select, option;
                       select = document.getElementById('listkeywordLive');
                       option = document.createElement('option');
@@ -524,7 +524,7 @@ function Release() {
                   api
                     .get(`/api/v1/message_managements/keyword_settings/${cm[0]}`)
                     .then((res) => {
-                      console.log('story_comment_KW_id: ', res.data.data);
+                      // console.log('story_comment_KW_id: ', res.data.data);
                       var select, option;
                       select = document.getElementById('listkeywordCM');
                       option = document.createElement('option');
@@ -543,14 +543,14 @@ function Release() {
               .catch((error) => {
                 console.log(error);
               });
-    
+
             setDmOnOff(res.data.data.dm_bag_status);
             // if (res.data.data.dm_bag_status == false) {
             //   falseConfigDM()
             // } else {
             //   trueConfigDM()
             // }
-    
+
             api
               .get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`)
               .then((res) => {
@@ -582,7 +582,7 @@ function Release() {
             //   // setLiveCommentBagName(res.data.data.message_bag.bag_name)
             //   console.log("dm_bag_id: ", res.data)
             //   // setDmCommentBagName(res.data.data.message_bag.bag_name)
-    
+
             // }).catch(error => {
             //   console.log(error)
             // })
@@ -597,8 +597,6 @@ function Release() {
       .catch((error) => {
         console.log(error);
       });
-
-    
   }, []);
 
   function getAllN() {
@@ -607,7 +605,7 @@ function Release() {
     api
       .get(`/api/v1/instagram_settings/${idInstaSetting}`)
       .then((res) => {
-        console.log('insta setting ', res.data.data);
+        // console.log('insta setting ', res.data.data);
         var dataB = res.data.data;
         setInstaSetting(res.data.data);
         setInstaSettingId(res.data.data.id);
@@ -657,7 +655,7 @@ function Release() {
               api
                 .get(`/api/v1/message_managements/keyword_settings/${story[0]}`)
                 .then((res) => {
-                  console.log('story_comment_KW_id: ', res.data.data);
+                  // console.log('story_comment_KW_id: ', res.data.data);
                   var select, option;
                   select = document.getElementById('listkeyword');
                   option = document.createElement('option');
@@ -692,7 +690,7 @@ function Release() {
               api
                 .get(`/api/v1/message_managements/keyword_settings/${live[0]}`)
                 .then((res) => {
-                  console.log('story_comment_KW_id: ', res.data.data);
+                  // console.log('story_comment_KW_id: ', res.data.data);
                   var select, option;
                   select = document.getElementById('listkeywordLive');
                   option = document.createElement('option');
@@ -727,7 +725,7 @@ function Release() {
               api
                 .get(`/api/v1/message_managements/keyword_settings/${cm[0]}`)
                 .then((res) => {
-                  console.log('story_comment_KW_id: ', res.data.data);
+                  // console.log('story_comment_KW_id: ', res.data.data);
                   var select, option;
                   select = document.getElementById('listkeywordCM');
                   option = document.createElement('option');
@@ -929,39 +927,43 @@ function Release() {
   function trueConfigFAQ() {
     document.getElementById('notiMsgFAQ').style.display = 'none';
     setCheckedFAQ(true);
-    var nodesStory = document.getElementById('addFAQContent').getElementsByTagName('*');
-    for (var i = 0; i < nodesStory.length; i++) {
-      nodesStory[i].disabled = false;
-    }
-    var nodeBtn = document.getElementById('addFAQbtn').getElementsByTagName('*');
-    for (var i = 0; i < nodeBtn.length; i++) {
-      nodeBtn[i].disabled = false;
-    }
-    document.getElementById('addFAQContent').addEventListener('click', () => {
-      document.getElementById('notiMsgFAQ').style.display = 'none';
-    });
-    document.getElementById('addFAQContent').addEventListener('click', () => {
-      document.getElementById('notiMsgFAQ').style.display = 'none';
-    });
+    setTimeout(() => {
+      var nodesStory = document.getElementById('addFAQContent').getElementsByTagName('*');
+      for (var i = 0; i < nodesStory.length; i++) {
+        nodesStory[i].disabled = false;
+      }
+      var nodeBtn = document.getElementById('addFAQbtn').getElementsByTagName('*');
+      for (var i = 0; i < nodeBtn.length; i++) {
+        nodeBtn[i].disabled = false;
+      }
+      document.getElementById('addFAQContent').addEventListener('click', () => {
+        document.getElementById('notiMsgFAQ').style.display = 'none';
+      });
+      document.getElementById('addFAQContent').addEventListener('click', () => {
+        document.getElementById('notiMsgFAQ').style.display = 'none';
+      });
+    }, 2000)
   }
 
   function trueConfigFixedMenu() {
     document.getElementById('notiMsgFixedMenu').style.display = 'none';
     setCheckedFixedMenu(true);
-    var nodesStory = document.getElementById('addFixedMenuContent').getElementsByTagName('*');
-    for (var i = 0; i < nodesStory.length; i++) {
-      nodesStory[i].disabled = false;
-    }
-    var nodeBtn = document.getElementById('addFixMenubtn').getElementsByTagName('*');
-    for (var i = 0; i < nodeBtn.length; i++) {
-      nodeBtn[i].disabled = false;
-    }
-    document.getElementById('addFixedMenuContent').addEventListener('click', () => {
-      document.getElementById('notiMsgFixedMenu').style.display = 'none';
-    });
-    document.getElementById('addFixMenubtn').addEventListener('click', () => {
-      document.getElementById('notiMsgFixedMenu').style.display = 'none';
-    });
+    setTimeout(() => {
+      var nodesStory = document.getElementById('addFixedMenuContent').getElementsByTagName('*');
+      for (var i = 0; i < nodesStory.length; i++) {
+        nodesStory[i].disabled = false;
+      }
+      var nodeBtn = document.getElementById('addFixMenubtn').getElementsByTagName('*');
+      for (var i = 0; i < nodeBtn.length; i++) {
+        nodeBtn[i].disabled = false;
+      }
+      document.getElementById('addFixedMenuContent').addEventListener('click', () => {
+        document.getElementById('notiMsgFixedMenu').style.display = 'none';
+      });
+      document.getElementById('addFixMenubtn').addEventListener('click', () => {
+        document.getElementById('notiMsgFixedMenu').style.display = 'none';
+      });
+    }, 2000)
   }
 
   function reloadUpdate() {
@@ -969,7 +971,7 @@ function Release() {
     api
       .get(`/api/v1/instagram_settings/${instaSettingId}`)
       .then((res) => {
-        console.log('insta setting 2: ', res.data.data);
+        // console.log('insta setting 2: ', res.data.data);
         setInstaSetting(res.data.data);
         setInstaSettingId(res.data.data.id);
         setPostGroupName(res.data.data.post_comment_group_name);
@@ -1002,7 +1004,7 @@ function Release() {
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`)
           .then((res) => {
-            console.log("story_comment_bag_id: ", res.data)
+            // console.log('story_comment_bag_id: ', res.data);
             setStoryCommentBagName(res.data.data.message_bag.bag_name);
           })
           .catch((error) => {
@@ -1011,7 +1013,7 @@ function Release() {
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
           .then((res) => {
-            console.log("story_comment_bag_id: ", res.data)
+            // console.log('story_comment_bag_id: ', res.data);
             setPostCommentBagName(res.data.data.message_bag.bag_name);
           })
           .catch((error) => {
@@ -1048,7 +1050,7 @@ function Release() {
             faw_item[i].msg_bag_name = bag_name[i];
           }
           setListFAQ(faw_item);
-          console.log('faq data: ', faw_item);
+          // console.log('faq data: ', faw_item);
         }, 2000);
       })
       .catch((error) => {
@@ -1088,7 +1090,7 @@ function Release() {
     api
       .get(`/api/v1/message_managements/persistent_menus`)
       .then((res) => {
-        console.log('persistent_menus: ', res.data.data);
+        // console.log('persistent_menus: ', res.data.data);
         var fm_item = res.data.data;
         var bag_name = [];
 
@@ -1130,7 +1132,7 @@ function Release() {
         // }, 2000)
 
         setListFixedMenu(fm_item);
-        console.log('FM ne ne ne: ', fm_item);
+        // console.log('FM ne ne ne: ', fm_item);
         // setListFixedMenu(res.data.data)
         loadListFixed();
       })
@@ -1323,7 +1325,7 @@ function Release() {
     api
       .get(`/api/v1/message_managements/persistent_menus`)
       .then((res) => {
-        console.log('persistent_menus: ', res.data.data);
+        // console.log('persistent_menus: ', res.data.data);
         // setListFixedMenu(res.data.data)
         var fm_item = res.data.data;
         var bag_name = [];
@@ -1380,7 +1382,10 @@ function Release() {
       } else if (fixed[i].is_support == true) {
         document.getElementById(`fixed-mnl-type${num}`).value = 'support';
         document.getElementById(`anw-mnl-type${num}`).value = fixed[i].payload;
-      } else if ((fixed[i].payload == null || fixed[i].payload == '') && fixed[i].is_support == false) {
+      } else if (
+        (fixed[i].payload == null || fixed[i].payload == '') &&
+        fixed[i].is_support == false
+      ) {
         document.getElementById(`fixed-mnl-type${num}`).value = 'message';
         document.getElementById(`anw-mnl-type${num}`).value = fixed[i].payload;
       }
@@ -2118,7 +2123,7 @@ function Release() {
       api
         .get(`/api/v1/message_managements/persistent_menus_turn_off?ig_id=${ig_id_status}`)
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           if (res.data.code == 2) {
             setCheckedFixedMenu(checkedFixedMenu);
 
@@ -2232,79 +2237,14 @@ function Release() {
     ele.remove();
   }
   function deleteFAQInList(value) {
-    if (listFAQ.length <= 1) {
-      setMsgNoti('よくある質問が最低1つの選択がある必要です。');
-      setIsOpenNoti(true);
-      setTimeout(() => {
-        setMsgNoti('');
-        setIsOpenNoti(false);
-      }, 2000);
-    } else {
-      api
-        .delete(`/api/v1/message_managements/ice_breakers/${value}`)
-        .then((res) => {
-          reloadFAQ();
-          api
-            .get(`/api/v1/message_managements/ice_breakers_turn_on`)
-            .then((res) => {
-              reloadFAQStatus();
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          setMsgNoti('削除しました。');
-          setIsOpenNoti(true);
-          setTimeout(() => {
-            setMsgNoti('');
-            setIsOpenNoti(false);
-          }, 2000);
-        })
-        .catch((error) => {
-          console.log(error);
-          // if (error.response.data.code === 3) {
-          //   requestNewToken(path)
-          // }
-        });
-    }
+    setFaqIdDelete(value);
+    setIsOpenConfirm(true);
   }
 
   function deleteFixedInList(value) {
     // alert(value)
-    if (listFixedMenu.length <= 1) {
-      setMsgNoti('固定メッセージが最低1つの選択がある必要です。');
-      setIsOpenNoti(true);
-      setTimeout(() => {
-        setMsgNoti('');
-        setIsOpenNoti(false);
-      }, 2000);
-    } else {
-      api
-        .delete(`/api/v1/message_managements/persistent_menus/${value}`)
-        .then((res) => {
-          // console.log(res)
-          reloadFixedMenu();
-          api
-            .get(`/api/v1/message_managements/persistent_menus_turn_on`)
-            .then((res) => {
-              reloadFixedMessageStatus();
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          setMsgNoti('固定メッセージを削除しました。');
-          setIsOpenNoti(true);
-          setTimeout(() => {
-            setMsgNoti('');
-            setIsOpenNoti(false);
-          }, 2000);
-        })
-        .catch((error) => {
-          console.log(error);
-          // if (error.response.data.code === 3) {
-          //   requestNewToken(path)
-          // }
-        });
-    }
+    setIsOpenConfirm(true);
+    setFixedIdDelete(value);
   }
   //editFAQInList
   function enableEdit(value) {
@@ -2357,17 +2297,18 @@ function Release() {
     api
       .patch(`/api/v1/message_managements/ice_breakers/${value}`, script)
       .then((res) => {
-        // console.log(res)
-        document.getElementById(`ene-faq-${value}`).style.display = 'block';
-        document.getElementById(`sav-faq-${value}`).style.display = 'none';
-        document.getElementById(`faq-q-${value}`).readOnly = true;
-        document.getElementById(`faq-a-${value}`).readOnly = true;
-        setMsgNoti('保存されました！');
+        setMsgNoti('FAQ を保存しました！');
         setIsOpenNoti(true);
         setTimeout(() => {
           setMsgNoti('');
           setIsOpenNoti(false);
         }, 2000);
+        // console.log(res)
+        document.getElementById(`ene-faq-${value}`).style.display = 'block';
+        document.getElementById(`sav-faq-${value}`).style.display = 'none';
+        document.getElementById(`faq-q-${value}`).readOnly = true;
+        document.getElementById(`faq-a-${value}`).readOnly = true;
+        
         api
           .get(`/api/v1/message_managements/ice_breakers_turn_on`)
           .then((res) => {
@@ -2470,14 +2411,14 @@ function Release() {
       api
         .patch(`/api/v1/message_managements/persistent_menus/${value}`, script)
         .then((res) => {
-          // console.log(res)
+          // console.log(res);
           document.getElementById(`title-fixed-menu-${value}`).readOnly = true;
           document.getElementById(`fixed-mnl-type${value}`).readOnly = true;
           document.getElementById(`anw-mnl-type${value}`).readOnly = true;
           document.getElementById(`ene-fixed-${value}`).style.display = 'block';
           document.getElementById(`sav-fixed-${value}`).style.display = 'none';
 
-          setMsgNoti('保存されました！');
+          setMsgNoti('固定メニューを保存しました！');
           setIsOpenNoti(true);
           setTimeout(() => {
             setMsgNoti('');
@@ -2552,7 +2493,7 @@ function Release() {
     var script = { ice_breaker: { question: faq[0], message_bag_id: bag[0] } };
 
     var newScript = JSON.stringify(script);
-    console.log(script);
+    // console.log(script);
     var checkbag;
     var checkqus;
     if (bag[0] == '') {
@@ -2664,10 +2605,10 @@ function Release() {
         title: faq[0],
         message_bag_id: anww[0],
         url: urll[0],
-        tyis_supportpe: typeFM,
+        is_support: typeFM,
       },
     };
-    console.log(script);
+    // console.log(script);
 
     if (faq[0] == '') {
       setFixMnText('タイトルを入力してください。');
@@ -2809,82 +2750,107 @@ function Release() {
   //     getAllN()
   // }
   function saveStorySetting() {
-    var reply = document.getElementById("replyStory").value //replyStory
-    var msg_bag = document.getElementById("listReplyBag").value
-    if (msg_bag == "") {
-      msg_bag = instaSetting.story_comment_bag_id
+    var reply = document.getElementById('replyStory').value; //replyStory
+    var msg_bag = document.getElementById('listReplyBag').value;
+    if (msg_bag == '') {
+      msg_bag = instaSetting.story_comment_bag_id;
     }
-    if (reply == "direct_message") {
-      var update = { instagram_setting: { dm_bag_id: instaSetting.dm_bag_id, post_comment_bag_id: instaSetting.post_comment_bag_id, story_comment_bag_id: msg_bag, live_comment_bag_id: instaSetting.live_comment_bag_id } }
+    if (reply == 'direct_message') {
+      var update = {
+        instagram_setting: {
+          dm_bag_id: instaSetting.dm_bag_id,
+          post_comment_bag_id: instaSetting.post_comment_bag_id,
+          story_comment_bag_id: msg_bag,
+          live_comment_bag_id: instaSetting.live_comment_bag_id,
+        },
+      };
       var path = window.location.pathname;
-      var ig_setting = { instagram_setting: { story_comment_bag_status: "direct_message" } }
-      api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting).then(res => {
-
-      }).catch(error => {
-        console.log(error)
-      })
-      api.patch(`/api/v1/instagram_settings/${instaSettingId}`, update).then(res => {
-        reloadUpdate()
-        setMsgNoti("ストーリー設定を保存しました。")
-        setIsOpenNoti(true)
-        setTimeout(() => {
-          setMsgNoti("")
-          setIsOpenNoti(false)
-        }, 2000)
-      }).catch(error => {
-        console.log(error)
-      })
-    } else if (reply == "keyword") {
-      for (var i = 0; i < story_actived.length; i++) {
-        console.log("story_actived: ", story_actived[i])
-        var id = story_actived[i]
-        api.get(`/api/v1/message_managements/keyword_settings/${story_actived[i]}`).then(res => {
-          // console.log("kw actived: ", res.data.data)
-          var setting = res.data.data
-          var update = {
-            keyword_setting: {
-              title: setting.title, keyword: setting.keyword, instagram_account_id: setting.instagram_account_id, message_bag_id: setting.message_bag_id,
-              is_dm: setting.is_dm, is_story_comment: false, is_post_comment: setting.is_post_comment, is_live_comment: setting.is_live_comment, is_active: setting.is_active
-            }
-          }
-          api.patch(`/api/v1/message_managements/keyword_settings/${id}`, update).then(res => {
-            setMsgNoti("ストーリー設定を保存しました。")
-            setIsOpenNoti(true)
-            setTimeout(() => {
-              setMsgNoti("")
-              setIsOpenNoti(false)
-            }, 2000)
-          }).catch(error => {
-            console.log(error)
-          })
-        }).catch(error => {
-          console.log(error)
+      var ig_setting = { instagram_setting: { story_comment_bag_status: 'direct_message' } };
+      api
+        .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
+        .then((res) => { })
+        .catch((error) => {
+          console.log(error);
+        });
+      api
+        .patch(`/api/v1/instagram_settings/${instaSettingId}`, update)
+        .then((res) => {
+          reloadUpdate();
+          setMsgNoti('ストーリー設定を保存しました。');
+          setIsOpenNoti(true);
+          setTimeout(() => {
+            setMsgNoti('');
+            setIsOpenNoti(false);
+          }, 2000);
         })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else if (reply == 'keyword') {
+      for (var i = 0; i < story_actived.length; i++) {
+        // console.log('story_actived: ', story_actived[i]);
+        var id = story_actived[i];
+        api
+          .get(`/api/v1/message_managements/keyword_settings/${story_actived[i]}`)
+          .then((res) => {
+            // console.log("kw actived: ", res.data.data)
+            var setting = res.data.data;
+            var update = {
+              keyword_setting: {
+                title: setting.title,
+                keyword: setting.keyword,
+                instagram_account_id: setting.instagram_account_id,
+                message_bag_id: setting.message_bag_id,
+                is_dm: setting.is_dm,
+                is_story_comment: false,
+                is_post_comment: setting.is_post_comment,
+                is_live_comment: setting.is_live_comment,
+                is_active: setting.is_active,
+              },
+            };
+            api
+              .patch(`/api/v1/message_managements/keyword_settings/${id}`, update)
+              .then((res) => {
+                setMsgNoti('ストーリー設定を保存しました。');
+                setIsOpenNoti(true);
+                setTimeout(() => {
+                  setMsgNoti('');
+                  setIsOpenNoti(false);
+                }, 2000);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
 
       setTimeout(function () {
-        var ig_setting = { instagram_setting: { story_comment_bag_status: "keyword" } }
-        api.patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting).then(res => {
-
-        }).catch(error => {
-          console.log(error)
-        })
-        api.patch(`/api/v1/message_managements/keyword_settings/${new_story_kw_id}`, story_kw_setting).then(res => {
-          console.log('res ne: ', res)
-          // reloadUpdate()
-          reloadKeyWord()
-
-        }).catch(error => {
-          console.log(error)
-          // }
-        })
+        var ig_setting = { instagram_setting: { story_comment_bag_status: 'keyword' } };
+        api
+          .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
+          .then((res) => { })
+          .catch((error) => {
+            console.log(error);
+          });
+        api
+          .patch(
+            `/api/v1/message_managements/keyword_settings/${new_story_kw_id}`,
+            story_kw_setting
+          )
+          .then((res) => {
+            // console.log('res ne: ', res);
+            // reloadUpdate()
+            reloadKeyWord();
+          })
+          .catch((error) => {
+            console.log(error);
+            // }
+          });
       }, 1500);
-
-
     }
-
-
-
   }
 
   function saveLiveSetting() {
@@ -2957,13 +2923,13 @@ function Release() {
               .patch(`/api/v1/message_managements/keyword_settings/${id}`, update)
               .then((res) => {
                 reloadUpdate();
-          setMsgNoti('ライブ設定を保存しました。');
-          setIsOpenNoti(true);
-          setTimeout(() => {
-            setMsgNoti('');
-            setIsOpenNoti(false);
-          }, 2000);
-               })
+                setMsgNoti('ライブ設定を保存しました。');
+                setIsOpenNoti(true);
+                setTimeout(() => {
+                  setMsgNoti('');
+                  setIsOpenNoti(false);
+                }, 2000);
+              })
               .catch((error) => {
                 console.log(error);
               });
@@ -3250,6 +3216,83 @@ function Release() {
     console.log(past_post);
   }
 
+  // confirm delete
+  const confirmDelete = () => {
+    setIsOpenConfirm(false);
+    if (fixedIdDelete) {
+      if (listFixedMenu.length <= 1) {
+        setMsgNoti('固定メッセージが最低1つの選択がある必要です。');
+        setIsOpenNoti(true);
+        setTimeout(() => {
+          setMsgNoti('');
+          setIsOpenNoti(false);
+        }, 2000);
+      } else {
+        api
+          .delete(`/api/v1/message_managements/persistent_menus/${fixedIdDelete}`)
+          .then((res) => {
+            // console.log(res)
+            reloadFixedMenu();
+            api
+              .get(`/api/v1/message_managements/persistent_menus_turn_on`)
+              .then((res) => {
+                reloadFixedMessageStatus();
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+            setMsgNoti('固定メッセージを削除しました。');
+            setIsOpenNoti(true);
+            setTimeout(() => {
+              setMsgNoti('');
+              setIsOpenNoti(false);
+            }, 2000);
+            setFixedIdDelete();
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    }
+    if (faqIdDelete) {
+      if (listFAQ.length <= 1) {
+        setMsgNoti('よくある質問が最低1つの選択がある必要です。');
+        setIsOpenNoti(true);
+        setTimeout(() => {
+          setMsgNoti('');
+          setIsOpenNoti(false);
+        }, 2000);
+      } else {
+        api
+          .delete(`/api/v1/message_managements/ice_breakers/${faqIdDelete}`)
+          .then((res) => {
+            reloadFAQ();
+            api
+              .get(`/api/v1/message_managements/ice_breakers_turn_on`)
+              .then((res) => {
+                reloadFAQStatus();
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+            setMsgNoti('削除しました。');
+            setIsOpenNoti(true);
+            setTimeout(() => {
+              setMsgNoti('');
+              setIsOpenNoti(false);
+            }, 2000);
+            setFaqIdDelete();
+          })
+          .catch((error) => {
+            console.log(error);
+            // if (error.response.data.code === 3) {
+            //   requestNewToken(path)
+            // }
+          });
+      }
+    }
+  };
+
   return (
     <>
       <div className="content">
@@ -3292,7 +3335,11 @@ function Release() {
                       </Button>
                     </div>
                     <div style={{ margin: '15px 0px 0px 20px' }}>
-                      <Switch onChange={() => changeFAQOnOff()} onColor="#64c1ff" checked={checkedFAQ} />
+                      <Switch
+                        onChange={() => changeFAQOnOff()}
+                        onColor="#64c1ff"
+                        checked={checkedFAQ}
+                      />
                     </div>
                   </div>
 
@@ -3300,7 +3347,11 @@ function Release() {
                     {listFAQ != undefined
                       ? listFAQ.map((item, i) => (
                         <form key={item.id} id={`form-faq-${item.id}`}>
-                          <div className="div-add-aq" style={{ display: 'flex' }} onLoad={loadFAQ(item)}>
+                          <div
+                            className="div-add-aq"
+                            style={{ display: 'flex' }}
+                            onLoad={loadFAQ(item)}
+                          >
                             <input
                               id={`faq-q-${item.id}`}
                               className="new-faq-q"
@@ -3367,8 +3418,14 @@ function Release() {
                                 }}
                               ></i>
                             </div>
-                            <div id={`deleteFAQfromList${item.id}`} onClick={() => deleteFAQInList(item.id)}>
-                              <i className="nc-icon nc-box nc-3x" style={{ fontSize: '30px', marginTop: '5px' }}></i>
+                            <div
+                              id={`deleteFAQfromList${item.id}`}
+                              onClick={() => deleteFAQInList(item.id)}
+                            >
+                              <i
+                                className="nc-icon nc-box nc-3x"
+                                style={{ fontSize: '30px', marginTop: '5px' }}
+                              ></i>
                             </div>
                           </div>
                         </form>
@@ -3440,7 +3497,10 @@ function Release() {
                                 ></i>
                               </div>
                               <div onClick={() => deleteFAQ(i)}>
-                                <i className="nc-icon nc-box nc-3x" style={{ fontSize: '30px', marginTop: '5px' }}></i>
+                                <i
+                                  className="nc-icon nc-box nc-3x"
+                                  style={{ fontSize: '30px', marginTop: '5px' }}
+                                ></i>
                               </div>
                               {/* <div style={{width:"5%"}} onClick={() => deleteFAQ(i)}><i className="nc-icon nc-box nc-3x" style={{ fontSize: "30px", marginTop: "5px", width:"5%" }}></i></div> */}
                             </div>
@@ -3607,7 +3667,11 @@ function Release() {
                       </div>
 
                       <div style={{ margin: '5px 0px 0px 0px' }}>
-                        <Switch onChange={() => changeStoryOnOff()} onColor="#64c1ff" checked={checked} />
+                        <Switch
+                          onChange={() => changeStoryOnOff()}
+                          onColor="#64c1ff"
+                          checked={checked}
+                        />
                       </div>
                     </div>
                     <div
@@ -3715,7 +3779,11 @@ function Release() {
                       </div>
 
                       <div style={{ margin: '5px 0px 0px 0px' }}>
-                        <Switch onChange={() => changeLiveOnOff()} onColor="#64c1ff" checked={checkedLive} />
+                        <Switch
+                          onChange={() => changeLiveOnOff()}
+                          onColor="#64c1ff"
+                          checked={checkedLive}
+                        />
                       </div>
                     </div>
                     <div
@@ -3832,7 +3900,11 @@ function Release() {
                         ></i>
                       </div>
                       <div style={{ margin: '5px 0px 0px 0px' }}>
-                        <Switch onChange={() => changeCMPostOnOff()} onColor="#64c1ff" checked={checkedCMPost} />
+                        <Switch
+                          onChange={() => changeCMPostOnOff()}
+                          onColor="#64c1ff"
+                          checked={checkedCMPost}
+                        />
                       </div>
                     </div>
                     <div
@@ -3889,7 +3961,11 @@ function Release() {
                       {listFixedMenu != undefined
                         ? listFixedMenu.map((item) => (
                           <form key={item.id} id={`fixed-menu-${item.id}`}>
-                            <div className="div-add-aq" style={{ display: 'flex' }} onLoad={loadFixedMenu(item)}>
+                            <div
+                              className="div-add-aq"
+                              style={{ display: 'flex' }}
+                              onLoad={loadFixedMenu(item)}
+                            >
                               <input
                                 name={`title-fixed-menu-${item.id}`}
                                 id={`title-fixed-menu-${item.id}`}
@@ -4159,6 +4235,13 @@ function Release() {
               <h4>{msgNoti}</h4>
             </div>
           </ModalNoti>
+          <ModalShort open={isOpenConfirm} onClose={() => setIsOpenConfirm(false)}>
+            <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+              <h4>これを削除しますか。</h4>
+              <Button onClick={() => confirmDelete()}>はい</Button>
+              <Button onClick={() => setIsOpenConfirm(false)}>いいえ</Button>
+            </div>
+          </ModalShort>
         </div>
       </div>
     </>

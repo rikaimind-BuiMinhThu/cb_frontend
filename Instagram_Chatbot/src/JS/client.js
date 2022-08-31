@@ -51,12 +51,15 @@ export function checkDateToday(dateInput) {
 export function checkDateEndIn(endDateIn, inputStartDate) {
   var startDate = parseInt(inputStartDate.replaceAll('-', ''));
   var endDate = parseInt(endDateIn.replaceAll('-', ''));
-  if (inputStartDate === '') {
-    document.getElementById(`newClientEndErrMsg`).style.display = 'block';
-    document.getElementById(
-      `newClientEndErrMsg`
-    ).innerHTML = `終了日は開始日の前ではない必要です。`;
-  } else if (startDate > endDate) {
+  if (inputStartDate === '' && endDateIn === '') {
+    // document.getElementById(`newClientEndErrMsg`).style.display = 'block';
+    // document.getElementById(
+    //   `newClientEndErrMsg`
+    // ).innerHTML = `終了日は開始日の前ではない必要です。`;
+    document.getElementById(`newClientEndErrMsg`).style.display = 'none';
+    document.getElementById(`newClientEndErrMsg`).innerHTML = ``;
+    return true;
+  } else if (inputStartDate !== '' && endDateIn !== '' && startDate > endDate) {
     document.getElementById(`newClientEndErrMsg`).style.display = 'block';
     document.getElementById(
       `newClientEndErrMsg`
