@@ -927,39 +927,43 @@ function Release() {
   function trueConfigFAQ() {
     document.getElementById('notiMsgFAQ').style.display = 'none';
     setCheckedFAQ(true);
-    var nodesStory = document.getElementById('addFAQContent').getElementsByTagName('*');
-    for (var i = 0; i < nodesStory.length; i++) {
-      nodesStory[i].disabled = false;
-    }
-    var nodeBtn = document.getElementById('addFAQbtn').getElementsByTagName('*');
-    for (var i = 0; i < nodeBtn.length; i++) {
-      nodeBtn[i].disabled = false;
-    }
-    document.getElementById('addFAQContent').addEventListener('click', () => {
-      document.getElementById('notiMsgFAQ').style.display = 'none';
-    });
-    document.getElementById('addFAQContent').addEventListener('click', () => {
-      document.getElementById('notiMsgFAQ').style.display = 'none';
-    });
+    setTimeout(() => {
+      var nodesStory = document.getElementById('addFAQContent').getElementsByTagName('*');
+      for (var i = 0; i < nodesStory.length; i++) {
+        nodesStory[i].disabled = false;
+      }
+      var nodeBtn = document.getElementById('addFAQbtn').getElementsByTagName('*');
+      for (var i = 0; i < nodeBtn.length; i++) {
+        nodeBtn[i].disabled = false;
+      }
+      document.getElementById('addFAQContent').addEventListener('click', () => {
+        document.getElementById('notiMsgFAQ').style.display = 'none';
+      });
+      document.getElementById('addFAQContent').addEventListener('click', () => {
+        document.getElementById('notiMsgFAQ').style.display = 'none';
+      });
+    }, 2000)
   }
 
   function trueConfigFixedMenu() {
     document.getElementById('notiMsgFixedMenu').style.display = 'none';
     setCheckedFixedMenu(true);
-    var nodesStory = document.getElementById('addFixedMenuContent').getElementsByTagName('*');
-    for (var i = 0; i < nodesStory.length; i++) {
-      nodesStory[i].disabled = false;
-    }
-    var nodeBtn = document.getElementById('addFixMenubtn').getElementsByTagName('*');
-    for (var i = 0; i < nodeBtn.length; i++) {
-      nodeBtn[i].disabled = false;
-    }
-    document.getElementById('addFixedMenuContent').addEventListener('click', () => {
-      document.getElementById('notiMsgFixedMenu').style.display = 'none';
-    });
-    document.getElementById('addFixMenubtn').addEventListener('click', () => {
-      document.getElementById('notiMsgFixedMenu').style.display = 'none';
-    });
+    setTimeout(() => {
+      var nodesStory = document.getElementById('addFixedMenuContent').getElementsByTagName('*');
+      for (var i = 0; i < nodesStory.length; i++) {
+        nodesStory[i].disabled = false;
+      }
+      var nodeBtn = document.getElementById('addFixMenubtn').getElementsByTagName('*');
+      for (var i = 0; i < nodeBtn.length; i++) {
+        nodeBtn[i].disabled = false;
+      }
+      document.getElementById('addFixedMenuContent').addEventListener('click', () => {
+        document.getElementById('notiMsgFixedMenu').style.display = 'none';
+      });
+      document.getElementById('addFixMenubtn').addEventListener('click', () => {
+        document.getElementById('notiMsgFixedMenu').style.display = 'none';
+      });
+    }, 2000)
   }
 
   function reloadUpdate() {
@@ -2293,17 +2297,18 @@ function Release() {
     api
       .patch(`/api/v1/message_managements/ice_breakers/${value}`, script)
       .then((res) => {
-        // console.log(res)
-        document.getElementById(`ene-faq-${value}`).style.display = 'block';
-        document.getElementById(`sav-faq-${value}`).style.display = 'none';
-        document.getElementById(`faq-q-${value}`).readOnly = true;
-        document.getElementById(`faq-a-${value}`).readOnly = true;
-        setMsgNoti('保存されました！');
+        setMsgNoti('FAQ を保存しました！');
         setIsOpenNoti(true);
         setTimeout(() => {
           setMsgNoti('');
           setIsOpenNoti(false);
         }, 2000);
+        // console.log(res)
+        document.getElementById(`ene-faq-${value}`).style.display = 'block';
+        document.getElementById(`sav-faq-${value}`).style.display = 'none';
+        document.getElementById(`faq-q-${value}`).readOnly = true;
+        document.getElementById(`faq-a-${value}`).readOnly = true;
+        
         api
           .get(`/api/v1/message_managements/ice_breakers_turn_on`)
           .then((res) => {
@@ -2413,7 +2418,7 @@ function Release() {
           document.getElementById(`ene-fixed-${value}`).style.display = 'block';
           document.getElementById(`sav-fixed-${value}`).style.display = 'none';
 
-          setMsgNoti('保存されました！');
+          setMsgNoti('固定メニューを保存しました！');
           setIsOpenNoti(true);
           setTimeout(() => {
             setMsgNoti('');
@@ -2763,7 +2768,7 @@ function Release() {
       var ig_setting = { instagram_setting: { story_comment_bag_status: 'direct_message' } };
       api
         .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-        .then((res) => {})
+        .then((res) => { })
         .catch((error) => {
           console.log(error);
         });
@@ -2826,7 +2831,7 @@ function Release() {
         var ig_setting = { instagram_setting: { story_comment_bag_status: 'keyword' } };
         api
           .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-          .then((res) => {})
+          .then((res) => { })
           .catch((error) => {
             console.log(error);
           });
@@ -2869,7 +2874,7 @@ function Release() {
       };
       api
         .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-        .then((res) => {})
+        .then((res) => { })
         .catch((error) => {
           console.log(error);
         });
@@ -2939,7 +2944,7 @@ function Release() {
         };
         api
           .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-          .then((res) => {})
+          .then((res) => { })
           .catch((error) => {
             console.log(error);
           });
@@ -2981,7 +2986,7 @@ function Release() {
       };
       api
         .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-        .then((res) => {})
+        .then((res) => { })
         .catch((error) => {
           console.log(error);
         });
@@ -3053,7 +3058,7 @@ function Release() {
         };
         api
           .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-          .then((res) => {})
+          .then((res) => { })
           .catch((error) => {
             console.log(error);
           });
@@ -3128,11 +3133,11 @@ function Release() {
   function isURL(str) {
     var pattern = new RegExp(
       '^(https?:\\/\\/)?' + // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-        '(\\#[-a-z\\d_]*)?$',
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$',
       'i'
     ); // fragment locator
     return pattern.test(str);
@@ -3341,90 +3346,90 @@ function Release() {
                   <div id="addFAQContent" style={{ width: '100%' }}>
                     {listFAQ != undefined
                       ? listFAQ.map((item, i) => (
-                          <form key={item.id} id={`form-faq-${item.id}`}>
-                            <div
-                              className="div-add-aq"
-                              style={{ display: 'flex' }}
-                              onLoad={loadFAQ(item)}
-                            >
-                              <input
-                                id={`faq-q-${item.id}`}
-                                className="new-faq-q"
-                                defaultValue={item.question}
-                                name={`faq_key${item.question}`}
-                                readOnly="readonly"
-                              ></input>
-                              {/* <input id={`faq-a-${item.id}`} className="new-faq-q" defaultValue={item.answer}
+                        <form key={item.id} id={`form-faq-${item.id}`}>
+                          <div
+                            className="div-add-aq"
+                            style={{ display: 'flex' }}
+                            onLoad={loadFAQ(item)}
+                          >
+                            <input
+                              id={`faq-q-${item.id}`}
+                              className="new-faq-q"
+                              defaultValue={item.question}
+                              name={`faq_key${item.question}`}
+                              readOnly="readonly"
+                            ></input>
+                            {/* <input id={`faq-a-${item.id}`} className="new-faq-q" defaultValue={item.answer}
                             name={`faq_answer${item.answer}`} readOnly="readonly"></input> */}
-                              <select
-                                id={`listGroupFAQ${item.id}`}
-                                // defaultValue={''}
-                                onChange={(e) => selectedGroup(e.target.value, item.id)}
-                                className="new-faq-q-so"
-                                name={`group_id_${numFAQ}`}
-                              >
-                                {/* <option value="" disabled hidden>
+                            <select
+                              id={`listGroupFAQ${item.id}`}
+                              // defaultValue={''}
+                              onChange={(e) => selectedGroup(e.target.value, item.id)}
+                              className="new-faq-q-so"
+                              name={`group_id_${numFAQ}`}
+                            >
+                              {/* <option value="" disabled hidden>
                                 {item.message_group_name}
                               </option> */}
-                                {listGroup?.map((group, i) => {
-                                  return (
-                                    <option key={i} value={group.id}>
-                                      {group.group_name}
-                                    </option>
-                                  );
-                                })}
-                              </select>
-                              <select
-                                id={`listBagFAQ${item.id}`}
-                                className="new-faq-q-so"
-                                // defaultValue={''}
-                                onChange={(e) => selectedBag(e.target.value)}
-                                name={`bag_id_${numFAQ}`}
-                              >
-                                {/* <option value="" disabled hidden>
+                              {listGroup?.map((group, i) => {
+                                return (
+                                  <option key={i} value={group.id}>
+                                    {group.group_name}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                            <select
+                              id={`listBagFAQ${item.id}`}
+                              className="new-faq-q-so"
+                              // defaultValue={''}
+                              onChange={(e) => selectedBag(e.target.value)}
+                              name={`bag_id_${numFAQ}`}
+                            >
+                              {/* <option value="" disabled hidden>
                                 {item.msg_bag_name}
                               </option> */}
-                              </select>
-                              <div
-                                id={`ene-faq-${item.id}`}
-                                onClick={() => enableEdit(item.id)}
-                                style={{ width: '5%' }}
-                              >
-                                <i
-                                  className="nc-icon nc-align-center nc-3x"
-                                  style={{
-                                    fontSize: '30px',
-                                    marginTop: '5px',
-                                    marginRight: '30px',
-                                  }}
-                                ></i>
-                              </div>
-                              <div
-                                id={`sav-faq-${item.id}`}
-                                onClick={() => editFAQInList(item.id)}
-                                style={{ width: '5%', display: 'none' }}
-                              >
-                                <i
-                                  className="nc-icon nc-cloud-download-93 nc-3x"
-                                  style={{
-                                    fontSize: '30px',
-                                    marginTop: '5px',
-                                    marginRight: '30px',
-                                  }}
-                                ></i>
-                              </div>
-                              <div
-                                id={`deleteFAQfromList${item.id}`}
-                                onClick={() => deleteFAQInList(item.id)}
-                              >
-                                <i
-                                  className="nc-icon nc-box nc-3x"
-                                  style={{ fontSize: '30px', marginTop: '5px' }}
-                                ></i>
-                              </div>
+                            </select>
+                            <div
+                              id={`ene-faq-${item.id}`}
+                              onClick={() => enableEdit(item.id)}
+                              style={{ width: '5%' }}
+                            >
+                              <i
+                                className="nc-icon nc-align-center nc-3x"
+                                style={{
+                                  fontSize: '30px',
+                                  marginTop: '5px',
+                                  marginRight: '30px',
+                                }}
+                              ></i>
                             </div>
-                          </form>
-                        ))
+                            <div
+                              id={`sav-faq-${item.id}`}
+                              onClick={() => editFAQInList(item.id)}
+                              style={{ width: '5%', display: 'none' }}
+                            >
+                              <i
+                                className="nc-icon nc-cloud-download-93 nc-3x"
+                                style={{
+                                  fontSize: '30px',
+                                  marginTop: '5px',
+                                  marginRight: '30px',
+                                }}
+                              ></i>
+                            </div>
+                            <div
+                              id={`deleteFAQfromList${item.id}`}
+                              onClick={() => deleteFAQInList(item.id)}
+                            >
+                              <i
+                                className="nc-icon nc-box nc-3x"
+                                style={{ fontSize: '30px', marginTop: '5px' }}
+                              ></i>
+                            </div>
+                          </div>
+                        </form>
+                      ))
                       : ''}
                     <form action="" id="new_FAQ">
                       <div style={{ width: '100%' }} id="faq_add">
@@ -3955,127 +3960,127 @@ function Release() {
                     <div id="addFixedMenuContent" style={{ width: '100%' }}>
                       {listFixedMenu != undefined
                         ? listFixedMenu.map((item) => (
-                            <form key={item.id} id={`fixed-menu-${item.id}`}>
-                              <div
-                                className="div-add-aq"
-                                style={{ display: 'flex' }}
-                                onLoad={loadFixedMenu(item)}
+                          <form key={item.id} id={`fixed-menu-${item.id}`}>
+                            <div
+                              className="div-add-aq"
+                              style={{ display: 'flex' }}
+                              onLoad={loadFixedMenu(item)}
+                            >
+                              <input
+                                name={`title-fixed-menu-${item.id}`}
+                                id={`title-fixed-menu-${item.id}`}
+                                className="new-faq-q-so"
+                                onChange={() => onChangeEditFM(`title-fixed-menu-${item.id}`)}
+                                defaultValue={item.title}
+                                type="text"
+                                readOnly="readonly"
+                                style={{ width: '20%' }}
+                              />
+                              <select
+                                style={{ width: '20%' }}
+                                id={`fixed-mnl-type${item.id}`}
+                                readOnly="readonly"
+                                onChange={(e) => selectFixedMenuUP(e.target.value, item.id)}
+                                className="new-faq-q-so"
+                                name={`fixed-option-${item.id}`}
                               >
-                                <input
-                                  name={`title-fixed-menu-${item.id}`}
-                                  id={`title-fixed-menu-${item.id}`}
-                                  className="new-faq-q-so"
-                                  onChange={() => onChangeEditFM(`title-fixed-menu-${item.id}`)}
-                                  defaultValue={item.title}
-                                  type="text"
-                                  readOnly="readonly"
-                                  style={{ width: '20%' }}
-                                />
-                                <select
-                                  style={{ width: '20%' }}
-                                  id={`fixed-mnl-type${item.id}`}
-                                  readOnly="readonly"
-                                  onChange={(e) => selectFixedMenuUP(e.target.value, item.id)}
-                                  className="new-faq-q-so"
-                                  name={`fixed-option-${item.id}`}
-                                >
-                                  <option value="" disabled hidden>
-                                    メッセージタイプ選択 ...
-                                  </option>
-                                  <option value="message">メッセージ</option>
-                                  <option value="website">ウェブサイト</option>
-                                  <option value="support">有人対応に切り替え</option>
-                                </select>
-                                <select
-                                  id={`listGroupFixedMenu${item.id}`}
-                                  style={{
-                                    width: '20%',
-                                    display: `${item.message_bag_id == null ? 'none' : 'block'}`,
-                                  }}
-                                  // defaultValue={''}
-                                  onChange={(e) => selectedGroupFMUP(e.target.value, item.id)}
-                                  className="new-faq-q-so"
-                                  name="client_id"
-                                >
-                                  {/* <option value="" disabled hidden>
+                                <option value="" disabled hidden>
+                                  メッセージタイプ選択 ...
+                                </option>
+                                <option value="message">メッセージ</option>
+                                <option value="website">ウェブサイト</option>
+                                <option value="support">有人対応に切り替え</option>
+                              </select>
+                              <select
+                                id={`listGroupFixedMenu${item.id}`}
+                                style={{
+                                  width: '20%',
+                                  display: `${item.message_bag_id == null ? 'none' : 'block'}`,
+                                }}
+                                // defaultValue={''}
+                                onChange={(e) => selectedGroupFMUP(e.target.value, item.id)}
+                                className="new-faq-q-so"
+                                name="client_id"
+                              >
+                                {/* <option value="" disabled hidden>
                                   {item.message_group_name}
                                 </option> */}
-                                  {listGroup?.map((group, i) => {
-                                    return (
-                                      <option key={i} value={group.id}>
-                                        {group.group_name}
-                                      </option>
-                                    );
-                                  })}
-                                </select>
-                                <select
-                                  id={`listBagFixedMenu${item.id}`}
-                                  style={{
-                                    width: '20%',
-                                    display: `${item.message_bag_id == null ? 'none' : 'block'}`,
-                                  }}
-                                  // defaultValue={''}
-                                  onChange={(e) => selectedBagFM(e.target.value)}
-                                  className="new-faq-q-so"
-                                  name={`msgbag_id${item.id}`}
-                                >
-                                  {/* <option value="" disabled hidden>
+                                {listGroup?.map((group, i) => {
+                                  return (
+                                    <option key={i} value={group.id}>
+                                      {group.group_name}
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                              <select
+                                id={`listBagFixedMenu${item.id}`}
+                                style={{
+                                  width: '20%',
+                                  display: `${item.message_bag_id == null ? 'none' : 'block'}`,
+                                }}
+                                // defaultValue={''}
+                                onChange={(e) => selectedBagFM(e.target.value)}
+                                className="new-faq-q-so"
+                                name={`msgbag_id${item.id}`}
+                              >
+                                {/* <option value="" disabled hidden>
                                   {item.message_bag_name}
                                 </option> */}
-                                </select>
-                                <input
-                                  name={`answer-${item.id}`}
-                                  id={`anw-mnl-type${item.id}`}
-                                  className="new-faq-q-so"
-                                  type="text"
-                                  readOnly="readonly"
-                                  style={{
-                                    width: '43%',
-                                    display: `${item.message_bag_id == null ? 'block' : 'none'}`,
-                                  }}
-                                />
+                              </select>
+                              <input
+                                name={`answer-${item.id}`}
+                                id={`anw-mnl-type${item.id}`}
+                                className="new-faq-q-so"
+                                type="text"
+                                readOnly="readonly"
+                                style={{
+                                  width: '43%',
+                                  display: `${item.message_bag_id == null ? 'block' : 'none'}`,
+                                }}
+                              />
 
-                                <div style={{ width: '5%' }}></div>
-                                <div
-                                  id={`ene-fixed-${item.id}`}
-                                  onClick={() => enableEditFixed(item.id)}
-                                  style={{ width: '5%' }}
-                                >
-                                  <i
-                                    className="nc-icon nc-align-center nc-3x"
-                                    style={{
-                                      fontSize: '30px',
-                                      marginTop: '5px',
-                                      marginRight: '30px',
-                                    }}
-                                  ></i>
-                                </div>
-                                <div
-                                  id={`sav-fixed-${item.id}`}
-                                  onClick={() => editFixedInList(item.id)}
-                                  style={{ width: '5%', display: 'none' }}
-                                >
-                                  <i
-                                    className="nc-icon nc-cloud-download-93 nc-3x"
-                                    style={{
-                                      fontSize: '30px',
-                                      marginTop: '5px',
-                                      marginRight: '30px',
-                                    }}
-                                  ></i>
-                                </div>
-                                <div onClick={() => deleteFixedInList(item.id)}>
-                                  <i
-                                    className="nc-icon nc-box nc-3x"
-                                    style={{
-                                      fontSize: '30px',
-                                      marginTop: '5px',
-                                    }}
-                                  ></i>
-                                </div>
+                              <div style={{ width: '5%' }}></div>
+                              <div
+                                id={`ene-fixed-${item.id}`}
+                                onClick={() => enableEditFixed(item.id)}
+                                style={{ width: '5%' }}
+                              >
+                                <i
+                                  className="nc-icon nc-align-center nc-3x"
+                                  style={{
+                                    fontSize: '30px',
+                                    marginTop: '5px',
+                                    marginRight: '30px',
+                                  }}
+                                ></i>
                               </div>
-                            </form>
-                          ))
+                              <div
+                                id={`sav-fixed-${item.id}`}
+                                onClick={() => editFixedInList(item.id)}
+                                style={{ width: '5%', display: 'none' }}
+                              >
+                                <i
+                                  className="nc-icon nc-cloud-download-93 nc-3x"
+                                  style={{
+                                    fontSize: '30px',
+                                    marginTop: '5px',
+                                    marginRight: '30px',
+                                  }}
+                                ></i>
+                              </div>
+                              <div onClick={() => deleteFixedInList(item.id)}>
+                                <i
+                                  className="nc-icon nc-box nc-3x"
+                                  style={{
+                                    fontSize: '30px',
+                                    marginTop: '5px',
+                                  }}
+                                ></i>
+                              </div>
+                            </div>
+                          </form>
+                        ))
                         : ''}
                       <form action="" id="fixed-menu">
                         <div style={{ width: '100%' }} id="fixed_add">

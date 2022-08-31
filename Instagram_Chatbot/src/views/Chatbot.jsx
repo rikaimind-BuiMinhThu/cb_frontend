@@ -284,7 +284,7 @@ function Chatbot() {
       // setImgCBNum(bagMsg[bagMsg.length - 1].id)
       bagMsg.forEach((item) => {
 
-        // console.log("each msg ne: ", item)
+        console.log("each msg ne: ", item)
         // Case message type is msg
         // console.log("item message ne: ", item)
         // setItemChoiceUpdate(item)
@@ -3165,7 +3165,7 @@ function Chatbot() {
 
     event.preventDefault()
     // document.querySelectorAll("#btn_a_tag").style.color = 'black'
-
+    document.getElementById(`btn_a_tag${idIn}`).disabled = true
     var nodeList = document.querySelectorAll(".btn_a_tag");
     for (var i = 0; i < nodeList.length; i++) {
       nodeList[i].style.color = 'black';
@@ -3184,13 +3184,13 @@ function Chatbot() {
     document.getElementById(`btn_a_tag${idIn}`).style.textDecoration = "underline"
     // document.getElementById(`btn_a_tag${idIn}`).style.fontWeight= "800"
 
-    document.getElementById(`btn_a_tag${idIn}`).disabled = true
+    
 
     // console.log("mul click")
     getMessage(idIn)
     setTimeout(() => {
       document.getElementById(`btn_a_tag${idIn}`).disabled = false
-    }, 500)
+    }, 1500)
     // document.getElementById("a_tag").setAttribute('disabled', 'disabled')
   }
 
@@ -5738,11 +5738,12 @@ function Chatbot() {
       var newCBAdd = { message_group: { group_name: newCB } }
       api.post(`/api/v1/message_managements/message_groups`, newCBAdd).then(res => {
         setIsOpenNoti(true)
+        setIsOpenAddChatbot(false)
         if (res.data.code == 2) {
           setMsgNoti("メッセージグループが存在します。")
         } else {
           refreshMsgGroup()
-          setIsOpenAddChatbot(false)
+
           setMsgNoti("メッセージグループを追加しました。")
         }
         setTimeout(() => {
@@ -6542,8 +6543,8 @@ function Chatbot() {
       var abc = document.createElement("div")
       document.getElementById(`choiceOption${idUpdateItemMsg}`).appendChild(abc)
       if (type == "mess") {
-      abc.innerHTML =
-        `
+        abc.innerHTML =
+          `
       <div style="border:none; border-radius:10px; background-color:white; width:200px; text-align:center">
         <div style="padding:10px 5px 0px 5px">${title}</div>
         <input id="titleAddSC${idUpdateItemMsg}" hidden type=text value="${title}" />
@@ -6557,10 +6558,10 @@ function Chatbot() {
         <input id="lblAddSC${idUpdateItemMsg}_${bagAddSC}" hidden type=text value="${lblas}" />
       </div>
       `
-    }
-    else if (type == "web_url") {
-      abc.innerHTML =
-      `
+      }
+      else if (type == "web_url") {
+        abc.innerHTML =
+          `
       <div style="border:none; border-radius:10px; background-color:white; width:200px; text-align:center">
         <div style="padding:10px 5px 0px 5px">${title}</div>
         <input id="titleAddSC${idUpdateItemMsg}" hidden type=text value="${title}" />
@@ -6574,7 +6575,7 @@ function Chatbot() {
         <input id="lblAddSC${idUpdateItemMsg}_${bagAddSC}" hidden type=text value="${lblas}" />
       </div>
       `
-    }
+      }
       document.getElementById(`msgChoice${idUpdateItemMsg}`).style.display = "none"
       setIsUpdateOpenSingleChoice(false)
       setLabelInputSCAll("")
@@ -7553,7 +7554,7 @@ function Chatbot() {
         <ModalShortTem open={isOpenTemplate} onClose={() => setIsOpenTemplate(false)}>
           <div style={{ width: "500px", height: "500px", textAlign: "center" }}>
             <h5>メッセージ袋名入力</h5>
-            <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>資料請求ボット</div>
+            <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>テンプレート1</div>
             <label style={{ width: "100%" }}>
               <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
               <input defaultValue={hotTem[0] != undefined ? hotTem[0].title : ""} id="docResuestBotTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "docResuestBotTitleErr")} name="chatbot_name"></input>
@@ -7576,7 +7577,7 @@ function Chatbot() {
               <label id="docResuestBotTitleErr" style={{ display: 'none', color: "red" }}></label>
             </label><br /><br />
 
-            <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>EC-chatbotボット</div>
+            <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>テンプレート2</div>
             <label style={{ width: "100%" }}>
               <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
               <input defaultValue={hotTem[1] != undefined ? hotTem[1].title : ""} id="ecChatbotBotTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "ecChatbotBotTitleErr")} name="chatbot_name"></input>
@@ -7599,7 +7600,7 @@ function Chatbot() {
               <label id="ecChatbotBotTitleErr" style={{ display: 'none', color: "red" }}></label>
             </label><br /><br />
 
-            <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>会員登録</div>
+            <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>テンプレート3</div>
             <label style={{ width: "100%" }}>
               <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
               <input defaultValue={hotTem[2] != undefined ? hotTem[2].title : ""} id="registrationTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")} name="chatbot_name"></input>
