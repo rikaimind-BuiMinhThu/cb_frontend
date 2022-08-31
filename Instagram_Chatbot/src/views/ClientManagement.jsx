@@ -476,7 +476,9 @@ function ClientManagement() {
       managerKata == true &&
       emailCheck == true &&
       emailCheckLen == true &&
-      dateCheck === true
+      dateCheck === true &&
+      price > 0 &&
+      zipCode > 0
     ) {
       var elements = document.getElementById('detailUserClient').elements;
       // console.log(elements);
@@ -560,6 +562,14 @@ function ClientManagement() {
       }
       if (updateImageChange && getBaseUrlAdd() === false) {
         getBaseUrlAdd();
+      }
+      if (price <= 0) {
+        document.getElementById('newClientプラン価格ErrMsg').style.display = 'block';
+        document.getElementById('newClientプラン価格ErrMsg').innerHTML = '正数を入力してください。';
+      }
+      if (zipCode <= 0) {
+        document.getElementById('newClient郵便番号ErrMsg').style.display = 'block';
+        document.getElementById('newClient郵便番号ErrMsg').innerHTML = '正数を入力してください。';
       }
       // console.log('Missing field');
     }
