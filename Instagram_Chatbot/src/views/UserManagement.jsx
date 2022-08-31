@@ -496,7 +496,8 @@ function UserManagement() {
       setPage(parseInt(value));
       setPageIndex(value);
       reloadListClient(value);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.querySelector('.main-panel').scrollTop = 0;
     }
   }
 
