@@ -7326,7 +7326,7 @@ function Chatbot() {
     api.post(`/api/v1/message_managements/message_groups/${id}/copy`).then(res => {
       setIsOpenTemplateDetail(false)
       console.log(res)
-      setMsgNoti("Copy Hot Template successfully")
+      setMsgNoti("テンプレートが選択されました！")
       setIsOpenNoti(true)
       setTimeout(() => {
         setIsOpenNoti(false)
