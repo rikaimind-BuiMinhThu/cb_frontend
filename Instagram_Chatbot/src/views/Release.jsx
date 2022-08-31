@@ -77,7 +77,7 @@ function Release() {
     api
       .get(`/api/v1/instagram_settings`)
       .then((res) => {
-        console.log('setIdInstaSetting: ', res.data.data[0].id);
+        // console.log('setIdInstaSetting: ', res.data.data[0].id);
         setIdInstaSetting(res.data.data[0].id);
         setPostGroupName(res.data.data[0].post_comment_group_name);
         setStoryGroupName(res.data.data[0].story_comment_group_name);
@@ -88,7 +88,7 @@ function Release() {
         setPostGroupBagId(res.data.data[0]?.post_comment_bag_id);
         setStoryGroupBagId(res.data.data[0]?.story_comment_bag_id);
         setLiveGroupBagId(res.data.data[0]?.live_comment_bag_id);
-        console.log(res.data);
+        // console.log(res.data);
       })
       .catch((error) => {
         console.log(error);
@@ -192,7 +192,7 @@ function Release() {
     api
       .get(`/api/v1/message_managements/keyword_settings`)
       .then((res) => {
-        console.log('keyword_settings: ', res.data.data);
+        // console.log('keyword_settings: ', res.data.data);
         setListKeyword(res.data.data);
         var listkey = res.data.data;
         var story = [];
@@ -399,14 +399,14 @@ function Release() {
     api
       .get(`/api/v1/instagram_settings`)
       .then((resId) => {
-        console.log('get the first idInstaSetting: ', resId.data.data[0].id);
+        // console.log('get the first idInstaSetting: ', resId.data.data[0].id);
         api
           .get(`/api/v1/instagram_settings/${resId.data.data[0].id}`)
           .then((res) => {
-            console.log('insta setting ', res.data.data);
+            // console.log('insta setting ', res.data.data);
             var dataB = res.data.data;
             setInstaSetting(res.data.data);
-            console.log('Instagram setting id: ', res);
+            // console.log('Instagram setting id: ', res);
             setInstaSettingId(res.data.data.id);
             setStoryOnOff(res.data.data.story_comment_bag_status);
             if (res.data.data.story_comment_bag_status == 'off') {
@@ -454,7 +454,7 @@ function Release() {
                   api
                     .get(`/api/v1/message_managements/keyword_settings/${story[0]}`)
                     .then((res) => {
-                      console.log('story_comment_KW_id: ', res.data.data);
+                      // console.log('story_comment_KW_id: ', res.data.data);
                       var select, option;
                       select = document.getElementById('listkeyword');
                       option = document.createElement('option');
@@ -489,7 +489,7 @@ function Release() {
                   api
                     .get(`/api/v1/message_managements/keyword_settings/${live[0]}`)
                     .then((res) => {
-                      console.log('story_comment_KW_id: ', res.data.data);
+                      // console.log('story_comment_KW_id: ', res.data.data);
                       var select, option;
                       select = document.getElementById('listkeywordLive');
                       option = document.createElement('option');
@@ -524,7 +524,7 @@ function Release() {
                   api
                     .get(`/api/v1/message_managements/keyword_settings/${cm[0]}`)
                     .then((res) => {
-                      console.log('story_comment_KW_id: ', res.data.data);
+                      // console.log('story_comment_KW_id: ', res.data.data);
                       var select, option;
                       select = document.getElementById('listkeywordCM');
                       option = document.createElement('option');
@@ -605,7 +605,7 @@ function Release() {
     api
       .get(`/api/v1/instagram_settings/${idInstaSetting}`)
       .then((res) => {
-        console.log('insta setting ', res.data.data);
+        // console.log('insta setting ', res.data.data);
         var dataB = res.data.data;
         setInstaSetting(res.data.data);
         setInstaSettingId(res.data.data.id);
@@ -655,7 +655,7 @@ function Release() {
               api
                 .get(`/api/v1/message_managements/keyword_settings/${story[0]}`)
                 .then((res) => {
-                  console.log('story_comment_KW_id: ', res.data.data);
+                  // console.log('story_comment_KW_id: ', res.data.data);
                   var select, option;
                   select = document.getElementById('listkeyword');
                   option = document.createElement('option');
@@ -690,7 +690,7 @@ function Release() {
               api
                 .get(`/api/v1/message_managements/keyword_settings/${live[0]}`)
                 .then((res) => {
-                  console.log('story_comment_KW_id: ', res.data.data);
+                  // console.log('story_comment_KW_id: ', res.data.data);
                   var select, option;
                   select = document.getElementById('listkeywordLive');
                   option = document.createElement('option');
@@ -725,7 +725,7 @@ function Release() {
               api
                 .get(`/api/v1/message_managements/keyword_settings/${cm[0]}`)
                 .then((res) => {
-                  console.log('story_comment_KW_id: ', res.data.data);
+                  // console.log('story_comment_KW_id: ', res.data.data);
                   var select, option;
                   select = document.getElementById('listkeywordCM');
                   option = document.createElement('option');
@@ -971,7 +971,7 @@ function Release() {
     api
       .get(`/api/v1/instagram_settings/${instaSettingId}`)
       .then((res) => {
-        console.log('insta setting 2: ', res.data.data);
+        // console.log('insta setting 2: ', res.data.data);
         setInstaSetting(res.data.data);
         setInstaSettingId(res.data.data.id);
         setPostGroupName(res.data.data.post_comment_group_name);
@@ -1004,7 +1004,7 @@ function Release() {
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`)
           .then((res) => {
-            console.log('story_comment_bag_id: ', res.data);
+            // console.log('story_comment_bag_id: ', res.data);
             setStoryCommentBagName(res.data.data.message_bag.bag_name);
           })
           .catch((error) => {
@@ -1013,7 +1013,7 @@ function Release() {
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
           .then((res) => {
-            console.log('story_comment_bag_id: ', res.data);
+            // console.log('story_comment_bag_id: ', res.data);
             setPostCommentBagName(res.data.data.message_bag.bag_name);
           })
           .catch((error) => {
@@ -1050,7 +1050,7 @@ function Release() {
             faw_item[i].msg_bag_name = bag_name[i];
           }
           setListFAQ(faw_item);
-          console.log('faq data: ', faw_item);
+          // console.log('faq data: ', faw_item);
         }, 2000);
       })
       .catch((error) => {
@@ -1090,7 +1090,7 @@ function Release() {
     api
       .get(`/api/v1/message_managements/persistent_menus`)
       .then((res) => {
-        console.log('persistent_menus: ', res.data.data);
+        // console.log('persistent_menus: ', res.data.data);
         var fm_item = res.data.data;
         var bag_name = [];
 
@@ -1132,7 +1132,7 @@ function Release() {
         // }, 2000)
 
         setListFixedMenu(fm_item);
-        console.log('FM ne ne ne: ', fm_item);
+        // console.log('FM ne ne ne: ', fm_item);
         // setListFixedMenu(res.data.data)
         loadListFixed();
       })
@@ -1325,7 +1325,7 @@ function Release() {
     api
       .get(`/api/v1/message_managements/persistent_menus`)
       .then((res) => {
-        console.log('persistent_menus: ', res.data.data);
+        // console.log('persistent_menus: ', res.data.data);
         // setListFixedMenu(res.data.data)
         var fm_item = res.data.data;
         var bag_name = [];
@@ -2123,7 +2123,7 @@ function Release() {
       api
         .get(`/api/v1/message_managements/persistent_menus_turn_off?ig_id=${ig_id_status}`)
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           if (res.data.code == 2) {
             setCheckedFixedMenu(checkedFixedMenu);
 
@@ -2411,7 +2411,7 @@ function Release() {
       api
         .patch(`/api/v1/message_managements/persistent_menus/${value}`, script)
         .then((res) => {
-          console.log(res);
+          // console.log(res);
           document.getElementById(`title-fixed-menu-${value}`).readOnly = true;
           document.getElementById(`fixed-mnl-type${value}`).readOnly = true;
           document.getElementById(`anw-mnl-type${value}`).readOnly = true;
@@ -2493,7 +2493,7 @@ function Release() {
     var script = { ice_breaker: { question: faq[0], message_bag_id: bag[0] } };
 
     var newScript = JSON.stringify(script);
-    console.log(script);
+    // console.log(script);
     var checkbag;
     var checkqus;
     if (bag[0] == '') {
@@ -2608,7 +2608,7 @@ function Release() {
         is_support: typeFM,
       },
     };
-    console.log(script);
+    // console.log(script);
 
     if (faq[0] == '') {
       setFixMnText('タイトルを入力してください。');
@@ -2788,7 +2788,7 @@ function Release() {
         });
     } else if (reply == 'keyword') {
       for (var i = 0; i < story_actived.length; i++) {
-        console.log('story_actived: ', story_actived[i]);
+        // console.log('story_actived: ', story_actived[i]);
         var id = story_actived[i];
         api
           .get(`/api/v1/message_managements/keyword_settings/${story_actived[i]}`)
@@ -2841,7 +2841,7 @@ function Release() {
             story_kw_setting
           )
           .then((res) => {
-            console.log('res ne: ', res);
+            // console.log('res ne: ', res);
             // reloadUpdate()
             reloadKeyWord();
           })

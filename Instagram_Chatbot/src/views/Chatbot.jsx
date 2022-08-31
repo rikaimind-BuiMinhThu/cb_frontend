@@ -100,7 +100,7 @@ function Chatbot() {
     var access_token = Cookies.get('page_access_token')
     if (access_token == "" || access_token == undefined || access_token == null) {
       api.get(`/api/v1/instagram_settings`).then(res => {
-        // console.log(res.data.data[0].page_access_token)
+        console.log(res.data.data[0].page_access_token)
         Cookies.set('page_access_token', res.data.data[0].page_access_token);
         Cookies.set('ig_id', res.data.data[0].ig_id);
       }).catch(error => {
@@ -6962,7 +6962,7 @@ function Chatbot() {
 
     } else if (value.length > 20) {
       document.getElementById(`newChatbotErrMsg`).style.display = 'block'
-      document.getElementById(`newChatbotErrMsg`).innerHTML = `Maximum 20 characters`
+      document.getElementById(`newChatbotErrMsg`).innerHTML = `最大20文字まで入力可能`
       document.getElementById(`btnAddGroup`).disabled = true
     } else {
       document.getElementById(`newChatbotErrMsg`).style.display = 'none'
@@ -6981,7 +6981,7 @@ function Chatbot() {
 
     } else if (value.length > 20) {
       document.getElementById(`${field}`).style.display = 'block'
-      document.getElementById(`${field}`).innerHTML = `Maximum 20 characters`
+      document.getElementById(`${field}`).innerHTML = `最大20文字まで入力可能`
       document.getElementById(`btnSaveTem`).disabled = true
     } else {
       document.getElementById(`${field}`).style.display = 'none'
@@ -7000,7 +7000,7 @@ function Chatbot() {
 
     } else if (value.length > 30) {
       document.getElementById(`newMsgBagErrMsg`).style.display = 'block'
-      document.getElementById(`newMsgBagErrMsg`).innerHTML = `Maximum 30 characters`
+      document.getElementById(`newMsgBagErrMsg`).innerHTML = `最大30文字まで入力可能`
       document.getElementById(`btnAddBag`).disabled = true
     } else {
       document.getElementById(`newMsgBagErrMsg`).style.display = 'none'
@@ -7428,9 +7428,9 @@ function Chatbot() {
                                           <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
                                             onClick={() => addMsgBagPop(data.id)}><i className="nc-icon nc-simple-add nc-3x" style={{ color: "black" }} /></Button>
                                           <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
-                                            onClick={() => copyMsgBagPop(data.id)}><i className="nc-icon nc-tag-content nc-3x" style={{ color: "black" }} /></Button>
+                                            onClick={() => copyMsgBagPop(data.id)}><i className="nc-icon nc-single-copy-04 nc-3x" style={{ color: "black" }} /></Button>
                                           <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
-                                            onClick={() => renameMsgBagPop(data.id)}><i className="nc-icon nc-single-copy-04 nc-3x" style={{ color: "black" }} /></Button>
+                                            onClick={() => renameMsgBagPop(data.id)}><i className="nc-icon nc-tag-content nc-3x" style={{ color: "black" }} /></Button>
                                           <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
                                             onClick={() => deleteMsgBagPop(data.id)}><i className="nc-icon nc-box nc-3x" style={{ color: "black" }} /></Button>
                                           <ul id={`ulMesBag${data.id}`} style={{ listStyleType: "none", width: "200%", marginLeft: "-10%" }}>
@@ -7694,7 +7694,7 @@ function Chatbot() {
               </div>
             </div>
           </div>
-          <Button id="btnSaveProMsg" style={{ pointerEvents: "none" }} onClick={() => saveProMsg()}>Save</Button>
+          <Button id="btnSaveProMsg" style={{ pointerEvents: "none" }} onClick={() => saveProMsg()}>保存</Button>
         </ModalShortTem>
         <ModalShort open={isOpenRenameMsgBag} onClose={() => setIsOpenRenameMsgBag(false)}>
           <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
