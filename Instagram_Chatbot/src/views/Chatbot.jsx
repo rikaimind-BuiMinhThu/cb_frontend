@@ -41,6 +41,7 @@ function Chatbot() {
   const [idMsgDeleteGr, setIdDeleteMsgGr] = useState()
   const [bagId, setBagId] = useState()
   var [customDiv, setCustomDiv] = useState([])
+  const [numHotTemp, setNumHotTemp] = useState(1)
   const [isAddOpenSingleChoice, setIsAddOpenSingleChoice] = useState(false)
   const [isUpdateOpenSingleChoice, setIsUpdateOpenSingleChoice] = useState(false)
   const [isAddOpenThreeChoice, setIsAddOpenThreeChoice] = useState(false)
@@ -177,22 +178,31 @@ function Chatbot() {
         idli.push(res.data.data[i].id)
         // 
       }
+      console.log("total gr: ", idli.length)
+      if (idli.length <= 1) {
+        window.location.reload()
+      } else {
+        for (var i = 0; i < idli.length; i++) {
 
-      for (var i = 0; i < idli.length; i++) {
-        document.getElementById(`ulMesBag${idli[i]}`).innerHTML = ""
-        var liMesBag = document.createElement('li')
-        liMesBag.setAttribute('id', `liMesBag${idli[i]}`)
 
-        document.getElementById(`ulMesBag${idli[i]}`).appendChild(liMesBag)
-        setIdList(idli)
-        // console.log(idli)
-        setGroupList(res.data.data)
-        // setTimeout(() => {
-        //   var i = idli.length - 1
-        //   document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
+          document.getElementById(`ulMesBag${idli[i]}`).innerHTML = ""
+          var liMesBag = document.createElement('li')
+          liMesBag.setAttribute('id', `liMesBag${idli[i]}`)
 
-        // }, 1000)
+          document.getElementById(`ulMesBag${idli[i]}`).appendChild(liMesBag)
+          setIdList(idli)
+          // console.log(idli)
+          setGroupList(res.data.data)
+
+
+          // setTimeout(() => {
+          //   var i = idli.length - 1
+          //   document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
+
+          // }, 1000)
+        }
       }
+
 
     }).catch(error => {
       console.log(error)
@@ -3184,7 +3194,7 @@ function Chatbot() {
     document.getElementById(`btn_a_tag${idIn}`).style.textDecoration = "underline"
     // document.getElementById(`btn_a_tag${idIn}`).style.fontWeight= "800"
 
-    
+
 
     // console.log("mul click")
     getMessage(idIn)
@@ -5806,51 +5816,61 @@ function Chatbot() {
     }
   }
 
+  function newTemp() {
+    let cDivs = customDiv;
+    cDivs.push(`newDiv${numHotTemp}`);
+    // console.log(cDivs)
+    setCustomDiv(cDivs);
+    setNumHotTemp(numHotTemp + 1);
+    document.getElementById('newTempAdd').disabled = true;
+    //newTempAdd
+  }
 
   function saveTemplate() {
 
-    var docRe = (document.getElementById("docResuestBotTitle").value != "" ? document.getElementById("docResuestBotTitle").value : hotTem[0].title)
-    var ecChat = (document.getElementById("ecChatbotBotTitle").value != "" ? document.getElementById("ecChatbotBotTitle").value : hotTem[1].title)
-    var regis = (document.getElementById("registrationTitle").value != "" ? document.getElementById("registrationTitle").value : hotTem[2].title)
+    // var docRe = (document.getElementById("docResuestBotTitle").value != "" ? document.getElementById("docResuestBotTitle").value : hotTem[0].title)
+    // var ecChat = (document.getElementById("ecChatbotBotTitle").value != "" ? document.getElementById("ecChatbotBotTitle").value : hotTem[1].title)
+    // var regis = (document.getElementById("registrationTitle").value != "" ? document.getElementById("registrationTitle").value : hotTem[2].title)
 
-    var docReGr = (document.getElementById("docResuestBot").value != "" ? document.getElementById("docResuestBot").value : hotTem[0].message_group_id)
-    var ecChatGr = (document.getElementById("ecChatbotBotBot").value != "" ? document.getElementById("ecChatbotBotBot").value : hotTem[1].message_group_id)
-    var regisGr = (document.getElementById("registrationBot").value != "" ? document.getElementById("registrationBot").value : hotTem[2].message_group_id)
+    // var docReGr = (document.getElementById("docResuestBot").value != "" ? document.getElementById("docResuestBot").value : hotTem[0].message_group_id)
+    // var ecChatGr = (document.getElementById("ecChatbotBotBot").value != "" ? document.getElementById("ecChatbotBotBot").value : hotTem[1].message_group_id)
+    // var regisGr = (document.getElementById("registrationBot").value != "" ? document.getElementById("registrationBot").value : hotTem[2].message_group_id)
 
 
-    var docDes = (document.getElementById("docResuestBotDes").value != "" ? document.getElementById("docResuestBotDes").value : hotTem[0].description)
-    var ecDes = (document.getElementById("ecChatbotBotDes").value != "" ? document.getElementById("ecChatbotBotDes").value : hotTem[1].description)
-    var regisDes = (document.getElementById("registrationDes").value != "" ? document.getElementById("registrationDes").value : hotTem[2].description)
+    // var docDes = (document.getElementById("docResuestBotDes").value != "" ? document.getElementById("docResuestBotDes").value : hotTem[0].description)
+    // var ecDes = (document.getElementById("ecChatbotBotDes").value != "" ? document.getElementById("ecChatbotBotDes").value : hotTem[1].description)
+    // var regisDes = (document.getElementById("registrationDes").value != "" ? document.getElementById("registrationDes").value : hotTem[2].description)
 
-    // var docTag = document.getElementById("docResuestBotTag").value.split(/[, ]+/)
-    // var ecTag = document.getElementById("ecChatbotBotTag").value.split(/[, ]+/)
-    // var regisTag = document.getElementById("registrationTag").value.split(/[, ]+/)
-    var tem =
-    {
-      hot_templates: [
-        { title: docRe, description: docDes, message_group_id: docReGr },
-        { title: ecChat, description: ecDes, message_group_id: ecChatGr },
-        { title: regis, description: regisDes, message_group_id: regisGr }
-      ]
-    }
+    // // var docTag = document.getElementById("docResuestBotTag").value.split(/[, ]+/)
+    // // var ecTag = document.getElementById("ecChatbotBotTag").value.split(/[, ]+/)
+    // // var regisTag = document.getElementById("registrationTag").value.split(/[, ]+/)
+    // var arrHotTemp = []
+    // var tem =
+    // {
+    //   hot_templates: [
+    //     { title: docRe, description: docDes, message_group_id: docReGr },
+    //     { title: ecChat, description: ecDes, message_group_id: ecChatGr },
+    //     { title: regis, description: regisDes, message_group_id: regisGr }
+    //   ]
+    // }
 
-    api.post(`/api/v1/message_managements/hot_templates`, tem).then(res => {
-      setIsOpenTemplate(false)
-      console.log(res)
-      setMsgNoti("テンプレートが保存されました！")
-      setIsOpenNoti(true)
-      setTimeout(() => {
-        setIsOpenNoti(false)
-      }, 1500)
-      refreshMsgGroup()
-      reloadTemplate()
-      // setTimeout(() => {
-      //   window.location.reload()
-      // }, 1500)
+    // api.post(`/api/v1/message_managements/hot_templates`, tem).then(res => {
+    //   setIsOpenTemplate(false)
+    //   console.log(res)
+    //   setMsgNoti("テンプレートが保存されました！")
+    //   setIsOpenNoti(true)
+    //   setTimeout(() => {
+    //     setIsOpenNoti(false)
+    //   }, 1500)
+    //   refreshMsgGroup()
+    //   reloadTemplate()
+    //   // setTimeout(() => {
+    //   //   window.location.reload()
+    //   // }, 1500)
 
-    }).catch(error => {
-      console.log(error)
-    })
+    // }).catch(error => {
+    //   console.log(error)
+    // })
 
 
 
@@ -6991,6 +7011,25 @@ function Chatbot() {
     }
   }
 
+  function checkFieldHotTemp(value, field) {
+    if (value === '') {
+      document.getElementById(`${field}`).style.display = 'block'
+      document.getElementById(`${field}`).innerHTML = `入力してください`
+      document.getElementById(`btnSaveTem`).disabled = true
+
+
+    } else if (value.length > 20) {
+      document.getElementById(`${field}`).style.display = 'block'
+      document.getElementById(`${field}`).innerHTML = `最大20文字まで入力可能`
+      document.getElementById(`btnSaveTem`).disabled = true
+    } else {
+      document.getElementById(`${field}`).style.display = 'none'
+      document.getElementById(`${field}`).innerHTML = ""
+      document.getElementById(`btnSaveTem`).disabled = false
+      return true
+    }
+  }
+
   function checkFieldAddBag(value) {
     if (value === '') {
       document.getElementById(`newMsgBagErrMsg`).style.display = 'block'
@@ -7383,6 +7422,13 @@ function Chatbot() {
     console.log("itemUpdate: ", itemUpdate)
   }
 
+  function deleteHotTemp(cdiv){
+    //newTempAdd
+    document.getElementById('newTempAdd').disabled = false;
+    var ele = document.getElementById(`expense-block-${cdiv}`);
+    ele.remove();
+  }
+
   return (
     <>
       <div className="content">
@@ -7554,8 +7600,8 @@ function Chatbot() {
         <ModalShortTem open={isOpenTemplate} onClose={() => setIsOpenTemplate(false)}>
           <div style={{ width: "500px", height: "500px", textAlign: "center" }}>
             <h5>メッセージ袋名入力</h5>
-            <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}>テンプレート1</div>
-            <label style={{ width: "100%" }}>
+            <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}></div>
+            {/* <label style={{ width: "100%" }}>
               <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
               <input defaultValue={hotTem[0] != undefined ? hotTem[0].title : ""} id="docResuestBotTitle" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "docResuestBotTitleErr")} name="chatbot_name"></input>
               &nbsp;
@@ -7572,7 +7618,7 @@ function Chatbot() {
               <div>
                 <label style={{ width: "70px" }}>詳細: &nbsp;</label>
                 <input defaultValue={hotTem[0] != undefined ? hotTem[0].description : ""} id="docResuestBotDes" style={{ width: "84.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "docResuestBotTitleErr")}></input>
-                {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="docResuestBotTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
+                
               </div>
               <label id="docResuestBotTitleErr" style={{ display: 'none', color: "red" }}></label>
             </label><br /><br />
@@ -7595,7 +7641,7 @@ function Chatbot() {
               <div>
                 <label style={{ width: "70px" }}>詳細: &nbsp;</label>
                 <input defaultValue={hotTem[1] != undefined ? hotTem[1].description : ""} id="ecChatbotBotDes" style={{ width: "84.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "ecChatbotBotTitleErr")}></input>
-                {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="ecChatbotBotTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
+          
               </div>
               <label id="ecChatbotBotTitleErr" style={{ display: 'none', color: "red" }}></label>
             </label><br /><br />
@@ -7618,15 +7664,98 @@ function Chatbot() {
               <div>
                 <label style={{ width: "70px" }}>詳細: &nbsp;</label>
                 <input defaultValue={hotTem[2] != undefined ? hotTem[2].description : ""} id="registrationDes" style={{ width: "84.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input>
-                {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="registrationTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
+                
               </div>
               <label id="registrationTitleErr" style={{ display: 'none', color: "red" }}></label>
-            </label><br />
-
-
-            <div style={{ width: "100%", textAlign: "center" }}>
-              <Button id="btnSaveTem" onClick={() => saveTemplate()}>テンプレート保存</Button>
+            </label><br /> */}
+            <div style={{height:"325px", overflowY:"scroll"}}>
+            {hotTem.map((item, i) => (
+              <div key={i}>
+                <br />
+                <label style={{ width: "100%" }}>
+                  <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
+                  <input defaultValue={item != undefined ? item.title : ""}
+                    id={`hotTempTitle_${i}`}
+                    style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }}
+                    onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErr_${i}`)} name="chatbot_name"></input>
+                  &nbsp;
+                  <select id={`hotTempGr_${i}`} style={{ width: "46%" }} defaultValue={""} className="new-faq-q-so1">
+                    <option value="" disabled hidden>{item != undefined ? item.group_name : "メッセージグループ選択 ..."}</option>
+                    {groupList?.map((group, i) => {
+                      return (
+                        <option key={i} value={group.id}>
+                          {group.group_name}
+                        </option>
+                      )
+                    })}
+                  </select>
+                  <div style={{ textAlign: "left", display: "flex" }}>
+                    <label style={{ width: "70px" }}>詳細: &nbsp;</label>
+                    <input defaultValue={item != undefined ? item.description : ""}
+                      id={`hotTempDesc_${i}`}
+                      style={{ width: "72.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }}
+                      onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErr_${i}`)}></input>
+                    <div style={{ marginLeft: "15px" }}>
+                      <i
+                        className="nc-icon nc-box nc-3x"
+                        style={{ fontSize: '22px', marginTop: '5px' }}
+                      ></i>
+                    </div>
+                    {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="registrationTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
+                  </div>
+                  <label id={`hotTempErr_${i}`} style={{ display: 'none', color: "red" }}></label>
+                </label><br />
+              </div>
+            ))}
             </div>
+            {customDiv.map((item, i) => (
+              <div key={item}>
+                <div id={`expense-block-${i}`}>
+                  <br />
+                  <label style={{ width: "100%" }}>
+                    <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
+                    <input
+                      id={`hotTempTitle_${i}`}
+                      style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }}
+                      onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErr_${i}`)} name="chatbot_name"></input>
+                    &nbsp;
+                    <select id={`hotTempGr_${i}`} style={{ width: "46%" }} defaultValue={""} className="new-faq-q-so1">
+                      <option value="" disabled hidden>メッセージグループ選択 ...</option>
+                      {groupList?.map((group, i) => {
+                        return (
+                          <option key={i} value={group.id}>
+                            {group.group_name}
+                          </option>
+                        )
+                      })}
+                    </select>
+                    <div style={{ textAlign: "left", display: "flex" }}>
+                      <label style={{ width: "70px" }}>詳細: &nbsp;</label>
+                      <input
+                        id={`hotTempDesc_${i}`}
+                        style={{ width: "72.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }}
+                        onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErr_${i}`)}></input>
+                      <div onClick={() => deleteHotTemp(i)} style={{ marginLeft: "15px" }}>
+                        <i
+                          className="nc-icon nc-box nc-3x"
+                          style={{ fontSize: '22px', marginTop: '5px' }}
+                        ></i>
+                      </div>
+                      {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="registrationTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
+                    </div>
+                    <label id={`hotTempErr_${i}`} style={{ display: 'none', color: "red" }}></label>
+                  </label><br />
+                </div>
+              </div>
+            ))}
+            <div style={{ width: "100%", textAlign: "center" }}>
+              <Button id="newTempAdd" onClick={() => { newTemp() }}>New template</Button>
+            </div>
+
+
+            {/* <div style={{ width: "100%", textAlign: "center" }}>
+              <Button id="btnSaveTem" onClick={() => saveTemplate()}>テンプレート保存</Button>
+            </div> */}
           </div>
         </ModalShortTem>
         <ModalShortTem open={isOpenTemplateDetail} onClose={() => setIsOpenTemplateDetail(false)}>

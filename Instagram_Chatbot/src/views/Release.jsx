@@ -271,11 +271,11 @@ function Release() {
       .then((res) => {
         // console.log("ice_breakers_status res: ", res)
         var ice_breakers_status = res.data.instagram_ice_breakers.data;
-        // console.log(`ice_breakers_status: `, ice_breakers_status)
+        console.log(`ice_breakers_status: `, ice_breakers_status)
         if (ice_breakers_status.length > 0) {
           trueConfigFAQ();
         } else {
-          falseConfigFAQ();
+          falseConfigFAQ(ice_breakers_status.length);
         }
       })
       .catch((error) => {
@@ -310,7 +310,7 @@ function Release() {
         if (instagram_persistent_menus.length > 0) {
           trueConfigFixedMenu();
         } else {
-          falseConfigFixedMenu();
+          falseConfigFixedMenu(instagram_persistent_menus.length);
         }
       })
       .catch((error) => {
@@ -352,7 +352,7 @@ function Release() {
         if (ice_breakers_status.length > 0) {
           trueConfigFAQ();
         } else {
-          falseConfigFAQ();
+          falseConfigFAQ(ice_breakers_status.length);
         }
       })
       .catch((error) => {
@@ -377,7 +377,7 @@ function Release() {
         if (instagram_persistent_menus.length > 0) {
           trueConfigFixedMenu();
         } else {
-          falseConfigFixedMenu();
+          falseConfigFixedMenu(instagram_persistent_menus.length);
         }
       })
       .catch((error) => {
@@ -386,7 +386,7 @@ function Release() {
   }
 
   function reloadFixedMessageStatusEmp() {
-    alert('enable roi ne');
+    // alert('enable roi ne');
     trueConfigFixedMenu();
   }
 
@@ -841,17 +841,29 @@ function Release() {
       document.getElementById('notiMsgDM').style.display = 'block';
     });
   }
-  function falseConfigFAQ() {
+  function falseConfigFAQ(len) {
     document.getElementById('notiMsgFAQ').style.display = 'none';
     setCheckedFAQ(false);
-    var nodesStory = document.getElementById('addFAQContent').getElementsByTagName('*');
-    for (var i = 0; i < nodesStory.length; i++) {
-      nodesStory[i].disabled = true;
+    if (len == 0) {
+      var nodesStory = document.getElementById('addFAQContent').getElementsByTagName('*');
+      for (var i = 0; i < nodesStory.length; i++) {
+        nodesStory[i].disabled = false;
+      }
+      var nodeBtn = document.getElementById('addFAQbtn').getElementsByTagName('*');
+      for (var i = 0; i < nodeBtn.length; i++) {
+        nodeBtn[i].disabled = false;
+      }
+    } else {
+      var nodesStory = document.getElementById('addFAQContent').getElementsByTagName('*');
+      for (var i = 0; i < nodesStory.length; i++) {
+        nodesStory[i].disabled = true;
+      }
+      var nodeBtn = document.getElementById('addFAQbtn').getElementsByTagName('*');
+      for (var i = 0; i < nodeBtn.length; i++) {
+        nodeBtn[i].disabled = true;
+      }
     }
-    var nodeBtn = document.getElementById('addFAQbtn').getElementsByTagName('*');
-    for (var i = 0; i < nodeBtn.length; i++) {
-      nodeBtn[i].disabled = true;
-    }
+
     document.getElementById('addFAQContent').addEventListener('click', () => {
       document.getElementById('notiMsgFAQ').style.display = 'block';
     });
@@ -860,17 +872,29 @@ function Release() {
     });
   }
 
-  function falseConfigFixedMenu() {
+  function falseConfigFixedMenu(len) {
     document.getElementById('notiMsgFixedMenu').style.display = 'none';
     setCheckedFixedMenu(false);
-    var nodesStory = document.getElementById('addFixedMenuContent').getElementsByTagName('*');
-    for (var i = 0; i < nodesStory.length; i++) {
-      nodesStory[i].disabled = true;
+    if (len == 0) {
+      var nodesStory = document.getElementById('addFixedMenuContent').getElementsByTagName('*');
+      for (var i = 0; i < nodesStory.length; i++) {
+        nodesStory[i].disabled = false;
+      }
+      var nodeBtn = document.getElementById('addFixMenubtn').getElementsByTagName('*');
+      for (var i = 0; i < nodeBtn.length; i++) {
+        nodeBtn[i].disabled = false;
+      }
+    } else {
+      var nodesStory = document.getElementById('addFixedMenuContent').getElementsByTagName('*');
+      for (var i = 0; i < nodesStory.length; i++) {
+        nodesStory[i].disabled = true;
+      }
+      var nodeBtn = document.getElementById('addFixMenubtn').getElementsByTagName('*');
+      for (var i = 0; i < nodeBtn.length; i++) {
+        nodeBtn[i].disabled = true;
+      }
     }
-    var nodeBtn = document.getElementById('addFixMenubtn').getElementsByTagName('*');
-    for (var i = 0; i < nodeBtn.length; i++) {
-      nodeBtn[i].disabled = true;
-    }
+
     document.getElementById('addFixedMenuContent').addEventListener('click', () => {
       document.getElementById('notiMsgFixedMenu').style.display = 'block';
     });
@@ -1035,6 +1059,15 @@ function Release() {
       .then((res) => {
         var faw_item = res.data.data;
         var bag_name = [];
+        if (faw_item.length = 0) {
+          document.getElementById('addFAQbtn').disabled = false;
+          document.getElementById('addFAQcss').disabled = false;
+
+          // var nodeBtn = document.getElementById('addFAQbtn').getElementsByTagName('*');
+          // for (var i = 0; i < nodeBtn.length; i++) {
+          //   nodeBtn[i].disabled = false;
+          // }
+        }
         for (var i = 0; i < res.data.data.length; i++) {
           api
             .get(`/api/v1/message_managements/message_bags/${res.data.data[i].message_bag_id}`)
@@ -1050,7 +1083,8 @@ function Release() {
             faw_item[i].msg_bag_name = bag_name[i];
           }
           setListFAQ(faw_item);
-          // console.log('faq data: ', faw_item);
+          console.log('faq data: ', faw_item.length);
+
         }, 2000);
       })
       .catch((error) => {
@@ -2308,7 +2342,7 @@ function Release() {
         document.getElementById(`sav-faq-${value}`).style.display = 'none';
         document.getElementById(`faq-q-${value}`).readOnly = true;
         document.getElementById(`faq-a-${value}`).readOnly = true;
-        
+
         api
           .get(`/api/v1/message_managements/ice_breakers_turn_on`)
           .then((res) => {
