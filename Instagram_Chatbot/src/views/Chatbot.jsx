@@ -231,6 +231,24 @@ function Chatbot() {
     })
   }, [])
 
+  function reloadHotTemp(){
+    api.get(`/api/v1/message_managements/hot_templates`).then(res => {
+      var imgUrl = [workingtable, chatbot, registration]
+      var tem = res.data.data
+
+      for (var i = 0; i < res.data.data.length; i++) {
+        tem[i].src = imgUrl[i]
+      }
+      setHotTem(tem)
+
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+  }
+
   function reloadTemplate() {
     api.get(`/api/v1/message_managements/hot_templates`).then(res => {
       var imgUrl = [workingtable, chatbot, registration]
@@ -7015,17 +7033,17 @@ function Chatbot() {
     if (value === '') {
       document.getElementById(`${field}`).style.display = 'block'
       document.getElementById(`${field}`).innerHTML = `入力してください`
-      document.getElementById(`btnSaveTem`).disabled = true
+      // document.getElementById(`btnSaveTem`).disabled = true
 
 
     } else if (value.length > 20) {
       document.getElementById(`${field}`).style.display = 'block'
       document.getElementById(`${field}`).innerHTML = `最大20文字まで入力可能`
-      document.getElementById(`btnSaveTem`).disabled = true
+      // document.getElementById(`btnSaveTem`).disabled = true
     } else {
       document.getElementById(`${field}`).style.display = 'none'
       document.getElementById(`${field}`).innerHTML = ""
-      document.getElementById(`btnSaveTem`).disabled = false
+      // document.getElementById(`btnSaveTem`).disabled = false
       return true
     }
   }
@@ -7422,11 +7440,108 @@ function Chatbot() {
     console.log("itemUpdate: ", itemUpdate)
   }
 
-  function deleteHotTemp(cdiv){
+  function deleteHotTemp(cdiv) {
     //newTempAdd
     document.getElementById('newTempAdd').disabled = false;
     var ele = document.getElementById(`expense-block-${cdiv}`);
     ele.remove();
+  }
+
+  function saveHotTemplate(i) {
+    var titleAdd = document.getElementById(`hotTempTitleAdd_${i}`).value
+    var groupAdd = document.getElementById(`hotTempGrAdd_${i}`).value
+    var descAdd = document.getElementById(`hotTempDescAdd_${i}`).value
+    
+    if (titleAdd == "" || groupAdd == "" || descAdd == "") {
+      document.getElementById(`hotTempErrAdd_${i}`).style.display = 'block'
+      document.getElementById(`hotTempErrAdd_${i}`).innerHTML = `入力してください`
+    }else if(titleAdd.length > 20 || descAdd.length >20){
+      
+      document.getElementById(`hotTempErrAdd_${i}`).style.display = 'block'
+      document.getElementById(`hotTempErrAdd_${i}`).innerHTML = `最大20文字まで入力可能`
+    } else {
+      document.getElementById(`hotTempErrAdd_${i}`).style.display = 'none'
+      document.getElementById(`hotTempErrAdd_${i}`).innerHTML = ``
+      var add = {
+        hot_template: { title: titleAdd, description: descAdd, message_group_id: groupAdd }
+      }
+      api.post(`/api/v1/message_managements/hot_templates`, add).then(res => {
+        console.log(res)
+        setTimeout(() => {
+          setIsOpenNoti(true)
+          setMsgNoti("Add hot template successfully")
+        }, 100)
+        setTimeout(function () {
+          setMsgNoti("")
+          setIsOpenNoti(false)
+        }, 2000);
+        reloadHotTemp()
+        deleteHotTemp(i)
+      }).catch(error => {
+        console.log(error)
+        // if (error.response.data.code === 3) {
+        //     requestNewToken(path)
+        // }
+      })
+    }
+  }
+
+  function deleteHotTempInList(id){
+    console.log(id)
+    api.delete(`/api/v1/message_managements/hot_templates/${id}`).then(res => {
+      console.log(res)
+      setTimeout(() => {
+        setIsOpenNoti(true)
+        setMsgNoti("Delete hot template successfully")
+      }, 100)
+      setTimeout(function () {
+        setMsgNoti("")
+        setIsOpenNoti(false)
+      }, 2000);
+      reloadHotTemp()
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //     requestNewToken(path)
+      // }
+    })
+  }
+
+  function updateItemInlist(id, i){
+    var titleAdd = document.getElementById(`hotTempTitle_${i}`).value
+    var groupAdd = document.getElementById(`hotTempGr_${i}`).value
+    var descAdd = document.getElementById(`hotTempDesc_${i}`).value
+
+    if (titleAdd == "" || groupAdd == "" || descAdd == "") {
+      document.getElementById(`hotTempErr_${i}`).style.display = 'block'
+      document.getElementById(`hotTempErr_${i}`).innerHTML = `入力してください`
+    }else if(titleAdd.length > 20 || descAdd.length >20){
+      
+      document.getElementById(`hotTempErr_${i}`).style.display = 'block'
+      document.getElementById(`hotTempErr_${i}`).innerHTML = `最大20文字まで入力可能`
+    } else {
+      var add = {
+        hot_template: { title: titleAdd, description: descAdd, message_group_id: groupAdd }
+      }
+      // console.log(add)
+      api.patch(`/api/v1/message_managements/hot_templates/${id}`, add).then(res => {
+        console.log(res)
+        setTimeout(() => {
+          setIsOpenNoti(true)
+          setMsgNoti("Update hot template successfully")
+        }, 100)
+        setTimeout(function () {
+          setMsgNoti("")
+          setIsOpenNoti(false)
+        }, 2000);
+        reloadHotTemp()
+      }).catch(error => {
+        console.log(error)
+        // if (error.response.data.code === 3) {
+        //     requestNewToken(path)
+        // }
+      })
+    }
   }
 
   return (
@@ -7668,45 +7783,55 @@ function Chatbot() {
               </div>
               <label id="registrationTitleErr" style={{ display: 'none', color: "red" }}></label>
             </label><br /> */}
-            <div style={{height:"325px", overflowY:"scroll"}}>
-            {hotTem.map((item, i) => (
-              <div key={i}>
-                <br />
-                <label style={{ width: "100%" }}>
-                  <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
-                  <input defaultValue={item != undefined ? item.title : ""}
-                    id={`hotTempTitle_${i}`}
-                    style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }}
-                    onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErr_${i}`)} name="chatbot_name"></input>
-                  &nbsp;
-                  <select id={`hotTempGr_${i}`} style={{ width: "46%" }} defaultValue={""} className="new-faq-q-so1">
-                    <option value="" disabled hidden>{item != undefined ? item.group_name : "メッセージグループ選択 ..."}</option>
-                    {groupList?.map((group, i) => {
-                      return (
-                        <option key={i} value={group.id}>
-                          {group.group_name}
-                        </option>
-                      )
-                    })}
-                  </select>
-                  <div style={{ textAlign: "left", display: "flex" }}>
-                    <label style={{ width: "70px" }}>詳細: &nbsp;</label>
-                    <input defaultValue={item != undefined ? item.description : ""}
-                      id={`hotTempDesc_${i}`}
-                      style={{ width: "72.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }}
-                      onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErr_${i}`)}></input>
-                    <div style={{ marginLeft: "15px" }}>
-                      <i
-                        className="nc-icon nc-box nc-3x"
-                        style={{ fontSize: '22px', marginTop: '5px' }}
-                      ></i>
+            <div style={{ height: "325px", overflowY: "scroll" }}>
+              {hotTem.map((item, i) => (
+                <div key={item.id}>
+                  <br />
+                  <label style={{ width: "100%" }}>
+                    <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
+                    <input defaultValue={item != undefined ? item.title : ""}
+                      id={`hotTempTitle_${i}`}
+                      style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }}
+                      onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErr_${i}`)} name="chatbot_name"></input>
+                    &nbsp;
+                    <select id={`hotTempGr_${i}`} style={{ width: "46%" }} defaultValue={item.message_group_id} className="new-faq-q-so1">
+                      {/* <option value="" disabled hidden>{item != undefined ? item.group_name : "メッセージグループ選択 ..."}</option> */}
+                      {groupList?.map((group, i) => {
+                        return (
+                          <option key={i} value={group.id}>
+                            {group.group_name}
+                          </option>
+                        )
+                      })}
+                    </select>
+                    <div style={{ textAlign: "left", display: "flex" }}>
+                      <label style={{ width: "70px", textAlign: "right", marginRight: "3px" }}>詳細: &nbsp;</label>
+                      <input defaultValue={item != undefined ? item.description : ""}
+                        id={`hotTempDesc_${i}`}
+                        style={{ width: "68.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }}
+                        onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErr_${i}`)}></input>
+                        <div onClick={() =>{updateItemInlist(item.id, i)}} style={{ marginLeft: "10px", marginRight: "10px" }}>
+                        <i
+                          className="nc-icon nc-cloud-download-93 nc-3x"
+                          style={{
+                            fontSize: '22px',
+                            marginTop: '5px',
+                            // marginRight: '30px',
+                          }}
+                        ></i>
+                      </div>
+                      <div onClick={()=> deleteHotTempInList(item.id)}>
+                        <i
+                          className="nc-icon nc-box nc-3x"
+                          style={{ fontSize: '22px', marginTop: '5px' }}
+                        ></i>
+                      </div>
+                      {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="registrationTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
                     </div>
-                    {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="registrationTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
-                  </div>
-                  <label id={`hotTempErr_${i}`} style={{ display: 'none', color: "red" }}></label>
-                </label><br />
-              </div>
-            ))}
+                    <label id={`hotTempErr_${i}`} style={{ display: 'none', color: "red" }}></label>
+                  </label><br />
+                </div>
+              ))}
             </div>
             {customDiv.map((item, i) => (
               <div key={item}>
@@ -7715,11 +7840,11 @@ function Chatbot() {
                   <label style={{ width: "100%" }}>
                     <label style={{ width: "70px" }}>タイトル: &nbsp;</label>
                     <input
-                      id={`hotTempTitle_${i}`}
+                      id={`hotTempTitleAdd_${i}`}
                       style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }}
-                      onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErr_${i}`)} name="chatbot_name"></input>
+                      onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErrAdd_${i}`)} name="chatbot_name"></input>
                     &nbsp;
-                    <select id={`hotTempGr_${i}`} style={{ width: "46%" }} defaultValue={""} className="new-faq-q-so1">
+                    <select id={`hotTempGrAdd_${i}`} style={{ width: "46%" }} defaultValue={""} className="new-faq-q-so1">
                       <option value="" disabled hidden>メッセージグループ選択 ...</option>
                       {groupList?.map((group, i) => {
                         return (
@@ -7730,12 +7855,22 @@ function Chatbot() {
                       })}
                     </select>
                     <div style={{ textAlign: "left", display: "flex" }}>
-                      <label style={{ width: "70px" }}>詳細: &nbsp;</label>
+                      <label style={{ width: "70px", textAlign: "right", marginRight: "3px" }}>詳細: &nbsp;</label>
                       <input
-                        id={`hotTempDesc_${i}`}
-                        style={{ width: "72.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }}
-                        onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErr_${i}`)}></input>
-                      <div onClick={() => deleteHotTemp(i)} style={{ marginLeft: "15px" }}>
+                        id={`hotTempDescAdd_${i}`}
+                        style={{ width: "68.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }}
+                        onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErrAdd_${i}`)}></input>
+                      <div onClick={() => saveHotTemplate(i)} style={{ marginLeft: "10px", marginRight: "10px" }}>
+                        <i
+                          className="nc-icon nc-cloud-download-93 nc-3x"
+                          style={{
+                            fontSize: '22px',
+                            marginTop: '5px',
+                            // marginRight: '30px',
+                          }}
+                        ></i>
+                      </div>
+                      <div onClick={() => deleteHotTemp(i)} >
                         <i
                           className="nc-icon nc-box nc-3x"
                           style={{ fontSize: '22px', marginTop: '5px' }}
@@ -7743,7 +7878,7 @@ function Chatbot() {
                       </div>
                       {/* <label style={{ width: "70px" }}>タグ:  &nbsp;</label> <input id="registrationTag" style={{ width: "35%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }} onChange={(e) => checkFieldDocRB(e.target.value, "registrationTitleErr")}></input> */}
                     </div>
-                    <label id={`hotTempErr_${i}`} style={{ display: 'none', color: "red" }}></label>
+                    <label id={`hotTempErrAdd_${i}`} style={{ display: 'none', color: "red" }}></label>
                   </label><br />
                 </div>
               </div>
