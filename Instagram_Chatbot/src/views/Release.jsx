@@ -1078,14 +1078,18 @@ function Release() {
               console.log(error);
             });
         }
-        setTimeout(() => {
-          for (var i = 0; i < res.data.data.length; i++) {
-            faw_item[i].msg_bag_name = bag_name[i];
-          }
-          setListFAQ(faw_item);
-          console.log('faq data: ', faw_item.length);
-
-        }, 2000);
+         // setTimeout(() => {
+        //   for (var i = 0; i < res.data.data.length; i++) {
+        //     faw_item[i].msg_bag_name = bag_name[i];
+        //   }
+        //   setListFAQ(faw_item);
+        //   // console.log('faq data: ', faw_item);
+        // }, 2000);
+        for (let i = 0; i < res.data.data.length; i++) {
+          faw_item[i].msg_bag_name = bag_name[i];
+        }
+        setListFAQ(faw_item);
+        // console.log('faw_item: ', faw_item);
       })
       .catch((error) => {
         console.log(error);
