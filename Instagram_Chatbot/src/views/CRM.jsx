@@ -490,7 +490,7 @@ function CRM() {
                       paddingTop: '-10px',
                       borderRadius: '3px',
                     }}
-                    placeholder="Enter instagram user..."
+                    placeholder="インスタグラムユーザー..."
                   ></input>
                   <input
                     id="searchUser"
@@ -504,7 +504,7 @@ function CRM() {
                       marginLeft: '10px',
                       marginRight: '10px',
                     }}
-                    placeholder="Enter client name..."
+                    placeholder="クライアント名..."
                   ></input>
                   <Switch
                     onChange={activeSearchChange}
@@ -530,7 +530,7 @@ function CRM() {
                   <thead className="text-primary">
                     <tr>
                       <th>ユーザー名</th>
-                      <th>Client name</th>
+                      <th>クライアント名</th>
                       <th>名前</th>
                       <th>フォローしている</th>
                       <th>フォローされている</th>

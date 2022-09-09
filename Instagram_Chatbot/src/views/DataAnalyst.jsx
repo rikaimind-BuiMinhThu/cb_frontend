@@ -1100,7 +1100,7 @@ function DataAnalyst() {
                     textAlign: 'center',
                   }}
                 >
-                  <h3>Live Data</h3>
+                  <h3>ライブデータ</h3>
                 </div>
                 {userRole && (
                   <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -1114,7 +1114,7 @@ function DataAnalyst() {
                         paddingTop: '-10px',
                         borderRadius: '3px',
                       }}
-                      placeholder="Enter client name..."
+                      placeholder="クライアント名入力..."
                     ></input>
                     <Button
                       onClick={() => liveSearch()}
@@ -1147,7 +1147,7 @@ function DataAnalyst() {
                               </td>
                               {userRole && (
                                 <td>
-                                  <h6>Client name</h6>
+                                  <h6>クライアント名</h6>
                                 </td>
                               )}
                               <td>
@@ -1217,7 +1217,7 @@ function DataAnalyst() {
                         paddingTop: '-10px',
                         borderRadius: '3px',
                       }}
-                      placeholder="Enter client name..."
+                      placeholder="クライアント名入力..."
                     ></input>
                     <Button
                       onClick={() => msgSearch()}
@@ -1252,7 +1252,7 @@ function DataAnalyst() {
                         </td>
                         {userRole && (
                           <td>
-                            <h6>Client name</h6>
+                            <h6>クライアント名</h6>
                           </td>
                         )}
                         <td>

@@ -274,6 +274,51 @@ function Release() {
   React.useEffect(() => {
     var path = window.location.pathname;
     api
+      .get(`/api/v1/message_managements/ice_breakers`)
+      .then((res) => {
+        var faw_item = res.data.data;
+        var bag_name = [];
+        if (faw_item.length == 0) {
+          document.getElementById('addFAQbtn').disabled = false;
+          document.getElementById('addFAQcss').disabled = false;
+
+          // var nodeBtn = document.getElementById('addFAQbtn').getElementsByTagName('*');
+          // for (var i = 0; i < nodeBtn.length; i++) {
+          //   nodeBtn[i].disabled = false;
+          // }
+        }
+        console.log("list item faw: ", res.data)
+        for (var i = 0; i < res.data.data.length; i++) {
+          api
+            .get(`/api/v1/message_managements/message_bags/${res.data.data[i].message_bag_id}`)
+            .then((ress) => {
+              bag_name.push(ress.data.data.message_bag.bag_name);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+        // setTimeout(() => {
+        //   for (var i = 0; i < res.data.data.length; i++) {
+        //     faw_item[i].msg_bag_name = bag_name[i];
+        //   }
+        //   setListFAQ(faw_item);
+        //   // console.log('faq data: ', faw_item);
+        // }, 2000);
+        for (let i = 0; i < res.data.data.length; i++) {
+          faw_item[i].msg_bag_name = bag_name[i];
+        }
+        setListFAQ(faw_item);
+        console.log('faw_item: ', faw_item);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
+  React.useEffect(() => {
+    var path = window.location.pathname;
+    api
       .get(`/api/v1/message_managements/ice_breakers_status?ig_id=${Cookies.get('ig_id')}`)
       .then((res) => {
         // console.log("ice_breakers_status res: ", res)
@@ -1059,49 +1104,7 @@ function Release() {
       });
   }
 
-  React.useEffect(() => {
-    var path = window.location.pathname;
-    api
-      .get(`/api/v1/message_managements/ice_breakers`)
-      .then((res) => {
-        var faw_item = res.data.data;
-        var bag_name = [];
-        if (faw_item.length = 0) {
-          document.getElementById('addFAQbtn').disabled = false;
-          document.getElementById('addFAQcss').disabled = false;
-
-          // var nodeBtn = document.getElementById('addFAQbtn').getElementsByTagName('*');
-          // for (var i = 0; i < nodeBtn.length; i++) {
-          //   nodeBtn[i].disabled = false;
-          // }
-        }
-        for (var i = 0; i < res.data.data.length; i++) {
-          api
-            .get(`/api/v1/message_managements/message_bags/${res.data.data[i].message_bag_id}`)
-            .then((ress) => {
-              bag_name.push(ress.data.data.message_bag.bag_name);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        }
-        // setTimeout(() => {
-        //   for (var i = 0; i < res.data.data.length; i++) {
-        //     faw_item[i].msg_bag_name = bag_name[i];
-        //   }
-        //   setListFAQ(faw_item);
-        //   // console.log('faq data: ', faw_item);
-        // }, 2000);
-        for (let i = 0; i < res.data.data.length; i++) {
-          faw_item[i].msg_bag_name = bag_name[i];
-        }
-        setListFAQ(faw_item);
-        // console.log('faw_item: ', faw_item);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
+  
   function getFAQAL() {
     var path = window.location.pathname;
     api

@@ -7488,7 +7488,7 @@ function Chatbot() {
         console.log(res)
         setTimeout(() => {
           setIsOpenNoti(true)
-          setMsgNoti("Add hot template successfully")
+          setMsgNoti("テンプレートを追加しました。")
         }, 100)
         setTimeout(function () {
           setMsgNoti("")
@@ -7511,7 +7511,7 @@ function Chatbot() {
       console.log(res)
       setTimeout(() => {
         setIsOpenNoti(true)
-        setMsgNoti("Delete hot template successfully")
+        setMsgNoti("テンプレートを削除しました。")
       }, 100)
       setTimeout(function () {
         setMsgNoti("")
@@ -7547,7 +7547,7 @@ function Chatbot() {
         console.log(res)
         setTimeout(() => {
           setIsOpenNoti(true)
-          setMsgNoti("Update hot template successfully")
+          setMsgNoti("テンプレートを更新しました。")
         }, 100)
         setTimeout(function () {
           setMsgNoti("")
@@ -7732,7 +7732,7 @@ function Chatbot() {
           </div>
         </ModalShort>
         <ModalShortTem open={isOpenTemplate} onClose={() => setIsOpenTemplate(false)}>
-          <div style={{ width: "500px", height: "500px", textAlign: "center" }}>
+          <div style={{ width: "500px", height: "530px", textAlign: "center" }}>
             <h5>メッセージ袋名入力</h5>
             <div style={{ fontSize: "15px", fontWeight: "600", width: "100%", textAlign: "left" }}></div>
             {/* <label style={{ width: "100%" }}>
@@ -7903,7 +7903,7 @@ function Chatbot() {
               </div>
             ))}
             <div style={{ width: "100%", textAlign: "center" }}>
-              <Button id="newTempAdd" onClick={() => { newTemp() }}>New template</Button>
+              <Button id="newTempAdd" onClick={() => { newTemp() }}>テンプレート追加</Button>
             </div>
 
 
@@ -7914,7 +7914,7 @@ function Chatbot() {
         </ModalShortTem>
         <ModalShortTem open={isOpenTemplateDetail} onClose={() => setIsOpenTemplateDetail(false)}>
           <div style={{ width: "500px", height: "400px", overflowY: "scroll" }}>
-            <h4>Select a template</h4>
+            <h4>テンプレート選択</h4>
             {hotTemSelect.map((item) => (
               <div key={item.id} style={{ width: "100%", textAlign: "center" }}>
                 {/* <div style={{ width: "40%" }}> */}

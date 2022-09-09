@@ -1294,7 +1294,7 @@ function ClientManagement() {
                             fontSize: '1.2em',
                           }}
                         >
-                          Filter by conversion rate from
+                          コンバージョン率
                         </h4>
                         <div style={{ borderRadius: '5px', padding: '5px' }}>
                           <DatePicker
@@ -1315,7 +1315,7 @@ function ClientManagement() {
                             fontSize: '1.2em',
                           }}
                         >
-                          to
+                          から
                         </h4>
                         <div style={{ borderRadius: '5px', padding: '5px' }}>
                           <DatePicker
@@ -1329,6 +1329,7 @@ function ClientManagement() {
                             }
                           />
                         </div>
+                        まで
                       </div>
                       <span id="dateCheckErrMsg" style={{ color: 'red', display: 'none' }}></span>
                     </div>

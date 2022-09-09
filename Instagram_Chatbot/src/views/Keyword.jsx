@@ -570,7 +570,7 @@ function Keyword() {
         .then((res) => {
           // console.log(res);
           setIsOpenNoti(true);
-          setMsgNoti('キーワードを更新しました。');
+          setMsgNoti('デフォルト返事を保存しました。');
           setTimeout(() => {
             setMsgNoti('');
             setIsOpenNoti(false);
@@ -581,7 +581,7 @@ function Keyword() {
         });
     } else {
       const defaultReplyBagError = document.getElementById('bag-reply-err');
-      defaultReplyBagError.innerHTML = 'Reply bag must have value';
+      defaultReplyBagError.innerHTML = 'メッセージ袋を選択してください。';
       defaultReplyBagError.style.display = 'block';
     }
   };
@@ -630,7 +630,7 @@ function Keyword() {
                   >
                     <div
                       style={{
-                        width: '50%',
+                        width: '60%',
                       }}
                     >
                       <div
@@ -641,10 +641,11 @@ function Keyword() {
                           justifyContent: 'space-between',
                         }}
                       >
-                        <h4 style={{ margin: '0', fontWeight: '400' }}>Label</h4>
+                        <span style={{ margin: '0', width:"150px" }}>デフォルト返事</span>
                         <select
                           name="msg-reply"
                           id="msg-reply"
+                          style={{padding:"8px 0px 8px 0px"}}
                           // defaultValue={
                           //   instagramSettingData?.default_reply_group_id
                           //     ? instagramSettingData?.default_reply_group_id
@@ -660,7 +661,7 @@ function Keyword() {
                             </option>
                           ))}
                           <option value="" disabled hidden>
-                            Please select message group
+                            メッセージグループを選択してください。
                           </option>
                         </select>
                         <select
@@ -671,12 +672,13 @@ function Keyword() {
                           //     ? instagramSettingData?.default_reply_bag_id
                           //     : ''
                           // }
+                          style={{padding:"8px 0px 8px 0px"}}
                           value={defaultReplyBagId ? defaultReplyBagId : ''}
                           className="new-faq-q-so"
                           onChange={handleSelectBagReply}
                         >
                           <option value="" disabled hidden>
-                            Please select message bag
+                            メッセージ袋を選択してください
                           </option>
                           {defaultReplyBag?.map((replyBag) => (
                             <option key={replyBag.id} value={replyBag.id}>
