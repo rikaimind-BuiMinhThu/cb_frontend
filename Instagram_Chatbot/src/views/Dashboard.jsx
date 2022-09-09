@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
 import { Line, Pie } from 'react-chartjs-2';
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  CardTitle,
-  Row,
-  Col,
-} from 'reactstrap';
+import { Card, CardHeader, CardBody, CardFooter, CardTitle, Row, Col } from 'reactstrap';
 import Cookies from 'js-cookie';
 import {
   dashboard24HoursPerformanceChart,
@@ -63,20 +55,16 @@ function Dashboard() {
     let month = dateEnd.toISOString().slice(5, 7) - 1;
     dateEnd = dateEnd.toISOString().slice(0, 10);
     api
-      .get(
-        `/api/v1/analytics/chatbot_usages/user?begin_date=${dateStart}&end_date=${dateEnd}`
-      )
+      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${dateStart}&end_date=${dateEnd}`)
       .then((res) => {
-        console.log('user EC: ', res.data.counts);
+        // console.log('user EC: ', res.data.counts);
         var useEC = res.data.counts;
         var dateEC = [];
         var user_count = [];
         for (var i = 0; i < useEC.length; i++) {
           // useEC[i].log_date.slice(0,5)
           // dateEC.push(useEC[i].log_date.slice(0, 5));
-          dateEC.push(
-            `${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`
-          );
+          dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
           user_count.push(useEC[i].user_count);
         }
         setDateECU(dateEC);
@@ -87,11 +75,9 @@ function Dashboard() {
       });
     ////////////////////////////////////////////////
     api
-      .get(
-        `/api/v1/analytics/chatbot_usages/message?begin_date=${dateStart}&end_date=${dateEnd}`
-      )
+      .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${dateStart}&end_date=${dateEnd}`)
       .then((res) => {
-        console.log('message EC: ', res.data.counts);
+        // console.log('message EC: ', res.data.counts);
         var messageECA = res.data.counts;
         var message_count = [];
         for (var i = 0; i < messageECA.length; i++) {
@@ -104,9 +90,7 @@ function Dashboard() {
       });
     ///////////////////////////////////////////////
     api
-      .get(
-        `/api/v1/analytics/users?begin_date=${dateStart}&end_date=${dateEnd}`
-      )
+      .get(`/api/v1/analytics/users?begin_date=${dateStart}&end_date=${dateEnd}`)
       .then((res) => {
         var useEC = res.data.user_counts;
         var user_count_all = 0;
@@ -273,7 +257,7 @@ function Dashboard() {
                     <Col md="8" xs="7">
                       <div className="numbers">
                         <CardTitle tag="p" style={{ fontSize: '23px' }}>
-                        キーワード設定
+                          キーワード設定
                         </CardTitle>
                         <p />
                       </div>
