@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardBody, Row, Col, Table } from 'reactstrap';
+import { Card, CardHeader, CardBody, Row, Col, Table, Button } from 'reactstrap';
 // import { Chart as ChartJS, registerables } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import CanvasJSReact from '../components/canvasjs-3.6.6/canvasjs.react';
@@ -14,6 +14,7 @@ import Cookies from 'js-cookie';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import requestNewToken from 'api/request-new-token';
+import * as utils from './../JS/client.js';
 // const categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
 
 function DataAnalyst() {
@@ -29,6 +30,14 @@ function DataAnalyst() {
   const [userChatwithCBAll, setUserChatwithCBAll] = useState();
   const [userTotal, setUserTotal] = useState();
   const [listGroup, setListGroup] = useState([]);
+  const [userRole, setUserRole] = useState(false);
+
+  React.useEffect(() => {
+    var cook = Cookies.get('user_role');
+    if (cook === 'admin_deel') {
+      setUserRole(true);
+    }
+  }, []);
 
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'));
@@ -346,17 +355,27 @@ function DataAnalyst() {
   // get list message groups
   const [msgExDataAll, setMsgExDataAll] = useState([]);
   React.useEffect(() => {
-    var path = window.location.pathname;
+    // var path = window.location.pathname;
+    let dateStart = new Date();
+    dateStart = new Date(dateStart.setMonth(dateStart.getMonth() - 1));
+    dateStart = new Date(dateStart.setDate(15));
+    dateStart = dateStart.toISOString().slice(0, 10);
+    let dateEnd = new Date();
+    dateEnd = dateEnd.toISOString().slice(0, 10);
     api
-      .get(`/api/v1/message_managements/message_groups`)
+      .get(
+        `/api/v1/message_managements/message_groups/data_analyst?begin_date=${dateStart}&end_date=${dateEnd}`
+      )
+      // .get(`/api/v1/message_managements/message_groups`)
       .then((res) => {
+        // console.log(res.data.data);
         setListGroup(res.data.data);
         var msgDataAll = [];
         for (var i = 0; i < res.data.data.length; i++) {
           api
             .get(`/api/v1/message_managements/message_groups/${res.data.data[i].id}/export_csv`)
-            .then((ress) => {
-              msgDataAll.push(ress.data.data.instagram_users);
+            .then((res) => {
+              msgDataAll.push(res.data.data.instagram_users);
             })
             .catch((error) => {
               console.log(error);
@@ -372,22 +391,25 @@ function DataAnalyst() {
 
   const [liveData, setLiveData] = useState([]);
   React.useEffect(() => {
-    let dateStart = new Date();
-    dateStart = dateStart.setMonth(dateStart.getMonth() - 1);
-    dateStart = new Date(dateStart);
-    var month = dateStart.toISOString().slice(5, 7) - 6;
+    // let dateStart = new Date();
+    // dateStart = dateStart.setMonth(dateStart.getMonth() - 1);
+    // dateStart = new Date(dateStart);
+    // var month = dateStart.toISOString().slice(5, 7) - 6;
+    // if (month < 10) {
+    //   month = `0${month}`;
+    // } else if (month <= 0) {
+    //   month = '01';
+    // }
+
     let dateLiveStart = new Date();
-    // dateLiveStart = dateLiveStart.setDate(1);
-    dateLiveStart = dateLiveStart.setMonth(dateStart.getMonth() - 6);
+    dateLiveStart = dateLiveStart.setMonth(dateLiveStart.getMonth() - 1);
+    dateLiveStart = new Date(dateLiveStart);
+    dateLiveStart = dateLiveStart.setDate(15);
     dateLiveStart = new Date(dateLiveStart);
     let dateLiveEnd = new Date();
     dateLiveEnd = dateLiveEnd.setDate(dateLiveEnd.getDate() + 1);
     dateLiveEnd = new Date(dateLiveEnd);
-    if (month < 10) {
-      month = `0${month}`;
-    } else if (month <= 0) {
-      month = '01';
-    }
+
     // alert()
     api
       .get(
@@ -569,55 +591,130 @@ function DataAnalyst() {
     setEndDate(end);
     var startD = startDate.toISOString().slice(0, 10);
     var endD = end.toISOString().slice(0, 10);
-    api
-      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        // console.log(res.data.counts);
-        var useEC = res.data.counts;
-        var dateEC = [];
-        var user_count = [];
-        for (var i = 0; i < useEC.length; i++) {
-          // useEC[i].log_date.slice(0,5)
+    let endTemp = new Date(endD);
+    let endDateLive = new Date(endTemp.setDate(endTemp.getDate() + 1));
+    endDateLive = endDateLive.toISOString().slice(0, 10);
+    if (utils.checkDateEnd(startD, endD) === true) {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[1].style.borderColor = '#51cbce';
+      api
+        .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          // console.log(res.data.counts);
+          var useEC = res.data.counts;
+          var dateEC = [];
+          var user_count = [];
+          for (var i = 0; i < useEC.length; i++) {
+            // useEC[i].log_date.slice(0,5)
 
-          // dateEC.push(useEC[i].log_date.slice(0, 5));
-          dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
-          user_count.push(useEC[i].user_count);
-        }
-        setDateECU(dateEC);
-        setUserECC(user_count);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    ////////////////////////////////////////////////
-    api
-      .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        // console.log('message: ', res.data.counts);
-        var messageECA = res.data.counts;
-        var message_count = [];
-        for (var i = 0; i < messageECA.length; i++) {
-          message_count.push(messageECA[i].message_count);
-        }
-        setMessageEC(message_count);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    ///////////////////////////////////////////////
-    api
-      .get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        var useEC = res.data.user_counts;
-        var user_count_all = 0;
-        for (var i = 0; i < useEC.length; i++) {
-          user_count_all = user_count_all + useEC[i].user_count;
-        }
-        setUserChatwithCB(user_count_all);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+            // dateEC.push(useEC[i].log_date.slice(0, 5));
+            dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
+            user_count.push(useEC[i].user_count);
+          }
+          setDateECU(dateEC);
+          setUserECC(user_count);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ////////////////////////////////////////////////
+      api
+        .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          // console.log('message: ', res.data.counts);
+          var messageECA = res.data.counts;
+          var message_count = [];
+          for (var i = 0; i < messageECA.length; i++) {
+            message_count.push(messageECA[i].message_count);
+          }
+          setMessageEC(message_count);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ///////////////////////////////////////////////
+      api
+        .get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          var useEC = res.data.user_counts;
+          var user_count_all = 0;
+          for (var i = 0; i < useEC.length; i++) {
+            user_count_all = user_count_all + useEC[i].user_count;
+          }
+          setUserChatwithCB(user_count_all);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ///////////////////////////////////////////////
+      api
+        .get(`/api/v1/analytics/chatbot_usages/live?begin_date=${startD}&end_date=${endDateLive}`)
+        .then((res) => {
+          setLiveData(res.data.live_usages);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ///////////////////////////////////////////////
+      if (userRole) {
+        const msgGroupSearchVal = document.getElementById('searchMsg').value;
+        api
+          .get(
+            `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&client_name=${msgGroupSearchVal}`
+          )
+          .then((res) => {
+            setListGroup(res?.data?.data);
+            let msgDataAll = [];
+            for (let i = 0; i < res.data.data.length; i++) {
+              api
+                .get(`/api/v1/message_managements/message_groups/${res.data.data[i].id}/export_csv`)
+                .then((res) => {
+                  msgDataAll.push(res.data.data.instagram_users);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }
+            // console.log('msgDataAll: ', msgDataAll);
+            setMsgExDataAll(msgDataAll);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        api
+          .get(
+            `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}`
+          )
+          .then((res) => {
+            setListGroup(res?.data?.data);
+            let msgDataAll = [];
+            for (let i = 0; i < res.data.data.length; i++) {
+              api
+                .get(`/api/v1/message_managements/message_groups/${res.data.data[i].id}/export_csv`)
+                .then((res) => {
+                  msgDataAll.push(res.data.data.instagram_users);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }
+            // console.log('msgDataAll: ', msgDataAll);
+            setMsgExDataAll(msgDataAll);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    } else {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[1].style.borderColor = 'red';
+      utils.checkDateEnd(startD, endD);
+    }
   }
 
   const headers = [
@@ -683,6 +780,7 @@ function DataAnalyst() {
 
   const headerMsgGrUser = [
     { label: 'ユーザー名', key: 'username' },
+    { label: 'アカウントURL', key: 'link_account' },
     { label: '名称', key: 'full_name' },
     { label: 'メール', key: 'email' },
     { label: '電話番号', key: 'phone_number' },
@@ -722,6 +820,7 @@ function DataAnalyst() {
         });
       }
     });
+    // console.log(value);
     setDataExMsgGr(data);
   };
 
@@ -740,6 +839,7 @@ function DataAnalyst() {
     datae.forEach((it) => {
       data.push({
         username: it.username,
+        link_account: `https://www.instagram.com/${it.username}`,
         full_name: it.full_name,
         email: it.email,
         phone_number: it.phone_number,
@@ -759,53 +859,161 @@ function DataAnalyst() {
   // select date start
   const selectDateStart = (start) => {
     setStartDate(start);
-    var startD = start.toISOString().slice(0, 10);
-    var endD = endDate.toISOString().slice(0, 10);
-    api
-      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        // console.log(res.data.counts);
-        var useEC = res.data.counts;
-        var dateEC = [];
-        var user_count = [];
-        for (var i = 0; i < useEC.length; i++) {
-          // useEC[i].log_date.slice(0,5)
+    let startD = start.toISOString().slice(0, 10);
+    let endD = endDate.toISOString().slice(0, 10);
+    let endTemp = new Date(endDate);
+    let endDateLive = new Date(endTemp.setDate(endTemp.getDate() + 1));
+    endDateLive = endDateLive.toISOString().slice(0, 10);
+    if (utils.checkDateEnd(startD, endD) === true) {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[0].style.borderColor = '#51cbce';
+      api
+        .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          // console.log(res.data.counts);
+          let useEC = res.data.counts;
+          let dateEC = [];
+          let user_count = [];
+          for (let i = 0; i < useEC.length; i++) {
+            // useEC[i].log_date.slice(0,5)
 
-          // dateEC.push(useEC[i].log_date.slice(0, 5));
-          dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
-          user_count.push(useEC[i].user_count);
-        }
-        setDateECU(dateEC);
-        setUserECC(user_count);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    ////////////////////////////////////////////////
+            // dateEC.push(useEC[i].log_date.slice(0, 5));
+            dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
+            user_count.push(useEC[i].user_count);
+          }
+          setDateECU(dateEC);
+          setUserECC(user_count);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ////////////////////////////////////////////////
+      api
+        .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          // console.log('message: ', res.data.counts);
+          let messageECA = res.data.counts;
+          let message_count = [];
+          for (let i = 0; i < messageECA.length; i++) {
+            message_count.push(messageECA[i].message_count);
+          }
+          setMessageEC(message_count);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ///////////////////////////////////////////////
+      api
+        .get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          let useEC = res.data.user_counts;
+          let user_count_all = 0;
+          for (let i = 0; i < useEC.length; i++) {
+            user_count_all = user_count_all + useEC[i].user_count;
+          }
+          setUserChatwithCB(user_count_all);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ///////////////////////////////////////////////
+      api
+        .get(`/api/v1/analytics/chatbot_usages/live?begin_date=${startD}&end_date=${endDateLive}`)
+        .then((res) => {
+          setLiveData(res.data.live_usages);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ///////////////////////////////////////////////
+      if (userRole) {
+        const msgGroupSearchVal = document.getElementById('searchMsg').value;
+        api
+          .get(
+            `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&client_name=${msgGroupSearchVal}`
+          )
+          .then((res) => {
+            setListGroup(res?.data?.data);
+            let msgDataAll = [];
+            for (let i = 0; i < res.data.data.length; i++) {
+              api
+                .get(`/api/v1/message_managements/message_groups/${res.data.data[i].id}/export_csv`)
+                .then((res) => {
+                  msgDataAll.push(res.data.data.instagram_users);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }
+            // console.log('msgDataAll: ', msgDataAll);
+            setMsgExDataAll(msgDataAll);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        api
+          .get(
+            `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}`
+          )
+          .then((res) => {
+            setListGroup(res?.data?.data);
+            let msgDataAll = [];
+            for (let i = 0; i < res.data.data.length; i++) {
+              api
+                .get(`/api/v1/message_managements/message_groups/${res.data.data[i].id}/export_csv`)
+                .then((res) => {
+                  msgDataAll.push(res.data.data.instagram_users);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }
+            // console.log('msgDataAll: ', msgDataAll);
+            setMsgExDataAll(msgDataAll);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    } else {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[0].style.borderColor = 'red';
+      utils.checkDateEnd(startD, endD);
+    }
+  };
+
+  // live search
+  const liveSearch = () => {};
+
+  // message group search
+  const msgSearch = () => {
+    let startD = startDate.toISOString().slice(0, 10);
+    let endD = endDate.toISOString().slice(0, 10);
+    const msgGroupSearchVal = document.getElementById('searchMsg').value;
     api
-      .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`)
+      .get(
+        `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&client_name=${msgGroupSearchVal}`
+      )
       .then((res) => {
-        // console.log('message: ', res.data.counts);
-        var messageECA = res.data.counts;
-        var message_count = [];
-        for (var i = 0; i < messageECA.length; i++) {
-          message_count.push(messageECA[i].message_count);
+        setListGroup(res?.data?.data);
+        let msgDataAll = [];
+        for (let i = 0; i < res.data.data.length; i++) {
+          api
+            .get(`/api/v1/message_managements/message_groups/${res.data.data[i].id}/export_csv`)
+            .then((res) => {
+              msgDataAll.push(res.data.data.instagram_users);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         }
-        setMessageEC(message_count);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    ///////////////////////////////////////////////
-    api
-      .get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        var useEC = res.data.user_counts;
-        var user_count_all = 0;
-        for (var i = 0; i < useEC.length; i++) {
-          user_count_all = user_count_all + useEC[i].user_count;
-        }
-        setUserChatwithCB(user_count_all);
+        // console.log('msgDataAll: ', msgDataAll);
+        setMsgExDataAll(msgDataAll);
       })
       .catch((error) => {
         console.log(error);
@@ -853,8 +1061,8 @@ function DataAnalyst() {
                     </div>
                   </div>
                 </div>
-                <div style={{ width: '100%' }}>
-                  <div style={{ float: 'right', display: 'flex' }}>
+                <div style={{ display: 'flex', alignItems: 'end', flexDirection: 'column' }}>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
                       <DatePicker
                         selected={startDate}
@@ -878,10 +1086,45 @@ function DataAnalyst() {
                       <option value="6m">6月間</option>
                     </select> */}
                   </div>
+                  <span id="dateCheckErrMsg" style={{ color: 'red', display: 'none' }}></span>
                 </div>
               </CardBody>
             </Card>
+
+            {/* live preview*/}
             <Card>
+              <CardHeader>
+                <div
+                  style={{
+                    width: '100%',
+                    textAlign: 'center',
+                  }}
+                >
+                  <h3>Live Data</h3>
+                </div>
+                {userRole && (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <input
+                      id="searchLive"
+                      name="searchLive"
+                      style={{
+                        height: '38px',
+                        width: '200px',
+                        border: '1px solid #dee2e6',
+                        paddingTop: '-10px',
+                        borderRadius: '3px',
+                      }}
+                      placeholder="Enter client name..."
+                    ></input>
+                    <Button
+                      onClick={() => liveSearch()}
+                      style={{ backgroundColor: '#66615b', marginRight: '15px' }}
+                    >
+                      検索
+                    </Button>
+                  </div>
+                )}
+              </CardHeader>
               <CardBody>
                 <div>
                   <div style={{ width: '100%' }}>
@@ -902,6 +1145,11 @@ function DataAnalyst() {
                               <td>
                                 <h6>ライブ日</h6>
                               </td>
+                              {userRole && (
+                                <td>
+                                  <h6>Client name</h6>
+                                </td>
+                              )}
                               <td>
                                 <h6>コメントしたユーザー数</h6>
                               </td>
@@ -921,6 +1169,7 @@ function DataAnalyst() {
                                   style={{ overflow: 'hidden', height: '14px' }}
                                 >
                                   <td>{item.media_start_at.slice(0, 10)}</td>
+                                  {userRole && <td>Name 1</td>}
                                   <td>{item.user_count}</td>
                                   <td>{item.comment_count}</td>
                                   <td>
@@ -947,7 +1196,7 @@ function DataAnalyst() {
 
             {/* message groups */}
             <Card>
-              <CardBody>
+              <CardHeader>
                 <div
                   style={{
                     width: '100%',
@@ -956,6 +1205,38 @@ function DataAnalyst() {
                 >
                   <h3>メッセージグループ</h3>
                 </div>
+                {userRole && (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <input
+                      id="searchMsg"
+                      name="searchMsg"
+                      style={{
+                        height: '38px',
+                        width: '200px',
+                        border: '1px solid #dee2e6',
+                        paddingTop: '-10px',
+                        borderRadius: '3px',
+                      }}
+                      placeholder="Enter client name..."
+                    ></input>
+                    <Button
+                      onClick={() => msgSearch()}
+                      style={{ backgroundColor: '#66615b', marginRight: '15px' }}
+                    >
+                      検索
+                    </Button>
+                  </div>
+                )}
+              </CardHeader>
+              <CardBody>
+                {/* <div
+                  style={{
+                    width: '100%',
+                    textAlign: 'center',
+                  }}
+                >
+                  <h3>メッセージグループ</h3>
+                </div> */}
                 <div style={{ width: '100%' }}>
                   <Table
                     style={{
@@ -969,6 +1250,11 @@ function DataAnalyst() {
                         <td>
                           <h6>グループ名</h6>
                         </td>
+                        {userRole && (
+                          <td>
+                            <h6>Client name</h6>
+                          </td>
+                        )}
                         <td>
                           <h6>作成/日付更新</h6>
                         </td>
@@ -990,9 +1276,8 @@ function DataAnalyst() {
                       {listGroup.map((item, i) => (
                         <tr key={item?.id} style={{ overflow: 'hidden', height: '14px' }}>
                           <td>{item?.group_name}</td>
+                          {userRole && <td>{item?.client_name}</td>}
                           <td>{item?.updated_at?.slice(0, 10)}</td>
-                          {/* <td>???</td>
-                          <td>???</td> */}
                           <td>
                             <span onClick={() => setMessageGroupDataExport(msgExDataAll[i])}>
                               <CSVLink {...csvMessageGroupReport}>

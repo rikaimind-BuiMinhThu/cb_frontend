@@ -4,6 +4,7 @@ import ReactApexChart from 'react-apexcharts';
 import api from '../api/api-management';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import * as utils from './../JS/client.js';
 
 function AttractedCustomer() {
   // states
@@ -235,23 +236,35 @@ function AttractedCustomer() {
     setEndDate(value);
     let startD = startDate.toISOString().slice(0, 10);
     let endD = value.toISOString().slice(0, 10);
-    api
-      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        let useEC = res.data.counts;
-        let dataEC = [];
-        let user_count = [];
-        for (let i = 0; i < useEC.length; i++) {
-          // dataEC.push(useEC[i].log_date.slice(0, 5));
-          dataEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
-          user_count.push(useEC[i].user_count);
-        }
-        setDataECU(dataEC);
-        setUserECC(user_count);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (utils.checkDateEnd(startD, endD) === true) {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[1].style.borderColor = '#51cbce';
+      api
+        .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          let useEC = res.data.counts;
+          let dataEC = [];
+          let user_count = [];
+          for (let i = 0; i < useEC.length; i++) {
+            // dataEC.push(useEC[i].log_date.slice(0, 5));
+            dataEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
+            user_count.push(useEC[i].user_count);
+          }
+          setDataECU(dataEC);
+          setUserECC(user_count);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[1].style.borderColor = 'red';
+      utils.checkDateEnd(startD, endD);
+    }
   };
 
   // select date start
@@ -259,23 +272,35 @@ function AttractedCustomer() {
     setStartDate(value);
     let startD = value.toISOString().slice(0, 10);
     let endD = endDate.toISOString().slice(0, 10);
-    api
-      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        let useEC = res.data.counts;
-        let dataEC = [];
-        let user_count = [];
-        for (let i = 0; i < useEC.length; i++) {
-          // dataEC.push(useEC[i].log_date.slice(0, 5));
-          dataEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
-          user_count.push(useEC[i].user_count);
-        }
-        setDataECU(dataEC);
-        setUserECC(user_count);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (utils.checkDateEnd(startD, endD) === true) {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[0].style.borderColor = '#51cbce';
+      api
+        .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          let useEC = res.data.counts;
+          let dataEC = [];
+          let user_count = [];
+          for (let i = 0; i < useEC.length; i++) {
+            // dataEC.push(useEC[i].log_date.slice(0, 5));
+            dataEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
+            user_count.push(useEC[i].user_count);
+          }
+          setDataECU(dataEC);
+          setUserECC(user_count);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[0].style.borderColor = 'red';
+      utils.checkDateEnd(startD, endD);
+    }
   };
 
   return (
@@ -288,16 +313,18 @@ function AttractedCustomer() {
               style={{
                 width: '100%',
                 display: 'flex',
-                justifyContent: 'flex-end',
+                alignItems: 'end',
+                flexDirection: 'column',
                 position: 'relative',
                 minHeight: '50px',
+                marginBottom: '10px',
               }}
             >
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  position: 'absolute',
+                  // position: 'absolute',
                   zIndex: '15',
                 }}
               >
@@ -337,6 +364,7 @@ function AttractedCustomer() {
                   <option value="6m">6月間</option>
                 </select> */}
               </div>
+              <span id="dateCheckErrMsg" style={{ color: 'red', display: 'none' }}></span>
             </div>
 
             {/* Charts view */}

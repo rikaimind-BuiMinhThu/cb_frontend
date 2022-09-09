@@ -9,6 +9,8 @@ import Switch from 'react-switch';
 import ModalNoti from './Popup/ModalNoti';
 import Cookies from 'js-cookie';
 import ModalShort from './Popup/ModalShort';
+import { useEffect } from 'react';
+
 function Keyword() {
   var [customDiv, setCustomDiv] = useState([]);
   var [numKeyword, setNumKeyword] = useState(1);
@@ -82,11 +84,18 @@ function Keyword() {
       });
   }
 
+  const [instagramSettingData, setInstagramSettingData] = useState({});
+  const [defaultReplyGroupId, setDefaultReplyGroupId] = useState(null);
+  const [defaultReplyBagId, setDefaultReplyBagId] = useState(null);
   React.useEffect(() => {
-    var path = window.location.pathname;
+    // var path = window.location.pathname;
     api
       .get(`/api/v1/instagram_settings`)
       .then((res) => {
+        // console.log(res?.data?.data[0]);
+        setInstagramSettingData(res?.data?.data[0]);
+        setDefaultReplyGroupId(res?.data?.data[0]?.default_reply_group_id);
+        setDefaultReplyBagId(res?.data?.data[0]?.default_reply_bag_id);
         setInstaSetting(res.data.data[0].id);
       })
       .catch((error) => {
@@ -527,6 +536,78 @@ function Keyword() {
       });
   };
 
+  // get default reply bag
+  const [defaultReplyBag, setDefaultReplyBag] = useState([]);
+  useEffect(() => {
+    if (instagramSettingData?.default_reply_group_id) {
+      api
+        .get(
+          `/api/v1/message_managements/message_groups/${instagramSettingData?.default_reply_group_id}`
+        )
+        .then((res) => {
+          setDefaultReplyBag(res?.data?.data?.message_bags);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [instagramSettingData]);
+
+  // save default reply
+  const saveDefaultReply = () => {
+    const post_comment_bag_id = document.getElementById('bag-reply').value;
+    if (post_comment_bag_id) {
+      const payload = {
+        instagram_setting: {
+          post_comment_bag_id: instagramSettingData?.post_comment_bag_id,
+          story_comment_bag_id: instagramSettingData?.story_comment_bag_id,
+          live_comment_bag_id: instagramSettingData?.live_comment_bag_id,
+          default_reply_bag_id: parseInt(post_comment_bag_id),
+        },
+      };
+      api
+        .patch(`/api/v1/instagram_settings/${instaSetting}`, payload)
+        .then((res) => {
+          // console.log(res);
+          setIsOpenNoti(true);
+          setMsgNoti('キーワードを更新しました。');
+          setTimeout(() => {
+            setMsgNoti('');
+            setIsOpenNoti(false);
+          }, 1500);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      const defaultReplyBagError = document.getElementById('bag-reply-err');
+      defaultReplyBagError.innerHTML = 'Reply bag must have value';
+      defaultReplyBagError.style.display = 'block';
+    }
+  };
+
+  // handle select message group reply
+  const handleSelectMsgReply = (e) => {
+    setDefaultReplyGroupId(e.target.value);
+    setDefaultReplyBagId('');
+    api
+      .get(`/api/v1/message_managements/message_groups/${e.target.value}`)
+      .then((res) => {
+        setDefaultReplyBag(res?.data?.data?.message_bags);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  // handle select bag reply
+  const handleSelectBagReply = (e) => {
+    setDefaultReplyBagId(e.target.value);
+    const defaultReplyBagError = document.getElementById('bag-reply-err');
+    defaultReplyBagError.innerHTML = '';
+    defaultReplyBagError.style.display = 'none';
+  };
+
   return (
     <>
       <div className="content">
@@ -538,6 +619,90 @@ function Keyword() {
               </CardHeader> */}
               <CardBody>
                 <div style={{ width: '100%' }}>
+                  <div
+                    className="div-add-aq"
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '50%',
+                      }}
+                    >
+                      <div
+                        style={{
+                          marginBottom: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}
+                      >
+                        <h4 style={{ margin: '0', fontWeight: '400' }}>Label</h4>
+                        <select
+                          name="msg-reply"
+                          id="msg-reply"
+                          // defaultValue={
+                          //   instagramSettingData?.default_reply_group_id
+                          //     ? instagramSettingData?.default_reply_group_id
+                          //     : ''
+                          // }
+                          value={defaultReplyGroupId ? defaultReplyGroupId : ''}
+                          className="new-faq-q-so"
+                          onChange={handleSelectMsgReply}
+                        >
+                          {listGroup?.map((group) => (
+                            <option key={group.id} value={group.id}>
+                              {group.group_name}
+                            </option>
+                          ))}
+                          <option value="" disabled hidden>
+                            Please select message group
+                          </option>
+                        </select>
+                        <select
+                          name="bag-reply"
+                          id="bag-reply"
+                          // defaultValue={
+                          //   instagramSettingData?.default_reply_bag_id
+                          //     ? instagramSettingData?.default_reply_bag_id
+                          //     : ''
+                          // }
+                          value={defaultReplyBagId ? defaultReplyBagId : ''}
+                          className="new-faq-q-so"
+                          onChange={handleSelectBagReply}
+                        >
+                          <option value="" disabled hidden>
+                            Please select message bag
+                          </option>
+                          {defaultReplyBag?.map((replyBag) => (
+                            <option key={replyBag.id} value={replyBag.id}>
+                              {replyBag.bag_name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <span
+                        id="bag-reply-err"
+                        style={{ display: 'none', color: 'red', float: 'right' }}
+                      ></span>
+                    </div>
+                    <div>
+                      <i
+                        className="nc-icon nc-cloud-download-93 nc-3x"
+                        style={{
+                          fontSize: '30px',
+                          marginTop: '5px',
+                          marginRight: '30px',
+                          cursor: 'pointer',
+                        }}
+                        onClick={saveDefaultReply}
+                      ></i>
+                    </div>
+                  </div>
                   <div style={{ width: '100%' }}>
                     <div style={{ width: '100%', display: 'flex' }}>
                       <div style={{ width: '50%' }}>
@@ -632,7 +797,6 @@ function Keyword() {
                               type="text"
                               style={{ width: '20%' }}
                             />
-
                             <input
                               name={`l-answer-${i}`}
                               defaultValue={cdiv.keyword.replaceAll('|', ', ')}
@@ -675,7 +839,11 @@ function Keyword() {
                             >
                               <i
                                 className="nc-icon nc-align-center nc-3x"
-                                style={{ fontSize: '30px', marginTop: '5px', marginRight: '30px' }}
+                                style={{
+                                  fontSize: '30px',
+                                  marginTop: '5px',
+                                  marginRight: '30px',
+                                }}
                               ></i>
                             </div>
                             <div
@@ -741,7 +909,6 @@ function Keyword() {
                                 type="text"
                                 style={{ width: '20%' }}
                               />
-
                               <input
                                 name={`answer-${i}`}
                                 className="new-faq-q-so"
@@ -784,7 +951,11 @@ function Keyword() {
                               <div>
                                 <i
                                   className="nc-icon nc-box nc-3x"
-                                  style={{ fontSize: '30px', marginTop: '5px', cursor: 'pointer' }}
+                                  style={{
+                                    fontSize: '30px',
+                                    marginTop: '5px',
+                                    cursor: 'pointer',
+                                  }}
                                 ></i>
                               </div>
                             </div>
