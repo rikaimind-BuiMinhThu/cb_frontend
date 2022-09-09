@@ -213,14 +213,15 @@ function Chatbot() {
   }
 
   const [hotTem, setHotTem] = useState([])
+  const [hotTemSelect, setHotTemSelect] = useState([])
   React.useEffect(() => {
     api.get(`/api/v1/message_managements/hot_templates`).then(res => {
       var imgUrl = [workingtable, chatbot, registration]
       var tem = res.data.data
 
-      for (var i = 0; i < res.data.data.length; i++) {
-        tem[i].src = imgUrl[i]
-      }
+      // for (var i = 0; i < res.data.data.length; i++) {
+      //   tem[i].src = imgUrl[i]
+      // }
       setHotTem(tem)
 
     }).catch(error => {
@@ -231,14 +232,32 @@ function Chatbot() {
     })
   }, [])
 
-  function reloadHotTemp(){
+  React.useEffect(() => {
+    api.get(`/api/v1/message_managements/hot_templates`).then(res => {
+      var tem = res.data.data
+      console.log("all hot temp: ", res.data.data)
+      var imgUrl = [workingtable, chatbot, registration]
+      // for (var i = 0; i < res.data.data.length; i++) {
+      //   tem[i].src = imgUrl[0]
+      // }
+      setHotTemSelect(tem)
+
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+  }, [])
+
+  function reloadHotTemp() {
     api.get(`/api/v1/message_managements/hot_templates`).then(res => {
       var imgUrl = [workingtable, chatbot, registration]
       var tem = res.data.data
 
-      for (var i = 0; i < res.data.data.length; i++) {
-        tem[i].src = imgUrl[i]
-      }
+      // for (var i = 0; i < res.data.data.length; i++) {
+      //   tem[i].src = imgUrl[i]
+      // }
       setHotTem(tem)
 
     }).catch(error => {
@@ -7451,12 +7470,12 @@ function Chatbot() {
     var titleAdd = document.getElementById(`hotTempTitleAdd_${i}`).value
     var groupAdd = document.getElementById(`hotTempGrAdd_${i}`).value
     var descAdd = document.getElementById(`hotTempDescAdd_${i}`).value
-    
+
     if (titleAdd == "" || groupAdd == "" || descAdd == "") {
       document.getElementById(`hotTempErrAdd_${i}`).style.display = 'block'
       document.getElementById(`hotTempErrAdd_${i}`).innerHTML = `入力してください`
-    }else if(titleAdd.length > 20 || descAdd.length >20){
-      
+    } else if (titleAdd.length > 20 || descAdd.length > 20) {
+
       document.getElementById(`hotTempErrAdd_${i}`).style.display = 'block'
       document.getElementById(`hotTempErrAdd_${i}`).innerHTML = `最大20文字まで入力可能`
     } else {
@@ -7486,7 +7505,7 @@ function Chatbot() {
     }
   }
 
-  function deleteHotTempInList(id){
+  function deleteHotTempInList(id) {
     console.log(id)
     api.delete(`/api/v1/message_managements/hot_templates/${id}`).then(res => {
       console.log(res)
@@ -7507,7 +7526,7 @@ function Chatbot() {
     })
   }
 
-  function updateItemInlist(id, i){
+  function updateItemInlist(id, i) {
     var titleAdd = document.getElementById(`hotTempTitle_${i}`).value
     var groupAdd = document.getElementById(`hotTempGr_${i}`).value
     var descAdd = document.getElementById(`hotTempDesc_${i}`).value
@@ -7515,8 +7534,8 @@ function Chatbot() {
     if (titleAdd == "" || groupAdd == "" || descAdd == "") {
       document.getElementById(`hotTempErr_${i}`).style.display = 'block'
       document.getElementById(`hotTempErr_${i}`).innerHTML = `入力してください`
-    }else if(titleAdd.length > 20 || descAdd.length >20){
-      
+    } else if (titleAdd.length > 20 || descAdd.length > 20) {
+
       document.getElementById(`hotTempErr_${i}`).style.display = 'block'
       document.getElementById(`hotTempErr_${i}`).innerHTML = `最大20文字まで入力可能`
     } else {
@@ -7810,7 +7829,7 @@ function Chatbot() {
                         id={`hotTempDesc_${i}`}
                         style={{ width: "68.5%", outline: "0", borderWidth: "0 0 2px", borderColor: "gray" }}
                         onChange={(e) => checkFieldHotTemp(e.target.value, `hotTempErr_${i}`)}></input>
-                        <div onClick={() =>{updateItemInlist(item.id, i)}} style={{ marginLeft: "10px", marginRight: "10px" }}>
+                      <div onClick={() => { updateItemInlist(item.id, i) }} style={{ marginLeft: "10px", marginRight: "10px" }}>
                         <i
                           className="nc-icon nc-cloud-download-93 nc-3x"
                           style={{
@@ -7820,7 +7839,7 @@ function Chatbot() {
                           }}
                         ></i>
                       </div>
-                      <div onClick={()=> deleteHotTempInList(item.id)}>
+                      <div onClick={() => deleteHotTempInList(item.id)}>
                         <i
                           className="nc-icon nc-box nc-3x"
                           style={{ fontSize: '22px', marginTop: '5px' }}
@@ -7894,19 +7913,20 @@ function Chatbot() {
           </div>
         </ModalShortTem>
         <ModalShortTem open={isOpenTemplateDetail} onClose={() => setIsOpenTemplateDetail(false)}>
-          <div style={{ width: "700px" }}>
-            {hotTem.map((item) => (
-              <div key={item.id} style={{ width: "100%", display: "flex" }}>
-                <div style={{ width: "40%" }}>
-                  <img src={item.src} style={{ width: "100%" }}></img>
-                </div>
-                <div style={{ width: "60%", paddingLeft: "20px" }}>
-                  <div style={{ marginTop: "10px" }}>
+          <div style={{ width: "500px", height: "400px", overflowY: "scroll" }}>
+            <h4>Select a template</h4>
+            {hotTemSelect.map((item) => (
+              <div key={item.id} style={{ width: "100%", textAlign: "center" }}>
+                {/* <div style={{ width: "40%" }}> */}
+                {/* <img src={item.src} style={{ width: "100%" }}></img> */}
+                {/* </div> */}
+                <div style={{ width: "70%", margin: "auto", display: "flex", textAlign: "left", paddingLeft: "20px" }}>
+                  <div style={{ marginTop: "10px", width:"70%", overflow:"hidden" }}>
                     <h5>{item.title}</h5>
                     <h6 style={{ marginTop: "-10px" }}>{item.description}</h6>
-                    <Button onClick={(e) => slectedHotTem(item.message_group_id)}>選択</Button>
-                  </div>
 
+                  </div>
+                  <div style={{ width:"30%", float: "right" }}> <Button onClick={(e) => slectedHotTem(item.message_group_id)}>選択</Button></div>
                 </div>
               </div>
             ))}

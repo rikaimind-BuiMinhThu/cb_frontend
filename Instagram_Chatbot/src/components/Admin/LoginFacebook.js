@@ -165,17 +165,18 @@ function LoginFacebook({ checkLogin }) {
               console.log(ig_id, ig_name)
               var fb_AuthResponse = window.FB.getAuthResponse();
               var data = { "fb_AuthResponse": fb_AuthResponse, "page_id": value, "ig_id": res.id }
+              console.log("data post insta connect", data)
               api.post(`/api/v1/instagram_connect`, data).then(res => {
                 if (res.data.code == 2) {
-                  alert("Code = 2")//Didn't link to insta
+                  alert("This account didn't link to instagram")//Didn't link to insta
                 } else if (res.data.code == 1) {
                   //
                   console.log(res.data)
-                }
-                var page_access_token
+                  var page_access_token
+                console.log("get page access token first come to release: ", Cookies.get("page_access_token") )
                 if (Cookies.get("page_access_token") != undefined) {
                   page_access_token = Cookies.get("page_access_token")
-                }else{
+                }else if(Cookies.get("page_access_token") == undefined){
                   page_access_token = accessToken2
                 }
 
@@ -191,6 +192,8 @@ function LoginFacebook({ checkLogin }) {
                 }).catch(error => {
                   console.log(error)
                 })
+                }
+                
               }).catch(error => {
                 console.log(error)
 
