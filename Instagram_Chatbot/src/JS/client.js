@@ -71,6 +71,19 @@ export function checkDateEndIn(endDateIn, inputStartDate) {
   }
 }
 
+export function checkDateEnd(startDateIn, endDateIn) {
+  var startDate = parseInt(startDateIn.replaceAll('-', ''));
+  var endDate = parseInt(endDateIn.replaceAll('-', ''));
+  if (startDateIn !== '' && endDateIn !== '' && startDate > endDate) {
+    document.getElementById(`dateCheckErrMsg`).style.display = 'block';
+    document.getElementById(`dateCheckErrMsg`).innerHTML = `終了日は開始日の前ではない必要です。`;
+  } else {
+    document.getElementById(`dateCheckErrMsg`).style.display = 'none';
+    document.getElementById(`dateCheckErrMsg`).innerHTML = ``;
+    return true;
+  }
+}
+
 export function checkFieldAdd(value, field) {
   if (value === '') {
     document.getElementById(`new${field}ErrMsg`).style.display = 'block';

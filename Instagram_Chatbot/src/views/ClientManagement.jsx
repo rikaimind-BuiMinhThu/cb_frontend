@@ -13,6 +13,8 @@ import { Title } from 'chart.js';
 import { Pagination } from '@material-ui/lab';
 import ModalShort from './Popup/ModalShort';
 import $ from 'jquery';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 function ClientManagement() {
   var [dataList, setDataList] = useState([]);
@@ -68,6 +70,10 @@ function ClientManagement() {
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [isOpenAddUser, setIsOpenAddUser] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [startDatePreview, setStartDatePreview] = useState(null);
+  const [endDatePreview, setEndDatePreview] = useState(null);
 
   React.useEffect(() => {
     var cook = Cookies.get('user_role');
@@ -127,43 +133,107 @@ function ClientManagement() {
       });
   }, []);
 
+  React.useEffect(() => {
+    const datePickerInputs = document.querySelectorAll(
+      '.react-datepicker__input-container > input'
+    );
+    datePickerInputs[0].style.padding = '2px 6px';
+    datePickerInputs[0].style.borderColor = '#51cbce';
+    datePickerInputs[0].style.borderRadius = '5px';
+    datePickerInputs[1].style.padding = '2px 6px';
+    datePickerInputs[1].style.borderColor = '#51cbce';
+    datePickerInputs[1].style.borderRadius = '5px';
+  }, []);
+
   function search() {
-    var searchVal = document.getElementById('searchUser').value;
+    let searchVal = document.getElementById('searchUser').value;
     setNamesearch(searchVal);
-    var path = window.location.pathname;
-    api
-      .get(`/api/v1/managements/clients?name=${searchVal}&page=${1}&client_id=`)
-      .then((res) => {
-        var totalPage = Math.ceil(res.data.data.total / 25);
-        if (pageIndex > totalPage) {
-          api
-            .get(`/api/v1/managements/clients?name=${searchVal}&page=${1}&client_id=`)
-            .then((resp) => {
-              setDataList(resp.data.data);
-            });
-        } else {
-          setDataList(res.data.data);
-        }
-        setPage(1);
-        setTotalPage(totalPage);
-      })
-      .catch((error) => {
-        console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
-      });
+    // let path = window.location.pathname;
+    if (startDatePreview && endDatePreview) {
+      if (
+        utils.checkDateEnd(
+          startDatePreview.toISOString().slice(0, 10),
+          endDatePreview.toISOString().slice(0, 10)
+        ) === true
+      ) {
+        api
+          .get(
+            `/api/v1/managements/clients?name=${searchVal}&page=${1}&client_id=&conversion_begin_date=${startDatePreview
+              .toISOString()
+              .slice(0, 10)}&conversion_end_date=${endDatePreview.toISOString().slice(0, 10)}`
+          )
+          .then((res) => {
+            let totalPage = Math.ceil(res?.data?.data?.total / 25);
+            setDataList(res?.data?.data);
+            setPage(1);
+            setTotalPage(totalPage);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        utils.checkDateEnd(
+          startDatePreview.toISOString().slice(0, 10),
+          endDatePreview.toISOString().slice(0, 10)
+        );
+      }
+    } else if (startDatePreview && !endDatePreview) {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[1].style.borderColor = 'red';
+    } else if (!startDatePreview && endDatePreview) {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[0].style.borderColor = 'red';
+    } else {
+      api
+        .get(`/api/v1/managements/clients?name=${searchVal}&page=${1}&client_id=`)
+        .then((res) => {
+          let totalPage = Math.ceil(res?.data?.data?.total / 25);
+          //// 9/8/2022 comment code below
+          // if (pageIndex > totalPage) {
+          //   api
+          //     .get(`/api/v1/managements/clients?name=${searchVal}&page=${1}&client_id=`)
+          //     .then((resp) => {
+          //       setDataList(resp.data.data);
+          //     });
+          // } else {
+          //   setDataList(res.data.data);
+          // }
+          //// comment stop here
+
+          setDataList(res?.data?.data);
+          setPage(1);
+          setTotalPage(totalPage);
+        })
+        .catch((error) => {
+          console.log(error);
+          // if (error.response.data.code === 3) {
+          //   requestNewToken(path)
+          // }
+        });
+    }
   }
 
   function reloadListClient(pgIndex) {
     var path = window.location.pathname;
     api
-      .get(`/api/v1/managements/clients?name=${namesearch}&page=${pgIndex}&client_id=`)
+      .get(
+        `/api/v1/managements/clients?name=${namesearch}&page=${pgIndex}&client_id=&conversion_begin_date=${startDatePreview
+          .toISOString()
+          .slice(0, 10)}&conversion_end_date=${endDatePreview.toISOString().slice(0, 10)}`
+      )
       .then((res) => {
         var totalPage = Math.ceil(res.data.data.total / 25);
         if (pgIndex > totalPage) {
           api
-            .get(`/api/v1/managements/clients?name=${namesearch}&page=${totalPage}&client_id=`)
+            .get(
+              `/api/v1/managements/clients?name=${namesearch}&page=${totalPage}&client_id=&conversion_begin_date=${startDatePreview
+                .toISOString()
+                .slice(0, 10)}&conversion_end_date=${endDatePreview.toISOString().slice(0, 10)}`
+            )
             .then((resp) => {
               setDataList(resp.data.data);
             });
@@ -1059,6 +1129,124 @@ function ClientManagement() {
     document.getElementById(`avatar`).click();
   }
 
+  useEffect(() => {
+    console.log(startDate);
+    console.log(
+      startDatePreview && startDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+    );
+    // console.log(new Date().toISOString().slice(0, 10).replaceAll('-', '/'));
+    // new Date().toLocaleDateString()
+  }, [startDate, startDatePreview]);
+
+  // select date start
+  const selectDateStart = (start) => {
+    let startTemp = new Date(start);
+    setStartDate(start);
+    setStartDatePreview(new Date(startTemp.setDate(startTemp.getDate() + 1)));
+    if (endDatePreview) {
+      let searchVal = document.getElementById('searchUser').value;
+      setNamesearch(searchVal);
+      let startD = startTemp.toISOString().slice(0, 10);
+      let endD = endDatePreview.toISOString().slice(0, 10);
+      if (utils.checkDateEnd(startD, endD) === true) {
+        const datePickerInputs = document.querySelectorAll(
+          '.react-datepicker__input-container > input'
+        );
+        datePickerInputs[0].style.borderColor = '#51cbce';
+        if (searchVal) {
+          api
+            .get(
+              `/api/v1/managements/clients?name=${searchVal}&page=${1}&client_id=&conversion_begin_date=${startD}&conversion_end_date=${endD}`
+            )
+            .then((res) => {
+              // console.log(res);
+              let totalPage = Math.ceil(res?.data?.data?.total / 25);
+              setDataList(res?.data?.data);
+              setPage(1);
+              setTotalPage(totalPage);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        } else {
+          api
+            .get(
+              `/api/v1/managements/clients?name=&page=${1}&client_id=&conversion_begin_date=${startD}&conversion_end_date=${endD}`
+            )
+            .then((res) => {
+              let totalPage = Math.ceil(res?.data?.data?.total / 25);
+              setDataList(res?.data?.data);
+              setPage(1);
+              setTotalPage(totalPage);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      } else {
+        const datePickerInputs = document.querySelectorAll(
+          '.react-datepicker__input-container > input'
+        );
+        datePickerInputs[0].style.borderColor = 'red';
+        utils.checkDateEnd(startD, endD);
+      }
+    }
+  };
+
+  // select date end
+  const selectDateEnd = (end) => {
+    let endTemp = new Date(end);
+    setEndDate(end);
+    setEndDatePreview(new Date(endTemp.setDate(endTemp.getDate() + 1)));
+    if (startDatePreview) {
+      let searchVal = document.getElementById('searchUser').value;
+      setNamesearch(searchVal);
+      let startD = startDatePreview.toISOString().slice(0, 10);
+      let endD = endTemp.toISOString().slice(0, 10);
+      if (utils.checkDateEnd(startD, endD) === true) {
+        const datePickerInputs = document.querySelectorAll(
+          '.react-datepicker__input-container > input'
+        );
+        datePickerInputs[1].style.borderColor = '#51cbce';
+        if (searchVal) {
+          api
+            .get(
+              `/api/v1/managements/clients?name=${searchVal}&page=${1}&client_id=&conversion_begin_date=${startD}&conversion_end_date=${endD}`
+            )
+            .then((res) => {
+              let totalPage = Math.ceil(res?.data?.data?.total / 25);
+              setDataList(res?.data?.data);
+              setPage(1);
+              setTotalPage(totalPage);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        } else {
+          api
+            .get(
+              `/api/v1/managements/clients?name=&page=${1}&client_id=&conversion_begin_date=${startD}&conversion_end_date=${endD}`
+            )
+            .then((res) => {
+              let totalPage = Math.ceil(res?.data?.data?.total / 25);
+              setDataList(res?.data?.data);
+              setPage(1);
+              setTotalPage(totalPage);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      } else {
+        const datePickerInputs = document.querySelectorAll(
+          '.react-datepicker__input-container > input'
+        );
+        datePickerInputs[1].style.borderColor = 'red';
+        utils.checkDateEnd(startD, endD);
+      }
+    }
+  };
+
   const items = dataList.clients;
   return (
     <>
@@ -1067,8 +1255,21 @@ function ClientManagement() {
           <Col md="12">
             <Card>
               <CardHeader>
-                <div className="swap" style={{ display: 'flex', width: '100%' }}>
-                  <div style={{ width: '50%', display: 'flex', alignItems: 'center' }}>
+                <div
+                  className="swap"
+                  style={{
+                    display: 'flex',
+                    width: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
                     <input
                       id="searchUser"
                       name="searchUser"
@@ -1079,12 +1280,60 @@ function ClientManagement() {
                         paddingTop: '-10px',
                         borderRadius: '3px',
                       }}
+                      onChange={(e) => setNamesearch(e.target.value)}
                     ></input>
                     <Button onClick={() => search()} style={{ backgroundColor: '#66615b' }}>
                       検索
                     </Button>
+                    <div style={{ marginLeft: '15px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <h4
+                          style={{
+                            margin: '0',
+                            fontWeight: '400',
+                            fontSize: '1.2em',
+                          }}
+                        >
+                          Filter by conversion rate from
+                        </h4>
+                        <div style={{ borderRadius: '5px', padding: '5px' }}>
+                          <DatePicker
+                            selected={startDate && startDate}
+                            onChange={(date) => selectDateStart(date)}
+                            dateFormat="yyyy/MM/dd"
+                            value={
+                              startDatePreview
+                                ? startDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+                                : 'yyyy/mm/dd'
+                            }
+                          />
+                        </div>
+                        <h4
+                          style={{
+                            margin: '0',
+                            fontWeight: '400',
+                            fontSize: '1.2em',
+                          }}
+                        >
+                          to
+                        </h4>
+                        <div style={{ borderRadius: '5px', padding: '5px' }}>
+                          <DatePicker
+                            selected={endDate}
+                            onChange={(date) => selectDateEnd(date)}
+                            dateFormat="yyyy/MM/dd"
+                            value={
+                              endDatePreview
+                                ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+                                : 'yyyy/mm/dd'
+                            }
+                          />
+                        </div>
+                      </div>
+                      <span id="dateCheckErrMsg" style={{ color: 'red', display: 'none' }}></span>
+                    </div>
                   </div>
-                  <div className="div_right" style={{ float: 'right' }}>
+                  <div className="div_right" style={{ float: 'right', width: '15%' }}>
                     <Button
                       type="text"
                       onClick={() => addUserPopup()}
