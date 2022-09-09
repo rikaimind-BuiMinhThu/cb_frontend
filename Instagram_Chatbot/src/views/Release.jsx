@@ -1078,7 +1078,7 @@ function Release() {
               console.log(error);
             });
         }
-         // setTimeout(() => {
+        // setTimeout(() => {
         //   for (var i = 0; i < res.data.data.length; i++) {
         //     faw_item[i].msg_bag_name = bag_name[i];
         //   }
