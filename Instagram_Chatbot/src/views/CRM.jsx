@@ -12,6 +12,8 @@ import ModalShort from './Popup/ModalShort';
 import ModalDetailInstaUser from './Popup/ModalDetailInstaUser';
 import Cookies from 'js-cookie';
 import ModalNoti from './Popup/ModalNoti';
+import Switch from 'react-switch';
+
 function CRM() {
   const [isOpenDetailUser, setIsOpenDetailUser] = useState(false);
 
@@ -25,6 +27,15 @@ function CRM() {
   const [msgNoti, setMsgNoti] = useState('');
   const [idActiveChatbot, setIdActiveChatbot] = useState();
   const [isOpenNotiActiveChatbot, setIsOpenNotiActiveChatbot] = useState('');
+  const [isActiveSearch, setIsActiveSearch] = useState(false);
+  const [userRole, setUserRole] = useState(false);
+
+  React.useEffect(() => {
+    var cook = Cookies.get('user_role');
+    if (cook === 'admin_deel') {
+      setUserRole(true);
+    }
+  }, []);
 
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'));
@@ -427,6 +438,39 @@ function CRM() {
       });
   }
 
+  // search
+  function search() {
+    let searchClientVal = document.getElementById('searchUser').value;
+    let searchInstagramVal = document.getElementById('searchInstagramUser').value;
+    api
+      .get(
+        `api/v1/managements/instagram_users?supporting_users=${isActiveSearch}&instagram_user_name=${searchInstagramVal}&client_name=${searchClientVal}`
+      )
+      .then((res) => {
+        setListInstagramUser(res?.data?.data?.instagram_users);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  // handle active search change
+  const activeSearchChange = () => {
+    setIsActiveSearch(!isActiveSearch);
+    // let searchClientVal = document.getElementById('searchUser').value;
+    // let searchInstagramVal = document.getElementById('searchInstagramUser').value;
+    // api
+    //   .get(
+    //     `api/v1/managements/instagram_users?supporting_users=${!isActiveSearch}&instagram_user_name=${searchInstagramVal}&client_name=${searchClientVal}`
+    //   )
+    //   .then((res) => {
+    //     setListInstagramUser(res?.data?.data?.instagram_users);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+  };
+
   return (
     <>
       <div className="content">
@@ -435,6 +479,45 @@ function CRM() {
             <Card>
               <CardHeader>
                 <h3>インスタグラムユーザー</h3>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <input
+                    id="searchInstagramUser"
+                    name="searchInstagramUser"
+                    style={{
+                      height: '38px',
+                      width: '200px',
+                      border: '1px solid #dee2e6',
+                      paddingTop: '-10px',
+                      borderRadius: '3px',
+                    }}
+                    placeholder="Enter instagram user..."
+                  ></input>
+                  <input
+                    id="searchUser"
+                    name="searchUser"
+                    style={{
+                      height: '38px',
+                      width: '200px',
+                      border: '1px solid #dee2e6',
+                      paddingTop: '-10px',
+                      borderRadius: '3px',
+                      marginLeft: '10px',
+                      marginRight: '10px',
+                    }}
+                    placeholder="Enter client name..."
+                  ></input>
+                  <Switch
+                    onChange={activeSearchChange}
+                    onColor="#64c1ff"
+                    checked={isActiveSearch}
+                  />
+                  <Button
+                    onClick={() => search()}
+                    style={{ backgroundColor: '#66615b', marginLeft: '10px' }}
+                  >
+                    検索
+                  </Button>
+                </div>
               </CardHeader>
               <CardBody>
                 <Table
@@ -447,6 +530,7 @@ function CRM() {
                   <thead className="text-primary">
                     <tr>
                       <th>ユーザー名</th>
+                      <th>Client name</th>
                       <th>名前</th>
                       <th>フォローしている</th>
                       <th>フォローされている</th>
@@ -456,7 +540,7 @@ function CRM() {
                     </tr>
                   </thead>
                   <tbody>
-                    {listInstagramUser.map((item) => (
+                    {listInstagramUser?.map((item) => (
                       <tr key={item.id}>
                         <td>
                           <a
@@ -466,6 +550,7 @@ function CRM() {
                             {item.username}
                           </a>
                         </td>
+                        {userRole && <td>{item?.client_name}</td>}
                         <td>{item.full_name}</td>
                         <td>{item.is_user_follow_business == true ? 'あり' : 'なし'}</td>
                         <td>{item.is_business_follow_user == true ? 'あり' : 'なし'}</td>
@@ -968,7 +1053,7 @@ function CRM() {
                         marginTop: '10px',
                       }}
                     ></img>
-                    {(customLabel == undefined ? [] : customLabel).map((item) => (
+                    {(customLabel == undefined ? [] : customLabel)?.map((item) => (
                       <div
                         key={item.id}
                         style={{
@@ -1064,7 +1149,7 @@ function CRM() {
                     <br />
 
                     <div className="grid-container-crm">
-                      {(customTable == undefined ? [] : customTable).map((item) => (
+                      {(customTable == undefined ? [] : customTable)?.map((item) => (
                         <div key={item.id} className="grid-item-crm">
                           <div style={{ display: 'flex', overflow: 'hidden' }}>
                             <div
@@ -1143,7 +1228,7 @@ function CRM() {
                   </div>
                 </div>
                 <div style={{ maxWidth: '43%', height: '95%', overflow: 'hidden' }}>
-                  {historyinstagramUser.map((item) => (
+                  {historyinstagramUser?.map((item) => (
                     <div
                       key={item.created_at}
                       style={{
