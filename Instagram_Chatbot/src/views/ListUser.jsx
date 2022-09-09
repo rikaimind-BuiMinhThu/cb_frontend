@@ -17,6 +17,8 @@ import { CSVLink } from 'react-csv';
 import Cookies from 'js-cookie';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import * as utils from './../JS/client.js';
+
 function ListUser() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -30,6 +32,15 @@ function ListUser() {
   const [userCB, setUserCB] = useState();
   const [userCBAll, setUserCBAll] = useState();
   const [instaUser, setInstaUser] = useState([]);
+  const [isAdminDeel, setIsAdminDeel] = useState(false);
+  const [lineDataWithoutRole, setLineDataWithoutRole] = useState([]);
+
+  React.useEffect(() => {
+    var cook = Cookies.get('user_role');
+    if (cook === 'admin_deel') {
+      setIsAdminDeel(true);
+    }
+  }, []);
 
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'));
@@ -140,6 +151,8 @@ function ListUser() {
       )
       .then((res) => {
         var useEC = res.data.user_counts;
+        // console.log('instagram user list: ', res.data.user_counts);
+        setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count));
         var user_count_all = 0;
         for (var i = 0; i < useEC.length; i++) {
           user_count_all = user_count_all + useEC[i].user_count;
@@ -328,76 +341,89 @@ function ListUser() {
 
   function selectDateEnd(end) {
     setEndDate(end);
-    var startD = startDate.toISOString().slice(0, 10);
-    var endD = end.toISOString().slice(0, 10);
-    api
-      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        var useEC = res.data.counts;
-        var dateEC = [];
-        var user_count = [];
-        for (var i = 0; i < useEC.length; i++) {
-          // useEC[i].log_date.slice(0,5)
-          // if (value == "3m" || value == "6m") {
-          //     dateEC.push(useEC[i].log_date.slice(0, 7))
-          // } else {
-          // dateEC.push(useEC[i].log_date.slice(0, 5));
-          // }
-          dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
-          user_count.push(useEC[i].user_count);
-        }
-        setDateECU(dateEC);
-        setUserECC(user_count);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    ////////////////////////////////////////////////
-    api
-      .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        var messageECA = res.data.counts;
-        var message_count = [];
-        var totalM = 0;
-        for (var i = 0; i < messageECA.length; i++) {
-          message_count.push(messageECA[i].message_count);
-          totalM = totalM + messageECA[i].message_count;
-        }
-        setMessageEC(message_count);
-        setMessageECA(totalM);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    ///////////////////////////////////////////////
-    api
-      .get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        var useEC = res.data.user_counts;
-        var user_count_all = 0;
-        for (var i = 0; i < useEC.length; i++) {
-          user_count_all = user_count_all + useEC[i].user_count;
-        }
-        setUserChatwithCB(user_count_all);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    ///////////////////////////////////////////////
-    api
-      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        var useEC = res.data.counts;
-        var user_count_alltime = 0;
-        for (var i = 0; i < useEC.length; i++) {
-          user_count_alltime = user_count_alltime + useEC[i].user_count;
-        }
-        setUserCB(user_count_alltime / useEC.length);
-        // console.log('analytics/users: ', user_count_alltime / useEC.length);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    let startD = startDate.toISOString().slice(0, 10);
+    let endD = end.toISOString().slice(0, 10);
+    if (utils.checkDateEnd(startD, endD) === true) {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[1].style.borderColor = '#51cbce';
+      api
+        .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          let useEC = res.data.counts;
+          let dateEC = [];
+          let user_count = [];
+          for (let i = 0; i < useEC.length; i++) {
+            // useEC[i].log_date.slice(0,5)
+            // if (value == "3m" || value == "6m") {
+            //     dateEC.push(useEC[i].log_date.slice(0, 7))
+            // } else {
+            // dateEC.push(useEC[i].log_date.slice(0, 5));
+            // }
+            dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
+            user_count.push(useEC[i].user_count);
+          }
+          setDateECU(dateEC);
+          setUserECC(user_count);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ////////////////////////////////////////////////
+      api
+        .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          let messageECA = res.data.counts;
+          let message_count = [];
+          let totalM = 0;
+          for (let i = 0; i < messageECA.length; i++) {
+            message_count.push(messageECA[i].message_count);
+            totalM = totalM + messageECA[i].message_count;
+          }
+          setMessageEC(message_count);
+          setMessageECA(totalM);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ///////////////////////////////////////////////
+      api
+        .get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count));
+          let useEC = res.data.user_counts;
+          let user_count_all = 0;
+          for (let i = 0; i < useEC.length; i++) {
+            user_count_all = user_count_all + useEC[i].user_count;
+          }
+          setUserChatwithCB(user_count_all);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ///////////////////////////////////////////////
+      api
+        .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          let useEC = res.data.counts;
+          let user_count_alltime = 0;
+          for (let i = 0; i < useEC.length; i++) {
+            user_count_alltime = user_count_alltime + useEC[i].user_count;
+          }
+          setUserCB(user_count_alltime / useEC.length);
+          // console.log('analytics/users: ', user_count_alltime / useEC.length);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[1].style.borderColor = 'red';
+      utils.checkDateEnd(startD, endD);
+    }
   }
 
   var datass = {
@@ -430,9 +456,9 @@ function ListUser() {
   var dataAPC = {
     series: [
       {
-        name: 'Ec chatbotユーザー',
+        name: isAdminDeel ? 'Ec chatbotユーザー' : '新規ユーザー',
         type: 'area',
-        data: userECC,
+        data: isAdminDeel ? userECC : lineDataWithoutRole,
       },
       {
         name: '送信したメッセージ数',
@@ -459,7 +485,7 @@ function ListUser() {
       yaxis: [
         {
           title: {
-            text: 'Ec chatbotユーザー',
+            text: isAdminDeel ? 'Ec chatbotユーザー' : '新規ユーザー',
           },
         },
         {
@@ -550,76 +576,89 @@ function ListUser() {
   // select date start
   const selectDateStart = (start) => {
     setStartDate(start);
-    var startD = start.toISOString().slice(0, 10);
-    var endD = endDate.toISOString().slice(0, 10);
-    api
-      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        var useEC = res.data.counts;
-        var dateEC = [];
-        var user_count = [];
-        for (var i = 0; i < useEC.length; i++) {
-          // useEC[i].log_date.slice(0,5)
-          // if (value == "3m" || value == "6m") {
-          //     dateEC.push(useEC[i].log_date.slice(0, 7))
-          // } else {
-          // dateEC.push(useEC[i].log_date.slice(0, 5));
-          // }
-          dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
-          user_count.push(useEC[i].user_count);
-        }
-        setDateECU(dateEC);
-        setUserECC(user_count);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    ////////////////////////////////////////////////
-    api
-      .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        var messageECA = res.data.counts;
-        var message_count = [];
-        var totalM = 0;
-        for (var i = 0; i < messageECA.length; i++) {
-          message_count.push(messageECA[i].message_count);
-          totalM = totalM + messageECA[i].message_count;
-        }
-        setMessageEC(message_count);
-        setMessageECA(totalM);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    ///////////////////////////////////////////////
-    api
-      .get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        var useEC = res.data.user_counts;
-        var user_count_all = 0;
-        for (var i = 0; i < useEC.length; i++) {
-          user_count_all = user_count_all + useEC[i].user_count;
-        }
-        setUserChatwithCB(user_count_all);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    ///////////////////////////////////////////////
-    api
-      .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
-      .then((res) => {
-        var useEC = res.data.counts;
-        var user_count_alltime = 0;
-        for (var i = 0; i < useEC.length; i++) {
-          user_count_alltime = user_count_alltime + useEC[i].user_count;
-        }
-        setUserCB(user_count_alltime / useEC.length);
-        // console.log('analytics/users: ', user_count_alltime / useEC.length);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    let startD = start.toISOString().slice(0, 10);
+    let endD = endDate.toISOString().slice(0, 10);
+    if (utils.checkDateEnd(startD, endD) === true) {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[0].style.borderColor = '#51cbce';
+      api
+        .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          let useEC = res.data.counts;
+          let dateEC = [];
+          let user_count = [];
+          for (let i = 0; i < useEC.length; i++) {
+            // useEC[i].log_date.slice(0,5)
+            // if (value == "3m" || value == "6m") {
+            //     dateEC.push(useEC[i].log_date.slice(0, 7))
+            // } else {
+            // dateEC.push(useEC[i].log_date.slice(0, 5));
+            // }
+            dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
+            user_count.push(useEC[i].user_count);
+          }
+          setDateECU(dateEC);
+          setUserECC(user_count);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ////////////////////////////////////////////////
+      api
+        .get(`/api/v1/analytics/chatbot_usages/message?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          let messageECA = res.data.counts;
+          let message_count = [];
+          let totalM = 0;
+          for (let i = 0; i < messageECA.length; i++) {
+            message_count.push(messageECA[i].message_count);
+            totalM = totalM + messageECA[i].message_count;
+          }
+          setMessageEC(message_count);
+          setMessageECA(totalM);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ///////////////////////////////////////////////
+      api
+        .get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count));
+          let useEC = res.data.user_counts;
+          let user_count_all = 0;
+          for (let i = 0; i < useEC.length; i++) {
+            user_count_all = user_count_all + useEC[i].user_count;
+          }
+          setUserChatwithCB(user_count_all);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      ///////////////////////////////////////////////
+      api
+        .get(`/api/v1/analytics/chatbot_usages/user?begin_date=${startD}&end_date=${endD}`)
+        .then((res) => {
+          let useEC = res.data.counts;
+          let user_count_alltime = 0;
+          for (let i = 0; i < useEC.length; i++) {
+            user_count_alltime = user_count_alltime + useEC[i].user_count;
+          }
+          setUserCB(user_count_alltime / useEC.length);
+          // console.log('analytics/users: ', user_count_alltime / useEC.length);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[0].style.borderColor = 'red';
+      utils.checkDateEnd(startD, endD);
+    }
   };
 
   return (
@@ -629,7 +668,7 @@ function ListUser() {
           <Col md="12">
             <Card style={{ width: '100%' }}>
               <div style={{ width: '100%', padding: '5px 20px 0px 20px' }}>
-                <div style={{ float: 'right', display: 'flex' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                   <div
                     onClick={() => setDataExport()}
                     style={{
@@ -647,21 +686,24 @@ function ListUser() {
                       <MDBIcon fas icon="arrow-circle-down" style={{ color: 'white' }}></MDBIcon>
                     </CSVLink>
                   </div>
-                  <div style={{ display: 'flex' }}>
-                    <div style={{ borderRadius: '5px', padding: '5px' }}>
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => selectDateStart(date)}
-                        dateFormat="yyyy/MM/dd"
-                      />
+                  <div style={{ display: 'flex', alignItems: 'end', flexDirection: 'column' }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <div style={{ borderRadius: '5px', padding: '5px' }}>
+                        <DatePicker
+                          selected={startDate}
+                          onChange={(date) => selectDateStart(date)}
+                          dateFormat="yyyy/MM/dd"
+                        />
+                      </div>
+                      <div style={{ borderRadius: '5px', padding: '5px' }}>
+                        <DatePicker
+                          selected={endDate}
+                          onChange={(date) => selectDateEnd(date)}
+                          dateFormat="yyyy/MM/dd"
+                        />
+                      </div>
                     </div>
-                    <div style={{ borderRadius: '5px', padding: '5px' }}>
-                      <DatePicker
-                        selected={endDate}
-                        onChange={(date) => selectDateEnd(date)}
-                        dateFormat="yyyy/MM/dd"
-                      />
-                    </div>
+                    <span id="dateCheckErrMsg" style={{ color: 'red', display: 'none' }}></span>
                   </div>
                   {/* <select onChange={(e) => selectDate(e.target.value)} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800" }} defaultValue={"5d"} name="days_num_ec_cb" id="days_num_ec_cb">
                                         <option value="5d">５日間</option>
@@ -710,28 +752,30 @@ function ListUser() {
                     </div>
                   </div>
                 </CardBody>
-                <CardBody style={{ width: '24%', marginLeft: '-6%' }}>
-                  <div style={{ width: '100%' }}>
-                    <div style={{ paddingTop: '10%' }}>
-                      <div
-                        style={{
-                          width: '100%',
-                          margin: 'auto',
-                          height: '100%',
-                          padding: '20% 0% 15% 0%',
-                        }}
-                      >
-                        {/* <AgChartsReact options={options} /> */}
-                        <ReactApexChart
-                          options={datass.options}
-                          series={datass.series}
-                          type="pie"
-                          width={350}
-                        />
+                {isAdminDeel && (
+                  <CardBody style={{ width: '24%', marginLeft: '-6%' }}>
+                    <div style={{ width: '100%' }}>
+                      <div style={{ paddingTop: '10%' }}>
+                        <div
+                          style={{
+                            width: '100%',
+                            margin: 'auto',
+                            height: '100%',
+                            padding: '20% 0% 15% 0%',
+                          }}
+                        >
+                          {/* <AgChartsReact options={options} /> */}
+                          <ReactApexChart
+                            options={datass.options}
+                            series={datass.series}
+                            type="pie"
+                            width={350}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardBody>
+                  </CardBody>
+                )}
               </div>
             </Card>
             <Card>
@@ -773,13 +817,17 @@ function ListUser() {
                       }}
                     >
                       <h5 style={{ margin: 'auto' }}>
-                        {percentECold.toFixed(2)} &emsp;
+                        {percentECold.toFixed(2) >= 0 ? percentECold.toFixed(2) : '0'} &emsp;
                         <MDBIcon fas icon="angle-up" style={{ color: '#00e396' }} />
                         &ensp;
                         <span style={{ fontSize: '19px', color: '#00e396' }}>
                           {parseFloat((percentECnew / (percentECold + percentECnew)) * 100).toFixed(
                             1
-                          )}
+                          ) >= 0
+                            ? parseFloat(
+                                (percentECnew / (percentECold + percentECnew)) * 100
+                              ).toFixed(1)
+                            : `0.0`}
                           %
                         </span>
                       </h5>
