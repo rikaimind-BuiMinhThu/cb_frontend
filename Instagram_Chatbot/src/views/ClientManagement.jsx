@@ -1294,7 +1294,7 @@ function ClientManagement() {
                             fontSize: '1.2em',
                           }}
                         >
-                          コンバージョン率
+                          コンバージョン数
                         </h4>
                         <div style={{ borderRadius: '5px', padding: '5px' }}>
                           <DatePicker
