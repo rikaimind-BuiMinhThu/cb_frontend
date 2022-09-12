@@ -20,6 +20,15 @@ function Dashboard() {
   const [userChatwithCB, setUserChatwithCB] = useState([]);
   const [userChatwithCBAll, setUserChatwithCBAll] = useState();
   const [userTotal, setUserTotal] = useState();
+  const [isAdminDeel, setIsAdminDeel] = useState(false);
+  const [lineDataWithoutRole, setLineDataWithoutRole] = useState([]);
+
+  React.useEffect(() => {
+    var cook = Cookies.get('user_role');
+    if (cook === 'admin_deel') {
+      setIsAdminDeel(true);
+    }
+  }, []);
 
   React.useEffect(() => {
     console.log('token in dashboard', Cookies.get('token'));
@@ -92,6 +101,7 @@ function Dashboard() {
     api
       .get(`/api/v1/analytics/users?begin_date=${dateStart}&end_date=${dateEnd}`)
       .then((res) => {
+        setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count));
         var useEC = res.data.user_counts;
         var user_count_all = 0;
         for (var i = 0; i < useEC.length; i++) {
@@ -125,9 +135,9 @@ function Dashboard() {
   var dataAPC = {
     series: [
       {
-        name: 'Ec chatbotユーザー',
+        name: isAdminDeel ? 'Ec chatbotユーザー' : '新規ユーザー',
         type: 'area',
-        data: userECC,
+        data: isAdminDeel ? userECC : lineDataWithoutRole,
       },
       {
         name: '送信したメッセージ数',
@@ -154,7 +164,7 @@ function Dashboard() {
       yaxis: [
         {
           title: {
-            text: 'Ec chatbotユーザー',
+            text: isAdminDeel ? 'Ec chatbotユーザー' : '新規ユーザー',
           },
         },
         {
