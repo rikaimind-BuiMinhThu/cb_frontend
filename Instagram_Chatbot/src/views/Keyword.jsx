@@ -96,7 +96,7 @@ function Keyword() {
         setInstagramSettingData(res?.data?.data[0]);
         setDefaultReplyGroupId(res?.data?.data[0]?.default_reply_group_id);
         setDefaultReplyBagId(res?.data?.data[0]?.default_reply_bag_id);
-        setInstaSetting(res.data.data[0].id);
+        setInstaSetting(res?.data?.data[0]?.id);
       })
       .catch((error) => {
         console.log(error);
@@ -638,14 +638,14 @@ function Keyword() {
                           marginBottom: '4px',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'space-between',
+                          // justifyContent: 'space-between',
                         }}
                       >
-                        <span style={{ margin: '0', width:"150px" }}>デフォルト返事</span>
+                        <span style={{ margin: '0', width: '150px' }}>デフォルト返事</span>
                         <select
                           name="msg-reply"
                           id="msg-reply"
-                          style={{padding:"8px 0px 8px 0px"}}
+                          style={{ padding: '8px 0px 8px 0px' }}
                           // defaultValue={
                           //   instagramSettingData?.default_reply_group_id
                           //     ? instagramSettingData?.default_reply_group_id
@@ -672,7 +672,7 @@ function Keyword() {
                           //     ? instagramSettingData?.default_reply_bag_id
                           //     : ''
                           // }
-                          style={{padding:"8px 0px 8px 0px"}}
+                          style={{ padding: '8px 0px 8px 0px' }}
                           value={defaultReplyBagId ? defaultReplyBagId : ''}
                           className="new-faq-q-so"
                           onChange={handleSelectBagReply}
@@ -686,23 +686,29 @@ function Keyword() {
                             </option>
                           ))}
                         </select>
+                        <div
+                          style={{
+                            marginLeft: '30px',
+                            display: 'flex',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <i
+                            className="nc-icon nc-cloud-download-93 nc-3x"
+                            style={{
+                              fontSize: '30px',
+                              // marginTop: '5px',
+                              // marginRight: '30px',
+                              cursor: 'pointer',
+                            }}
+                            onClick={saveDefaultReply}
+                          ></i>
+                        </div>
                       </div>
                       <span
                         id="bag-reply-err"
                         style={{ display: 'none', color: 'red', float: 'right' }}
                       ></span>
-                    </div>
-                    <div>
-                      <i
-                        className="nc-icon nc-cloud-download-93 nc-3x"
-                        style={{
-                          fontSize: '30px',
-                          marginTop: '5px',
-                          marginRight: '30px',
-                          cursor: 'pointer',
-                        }}
-                        onClick={saveDefaultReply}
-                      ></i>
                     </div>
                   </div>
                   <div style={{ width: '100%' }}>
