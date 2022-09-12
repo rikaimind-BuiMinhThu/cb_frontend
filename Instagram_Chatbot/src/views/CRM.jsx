@@ -440,8 +440,8 @@ function CRM() {
 
   // search
   function search() {
-    let searchClientVal = document.getElementById('searchUser').value;
-    let searchInstagramVal = document.getElementById('searchInstagramUser').value;
+    let searchClientVal = document.getElementById('searchUser')?.value;
+    let searchInstagramVal = document.getElementById('searchInstagramUser')?.value;
     api
       .get(
         `api/v1/managements/instagram_users?supporting_users=${isActiveSearch}&instagram_user_name=${searchInstagramVal}&client_name=${searchClientVal}`
@@ -477,48 +477,50 @@ function CRM() {
         <Row>
           <Col>
             <Card>
-              <CardHeader>
-                <h3>インスタグラムユーザー</h3>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <input
-                    id="searchInstagramUser"
-                    name="searchInstagramUser"
-                    style={{
-                      height: '38px',
-                      width: '200px',
-                      border: '1px solid #dee2e6',
-                      paddingTop: '-10px',
-                      borderRadius: '3px',
-                    }}
-                    placeholder="インスタグラムユーザー..."
-                  ></input>
-                  <input
-                    id="searchUser"
-                    name="searchUser"
-                    style={{
-                      height: '38px',
-                      width: '200px',
-                      border: '1px solid #dee2e6',
-                      paddingTop: '-10px',
-                      borderRadius: '3px',
-                      marginLeft: '10px',
-                      marginRight: '10px',
-                    }}
-                    placeholder="クライアント名..."
-                  ></input>
-                  <Switch
-                    onChange={activeSearchChange}
-                    onColor="#64c1ff"
-                    checked={isActiveSearch}
-                  />
-                  <Button
-                    onClick={() => search()}
-                    style={{ backgroundColor: '#66615b', marginLeft: '10px' }}
-                  >
-                    検索
-                  </Button>
-                </div>
-              </CardHeader>
+              {userRole && (
+                <CardHeader>
+                  <h3>インスタグラムユーザー</h3>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <input
+                      id="searchInstagramUser"
+                      name="searchInstagramUser"
+                      style={{
+                        height: '38px',
+                        width: '200px',
+                        border: '1px solid #dee2e6',
+                        paddingTop: '-10px',
+                        borderRadius: '3px',
+                      }}
+                      placeholder="インスタグラムユーザー..."
+                    ></input>
+                    <input
+                      id="searchUser"
+                      name="searchUser"
+                      style={{
+                        height: '38px',
+                        width: '200px',
+                        border: '1px solid #dee2e6',
+                        paddingTop: '-10px',
+                        borderRadius: '3px',
+                        marginLeft: '10px',
+                        marginRight: '10px',
+                      }}
+                      placeholder="クライアント名..."
+                    ></input>
+                    <Switch
+                      onChange={activeSearchChange}
+                      onColor="#64c1ff"
+                      checked={isActiveSearch}
+                    />
+                    <Button
+                      onClick={() => search()}
+                      style={{ backgroundColor: '#66615b', marginLeft: '10px' }}
+                    >
+                      検索
+                    </Button>
+                  </div>
+                </CardHeader>
+              )}
               <CardBody>
                 <Table
                   style={{
