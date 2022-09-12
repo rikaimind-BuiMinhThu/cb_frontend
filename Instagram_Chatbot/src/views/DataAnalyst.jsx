@@ -31,6 +31,7 @@ function DataAnalyst() {
   const [userTotal, setUserTotal] = useState();
   const [listGroup, setListGroup] = useState([]);
   const [userRole, setUserRole] = useState(false);
+  const [lineDataWithoutRole, setLineDataWithoutRole] = useState([]);
 
   React.useEffect(() => {
     var cook = Cookies.get('user_role');
@@ -302,6 +303,7 @@ function DataAnalyst() {
       .then((res) => {
         // console.log(res.data.user_counts);
         var useEC = res.data.user_counts;
+        setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count));
         var user_count_all = 0;
         for (var i = 0; i < useEC.length; i++) {
           user_count_all = user_count_all + useEC[i].user_count;
@@ -520,9 +522,9 @@ function DataAnalyst() {
   var dataAPC = {
     series: [
       {
-        name: 'Ec chatbotユーザー',
+        name: userRole ? 'Ec chatbotユーザー' : '新規ユーザー',
         type: 'area',
-        data: userECC,
+        data: userRole ? userECC : lineDataWithoutRole,
       },
       {
         name: '送信したメッセージ数',
@@ -549,7 +551,7 @@ function DataAnalyst() {
       yaxis: [
         {
           title: {
-            text: 'Ec chatbotユーザー',
+            text: userRole ? 'Ec chatbotユーザー' : '新規ユーザー',
           },
         },
         {
@@ -638,9 +640,10 @@ function DataAnalyst() {
       api
         .get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`)
         .then((res) => {
-          var useEC = res.data.user_counts;
-          var user_count_all = 0;
-          for (var i = 0; i < useEC.length; i++) {
+          setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count));
+          let useEC = res.data.user_counts;
+          let user_count_all = 0;
+          for (let i = 0; i < useEC.length; i++) {
             user_count_all = user_count_all + useEC[i].user_count;
           }
           setUserChatwithCB(user_count_all);
@@ -908,6 +911,7 @@ function DataAnalyst() {
       api
         .get(`/api/v1/analytics/users?begin_date=${startD}&end_date=${endD}`)
         .then((res) => {
+          setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count));
           let useEC = res.data.user_counts;
           let user_count_all = 0;
           for (let i = 0; i < useEC.length; i++) {
