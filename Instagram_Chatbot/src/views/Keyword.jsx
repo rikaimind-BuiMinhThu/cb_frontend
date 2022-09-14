@@ -10,6 +10,7 @@ import ModalNoti from './Popup/ModalNoti';
 import Cookies from 'js-cookie';
 import ModalShort from './Popup/ModalShort';
 import { useEffect } from 'react';
+import { Pagination } from '@material-ui/lab';
 
 function Keyword() {
   var [customDiv, setCustomDiv] = useState([]);
@@ -22,6 +23,8 @@ function Keyword() {
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [msgNoti, setMsgNoti] = useState();
+  const [totalPage, setTotalPage] = useState(1);
+  const [page, setPage] = useState(1);
   // const [checked, setChecked] = useState([true, false, true])
 
   // React.useEffect(() => {
@@ -50,10 +53,11 @@ function Keyword() {
     var path = window.location.pathname;
 
     api
-      .get(`/api/v1/message_managements/keyword_settings`)
+      .get(`/api/v1/message_managements/keyword_settings?page=1`)
       .then((res) => {
-        // console.log('keyword_settings: ', res.data.data);
-        setListKeyword(res.data.data);
+        // console.log('keyword_settings: ', res.data);
+        setTotalPage(Math.ceil(res.data?.total / 15));
+        setListKeyword(res.data?.data);
         // var listkey = res.data.data
         // console.log(listkey.length)
       })
@@ -69,9 +73,10 @@ function Keyword() {
     var path = window.location.pathname;
     // console.log("Reload ne")
     api
-      .get(`/api/v1/message_managements/keyword_settings`)
+      .get(`/api/v1/message_managements/keyword_settings?page=1`)
       .then((res) => {
         // console.log("keyword_settings: ", res.data.data)
+        setTotalPage(Math.ceil(res.data?.total / 15));
         setListKeyword(res.data.data);
         // var listkey = res.data.data
         // console.log(listkey.length)
@@ -608,6 +613,34 @@ function Keyword() {
     defaultReplyBagError.style.display = 'none';
   };
 
+  // handle change page
+  const handleChangePage = (e, value) => {
+    setPage(parseInt(value));
+    // reload
+    api
+      .get(`/api/v1/message_managements/keyword_settings?page=${value}`)
+      .then((res) => {
+        let totalPage = Math.ceil(res.data?.total / 15);
+        if (totalPage < parseInt(value)) {
+          api
+            .get(`/api/v1/message_managements/keyword_settings?page=${totalPage}`)
+            .then((res) => {
+              setListKeyword(res.data?.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        } else {
+          setListKeyword(res.data?.data);
+        }
+        setTotalPage(Math.ceil(res.data?.total / 15));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    document.querySelector('.main-panel').scrollTop = 0;
+  };
+
   return (
     <>
       <div className="content">
@@ -987,6 +1020,13 @@ function Keyword() {
                     </div>
                   </div>
                 </div>
+
+                <Pagination
+                  count={totalPage}
+                  variant="outlined"
+                  page={page}
+                  onChange={handleChangePage}
+                />
               </CardBody>
             </Card>
           </Col>

@@ -5,14 +5,13 @@ import insta_img from './Popup/instagram.jpeg';
 import tag_icon from './Popup/tag_icon.jpeg';
 import ModalDetail from './Popup/ModalDetail';
 import '../assets/css/general.css';
-
 import api from '../api/api-management';
-
 import ModalShort from './Popup/ModalShort';
 import ModalDetailInstaUser from './Popup/ModalDetailInstaUser';
 import Cookies from 'js-cookie';
 import ModalNoti from './Popup/ModalNoti';
 import Switch from 'react-switch';
+import { Pagination } from '@material-ui/lab';
 
 function CRM() {
   const [isOpenDetailUser, setIsOpenDetailUser] = useState(false);
@@ -29,6 +28,9 @@ function CRM() {
   const [isOpenNotiActiveChatbot, setIsOpenNotiActiveChatbot] = useState('');
   const [isActiveSearch, setIsActiveSearch] = useState(false);
   const [userRole, setUserRole] = useState(false);
+  const [totalPage, setTotalPage] = useState(1);
+  const [page, setPage] = useState(1);
+  // const [pageIndex, setPageIndex] = useState(1);
 
   React.useEffect(() => {
     var cook = Cookies.get('user_role');
@@ -55,10 +57,11 @@ function CRM() {
   React.useEffect(() => {
     // var path = window.location.pathname;
     api
-      .get(`/api/v1/managements/instagram_users`)
+      .get(`/api/v1/managements/instagram_users?page=1`)
       .then((res) => {
-        // console.log('instagram_users: ', res.data.data.instagram_users);
-        setListInstagramUser(res.data.data.instagram_users);
+        // console.log('instagram_users: ', res.data);
+        setTotalPage(Math.ceil(res.data?.total / 25));
+        setListInstagramUser(res.data?.data?.instagram_users);
       })
       .catch((error) => {
         console.log(error);
@@ -440,18 +443,38 @@ function CRM() {
 
   // search
   function search() {
-    let searchClientVal = document.getElementById('searchUser')?.value;
-    let searchInstagramVal = document.getElementById('searchInstagramUser')?.value;
-    api
-      .get(
-        `api/v1/managements/instagram_users?supporting_users=${isActiveSearch}&instagram_user_name=${searchInstagramVal}&client_name=${searchClientVal}`
-      )
-      .then((res) => {
-        setListInstagramUser(res?.data?.data?.instagram_users);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (userRole) {
+      let searchClientVal = document.getElementById('searchUser')?.value;
+      let searchInstagramVal = document.getElementById('searchInstagramUser')?.value;
+      api
+        .get(
+          `api/v1/managements/instagram_users?supporting_users=${isActiveSearch}&instagram_user_name=${searchInstagramVal}&client_name=${searchClientVal}&page=1`
+        )
+        .then((res) => {
+          // console.log(res.data);
+          setTotalPage(Math.ceil(res.data?.total / 25));
+          setListInstagramUser(res?.data?.data?.instagram_users);
+          setPage(1);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      let searchInstagramVal = document.getElementById('searchInstagramUser')?.value;
+      api
+        .get(
+          `api/v1/managements/instagram_users?supporting_users=${isActiveSearch}&instagram_user_name=${searchInstagramVal}&page=1`
+        )
+        .then((res) => {
+          // console.log(res.data);
+          setTotalPage(Math.ceil(res.data?.total / 25));
+          setListInstagramUser(res?.data?.data?.instagram_users);
+          setPage(1);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 
   // handle active search change
@@ -471,28 +494,64 @@ function CRM() {
     //   });
   };
 
+  // reload crm
+  const reload = (pgIndex) => {
+    api
+      .get(`/api/v1/managements/instagram_users?page=${pgIndex}`)
+      .then((res) => {
+        // console.log(res.data);
+        let totalPage = Math.ceil(res.data?.total / 25);
+        if (totalPage < pgIndex) {
+          api
+            .get(`/api/v1/managements/instagram_users?page=${totalPage}`)
+            .then((res) => {
+              setListInstagramUser(res?.data?.data?.instagram_users);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        } else {
+          setListInstagramUser(res.data?.data?.instagram_users);
+        }
+        setTotalPage(Math.ceil(res.data?.total / 25));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  // handle change page
+  const handleChangePage = (e, value) => {
+    // console.log(value);
+    // setPageIndex(parseInt(value));
+    setPage(parseInt(value));
+    reload(parseInt(value));
+    document.querySelector('.main-panel').scrollTop = 0;
+  };
+
   return (
     <>
       <div className="content">
         <Row>
           <Col>
             <Card>
-              {userRole && (
-                <CardHeader>
-                  <h3>インスタグラムユーザー</h3>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <input
-                      id="searchInstagramUser"
-                      name="searchInstagramUser"
-                      style={{
-                        height: '38px',
-                        width: '200px',
-                        border: '1px solid #dee2e6',
-                        paddingTop: '-10px',
-                        borderRadius: '3px',
-                      }}
-                      placeholder="インスタグラムユーザー..."
-                    ></input>
+              <CardHeader>
+                <h3>インスタグラムユーザー</h3>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <input
+                    id="searchInstagramUser"
+                    name="searchInstagramUser"
+                    style={{
+                      height: '38px',
+                      width: '200px',
+                      border: '1px solid #dee2e6',
+                      paddingTop: '-10px',
+                      borderRadius: '3px',
+                      marginRight: '10px',
+                    }}
+                    placeholder="インスタグラムユーザー..."
+                  ></input>
+                  {userRole && (
                     <input
                       id="searchUser"
                       name="searchUser"
@@ -502,25 +561,25 @@ function CRM() {
                         border: '1px solid #dee2e6',
                         paddingTop: '-10px',
                         borderRadius: '3px',
-                        marginLeft: '10px',
                         marginRight: '10px',
                       }}
                       placeholder="クライアント名..."
                     ></input>
-                    <Switch
-                      onChange={activeSearchChange}
-                      onColor="#64c1ff"
-                      checked={isActiveSearch}
-                    />
-                    <Button
-                      onClick={() => search()}
-                      style={{ backgroundColor: '#66615b', marginLeft: '10px' }}
-                    >
-                      検索
-                    </Button>
-                  </div>
-                </CardHeader>
-              )}
+                  )}
+                  <Switch
+                    onChange={activeSearchChange}
+                    onColor="#64c1ff"
+                    checked={isActiveSearch}
+                  />
+                  <Button
+                    onClick={() => search()}
+                    style={{ backgroundColor: '#66615b', marginLeft: '10px' }}
+                  >
+                    検索
+                  </Button>
+                </div>
+              </CardHeader>
+
               <CardBody>
                 <Table
                   style={{
@@ -608,6 +667,13 @@ function CRM() {
                     </tr> */}
                   </tbody>
                 </Table>
+
+                <Pagination
+                  count={totalPage}
+                  variant="outlined"
+                  page={page}
+                  onChange={handleChangePage}
+                />
               </CardBody>
             </Card>
           </Col>

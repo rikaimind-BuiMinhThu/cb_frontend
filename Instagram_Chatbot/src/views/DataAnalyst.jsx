@@ -15,6 +15,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import requestNewToken from 'api/request-new-token';
 import * as utils from './../JS/client.js';
+import { Pagination } from '@material-ui/lab';
+import { useEffect } from 'react';
 // const categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
 
 function DataAnalyst() {
@@ -32,6 +34,10 @@ function DataAnalyst() {
   const [listGroup, setListGroup] = useState([]);
   const [userRole, setUserRole] = useState(false);
   const [lineDataWithoutRole, setLineDataWithoutRole] = useState([]);
+  const [totalPageLive, setTotalPageLive] = useState(1);
+  const [pageLive, setPageLive] = useState(1);
+  const [totalPageMsg, setTotalPageMsg] = useState(1);
+  const [pageMsg, setPageMsg] = useState(1);
 
   React.useEffect(() => {
     var cook = Cookies.get('user_role');
@@ -55,188 +61,229 @@ function DataAnalyst() {
     }
   }, []);
 
-  var testMsgEx = [
-    {
-      id: 1,
-      instagram_id: '5105085919538441',
-      username: 'linhvu9740',
-      full_name: 'Linh Vu',
-      follower_count: 0,
-      is_verified_user: null,
-      is_user_follow_business: true,
-      is_business_follow_user: false,
-      instagram_account_id: 1,
-      created_at: '2022-07-31T09:58:36.678Z',
-      updated_at: '2022-08-26T17:34:21.215Z',
-      pending_message_id: null,
-      email: 'Hha@gmail.com',
-      phone_number: '03111111111',
-      real_name: 'Haha',
-      company_name: 'haha@gmail.com',
-      company_role: null,
-      website: null,
-      propose: null,
-      know_product_in: null,
-      status: 'completion',
-      start_chatbot_in: 'dm',
-      start_chatbot_at: '2022-08-15T17:55:49.293Z',
-      chatbot_usages: [
-        {
-          id: 24591,
-          usage_type: 'dm_received',
-          content: 'Kaka',
-          media_id: '',
-          media_start_at: null,
-          instagram_account_id: 1,
-          created_at: '2022-08-26T16:57:23.874Z',
-          updated_at: '2022-08-26T16:57:23.874Z',
-          instagram_user_id: 1,
-        },
-        {
-          id: 24592,
-          usage_type: 'dm_sent',
-          content: 'ssd',
-          media_id: null,
-          media_start_at: null,
-          instagram_account_id: 1,
-          created_at: '2022-08-26T16:57:25.616Z',
-          updated_at: '2022-08-26T16:57:25.616Z',
-          instagram_user_id: 1,
-        },
-        {
-          id: 24593,
-          usage_type: 'dm_sent',
-          content: 'ssdd',
-          media_id: null,
-          media_start_at: null,
-          instagram_account_id: 1,
-          created_at: '2022-08-26T16:57:26.578Z',
-          updated_at: '2022-08-26T16:57:26.578Z',
-          instagram_user_id: 1,
-        },
-      ],
-    },
-    {
-      id: 1,
-      instagram_id: '5105085919538441',
-      username: 'linhvu9740',
-      full_name: 'Linh Vu',
-      follower_count: 0,
-      is_verified_user: null,
-      is_user_follow_business: true,
-      is_business_follow_user: false,
-      instagram_account_id: 1,
-      created_at: '2022-07-31T09:58:36.678Z',
-      updated_at: '2022-08-26T17:34:21.215Z',
-      pending_message_id: null,
-      email: 'Hha@gmail.com',
-      phone_number: '03111111111',
-      real_name: 'Haha',
-      company_name: 'haha@gmail.com',
-      company_role: null,
-      website: null,
-      propose: null,
-      know_product_in: null,
-      status: 'completion',
-      start_chatbot_in: 'dm',
-      start_chatbot_at: '2022-08-15T17:55:49.293Z',
-      chatbot_usages: [
-        {
-          id: 24591,
-          usage_type: 'dm_received',
-          content: 'Kaka',
-          media_id: '',
-          media_start_at: null,
-          instagram_account_id: 1,
-          created_at: '2022-08-26T16:57:23.874Z',
-          updated_at: '2022-08-26T16:57:23.874Z',
-          instagram_user_id: 1,
-        },
-        {
-          id: 24592,
-          usage_type: 'dm_sent',
-          content: 'ssd',
-          media_id: null,
-          media_start_at: null,
-          instagram_account_id: 1,
-          created_at: '2022-08-26T16:57:25.616Z',
-          updated_at: '2022-08-26T16:57:25.616Z',
-          instagram_user_id: 1,
-        },
-        {
-          id: 24593,
-          usage_type: 'dm_sent',
-          content: 'ssdd',
-          media_id: null,
-          media_start_at: null,
-          instagram_account_id: 1,
-          created_at: '2022-08-26T16:57:26.578Z',
-          updated_at: '2022-08-26T16:57:26.578Z',
-          instagram_user_id: 1,
-        },
-      ],
-    },
-    {
-      id: 1,
-      instagram_id: '5105085919538441',
-      username: 'linhvu9740',
-      full_name: 'Linh Vu',
-      follower_count: 0,
-      is_verified_user: null,
-      is_user_follow_business: true,
-      is_business_follow_user: false,
-      instagram_account_id: 1,
-      created_at: '2022-07-31T09:58:36.678Z',
-      updated_at: '2022-08-26T17:34:21.215Z',
-      pending_message_id: null,
-      email: 'Hha@gmail.com',
-      phone_number: '03111111111',
-      real_name: 'Haha',
-      company_name: 'haha@gmail.com',
-      company_role: null,
-      website: null,
-      propose: null,
-      know_product_in: null,
-      status: 'completion',
-      start_chatbot_in: 'dm',
-      start_chatbot_at: '2022-08-15T17:55:49.293Z',
-      chatbot_usages: [
-        {
-          id: 24591,
-          usage_type: 'dm_received',
-          content: 'Kaka',
-          media_id: '',
-          media_start_at: null,
-          instagram_account_id: 1,
-          created_at: '2022-08-26T16:57:23.874Z',
-          updated_at: '2022-08-26T16:57:23.874Z',
-          instagram_user_id: 1,
-        },
-        {
-          id: 24592,
-          usage_type: 'dm_sent',
-          content: 'ssd',
-          media_id: null,
-          media_start_at: null,
-          instagram_account_id: 1,
-          created_at: '2022-08-26T16:57:25.616Z',
-          updated_at: '2022-08-26T16:57:25.616Z',
-          instagram_user_id: 1,
-        },
-        {
-          id: 24593,
-          usage_type: 'dm_sent',
-          content: 'ssdd',
-          media_id: null,
-          media_start_at: null,
-          instagram_account_id: 1,
-          created_at: '2022-08-26T16:57:26.578Z',
-          updated_at: '2022-08-26T16:57:26.578Z',
-          instagram_user_id: 1,
-        },
-      ],
-    },
-  ];
+  const [liveData, setLiveData] = useState([]);
+  useEffect(() => {
+    // let dateStart = new Date();
+    // dateStart = dateStart.setMonth(dateStart.getMonth() - 1);
+    // dateStart = new Date(dateStart);
+    // var month = dateStart.toISOString().slice(5, 7) - 6;
+    // if (month < 10) {
+    //   month = `0${month}`;
+    // } else if (month <= 0) {
+    //   month = '01';
+    // }
+
+    let dateLiveStart = new Date();
+    dateLiveStart = dateLiveStart.setMonth(dateLiveStart.getMonth() - 1);
+    dateLiveStart = new Date(dateLiveStart);
+    dateLiveStart = dateLiveStart.setDate(15);
+    dateLiveStart = new Date(dateLiveStart);
+    let dateLiveEnd = new Date();
+    dateLiveEnd = dateLiveEnd.setDate(dateLiveEnd.getDate() + 1);
+    dateLiveEnd = new Date(dateLiveEnd);
+
+    // alert()
+    api
+      .get(
+        `/api/v1/analytics/chatbot_usages/live?begin_date=${dateLiveStart
+          .toISOString()
+          .slice(0, 10)}&end_date=${dateLiveEnd.toISOString().slice(0, 10)}&page=1`
+      )
+      .then((res) => {
+        // console.log('live analytics: ', res.data);
+        setTotalPageLive(Math.ceil(res.data?.total / 10));
+        setLiveData(res.data?.live_usages);
+      })
+      .catch((error) => {
+        console.log(error);
+        // if (error.response.data.code === 3) {
+        //     requestNewToken(path)
+        // }
+      });
+  }, []);
+
+  // var testMsgEx = [
+  //   {
+  //     id: 1,
+  //     instagram_id: '5105085919538441',
+  //     username: 'linhvu9740',
+  //     full_name: 'Linh Vu',
+  //     follower_count: 0,
+  //     is_verified_user: null,
+  //     is_user_follow_business: true,
+  //     is_business_follow_user: false,
+  //     instagram_account_id: 1,
+  //     created_at: '2022-07-31T09:58:36.678Z',
+  //     updated_at: '2022-08-26T17:34:21.215Z',
+  //     pending_message_id: null,
+  //     email: 'Hha@gmail.com',
+  //     phone_number: '03111111111',
+  //     real_name: 'Haha',
+  //     company_name: 'haha@gmail.com',
+  //     company_role: null,
+  //     website: null,
+  //     propose: null,
+  //     know_product_in: null,
+  //     status: 'completion',
+  //     start_chatbot_in: 'dm',
+  //     start_chatbot_at: '2022-08-15T17:55:49.293Z',
+  //     chatbot_usages: [
+  //       {
+  //         id: 24591,
+  //         usage_type: 'dm_received',
+  //         content: 'Kaka',
+  //         media_id: '',
+  //         media_start_at: null,
+  //         instagram_account_id: 1,
+  //         created_at: '2022-08-26T16:57:23.874Z',
+  //         updated_at: '2022-08-26T16:57:23.874Z',
+  //         instagram_user_id: 1,
+  //       },
+  //       {
+  //         id: 24592,
+  //         usage_type: 'dm_sent',
+  //         content: 'ssd',
+  //         media_id: null,
+  //         media_start_at: null,
+  //         instagram_account_id: 1,
+  //         created_at: '2022-08-26T16:57:25.616Z',
+  //         updated_at: '2022-08-26T16:57:25.616Z',
+  //         instagram_user_id: 1,
+  //       },
+  //       {
+  //         id: 24593,
+  //         usage_type: 'dm_sent',
+  //         content: 'ssdd',
+  //         media_id: null,
+  //         media_start_at: null,
+  //         instagram_account_id: 1,
+  //         created_at: '2022-08-26T16:57:26.578Z',
+  //         updated_at: '2022-08-26T16:57:26.578Z',
+  //         instagram_user_id: 1,
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: 1,
+  //     instagram_id: '5105085919538441',
+  //     username: 'linhvu9740',
+  //     full_name: 'Linh Vu',
+  //     follower_count: 0,
+  //     is_verified_user: null,
+  //     is_user_follow_business: true,
+  //     is_business_follow_user: false,
+  //     instagram_account_id: 1,
+  //     created_at: '2022-07-31T09:58:36.678Z',
+  //     updated_at: '2022-08-26T17:34:21.215Z',
+  //     pending_message_id: null,
+  //     email: 'Hha@gmail.com',
+  //     phone_number: '03111111111',
+  //     real_name: 'Haha',
+  //     company_name: 'haha@gmail.com',
+  //     company_role: null,
+  //     website: null,
+  //     propose: null,
+  //     know_product_in: null,
+  //     status: 'completion',
+  //     start_chatbot_in: 'dm',
+  //     start_chatbot_at: '2022-08-15T17:55:49.293Z',
+  //     chatbot_usages: [
+  //       {
+  //         id: 24591,
+  //         usage_type: 'dm_received',
+  //         content: 'Kaka',
+  //         media_id: '',
+  //         media_start_at: null,
+  //         instagram_account_id: 1,
+  //         created_at: '2022-08-26T16:57:23.874Z',
+  //         updated_at: '2022-08-26T16:57:23.874Z',
+  //         instagram_user_id: 1,
+  //       },
+  //       {
+  //         id: 24592,
+  //         usage_type: 'dm_sent',
+  //         content: 'ssd',
+  //         media_id: null,
+  //         media_start_at: null,
+  //         instagram_account_id: 1,
+  //         created_at: '2022-08-26T16:57:25.616Z',
+  //         updated_at: '2022-08-26T16:57:25.616Z',
+  //         instagram_user_id: 1,
+  //       },
+  //       {
+  //         id: 24593,
+  //         usage_type: 'dm_sent',
+  //         content: 'ssdd',
+  //         media_id: null,
+  //         media_start_at: null,
+  //         instagram_account_id: 1,
+  //         created_at: '2022-08-26T16:57:26.578Z',
+  //         updated_at: '2022-08-26T16:57:26.578Z',
+  //         instagram_user_id: 1,
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: 1,
+  //     instagram_id: '5105085919538441',
+  //     username: 'linhvu9740',
+  //     full_name: 'Linh Vu',
+  //     follower_count: 0,
+  //     is_verified_user: null,
+  //     is_user_follow_business: true,
+  //     is_business_follow_user: false,
+  //     instagram_account_id: 1,
+  //     created_at: '2022-07-31T09:58:36.678Z',
+  //     updated_at: '2022-08-26T17:34:21.215Z',
+  //     pending_message_id: null,
+  //     email: 'Hha@gmail.com',
+  //     phone_number: '03111111111',
+  //     real_name: 'Haha',
+  //     company_name: 'haha@gmail.com',
+  //     company_role: null,
+  //     website: null,
+  //     propose: null,
+  //     know_product_in: null,
+  //     status: 'completion',
+  //     start_chatbot_in: 'dm',
+  //     start_chatbot_at: '2022-08-15T17:55:49.293Z',
+  //     chatbot_usages: [
+  //       {
+  //         id: 24591,
+  //         usage_type: 'dm_received',
+  //         content: 'Kaka',
+  //         media_id: '',
+  //         media_start_at: null,
+  //         instagram_account_id: 1,
+  //         created_at: '2022-08-26T16:57:23.874Z',
+  //         updated_at: '2022-08-26T16:57:23.874Z',
+  //         instagram_user_id: 1,
+  //       },
+  //       {
+  //         id: 24592,
+  //         usage_type: 'dm_sent',
+  //         content: 'ssd',
+  //         media_id: null,
+  //         media_start_at: null,
+  //         instagram_account_id: 1,
+  //         created_at: '2022-08-26T16:57:25.616Z',
+  //         updated_at: '2022-08-26T16:57:25.616Z',
+  //         instagram_user_id: 1,
+  //       },
+  //       {
+  //         id: 24593,
+  //         usage_type: 'dm_sent',
+  //         content: 'ssdd',
+  //         media_id: null,
+  //         media_start_at: null,
+  //         instagram_account_id: 1,
+  //         created_at: '2022-08-26T16:57:26.578Z',
+  //         updated_at: '2022-08-26T16:57:26.578Z',
+  //         instagram_user_id: 1,
+  //       },
+  //     ],
+  //   },
+  // ];
 
   React.useEffect(() => {
     let dateStart = new Date();
@@ -366,11 +413,12 @@ function DataAnalyst() {
     dateEnd = dateEnd.toISOString().slice(0, 10);
     api
       .get(
-        `/api/v1/message_managements/message_groups/data_analyst?begin_date=${dateStart}&end_date=${dateEnd}`
+        `/api/v1/message_managements/message_groups/data_analyst?begin_date=${dateStart}&end_date=${dateEnd}&page=1`
       )
       // .get(`/api/v1/message_managements/message_groups`)
       .then((res) => {
-        // console.log(res.data.data);
+        // console.log(res.data);
+        setTotalPageMsg(Math.ceil(res.data?.total / 10));
         setListGroup(res.data.data);
         var msgDataAll = [];
         for (var i = 0; i < res.data.data.length; i++) {
@@ -388,46 +436,6 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
-      });
-  }, []);
-
-  const [liveData, setLiveData] = useState([]);
-  React.useEffect(() => {
-    // let dateStart = new Date();
-    // dateStart = dateStart.setMonth(dateStart.getMonth() - 1);
-    // dateStart = new Date(dateStart);
-    // var month = dateStart.toISOString().slice(5, 7) - 6;
-    // if (month < 10) {
-    //   month = `0${month}`;
-    // } else if (month <= 0) {
-    //   month = '01';
-    // }
-
-    let dateLiveStart = new Date();
-    dateLiveStart = dateLiveStart.setMonth(dateLiveStart.getMonth() - 1);
-    dateLiveStart = new Date(dateLiveStart);
-    dateLiveStart = dateLiveStart.setDate(15);
-    dateLiveStart = new Date(dateLiveStart);
-    let dateLiveEnd = new Date();
-    dateLiveEnd = dateLiveEnd.setDate(dateLiveEnd.getDate() + 1);
-    dateLiveEnd = new Date(dateLiveEnd);
-
-    // alert()
-    api
-      .get(
-        `/api/v1/analytics/chatbot_usages/live?begin_date=${dateLiveStart
-          .toISOString()
-          .slice(0, 10)}&end_date=${dateLiveEnd.toISOString().slice(0, 10)}`
-      )
-      .then((res) => {
-        // console.log('live analytics: ', res.data.live_usages);
-        setLiveData(res.data.live_usages);
-      })
-      .catch((error) => {
-        console.log(error);
-        // if (error.response.data.code === 3) {
-        //     requestNewToken(path)
-        // }
       });
   }, []);
 
@@ -652,22 +660,61 @@ function DataAnalyst() {
           console.log(error);
         });
       ///////////////////////////////////////////////
-      api
-        .get(`/api/v1/analytics/chatbot_usages/live?begin_date=${startD}&end_date=${endDateLive}`)
-        .then((res) => {
-          setLiveData(res.data.live_usages);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      // api
+      //   .get(
+      //     `/api/v1/analytics/chatbot_usages/live?begin_date=${startD}&end_date=${endDateLive}&page=1`
+      //   )
+      //   .then((res) => {
+      //     setTotalPageLive(Math.ceil(res.data?.total / 10));
+      //     setPageLive(1);
+      //     setLiveData(res.data?.live_usages);
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //   });
+
+      // will uncomment when have api param client_name
+      if (userRole) {
+        const liveSearchVal = document.getElementById('searchLive').value;
+        api
+          // .get(
+          //   `/api/v1/analytics/chatbot_usages/live?begin_date=${startD}&end_date=${endDateLive}&page=1&client_name=${liveSearchVal}`
+          // )
+          .get(
+            `/api/v1/analytics/chatbot_usages/live?begin_date=${startD}&end_date=${endDateLive}&page=1`
+          )
+          .then((res) => {
+            setPageLive(1);
+            setLiveData(res.data?.live_usages);
+            setTotalPageLive(Math.ceil(res.data?.total / 10));
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        api
+          .get(
+            `/api/v1/analytics/chatbot_usages/live?begin_date=${startD}&end_date=${endDateLive}&page=1`
+          )
+          .then((res) => {
+            setPageLive(1);
+            setLiveData(res.data?.live_usages);
+            setTotalPageLive(Math.ceil(res.data?.total / 10));
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
       ///////////////////////////////////////////////
       if (userRole) {
         const msgGroupSearchVal = document.getElementById('searchMsg').value;
         api
           .get(
-            `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&client_name=${msgGroupSearchVal}`
+            `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&client_name=${msgGroupSearchVal}&page=1`
           )
           .then((res) => {
+            setTotalPageMsg(Math.ceil(res.data?.total / 10));
+            setPageMsg(1);
             setListGroup(res?.data?.data);
             let msgDataAll = [];
             for (let i = 0; i < res.data.data.length; i++) {
@@ -689,9 +736,11 @@ function DataAnalyst() {
       } else {
         api
           .get(
-            `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}`
+            `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&page=1`
           )
           .then((res) => {
+            setTotalPageMsg(Math.ceil(res.data?.total / 10));
+            setPageMsg(1);
             setListGroup(res?.data?.data);
             let msgDataAll = [];
             for (let i = 0; i < res.data.data.length; i++) {
@@ -923,22 +972,59 @@ function DataAnalyst() {
           console.log(error);
         });
       ///////////////////////////////////////////////
-      api
-        .get(`/api/v1/analytics/chatbot_usages/live?begin_date=${startD}&end_date=${endDateLive}`)
-        .then((res) => {
-          setLiveData(res.data.live_usages);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      // api
+      //   .get(`/api/v1/analytics/chatbot_usages/live?begin_date=${startD}&end_date=${endDateLive}`)
+      //   .then((res) => {
+      //     setTotalPageLive(Math.ceil(res.data?.total / 10));
+      //     setPageLive(1);
+      //     setLiveData(res.data?.live_usages);
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //   });
+
+      // will uncomment when have api param client_name
+      if (userRole) {
+        const liveSearchVal = document.getElementById('searchLive').value;
+        api
+          // .get(
+          //   `/api/v1/analytics/chatbot_usages/live?begin_date=${startD}&end_date=${endDateLive}&page=1&client_name=${liveSearchVal}`
+          // )
+          .get(
+            `/api/v1/analytics/chatbot_usages/live?begin_date=${startD}&end_date=${endDateLive}&page=1`
+          )
+          .then((res) => {
+            setPageLive(1);
+            setLiveData(res.data?.live_usages);
+            setTotalPageLive(Math.ceil(res.data?.total / 10));
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        api
+          .get(
+            `/api/v1/analytics/chatbot_usages/live?begin_date=${startD}&end_date=${endDateLive}&page=1`
+          )
+          .then((res) => {
+            setPageLive(1);
+            setLiveData(res.data?.live_usages);
+            setTotalPageLive(Math.ceil(res.data?.total / 10));
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
       ///////////////////////////////////////////////
       if (userRole) {
         const msgGroupSearchVal = document.getElementById('searchMsg').value;
         api
           .get(
-            `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&client_name=${msgGroupSearchVal}`
+            `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&client_name=${msgGroupSearchVal}&page=1`
           )
           .then((res) => {
+            setTotalPageMsg(Math.ceil(res.data?.total / 10));
+            setPageMsg(1);
             setListGroup(res?.data?.data);
             let msgDataAll = [];
             for (let i = 0; i < res.data.data.length; i++) {
@@ -960,9 +1046,11 @@ function DataAnalyst() {
       } else {
         api
           .get(
-            `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}`
+            `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&page=1`
           )
           .then((res) => {
+            setTotalPageMsg(Math.ceil(res.data?.total / 10));
+            setPageMsg(1);
             setListGroup(res?.data?.data);
             let msgDataAll = [];
             for (let i = 0; i < res.data.data.length; i++) {
@@ -992,7 +1080,25 @@ function DataAnalyst() {
   };
 
   // live search
-  const liveSearch = () => {};
+  const liveSearch = () => {
+    let startDateLive = startDate.toISOString().slice(0, 10);
+    let endTemp = new Date(endDate);
+    let endDateLive = new Date(endTemp.setDate(endTemp.getDate() + 1));
+    endDateLive = endDateLive.toISOString().slice(0, 10);
+    const liveSearchVal = document.getElementById('searchLive').value;
+    api
+      .get(
+        `/api/v1/analytics/chatbot_usages/live?begin_date=${startDateLive}&end_date=${endDateLive}&page=1&client_name=${liveSearchVal}`
+      )
+      .then((res) => {
+        setPageLive(1);
+        setTotalPageLive(Math.ceil(res.data?.total / 10));
+        setLiveData(res.data?.live_usages);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   // message group search
   const msgSearch = () => {
@@ -1001,9 +1107,11 @@ function DataAnalyst() {
     const msgGroupSearchVal = document.getElementById('searchMsg').value;
     api
       .get(
-        `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&client_name=${msgGroupSearchVal}`
+        `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&client_name=${msgGroupSearchVal}&page=1`
       )
       .then((res) => {
+        setTotalPageMsg(Math.ceil(res.data?.total / 10));
+        setPageMsg(1);
         setListGroup(res?.data?.data);
         let msgDataAll = [];
         for (let i = 0; i < res.data.data.length; i++) {
@@ -1022,6 +1130,222 @@ function DataAnalyst() {
       .catch((error) => {
         console.log(error);
       });
+  };
+
+  // handle change page live
+  const handleChangePageLive = (e, value) => {
+    setPageLive(parseInt(value));
+    let startDateLive = startDate.toISOString().slice(0, 10);
+    let endTemp = new Date(endDate);
+    let endDateLive = new Date(endTemp.setDate(endTemp.getDate() + 1));
+    endDateLive = endDateLive.toISOString().slice(0, 10);
+    // api
+    //   .get(
+    //     `/api/v1/analytics/chatbot_usages/live?begin_date=${startDateLive}&end_date=${endDateLive}&page=${value}`
+    //   )
+    //   .then((res) => {
+    //     let totalPage = Math.ceil(res.data?.total / 10);
+    //     if (totalPage < parseInt(value)) {
+    //       api
+    //         .get(
+    //           `/api/v1/analytics/chatbot_usages/live?begin_date=${startDateLive}&end_date=${endDateLive}?page=${totalPage}`
+    //         )
+    //         .then((res) => {
+    //           setLiveData(res.data?.live_usages);
+    //         })
+    //         .catch((error) => {
+    //           console.log(error);
+    //         });
+    //     } else {
+    //       setLiveData(res.data?.live_usages);
+    //     }
+    //     setTotalPageLive(Math.ceil(res.data?.total / 10));
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+
+    if (userRole) {
+      const liveSearchVal = document.getElementById('searchLive').value;
+      // will uncomment when have api param client_name
+      api
+        // .get(
+        //   `/api/v1/analytics/chatbot_usages/live?begin_date=${startDateLive}&end_date=${endDateLive}&page=${value}&client_name=${liveSearchVal}`
+        // )
+        .get(
+          `/api/v1/analytics/chatbot_usages/live?begin_date=${startDateLive}&end_date=${endDateLive}&page=${value}`
+        )
+        .then((res) => {
+          let totalPage = Math.ceil(res.data?.total / 10);
+          if (totalPage < parseInt(value)) {
+            api
+              // .get(
+              //   `/api/v1/analytics/chatbot_usages/live?begin_date=${startDateLive}&end_date=${endDateLive}?page=${totalPage}&client_name=${liveSearchVal}`
+              // )
+              .get(
+                `/api/v1/analytics/chatbot_usages/live?begin_date=${startDateLive}&end_date=${endDateLive}?page=${totalPage}`
+              )
+              .then((res) => {
+                setLiveData(res.data?.live_usages);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else {
+            setLiveData(res.data?.live_usages);
+          }
+          setTotalPageLive(Math.ceil(res.data?.total / 10));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      api
+        .get(
+          `/api/v1/analytics/chatbot_usages/live?begin_date=${startDateLive}&end_date=${endDateLive}&page=${value}`
+        )
+        .then((res) => {
+          let totalPage = Math.ceil(res.data?.total / 10);
+          if (totalPage < parseInt(value)) {
+            api
+              .get(
+                `/api/v1/analytics/chatbot_usages/live?begin_date=${startDateLive}&end_date=${endDateLive}?page=${totalPage}`
+              )
+              .then((res) => {
+                setLiveData(res.data?.live_usages);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else {
+            setLiveData(res.data?.live_usages);
+          }
+          setTotalPageLive(Math.ceil(res.data?.total / 10));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
+
+  // handle change page live
+  const handleChangePageMsg = (e, value) => {
+    setPageMsg(parseInt(value));
+    let startD = startDate.toISOString().slice(0, 10);
+    let endD = endDate.toISOString().slice(0, 10);
+    if (userRole) {
+      const msgGroupSearchVal = document.getElementById('searchMsg').value;
+      api
+        .get(
+          `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&client_name=${msgGroupSearchVal}&page=${value}`
+        )
+        .then((res) => {
+          console.log(res.data);
+          setTotalPageMsg(Math.ceil(res.data?.total / 10));
+
+          let totalPage = Math.ceil(res.data?.total / 10);
+          if (totalPage < parseInt(value)) {
+            api
+              .get(
+                `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&client_name=${msgGroupSearchVal}&page=${totalPage}`
+              )
+              .then((res) => {
+                setListGroup(res?.data?.data);
+                let msgDataAll = [];
+                for (let i = 0; i < res.data?.data.length; i++) {
+                  api
+                    .get(
+                      `/api/v1/message_managements/message_groups/${res.data.data[i].id}/export_csv`
+                    )
+                    .then((res) => {
+                      msgDataAll.push(res.data.data.instagram_users);
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    });
+                }
+                // console.log('msgDataAll: ', msgDataAll);
+                setMsgExDataAll(msgDataAll);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else {
+            setListGroup(res?.data?.data);
+            let msgDataAll = [];
+            for (let i = 0; i < res.data.data.length; i++) {
+              api
+                .get(`/api/v1/message_managements/message_groups/${res.data.data[i].id}/export_csv`)
+                .then((res) => {
+                  msgDataAll.push(res.data.data.instagram_users);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }
+            // console.log('msgDataAll: ', msgDataAll);
+            setMsgExDataAll(msgDataAll);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      api
+        .get(
+          `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&page=${value}`
+        )
+        .then((res) => {
+          setTotalPageMsg(Math.ceil(res.data?.total / 10));
+
+          let totalPage = Math.ceil(res.data?.total / 10);
+          if (totalPage < parseInt(value)) {
+            api
+              .get(
+                `/api/v1/message_managements/message_groups/data_analyst?begin_date=${startD}&end_date=${endD}&page=${totalPage}`
+              )
+              .then((res) => {
+                setListGroup(res?.data?.data);
+                let msgDataAll = [];
+                for (let i = 0; i < res.data.data.length; i++) {
+                  api
+                    .get(
+                      `/api/v1/message_managements/message_groups/${res.data.data[i].id}/export_csv`
+                    )
+                    .then((res) => {
+                      msgDataAll.push(res.data.data.instagram_users);
+                    })
+                    .catch((error) => {
+                      console.log(error);
+                    });
+                }
+                // console.log('msgDataAll: ', msgDataAll);
+                setMsgExDataAll(msgDataAll);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else {
+            setListGroup(res?.data?.data);
+            let msgDataAll = [];
+            for (let i = 0; i < res.data.data.length; i++) {
+              api
+                .get(`/api/v1/message_managements/message_groups/${res.data.data[i].id}/export_csv`)
+                .then((res) => {
+                  msgDataAll.push(res.data.data.instagram_users);
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            }
+            // console.log('msgDataAll: ', msgDataAll);
+            setMsgExDataAll(msgDataAll);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   return (
@@ -1192,6 +1516,13 @@ function DataAnalyst() {
                           </tbody>
                         </Table>
                       </div>
+
+                      <Pagination
+                        count={totalPageLive}
+                        variant="outlined"
+                        page={pageLive}
+                        onChange={handleChangePageLive}
+                      />
                     </CardBody>
                   </div>
                 </div>
@@ -1309,6 +1640,13 @@ function DataAnalyst() {
                     </tbody>
                   </Table>
                 </div>
+
+                <Pagination
+                  count={totalPageMsg}
+                  variant="outlined"
+                  page={pageMsg}
+                  onChange={handleChangePageMsg}
+                />
               </CardBody>
             </Card>
           </Col>

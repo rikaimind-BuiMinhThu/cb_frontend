@@ -1129,15 +1129,6 @@ function ClientManagement() {
     document.getElementById(`avatar`).click();
   }
 
-  useEffect(() => {
-    console.log(startDate);
-    console.log(
-      startDatePreview && startDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-    );
-    // console.log(new Date().toISOString().slice(0, 10).replaceAll('-', '/'));
-    // new Date().toLocaleDateString()
-  }, [startDate, startDatePreview]);
-
   // select date start
   const selectDateStart = (start) => {
     let startTemp = new Date(start);
