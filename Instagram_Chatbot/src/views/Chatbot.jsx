@@ -24,6 +24,8 @@ import ModalShortTem from "./Popup/ModalShortTem";
 import workingtable from "../views/Popup/workingtable.jpg"
 import registration from "../views/Popup/registration.jpeg"
 import chatbot from "../views/Popup/chatbot.png"
+import { Pagination } from '@material-ui/lab';
+import { MDBIcon } from 'mdbreact';
 
 function Chatbot() {
   const [groupList, setGroupList] = useState([])
@@ -49,7 +51,8 @@ function Chatbot() {
   const [isAddOpenFreeInput, setIsAddOpenFreeInput] = useState(false)
   const [isUpdateOpenFreeInput, setIsUpdateOpenFreeInput] = useState(false)
   const [isOpenChangeIndexMsg, setIsOpenChangeIndexMsg] = useState(false)
-
+  var [pageIndex, setPageIndex] = useState(1);
+  var [totalPage, setTotalPage] = useState();
   const [isUpdateOpenSingleChoiceGet, setIsUpdateOpenSingleChoiceGet] = useState(false)
 
   React.useEffect(() => {
@@ -114,7 +117,7 @@ function Chatbot() {
   React.useEffect(() => {
     // var paramSearch = { page: pageIndex }
     var path = window.location.pathname;
-    api.get(`/api/v1/message_managements/message_groups`).then(res => {
+    api.get(`/api/v1/message_managements/message_groups?page=1`).then(res => {
       console.log("message_groups: ", res.data.data.length)
       var idli = []
       for (var i = 0; i < res.data.data.length; i++) {
@@ -122,7 +125,9 @@ function Chatbot() {
         // 
       }
       setIdList(idli)
-      // console.log(idli)
+      // console.log("total ne: ", res.data.total)
+      var totalPage = Math.ceil(res.data.total / 25);
+      setTotalPage(totalPage);
       setGroupList(res.data.data)
       setTimeout(() => {
         for (var i = 0; i < idli.length; i++) {
@@ -139,6 +144,37 @@ function Chatbot() {
       // }
     })
   }, [])
+
+  function reloadListGroupPaging(pgIndex) {
+    // var paramSearch = { page: pageIndex }
+    var path = window.location.pathname;
+    api.get(`/api/v1/message_managements/message_groups?page=${pgIndex}`).then(res => {
+      console.log("message_groups: ", res.data.data.length)
+      var idli = []
+      for (var i = 0; i < res.data.data.length; i++) {
+        idli.push(res.data.data[i].id)
+        // 
+      }
+      setIdList(idli)
+      // console.log("total ne: ", res.data.total)
+      var totalPage = Math.ceil(res.data.total / 25);
+      setTotalPage(totalPage);
+      setGroupList(res.data.data)
+      setTimeout(() => {
+        for (var i = 0; i < idli.length; i++) {
+          if (document.getElementById('liMesBag') !== null) {
+            document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
+          }
+
+        }
+      }, 1000)
+    }).catch(error => {
+      console.log(error)
+      // if (error.response.data.code === 3) {
+      //   requestNewToken(path)
+      // }
+    })
+  }
 
   function reloadGroup() {
     var path = window.location.pathname;
@@ -168,9 +204,14 @@ function Chatbot() {
 
   ///bo comment ben tren
   const [idPPUP, setIdPPUP] = useState()
-  function refreshMsgGroup() {
-    var path = window.location.pathname;
-    api.get(`/api/v1/message_managements/message_groups`).then(res => {
+  function refreshMsgGroup(pgIn) {
+    var page
+    if (pgIn == undefined || pgIn == null || pgIn == "") {
+      page = pageIndex
+    } else {
+      page = pgIn
+    }
+    api.get(`/api/v1/message_managements/message_groups?page=${page}`).then(res => {
       // var totalPage = Math.ceil(res.data.data.total / 25)
       // setTotalPage(totalPage)
       var idli = []
@@ -182,25 +223,44 @@ function Chatbot() {
       if (idli.length <= 1) {
         window.location.reload()
       } else {
-        for (var i = 0; i < idli.length; i++) {
+        console.log("total gr: ", res.data.data)
+        var totalPage = Math.ceil(res.data.total / 25);
+        setTotalPage(totalPage);
+        setGroupList(res.data.data)
+        setIdList(idli)
+        if (page == pageIndex) {
+          console.log("page not change")
+          for (var i = 0; i < idli.length; i++) {
+            document.getElementById(`ulMesBag${idli[i]}`).innerHTML = ""
+            var liMesBag = document.createElement('li')
+            liMesBag.setAttribute('id', `liMesBag${idli[i]}`)
+            document.getElementById(`ulMesBag${idli[i]}`).appendChild(liMesBag)
+            
+            // console.log(idli)
+            // setTimeout(() => {
+            //   var i = idli.length - 1
+            //   document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
 
+            // }, 1000)
+          }
+        } else if (page != pageIndex) {
+          console.log("page change")
 
-          document.getElementById(`ulMesBag${idli[i]}`).innerHTML = ""
-          var liMesBag = document.createElement('li')
-          liMesBag.setAttribute('id', `liMesBag${idli[i]}`)
+          setTimeout(() => {
+            for (var i = 0; i < idli.length; i++) {
+              document.getElementById(`ulMesBag${idli[i]}`).innerHTML = ""
+              var liMesBag = document.createElement('li')
+              // if (document.getElementById('liMesBag') !== null) {
+                liMesBag.setAttribute('id', `liMesBag${idli[i]}`)
+                document.getElementById(`ulMesBag${idli[i]}`).appendChild(liMesBag)
+                
+              // }
 
-          document.getElementById(`ulMesBag${idli[i]}`).appendChild(liMesBag)
-          setIdList(idli)
-          // console.log(idli)
-          setGroupList(res.data.data)
-
-
-          // setTimeout(() => {
-          //   var i = idli.length - 1
-          //   document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
-
-          // }, 1000)
+            }
+          }, 1000)
         }
+
+
       }
 
 
@@ -3196,6 +3256,7 @@ function Chatbot() {
   const [idReloadMsgBag, setIdReloadMsgBag] = useState()
   const [idReloadMsgBagFromGetMSG, setIdReloadMsgBagFromGetMSG] = useState()
   const [idMsgBagRename, setIdMsgBagRename] = useState()
+  const [idMsgBagMovePage, setIdMsgBagMovePage] = useState()
   const [idMsgBagCopy, setIdMsgBagCopy] = useState()
   const [idMsgBagDelete, setIdMsgBagDelete] = useState()
 
@@ -3396,6 +3457,7 @@ function Chatbot() {
             <div class="dropdown-content">
               <button id="renameBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">名前変更</button>
               <button id="copyBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">コピー</button>
+              <button id="moveBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">Move</button>
               <button id="deleteBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">削除</button>
               <button id="cancelBtn${idIn}_${idd}" style="border:none; border-radius:10px; background-color: #66615b; color:white; font-size:13px">キャンセル</button>
             </div>
@@ -3409,10 +3471,16 @@ function Chatbot() {
             setIdMsgBagRename(idd)
             setIsOpenMsgBagRename(true)
           })
+
           document.getElementById(`copyBtn${idIn}_${idd}`).addEventListener('click', (event) => {
             event.preventDefault()
             setIdMsgBagCopy(idd)
             setIsOpenMsgBagCopy(true)
+          })
+
+          document.getElementById(`moveBtn${idIn}_${idd}`).addEventListener('click', (event) => {
+            event.preventDefault()
+            setIdMsgBagMovePage(idd)
           })
 
           document.getElementById(`cancelBtn${idIn}_${idd}`).addEventListener('click', (event) => {
@@ -3755,7 +3823,9 @@ function Chatbot() {
   const [isOpenRenameMsgBag, setIsOpenRenameMsgBag] = useState(false)
   const [isOpenCopyMsgBag, setIsOpenCopyMsgBag] = useState(false)
   const [isOpenDeleteMsgBag, setIsOpenDeleteMsgBag] = useState(false)
+  const [isOpenMoveMsgBagPage, setIsOpenMoveMsgBagPage] = useState(false)
 
+  //setIsOpenMoveMsgBagPage
   const [isOpenMsgBagRename, setIsOpenMsgBagRename] = useState(false)
   const [isOpenMsgBagCopy, setIsOpenMsgBagCopy] = useState(false)
   const [isOpenMsgBagDelete, setIsOpenMsgBagDelete] = useState(false)
@@ -5819,6 +5889,34 @@ function Chatbot() {
     setIsOpenCopyMsgBag(true)
     setIdCopyMsgGr(id)
   }
+const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
+  function moveMsgBagPop(id) {
+    setIdGrGetMsgBag(id)
+    setIsOpenMoveMsgBagPage(true)
+    // setIdCopyMsgGr(id)
+    console.log(idMsgBagMovePage)
+  }
+
+  function moveBagToGr(){
+    var msgGr = {message_group_id: idGrGetMsgBag}
+    api.post(`/api/v1/message_managements/message_bags/${idMsgBagMovePage}/move`, msgGr).then(res => {
+      setIsOpenMoveMsgBagPage(false)
+      console.log(res)
+      setMsgNoti("Move bag to group successfully")
+      setIsOpenNoti(true)
+      setTimeout(() => {
+        setIsOpenNoti(false)
+      }, 1500)
+      refreshMsgGroup()
+      // setTimeout(() => {
+      //   window.location.reload()
+      // }, 1500)
+
+    }).catch(error => {
+      console.log(error)
+    })
+  }
+  //
   function deleteMsgBagPop(id) {
     setIsOpenDeleteMsgBag(true)
     setIdDeleteMsgGr(id)
@@ -7562,6 +7660,18 @@ function Chatbot() {
       })
     }
   }
+  var [page, setPage] = useState(1);
+
+  function handleChange(event, value) {
+    console.log('pageIndex: ', value);
+    setPage(parseInt(value));
+    setPageIndex(value);
+    // reloadListGroupPaging(value)
+    refreshMsgGroup(value)
+    // reloadListClient(value);
+    // window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelector('.main-panel').scrollTop = 0;
+  }
 
   return (
     <>
@@ -7605,14 +7715,17 @@ function Chatbot() {
                                               </button>
                                             </div>
                                           </div>
-                                          <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
-                                            onClick={() => addMsgBagPop(data.id)}><i className="nc-icon nc-simple-add nc-3x" style={{ color: "black" }} /></Button>
-                                          <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
-                                            onClick={() => copyMsgBagPop(data.id)}><i className="nc-icon nc-single-copy-04 nc-3x" style={{ color: "black" }} /></Button>
-                                          <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
-                                            onClick={() => renameMsgBagPop(data.id)}><i className="nc-icon nc-tag-content nc-3x" style={{ color: "black" }} /></Button>
-                                          <Button style={{ height: '30px', width: "8%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
-                                            onClick={() => deleteMsgBagPop(data.id)}><i className="nc-icon nc-box nc-3x" style={{ color: "black" }} /></Button>
+
+                                          <Button style={{ height: '30px', width: "7%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
+                                            onClick={() => addMsgBagPop(data.id)}><MDBIcon fas icon="pen" style={{ color: "black" }} /></Button>
+                                          <Button style={{ height: '30px', width: "7%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
+                                            onClick={() => copyMsgBagPop(data.id)}><MDBIcon far icon="copy" style={{ color: "black" }} /></Button>
+                                          <Button style={{ height: '30px', width: "7%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
+                                            onClick={() => moveMsgBagPop(data.id)}><MDBIcon far icon="file-alt" style={{ color: "black" }} /></Button>
+                                          <Button style={{ height: '30px', width: "7%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
+                                            onClick={() => renameMsgBagPop(data.id)}><MDBIcon far icon="edit" style={{ color: "black" }} /></Button>
+                                          <Button style={{ height: '30px', width: "7%", padding: '0', margin: "0px 0px 0px 0px", backgroundColor: "#FFFFFF" }}
+                                            onClick={() => deleteMsgBagPop(data.id)}><MDBIcon far icon="trash-alt" style={{ color: "black" }} /></Button>
                                           <ul id={`ulMesBag${data.id}`} style={{ listStyleType: "none", width: "200%", marginLeft: "-10%" }}>
                                             <li id={`liMesBag${data.id}`}>
                                               {/* <Nav id="itemBag" >
@@ -7717,6 +7830,12 @@ function Chatbot() {
                     </Card>
                   </Col>
                 </Row>
+                <Pagination
+                  count={totalPage}
+                  variant="outlined"
+                  page={page}
+                  onChange={handleChange}
+                />
               </CardBody>
             </Card>
           </Col>
@@ -7729,6 +7848,14 @@ function Chatbot() {
               <label id="newChatbotErrMsg" style={{ display: 'none', color: "red" }}></label>
             </label><br />
             <Button id="btnAddGroup" onClick={() => addChatBot()}>グループ追加</Button>
+          </div>
+        </ModalShort>
+        <ModalShort open={isOpenMoveMsgBagPage} onClose={() => setIsOpenMoveMsgBagPage(false)}>
+          <div style={{ width: "300px", textAlign: "center", color: "#51cbce" }}>
+            <h4>Do you want to move bag selected to this Message group?</h4>
+
+            <Button onClick={() => moveBagToGr()}>はい</Button>
+            <Button onClick={() => setIsOpenMoveMsgBagPage(false)}>いいえ</Button>
           </div>
         </ModalShort>
         <ModalShortTem open={isOpenTemplate} onClose={() => setIsOpenTemplate(false)}>
@@ -7921,12 +8048,12 @@ function Chatbot() {
                 {/* <img src={item.src} style={{ width: "100%" }}></img> */}
                 {/* </div> */}
                 <div style={{ width: "70%", margin: "auto", display: "flex", textAlign: "left", paddingLeft: "20px" }}>
-                  <div style={{ marginTop: "10px", width:"70%", overflow:"hidden" }}>
+                  <div style={{ marginTop: "10px", width: "70%", overflow: "hidden" }}>
                     <h5>{item.title}</h5>
                     <h6 style={{ marginTop: "-10px" }}>{item.description}</h6>
 
                   </div>
-                  <div style={{ width:"30%", float: "right" }}> <Button onClick={(e) => slectedHotTem(item.message_group_id)}>選択</Button></div>
+                  <div style={{ width: "30%", float: "right" }}> <Button onClick={(e) => slectedHotTem(item.message_group_id)}>選択</Button></div>
                 </div>
               </div>
             ))}
