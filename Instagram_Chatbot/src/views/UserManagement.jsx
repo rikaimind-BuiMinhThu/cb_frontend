@@ -426,13 +426,17 @@ function UserManagement() {
       api
         .post(`/api/v1/users/registrations`, newUser)
         .then((res) => {
-          if (res.data?.code === 1 && res.data?.code === '1') {
+          if (res.data?.code === 1 || res.data?.code === '1') {
             reloadListClient(pageIndex);
             setMsgNoti('ユーザーを追加しました!');
             setIsOpenAddUser(false);
             setIsOpenNoti(true);
-          } else if (res.data?.code === 2 && res.data?.code === '2') {
-            setMsgNoti(res.data?.message);
+          } else if (res.data?.code === 2 || res.data?.code === '2') {
+            if (res.data?.message.includes('Email has already been taken')) {
+              setMsgNoti('メールアドレスはは既に存在しています。');
+            } else {
+              setMsgNoti(res.data?.message);
+            }
             setIsOpenAddUser(false);
             setIsOpenNoti(true);
           }

@@ -851,7 +851,7 @@ function ClientManagement() {
             setMsgNoti('クライアント追加しました!');
             setIsOpenAddUser(false);
             setIsOpenNoti(true);
-          } else if (res.data?.code === 2 && res.data?.code === '2') {
+          } else if (res.data?.code === 2 || res.data?.code === '2') {
             if (res.data.message.includes(`Client name has`)) {
               setMsgNoti('クライアント名は既に存在しています。');
             } else if (res.data.message.includes(`Duplicate entry`)) {
