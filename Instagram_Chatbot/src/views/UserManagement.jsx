@@ -324,7 +324,7 @@ function UserManagement() {
       if (passCheck === false) {
         document.getElementById('パスワード(確認用)ErrMsg').style.display = 'block';
         document.getElementById('パスワード(確認用)ErrMsg').innerHTML =
-          'パスワード（確認用）はパスワードと同じの必要です。';
+          'パスワードが一致しません。もう一度ご入力ください。';
       }
       if (passCheckLen === false) {
         document.getElementById('パスワードErrMsg').style.display = 'block';
@@ -426,10 +426,16 @@ function UserManagement() {
       api
         .post(`/api/v1/users/registrations`, newUser)
         .then((res) => {
-          reloadListClient(pageIndex);
-          setMsgNoti('ユーザーを追加しました!');
-          setIsOpenAddUser(false);
-          setIsOpenNoti(true);
+          if (res.data?.code === 1 && res.data?.code === '1') {
+            reloadListClient(pageIndex);
+            setMsgNoti('ユーザーを追加しました!');
+            setIsOpenAddUser(false);
+            setIsOpenNoti(true);
+          } else if (res.data?.code === 2 && res.data?.code === '2') {
+            setMsgNoti(res.data?.message);
+            setIsOpenAddUser(false);
+            setIsOpenNoti(true);
+          }
         })
         .catch((error) => {
           alert(error);
@@ -442,7 +448,7 @@ function UserManagement() {
       if (passCheck == false) {
         document.getElementById('newUserパスワード(確認用)ErrMsg').style.display = 'block';
         document.getElementById('newUserパスワード(確認用)ErrMsg').innerHTML =
-          'パスワード（確認用）はパスワードと同じの必要です。';
+          'パスワードが一致しません。もう一度ご入力ください。';
       }
       if (passCheckLen == false) {
         document.getElementById('newUserパスワードErrMsg').style.display = 'block';
