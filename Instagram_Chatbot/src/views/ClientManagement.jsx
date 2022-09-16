@@ -111,7 +111,7 @@ function ClientManagement() {
     api
       .get(`/api/v1/managements/clients`, paramSearch)
       .then((res) => {
-        // console.log(res.data.data);
+        // console.log('list client: ', res.data.data);
         var totalPage = Math.ceil(res.data.data.total / 25);
         setTotalPage(totalPage);
         setDataList(res.data.data);
@@ -218,37 +218,69 @@ function ClientManagement() {
   }
 
   function reloadListClient(pgIndex) {
-    var path = window.location.pathname;
-    api
-      .get(
-        `/api/v1/managements/clients?name=${namesearch}&page=${pgIndex}&client_id=&conversion_begin_date=${startDatePreview
-          .toISOString()
-          .slice(0, 10)}&conversion_end_date=${endDatePreview.toISOString().slice(0, 10)}`
-      )
-      .then((res) => {
-        var totalPage = Math.ceil(res.data.data.total / 25);
-        if (pgIndex > totalPage) {
-          api
-            .get(
-              `/api/v1/managements/clients?name=${namesearch}&page=${totalPage}&client_id=&conversion_begin_date=${startDatePreview
-                .toISOString()
-                .slice(0, 10)}&conversion_end_date=${endDatePreview.toISOString().slice(0, 10)}`
-            )
-            .then((resp) => {
-              setDataList(resp.data.data);
-            });
-        } else {
-          setDataList(res.data.data);
-        }
-        setTotalPage(totalPage);
-        // setPage(1)
-      })
-      .catch((error) => {
-        console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
-      });
+    // var path = window.location.pathname;
+    if (startDatePreview && endDatePreview) {
+      api
+        .get(
+          `/api/v1/managements/clients?name=${namesearch}&page=${pgIndex}&client_id=&conversion_begin_date=${startDatePreview
+            .toISOString()
+            .slice(0, 10)}&conversion_end_date=${endDatePreview.toISOString().slice(0, 10)}`
+        )
+        .then((res) => {
+          var totalPage = Math.ceil(res.data.data.total / 25);
+          if (pgIndex > totalPage) {
+            api
+              .get(
+                `/api/v1/managements/clients?name=${namesearch}&page=${totalPage}&client_id=&conversion_begin_date=${startDatePreview
+                  .toISOString()
+                  .slice(0, 10)}&conversion_end_date=${endDatePreview.toISOString().slice(0, 10)}`
+              )
+              .then((resp) => {
+                setDataList(resp.data.data);
+              });
+          } else {
+            setDataList(res.data.data);
+          }
+          setTotalPage(totalPage);
+          // setPage(1)
+        })
+        .catch((error) => {
+          console.log(error);
+          // if (error.response.data.code === 3) {
+          //   requestNewToken(path)
+          // }
+        });
+    } else if (startDatePreview && !endDatePreview) {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[1].style.borderColor = 'red';
+    } else if (!startDatePreview && endDatePreview) {
+      const datePickerInputs = document.querySelectorAll(
+        '.react-datepicker__input-container > input'
+      );
+      datePickerInputs[0].style.borderColor = 'red';
+    } else {
+      api
+        .get(`/api/v1/managements/clients?name=${namesearch}&page=${pgIndex}&client_id=`)
+        .then((res) => {
+          var totalPage = Math.ceil(res.data.data.total / 25);
+          if (pgIndex > totalPage) {
+            api
+              .get(`/api/v1/managements/clients?name=${namesearch}&page=${totalPage}&client_id=`)
+              .then((resp) => {
+                setDataList(resp.data.data);
+              });
+          } else {
+            setDataList(res.data.data);
+          }
+          setTotalPage(totalPage);
+          // setPage(1)
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 
   function getUserDetail(item) {
@@ -717,7 +749,7 @@ function ClientManagement() {
       document.getElementById('newClientパスワードErrMsg').innerHTML = '';
       passwdLengthCheck = true;
     }
-    if (cfPassword != password) {
+    if (cfPassword !== password) {
       cfPass = false;
     } else {
       document.getElementById('newClientパスワード(確認用)ErrMsg').style.display = 'none';
@@ -792,7 +824,8 @@ function ClientManagement() {
       emailCheck == true &&
       dateCheck === true &&
       price > 0 &&
-      zipCode > 0
+      zipCode > 0 &&
+      cfPass === true
     ) {
       // if (checkFieldAdd(name, 'Name') === true && checkFieldAdd(address, "Address") === true && utils.checkInputNumber(phone, "Phone") === true) {
       var elements = document.getElementById('addForm').elements;
@@ -818,9 +851,13 @@ function ClientManagement() {
             setMsgNoti('クライアント追加しました!');
             setIsOpenAddUser(false);
             setIsOpenNoti(true);
-          } else {
+          } else if (res.data?.code === 2 && res.data?.code === '2') {
             if (res.data.message.includes(`Client name has`)) {
-              setMsgNoti('クライアント名は一意です。');
+              setMsgNoti('クライアント名は既に存在しています。');
+            } else if (res.data.message.includes(`Duplicate entry`)) {
+              setMsgNoti('メールアドレスはは既に存在しています。');
+            } else if (res.data.message.includes(`Password confirmation doesn't match Password`)) {
+              setMsgNoti('パスワードが一致しません。もう一度ご入力ください。');
             } else {
               setMsgNoti(res.data.message);
             }
@@ -851,7 +888,7 @@ function ClientManagement() {
         document.getElementById('newClientパスワードErrMsg').innerHTML =
           '24文字以下入力してください。6文字以上入力してください。';
       }
-      if (cfPass == false) {
+      if (cfPass === false) {
         document.getElementById('newClientパスワード(確認用)ErrMsg').style.display = 'block';
         document.getElementById('newClientパスワード(確認用)ErrMsg').innerHTML =
           '確認用パスワードが一致しません';
@@ -1340,10 +1377,11 @@ function ClientManagement() {
                 <Table style={{ textAlign: 'center', tableLayout: 'fixed', overflow: 'hidden' }}>
                   <thead className="text-primary">
                     <tr>
-                      <th style={{ width: '5%' }}>ID</th>
+                      <th style={{ width: '4%' }}>ID</th>
                       <th style={{ width: '7%' }}> 画像</th>
                       <th style={{ width: '10%' }}>名称</th>
                       <th style={{ width: '10%' }}>プラン</th>
+                      <th style={{ width: '7%' }}>ステータス</th>
                       {/* <th style={{ width: "10%" }}><select className="text-primary" style={{ border: "none", fontWeight: "bold" }} defaultValue={''}>
                         <option value="">プラン</option>
                         <option value={0}>スタートアッププラン</option>
@@ -1356,7 +1394,7 @@ function ClientManagement() {
                       {/**Date start count price */}
                       <th style={{ width: '10%' }}>最低利用期間終了日</th>
                       {/**Date end using */}
-                      <th style={{ minWidth: '175px', width: '175px' }}>住所</th>
+                      <th style={{ minWidth: '165px', width: '165px' }}>住所</th>
                       {/**Address */}
                       <th style={{ width: '10%' }}>コンバージョン数</th>
                       <th style={{ width: '10%' }}>最終ログイン日時</th>
@@ -1367,7 +1405,17 @@ function ClientManagement() {
                   <tbody>
                     {items &&
                       items.map((item) => (
-                        <tr key={item.id} style={{ overflow: 'hidden', height: '14px' }}>
+                        <tr
+                          key={item.id}
+                          style={{
+                            overflow: 'hidden',
+                            height: '14px',
+                            backgroundColor:
+                              item?.status === 'pause' || item?.status === 'ended'
+                                ? '#d5d5d5'
+                                : 'white',
+                          }}
+                        >
                           <td>{item.id}</td>
                           <td style={{ margin: '0', padding: '0' }}>
                             <img
@@ -1386,6 +1434,15 @@ function ClientManagement() {
                               ? '完全成果報酬'
                               : 'プレミアム'}
                           </td>
+                          <td>
+                            {item?.status === 'pause'
+                              ? '休止'
+                              : item?.status === 'ended'
+                              ? '解約'
+                              : item?.status === 'trial'
+                              ? 'お試し'
+                              : '契約'}
+                          </td>
                           <td>{item.price}</td>
                           <td id="dateStart">
                             <div>
@@ -1402,7 +1459,18 @@ function ClientManagement() {
                           </td>
                           {/* .slice(0, 10) */}
                           <td style={{ minWidth: '200px', width: '200px' }}>
-                            <div>
+                            <div
+                              style={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                display: '-webkit-box',
+                                lineClamp: 2,
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                              }}
+                            >
+                              {/* {item.prefecture}、{item.municipality}、{item.address}、
+                              {item.building_name} */}
                               {item.prefecture}、{item.address}、{item.building_name}
                             </div>
                           </td>
