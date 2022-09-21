@@ -23,7 +23,6 @@ import ClientManagement from "views/ClientManagement";
 import Policy from "views/InstagramBotElement/Policy";
 import Release from "views/InstagramBotElement/Release";
 import UserManagement from "views/UserManagement";
-// import Pricing from "views/Pricing";
 import Keyword from "views/InstagramBotElement/Keyword";
 import DataAnalyst from "views/InstagramBotElement/DataAnalyst";
 import ListUser from "views/InstagramBotElement/ListUser";
@@ -31,8 +30,15 @@ import AttractedCustomer from "views/InstagramBotElement/AttractedCusomer";
 import CRM from "views/InstagramBotElement/CRM";
 import Template from "views/InstagramBotElement/Template";
 import BotManagement from "views/BotElement/BotManagement";
-import AdBotchat from "views/BotElement/AddBotchat";
-// import Cookies from 'js-cookie'
+import AddBotchat from "views/BotElement/AddBotchat";
+import AccountInformation from "views/BotElement/AccountInformation";
+import BasicSetting from "views/BotElement/BasicSetting";
+import SubUserManagement from "views/BotElement/SubUserManagement";
+import PlanSelection from "views/BotElement/PlanSelection";
+import PaymentSetting from "views/BotElement/PaymentSetting";
+import PaymentHistory from "views/BotElement/PaymentHistory";
+import IPAddressSetting from "views/BotElement/IPAddressSetting";
+import Scenario from "views/BotElement/BotSetting/Scenario";
 
 var routes = [
   {
@@ -151,16 +157,66 @@ var routes = [
     path: "/add-bot-management",
     name: "Add Bot Management",
     // icon: "nc-icon nc-single-02",
-    component: AdBotchat,
+    component: AddBotchat,
     layout: "/admin",
   },
-  // {
-  //   path: "/icons",
-  //   name: "Icons",
-  //   icon: "nc-icon nc-diamond",
-  //   component: Icons,
-  //   layout: "/admin",
-  // }
+  {
+    path: "/account-information",
+    name: "Account Information Top",
+    // icon: "nc-icon nc-single-02",
+    component: AccountInformation,
+    layout: "/admin",
+  },
+  {
+    path: "/basic-setting",
+    name: "Basic Setting",
+    // icon: "nc-icon nc-single-02",
+    component: BasicSetting,
+    layout: "/admin",
+  },
+  {
+    path: "/sub-user",
+    name: "Sub User Management",
+    // icon: "nc-icon nc-single-02",
+    component: SubUserManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/plan-selection",
+    name: "Plan Selection",
+    // icon: "nc-icon nc-single-02",
+    component: PlanSelection,
+    layout: "/admin",
+  },
+  {
+    path: "/payment-setting",
+    name: "Payment Setting",
+    // icon: "nc-icon nc-single-02",
+    component: PaymentSetting,
+    layout: "/admin",
+  },
+  {
+    path: "/payment-history",
+    name: "Payment History",
+    // icon: "nc-icon nc-single-02",
+    component: PaymentHistory,
+    layout: "/admin",
+  },
+  {
+    path: "/ip-address-setting",
+    name: "IP Address Setting",
+    // icon: "nc-icon nc-single-02",
+    component: IPAddressSetting,
+    layout: "/admin",
+  },
+  {
+    path: "/scenario-setting",
+    name: "Scenario Setting",
+    // icon: "nc-icon nc-single-02",
+    component: Scenario,
+    layout: "/admin",
+  },
+
 ];
 // if(Cookies.get('token') !== ""){
 //   routes.splice('2','1')

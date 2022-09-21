@@ -2,7 +2,12 @@ import React from 'react'
 import { Button } from 'react-bootstrap';
 import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
 import "./../../assets/css/bot/bot-list.css"
+import Cookies from 'js-cookie';
 function BotManagement() {
+  function openBotSetting(){
+    Cookies.set('bot_type', "bot");
+    window.location.href= '/admin/scenario-setting'
+  }
   return (
     <>
       <div className="content">
@@ -42,7 +47,7 @@ function BotManagement() {
                       <td className='border-table-bot'>Owner</td>
                       <td className='border-table-bot action-table-bot'>
                         <div style={{display:"flex", textAlign:"center", width:"100%"}}>
-                          <button className='btn-edit-bot'>Edit</button>
+                          <button className='btn-edit-bot' onClick={() => openBotSetting()}>Edit</button>
                           <button className='btn-demo-bot'>Demo</button>
                           <button className='btn-stop-bot'>Stop</button>
                           <button className='btn-delete-bot'>Delete</button>

@@ -25,6 +25,16 @@ function Sidebar(props) {
     }
   })
 
+  React.useEffect(() => {
+    var bot_type = Cookies.get("bot_type")
+    if (bot_type == "bot") {
+      console.log("botne")
+      document.getElementById("sidebar_all").style.display="none"
+    } else if(bot_type=="insta"){
+      console.log("insta ne")
+    }
+  })
+
   const sidebar = React.useRef();
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
@@ -53,6 +63,11 @@ function Sidebar(props) {
       document.getElementById('botDropdown').style.display = "block"
     }
   }
+
+  function homePage(){
+    Cookies.remove('bot_type')
+  }
+
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
       ps = new PerfectScrollbar(sidebar.current, {
@@ -72,7 +87,7 @@ function Sidebar(props) {
       data-color={props.bgColor}
       data-active-color={props.activeColor}
     >
-      <div className="logo" style={{ width: "100%" }}>
+      <div className="logo" style={{ width: "100%" }} onClick={() => homePage()}>
         <a
           href="/admin/dashboard"
         >
@@ -81,7 +96,19 @@ function Sidebar(props) {
       </div>
       <div className="sidebar-wrapper" ref={sidebar}>
         <Nav>
-          <ul>
+          <ul id="sidebar_all">
+            <li className={activeRoute('account-information') + (true ? " active-pro" : "")} key={'account-information'}>
+              <NavLink to="account-information" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>アカウント情報</p>
+              </NavLink>
+            </li>
+            <li className={activeRoute('basic-setting') + (true ? " active-pro" : "")} key={'basic-setting'}>
+              <NavLink to="basic-setting" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>Basic Setting</p>
+              </NavLink>
+            </li>
             <li id="sidebarClient" className={activeRoute('client-management') + (true ? " active-pro" : "")} key={'client-management'}>
               <NavLink to="client-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-badge" style={{ color: "black" }} />
@@ -155,22 +182,45 @@ function Sidebar(props) {
               </ul>
             </li> */}
             <li className={activeRoute('bot') + (true ? " active-pro" : "")} key={'bot'}>
-              <NavLink to="bot" onClick={hideBotList} className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+              <NavLink to="bot" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-bulb-63" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>Bot List</p>
               </NavLink>
-              <ul id="botDropdown" style={{ display: "none", marginLeft: "-30px" }}>
-                <li className={activeRoute('bot-management') + (true ? " active-pro" : "")} key={'bot-management'}>
-                  <NavLink to="bot-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
-                    <i className="nc-icon nc-bulb-63" style={{ color: "black" }} />
-                    <p style={{ color: "black" }}>Bot List</p>
-                  </NavLink>
-                </li>
-              </ul>
+             
             </li>
+            <li className={activeRoute('sub-user') + (true ? " active-pro" : "")} key={'sub-user'}>
+              <NavLink to="sub-user" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>Sub User Management</p>
+              </NavLink>
+            </li>
+            <li className={activeRoute('plan-selection') + (true ? " active-pro" : "")} key={'plan-selection'}>
+              <NavLink to="plan-selection" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>Plan Selection</p>
+              </NavLink>
+            </li>
+            <li className={activeRoute('plan-setting') + (true ? " active-pro" : "")} key={'plan-setting'}>
+              <NavLink to="plan-setting" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>Plan Setting</p>
+              </NavLink>
+            </li>
+            <li className={activeRoute('payment-history') + (true ? " active-pro" : "")} key={'payment-history'}>
+              <NavLink to="payment-history" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>Payment History</p>
+              </NavLink>
+            </li>
+            
           </ul>
           <ul>
-
+          <li className={activeRoute('scenario-setting') + (true ? " active-pro" : "")} key={'scenario-setting'}>
+              <NavLink to="scenario-setting" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                <p style={{ color: "black" }}>scenario-setting</p>
+              </NavLink>
+            </li>
           </ul>
         </Nav>
       </div>
