@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import api from '../api/api-management';
+import api from '../../api/api-management';
 import requestNewToken from 'api/request-new-token';
-import '../assets/css/release.css';
+import '../../assets/css/release.css';
 import Cookies from 'js-cookie';
 // reactstrap components
 import {
@@ -17,13 +17,12 @@ import {
   Row,
   Col,
 } from 'reactstrap';
-import { element } from 'prop-types';
 import Switch from 'react-switch';
 import LoginFacebook from 'components/Admin/LoginFacebook';
-import ModalNoti from './Popup/ModalNoti';
+import ModalNoti from './../Popup/ModalNoti';
 import axios from 'axios';
 import { useEffect } from 'react';
-import ModalShort from './Popup/ModalShort';
+import ModalShort from './../Popup/ModalShort';
 
 function Release() {
   const [listGroup, setListGroup] = useState([]);

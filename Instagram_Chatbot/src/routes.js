@@ -17,21 +17,21 @@
 
 */
 import Dashboard from "views/Dashboard.jsx";
-import Chatbot from "views/Chatbot.jsx";
-import Icons from "views/Icons.jsx";
+import Chatbot from "views/InstagramBotElement/Chatbot";
+
 import ClientManagement from "views/ClientManagement";
-import Policy from "views/Policy"
-import UserPage from "views/User.jsx";
-import UpgradeToPro from "views/Upgrade.jsx";
-import Release from "views/Release";
+import Policy from "views/InstagramBotElement/Policy";
+import Release from "views/InstagramBotElement/Release";
 import UserManagement from "views/UserManagement";
 // import Pricing from "views/Pricing";
-import Keyword from "views/Keyword";
-import DataAnalyst from "views/DataAnalyst";
-import listUser from "views/ListUser";
-import AttractedCusomer from "views/AttractedCusomer";
-import CRM from "views/CRM";
-import Template from "views/Template";
+import Keyword from "views/InstagramBotElement/Keyword";
+import DataAnalyst from "views/InstagramBotElement/DataAnalyst";
+import ListUser from "views/InstagramBotElement/ListUser";
+import AttractedCustomer from "views/InstagramBotElement/AttractedCusomer";
+import CRM from "views/InstagramBotElement/CRM";
+import Template from "views/InstagramBotElement/Template";
+import BotManagement from "views/BotElement/BotManagement";
+import AdBotchat from "views/BotElement/AddBotchat";
 // import Cookies from 'js-cookie'
 
 var routes = [
@@ -54,6 +54,13 @@ var routes = [
     name: "ユーザー管理",
     icon: "nc-icon nc-circle-10",
     component: UserManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/instagram",
+    name: "ホーム",
+    icon: "nc-icon nc-bank",
+    component: Chatbot,
     layout: "/admin",
   },
   {
@@ -92,6 +99,13 @@ var routes = [
     layout: "/admin",
   },
   {
+    path: "/data",
+    name: "データ分析",
+    // icon: "nc-icon nc-bell-55",
+    component: DataAnalyst,
+    layout: "/admin",
+  },
+  {
     path: "/data-analyst",
     name: "データ分析",
     // icon: "nc-icon nc-bell-55",
@@ -102,14 +116,14 @@ var routes = [
     path: "/list-user",
     name: "ユーザー一覧",
     // icon: "nc-icon nc-bell-55",
-    component: listUser,
+    component: ListUser,
     layout: "/admin",
   },
   {
     path: "/attracted-customer",
     name: "集客",
     // icon: "nc-icon nc-bell-55",
-    component: AttractedCusomer,
+    component: AttractedCustomer,
     layout: "/admin",
   },
   {
@@ -119,13 +133,27 @@ var routes = [
     component: Template,
     layout: "/admin",
   },
-  // {
-  //   path: "/user-page",
-  //   name: "User Profile",
-  //   icon: "nc-icon nc-single-02",
-  //   component: UserPage,
-  //   layout: "/admin",
-  // },
+  {
+    path: "/bot",
+    name: "Bot Management",
+    // icon: "nc-icon nc-single-02",
+    component: BotManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/bot-management",
+    name: "Bot Management",
+    // icon: "nc-icon nc-single-02",
+    component: BotManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/add-bot-management",
+    name: "Add Bot Management",
+    // icon: "nc-icon nc-single-02",
+    component: AdBotchat,
+    layout: "/admin",
+  },
   // {
   //   path: "/icons",
   //   name: "Icons",

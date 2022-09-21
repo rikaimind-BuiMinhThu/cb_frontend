@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Card, CardHeader, CardBody, Row, Col } from "reactstrap";
-import workingtable from "../views/Popup/workingtable.jpg"
-import registration from "../views/Popup/registration.jpeg"
-import chatbot from "../views/Popup/chatbot.png"
+// import workingtable from "../views/Popup/workingtable.jpg"
+// import registration from "../views/Popup/registration.jpeg"
+// import chatbot from "../views/Popup/chatbot.png"
 import { Button } from 'react-bootstrap';
 
 function Template() {
@@ -12,7 +12,7 @@ function Template() {
             <div className="content">
                 <Row>
                     <Col md="12">
-                        <Card>
+                        {/* <Card>
                             <CardBody style={{ width: "70%", margin: "auto", display: "flex" }}>
                                 <div style={{ width: "40%" }}>
                                     <img src={workingtable} style={{ width: "100%" }}></img>
@@ -67,7 +67,7 @@ function Template() {
 
                                 </div>
                             </CardBody>
-                        </Card>
+                        </Card> */}
 
 
                     </Col>

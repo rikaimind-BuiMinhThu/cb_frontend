@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
-import '../assets/css/release.css';
-import api from '../api/api-management';
+import '../../assets/css/release.css';
+import api from '../../api/api-management';
 import requestNewToken from 'api/request-new-token';
 // reactstrap components
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 import Switch from 'react-switch';
-import ModalNoti from './Popup/ModalNoti';
+import ModalNoti from './../Popup/ModalNoti';
 import Cookies from 'js-cookie';
-import ModalShort from './Popup/ModalShort';
+import ModalShort from './../Popup/ModalShort';
 import { useEffect } from 'react';
 import { Pagination } from '@material-ui/lab';
 
