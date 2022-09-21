@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Button, Card, CardBody, CardHeader, Col, Row, Table } from 'reactstrap';
-import ava from './Popup/ava.png';
-import insta_img from './Popup/instagram.jpeg';
-import tag_icon from './Popup/tag_icon.jpeg';
-import ModalDetail from './Popup/ModalDetail';
-import '../assets/css/general.css';
-import api from '../api/api-management';
-import ModalShort from './Popup/ModalShort';
-import ModalDetailInstaUser from './Popup/ModalDetailInstaUser';
+import ava from './../Popup/ava.png';
+import insta_img from './../Popup/instagram.jpeg';
+import tag_icon from './../Popup/tag_icon.jpeg';
+// import ModalDetail from './Popup/ModalDetail';
+import '../../assets/css/general.css';
+import api from '../../api/api-management';
+import ModalShort from './../Popup/ModalShort';
+import ModalDetailInstaUser from './../Popup/ModalDetailInstaUser';
 import Cookies from 'js-cookie';
-import ModalNoti from './Popup/ModalNoti';
+import ModalNoti from './../Popup/ModalNoti';
 import Switch from 'react-switch';
 import { Pagination } from '@material-ui/lab';
 

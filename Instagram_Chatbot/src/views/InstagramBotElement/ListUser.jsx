@@ -1,23 +1,14 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
-// import { Chart as ChartJS, registerables } from 'chart.js';
-import { Line } from 'react-chartjs-2';
-import CanvasJSReact from '../components/canvasjs-3.6.6/canvasjs.react';
-import { VictoryPie } from 'victory-pie';
 import ReactApexChart from 'react-apexcharts';
-// var CanvasJS = CanvasJSReact.CanvasJS;
-// var CanvasJSChart = CanvasJSReact.CanvasJSChart;
-// ChartJS.register(...registerables)
-import '../assets/css/general.css';
-// import { AgChartsReact } from "ag-charts-react";
-import api from '../api/api-management';
-import { Icon } from 'semantic-ui-react';
+import '../../assets/css/general.css';
+import api from '../../api/api-management';
 import { MDBIcon } from 'mdbreact';
 import { CSVLink } from 'react-csv';
 import Cookies from 'js-cookie';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import * as utils from './../JS/client.js';
+import * as utils from './../../JS/client.js';
 
 function ListUser() {
   const [startDate, setStartDate] = useState(new Date());

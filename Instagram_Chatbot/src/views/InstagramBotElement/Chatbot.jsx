@@ -7,23 +7,19 @@ import {
   Row,
   Col,
 } from "reactstrap";
-import "../assets/css/general.css";
+import "../../assets/css/general.css";
 import Cookies from "js-cookie";
-import api from '../api/api-management'
+import api from '../../api/api-management'
 import requestNewToken from "api/request-new-token";
-import ModalShort from "./Popup/ModalShort";
-import * as utils from './../JS/client.js'
-import ChatbotOption from "./ChatbotElement/ChatbotOption.jsx";
-import ModalNoti from "./Popup/ModalNoti";
+import ModalShort from "./../Popup/ModalShort";
+import * as utils from './../../JS/client.js'
+import ModalNoti from "./../Popup/ModalNoti";
 import axios from "axios";
-import Modal from "./Popup/Modal";
-import { Helmet } from "react-helmet";
-import Sortable, { MultiDrag, Swap } from 'sortablejs';
-import Template from "./Template";
-import ModalShortTem from "./Popup/ModalShortTem";
-import workingtable from "../views/Popup/workingtable.jpg"
-import registration from "../views/Popup/registration.jpeg"
-import chatbot from "../views/Popup/chatbot.png"
+import Modal from "./../Popup/Modal";
+import ModalShortTem from "./../Popup/ModalShortTem";
+// import workingtable from "../views/Popup/workingtable.jpg"
+// import registration from "../views/Popup/registration.jpeg"
+// import chatbot from "../views/Popup/chatbot.png"
 import { Pagination } from '@material-ui/lab';
 import { MDBIcon } from 'mdbreact';
 
@@ -276,7 +272,7 @@ function Chatbot() {
   const [hotTemSelect, setHotTemSelect] = useState([])
   React.useEffect(() => {
     api.get(`/api/v1/message_managements/hot_templates`).then(res => {
-      var imgUrl = [workingtable, chatbot, registration]
+      // var imgUrl = [workingtable, chatbot, registration]
       var tem = res.data.data
 
       // for (var i = 0; i < res.data.data.length; i++) {
@@ -296,7 +292,7 @@ function Chatbot() {
     api.get(`/api/v1/message_managements/hot_templates`).then(res => {
       var tem = res.data.data
       console.log("all hot temp: ", res.data.data)
-      var imgUrl = [workingtable, chatbot, registration]
+      // var imgUrl = [workingtable, chatbot, registration]
       // for (var i = 0; i < res.data.data.length; i++) {
       //   tem[i].src = imgUrl[0]
       // }
@@ -312,7 +308,7 @@ function Chatbot() {
 
   function reloadHotTemp() {
     api.get(`/api/v1/message_managements/hot_templates`).then(res => {
-      var imgUrl = [workingtable, chatbot, registration]
+      // var imgUrl = [workingtable, chatbot, registration]
       var tem = res.data.data
 
       // for (var i = 0; i < res.data.data.length; i++) {
@@ -330,11 +326,11 @@ function Chatbot() {
 
   function reloadTemplate() {
     api.get(`/api/v1/message_managements/hot_templates`).then(res => {
-      var imgUrl = [workingtable, chatbot, registration]
+      // var imgUrl = [workingtable, chatbot, registration]
       var tem = res.data.data
 
       for (var i = 0; i < res.data.data.length; i++) {
-        tem[i].src = imgUrl[i]
+        // tem[i].src = imgUrl[i]
       }
       setHotTem(tem)
 

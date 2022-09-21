@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardBody, Row, Col, Table } from 'reactstrap';
 import ReactApexChart from 'react-apexcharts';
-import api from '../api/api-management';
+import api from './../../api/api-management';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import * as utils from './../JS/client.js';
+import * as utils from '../../JS/client.js';
 
 function AttractedCustomer() {
   // states
