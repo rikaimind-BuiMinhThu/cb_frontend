@@ -1,47 +1,67 @@
-.border-table-bot{
-    border: 1px solid #7186a0
+.border-table-bot {
+  border: 1px solid #7186a0;
 }
-.action-table-bot{
-    width: 250px;
-    min-width: 250px;
+.action-table-bot {
+  width: 250px;
+  min-width: 250px;
 }
-.div-add-bot{
-    width: 100%;
-    padding-top: 20px;
-    padding-bottom: 50px;
+.div-add-bot {
+  width: 100%;
+  padding-top: 20px;
+  padding-bottom: 50px;
 }
-.btn-add-bot{
-    float: right;
-    border: none;
-    background-color: #51cbce;
-    padding: 5px 15px 5px 15px;
-    border-radius: 5px;
+.btn-add-bot {
+  float: right;
+  border: none;
+  background-color: #51cbce;
+  padding: 5px 15px 5px 15px;
+  border-radius: 5px;
 }
-.btn-edit-bot{
-    width: 25%;
-    color: #327aed;
-    font-weight: 700;
-    border: none;
-    background: #FFFFFF;
+.btn-edit-bot {
+  /* width: 25%; */
+  color: #327aed;
+  font-weight: 700;
+  border: none;
+  background: #ffffff;
 }
-.btn-demo-bot{
-    width: 25%;
-    color: #327aed;
-    font-weight: 500;
-    border: none;
-    background: #FFFFFF;
+.btn-demo-bot {
+  /* width: 25%; */
+  color: #327aed;
+  font-weight: 500;
+  border: none;
+  background: #ffffff;
 }
-.btn-stop-bot{
-    width: 25%;
-    color: #7186a0;
-    font-weight: 500;
-    border: none;
-    background: #FFFFFF;
+.btn-stop-bot {
+  /* width: 25%; */
+  color: #7186a0;
+  font-weight: 500;
+  border: none;
+  background: #ffffff;
 }
-.btn-delete-bot{
-    width: 25%;
-    color: #f46835;
-    font-weight: 700;
-    border: none;
-    background: #FFFFFF;
+.btn-delete-bot {
+  /* width: 25%; */
+  color: #f46835;
+  font-weight: 700;
+  border: none;
+  background: #ffffff;
+}
+
+/* table */
+.table {
+  text-align: center;
+  table-layout: fixed;
+  overflow: hidden;
+  border: 1px solid;
+}
+table.table thead tr th {
+  border: 1px solid #7186a0;
+}
+
+/* action */
+.action-wrapper {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  justify-content: space-between;
 }
