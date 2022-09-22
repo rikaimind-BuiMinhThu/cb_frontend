@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
 import './../../assets/css/bot/add-bot.css';
+import api from '../../api/api-management';
 // icons
 import IconManDefault from '../../assets/img/bot-icon/man1_new.png';
 import IconWomenDefault from '../../assets/img/bot-icon/women1_new.png';
@@ -80,12 +81,14 @@ function AddBotchat() {
   const handleIconClick = (index, imageDefault) => {
     document.querySelector('.icons .icon.active').classList.remove('active');
     document.querySelector(`.icons .icon.icon-${index}`).classList.add('active');
+    console.log('imageDefault: ', imageDefault)
+    setBotImage(imageDefault)
   };
 
   // get base url image add
   const getBaseUrlAdd = () => {
     const file = document.getElementById('bot_image')?.files[0];
-    if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
+    if (file?.type === 'image/png' || file?.type === 'image/jpeg' || file?.type === 'image/jpg') {
       let reader = new FileReader();
       let baseString;
       reader.onloadend = function () {
@@ -107,17 +110,38 @@ function AddBotchat() {
 
   // add new bot chat
   const addNewBotChat = async () => {
-    if (scenario && urlExistForm && title && subtitle && botName) {
+    // if (scenario && urlExistForm && title && subtitle && botName) {
+    if (title && subtitle && botName) {
+      console.log("botImage: ", botImage)
+      console.log("subtitle: ", subtitle)
+      console.log("title: ", title)
+      console.log("botName: ", botName)
+      console.log("IconManDefault: ", IconManDefault)
+      console.log("designType: ", designType)
+      console.log("mainColor: ", mainColor)
+      var iconBot = ''
+      if(botImage == ""){
+        iconBot = IconManDefault
+      }else{
+        iconBot = botImage
+      }
+      var bot={chatbot:{title: title  , subtitle:subtitle, design_type: designType, main_color: mainColor, icon:iconBot, bot_name: botName}}
+      api.post(`api/v1/managements/chatbots`, bot).then(res =>{
+        console.log(res)
+      }).catch(error =>{
+        console.log(error)
+      })
+      //mainColor
     } else {
-      if (!scenario) {
-        document.querySelector('.error-message.scenario-template').innerHTML =
-          'Please select scenario';
-        document.querySelector('.error-message.scenario-template').style.display = 'block';
-      }
-      if (!urlExistForm) {
-        document.querySelector('.error-message.url').innerHTML = 'Please input a url';
-        document.querySelector('.error-message.url').style.display = 'block';
-      }
+      // if (!scenario) {
+      //   document.querySelector('.error-message.scenario-template').innerHTML =
+      //     'Please select scenario';
+      //   document.querySelector('.error-message.scenario-template').style.display = 'block';
+      // }
+      // if (!urlExistForm) {
+      //   document.querySelector('.error-message.url').innerHTML = 'Please input a url';
+      //   document.querySelector('.error-message.url').style.display = 'block';
+      // }
       if (!title) {
         document.querySelector('.error-message.title').innerHTML = 'Please input title';
         document.querySelector('.error-message.title').style.display = 'block';
