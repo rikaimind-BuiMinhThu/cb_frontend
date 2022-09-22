@@ -1,0 +1,139 @@
+.title-bd {
+  color: #9b9b8c;
+  font-size: 40px;
+  letter-spacing: 10px;
+  font-weight: 400;
+  text-align: center;
+  margin: 20px 0 40px;
+  text-transform: uppercase;
+}
+.action-wrapper-bd {
+  margin-left: 100px;
+  background-color: white;
+  width: 50%;
+  border-radius: 10px;
+}
+.action-title-bd {
+  background-color: #fafafa;
+  border-color: #eff2f7;
+  font-size: 15px;
+  font-weight: 400;
+  text-transform: uppercase;
+  padding: 15px;
+  margin: 0;
+}
+.actions-bd {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+}
+.action-bd {
+  display: inline-block;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+/* chat */
+.chat-wrapper-bd {
+  position: absolute;
+  right: 20px;
+  width: 360px;
+  border: none;
+}
+.chat-header-bd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 70px;
+  padding: 0 15px;
+  cursor: pointer;
+  border-radius: 35px;
+}
+.info-wrapper-bd {
+  display: flex;
+  align-items: center;
+}
+.info-wrapper-bd img {
+  display: block;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+.info-wrapper-bd + span {
+  font-size: 40px;
+  font-weight: 400;
+  color: white;
+}
+.info__title {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+.info__title span {
+  color: white;
+}
+
+.chat-body-bd {
+  width: 100%;
+  background-color: aquamarine;
+}
+.message-groups-bd {
+  box-sizing: border-box;
+  max-height: 460px;
+  padding: 5px 10px 60px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.message-wrapper-bd {
+  display: flex;
+  max-width: 90%;
+  margin-bottom: 10px;
+}
+.message-avt-bd {
+  width: 30px;
+  height: 30px;
+  margin-right: 8px;
+}
+.message-avt-bd img {
+  border-radius: 50%;
+}
+.message-bd {
+  flex: 1;
+  padding: 12px 8px;
+  background-color: white;
+  border: 1px solid #333;
+  border-radius: 8px;
+}
+.message-wrapper-bd.chat-right-bd {
+  padding: 12px 8px;
+  background-color: white;
+  border: 1px solid #333;
+  border-radius: 8px;
+  float: right;
+  flex-direction: column;
+}
+.message-wrapper-bd.chat-right-bd h4 {
+  margin: 0 0 0 8px;
+  font-size: 18px;
+  font-weight: 400;
+}
+.btn-send-message-bd {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+.btn-send-message-bd button {
+  border-radius: 16px;
+  border: none;
+  background-color: rgb(41, 41, 250);
+  color: white;
+  padding: 4px 24px;
+  cursor: pointer;
+}
+.btn-send-message-bd button:hover {
+  background-color: #ccc;
+  color: black;
+}
