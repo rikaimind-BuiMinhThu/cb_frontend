@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
+import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 import './../../assets/css/bot/add-bot.css';
 import api from '../../api/api-management';
 // icons
 import IconManDefault from '../../assets/img/bot-icon/man1_new.png';
 import IconWomenDefault from '../../assets/img/bot-icon/women1_new.png';
+import ModalNoti from 'views/Popup/ModalNoti';
+import { Link } from 'react-router-dom';
 
 const colors = [
   {
@@ -51,6 +53,8 @@ function AddBotchat() {
   const [designType, setDesignType] = useState('flat');
   const [botImage, setBotImage] = useState('');
   const [botName, setBotName] = useState('');
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [msgNoti, setMsgNoti] = useState('');
 
   // side effects
   useEffect(() => {
@@ -81,8 +85,8 @@ function AddBotchat() {
   const handleIconClick = (index, imageDefault) => {
     document.querySelector('.icons .icon.active').classList.remove('active');
     document.querySelector(`.icons .icon.icon-${index}`).classList.add('active');
-    console.log('imageDefault: ', imageDefault)
-    setBotImage(imageDefault)
+    // console.log('imageDefault: ', imageDefault);
+    setBotImage(imageDefault);
   };
 
   // get base url image add
@@ -109,28 +113,40 @@ function AddBotchat() {
   };
 
   // add new bot chat
-  const addNewBotChat = async () => {
+  const addNewBotChat = () => {
     // if (scenario && urlExistForm && title && subtitle && botName) {
     if (title && subtitle && botName) {
-      console.log("botImage: ", botImage)
-      console.log("subtitle: ", subtitle)
-      console.log("title: ", title)
-      console.log("botName: ", botName)
-      console.log("IconManDefault: ", IconManDefault)
-      console.log("designType: ", designType)
-      console.log("mainColor: ", mainColor)
-      var iconBot = ''
-      if(botImage == ""){
-        iconBot = IconManDefault
-      }else{
-        iconBot = botImage
+      let iconBot = '';
+      if (botImage === '') {
+        iconBot = IconManDefault;
+      } else {
+        iconBot = botImage;
       }
-      var bot={chatbot:{title: title  , subtitle:subtitle, design_type: designType, main_color: mainColor, icon:iconBot, bot_name: botName}}
-      api.post(`api/v1/managements/chatbots`, bot).then(res =>{
-        console.log(res)
-      }).catch(error =>{
-        console.log(error)
-      })
+      let bot = {
+        chatbot: {
+          title: title,
+          subtitle: subtitle,
+          design_type: designType,
+          main_color: mainColor,
+          icon: iconBot,
+          bot_name: botName,
+        },
+      };
+      api
+        .post(`api/v1/managements/chatbots`, bot)
+        .then((res) => {
+          console.log(res);
+          if (res.data.code === 1 || res.data.code === '1') {
+            setMsgNoti('Add new bot chat successfully!');
+            setIsOpenNoti(true);
+          } else if (res.data?.code === 2 || res.data?.code === '2') {
+            setMsgNoti(res.data.message);
+            setIsOpenNoti(true);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
       //mainColor
     } else {
       // if (!scenario) {
@@ -164,7 +180,7 @@ function AddBotchat() {
           <Col md="12">
             <Card>
               <CardHeader>
-                <h4>Add Botchat</h4>
+                <h4 style={{ margin: '10px 0' }}>Add Botchat</h4>
               </CardHeader>
               <CardBody>
                 <form action="">
@@ -178,7 +194,11 @@ function AddBotchat() {
                             id="select-scenario"
                             name="scenario-template"
                             onChange={(e) => setScenario(e.target.value)}
+                            value={scenario}
                           >
+                            <option value="" disabled hidden>
+                              Select Scenario
+                            </option>
                             <option value="1">Option 1</option>
                             <option value="2">Option 2</option>
                             <option value="3">Option 3</option>
@@ -266,7 +286,9 @@ function AddBotchat() {
                         <span className="error-message main-colors"></span>
                       </div>
                       <div className="btn-wrapper">
-                        <button className="btn btn-preview">Preview</button>
+                        <button type="button" className="btn btn-preview">
+                          Preview
+                        </button>
                       </div>
                     </div>
                     <div className="bot-right">
@@ -325,7 +347,11 @@ function AddBotchat() {
                         </div>
                       </div>
                       <div className="btn-wrapper">
-                        <button className="btn btn-close">Close</button>
+                        <Link to={'/admin/bot'}>
+                          <button type="button" className="btn btn-close">
+                            Close
+                          </button>
+                        </Link>
                         <button type="button" className="btn btn-new-bot" onClick={addNewBotChat}>
                           New bot
                         </button>
@@ -337,6 +363,11 @@ function AddBotchat() {
             </Card>
           </Col>
         </Row>
+        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
+          </div>
+        </ModalNoti>
       </div>
     </>
   );
