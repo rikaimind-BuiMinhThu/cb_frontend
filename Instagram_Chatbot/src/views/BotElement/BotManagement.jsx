@@ -6,7 +6,8 @@ import Cookies from 'js-cookie';
 import { Link } from 'react-router-dom';
 import api from '../../api/api-management';
 import { Pagination } from '@material-ui/lab';
-import ModalShort from 'views/Popup/ModalShort';
+import ModalShort from '../../views/Popup/ModalShort';
+import ModalNoti from '../../views/Popup/ModalNoti';
 
 function BotManagement() {
   // states
@@ -17,8 +18,27 @@ function BotManagement() {
   const [msgConfirm, setMsgConfirm] = useState('');
   const [isStop, setIsStop] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
+  const [idSelected, setIdSelected] = useState('');
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [msgNoti, setMsgNoti] = useState('');
+  const [statusSelected, setStatusSelected] = useState('');
 
   // side effects
+  useEffect(() => {
+    console.log('token in dashboard', Cookies.get('token'));
+    console.log('is_auth', Cookies.get('is_auth'));
+    if (
+      Cookies.get('token') == undefined ||
+      Cookies.get('token') == null ||
+      Cookies.get('token') == ''
+    ) {
+      window.location.href = '/';
+    }
+    if (Cookies.get('is_auth') == 'false') {
+      window.location.href = '/';
+    }
+  }, []);
+
   useEffect(() => {
     api
       .get(`/api/v1/managements/chatbots?pages=1`)
@@ -57,23 +77,112 @@ function BotManagement() {
   // handle confirm action
   const confirmAction = () => {
     if (isStop) {
+      api
+        .patch(`/api/v1/managements/chatbots/${idSelected}`, {
+          chatbot: { status: statusSelected === 'off' ? 'on' : 'off' },
+        })
+        .then((res) => {
+          console.log(res);
+          if (res.data?.code === 1) {
+            setIsStop(false);
+            setIsOpenPopupConfirm(false);
+            setMsgConfirm('');
+            setIdSelected('');
+            setStatusSelected('');
+            setIsOpenNoti(true);
+            setMsgNoti('Changed status successfully!');
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti('');
+            }, 2000);
+            api
+              .get(`/api/v1/managements/chatbots?pages=${page}`)
+              .then((res) => {
+                console.log('bot list get data: ', res.data);
+                setBotList(res.data?.data);
+                setTotalPage(Math.ceil(res.data?.total / 10));
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else if (res.data?.code === 2) {
+            setIsStop(false);
+            setIsOpenPopupConfirm(false);
+            setMsgConfirm('');
+            setIdSelected('');
+            setStatusSelected('');
+            setIsOpenNoti(true);
+            setMsgNoti(res.data?.message);
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti('');
+            }, 2000);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
     if (isDelete) {
+      api
+        .delete(`/api/v1/managements/chatbots/${idSelected}`)
+        .then((res) => {
+          console.log(res);
+          if (res.data?.code === 1) {
+            setIsDelete(false);
+            setIsOpenPopupConfirm(false);
+            setMsgConfirm('');
+            setIdSelected('');
+            setIsOpenNoti(true);
+            setMsgNoti('Delete successfully');
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti('');
+            }, 2000);
+            api
+              .get(`/api/v1/managements/chatbots?pages=1`)
+              .then((res) => {
+                console.log('bot list get data: ', res.data);
+                setBotList(res.data?.data);
+                setTotalPage(Math.ceil(res.data?.total / 10));
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else if (res.data?.code === 2) {
+            setIsDelete(false);
+            setIsOpenPopupConfirm(false);
+            setMsgConfirm('');
+            setIdSelected('');
+            setIsOpenNoti(true);
+            setMsgNoti(res.data?.message);
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti('');
+            }, 2000);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
   };
 
   // handle stop bot button click
-  const handleStopBot = () => {
+  const handleStopBot = (id, status) => {
     setIsStop(true);
     setIsOpenPopupConfirm(true);
     setMsgConfirm('Are you sure you want to stop this bot?');
+    setIdSelected(id);
+    setStatusSelected(status);
   };
 
   // handle delete bot button click
-  const handleDeleteBot = () => {
+  const handleDeleteBot = (id) => {
     setIsDelete(true);
     setIsOpenPopupConfirm(true);
     setMsgConfirm('Are you sure you want to delete this bot?');
+    setIdSelected(id);
   };
 
   return (
@@ -117,10 +226,16 @@ function BotManagement() {
                             <Link to={`/admin/demo-bot/${bot?.id}`}>
                               <button className="btn-demo-bot">Demo</button>
                             </Link>
-                            <button className="btn-stop-bot" onClick={handleStopBot}>
-                              Stop
+                            <button
+                              className="btn-stop-bot"
+                              onClick={() => handleStopBot(bot?.id, bot?.status)}
+                            >
+                              {bot?.status === 'off' ? 'Start' : 'Stop'}
                             </button>
-                            <button className="btn-delete-bot" onClick={handleDeleteBot}>
+                            <button
+                              className="btn-delete-bot"
+                              onClick={() => handleDeleteBot(bot?.id)}
+                            >
                               Delete
                             </button>
                           </div>
@@ -146,6 +261,11 @@ function BotManagement() {
             <Button onClick={() => setIsOpenPopupConfirm(false)}>いいえ</Button>
           </div>
         </ModalShort>
+        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
+          </div>
+        </ModalNoti>
       </div>
     </>
   );
