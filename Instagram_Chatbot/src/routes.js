@@ -39,6 +39,7 @@ import PaymentSetting from "views/BotElement/PaymentSetting";
 import PaymentHistory from "views/BotElement/PaymentHistory";
 import IPAddressSetting from "views/BotElement/IPAddressSetting";
 import Scenario from "views/BotElement/BotSetting/Scenario";
+import BotDemo from "views/BotElement/BotDemo";
 
 var routes = [
   {
@@ -214,6 +215,13 @@ var routes = [
     name: "Scenario Setting",
     // icon: "nc-icon nc-single-02",
     component: Scenario,
+    layout: "/admin",
+  },
+  {
+    path: "/demo-bot/:id",
+    name: "Demo Bot",
+    // icon: "nc-icon nc-single-02",
+    component: BotDemo,
     layout: "/admin",
   },
 
