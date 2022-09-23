@@ -5,7 +5,7 @@ import api from '../../api/api-management';
 // icons
 import IconManDefault from '../../assets/img/bot-icon/man1_new.png';
 import IconWomenDefault from '../../assets/img/bot-icon/women1_new.png';
-import ModalNoti from 'views/Popup/ModalNoti';
+import ModalNoti from '../../views/Popup/ModalNoti';
 import { Link } from 'react-router-dom';
 
 const colors = [
@@ -114,7 +114,6 @@ function AddBotchat() {
 
   // add new bot chat
   const addNewBotChat = () => {
-    
     // if (scenario && urlExistForm && title && subtitle && botName) {
     if (title && subtitle && botName) {
       let iconBot = '';
@@ -124,13 +123,19 @@ function AddBotchat() {
         iconBot = botImage;
       }
       let main_color = {
-        blue: "#327AED", green: "#26B197", orange: "#fC7E02",
-        yellow: "#DCF843", pink: "#ED6D9E", purple: "#546DA7", black: "#7C8290", white: "#D8E2EF"
-      }
-      var color
+        blue: '#327AED',
+        green: '#26B197',
+        orange: '#fC7E02',
+        yellow: '#DCF843',
+        pink: '#ED6D9E',
+        purple: '#546DA7',
+        black: '#7C8290',
+        white: '#D8E2EF',
+      };
+      var color;
       Object.entries(main_color).forEach(([key, val]) => {
-        if(mainColor == val){
-          color = key
+        if (mainColor == val) {
+          color = key;
         }
       });
       var bot = {
@@ -158,8 +163,7 @@ function AddBotchat() {
         .catch((error) => {
           console.log(error);
         });
-        
-          } else {
+    } else {
       // if (!scenario) {
       //   document.querySelector('.error-message.scenario-template').innerHTML =
       //     'Please select scenario';
