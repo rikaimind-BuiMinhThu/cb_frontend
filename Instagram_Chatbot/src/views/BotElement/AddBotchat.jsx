@@ -13,10 +13,10 @@ const colors = [
     color: '#327AED',
   },
   {
-    color: '#11B198',
+    color: '#26B197',
   },
   {
-    color: '#FF7E00',
+    color: '#fC7E02',
   },
   {
     color: '#DCF843',
@@ -114,6 +114,7 @@ function AddBotchat() {
 
   // add new bot chat
   const addNewBotChat = () => {
+    
     // if (scenario && urlExistForm && title && subtitle && botName) {
     if (title && subtitle && botName) {
       let iconBot = '';
@@ -122,12 +123,22 @@ function AddBotchat() {
       } else {
         iconBot = botImage;
       }
-      let bot = {
+      let main_color = {
+        blue: "#327AED", green: "#26B197", orange: "#fC7E02",
+        yellow: "#DCF843", pink: "#ED6D9E", purple: "#546DA7", black: "#7C8290", white: "#D8E2EF"
+      }
+      var color
+      Object.entries(main_color).forEach(([key, val]) => {
+        if(mainColor == val){
+          color = key
+        }
+      });
+      var bot = {
         chatbot: {
           title: title,
           subtitle: subtitle,
           design_type: designType,
-          main_color: mainColor,
+          main_color: color,
           icon: iconBot,
           bot_name: botName,
         },
@@ -147,8 +158,8 @@ function AddBotchat() {
         .catch((error) => {
           console.log(error);
         });
-      //mainColor
-    } else {
+        
+          } else {
       // if (!scenario) {
       //   document.querySelector('.error-message.scenario-template').innerHTML =
       //     'Please select scenario';
