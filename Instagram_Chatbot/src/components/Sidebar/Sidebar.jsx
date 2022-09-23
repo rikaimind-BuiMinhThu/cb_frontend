@@ -29,8 +29,8 @@ function Sidebar(props) {
     var bot_type = Cookies.get("bot_type")
     if (bot_type == "bot") {
       console.log("botne")
-      document.getElementById("sidebar_all").style.display="none"
-    } else if(bot_type=="insta"){
+      document.getElementById("sidebar_all").style.display = "none"
+    } else if (bot_type == "insta") {
       console.log("insta ne")
     }
   })
@@ -64,7 +64,42 @@ function Sidebar(props) {
     }
   }
 
-  function homePage(){
+  function displayBotSetting() {
+    if (document.getElementById('ulBotSetting').style.display === "block") {
+      document.getElementById('ulBotSetting').style.display = "none"
+    } else {
+      document.getElementById('ulBotSetting').style.display = "block"
+    }
+  }
+
+  function displayScenarioSetting() {
+    if (document.getElementById('scenarioSetting').style.display === "block") {
+      document.getElementById('scenarioSetting').style.display = "none"
+    } else {
+      document.getElementById('scenarioSetting').style.display = "block"
+    }
+  }
+
+  function displayDesignSetting() {
+    if (document.getElementById('designSetting').style.display === "block") {
+      document.getElementById('designSetting').style.display = "none"
+    } else {
+      document.getElementById('designSetting').style.display = "block"
+    }
+  }
+
+  function displayEmailSetting() {
+    if (document.getElementById('emailSetting').style.display === "block") {
+      document.getElementById('emailSetting').style.display = "none"
+    } else {
+      document.getElementById('emailSetting').style.display = "block"
+    }
+  }
+
+
+  // /emailSetting
+
+  function homePage() {
     Cookies.remove('bot_type')
   }
 
@@ -97,25 +132,25 @@ function Sidebar(props) {
       <div className="sidebar-wrapper" ref={sidebar}>
         <Nav>
           <ul id="sidebar_all">
-            <li className={activeRoute('account-information') + (true ? " active-pro" : "")} key={'account-information'}>
+            <li style={{ listStyleType: "none", marginLeft: "-50px" }} className={activeRoute('account-information') + (true ? " active-pro" : "")} key={'account-information'}>
               <NavLink to="/admin/account-information" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-badge" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>アカウント情報</p>
               </NavLink>
             </li>
-            <li className={activeRoute('basic-setting') + (true ? " active-pro" : "")} key={'basic-setting'}>
+            <li style={{ listStyleType: "none", marginLeft: "-50px" }} className={activeRoute('basic-setting') + (true ? " active-pro" : "")} key={'basic-setting'}>
               <NavLink to="/admin/basic-setting" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-badge" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>Basic Setting</p>
               </NavLink>
             </li>
-            <li id="sidebarClient" className={activeRoute('client-management') + (true ? " active-pro" : "")} key={'client-management'}>
+            <li style={{ listStyleType: "none", marginLeft: "-50px" }} id="sidebarClient" className={activeRoute('client-management') + (true ? " active-pro" : "")} key={'client-management'}>
               <NavLink to="/admin/client-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-badge" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>クライアント管理</p>
               </NavLink>
             </li>
-            <li id="sidebarUser" className={activeRoute('user-management') + (true ? " active-pro" : "")} key={'user-management'}>
+            <li style={{ listStyleType: "none", marginLeft: "-50px" }} id="sidebarUser" className={activeRoute('user-management') + (true ? " active-pro" : "")} key={'user-management'}>
               <NavLink to="/admin/user-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-circle-10" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>ユーザー管理
@@ -181,46 +216,109 @@ function Sidebar(props) {
                 </li>
               </ul>
             </li> */}
-            <li className={activeRoute('bot') + (true ? " active-pro" : "")} key={'bot'}>
+            <li style={{ listStyleType: "none", marginLeft: "-50px" }} className={activeRoute('bot') + (true ? " active-pro" : "")} key={'bot'}>
               <NavLink to="/admin/bot" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-bulb-63" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>Bot List</p>
               </NavLink>
-             
+
             </li>
-            <li className={activeRoute('sub-user') + (true ? " active-pro" : "")} key={'sub-user'}>
+            <li style={{ listStyleType: "none", marginLeft: "-50px" }} className={activeRoute('sub-user') + (true ? " active-pro" : "")} key={'sub-user'}>
               <NavLink to="/admin/sub-user" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-badge" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>Sub User Management</p>
               </NavLink>
             </li>
-            <li className={activeRoute('plan-selection') + (true ? " active-pro" : "")} key={'plan-selection'}>
+            <li style={{ listStyleType: "none", marginLeft: "-50px" }} className={activeRoute('plan-selection') + (true ? " active-pro" : "")} key={'plan-selection'}>
               <NavLink to="/admin/plan-selection" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-badge" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>Plan Selection</p>
               </NavLink>
             </li>
-            <li className={activeRoute('plan-setting') + (true ? " active-pro" : "")} key={'plan-setting'}>
+            <li style={{ listStyleType: "none", marginLeft: "-50px" }} className={activeRoute('plan-setting') + (true ? " active-pro" : "")} key={'plan-setting'}>
               <NavLink to="/admin/plan-setting" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-badge" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>Plan Setting</p>
               </NavLink>
             </li>
-            <li className={activeRoute('payment-history') + (true ? " active-pro" : "")} key={'payment-history'}>
+            <li style={{ listStyleType: "none", marginLeft: "-50px" }} className={activeRoute('payment-history') + (true ? " active-pro" : "")} key={'payment-history'}>
               <NavLink to="/admin/payment-history" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-badge" style={{ color: "black" }} />
                 <p style={{ color: "black" }}>Payment History</p>
               </NavLink>
             </li>
-            
+
           </ul>
           <ul>
-          <li className={activeRoute('scenario-setting') + (true ? " active-pro" : "")} key={'scenario-setting'}>
-              <NavLink to="/admin/scenario-setting" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+            <li style={{ listStyleType: "none", marginLeft: "-50px" }} className={activeRoute('bot-setting') + (true ? " active-pro" : "")} key={'scenario-setting'}>
+              <NavLink to="/admin/bot-setting" onClick={() => displayBotSetting()} className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                 <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                <p style={{ color: "black" }}>scenario-setting</p>
+                <p style={{ color: "black" }}>Bot Setting</p>
               </NavLink>
+              <ul id={"ulBotSetting"} style={{ listStyleType: "none", marginLeft: "-30px", textDecoration: "underline", display: "none" }}>
+                <li key={'scenario-setting'}>
+                  <NavLink onClick={() => displayScenarioSetting()} to="/admin/scenario-list" className="nav-link" activeStyle={{ color: "black" }}>
+                    <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                    <p style={{ color: "black" }}>Scenario Setting</p>
+                  </NavLink>
+                  <ul id="scenarioSetting" style={{ listStyleType: "none", marginLeft: "-30px", textDecoration: "underline", display: "none" }}>
+                    <li className={activeRoute('scenario-list') + (true ? " active-pro" : "")} key={'scenario-list'}>
+                      <NavLink to="/admin/scenario-list" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                        <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                        <p style={{ color: "black" }}>Scenario List</p>
+                      </NavLink>
+                    </li>
+                    <li className={activeRoute('media-management') + (true ? " active-pro" : "")} key={'media-management'}>
+                      <NavLink to="/admin/media-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                        <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                        <p style={{ color: "black" }}>Meida Management</p>
+                      </NavLink>
+                    </li>
+                  </ul>
+                </li>
+                <li key={'media-management'}>
+                  <NavLink onClick={() => displayDesignSetting()} to="/admin/start-button" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                    <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                    <p style={{ color: "black" }}>Design Setting</p>
+                  </NavLink>
+                  <ul id="designSetting" style={{ listStyleType: "none", marginLeft: "-30px", textDecoration: "underline", display: "none" }}>
+                    <li className={activeRoute('start-button') + (true ? " active-pro" : "")} key={'start-button'}>
+                      <NavLink to="/admin/start-button" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                        <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                        <p style={{ color: "black" }}>Start Button</p>
+                      </NavLink>
+                    </li>
+                    <li className={activeRoute('chat-body') + (true ? " active-pro" : "")} key={'chat-body'}>
+                      <NavLink to="/admin/chat-body" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                        <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                        <p style={{ color: "black" }}>Chat Body</p>
+                      </NavLink>
+                    </li>
+                  </ul>
+                </li>
+                <li key={'create-email'}>
+                  <NavLink onClick={() => displayEmailSetting()} to="/admin/create-email" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                    <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                    <p style={{ color: "black" }}>Email Setting</p>
+                  </NavLink>
+                </li>
+                <ul id="emailSetting" style={{ listStyleType: "none", marginLeft: "-30px", textDecoration: "underline", display: "none" }}>
+                  <li className={activeRoute('create-email') + (true ? " active-pro" : "")} key={'reate-email'}>
+                    <NavLink to="/admin/create-email" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                      <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                      <p style={{ color: "black" }}>Chat Body</p>
+                    </NavLink>
+                  </li>
+                  <li className={activeRoute('list-email') + (true ? " active-pro" : "")} key={'list-email'}>
+                    <NavLink to="/admin/list-email" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                      <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                      <p style={{ color: "black" }}>Chat Body</p>
+                    </NavLink>
+                  </li>
+                </ul>
+              </ul>
             </li>
+
           </ul>
         </Nav>
       </div>

@@ -39,7 +39,12 @@ import PaymentSetting from "views/BotElement/PaymentSetting";
 import PaymentHistory from "views/BotElement/PaymentHistory";
 import IPAddressSetting from "views/BotElement/IPAddressSetting";
 import Scenario from "views/BotElement/BotSetting/Scenario";
-import BotDemo from "views/BotElement/BotDemo";
+import ScenarioList from "views/BotElement/BotSetting/ScenarioSetting/ScenarioList";
+import MediaFileManagement from "views/BotElement/BotSetting/ScenarioSetting/MediaFileManagement";
+import StartButton from "views/BotElement/BotSetting/DesignSetting/StartButton";
+import ChatBody from "views/BotElement/BotSetting/DesignSetting/ChatBody";
+import CreateEmail from "views/BotElement/BotSetting/EmailSetting/CreateEmail";
+import ListEmail from "views/BotElement/BotSetting/EmailSetting/ListEmail";
 
 var routes = [
   {
@@ -211,6 +216,13 @@ var routes = [
     layout: "/admin",
   },
   {
+    path: "/bot-setting",
+    name: "Bot Setting",
+    // icon: "nc-icon nc-single-02",
+    component: Scenario,
+    layout: "/admin",
+  },
+  {
     path: "/scenario-setting",
     name: "Scenario Setting",
     // icon: "nc-icon nc-single-02",
@@ -218,13 +230,47 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/demo-bot/:id",
-    name: "Demo Bot",
+    path: "/scenario-list",
+    name: "Scenario List",
     // icon: "nc-icon nc-single-02",
-    component: BotDemo,
+    component: ScenarioList,
     layout: "/admin",
   },
-
+  {
+    path: "/media-management",
+    name: "Media management",
+    // icon: "nc-icon nc-single-02",
+    component: MediaFileManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/start-button",
+    name: "Start Button",
+    // icon: "nc-icon nc-single-02",
+    component: StartButton,
+    layout: "/admin",
+  },
+  {
+    path: "/chat-body",
+    name: "Chat Body",
+    // icon: "nc-icon nc-single-02",
+    component: ChatBody,
+    layout: "/admin",
+  },
+  {
+    path: "/create-email",
+    name: "Create Email",
+    // icon: "nc-icon nc-single-02",
+    component: CreateEmail,
+    layout: "/admin",
+  },
+  {
+    path: "/list-email",
+    name: "List Email",
+    // icon: "nc-icon nc-single-02",
+    component: ListEmail,
+    layout: "/admin",
+  },
 ];
 // if(Cookies.get('token') !== ""){
 //   routes.splice('2','1')
