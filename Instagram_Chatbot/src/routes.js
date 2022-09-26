@@ -38,13 +38,28 @@ import PlanSelection from "views/BotElement/PlanSelection";
 import PaymentSetting from "views/BotElement/PaymentSetting";
 import PaymentHistory from "views/BotElement/PaymentHistory";
 import IPAddressSetting from "views/BotElement/IPAddressSetting";
-import Scenario from "views/BotElement/BotSetting/Scenario";
 import ScenarioList from "views/BotElement/BotSetting/ScenarioSetting/ScenarioList";
 import MediaFileManagement from "views/BotElement/BotSetting/ScenarioSetting/MediaFileManagement";
 import StartButton from "views/BotElement/BotSetting/DesignSetting/StartButton";
 import ChatBody from "views/BotElement/BotSetting/DesignSetting/ChatBody";
 import CreateEmail from "views/BotElement/BotSetting/EmailSetting/CreateEmail";
 import ListEmail from "views/BotElement/BotSetting/EmailSetting/ListEmail";
+import BotDemo from "views/BotElement/BotDemo";
+import CreateAPI from "views/BotElement/BotSetting/APISetting/CreateAPI";
+import APIManagement from "views/BotElement/BotSetting/APISetting/APIManagement";
+import CreateABTest from "views/BotElement/BotSetting/ABTest/CreateABTest";
+import ListABTest from "views/BotElement/BotSetting/ABTest/ListABTest";
+import Scenario from "views/BotElement/BotSetting/ScenarioSetting/Scenario";
+import VariableManagement from "views/BotElement/BotSetting/VariableManagement";
+import InstallationTag from "views/BotElement/BotSetting/InstallationTag";
+import Conversion from "views/BotElement/BotSetting/Conversion";
+import Preview from "views/BotElement/BotSetting/Preview";
+import ConversionInfo from "views/BotElement/BotSetting/Report/ConversionInfo";
+import { Statistic } from "semantic-ui-react";
+import BasicInformation from "views/BotElement/BotSetting/AdvanceSetting/BasicInformation";
+import TimeAndLang from "views/BotElement/BotSetting/AdvanceSetting/TimeAndLang";
+import WithdrawalPrevention from "views/BotElement/BotSetting/AdvanceSetting/WithdrawalPrevention";
+import BotAdmin from "views/BotElement/BotSetting/AdvanceSetting/BotAdmin";
 
 var routes = [
   {
@@ -219,7 +234,7 @@ var routes = [
     path: "/bot-setting",
     name: "Bot Setting",
     // icon: "nc-icon nc-single-02",
-    component: Scenario,
+    component: ScenarioList,
     layout: "/admin",
   },
   {
@@ -269,6 +284,110 @@ var routes = [
     name: "List Email",
     // icon: "nc-icon nc-single-02",
     component: ListEmail,
+    layout: "/admin",
+  },
+  {
+    path: "/demo-bot/:id",
+    name: "Bot Demo",
+    // icon: "nc-icon nc-single-02",
+    component: BotDemo,
+    layout: "/admin",
+  },
+  {
+    path: "/create-api",
+    name: "Create API",
+    // icon: "nc-icon nc-single-02",
+    component: CreateAPI,
+    layout: "/admin",
+  },
+  {
+    path: "/api-management",
+    name: "API Management",
+    // icon: "nc-icon nc-single-02",
+    component: APIManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/create-ab-test",
+    name: "Create AB Test",
+    // icon: "nc-icon nc-single-02",
+    component: CreateABTest,
+    layout: "/admin",
+  },
+  {
+    path: "/list-ab-test",
+    name: "List AB Test",
+    // icon: "nc-icon nc-single-02",
+    component: ListABTest,
+    layout: "/admin",
+  },
+  {
+    path: "/variable-management",
+    name: "Variable Management",
+    // icon: "nc-icon nc-single-02",
+    component: VariableManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/installation-tag-demo",
+    name: "Installation Tag and Demo",
+    // icon: "nc-icon nc-single-02",
+    component: InstallationTag,
+    layout: "/admin",
+  },
+  {
+    path: "/conversion",
+    name: "Conversion",
+    // icon: "nc-icon nc-single-02",
+    component: Conversion,
+    layout: "/admin",
+  },
+
+  {
+    path: "/preview",
+    name: "Preview",
+    // icon: "nc-icon nc-single-02",
+    component: Preview,
+    layout: "/admin",
+  },
+  {
+    path: "/conversion-info",
+    name: "Conversion Information",
+    // icon: "nc-icon nc-single-02",
+    component: ConversionInfo,
+    layout: "/admin",
+  },
+  { 
+    path: "/statistics",
+    name: "Statistics",
+    // icon: "nc-icon nc-single-02",
+    component: Statistic,
+    layout: "/admin",
+  },
+
+  {
+    path: "/basic-info",
+    name: "Basic Information",
+    // icon: "nc-icon nc-single-02",
+    component: BasicInformation,
+    layout: "/admin",
+  },{
+    path: "/tz-lang",
+    name: "Timezone and Language",
+    // icon: "nc-icon nc-single-02",
+    component: TimeAndLang,
+    layout: "/admin",
+  },{
+    path: "/withdrawal-prevention",
+    name: "Withdrawal Prevention",
+    // icon: "nc-icon nc-single-02",
+    component: WithdrawalPrevention,
+    layout: "/admin",
+  },{
+    path: "/bot-admin",
+    name: "Bot Admin",
+    // icon: "nc-icon nc-single-02",
+    component: BotAdmin,
     layout: "/admin",
   },
 ];
