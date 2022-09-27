@@ -129,7 +129,7 @@ function Sidebar(props) {
   }
 
   // /APISetting
-  
+
   function homePage() {
     Cookies.remove('bot_type')
   }
@@ -336,13 +336,13 @@ function Sidebar(props) {
                     <li className={activeRoute('create-email') + (true ? " active-pro" : "")} key={'create-email'}>
                       <NavLink to="/admin/create-email" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                         <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                        <p style={{ color: "black" }}>Chat Body</p>
+                        <p style={{ color: "black" }}>Create Email</p>
                       </NavLink>
                     </li>
                     <li className={activeRoute('list-email') + (true ? " active-pro" : "")} key={'list-email'}>
                       <NavLink to="/admin/list-email" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                         <i className="nc-icon nc-badge" style={{ color: "black" }} />
-                        <p style={{ color: "black" }}>Chat Body</p>
+                        <p style={{ color: "black" }}>Email List</p>
                       </NavLink>
                     </li>
                   </ul>
