@@ -1,0 +1,13 @@
+.ss-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.ss-actions > button {
+  margin-right: 10px;
+  background-color: #044ab9;
+  color: white;
+}
+.ss-actions > button:last-child {
+  margin-right: 0;
+}
