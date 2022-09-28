@@ -7,7 +7,7 @@ import { useState } from 'react';
 import ModalShort from 'views/Popup/ModalShort';
 import { Button } from 'react-bootstrap';
 import ModalNoti from 'views/Popup/ModalNoti';
-
+import Cookies from 'js-cookie';
 
 
 
@@ -22,9 +22,12 @@ function ListEmail() {
 
 
   useEffect(() => {
-    api.get('/api/v1/managements/emails?page=1').then(res => {
-      console.log(res.data.data);
-      setEmailList(res.data.data);
+    var bot_id = Cookies.get('bot_id')
+    api.get(`/api/v1/managements/emails?page=1&chatbot_id=${bot_id}`).then(res => {
+      console.log(res.data);  
+      if(res.data.code ==1){
+         setEmailList(res.data.data);
+      }
     }).catch(err => {
       console.log(err);
     })
@@ -162,7 +165,7 @@ function ListEmail() {
                         </div>
 
                         <div className='mail-actions'>
-                          <button className='mail-actions--btn btn btn-default'>Edit</button>
+                          <button className='mail-actions--btn btn btn-default' onClick={()=>{window.location.href=`/admin/edit-email/${item?.id}`}}>Edit</button>
                           <button className='mail-actions--btn btn btn-success' onClick={() => openDuplicate(item.id)}>Duplication</button>
                           <button className='mail-actions--btn btn btn-danger' onClick={() => openDelete(item.id)}>Delete</button>
                         </div>

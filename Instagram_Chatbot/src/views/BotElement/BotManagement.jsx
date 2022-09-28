@@ -53,8 +53,10 @@ function BotManagement() {
   }, []);
 
   // open bot settings
-  function openBotSetting() {
+  function openBotSetting(id) {
+    Cookies.remove('bot_id')
     Cookies.set('bot_type', 'bot');
+    Cookies.set('bot_id', `${id}`);
     window.location.href = '/admin/scenario-setting';
   }
 
@@ -220,7 +222,7 @@ function BotManagement() {
                         <td className="border-table-bot">Owner</td>
                         <td className="border-table-bot action-table-bot">
                           <div className="action-wrapper">
-                            <button className="btn-edit-bot" onClick={() => openBotSetting()}>
+                            <button className="btn-edit-bot" onClick={() => openBotSetting(bot.id)}>
                               Edit
                             </button>
                             <Link to={`/admin/demo-bot/${bot?.id}`}>

@@ -1,11 +1,10 @@
 import { element } from 'prop-types';
-import React from 'react'
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 import './../../../../assets/css/bot/email/create-email.css';
 import api from './../../../../api/api-management';
 import ModalNoti from 'views/Popup/ModalNoti';
-
+import Cookies from 'js-cookie';
 
 
 function CreateEmail() {
@@ -16,7 +15,16 @@ function CreateEmail() {
   const [bccAll, setBccAll] = useState([]);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState();
+  const [mailAction, setMailAction] = useState(true)
 
+  useEffect(() => {
+    const url = window.location.pathname;
+    if(url.includes(`edit-email`)){
+      var id = url.substring(url.length-1, url.length)
+      console.log(id)
+      setMailAction(false)
+    }
+  }, [])
 
   function addCC(e) {
     if (e.keyCode === 13) {
@@ -105,6 +113,10 @@ function CreateEmail() {
       obj.cc = ccAll
       obj.bcc = bccAll
 
+
+      var bot_id = Cookies.get('bot_id')
+      obj.chatbot_id = bot_id
+      console.log('bot_id: ', bot_id)
       let add = { email: obj }
 
       api.post('/api/v1/managements/emails', add).then(res => {
@@ -177,7 +189,7 @@ function CreateEmail() {
                   <div className='field-container'>
                     <span className='field-lable'>Emailtemplate name</span>
                     <div className='field-input'>
-                      <input id='email_template_name' type='text' placeholder='Enter email template name' name='email_template_name'
+                      <input id='email_template_name' defaultValue={mailAction==false? "value of edit email":""} type='text' placeholder='Enter email template name' name='email_template_name'
                         onChange={() => checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name')}
                         onBlur={() => checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name')}></input>
                       <span id="errEmailName" className='err-email-format'></span>
@@ -185,7 +197,7 @@ function CreateEmail() {
                   </div>
 
                   <div className='field-container'>
-                    <span className='field-lable'>sender name</span>
+                    <span className='field-lable'>Sender name</span>
                     <div className='field-input'>
                       <input id='sender_name' type='text' placeholder='Please enter the sender name' name='sender_name'></input>
                       <span id="errEmailSender" className='err-email-format'></span>
@@ -193,7 +205,7 @@ function CreateEmail() {
                   </div>
 
                   <div className='field-container'>
-                    <span className='field-lable'>to</span>
+                    <span className='field-lable'>To</span>
                     <div className='field-input'>
                       <input id='to' type='text' placeholder='no-reply@botchan.chat' name='to' onChange={() => checkTo('to', 'errEmailTo', 'To')}
                         onBlur={() => checkTo('to', 'errEmailTo', 'To')}></input>
@@ -230,7 +242,7 @@ function CreateEmail() {
                   </div>
 
                   <div className='field-container'>
-                    <span className='field-lable'>subject</span>
+                    <span className='field-lable'>Subject</span>
                     <div className='field-input'>
                       <input id='subject' type='text' placeholder='Please enter a subject' name='subject' onChange={() => checkRequired('subject', 'errSubject', 'Subject')}
                         onBlur={() => checkRequired('subject', 'errSubject', 'Subject')}></input>

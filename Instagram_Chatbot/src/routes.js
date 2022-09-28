@@ -280,6 +280,13 @@ var routes = [
     layout: "/admin",
   },
   {
+    path: "/edit-email/:id",
+    name: "Edit Email",
+    // icon: "nc-icon nc-single-02",
+    component: CreateEmail,
+    layout: "/admin",
+  },
+  {
     path: "/list-email",
     name: "List Email",
     // icon: "nc-icon nc-single-02",
