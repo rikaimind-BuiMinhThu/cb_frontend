@@ -1,8 +1,103 @@
 import React from 'react'
+import { useEffect } from 'react';
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
-import './../../../../assets/css/bot/email/list-email.css'
+import './../../../../assets/css/bot/email/list-email.css';
+import api from './../../../../api/api-management';
+import { useState } from 'react';
+import ModalShort from 'views/Popup/ModalShort';
+import { Button } from 'react-bootstrap';
+import ModalNoti from 'views/Popup/ModalNoti';
+
+
+
 
 function ListEmail() {
+
+  const [emailList, setEmailList] = useState([]);
+  const [isOpenDuplicate, setIsOpenDuplicate] = useState(false);
+  const [idEmail, setIdEmail] = useState();
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [msgNoti, setMsgNoti] = useState();
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
+
+
+  useEffect(() => {
+    api.get('/api/v1/managements/emails?page=1').then(res => {
+      console.log(res.data.data);
+      setEmailList(res.data.data);
+    }).catch(err => {
+      console.log(err);
+    })
+  }, [])
+
+  function reLoad() {
+    api.get('/api/v1/managements/emails?page=1').then(res => {
+      setEmailList(res.data.data);
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  function openDuplicate(id) {
+    setIsOpenDuplicate(true);
+    setIdEmail(id);
+  }
+
+  function duplicateEmail() {
+    api.post(`/api/v1/managements/emails/${idEmail}/duplicate`).then(res => {
+      if (res.data.code == 1) {
+        setIsOpenDuplicate(false);
+        setIsOpenNoti(true);
+        setMsgNoti(`Dulicate successfully!`);
+        reLoad();
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMsgNoti(``);
+        }, 2000)
+      } else if (res.data.code == 2) {
+        setIsOpenDuplicate(false);
+        setIsOpenNoti(true);
+        setMsgNoti(res.data.message);
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMsgNoti(``);
+        }, 2000)
+      }
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  function openDelete(id) {
+    setIsOpenDelete(true);
+    setIdEmail(id);
+  }
+
+  function deleteEmail() {
+    api.delete(`/api/v1/managements/emails/${idEmail}`).then(res => {
+      if (res.data.code == 1) {
+        setIsOpenDelete(false);
+        setIsOpenNoti(true);
+        setMsgNoti(`Delete successfully!`);
+        reLoad();
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMsgNoti(``);
+        }, 2000)
+      } else if (res.data.code == 2) {
+        setIsOpenDelete(false);
+        setIsOpenNoti(true);
+        setMsgNoti(res.data.message);
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMsgNoti(``);
+        }, 2000)
+      }
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
   return (
     // <div>ListEmail</div>
     <>
@@ -16,97 +111,92 @@ function ListEmail() {
               </CardHeader>
               <CardBody>
                 <div className='mail__list'>
-                  <div className='mail__list-item'>
-                    <p>Test</p>
-                    <div className='mail-block'>
 
-                      <table className='mail-table'>
-                        <tr>
-                          <th>From</th>
-                          <td>nghia ne (no-reply@botchan.chat)</td>
-                        </tr>
-                        <tr>
-                          <th>To</th>
-                          <td>aaa@gmail.com</td>
-                        </tr>
-                        <tr>
-                          <th>CC</th>
-                          <td>aaa@gmail.com <br />aaab@gmail.com</td>
-                        </tr>
-                        <tr>
-                          <th>BCC</th>
-                          <td>aaa@gmail.com <br />aaab@gmail.com</td>
-                        </tr>
-                        <tr>
-                          <th>Reply-To</th>
-                          <td>aaa@gmail.com</td>
-                        </tr>
-                      </table>
+                  {emailList?.map((item, i) => (
+                    <div className='mail__list-item' key={i}>
+                      <p>Test</p>
+                      <div className='mail-block'>
+                        <table className='mail-table'>
+                          <tbody>
+                            <tr>
+                              <th>From</th>
+                              <td>{item.sender_name} (no-reply@botchan.chat)</td>
+                            </tr>
+                            <tr>
+                              <th>To</th>
+                              <td>{item.to}</td>
+                            </tr>
+                            <tr>
+                              <th>CC</th>
+                              <td>
+                                {item.cc?.map((cc, ic) => (
+                                  <span key={ic} style={{ fontWeight: "400" }}>
+                                    {cc.to} <br /></span>
+                                ))}
+                              </td>
+                              {/* <td>aaa@gmail.com <br />aaab@gmail.com</td> */}
+                            </tr>
+                            <tr>
+                              <th>BCC</th>
+                              <td>
+                                {item.bcc?.map((bcc, ib) => (
+                                  <span key={ib} style={{ fontWeight: "400" }}>
+                                    {bcc.to} <br /></span>
+                                ))}
+                              </td>
+                            </tr>
+                            <tr>
+                              <th>Reply-To</th>
+                              <td>{item.reply_to}</td>
+                            </tr>
+                          </tbody>
+                        </table>
 
-                      <div className='mail-detail'>
-                        <div className='email-detail--subject' type='text' >
-                          <span>Subject: </span>test send</div>
-                        <div className='mail-detail--text' >
-                          <span>Text: </span>
-                          <p>send email</p>
+                        <div className='mail-detail'>
+                          <div className='email-detail--subject' type='text' >
+                            <span>Subject: </span>{item.subject}</div>
+                          <div className='mail-detail--text' >
+                            <span>Text: </span>
+                            <p>{item.content}</p>
+                          </div>
+                        </div>
+
+                        <div className='mail-actions'>
+                          <button className='mail-actions--btn btn btn-default'>Edit</button>
+                          <button className='mail-actions--btn btn btn-success' onClick={() => openDuplicate(item.id)}>Duplication</button>
+                          <button className='mail-actions--btn btn btn-danger' onClick={() => openDelete(item.id)}>Delete</button>
                         </div>
                       </div>
-
-                      <div className='mail-actions'>
-                        <button className='mail-actions--btn btn btn-default'>Edit</button>
-                        <button className='mail-actions--btn btn btn-success'>duplication</button>
-                        <button className='mail-actions--btn btn btn-danger'>Delete</button>
-                      </div>
                     </div>
-                  </div>
-                  <div className='mail__list-item'>
-                    <p>Test</p>
-                    <div className='mail-block'>
 
-                      <table className='mail-table'>
-                        <tr>
-                          <th>From</th>
-                          <td>nghia ne (no-reply@botchan.chat)</td>
-                        </tr>
-                        <tr>
-                          <th>To</th>
-                          <td>aaa@gmail.com</td>
-                        </tr>
-                        <tr>
-                          <th>CC</th>
-                          <td>aaa@gmail.com <br />aaab@gmail.com</td>
-                        </tr>
-                        <tr>
-                          <th>BCC</th>
-                          <td>aaa@gmail.com <br />aaab@gmail.com</td>
-                        </tr>
-                        <tr>
-                          <th>Reply-To</th>
-                          <td>aaa@gmail.com</td>
-                        </tr>
-                      </table>
-
-                      <div className='mail-detail'>
-                        <div className='email-detail--subject' type='text' >
-                          <span>Subject: </span>test send</div>
-                        <div className='mail-detail--text' >
-                          <span>Text: </span>
-                          <p>send email</p>
-                        </div>
-                      </div>
-
-                      <div className='mail-actions'>
-                        <button className='mail-actions--btn btn btn-default'>Edit</button>
-                        <button className='mail-actions--btn btn btn-success'>Duplicate</button>
-                        <button className='mail-actions--btn btn btn-danger'>Delete</button>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </CardBody>
             </Card>
           </Col>
         </Row>
+
+        <ModalShort open={isOpenDuplicate} onClose={() => setIsOpenDuplicate(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <h4>Do you want to duplicate email?</h4>
+            <Button onClick={() => duplicateEmail()}>Yes</Button>
+            <Button onClick={() => setIsOpenDuplicate(false)}>No</Button>
+          </div>
+        </ModalShort>
+
+        <ModalShort open={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <h4>Do you want to delete email?</h4>
+            <Button onClick={() => deleteEmail()}>Yes</Button>
+            <Button onClick={() => setIsOpenDelete(false)}>No</Button>
+          </div>
+        </ModalShort>
+
+        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
+          </div>
+        </ModalNoti>
       </div>
     </>
   )
