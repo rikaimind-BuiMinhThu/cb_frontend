@@ -14,6 +14,7 @@ function VariableManagement() {
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState();
   const [listVariable, setListVariable] = useState([]);
+  const [openVariable, setOpenVariable] = useState(true);
 
 
 
@@ -59,15 +60,21 @@ function VariableManagement() {
     console.log(add)
 
     api.post(`/api/v1/managements/chatbots/${botId}/variables`, add).then(res => {
-      console.log(res);
-      reloadListVariable()
-      const list = document.getElementById(`new_var_add_${index}`);
-      while (list.hasChildNodes()) {
-        list.removeChild(list.firstChild);
+      if (res.data.code == 1) {
+        console.log(res);
+        reloadListVariable();
+        setIsOpenNoti(true);
+        setMsgNoti(`Save successfully!`);
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMsgNoti(``);
+        }, 2000)
+        const list = document.getElementById(`new_var_add_${index}`);
+        while (list.hasChildNodes()) {
+          list.removeChild(list.firstChild);
+        }
+        document.getElementById('add_new_var').removeAttribute('disabled');
       }
-      document.getElementById('add_new_var').removeAttribute('disabled');
-
-
     }).catch(err => {
       console.log(err)
     })
@@ -84,14 +91,65 @@ function VariableManagement() {
 
   //function delete variable
   function deleteVariable(id) {
-
+    api.delete(`/api/v1/managements/chatbots/${botId}/variables/${id}`).then(res => {
+      if (res.data.code == 1) {
+        reloadListVariable();
+        setIsOpenNoti(true);
+        setMsgNoti(`Delete successfully!`);
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMsgNoti(``);
+        }, 2000)
+      }
+    }).catch(err => {
+      console.log(err);
+    })
   }
 
   //funtion update variable
   function updateVariable(id, index) {
     let name = document.getElementById(`up_variable_name_${index}`).value
     let dfvalue = document.getElementById(`up_variable_value_${index}`).value
-    console.log(name, dfvalue)
+    let editVariable = {
+      'variable': {
+        "variable_name": name,
+        "default_value": dfvalue,
+      }
+    }
+    api.patch(`/api/v1/managements/chatbots/${botId}/variables/${id}`, editVariable).then(res => {
+      console.log(res);
+      if (res.data.code == 1) {
+        reloadListVariable();
+        setIsOpenNoti(true);
+        setMsgNoti(`Update successfully!`);
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMsgNoti(``);
+        }, 2000)
+      }
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  //validate
+  const field = document.getElementById.bind(document);
+  function checkInput(idInput, errInput, lable) {
+    if (field(idInput).value === '') {
+      field(errInput).style.display = 'block';
+      field(errInput).innerHTML = `${lable} required.`
+      return false;
+    }
+    else if (field(idInput).value.length > 30) {
+      field(errInput).style.display = 'block';
+      field(errInput).innerHTML = `${lable} > 30 charectors.`
+      return false;
+    }
+    else {
+      field(errInput).style.display = 'none';
+      field(errInput).innerHTML = ``
+      return true;
+    }
   }
 
   return (
@@ -101,73 +159,165 @@ function VariableManagement() {
           <Col md="12">
             <Card>
               <CardHeader>
-                <button className='btn btn-primary'>USER-DEFINED VARIABLE</button>
-                <button className='btn btn-primary'>SYSTEM VARIABLES</button>
-                <p className='variable-note'>* A variable that stores the user's input contents. It can be assigned and referenced in the scenario.</p>
+                <button className='btn btn-primary' onClick={() => setOpenVariable(true)}>USER-DEFINED VARIABLE</button>
+                <button className='btn btn-primary' onClick={() => setOpenVariable(false)}>SYSTEM VARIABLES</button>
+                <p className='var-variable-note'>* A variable that stores the user's input contents. It can be assigned and referenced in the scenario.</p>
               </CardHeader>
               <CardBody>
-                <div className=''>
-                  <div className='form__head'>
-                    <label>Variable name</label>
-                    <label>Default value</label>
-                  </div>
-                  <div className='form__variable'>
-                    {listVariable.map((item, i) => (
-                      <div className='form__variable-group' id={`up_var_add_${i}`} key={i}>
-                        <input id={`up_variable_name_${i}`} defaultValue={item.variable_name} className='form__variable-name' placeholder='Please input variavble name' />
-                        <input id={`up_variable_value_${i}`} defaultValue={item.default_value} className='form__variable-value' placeholder='Please input variable value' />
-                        <div className='form__variable-delete'>
-                          <MDBIcon
-                            id='save_new_var'
-                            fas
-                            icon="edit" style={{ fontSize: '20px' }}
-                            onClick={() => updateVariable(item.id, i)}
-                          ></MDBIcon>
-                          <MDBIcon
-                            id='save_new_var'
-                            fas
-                            icon="trash" style={{ fontSize: '20px', marginLeft: '10px' }}
-                            onClick={() => deleteVariable(item.id)}
-                          ></MDBIcon>
-
-                        </div>
-                      </div>
-                    ))}
-                    {customVariable.map((cdiv, i) => (
-                      <div className='form__variable-group' id={`new_var_add_${i}`} key={i}>
-                        <input id={`variable_name_${i}`} className='form__variable-name' placeholder='Please input variavble name' />
-                        <input id={`variable_value_${i}`} className='form__variable-value' placeholder='Please input variable value' />
-                        <div className='form__variable-delete'>
-                          <MDBIcon
-                            id='save_new_var'
-                            fas
-                            icon="save" style={{ fontSize: '20px' }}
-                            onClick={() => saveNewVar(i)}
-                          ></MDBIcon>
-                          <MDBIcon
-                            id='cancel_new_var'
-                            fas
-                            icon="minus-circle" style={{ fontSize: '20px', marginLeft: '10px' }}
-                            onClick={() => cancelSaveNewVakr(i)}
-                          ></MDBIcon>
-                        </div>
-                      </div>
-                    ))}
-
-                    <div className='var-div-add-new'>
-                      <button id='add_new_var' onClick={() => addNewVar()} className='var-btn-add-new'>
-                        Add
-                      </button>
-
-
+                {openVariable ?
+                  <div className='var_defined-variable'>
+                    <div className='var-form__head'>
+                      <label>Variable name</label>
+                      <label>Default value</label>
                     </div>
+                    <div className='var-form__variable'>
+                      {listVariable.map((item, i) => (
+                        <div className='var-form__variable-group' id={`up_var_add_${i}`} key={i}>
+                          <div className='var-form__variable-name' >
+                            <input id={`up_variable_name_${i}`} defaultValue={item.variable_name} placeholder='Please input variavble name'
+                              onChange={() => checkInput(`up_variable_name_${i}`, `errUpVarName_${i}`, 'Variavble name')}
+                              onBlur={() => checkInput(`up_variable_name_${i}`, `errUpVarName_${i}`, 'Variavble name')} />
+                            <span id={`errUpVarName_${i}`} className='err-varriable'></span>
+                          </div>
 
+                          <div className='var-form__variable-name' >
+                            <input id={`up_variable_value_${i}`} defaultValue={item.default_value} placeholder='Please input variable value'
+                              onChange={() => checkInput(`up_variable_value_${i}`, `errUpVarValue_${i}`, 'Variable value')}
+                              onBlur={() => checkInput(`up_variable_value_${i}`, `errUpVarValue_${i}`, 'Variable value')} />
+                            <span id={`errUpVarValue_${i}`} className='err-varriable'></span>
+                          </div>
+
+                          <div className='var-form__variable-delete'>
+                            <MDBIcon
+                              id='save_new_var'
+                              fas
+                              icon="edit" style={{ fontSize: '20px' }}
+                              onClick={() => updateVariable(item.id, i)}
+                            ></MDBIcon>
+                            <MDBIcon
+                              id='save_new_var'
+                              fas
+                              icon="trash" style={{ fontSize: '20px', marginLeft: '10px' }}
+                              onClick={() => deleteVariable(item.id)}
+                            ></MDBIcon>
+
+                          </div>
+                        </div>
+                      ))}
+                      {customVariable.map((cdiv, i) => (
+                        <div className='var-form__variable-group' id={`new_var_add_${i}`} key={i}>
+                          <input id={`variable_name_${i}`} className='var-form__variable-name' placeholder='Please input variavble name'
+                            onChange={() => checkInput(`variable_name_${i}`, `errVarName_${i}`, 'Variavble name')}
+                            onBlur={() => checkInput(`variable_name_${i}`, `errVarName_${i}`, 'Variavble name')} />
+                          <span id={`errVarName_${i}`} className='err-varriable'></span>
+                          <input id={`variable_value_${i}`} className='var-form__variable-value' placeholder='Please input variable value'
+                            onChange={() => checkInput(`variable_value_${i}`, `errVarValue_${i}`, 'Variavble value')}
+                            onBlur={() => checkInput(`variable_value_${i}`, `errVarValue_${i}`, 'Variavble value')} />
+                          <span id={`errVarValue_${i}`} className='err-varriable'></span>
+                          <div className='var-form__variable-delete'>
+                            <MDBIcon
+                              id='save_new_var'
+                              fas
+                              icon="save" style={{ fontSize: '20px' }}
+                              onClick={() => saveNewVar(i)}
+                            ></MDBIcon>
+                            <MDBIcon
+                              id='cancel_new_var'
+                              fas
+                              icon="minus-circle" style={{ fontSize: '20px', marginLeft: '10px' }}
+                              onClick={() => cancelSaveNewVakr(i)}
+                            ></MDBIcon>
+                          </div>
+                        </div>
+                      ))}
+
+                      <div className='var-div-add-new'>
+                        <button id='add_new_var' onClick={() => addNewVar()} className='var-btn-add-new'>
+                          Add
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                {/* <div className='variable-plus'>
-                  <MDBIcon fas icon="plus-circle" />
-                </div> */}
+                  : <div className='var_system-variable'>
+                    <div className='var-form__head'>
+                      <label>Variable name</label>
+                      <label>Variable description</label>
+                    </div>
+                    <div className='var-form__variable'>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='current_url' />
+                        <div className='var-form__variable-value var-none-border'>URL of the page that opened the bot</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='current_url_param' />
+                        <div className='var-form__variable-value var-none-border'>Parameters in the URL of the page that opened the bot (character string after "?")</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='current_url_title' />
+                        <div className='var-form__variable-value var-none-border'>The title of the webpage that opened the bot</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='user_id' />
+                        <div className='var-form__variable-value var-none-border'>A unique ID automatically assigned to each user using the bot</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='bot_id' />
+                        <div className='var-form__variable-value var-none-border'>the bot's ID</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='preview_flg' />
+                        <div className='var-form__variable-value var-none-border'>Flag for users using preview features (empty for normal users)</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='user_ip_address' />
+                        <div className='var-form__variable-value var-none-border'>IP address of the accessing user</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='user_country' />
+                        <div className='var-form__variable-value var-none-border'>Country name calculated from IP address</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='user_city' />
+                        <div className='var-form__variable-value var-none-border'>Municipality calculated from the IP address</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='user_device' />
+                        <div className='var-form__variable-value var-none-border'>The type of device the user is using (PC, smartphone, tablet)</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='user_browser' />
+                        <div className='var-form__variable-value var-none-border'>the type of browser the user is using</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='user_agent' />
+                        <div className='var-form__variable-value var-none-border'>User's browser information and OS information (each type, version, etc.)</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='cv_datetime' />
+                        <div className='var-form__variable-value var-none-border'>The date and time when the user reached the end of the scenario</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='cv_flg' />
+                        <div className='var-form__variable-value var-none-border'>Flag when the user has reached the end of the scenario (returns a value of "1" for users who have reached the end, and a value of "0" for users in the middle)</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='start_datetime' />
+                        <div className='var-form__variable-value var-none-border'>The date and time when you opened the chatbot and had your first conversation</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='user_referer_firstopen' />
+                        <div className='var-form__variable-value var-none-border'>User's referral when first opened (the URL of the page they were on before visiting the site)</div>
+                      </div>
+                      <div className='var-form__variable-group'>
+                        <input type="text" disabled className='var-form__variable-name' value='user_referer_current' />
+                        <div className='var-form__variable-value var-none-border'>User's last referral (the URL of the page they were on before visiting your site)</div>
+                      </div>
+                    </div>
+                  </div>
+
+                }
+
               </CardBody>
             </Card>
           </Col>
