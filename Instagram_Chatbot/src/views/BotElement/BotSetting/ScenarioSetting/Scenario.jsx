@@ -1,10 +1,26 @@
 import '../../../../assets/css/bot/scenario/scenario-single.css';
-import { useEffect } from 'react';
-import { Col, Row, Card, CardBody, CardHeader, Button } from 'reactstrap';
-import icon from '../../../../assets/img/bot-icon/man1_new.png'
+import { useEffect, useState } from 'react';
+import { Col, Row, Card, CardBody, Button } from 'reactstrap';
+import icon from '../../../../assets/img/bot-icon/man1_new.png';
 import { MDBIcon } from 'mdbreact';
+
+const data = [
+  {
+    belong_to: 'bot',
+    id: '1',
+    type: 'delay',
+  },
+  {
+    belong_to: 'user',
+    id: '2',
+    type: 'text_input',
+  },
+];
+
 const Scenario = () => {
   // states
+  const [belongTo, setBelongTo] = useState('bot');
+  const [messageType, setMessageType] = useState('text');
 
   // side effects
   useEffect(() => {
@@ -13,7 +29,7 @@ const Scenario = () => {
   }, []);
 
   function botUploadFile() {
-    document.getElementById('bot-file-upload').click()
+    document.getElementById('ss-bot-file-upload').click();
   }
 
   function getBaseUrl(event) {
@@ -23,12 +39,17 @@ const Scenario = () => {
     var reader = new FileReader();
     var baseString;
     var imgUrl = URL.createObjectURL(event.target.files[0]);
-    if (file?.type === 'image/png' || file?.type === 'image/jpeg' || file?.type === 'image/jpg'
-      || file?.type === 'image/gif' || file?.type === 'image/img') {
-      document.getElementById(`bot-file-upload-img`).style.display = "block"
+    if (
+      file?.type === 'image/png' ||
+      file?.type === 'image/jpeg' ||
+      file?.type === 'image/jpg' ||
+      file?.type === 'image/gif' ||
+      file?.type === 'image/img'
+    ) {
+      document.getElementById(`bot-file-upload-img`).style.display = 'block';
       document.getElementById(`bot-file-upload-img`).src = imgUrl;
     } else {
-      document.getElementById(`bot-file-upload-img`).style.display = "none"
+      document.getElementById(`bot-file-upload-img`).style.display = 'none';
       document.getElementById(`bot-file-upload-img`).src = '';
     }
 
@@ -36,10 +57,10 @@ const Scenario = () => {
       baseString = reader.result;
       // setInputImage(baseString);
       console.log(event.target.files[0].name);
-      document.getElementById('bot-file-upload-name').innerHTML = event.target.files[0].name
+      document.getElementById('bot-file-upload-name').innerHTML = event.target.files[0].name;
       if (baseString !== undefined || baseString !== '') {
         // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
-        console.log('No file selected')
+        console.log('No file selected');
       }
     };
     reader.readAsDataURL(file);
@@ -49,6 +70,34 @@ const Scenario = () => {
     // }
   }
 
+  // handle select message
+  const handleSelectMessage = (id, type, belongTo) => {
+    setMessageType(type);
+    setBelongTo(belongTo);
+    document.querySelectorAll('.ss-edit-option-wrapper').forEach((ele) => {
+      if (!ele.classList.contains(`ss-edit-option-wrapper-${id}`)) {
+        ele.classList.remove('ss-edit-option-wrapper--select');
+      }
+    });
+    document.querySelectorAll('.ss-message').forEach((ele) => {
+      ele.classList.remove('ss-message--select');
+      ele.classList.remove('ss-message--error');
+    });
+    document.querySelector(`.ss-message-${id}`).classList.add('ss-message--select');
+  };
+
+  // handle edit icon click
+  const handleEditIconClick = (id) => {
+    document.querySelectorAll('.ss-edit-option-wrapper').forEach((ele) => {
+      if (!ele.classList.contains(`ss-edit-option-wrapper-${id}`)) {
+        ele.classList.remove('ss-edit-option-wrapper--select');
+      }
+    });
+    document
+      .querySelector(`.ss-edit-option-wrapper-${id}`)
+      .classList.toggle('ss-edit-option-wrapper--select');
+  };
+
   return (
     <div className="content">
       <div className="ss-actions">
@@ -56,144 +105,377 @@ const Scenario = () => {
         <Button>Save and preview</Button>
       </div>
       <Row>
-        <Col >
+        <Col>
           <Card>
             <CardBody>
-              <div className='ss-sc-setting'>
-                <div className='ss-sc-content ss-overview'>
-
+              <div className="ss-sc-setting">
+                {/* ss overview */}
+                <div className="ss-sc-content ss-overview">
                   {/* Input name of scenario */}
-                  <input className='ss-scenario-name' type="text"></input>
+                  <input
+                    className="ss-scenario-name ss-input-value"
+                    type="text"
+                    value={'Scenario 1'}
+                    onChange={() => {}}
+                    placeholder="Enter scenario name"
+                  ></input>
 
                   {/* Overview scenario */}
-                  <div className='ss-overview-detail'>
+                  <div className="ss-overview-detail">
+                    {data.map((message) =>
+                      message.belong_to === 'bot' ? (
+                        <div key={message.id} className="ss-bot-chat-wrapper ss-message-wrapper">
+                          <div
+                            className={`ss-bot-chat ss-message ss-message--select ss-message-${message.id}`}
+                          >
+                            <div
+                              className="ss-bot-chat-detail ss-message__detail"
+                              onClick={() =>
+                                handleSelectMessage(message.id, message.type, message.belong_to)
+                              }
+                            >
+                              <img className="ss-bot-ava" src={icon} alt="" />
 
-                    {/* Detail bot chat overview */}
-                    <div className='ss-bot-chat'>
-                      <div className='ss-bot-chat-detail'>
-                        <img className='ss-bot-ava' src={icon}></img>
-                        <div className='ss-bot-chat-detail-content'>
+                              {/* bot: type == 'text' */}
+                              {message.type === 'text' && (
+                                <textarea
+                                  className="ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value"
+                                  value={''}
+                                  readOnly
+                                ></textarea>
+                              )}
+                              {/* bot: type == 'file' */}
+                              {/* file type: jpeg, jpg, png */}
+                              {/* {message.type === 'file' && (
+                                <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-img">
+                                  <img
+                                    src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/63354faaba626.jpg"
+                                    alt=""
+                                  />
+                                </div>
+                              )} */}
 
+                              {/* file type: gif, mp4 */}
+                              {/* {message.type === 'file' && (
+                                <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-video">
+                                  <video
+                                    src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/633551125f613.mp4"
+                                    controls="controls"
+                                  ></video>
+                                </div>
+                              )} */}
+
+                              {/* file type: pdf */}
+                              {message.type === 'file' && (
+                                <textarea
+                                  className="ss-bot-chat-detail-content ss-message__content--bot-file-pdf ss-input-value"
+                                  value={
+                                    'https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/6335523536dd4.pdf'
+                                  }
+                                  readOnly
+                                ></textarea>
+                              )}
+
+                              {/* bot: type == 'email' */}
+                              {message.type === 'email' && (
+                                <textarea
+                                  className="ss-bot-chat-detail-content ss-message__content--bot-email ss-input-value"
+                                  value={''}
+                                  readOnly
+                                ></textarea>
+                              )}
+
+                              {/* bot: type == 'script' */}
+                              {message.type === 'script' && (
+                                <textarea
+                                  className="ss-bot-chat-detail-content ss-message__content--bot-script ss-input-value"
+                                  value={''}
+                                  readOnly
+                                ></textarea>
+                              )}
+
+                              {/* bot: type == 'delay' */}
+                              {message.type === 'delay' && (
+                                <textarea
+                                  className="ss-bot-chat-detail-content ss-message__content--bot-delay ss-input-value"
+                                  value={'1 秒'}
+                                  readOnly
+                                ></textarea>
+                              )}
+
+                              <div className="ss-chat-option">
+                                <MDBIcon
+                                  fas
+                                  icon="pencil-alt"
+                                  style={{ marginTop: '10px' }}
+                                  onClick={() => handleEditIconClick(message.id)}
+                                ></MDBIcon>
+                                <MDBIcon
+                                  fas
+                                  icon="grip-vertical"
+                                  style={{ marginTop: '10px' }}
+                                ></MDBIcon>
+                                <div
+                                  className={`ss-edit-option-wrapper ss-edit-option-wrapper-${message.id}`}
+                                >
+                                  <div className="ss-option-wrapper">
+                                    <MDBIcon
+                                      fas
+                                      icon="copy"
+                                      className="ss-add-option-icon"
+                                    ></MDBIcon>
+                                    <span>Copy</span>
+                                  </div>
+                                  <div className="ss-option-wrapper">
+                                    <MDBIcon
+                                      fas
+                                      icon="eye-slash"
+                                      className="ss-add-option-icon"
+                                    ></MDBIcon>
+                                    <span>Hidden</span>
+                                  </div>
+                                  <div className="ss-option-wrapper">
+                                    <MDBIcon
+                                      fas
+                                      icon="trash"
+                                      className="ss-add-option-icon"
+                                    ></MDBIcon>
+                                    <span>Delete</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="ss-add-action-wrapper">
+                              <MDBIcon fas icon="plus-circle" className="ss-add-icon"></MDBIcon>
+                              <div className="ss-add-message-option-wrapper">
+                                <div className="ss-option-wrapper">
+                                  <MDBIcon
+                                    fas
+                                    icon="comment"
+                                    className="ss-add-option-icon"
+                                  ></MDBIcon>
+                                  <span>Bot statement</span>
+                                </div>
+                                <div className="ss-option-wrapper">
+                                  <MDBIcon
+                                    fas
+                                    icon="comment"
+                                    className="ss-add-option-icon"
+                                  ></MDBIcon>
+                                  <span>User input</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className='ss-chat-option'>
-                          <MDBIcon
-                            fas
-                            icon="pencil-alt"
-                            style={{ fontSize: '20px', marginTop: "10px" }}></MDBIcon>
+                      ) : (
+                        <div key={message.id} className="ss-user-chat-wrapper ss-message-wrapper">
+                          <div
+                            className={`ss-user-chat ss-message ss-message--error ss-message-${message.id}`}
+                          >
+                            <div
+                              className="ss-user-chat-detail ss-message__detail"
+                              onClick={() =>
+                                handleSelectMessage(message.id, message.type, message.belong_to)
+                              }
+                            >
+                              {/* type == 'text' */}
+                              {message.type === 'text_input' && (
+                                <textarea
+                                  className="ss-user-chat-detail-content ss-message__content--text ss-input-value"
+                                  readOnly
+                                  value={''}
+                                ></textarea>
+                              )}
 
-                          <MDBIcon
-                            fas
-                            icon="grip-vertical"
-                            style={{ fontSize: '20px', marginTop: "10px" }}
-                          ></MDBIcon>
+                              <div className="ss-chat-option">
+                                <MDBIcon
+                                  fas
+                                  icon="pencil-alt"
+                                  style={{ marginTop: '10px' }}
+                                  onClick={() => handleEditIconClick(message.id)}
+                                ></MDBIcon>
+                                <MDBIcon
+                                  fas
+                                  icon="grip-vertical"
+                                  style={{ marginTop: '10px' }}
+                                ></MDBIcon>
+                                <div
+                                  className={`ss-edit-option-wrapper ss-edit-option-wrapper-${message.id}`}
+                                >
+                                  <div className="ss-option-wrapper">
+                                    <MDBIcon
+                                      fas
+                                      icon="copy"
+                                      className="ss-add-option-icon"
+                                    ></MDBIcon>
+                                    <span>Copy</span>
+                                  </div>
+                                  <div className="ss-option-wrapper">
+                                    <MDBIcon
+                                      fas
+                                      icon="eye-slash"
+                                      className="ss-add-option-icon"
+                                    ></MDBIcon>
+                                    <span>Hidden</span>
+                                  </div>
+                                  <div className="ss-option-wrapper">
+                                    <MDBIcon
+                                      fas
+                                      icon="trash"
+                                      className="ss-add-option-icon"
+                                    ></MDBIcon>
+                                    <span>Delete</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="ss-add-action-wrapper">
+                              <MDBIcon fas icon="plus-circle" className="ss-add-icon"></MDBIcon>
+                              <div className="ss-add-message-option-wrapper">
+                                <div className="ss-option-wrapper">
+                                  <MDBIcon
+                                    fas
+                                    icon="comment"
+                                    className="ss-add-option-icon"
+                                  ></MDBIcon>
+                                  <span>Bot statement</span>
+                                </div>
+                                <div className="ss-option-wrapper">
+                                  <MDBIcon
+                                    fas
+                                    icon="comment"
+                                    className="ss-add-option-icon"
+                                  ></MDBIcon>
+                                  <span>User input</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <MDBIcon
-                        fas
-                        icon="plus-circle"
-                        style={{ fontSize: '20px', margin: "10px 0px 0px 10px" }}
-                      ></MDBIcon>
-                    </div>
-
-                    {/* Detail user chat overview */}
-                    <div className='ss-user-chat'>
-                      <div className='ss-user-chat-detail'>
-                        <div className='ss-user-chat-detail-content'>
-
-                        </div>
-                        <div className='ss-chat-option'>
-                          <MDBIcon
-                            fas
-                            icon="pencil-alt"
-                            style={{ fontSize: '20px', marginTop: "10px" }}></MDBIcon>
-
-                          <MDBIcon
-                            fas
-                            icon="grip-vertical"
-                            style={{ fontSize: '20px', marginTop: "10px" }}
-                          ></MDBIcon>
-                        </div>
-
-                      </div>
-                      <MDBIcon
-                        className='ss-user-add-input'
-                        fas
-                        icon="plus-circle"
-                      ></MDBIcon>
-
-                    </div>
+                      )
+                    )}
                   </div>
                 </div>
-                <div className='ss-sc-content ss-bot-setting'>
-                  <div id='bot-statement' className='ss-bot-statement-detail-setting'>
 
-                    {/* Bot setting detail below */}
-                    <div style={{ padding: '10px' }}>
-                      <label>type</label>
-                      <select name="bot_statement_type" id="bot-statement-type" className='ss-bot-statement-type'>
-                        <option value="text">Text</option>
-                        <option value="file">File</option>
-                        <option value="email">Email</option>
-                        <option value="script">Script</option>
-                        <option value="deplay">Delay</option>
-                        {/* <option value="api_link_age">Text</option> Pending */}
-                      </select>
+                {/* ss setting */}
+                <div className="ss-sc-content ss-setting-wrapper">
+                  {belongTo === 'bot' && (
+                    <div id="bot-statement" className="ss-bot-statement-detail-setting">
+                      {/* Bot setting detail below */}
+                      <div style={{ padding: '10px' }}>
+                        <label htmlFor="ss-bot-statement-title">Type</label>
+                        <select
+                          name="bot_statement_type"
+                          id="ss-bot-statement-type"
+                          className="ss-bot-statement-type ss-input-value"
+                          value={messageType}
+                          onChange={(e) => setMessageType(e.target.value)}
+                        >
+                          <option value="text">Text</option>
+                          <option value="file">File</option>
+                          <option value="email">Email</option>
+                          <option value="script">Script</option>
+                          <option value="delay">Delay</option>
+                          {/* <option value="api_link_age">Text</option> Pending */}
+                        </select>
 
-                      <div id='bot-statement-type-text' className='ss-bot-statement-type-text'>
-                        <textarea
-                          name="bot-statement-type-text-content"
-                          id="bot-statement-type-text-content"
-                          className='bot-statement-type-text-content'
-                          rows={5}
-                          placeholder="Input..."></textarea>
-                        <input type="checkbox" id='bot-text-scroll-auto' name='bot-text-scroll-auto' />&ensp;
-                        <label htmlFor="scroll-auto">Do not scroll automatically</label>
+                        {/* type: text */}
+                        {messageType === 'text' && (
+                          <div className="ss-bot-statement-wrapper">
+                            <div
+                              id="ss-bot-statement-type-text"
+                              className="ss-bot-statement-type-text"
+                            >
+                              <textarea
+                                name="bot-statement-type-text-content"
+                                id="bot-statement-type-text-content"
+                                className="ss-bot-statement-type-text-content ss-input-value"
+                                rows={5}
+                                placeholder="Input..."
+                              ></textarea>
+                            </div>
+                            <div className="ss-bot-checkbox-scroll-auto">
+                              <input
+                                type="checkbox"
+                                id="ss-bot-text-scroll-auto"
+                                name="bot-text-scroll-auto"
+                              />
+                              <label
+                                htmlFor="ss-bot-text-scroll-auto"
+                                className="ss-bot-statement-type-text__label"
+                              >
+                                Do not scroll automatically
+                              </label>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* type: file */}
+                        {messageType === 'file' && (
+                          <div className="ss-bot-statement-wrapper">
+                            <div
+                              id="bot-statement-type-file"
+                              className="ss-bot-statement-type-file"
+                            >
+                              <div style={{ textAlign: 'center' }}>
+                                <img
+                                  src=""
+                                  id="bot-file-upload-img"
+                                  className="ss-bot-file-upload-img"
+                                  alt=""
+                                />
+                                <textarea
+                                  name="bot-statement-type-file-content"
+                                  id="bot-statement-type-file-content"
+                                  className="ss-bot-statement-type-file-content ss-input-value"
+                                  rows={5}
+                                  placeholder="File URL"
+                                ></textarea>
+                                <span id="bot-file-upload-name"></span>
+                                <input
+                                  type="file"
+                                  id="ss-bot-file-upload"
+                                  name="bot-file-upload"
+                                  hidden
+                                  onChange={(e) => {
+                                    getBaseUrl(e);
+                                    // setUpdateImageChange(true);
+                                  }}
+                                />
+                                <button
+                                  className="ss-bot-file-upload-btn"
+                                  onClick={() => botUploadFile()}
+                                >
+                                  Upload
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        <div
+                          id="bot-statement-type-email"
+                          className="ss-bot-statement-type-email"
+                        ></div>
                       </div>
 
-                      <div id='bot-statement-type-file' className='ss-bot-statement-type-file'>
-                        <div style={{ textAlign: "center" }}>
-                          <img src="" id="bot-file-upload-img" className='ss-bot-file-upload-img' alt="" />
-                          <span id="bot-file-upload-name"></span><br /><br />
-                          <input type="file" id="bot-file-upload" name="bot-file-upload" hidden
-                            onChange={(e) => {
-                              getBaseUrl(e);
-                              // setUpdateImageChange(true);
-                            }}
-                          />
-                          <button className='ss-bot-file-upload-btn' onClick={() => botUploadFile()}>
-                            Upload
-                          </button>
-                        </div>
-                      </div>
-
-                      <div id='bot-statement-type-email' className='ss-bot-statement-type-email'>
-
-                      </div>
-
+                      <div></div>
                     </div>
+                  )}
 
-                    <div>
-
+                  {belongTo === 'user' && (
+                    <div id="user-chat" className="ss-user-chat-detail-setting">
+                      <span>Name </span>
+                      <input type="text" className="ss-user-chat-detail-setting-user-title" />
+                      <div id="" className="ss-user-chat-detail-setting-content"></div>
                     </div>
-                  </div>
-                  <div id='user-chat' className='ss-user-chat-detail-setting'>
-                    <span>Name </span><input type="text" className='ss-user-chat-detail-setting-user-title' />
-                    <div id='' className='ss-user-chat-detail-setting-content'>
-
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </CardBody>
           </Card>
         </Col>
-        {/* <Col >
-          <Card>
-            <CardBody>
-              
-            </CardBody>
-          </Card>
-        </Col> */}
       </Row>
     </div>
   );
