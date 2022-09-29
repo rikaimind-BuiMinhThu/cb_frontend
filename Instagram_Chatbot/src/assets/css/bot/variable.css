@@ -16,21 +16,37 @@
 }
 .form__variable-group{
     display: flex;
+    margin-top: 10px;
 }
 .form__variable-name{
     width: 30%;
-    margin-right: 15px;
+    margin-right: 1.5%;
     border: 1px solid #7186a0;
     border-radius: 3px;
-    padding: 10px 18px;
+    padding: 10px 1.5%;
 }
 .form__variable-value{
     width: 50%;
-    margin-right: 10px;
+    margin-right: 1.5%;
     border: 1px solid #7186a0;
     border-radius: 3px;
-    padding: 10px 18px;
+    padding: 10px 1.5%;
 }
 .form__variable-delete{
     margin-top: 10px;
+}
+.var-div-add-new{
+    width: 100%;
+    display: flex;
+    margin-top: 10px;
+}
+.var-btn-add-new{
+    /* font-size: 20px; */
+    margin-left: 83%;
+    font-weight: 700;
+    color: #FFFFFF;
+    border: none;
+    padding: 5px 10px 5px 10px;
+    border-radius: 5px;
+    background-color: #51cbce;
 }
