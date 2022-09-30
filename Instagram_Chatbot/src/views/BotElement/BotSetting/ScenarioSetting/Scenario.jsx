@@ -4,11 +4,11 @@ import { Col, Row, Card, CardBody, Button } from 'reactstrap';
 import icon from '../../../../assets/img/bot-icon/man1_new.png';
 import { MDBIcon } from 'mdbreact';
 
-const data = [
+let data = [
   {
     belong_to: 'bot',
     id: '1',
-    type: 'delay',
+    type: 'text',
   },
   {
     belong_to: 'user',
@@ -19,8 +19,18 @@ const data = [
 
 const Scenario = () => {
   // states
+  const [scenarioName, setScenarioName] = useState('');
   const [belongTo, setBelongTo] = useState('bot');
   const [messageType, setMessageType] = useState('text');
+  const [idMessageSelect, setIdMessageSelect] = useState('');
+  // bot setting values
+  const [botTextValue, setBotTextValue] = useState('');
+  const [botScriptValue, setBotScriptValue] = useState('');
+  const [botDelayValue, setBotDelayValue] = useState(1);
+  const [botIsScrollAuto, setBotIsScrollAuto] = useState(false);
+  const [botIsTurnOnTyping, setBotIsTurnOnTyping] = useState(false);
+
+  // user setting values
 
   // side effects
   useEffect(() => {
@@ -33,47 +43,43 @@ const Scenario = () => {
   }
 
   function getBaseUrl(event) {
-    // console.log('getNe');
     var file = document.querySelector('input[type=file]')['files'][0];
     // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
     var reader = new FileReader();
     var baseString;
-    var imgUrl = URL.createObjectURL(event.target.files[0]);
-    if (
-      file?.type === 'image/png' ||
-      file?.type === 'image/jpeg' ||
-      file?.type === 'image/jpg' ||
-      file?.type === 'image/gif' ||
-      file?.type === 'image/img'
-    ) {
-      document.getElementById(`bot-file-upload-img`).style.display = 'block';
-      document.getElementById(`bot-file-upload-img`).src = imgUrl;
-    } else {
-      document.getElementById(`bot-file-upload-img`).style.display = 'none';
-      document.getElementById(`bot-file-upload-img`).src = '';
-    }
+    // var imgUrl = URL.createObjectURL(event.target.files[0]);
+    // if (
+    //   file?.type === 'image/png' ||
+    //   file?.type === 'image/jpeg' ||
+    //   file?.type === 'image/jpg' ||
+    //   file?.type === 'image/gif' ||
+    //   file?.type === 'image/img'
+    // ) {
+    //   document.getElementById(`bot-file-upload-img`).style.display = 'block';
+    //   document.getElementById(`bot-file-upload-img`).src = imgUrl;
+    // } else {
+    //   document.getElementById(`bot-file-upload-img`).style.display = 'none';
+    //   document.getElementById(`bot-file-upload-img`).src = '';
+    // }
 
     reader.onloadend = function () {
       baseString = reader.result;
       // setInputImage(baseString);
       console.log(event.target.files[0].name);
-      document.getElementById('bot-file-upload-name').innerHTML = event.target.files[0].name;
+      document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
       if (baseString !== undefined || baseString !== '') {
         // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
         console.log('No file selected');
       }
     };
     reader.readAsDataURL(file);
-    // return true;
-    // } else {
-    // return false;
-    // }
   }
 
   // handle select message
   const handleSelectMessage = (id, type, belongTo) => {
     setMessageType(type);
     setBelongTo(belongTo);
+    setIdMessageSelect(id);
     document.querySelectorAll('.ss-edit-option-wrapper').forEach((ele) => {
       if (!ele.classList.contains(`ss-edit-option-wrapper-${id}`)) {
         ele.classList.remove('ss-edit-option-wrapper--select');
@@ -98,10 +104,20 @@ const Scenario = () => {
       .classList.toggle('ss-edit-option-wrapper--select');
   };
 
+  // handle change bot statement type
+  const handleChangeBotStatementType = (e) => {
+    setMessageType(e.target.value);
+    data.forEach((message) => {
+      if (idMessageSelect && message.id === idMessageSelect) {
+        message.type = e.target.value;
+      }
+    });
+  };
+
   return (
     <div className="content">
       <div className="ss-actions">
-        <Button>Save scenario</Button>
+        <Button>Save</Button>
         <Button>Save and preview</Button>
       </div>
       <Row>
@@ -115,8 +131,8 @@ const Scenario = () => {
                   <input
                     className="ss-scenario-name ss-input-value"
                     type="text"
-                    value={'Scenario 1'}
-                    onChange={() => {}}
+                    value={scenarioName}
+                    onChange={(e) => setScenarioName(e.target.value)}
                     placeholder="Enter scenario name"
                   ></input>
 
@@ -140,7 +156,7 @@ const Scenario = () => {
                               {message.type === 'text' && (
                                 <textarea
                                   className="ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value"
-                                  value={''}
+                                  value={botTextValue}
                                   readOnly
                                 ></textarea>
                               )}
@@ -167,13 +183,23 @@ const Scenario = () => {
 
                               {/* file type: pdf */}
                               {message.type === 'file' && (
-                                <textarea
-                                  className="ss-bot-chat-detail-content ss-message__content--bot-file-pdf ss-input-value"
-                                  value={
-                                    'https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/6335523536dd4.pdf'
-                                  }
-                                  readOnly
-                                ></textarea>
+                                // <textarea
+                                //   className="ss-bot-chat-detail-content ss-message__content--bot-file-pdf ss-input-value"
+                                //   value={
+                                //     'https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/6335523536dd4.pdf'
+                                //   }
+                                //   readOnly
+                                // ></textarea>
+                                <span
+                                  style={{
+                                    cursor: 'pointer',
+                                    color: 'blue',
+                                    fontWeight: '400',
+                                    fontSize: '15px',
+                                  }}
+                                >
+                                  Download this file
+                                </span>
                               )}
 
                               {/* bot: type == 'email' */}
@@ -189,7 +215,7 @@ const Scenario = () => {
                               {message.type === 'script' && (
                                 <textarea
                                   className="ss-bot-chat-detail-content ss-message__content--bot-script ss-input-value"
-                                  value={''}
+                                  value={botScriptValue}
                                   readOnly
                                 ></textarea>
                               )}
@@ -198,7 +224,7 @@ const Scenario = () => {
                               {message.type === 'delay' && (
                                 <textarea
                                   className="ss-bot-chat-detail-content ss-message__content--bot-delay ss-input-value"
-                                  value={'1 秒'}
+                                  value={`${botDelayValue} 秒`}
                                   readOnly
                                 ></textarea>
                               )}
@@ -370,7 +396,7 @@ const Scenario = () => {
                           id="ss-bot-statement-type"
                           className="ss-bot-statement-type ss-input-value"
                           value={messageType}
-                          onChange={(e) => setMessageType(e.target.value)}
+                          onChange={handleChangeBotStatementType}
                         >
                           <option value="text">Text</option>
                           <option value="file">File</option>
@@ -385,7 +411,7 @@ const Scenario = () => {
                           <div className="ss-bot-statement-wrapper">
                             <div
                               id="ss-bot-statement-type-text"
-                              className="ss-bot-statement-type-text"
+                              className="ss-bot-statement-type-text ss-bot-statement-type"
                             >
                               <textarea
                                 name="bot-statement-type-text-content"
@@ -393,6 +419,8 @@ const Scenario = () => {
                                 className="ss-bot-statement-type-text-content ss-input-value"
                                 rows={5}
                                 placeholder="Input..."
+                                value={botTextValue}
+                                onChange={(e) => setBotTextValue(e.target.value)}
                               ></textarea>
                             </div>
                             <div className="ss-bot-checkbox-scroll-auto">
@@ -400,6 +428,8 @@ const Scenario = () => {
                                 type="checkbox"
                                 id="ss-bot-text-scroll-auto"
                                 name="bot-text-scroll-auto"
+                                checked={botIsScrollAuto}
+                                onChange={(e) => setBotIsScrollAuto(!botIsScrollAuto)}
                               />
                               <label
                                 htmlFor="ss-bot-text-scroll-auto"
@@ -415,38 +445,32 @@ const Scenario = () => {
                         {messageType === 'file' && (
                           <div className="ss-bot-statement-wrapper">
                             <div
-                              id="bot-statement-type-file"
-                              className="ss-bot-statement-type-file"
+                              id="ss-bot-statement-type-file"
+                              className="ss-bot-statement-type-file ss-bot-statement-type"
                             >
-                              <div style={{ textAlign: 'center' }}>
-                                <img
-                                  src=""
-                                  id="bot-file-upload-img"
-                                  className="ss-bot-file-upload-img"
-                                  alt=""
-                                />
-                                <textarea
-                                  name="bot-statement-type-file-content"
-                                  id="bot-statement-type-file-content"
-                                  className="ss-bot-statement-type-file-content ss-input-value"
-                                  rows={5}
-                                  placeholder="File URL"
-                                ></textarea>
-                                <span id="bot-file-upload-name"></span>
-                                <input
-                                  type="file"
-                                  id="ss-bot-file-upload"
-                                  name="bot-file-upload"
-                                  hidden
-                                  onChange={(e) => {
-                                    getBaseUrl(e);
-                                    // setUpdateImageChange(true);
-                                  }}
-                                />
-                                <button
-                                  className="ss-bot-file-upload-btn"
-                                  onClick={() => botUploadFile()}
-                                >
+                              {/* <img
+                                src=""
+                                id="bot-file-upload-img"
+                                className="ss-bot-file-upload-img"
+                                alt=""
+                              /> */}
+                              <textarea
+                                name="bot-statement-type-file-content"
+                                id="ss-bot-statement-type-file-content"
+                                className="ss-bot-statement-type-file-content ss-input-value"
+                                rows={5}
+                                placeholder="File URL"
+                              ></textarea>
+                              <input
+                                type="file"
+                                id="ss-bot-file-upload"
+                                name="bot-file-upload"
+                                hidden
+                                onChange={(e) => getBaseUrl(e)}
+                              />
+                              <div className="ss-file-upload-wrapper">
+                                <span id="ss-bot-file-upload-name"></span>
+                                <button className="ss-bot-file-upload-btn" onClick={botUploadFile}>
                                   Upload
                                 </button>
                               </div>
@@ -454,22 +478,91 @@ const Scenario = () => {
                           </div>
                         )}
 
-                        <div
-                          id="bot-statement-type-email"
-                          className="ss-bot-statement-type-email"
-                        ></div>
-                      </div>
+                        {/* type: email */}
+                        {messageType === 'email' && (
+                          <div className="ss-bot-statement-wrapper">
+                            <div
+                              id="ss-bot-statement-type-email"
+                              className="ss-bot-statement-type-email ss-bot-statement-type"
+                            >
+                              <select
+                                name="ss-bot-statement-type-email-select"
+                                id="ss-bot-statement-type-email-select"
+                                defaultValue={'default'}
+                                className="ss-bot-statement-type-email-select ss-input-value"
+                              >
+                                <option value="default">Default</option>
+                              </select>
+                            </div>
+                          </div>
+                        )}
 
-                      <div></div>
+                        {/* type: script */}
+                        {messageType === 'script' && (
+                          <div className="ss-bot-statement-wrapper">
+                            <div
+                              id="ss-bot-statement-type-script"
+                              className="ss-bot-statement-type-script ss-bot-statement-type"
+                            >
+                              <textarea
+                                name="bot-statement-type-script-content"
+                                id="bot-statement-type-script-content"
+                                className="ss-bot-statement-type-script-content ss-input-value"
+                                rows={5}
+                                placeholder="Script..."
+                                value={botScriptValue}
+                                onChange={(e) => setBotScriptValue(e.target.value)}
+                              ></textarea>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* type: delay */}
+                        {messageType === 'delay' && (
+                          <div className="ss-bot-statement-wrapper">
+                            <div
+                              id="ss-bot-statement-type-delay"
+                              className="ss-bot-statement-type-delay ss-bot-statement-type"
+                            >
+                              <div className="ss-bot-statement-type-delay-wrapper">
+                                <div className="ss-bot-statement-type-delay__value-wrapper">
+                                  <span>Delay (seconds)</span>
+                                  <input
+                                    type="number"
+                                    name="ss-bot-statement-type-delay__num"
+                                    id="ss-bot-statement-type-delay__num"
+                                    className="ss-bot-statement-type-delay__num ss-input-value"
+                                    min={'0'}
+                                    max={'10'}
+                                    value={botDelayValue}
+                                    onChange={(e) => setBotDelayValue(e.target.value)}
+                                  />
+                                </div>
+                                <div className="ss-bot-statement-type-delay__checkbox-wrapper">
+                                  <input
+                                    type="checkbox"
+                                    id="ss-bot-statement-type-delay__checkbox"
+                                    name="ss-bot-statement-type-delay__checkbox"
+                                    checked={botIsTurnOnTyping}
+                                    onChange={(e) => setBotIsTurnOnTyping(!botIsTurnOnTyping)}
+                                  />
+                                  <label
+                                    htmlFor="ss-bot-statement-type-delay__checkbox"
+                                    className="ss-bot-statement-type-delay__checkbox-label"
+                                  >
+                                    Turn on typing index
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
 
                   {belongTo === 'user' && (
-                    <div id="user-chat" className="ss-user-chat-detail-setting">
-                      <span>Name </span>
-                      <input type="text" className="ss-user-chat-detail-setting-user-title" />
-                      <div id="" className="ss-user-chat-detail-setting-content"></div>
-                    </div>
+                    <div id="user-chat" className="ss-user-chat-detail-setting"></div>
                   )}
                 </div>
               </div>
