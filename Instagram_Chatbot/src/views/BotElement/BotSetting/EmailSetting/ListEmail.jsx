@@ -8,7 +8,7 @@ import ModalShort from 'views/Popup/ModalShort';
 import { Button } from 'react-bootstrap';
 import ModalNoti from 'views/Popup/ModalNoti';
 import Cookies from 'js-cookie';
-
+import { Pagination } from '@material-ui/lab';
 
 
 function ListEmail() {
@@ -19,23 +19,38 @@ function ListEmail() {
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState();
   const [isOpenDelete, setIsOpenDelete] = useState(false);
-
+  var [pageIndex, setPageIndex] = useState(1);
+  var [totalPage, setTotalPage] = useState();
+  var [page, setPage] = useState(1);
 
   useEffect(() => {
     var bot_id = Cookies.get('bot_id')
     api.get(`/api/v1/managements/emails?page=1&chatbot_id=${bot_id}`).then(res => {
-      console.log(res.data);  
-      if(res.data.code ==1){
-         setEmailList(res.data.data);
+      console.log(res.data);
+      var totalPage = Math.ceil(res.data.total_count / 25);
+      setTotalPage(totalPage);
+      if (res.data.code == 1) {
+        setEmailList(res.data.data);
       }
     }).catch(err => {
       console.log(err);
     })
   }, [])
 
-  function reLoad() {
-    api.get('/api/v1/managements/emails?page=1').then(res => {
-      setEmailList(res.data.data);
+  function reLoad(pgIndex) {
+    var bot_id = Cookies.get('bot_id')
+    api.get(`/api/v1/managements/emails?page=${pgIndex}&chatbot_id=${bot_id}`).then(res => {
+      var totalPage = Math.ceil(res.data.total_count / 25);
+      if (pgIndex > totalPage) {
+        api.get(`/api/v1/managements/emails?page=${totalPage}&chatbot_id=${bot_id}`).then(res => {
+          setEmailList(res.data.data);
+        }).catch(err => {
+          console.log(err);
+        })
+      } else {
+        setEmailList(res.data.data);
+      }
+      setTotalPage(totalPage);
     }).catch(err => {
       console.log(err);
     })
@@ -99,6 +114,12 @@ function ListEmail() {
     }).catch(err => {
       console.log(err);
     })
+  }
+  function handleChange(event, value) {
+    setPage(parseInt(value));
+    setPageIndex(value);
+    reLoad(value);
+    document.querySelector('.main-panel').scrollTop = 0;
   }
 
   return (
@@ -165,7 +186,7 @@ function ListEmail() {
                         </div>
 
                         <div className='mail-actions'>
-                          <button className='mail-actions--btn btn btn-default' onClick={()=>{window.location.href=`/admin/edit-email/${item?.id}`}}>Edit</button>
+                          <button className='mail-actions--btn btn btn-default' onClick={() => { window.location.href = `/admin/edit-email/${item?.id}` }}>Edit</button>
                           <button className='mail-actions--btn btn btn-success' onClick={() => openDuplicate(item.id)}>Duplication</button>
                           <button className='mail-actions--btn btn btn-danger' onClick={() => openDelete(item.id)}>Delete</button>
                         </div>
@@ -174,6 +195,13 @@ function ListEmail() {
 
                   ))}
                 </div>
+
+                <Pagination
+                  count={totalPage}
+                  variant="outlined"
+                  page={page}
+                  onChange={handleChange}
+                />
               </CardBody>
             </Card>
           </Col>

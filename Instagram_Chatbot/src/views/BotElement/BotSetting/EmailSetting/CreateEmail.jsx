@@ -23,7 +23,8 @@ function CreateEmail() {
   useEffect(() => {
     const url = window.location.pathname;
     if (url.includes(`edit-email`)) {
-      var id = url.substring(url.length - 1, url.length)
+      var id = url.slice(url.lastIndexOf('/') + 1);
+      console.log('id', id);
       let ccList = []
       let bccList = []
       setMailAction(false)
@@ -37,7 +38,7 @@ function CreateEmail() {
           }
           setCcNum(res.data.data.email_cc.length);
           ccList.forEach((index, i) => {
-            
+
             let cc = document.getElementById('list-cc');
             var newCc = document.createElement('div')
             newCc.setAttribute('id', `cc${i}`)
@@ -70,10 +71,10 @@ function CreateEmail() {
             newBcc.innerHTML = `
             <div style="margin:0px 5px 0px 0px; border-radius:5px; width:max-content; background-color:#e0e0e0; display:flex">
             <span style="width:max-content;">${index}</span>&ensp; 
-            <span id="deleteCc${i}">X</span></div>
+            <span id="deleteBCc${i}">X</span></div>
             `
             bcc.appendChild(newBcc);
-            document.getElementById(`deleteCc${i}`).addEventListener('click', () => {
+            document.getElementById(`deleteBCc${i}`).addEventListener('click', () => {
               var ele = document.getElementById(`bcc${i}`)
               ele.parentNode.removeChild(ele);
               var listbcc = bccList
@@ -89,37 +90,37 @@ function CreateEmail() {
     }
   }, [])
 
-  function checkListcc(value, listcc){
+  function checkListcc(value, listcc) {
     var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
-      if (value.match(mailformat)) {
-        listcc.push(value);
-        setCcAll(listcc);
+    if (value.match(mailformat)) {
+      listcc.push(value);
+      setCcAll(listcc);
 
-        let cc = document.getElementById('list-cc');
-        var newCc = document.createElement('div')
-        newCc.setAttribute('id', `cc${ccNum}`)
-        newCc.innerHTML = `
+      let cc = document.getElementById('list-cc');
+      var newCc = document.createElement('div')
+      newCc.setAttribute('id', `cc${ccNum}`)
+      newCc.innerHTML = `
         <div style="margin:0px 5px 0px 0px; border-radius:5px; width:max-content; background-color:#e0e0e0; display:flex">
         <span style="width:max-content;">${value}</span>&ensp; 
         <span id="deleteCc${ccNum}FI">X</span></div>
         `
-        cc.appendChild(newCc);
-        document.getElementById(`deleteCc${ccNum}FI`).addEventListener('click', () => {
-          var ele = document.getElementById(`cc${ccNum}`)
-          ele.parentNode.removeChild(ele);
-          listcc.splice(ccNum, 1);
-          setCcAll(listcc);
-          setListCcDetail(listcc);
-        })
-        document.getElementById('cc').value = '';
-        setCcNum(ccNum + 1);
-        document.getElementById('errCcMail').style.display = 'none'
-      } else {
-        document.getElementById('errCcMail').style.display = 'block'
-      }
+      cc.appendChild(newCc);
+      document.getElementById(`deleteCc${ccNum}FI`).addEventListener('click', () => {
+        var ele = document.getElementById(`cc${ccNum}`)
+        ele.parentNode.removeChild(ele);
+        listcc.splice(ccNum, 1);
+        setCcAll(listcc);
+        setListCcDetail(listcc);
+      })
+      document.getElementById('cc').value = '';
+      setCcNum(ccNum + 1);
+      document.getElementById('errCcMail').style.display = 'none'
+    } else {
+      document.getElementById('errCcMail').style.display = 'block'
+    }
   }
 
-  function checkListBcc(value, listbcc){
+  function checkListBcc(value, listbcc) {
     var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
     if (value.match(mailformat)) {
 
@@ -132,14 +133,14 @@ function CreateEmail() {
       newBcc.innerHTML = `
       <div style="margin:0px 5px 0px 0px; border-radius:5px; width:max-content; background-color:#e0e0e0; display:flex">
       <span style="width:max-content;">${value}</span>&ensp; 
-      <span id="deleteCc${bccNum}FI">X</span></div>
+      <span id="deleteBCc${bccNum}FI">X</span></div>
       `
       bcc.appendChild(newBcc);
-      document.getElementById(`deleteCc${bccNum}FI`).addEventListener('click', () => {
+      document.getElementById(`deleteBCc${bccNum}FI`).addEventListener('click', () => {
+        console.log('clicked delete bcc')
         var ele = document.getElementById(`bcc${bccNum}`)
         ele.parentNode.removeChild(ele);
         listbcc.splice(bccNum, 1);
-        console.log("listbcc: ", listbcc)
         setBccAll(listbcc);
         setListBccDetail(listbcc);
       })
@@ -171,7 +172,7 @@ function CreateEmail() {
       } else {
         checkListBcc(value, bccAll)
       }
-      
+
     }
   }
 
@@ -199,30 +200,33 @@ function CreateEmail() {
       console.log('bot_id: ', bot_id)
       let add = { email: obj }
       console.log(add)
-      // api.post('/api/v1/managements/emails', add).then(res => {
-      //   if (res.data.code == 1) {
-      //     setIsOpenNoti(true);
-      //     setMsgNoti(`Add successfully!`)
-      //     setTimeout(() => {
-      //       setIsOpenNoti(false);
-      //       setMsgNoti(``)
-      //     }, 2000)
-      //   } else if (res.data.code == 2) {
-      //     setIsOpenNoti(true);
-      //     setMsgNoti(res.data.message)
-      //     setTimeout(() => {
-      //       setIsOpenNoti(false);
-      //       setMsgNoti(``)
-      //     }, 2000)
-      //   }
-      // }).catch(err => {
-      //   console.log(err);
-      // })
+      api.post('/api/v1/managements/emails', add).then(res => {
+        if (res.data.code == 1) {
+          setIsOpenNoti(true);
+          setMsgNoti(`Add successfully!`)
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+            window.location.href = `/admin/list-email`
+          }, 1500)
+        } else if (res.data.code == 2) {
+          setIsOpenNoti(true);
+          setMsgNoti(res.data.message)
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``)
+          }, 2000)
+        }
+      }).catch(err => {
+        console.log(err);
+      })
     }
   }
 
   function saveEmail(e) {
     e.preventDefault();
+    const url = window.location.pathname;
+    var id = url.slice(url.lastIndexOf('/') + 1);
     checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name');
     checkTo('to', 'errEmailTo', 'To');
     checkRequired('subject', 'errSubject', 'Subject');
@@ -246,25 +250,26 @@ function CreateEmail() {
       let add = { email: obj }
       console.log(add)
 
-      // api.post('/api/v1/managements/emails', add).then(res => {
-      //   if (res.data.code == 1) {
-      //     setIsOpenNoti(true);
-      //     setMsgNoti(`Add successfully!`)
-      //     setTimeout(() => {
-      //       setIsOpenNoti(false);
-      //       setMsgNoti(``)
-      //     }, 2000)
-      //   } else if (res.data.code == 2) {
-      //     setIsOpenNoti(true);
-      //     setMsgNoti(res.data.message)
-      //     setTimeout(() => {
-      //       setIsOpenNoti(false);
-      //       setMsgNoti(``)
-      //     }, 2000)
-      //   }
-      // }).catch(err => {
-      //   console.log(err);
-      // })
+      api.patch(`/api/v1/managements/emails/${id}`, add).then(res => {
+        if (res.data.code == 1) {
+          setIsOpenNoti(true);
+          setMsgNoti(`Update successfully!`)
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+            window.location.href = `/admin/list-email`
+          }, 1500)
+        } else if (res.data.code == 2) {
+          setIsOpenNoti(true);
+          setMsgNoti(res.data.message)
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``)
+          }, 2000)
+        }
+      }).catch(err => {
+        console.log(err);
+      })
     }
   }
 
@@ -344,17 +349,9 @@ function CreateEmail() {
 
                   <div className='field-container'>
                     <span className='field-lable'>CC</span>
-                    <div className='field-input'>
-                      <div id='list-cc'>
-                        {ccAll != undefined && ccAll != null && ccAll.forEach(item => (
-                          <div id=''>
-                            <div style="margin:0px 5px 0px 0px; border-radius:5px; width:max-content; background-color:#e0e0e0; display:flex">
-                              <span style="width:max-content;">{item}</span>&ensp;
-                              <span id={`deleteCc${ccNum}FI`}>X</span></div>
-                          </div>
-                        ))}
-                      </div>
-                      <input id='cc' type='text' placeholder={listCcDetail.length != 0 ? '' : 'no-reply@botchan.chat'} onKeyUp={(e) => addCC(e)} ></input>
+                    <div className='field-input-cc'>
+                      <div id='list-cc'></div>
+                      <input id='cc' type='text' placeholder='no-reply@botchan.chat' onKeyUp={(e) => addCC(e)} ></input>
                       {/* <textarea className='textarea-email' placeholder='no-reply@botchan.chat' name='cc'></textarea> */}
                       <span id="errCcMail" className='err-email-format'>Please input right format of email</span>
                     </div>
@@ -362,7 +359,7 @@ function CreateEmail() {
 
                   <div className='field-container'>
                     <span className='field-lable'>BCC</span>
-                    <div className='field-input'>
+                    <div className='field-input-cc'>
                       <div id='list-bcc'></div>
                       <input id='bcc' type='text' placeholder='no-reply@botchan.chat' onKeyUp={(e) => addBCC(e)} ></input>
                       {/* <textarea className='textarea-email' placeholder='no-reply@botchan.chat' name='bcc'></textarea> */}
@@ -389,8 +386,8 @@ function CreateEmail() {
                   <div className='field-container'>
                     <span className='field-lable'>Text</span>
                     <div className='field-input'>
-                      <textarea id='text' cols='10' rows='7' defaultValue={mailAction == false ? detailEmail?.email.content : ""} placeholder='Please enter the text' name='content' onChange={() => checkRequired('text', 'errText', 'text')}
-                        onBlur={() => checkRequired('text', 'errText', 'text')}></textarea>
+                      <textarea id='text' cols='10' rows='7' defaultValue={mailAction == false ? detailEmail?.email.content : ""} placeholder='Please enter the text' name='content' onChange={() => checkRequired('text', 'errText', 'Text')}
+                        onBlur={() => checkRequired('text', 'errText', 'Text')}></textarea>
                       <span id="errText" className='err-email-format'></span>
                     </div>
                   </div>
