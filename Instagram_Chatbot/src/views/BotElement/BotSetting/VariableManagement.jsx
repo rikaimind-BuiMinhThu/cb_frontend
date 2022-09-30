@@ -49,35 +49,40 @@ function VariableManagement() {
     cDivs.push(`newDiv${numVar}`);
     setCustomVariable(cDivs);
     setNumVar(numVar + 1);
+    console.log(customVariable);
     document.getElementById('add_new_var').setAttribute('disabled', '');
   }
 
   //save new variable
   function saveNewVar(index) {
-    let name = document.getElementById(`variable_name_${index}`).value
-    let dfvalue = document.getElementById(`variable_value_${index}`).value
-    let add = { variable: { variable_name: name, default_value: dfvalue } }
-    console.log(add)
+    checkInput(`variable_name_${index}`, `errVarName_${index}`, 'Variavble name');
+    checkInput(`variable_value_${index}`, `errVarValue_${index}`, 'Variavble value');
+    if (checkInput(`variable_name_${index}`, `errVarName_${index}`, 'Variavble name') &&
+      checkInput(`variable_value_${index}`, `errVarValue_${index}`, 'Variavble value')) {
+      let name = document.getElementById(`variable_name_${index}`).value
+      let dfvalue = document.getElementById(`variable_value_${index}`).value
+      let add = { variable: { variable_name: name, default_value: dfvalue } }
 
-    api.post(`/api/v1/managements/chatbots/${botId}/variables`, add).then(res => {
-      if (res.data.code == 1) {
-        console.log(res);
-        reloadListVariable();
-        setIsOpenNoti(true);
-        setMsgNoti(`Save successfully!`);
-        setTimeout(() => {
-          setIsOpenNoti(false);
-          setMsgNoti(``);
-        }, 2000)
-        const list = document.getElementById(`new_var_add_${index}`);
-        while (list.hasChildNodes()) {
-          list.removeChild(list.firstChild);
+      api.post(`/api/v1/managements/chatbots/${botId}/variables`, add).then(res => {
+        if (res.data.code == 1) {
+          console.log(res);
+          reloadListVariable();
+          setIsOpenNoti(true);
+          setMsgNoti(`Save successfully!`);
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+          }, 2000)
+          const list = document.getElementById(`new_var_add_${index}`);
+          while (list.hasChildNodes()) {
+            list.removeChild(list.firstChild);
+          }
+          document.getElementById('add_new_var').removeAttribute('disabled');
         }
-        document.getElementById('add_new_var').removeAttribute('disabled');
-      }
-    }).catch(err => {
-      console.log(err)
-    })
+      }).catch(err => {
+        console.log(err)
+      })
+    }
   }
 
   function cancelSaveNewVakr(index) {
@@ -108,28 +113,33 @@ function VariableManagement() {
 
   //funtion update variable
   function updateVariable(id, index) {
-    let name = document.getElementById(`up_variable_name_${index}`).value
-    let dfvalue = document.getElementById(`up_variable_value_${index}`).value
-    let editVariable = {
-      'variable': {
-        "variable_name": name,
-        "default_value": dfvalue,
+    checkInput(`up_variable_name_${index}`, `errUpVarName_${index}`, 'Variavble name');
+    checkInput(`up_variable_value_${index}`, `errUpVarValue_${index}`, 'Variable value');
+    if (checkInput(`up_variable_name_${index}`, `errUpVarName_${index}`, 'Variavble name') &&
+      checkInput(`up_variable_value_${index}`, `errUpVarValue_${index}`, 'Variable value')) {
+      let name = document.getElementById(`up_variable_name_${index}`).value
+      let dfvalue = document.getElementById(`up_variable_value_${index}`).value
+      let editVariable = {
+        'variable': {
+          "variable_name": name,
+          "default_value": dfvalue,
+        }
       }
+      api.patch(`/api/v1/managements/chatbots/${botId}/variables/${id}`, editVariable).then(res => {
+        console.log(res);
+        if (res.data.code == 1) {
+          reloadListVariable();
+          setIsOpenNoti(true);
+          setMsgNoti(`Update successfully!`);
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+          }, 2000)
+        }
+      }).catch(err => {
+        console.log(err);
+      })
     }
-    api.patch(`/api/v1/managements/chatbots/${botId}/variables/${id}`, editVariable).then(res => {
-      console.log(res);
-      if (res.data.code == 1) {
-        reloadListVariable();
-        setIsOpenNoti(true);
-        setMsgNoti(`Update successfully!`);
-        setTimeout(() => {
-          setIsOpenNoti(false);
-          setMsgNoti(``);
-        }, 2000)
-      }
-    }).catch(err => {
-      console.log(err);
-    })
   }
 
   //validate
@@ -206,14 +216,18 @@ function VariableManagement() {
                       ))}
                       {customVariable.map((cdiv, i) => (
                         <div className='var-form__variable-group' id={`new_var_add_${i}`} key={i}>
-                          <input id={`variable_name_${i}`} className='var-form__variable-name' placeholder='Please input variavble name'
-                            onChange={() => checkInput(`variable_name_${i}`, `errVarName_${i}`, 'Variavble name')}
-                            onBlur={() => checkInput(`variable_name_${i}`, `errVarName_${i}`, 'Variavble name')} />
-                          <span id={`errVarName_${i}`} className='err-varriable'></span>
-                          <input id={`variable_value_${i}`} className='var-form__variable-value' placeholder='Please input variable value'
-                            onChange={() => checkInput(`variable_value_${i}`, `errVarValue_${i}`, 'Variavble value')}
-                            onBlur={() => checkInput(`variable_value_${i}`, `errVarValue_${i}`, 'Variavble value')} />
-                          <span id={`errVarValue_${i}`} className='err-varriable'></span>
+                          <div className='var-form__variable-name'>
+                            <input id={`variable_name_${i}`} placeholder='Please input variavble name'
+                              onChange={() => checkInput(`variable_name_${i}`, `errVarName_${i}`, 'Variavble name')}
+                              onBlur={() => checkInput(`variable_name_${i}`, `errVarName_${i}`, 'Variavble name')} />
+                            <span id={`errVarName_${i}`} className='err-varriable'></span>
+                          </div>
+                          <div className='var-form__variable-name'>
+                            <input id={`variable_value_${i}`} placeholder='Please input variable value'
+                              onChange={() => checkInput(`variable_value_${i}`, `errVarValue_${i}`, 'Variavble value')}
+                              onBlur={() => checkInput(`variable_value_${i}`, `errVarValue_${i}`, 'Variavble value')} />
+                            <span id={`errVarValue_${i}`} className='err-varriable'></span>
+                          </div>
                           <div className='var-form__variable-delete'>
                             <MDBIcon
                               id='save_new_var'
@@ -246,71 +260,105 @@ function VariableManagement() {
                     </div>
                     <div className='var-form__variable'>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='current_url' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='current_url' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>URL of the page that opened the bot</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='current_url_param' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='current_url_param' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>Parameters in the URL of the page that opened the bot (character string after "?")</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='current_url_title' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='current_url_title' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>The title of the webpage that opened the bot</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='user_id' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='user_id' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>A unique ID automatically assigned to each user using the bot</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='bot_id' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='bot_id' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>the bot's ID</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='preview_flg' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='preview_flg' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>Flag for users using preview features (empty for normal users)</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='user_ip_address' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='user_ip_address' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>IP address of the accessing user</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='user_country' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='user_country' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>Country name calculated from IP address</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='user_city' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='user_city' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>Municipality calculated from the IP address</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='user_device' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='user_device' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>The type of device the user is using (PC, smartphone, tablet)</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='user_browser' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='user_browser' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>the type of browser the user is using</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='user_agent' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='user_agent' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>User's browser information and OS information (each type, version, etc.)</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='cv_datetime' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='cv_datetime' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>The date and time when the user reached the end of the scenario</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='cv_flg' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='cv_flg' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>Flag when the user has reached the end of the scenario (returns a value of "1" for users who have reached the end, and a value of "0" for users in the middle)</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='start_datetime' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='start_datetime' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>The date and time when you opened the chatbot and had your first conversation</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='user_referer_firstopen' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='user_referer_firstopen' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>User's referral when first opened (the URL of the page they were on before visiting the site)</div>
                       </div>
                       <div className='var-form__variable-group'>
-                        <input type="text" disabled className='var-form__variable-name' value='user_referer_current' />
+                        <div className='var-form__variable-name'>
+                          <input type="text" disabled value='user_referer_current' />
+                        </div>
                         <div className='var-form__variable-value var-none-border'>User's last referral (the URL of the page they were on before visiting your site)</div>
                       </div>
                     </div>
