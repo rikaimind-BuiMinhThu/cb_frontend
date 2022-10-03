@@ -69,22 +69,12 @@
 .ss-bot-chat {
   width: 100%;
 }
-.ss-user-chat-wrapper {
-  display: flex;
-  justify-content: flex-end;
-}
-.ss-user-chat {
-  width: 70%;
-}
+
 .ss-bot-chat-detail {
   width: 100%;
   display: flex;
 }
-.ss-user-chat-detail {
-  width: 100%;
-  display: flex;
-  /* justify-content: flex-end; */
-}
+
 .ss-bot-ava {
   width: 30px;
   height: 30px;
@@ -100,13 +90,7 @@
   /* z-index: 5; */
   overflow-y: auto;
 }
-.ss-user-chat-detail-content {
-  width: 100%;
-  border-radius: 5px;
-  border: 1px solid gray;
-  height: 85px;
-  overflow-y: auto;
-}
+
 /* bot: type = 'text' */
 textarea.ss-message__content--bot-text {
   resize: none;
@@ -177,6 +161,275 @@ textarea.ss-message__content--bot-delay {
 }
 .ss-message.ss-message--error > .ss-message__detail > textarea.ss-message__content--bot-delay {
   border-color: red;
+}
+
+/* user overview */
+.ss-user-chat-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+.ss-user-chat {
+  width: 70%;
+}
+.ss-user-chat-detail {
+  width: 100%;
+  display: flex;
+  /* justify-content: flex-end; */
+}
+.ss-user-chat-detail-content {
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid gray;
+  padding: 10px;
+  background-color: white;
+  /* height: 85px;
+  overflow-y: auto; */
+}
+.ss-message.ss-message--select > .ss-message__detail > .ss-user-chat-detail-content {
+  border-color: #327aed;
+}
+.ss-message.ss-message--error > .ss-message__detail > .ss-user-chat-detail-content {
+  border-color: red;
+}
+.ss-user-message__content-wrapper {
+}
+.ss-user-message__action-wrapper {
+  display: flex;
+  justify-content: center;
+}
+.ss-user-message__action-btn {
+  background-color: #327aed;
+}
+/* user: type = 'text_input' */
+.ss-message__content--user-text-input-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ss-message__content--user-text-input-title {
+  font-weight: 400;
+  color: black;
+  font-size: 12px;
+  margin-right: 8px;
+}
+.ss-message__content--user-text-input-required {
+  color: #ff7e00;
+  font-size: 12px;
+  font-weight: 400;
+}
+.ss-message__content--user-text-input {
+  margin-bottom: 8px;
+}
+.ss-message__content--user-text-input:last-child {
+  margin-bottom: 0;
+}
+/* user: type = 'label' */
+.ss-message__content--user-label-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ss-message__content--user-label-title {
+  font-weight: 400;
+  color: black;
+  font-size: 12px;
+  margin-right: 8px;
+}
+.ss-message__content--user-label-required {
+  color: #ff7e00;
+  font-size: 12px;
+  font-weight: 400;
+}
+/* user: type = 'textarea' */
+.ss-message__content--user-textarea-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ss-message__content--user-textarea-title {
+  font-weight: 400;
+  color: black;
+  font-size: 12px;
+  margin-right: 8px;
+}
+.ss-message__content--user-textarea-required {
+  color: #ff7e00;
+  font-size: 12px;
+  font-weight: 400;
+}
+.ss-message__content--user-textarea {
+  /* resize: none; */
+}
+/* user: type = 'radio_button' */
+.ss-message__content--user-radio_button-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ss-message__content--user-radio_button-title {
+  font-weight: 400;
+  color: black;
+  font-size: 12px;
+  margin-right: 8px;
+}
+.ss-message__content--user-radio_button-required {
+  color: #ff7e00;
+  font-size: 12px;
+  font-weight: 400;
+}
+.ss-message__content--user-radio_button-wrapper {
+}
+/* radio_button: type = 'default' || 'consume_api_response' */
+.ss-message__content--user-radio_button {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+  background: #ebf7ff;
+  padding: 10px;
+  border-radius: 5px;
+}
+.ss-message__content--user-radio_button:last-child {
+  margin-bottom: 0;
+}
+input#ss-message__content--user-radio_button {
+  width: 19px;
+  height: 19px;
+}
+.ss-message__content--user-radio_button > label {
+  margin: 0 0 0 8px;
+}
+/* radio_button: type = 'block_style' */
+.ss-message__content--user-radio_button--block_style {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+  border: 1px solid black;
+  padding: 8px 0;
+}
+.ss-message__content--user-radio_button--block_style:last-child {
+  margin-bottom: 0;
+}
+.ss-message__content--user-radio_button--block_style > span {
+  font-weight: 400;
+  font-size: 14px;
+  color: black;
+}
+/* radio_button: type = 'radio_button_img' */
+.ss-message__content--user-radio_button--radio_button_img {
+  position: relative;
+  margin-bottom: 2px;
+}
+.ss-message__content--user-radio_button--radio_button_img:last-child {
+  margin-bottom: 0;
+}
+input#ss-message__content--user-radio_button--radio_button_img {
+  position: absolute;
+  width: 19px;
+  height: 19px;
+  top: 8px;
+  left: 8px;
+}
+
+/* user: type = 'checkbox' */
+.ss-message__content--user-checkbox-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ss-message__content--user-checkbox-title {
+  font-weight: 400;
+  color: black;
+  font-size: 12px;
+  margin-right: 8px;
+}
+.ss-message__content--user-checkbox-required {
+  color: #ff7e00;
+  font-size: 12px;
+  font-weight: 400;
+}
+.ss-message__content--user-checkbox-wrapper {
+}
+/* checkbox: type = 'default' || 'consume_api_response' */
+.ss-message__content--user-checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+  background: #ebf7ff;
+  padding: 10px;
+  border-radius: 5px;
+}
+.ss-message__content--user-checkbox:last-child {
+  margin-bottom: 0;
+}
+input#ss-message__content--user-checkbox {
+  width: 19px;
+  height: 19px;
+}
+.ss-message__content--user-checkbox > label {
+  margin: 0 0 0 8px;
+}
+/* checkbox: type = 'block_style' */
+.ss-message__content--user-checkbox--block_style {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+  border: 1px solid black;
+  padding: 8px 0;
+}
+.ss-message__content--user-checkbox--block_style:last-child {
+  margin-bottom: 0;
+}
+.ss-message__content--user-checkbox--block_style > span {
+  font-weight: 400;
+  font-size: 14px;
+  color: black;
+}
+/* checkbox: type = 'checkbox_img' */
+.ss-message__content--user-checkbox--checkbox_img {
+  position: relative;
+  margin-bottom: 2px;
+}
+.ss-message__content--user-checkbox--checkbox_img:last-child {
+  margin-bottom: 0;
+}
+input#ss-message__content--user-checkbox--checkbox_img {
+  position: absolute;
+  width: 19px;
+  height: 19px;
+  top: 8px;
+  left: 8px;
+}
+
+/* user: type = 'pull_down' */
+.ss-message__content--user-pull_down-comment {
+}
+.ss-message__content--user-pull_down-comment > span {
+  font-weight: 400;
+  font-size: 14px;
+  color: black;
+}
+.ss-message__content--user-pull_down-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ss-message__content--user-pull_down-title {
+  font-weight: 400;
+  color: black;
+  font-size: 12px;
+  margin-right: 8px;
+}
+.ss-message__content--user-pull_down-required {
+  color: #ff7e00;
+  font-size: 12px;
+  font-weight: 400;
+}
+.ss-message__content--user-pull_down-wrapper {
+}
+/* pull_down: type: 'customization' */
+.ss-message__content--user-pull_down--customization {
 }
 
 /* chat option */

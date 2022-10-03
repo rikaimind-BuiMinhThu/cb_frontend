@@ -13,7 +13,10 @@ let data = [
   {
     belong_to: 'user',
     id: '2',
-    type: 'text_input',
+    type: 'pull_down',
+    message_detail: {
+      type: 'customization',
+    },
   },
 ];
 
@@ -233,7 +236,7 @@ const Scenario = () => {
                                 <MDBIcon
                                   fas
                                   icon="pencil-alt"
-                                  style={{ marginTop: '10px' }}
+                                  // style={{ marginTop: '10px' }}
                                   onClick={() => handleEditIconClick(message.id)}
                                 ></MDBIcon>
                                 <MDBIcon
@@ -305,20 +308,368 @@ const Scenario = () => {
                                 handleSelectMessage(message.id, message.type, message.belong_to)
                               }
                             >
-                              {/* type == 'text' */}
-                              {message.type === 'text_input' && (
-                                <textarea
-                                  className="ss-user-chat-detail-content ss-message__content--text ss-input-value"
-                                  readOnly
-                                  value={''}
-                                ></textarea>
-                              )}
+                              <div className="ss-user-chat-detail-content">
+                                <div className="ss-user-message__content-wrapper">
+                                  {/* type == 'text_input' */}
+                                  {message.type === 'text_input' && (
+                                    <>
+                                      <div className="ss-message__content--user-text-input-top">
+                                        <span className="ss-message__content--user-text-input-title">
+                                          Title
+                                        </span>
+                                        <span className="ss-message__content--user-text-input-required">
+                                          * required
+                                        </span>
+                                      </div>
+                                      {(message.message_detail.type === 'text' ||
+                                        message.message_detail.type === 'urls' ||
+                                        message.message_detail.type === 'email_address' ||
+                                        message.message_detail.type === 'phone_number' ||
+                                        message.message_detail.type === 'password') && (
+                                        <input
+                                          className="ss-message__content--user-text-input ss-input-value"
+                                          readOnly
+                                          value={''}
+                                          disabled
+                                        ></input>
+                                      )}
+                                      {(message.message_detail.type === 'email_confirmation' ||
+                                        message.message_detail.type ===
+                                          'password_confirmation') && (
+                                        <>
+                                          <input
+                                            className="ss-message__content--user-text-input ss-input-value"
+                                            readOnly
+                                            value={''}
+                                            disabled
+                                          ></input>
+                                          <input
+                                            className="ss-message__content--user-text-input ss-input-value"
+                                            readOnly
+                                            value={''}
+                                            disabled
+                                          ></input>
+                                        </>
+                                      )}
+                                    </>
+                                  )}
+                                  {/* type == 'label' */}
+                                  {message.type === 'label' && (
+                                    <>
+                                      <div className="ss-message__content--user-label-top">
+                                        <span className="ss-message__content--user-label-title">
+                                          Label
+                                        </span>
+                                        <span className="ss-message__content--user-label-required">
+                                          * required
+                                        </span>
+                                      </div>
+                                    </>
+                                  )}
+                                  {/* type == 'textarea' */}
+                                  {message.type === 'textarea' && (
+                                    <>
+                                      <div className="ss-message__content--user-textarea-top">
+                                        <span className="ss-message__content--user-textarea-title">
+                                          Title
+                                        </span>
+                                        <span className="ss-message__content--user-textarea-required">
+                                          * required
+                                        </span>
+                                      </div>
+                                      {(message.message_detail.type === 'text_input' ||
+                                        message.message_detail.type === 'invalid_input') && (
+                                        <textarea
+                                          className="ss-message__content--user-textarea ss-input-value"
+                                          readOnly
+                                          value={''}
+                                          rows={3}
+                                        ></textarea>
+                                      )}
+                                      {message.message_detail.type === 'consume_api_response' && (
+                                        <textarea
+                                          className="ss-message__content--user-textarea ss-input-value"
+                                          readOnly
+                                          value={'入力値の検証にAPIを利用する'}
+                                          rows={3}
+                                        ></textarea>
+                                      )}
+                                    </>
+                                  )}
+                                  {/* type == 'radio_button' */}
+                                  {message.type === 'radio_button' && (
+                                    <>
+                                      <div className="ss-message__content--user-radio_button-top">
+                                        <span className="ss-message__content--user-radio_button-title">
+                                          Title
+                                        </span>
+                                        <span className="ss-message__content--user-radio_button-required">
+                                          * required
+                                        </span>
+                                      </div>
+                                      <div className="ss-message__content--user-radio_button-wrapper">
+                                        {message.message_detail.type === 'default' && (
+                                          <>
+                                            <div className="ss-message__content--user-radio_button">
+                                              <input
+                                                type="radio"
+                                                name="ss-message__content--user-radio_button"
+                                                id="ss-message__content--user-radio_button"
+                                                disabled
+                                              />
+                                              <label htmlFor="ss-message__content--user-radio_button">
+                                                label
+                                              </label>
+                                            </div>
+                                            <div className="ss-message__content--user-radio_button">
+                                              <input
+                                                type="radio"
+                                                name="ss-message__content--user-radio_button"
+                                                id="ss-message__content--user-radio_button"
+                                                disabled
+                                              />
+                                              <label htmlFor="ss-message__content--user-radio_button">
+                                                label
+                                              </label>
+                                            </div>
+                                          </>
+                                        )}
+                                        {message.message_detail.type === 'radio_button_img' && (
+                                          <>
+                                            <div className="ss-message__content--user-radio_button--radio_button_img">
+                                              <input
+                                                type="radio"
+                                                name="ss-message__content--user-radio_button--radio_button_img"
+                                                id="ss-message__content--user-radio_button--radio_button_img"
+                                                disabled
+                                              />
+                                              <img
+                                                src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/63355263374d1.jpg"
+                                                alt=""
+                                              />
+                                            </div>
+                                            <div className="ss-message__content--user-radio_button--radio_button_img">
+                                              <input
+                                                type="radio"
+                                                name="ss-message__content--user-radio_button--radio_button_img"
+                                                id="ss-message__content--user-radio_button--radio_button_img"
+                                                disabled
+                                              />
+                                              <img
+                                                src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/63355263374d1.jpg"
+                                                alt=""
+                                              />
+                                            </div>
+                                          </>
+                                        )}
+                                        {message.message_detail.type === 'consume_api_response' && (
+                                          <>
+                                            <div className="ss-message__content--user-radio_button">
+                                              <input
+                                                type="radio"
+                                                name="ss-message__content--user-radio_button"
+                                                id="ss-message__content--user-radio_button"
+                                                disabled
+                                              />
+                                              <label htmlFor="ss-message__content--user-radio_button">
+                                                label
+                                              </label>
+                                            </div>
+                                            <div className="ss-message__content--user-radio_button">
+                                              <input
+                                                type="radio"
+                                                name="ss-message__content--user-radio_button"
+                                                id="ss-message__content--user-radio_button"
+                                                disabled
+                                              />
+                                              <label htmlFor="ss-message__content--user-radio_button">
+                                                label
+                                              </label>
+                                            </div>
+                                          </>
+                                        )}
+                                        {message.message_detail.type === 'block_style' && (
+                                          <>
+                                            <div className="ss-message__content--user-radio_button--block_style">
+                                              <span>label</span>
+                                            </div>
+                                            <div className="ss-message__content--user-radio_button--block_style">
+                                              <span>label</span>
+                                            </div>
+                                          </>
+                                        )}
+                                      </div>
+                                    </>
+                                  )}
+                                  {/* type == 'checkbox' */}
+                                  {message.type === 'checkbox' && (
+                                    <>
+                                      <div className="ss-message__content--user-checkbox-top">
+                                        <span className="ss-message__content--user-checkbox-title">
+                                          Title
+                                        </span>
+                                        <span className="ss-message__content--user-checkbox-required">
+                                          * required
+                                        </span>
+                                      </div>
+                                      <div className="ss-message__content--user-checkbox-wrapper">
+                                        {message.message_detail.type === 'default' && (
+                                          <>
+                                            <div className="ss-message__content--user-checkbox">
+                                              <input
+                                                type="checkbox"
+                                                name="ss-message__content--user-checkbox"
+                                                id="ss-message__content--user-checkbox"
+                                                disabled
+                                              />
+                                              <label htmlFor="ss-message__content--user-checkbox">
+                                                label
+                                              </label>
+                                            </div>
+                                            <div className="ss-message__content--user-checkbox">
+                                              <input
+                                                type="checkbox"
+                                                name="ss-message__content--user-checkbox"
+                                                id="ss-message__content--user-checkbox"
+                                                disabled
+                                              />
+                                              <label htmlFor="ss-message__content--user-checkbox">
+                                                label
+                                              </label>
+                                            </div>
+                                          </>
+                                        )}
+                                        {message.message_detail.type === 'checkbox_img' && (
+                                          <>
+                                            <div className="ss-message__content--user-checkbox--checkbox_img">
+                                              <input
+                                                type="checkbox"
+                                                name="ss-message__content--user-checkbox--checkbox_img"
+                                                id="ss-message__content--user-checkbox--checkbox_img"
+                                                disabled
+                                              />
+                                              <img
+                                                src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/63355263374d1.jpg"
+                                                alt=""
+                                              />
+                                            </div>
+                                            <div className="ss-message__content--user-checkbox--checkbox_img">
+                                              <input
+                                                type="checkbox"
+                                                name="ss-message__content--user-checkbox--checkbox_img"
+                                                id="ss-message__content--user-checkbox--checkbox_img"
+                                                disabled
+                                              />
+                                              <img
+                                                src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/63355263374d1.jpg"
+                                                alt=""
+                                              />
+                                            </div>
+                                          </>
+                                        )}
+                                        {message.message_detail.type === 'consume_api_response' && (
+                                          <>
+                                            <div className="ss-message__content--user-checkbox">
+                                              <input
+                                                type="checkbox"
+                                                name="ss-message__content--user-checkbox"
+                                                id="ss-message__content--user-checkbox"
+                                                disabled
+                                              />
+                                              <label htmlFor="ss-message__content--user-checkbox">
+                                                label
+                                              </label>
+                                            </div>
+                                            <div className="ss-message__content--user-checkbox">
+                                              <input
+                                                type="checkbox"
+                                                name="ss-message__content--user-checkbox"
+                                                id="ss-message__content--user-checkbox"
+                                                disabled
+                                              />
+                                              <label htmlFor="ss-message__content--user-checkbox">
+                                                label
+                                              </label>
+                                            </div>
+                                          </>
+                                        )}
+                                      </div>
+                                    </>
+                                  )}
+                                  {/* type == 'pull_down' */}
+                                  {message.type === 'pull_down' && (
+                                    <>
+                                      <div className="ss-message__content--user-pull_down-top">
+                                        <span className="ss-message__content--user-pull_down-title">
+                                          Title
+                                        </span>
+                                        <span className="ss-message__content--user-pull_down-required">
+                                          * required
+                                        </span>
+                                      </div>
+                                      <div className="ss-message__content--user-pull_down-wrapper">
+                                        {message.message_detail.type === 'customization' && (
+                                          <>
+                                            <div className="ss-message__content--user-pull_down--customization">
+                                              <div
+                                                className="ss-message__content--user-pull_down-comment"
+                                                style={{ marginBottom: '4px' }}
+                                              >
+                                                <span>comment</span>
+                                              </div>
+                                              <div className="ss-message__content--user-pull_down-row">
+                                                <select
+                                                  name="ss-message__content--user-pull_down--customization"
+                                                  id="ss-message__content--user-pull_down--customization"
+                                                  defaultValue={'default'}
+                                                  className="ss-input-value"
+                                                >
+                                                  <option value="default" hidden disabled>
+                                                    Please select
+                                                  </option>
+                                                  <option value="option1">Option 1</option>
+                                                </select>
+                                              </div>
+                                              <div
+                                                className="ss-message__content--user-pull_down-comment"
+                                                style={{ marginTop: '4px' }}
+                                              >
+                                                <span>comment</span>
+                                              </div>
+                                            </div>
+                                          </>
+                                        )}
+                                        {message.message_detail.type === 'time_hm' && <></>}
+                                        {message.message_detail.type === 'date_ymd' && <></>}
+                                        {message.message_detail.type === 'date_md' && <></>}
+                                        {message.message_detail.type === 'date_ym' && <></>}
+                                        {message.message_detail.type === 'date_ym_hm' && <></>}
+                                        {message.message_detail.type === 'dob_ymd' && <></>}
+                                        {message.message_detail.type === 'dob_ym' && <></>}
+                                        {message.message_detail.type === 'timezone_from_to' && (
+                                          <></>
+                                        )}
+                                        {message.message_detail.type === 'period_from_to' && <></>}
+                                        {message.message_detail.type === 'prefectures' && <></>}
+                                        {message.message_detail.type === 'up_to_municipality' && (
+                                          <></>
+                                        )}
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                                <div className="ss-user-message__action-wrapper">
+                                  <Button className="ss-user-message__action-btn">
+                                    To the next
+                                  </Button>
+                                </div>
+                              </div>
 
                               <div className="ss-chat-option">
                                 <MDBIcon
                                   fas
                                   icon="pencil-alt"
-                                  style={{ marginTop: '10px' }}
+                                  // style={{ marginTop: '10px' }}
                                   onClick={() => handleEditIconClick(message.id)}
                                 ></MDBIcon>
                                 <MDBIcon
