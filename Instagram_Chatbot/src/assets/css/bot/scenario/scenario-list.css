@@ -116,3 +116,48 @@
   border: none;
   color: red;
 }
+
+/* create scenario popup */
+.sl-popup-create-scenario-wrapper {
+  width: 550px;
+  text-align: center;
+  color: '#51cbce';
+  border: none;
+}
+.sl-popup-create-scenario-input-wrapper {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sl-popup-create-scenario-input-wrapper > span {
+  font-weight: 400;
+  margin-right: 8px;
+}
+.sl-popup-create-scenario-input-wrapper > input {
+  font-weight: 400;
+  font-size: 15px;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  flex: 1;
+}
+.sl-popup-create-scenario-note-wrapper {
+  margin-bottom: 10px;
+}
+.sl-popup-create-scenario-note-wrapper > span {
+  font-weight: 400;
+  font-size: 12px;
+}
+.sl-popup-create-scenario-btn-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 65%;
+  margin: 0 auto;
+}
+.sl-popup-create-scenario-create-btn {
+  background-color: #51c4fd;
+}
+.sl-popup-create-scenario-cancel-btn {
+}
