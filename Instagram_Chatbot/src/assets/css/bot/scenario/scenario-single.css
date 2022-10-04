@@ -403,13 +403,6 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 /* user: type = 'pull_down' */
-.ss-message__content--user-pull_down-comment {
-}
-.ss-message__content--user-pull_down-comment > span {
-  font-weight: 400;
-  font-size: 14px;
-  color: black;
-}
 .ss-message__content--user-pull_down-top {
   display: flex;
   align-items: center;
@@ -427,9 +420,84 @@ input#ss-message__content--user-checkbox--checkbox_img {
   font-weight: 400;
 }
 .ss-message__content--user-pull_down-wrapper {
+  box-sizing: border-box;
+}
+.ss-message__content--user-pull_down-comment {
+}
+.ss-message__content--user-pull_down-comment > span {
+  font-weight: 400;
+  font-size: 14px;
+  color: black;
+}
+.ss-message__content--user-pull_down-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: -4px;
+  margin-right: -4px;
+}
+.ss-message__content--user-pull_down-col {
+  padding-left: 4px;
+  padding-right: 4px;
+  margin-bottom: 8px;
+}
+.ss-message__content--user-pull_down-col.col-12 {
+  flex: 100%;
+  max-width: 100%;
+}
+.ss-message__content--user-pull_down-col.col-6 {
+  flex: 50%;
+  max-width: 50%;
+}
+.ss-message__content--user-pull_down-col.col-4 {
+  flex: 33.33333%;
+  max-width: 33.33333%;
 }
 /* pull_down: type: 'customization' */
 .ss-message__content--user-pull_down--customization {
+}
+/* pull_down: type: 'time_hm' || 'date_md' || 'date_ym' || 'dob_ym' */
+.ss-message__content--user-pull_down--time_hm {
+}
+/* pull_down: type: 'date_ymd' || 'dob_ymd' */
+.ss-message__content--user-pull_down--date_ymd {
+}
+/* pull_down: type: 'timezone_from_to' */
+.ss-message__content--user-pull_down--timezone_from_to {
+}
+/* pull_down: type: 'period_from_to' */
+.ss-message__content--user-pull_down--period_from_to {
+}
+/* pull_down: type: 'prefectures' */
+.ss-message__content--user-pull_down--prefectures {
+}
+/* pull_down: type: 'up_to_municipality' */
+.ss-message__content--user-pull_down--up_to_municipality {
+}
+
+/* user: type = 'zip_code_address' */
+.ss-message__content--user-zip_code_address-field {
+  margin-bottom: 8px;
+}
+.ss-message__content--user-zip_code_address-field:last-child {
+  margin-bottom: 0;
+}
+.ss-message__content--user-zip_code_address-top {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 8px;
+}
+.ss-message__content--user-zip_code_address-required {
+  color: #ff7e00;
+  font-size: 12px;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+.ss-message__content--user-zip_code_address {
+}
+.ss-message__content--user-zip_code_address-title {
+  font-weight: 400;
+  color: black;
+  font-size: 12px;
 }
 
 /* chat option */

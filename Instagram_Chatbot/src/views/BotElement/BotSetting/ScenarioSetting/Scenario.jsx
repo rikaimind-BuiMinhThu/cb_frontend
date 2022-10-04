@@ -13,9 +13,9 @@ let data = [
   {
     belong_to: 'user',
     id: '2',
-    type: 'pull_down',
+    type: 'zip_code_address',
     message_detail: {
-      type: 'customization',
+      type: 'up_to_municipality',
     },
   },
 ];
@@ -618,17 +618,18 @@ const Scenario = () => {
                                                 <span>comment</span>
                                               </div>
                                               <div className="ss-message__content--user-pull_down-row">
-                                                <select
-                                                  name="ss-message__content--user-pull_down--customization"
-                                                  id="ss-message__content--user-pull_down--customization"
-                                                  defaultValue={'default'}
-                                                  className="ss-input-value"
-                                                >
-                                                  <option value="default" hidden disabled>
-                                                    Please select
-                                                  </option>
-                                                  <option value="option1">Option 1</option>
-                                                </select>
+                                                <div className="ss-message__content--user-pull_down-col col-12">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--customization"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
                                               </div>
                                               <div
                                                 className="ss-message__content--user-pull_down-comment"
@@ -639,21 +640,500 @@ const Scenario = () => {
                                             </div>
                                           </>
                                         )}
-                                        {message.message_detail.type === 'time_hm' && <></>}
-                                        {message.message_detail.type === 'date_ymd' && <></>}
-                                        {message.message_detail.type === 'date_md' && <></>}
-                                        {message.message_detail.type === 'date_ym' && <></>}
-                                        {message.message_detail.type === 'date_ym_hm' && <></>}
-                                        {message.message_detail.type === 'dob_ymd' && <></>}
-                                        {message.message_detail.type === 'dob_ym' && <></>}
+                                        {(message.message_detail.type === 'time_hm' ||
+                                          message.message_detail.type === 'date_md' ||
+                                          message.message_detail.type === 'date_ym' ||
+                                          message.message_detail.type === 'dob_ym') && (
+                                          <>
+                                            <div className="ss-message__content--user-pull_down--time_hm">
+                                              <div className="ss-message__content--user-pull_down-row">
+                                                <div className="ss-message__content--user-pull_down-col col-6">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--time_hm"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-6">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--time_hm"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                              </div>
+                                              <div
+                                                className="ss-message__content--user-pull_down-comment"
+                                                style={{ marginTop: '4px' }}
+                                              >
+                                                <span>comment</span>
+                                              </div>
+                                            </div>
+                                          </>
+                                        )}
+                                        {(message.message_detail.type === 'date_ymd' ||
+                                          message.message_detail.type === 'dob_ymd') && (
+                                          <>
+                                            <div className="ss-message__content--user-pull_down--date_ymd">
+                                              <div className="ss-message__content--user-pull_down-row">
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--date_ymd"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--date_ymd"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--date_ymd"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                              </div>
+                                              <div
+                                                className="ss-message__content--user-pull_down-comment"
+                                                style={{ marginTop: '4px' }}
+                                              >
+                                                <span>comment</span>
+                                              </div>
+                                            </div>
+                                          </>
+                                        )}
+                                        {/* {message.message_detail.type === 'date_md' && <></>} */}
+                                        {/* {message.message_detail.type === 'date_ym' && <></>} */}
+                                        {message.message_detail.type === 'date_ym_hm' && (
+                                          <>
+                                            <div className="ss-message__content--user-pull_down--date_ym_hm">
+                                              <div className="ss-message__content--user-pull_down-row">
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--date_ym_hm"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--date_ym_hm"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--date_ym_hm"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--date_ym_hm"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--date_ym_hm"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                              </div>
+                                              <div
+                                                className="ss-message__content--user-pull_down-comment"
+                                                style={{ marginTop: '4px' }}
+                                              >
+                                                <span>comment</span>
+                                              </div>
+                                            </div>
+                                          </>
+                                        )}
+                                        {/* {message.message_detail.type === 'dob_ymd' && <></>} */}
+                                        {/* {message.message_detail.type === 'dob_ym' && <></>} */}
                                         {message.message_detail.type === 'timezone_from_to' && (
-                                          <></>
+                                          <>
+                                            <div className="ss-message__content--user-pull_down--timezone_from_to">
+                                              <div className="ss-message__content--user-pull_down-row">
+                                                <div className="ss-message__content--user-pull_down-col col-6">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--timezone_from_to"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-6">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--timezone_from_to"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                              </div>
+                                              <div style={{ textAlign: 'center' }}>
+                                                <span
+                                                  style={{ fontWeight: '400', fontSize: '14px' }}
+                                                >
+                                                  ~
+                                                </span>
+                                              </div>
+                                              <div className="ss-message__content--user-pull_down-row">
+                                                <div className="ss-message__content--user-pull_down-col col-6">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--timezone_from_to"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-6">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--timezone_from_to"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                              </div>
+                                              <div
+                                                className="ss-message__content--user-pull_down-comment"
+                                                style={{ marginTop: '4px' }}
+                                              >
+                                                <span>comment</span>
+                                              </div>
+                                            </div>
+                                          </>
                                         )}
-                                        {message.message_detail.type === 'period_from_to' && <></>}
-                                        {message.message_detail.type === 'prefectures' && <></>}
+                                        {message.message_detail.type === 'period_from_to' && (
+                                          <>
+                                            <div className="ss-message__content--user-pull_down--period_from_to">
+                                              <div className="ss-message__content--user-pull_down-row">
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--period_from_to"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--period_from_to"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--period_from_to"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                              </div>
+                                              <div style={{ textAlign: 'center' }}>
+                                                <span
+                                                  style={{ fontWeight: '400', fontSize: '14px' }}
+                                                >
+                                                  ~
+                                                </span>
+                                              </div>
+                                              <div className="ss-message__content--user-pull_down-row">
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--period_from_to"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--period_from_to"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                                <div className="ss-message__content--user-pull_down-col col-4">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--period_from_to"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                              </div>
+                                              <div
+                                                className="ss-message__content--user-pull_down-comment"
+                                                style={{ marginTop: '4px' }}
+                                              >
+                                                <span>comment</span>
+                                              </div>
+                                            </div>
+                                          </>
+                                        )}
+                                        {message.message_detail.type === 'prefectures' && (
+                                          <>
+                                            <div className="ss-message__content--user-pull_down--prefectures">
+                                              <div className="ss-message__content--user-pull_down-row">
+                                                <div className="ss-message__content--user-pull_down-col col-12">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--prefectures"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </>
+                                        )}
                                         {message.message_detail.type === 'up_to_municipality' && (
-                                          <></>
+                                          <>
+                                            <div className="ss-message__content--user-pull_down--up_to_municipality">
+                                              <div
+                                                className="ss-message__content--user-pull_down-comment"
+                                                style={{ marginBottom: '4px' }}
+                                              >
+                                                <span>comment</span>
+                                              </div>
+                                              <div className="ss-message__content--user-pull_down-row">
+                                                <div className="ss-message__content--user-pull_down-col col-12">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--up_to_municipality"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                              </div>
+                                              <div style={{ textAlign: 'center' }}>
+                                                <span
+                                                  style={{ fontWeight: '400', fontSize: '14px' }}
+                                                >
+                                                  ~
+                                                </span>
+                                              </div>
+                                              <div className="ss-message__content--user-pull_down-row">
+                                                <div className="ss-message__content--user-pull_down-col col-12">
+                                                  <select
+                                                    name="ss-message__content--user-pull_down--up_to_municipality"
+                                                    defaultValue={'default'}
+                                                    className="ss-input-value"
+                                                  >
+                                                    <option value="default" hidden disabled>
+                                                      Please select
+                                                    </option>
+                                                    <option value="option1">Option 1</option>
+                                                  </select>
+                                                </div>
+                                              </div>
+                                              <div
+                                                className="ss-message__content--user-pull_down-comment"
+                                                style={{ marginTop: '4px' }}
+                                              >
+                                                <span>comment</span>
+                                              </div>
+                                            </div>
+                                          </>
                                         )}
+                                      </div>
+                                    </>
+                                  )}
+                                  {/* type == 'zip_code_address' */}
+                                  {message.type === 'zip_code_address' && (
+                                    <>
+                                      <div className="ss-message__content--user-zip_code_address-field">
+                                        <div className="ss-message__content--user-zip_code_address-top">
+                                          <span className="ss-message__content--user-zip_code_address-required">
+                                            * required
+                                          </span>
+                                          <span className="ss-message__content--user-zip_code_address-title">
+                                            Post code
+                                          </span>
+                                        </div>
+                                        <input
+                                          className="ss-message__content--user-zip_code_address ss-input-value"
+                                          readOnly
+                                          value={''}
+                                          disabled
+                                        ></input>
+                                      </div>
+                                      <div className="ss-message__content--user-zip_code_address-field">
+                                        <div className="ss-message__content--user-zip_code_address-top">
+                                          <span className="ss-message__content--user-zip_code_address-required">
+                                            * required
+                                          </span>
+                                          <span className="ss-message__content--user-zip_code_address-title">
+                                            Prefectures
+                                          </span>
+                                        </div>
+                                        <input
+                                          className="ss-message__content--user-zip_code_address ss-input-value"
+                                          readOnly
+                                          value={''}
+                                          disabled
+                                        ></input>
+                                      </div>
+                                      <div className="ss-message__content--user-zip_code_address-field">
+                                        <div className="ss-message__content--user-zip_code_address-top">
+                                          <span className="ss-message__content--user-zip_code_address-required">
+                                            * required
+                                          </span>
+                                          <span className="ss-message__content--user-zip_code_address-title">
+                                            Municipalities
+                                          </span>
+                                        </div>
+                                        <input
+                                          className="ss-message__content--user-zip_code_address ss-input-value"
+                                          readOnly
+                                          value={''}
+                                          disabled
+                                        ></input>
+                                      </div>
+                                      <div className="ss-message__content--user-zip_code_address-field">
+                                        <div className="ss-message__content--user-zip_code_address-top">
+                                          <span className="ss-message__content--user-zip_code_address-required">
+                                            * required
+                                          </span>
+                                          <span className="ss-message__content--user-zip_code_address-title">
+                                            Address
+                                          </span>
+                                        </div>
+                                        <input
+                                          className="ss-message__content--user-zip_code_address ss-input-value"
+                                          readOnly
+                                          value={''}
+                                          disabled
+                                        ></input>
+                                      </div>
+                                      <div className="ss-message__content--user-zip_code_address-field">
+                                        <div className="ss-message__content--user-zip_code_address-top">
+                                          <span className="ss-message__content--user-zip_code_address-required">
+                                            * required
+                                          </span>
+                                          <span className="ss-message__content--user-zip_code_address-title">
+                                            Building name
+                                          </span>
+                                        </div>
+                                        <input
+                                          className="ss-message__content--user-zip_code_address ss-input-value"
+                                          readOnly
+                                          value={''}
+                                          disabled
+                                        ></input>
                                       </div>
                                     </>
                                   )}
