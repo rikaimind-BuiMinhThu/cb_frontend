@@ -14,7 +14,7 @@ export function checkEmail(inputId, errId, label) {
 
 
 export function checkMaxLength(inputId, errId, label, length) {
-    if (field(inputId).value.length > length) {
+    if (field(inputId).value.length > length && field(inputId).value != '') {
         field(errId).style.display = 'block';
         field(errId).innerHTML = `${label} must be less than ${length} charactors.`
         return false;
@@ -51,9 +51,17 @@ export function checkSelect(inputId, errId, label) {
 
 
 export function checkInput(inputId, errId, label) {
-    checkMaxLength(inputId, errId, label, 15);
+    checkMaxLength(inputId, errId, label, 50);
     checkRequired(inputId, errId, label);
     if (checkRequired(inputId, errId, label)
-        && checkMaxLength(inputId, errId, label, 15)
+        && checkMaxLength(inputId, errId, label, 50)
     ) return true;
+}
+
+
+export function checkAddress(inputId, errId, label) {
+    checkEmail(inputId, errId, label);
+    checkRequired(inputId, errId, label);
+    if (checkRequired(inputId, errId, label) &&
+        checkEmail(inputId, errId, label)) return true;
 }
