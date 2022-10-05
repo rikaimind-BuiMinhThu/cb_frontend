@@ -3,13 +3,13 @@ input::-webkit-outer-spin-button,
     -webkit-appearance: none;
     margin: 0;
   }
-.field-container{
+.bs-field-container{
     width: 70%;
     display: flex;
     align-items: flex-start;
 
 }
-.field-lable{
+.bs-field-lable{
     width: 20%;
     color: #000;
     font-size: 13px;
@@ -17,7 +17,7 @@ input::-webkit-outer-spin-button,
     margin-right: 23px;
     margin-top: 14px;
 }
-.field-input{
+.bs-field-input{
     width: 60%;
     margin-bottom: 15px;
     position: relative;
@@ -32,13 +32,13 @@ input, select{
     box-sizing: border-box;
     width: 100%;
 }
-.field-btn{
+.bs-field-btn{
     margin-top: 50px;
     padding-top: 20px;
     border-top: 1px solid #c7d0d9;
     display: flex;
     justify-content: flex-end;
 }
-.err-format{
+.bs-err-format{
     color: red;
 }
