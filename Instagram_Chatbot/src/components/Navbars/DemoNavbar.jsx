@@ -42,7 +42,7 @@ import { useCookies } from "react-cookie";
 var Cookiess = require('js-cookie-remove-all');
 
 function Header(props) {
-  const [cookie, setCookie,removeCookie] = useCookies(['token']);
+  const [cookie, setCookie, removeCookie] = useCookies(['token']);
   const [isOpen, setIsOpen] = React.useState(false);
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [color, setColor] = React.useState("transparent");
@@ -93,7 +93,7 @@ function Header(props) {
       sidebarToggle.current.classList.toggle("toggled");
     }
   }, [location]);
-  const logout = () =>{
+  const logout = () => {
     Cookies.set('is_auth', 'false');
     Cookies.remove('token', '/')
     // removeCookie('token', '/admin/client-management')
@@ -102,8 +102,9 @@ function Header(props) {
     // removeCookie('token', '/admin/dashboard')
     // removeCookie('token', '/admin/admin/chatbot')
     Cookies.remove('user_role')
+    Cookies.remove('user_id')
     Cookies.remove('page_access_token')
-    window.location.href ='/'
+    window.location.href = '/'
     // window.location.href ='/'
   }
   return (
@@ -119,7 +120,7 @@ function Header(props) {
         props.location.pathname.indexOf("full-screen-maps") !== -1
           ? "navbar-absolute fixed-top"
           : "navbar-absolute fixed-top " +
-            (color === "transparent" ? "navbar-transparent " : "")
+          (color === "transparent" ? "navbar-transparent " : "")
       }
     >
       <Container fluid>
