@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import { Col, Row, Card, CardBody, Button } from 'reactstrap';
 import icon from '../../../../assets/img/bot-icon/man1_new.png';
 import { MDBIcon } from 'mdbreact';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { Link } from 'react-router-dom';
 
 let data = [
   {
@@ -13,9 +16,9 @@ let data = [
   {
     belong_to: 'user',
     id: '2',
-    type: 'zip_code_address',
+    type: 'text_input',
     message_detail: {
-      type: 'up_to_municipality',
+      type: 'text',
     },
   },
 ];
@@ -26,6 +29,7 @@ const Scenario = () => {
   const [belongTo, setBelongTo] = useState('bot');
   const [messageType, setMessageType] = useState('text');
   const [idMessageSelect, setIdMessageSelect] = useState('');
+  const [startDate, setStartDate] = useState(new Date());
   // bot setting values
   const [botTextValue, setBotTextValue] = useState('');
   const [botScriptValue, setBotScriptValue] = useState('');
@@ -1080,12 +1084,23 @@ const Scenario = () => {
                                             Prefectures
                                           </span>
                                         </div>
-                                        <input
+                                        {/* use_drop_down: 'no' */}
+                                        {/* <input
                                           className="ss-message__content--user-zip_code_address ss-input-value"
                                           readOnly
                                           value={''}
                                           disabled
-                                        ></input>
+                                        ></input> */}
+                                        {/* use_drop_down: 'yes' */}
+                                        <select
+                                          name="ss-message__content--user-zip_code_address"
+                                          className="ss-message__content--user-zip_code_address ss-input-value"
+                                        >
+                                          <option value="default" disabled hidden>
+                                            Select prefectures
+                                          </option>
+                                          <option value="1">Prefecture 1</option>
+                                        </select>
                                       </div>
                                       <div className="ss-message__content--user-zip_code_address-field">
                                         <div className="ss-message__content--user-zip_code_address-top">
@@ -1134,6 +1149,149 @@ const Scenario = () => {
                                           value={''}
                                           disabled
                                         ></input>
+                                      </div>
+                                    </>
+                                  )}
+                                  {/* type == 'attaching_file' */}
+                                  {message.type === 'attaching_file' && (
+                                    <>
+                                      <div className="ss-message__content--user-attaching_file-top">
+                                        <span className="ss-message__content--user-attaching_file-required">
+                                          * required
+                                        </span>
+                                      </div>
+                                      <div className="ss-message__content--user-attaching_file">
+                                        <Button className="ss-message__content--user-attaching_file-btn">
+                                          Select file
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
+                                  {/* type == 'calender' */}
+                                  {message.type === 'calender' && (
+                                    <>
+                                      <div className="ss-message__content--user-calender-top">
+                                        <span className="ss-message__content--user-calender-title">
+                                          Title
+                                        </span>
+                                        <span className="ss-message__content--user-calender-required">
+                                          * required
+                                        </span>
+                                      </div>
+                                      {/* calendar: type = 'date_selection' */}
+                                      {message.message_detail.type === 'date_selection' && (
+                                        <>
+                                          <div className="ss-message__content--user-calender-date_selection">
+                                            <MDBIcon
+                                              fas
+                                              icon="calendar"
+                                              className="ss-message__content--user-calender-icon-date_selection"
+                                            />
+                                          </div>
+                                        </>
+                                      )}
+                                      {/* calendar: type = 'embedded' */}
+                                      {message.message_detail.type === 'embedded' && (
+                                        <>
+                                          <div className="ss-message__content--user-calender-embedded">
+                                            <DatePicker
+                                              selected={startDate}
+                                              onChange={(date) => setStartDate(date)}
+                                              inline
+                                            />
+                                          </div>
+                                        </>
+                                      )}
+                                      {/* calendar: type = 'start_end_date' */}
+                                      {message.message_detail.type === 'start_end_date' && (
+                                        <>
+                                          <div
+                                            style={{
+                                              display: 'flex',
+                                              flexWrap: 'wrap',
+                                              marginLeft: '-4px',
+                                              marginRight: '-4px',
+                                            }}
+                                          >
+                                            <div
+                                              style={{
+                                                paddingLeft: '4px',
+                                                paddingRight: '4px',
+                                                flex: '50%',
+                                                maxWidth: '50%',
+                                              }}
+                                            >
+                                              <div className="ss-message__content--user-calender-date_selection">
+                                                <MDBIcon
+                                                  fas
+                                                  icon="calendar"
+                                                  className="ss-message__content--user-calender-icon-date_selection"
+                                                />
+                                              </div>
+                                            </div>
+                                            <div
+                                              style={{
+                                                paddingLeft: '4px',
+                                                paddingRight: '4px',
+                                                flex: '50%',
+                                                maxWidth: '50%',
+                                              }}
+                                            >
+                                              <div className="ss-message__content--user-calender-date_selection">
+                                                <MDBIcon
+                                                  fas
+                                                  icon="calendar"
+                                                  className="ss-message__content--user-calender-icon-date_selection"
+                                                />
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </>
+                                      )}
+                                    </>
+                                  )}
+                                  {/* type == 'agree_to_term' */}
+                                  {message.type === 'agree_to_term' && (
+                                    <>
+                                      <div className="ss-message__content--user-agree_to_term-top">
+                                        <span className="ss-message__content--user-agree_to_term-title">
+                                          Title
+                                        </span>
+                                        <span className="ss-message__content--user-agree_to_term-required">
+                                          * required
+                                        </span>
+                                      </div>
+                                      {/* agree_to_term: type = 'detail_content' */}
+                                      {message.message_detail.type === 'detail_content' && (
+                                        <>
+                                          <div className="ss-message__content--user-agree_to_term-detail_content">
+                                            <textarea
+                                              name="ss-message__content--user-agree_to_term-detail_content"
+                                              id=""
+                                              rows="5"
+                                              value={'Some terms'}
+                                              className="ss-input-value"
+                                              readOnly
+                                            ></textarea>
+                                          </div>
+                                        </>
+                                      )}
+                                      {/* agree_to_term: type = 'post_link_only' */}
+                                      {message.message_detail.type === 'post_link_only' && (
+                                        <>
+                                          <div className="ss-message__content--user-agree_to_term-post_link_only">
+                                            <span style={{ marginRight: '8px' }}>comment</span>
+                                            <Link to={(location) => location}>Term link</Link>
+                                            <span style={{ marginLeft: '8px' }}>comment</span>
+                                          </div>
+                                        </>
+                                      )}
+                                      <div className="ss-message__content--user-agree_to_term-bottom">
+                                        <input
+                                          type="checkbox"
+                                          name="ss-message__content--user-agree_to_term-bottom"
+                                        />
+                                        <span>I agree to these terms</span>
                                       </div>
                                     </>
                                   )}
@@ -1393,7 +1551,82 @@ const Scenario = () => {
                   )}
 
                   {belongTo === 'user' && (
-                    <div id="user-chat" className="ss-user-chat-detail-setting"></div>
+                    <div id="user-chat" className="ss-user-chat-detail-setting ss-user-setting">
+                      <div className="ss-user-setting__top">
+                        <div className="ss-user-setting__name-wrapper">
+                          <span>Name</span>
+                          <input
+                            type="text"
+                            name="ss-user-setting__name"
+                            placeholder="Enter chat name"
+                            className="ss-user-setting__name-input ss-input-value"
+                          />
+                        </div>
+                        <span className="ss-user-setting__name-error ">* required</span>
+                      </div>
+                      <div className="ss-user-setting__main">
+                        {/* pause there */}
+                        {data.map((message) => (
+                          <>
+                            <div className="ss-user-setting__item ss-user-setting__item--active">
+                              <MDBIcon
+                                fas
+                                icon="times-circle"
+                                className="ss-user-setting__item-delete-btn"
+                              />
+                              {/* user: type = 'text_input' */}
+                              {message.type === 'text_input' && (
+                                <>
+                                  <div className="ss-user-setting__item-text_input-top">
+                                    <div className="ss-user-setting__item-text_input-save-variable-wrapper">
+                                      <input
+                                        type="checkbox"
+                                        name="ss-user-setting__item-text_input-save-variable"
+                                      />
+                                      <span>Save the input contents in a variable.</span>
+                                    </div>
+                                    <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                      <input
+                                        type="checkbox"
+                                        name="ss-user-setting__item-text_input-use-api"
+                                      />
+                                      <span>Use APIs to validate input values.</span>
+                                    </div>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          </>
+                        ))}
+                      </div>
+                      <div className="ss-user-setting__bottom">
+                        <div className="ss-user-setting__select-wrapper">
+                          <select
+                            name="ss-user-setting__select-type"
+                            id="ss-user-setting__select-type"
+                            defaultValue={'text_input'}
+                            onChange={(e) => setMessageType(e.target.value)}
+                            className="ss-input-value"
+                          >
+                            <option value="text_input">Text input</option>
+                            <option value="label">Label</option>
+                            <option value="textarea">Textarea</option>
+                            <option value="radio_button">Radio buttons</option>
+                            <option value="checkbox">Checkbox</option>
+                            <option value="pull_down">Pull down</option>
+                            <option value="zip_code_address">Zip code and address</option>
+                            <option value="attaching_file">Attaching file</option>
+                            <option value="calender">Calendar</option>
+                            <option value="agree_to_term">Agree to terms</option>
+                          </select>
+                          <Button className="ss-user-setting__select-btn-add">Addition</Button>
+                        </div>
+                        <div className="ss-user-setting__checkbox-wrapper">
+                          <input type="checkbox" name="ss-user-setting__checkbox" />
+                          <span>Align to the beginning and stop</span>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>

@@ -97,9 +97,11 @@ textarea.ss-message__content--bot-text {
 }
 .ss-message.ss-message--select > .ss-message__detail > textarea.ss-message__content--bot-text {
   border-color: #327aed;
+  box-shadow: 0 0 3px #327aed;
 }
 .ss-message.ss-message--error > .ss-message__detail > textarea.ss-message__content--bot-text {
   border-color: red;
+  box-shadow: 0 0 3px red;
 }
 
 /* bot: type = 'file' */
@@ -125,9 +127,11 @@ textarea.ss-message__content--bot-file-pdf {
 }
 .ss-message.ss-message--select > .ss-message__detail > textarea.ss-message__content--bot-file-pdf {
   border-color: #327aed;
+  box-shadow: 0 0 3px #327aed;
 }
 .ss-message.ss-message--error > .ss-message__detail > textarea.ss-message__content--bot-file-pdf {
   border-color: red;
+  box-shadow: 0 0 3px red;
 }
 
 /* bot: type = 'email' */
@@ -136,9 +140,11 @@ textarea.ss-message__content--bot-email {
 }
 .ss-message.ss-message--select > .ss-message__detail > textarea.ss-message__content--bot-email {
   border-color: #327aed;
+  box-shadow: 0 0 3px #327aed;
 }
 .ss-message.ss-message--error > .ss-message__detail > textarea.ss-message__content--bot-email {
   border-color: red;
+  box-shadow: 0 0 3px red;
 }
 
 /* bot: type = 'script' */
@@ -147,9 +153,11 @@ textarea.ss-message__content--bot-script {
 }
 .ss-message.ss-message--select > .ss-message__detail > textarea.ss-message__content--bot-script {
   border-color: #327aed;
+  box-shadow: 0 0 3px #327aed;
 }
 .ss-message.ss-message--error > .ss-message__detail > textarea.ss-message__content--bot-script {
   border-color: red;
+  box-shadow: 0 0 3px red;
 }
 
 /* bot: type = 'delay' */
@@ -158,9 +166,11 @@ textarea.ss-message__content--bot-delay {
 }
 .ss-message.ss-message--select > .ss-message__detail > textarea.ss-message__content--bot-delay {
   border-color: #327aed;
+  box-shadow: 0 0 3px #327aed;
 }
 .ss-message.ss-message--error > .ss-message__detail > textarea.ss-message__content--bot-delay {
   border-color: red;
+  box-shadow: 0 0 3px red;
 }
 
 /* user overview */
@@ -187,9 +197,11 @@ textarea.ss-message__content--bot-delay {
 }
 .ss-message.ss-message--select > .ss-message__detail > .ss-user-chat-detail-content {
   border-color: #327aed;
+  box-shadow: 0 0 3px #327aed;
 }
 .ss-message.ss-message--error > .ss-message__detail > .ss-user-chat-detail-content {
   border-color: red;
+  box-shadow: 0 0 3px red;
 }
 .ss-user-message__content-wrapper {
 }
@@ -499,6 +511,103 @@ input#ss-message__content--user-checkbox--checkbox_img {
   color: black;
   font-size: 12px;
 }
+/* user: type = 'attaching_file' */
+.ss-message__content--user-attaching_file-top {
+  display: flex;
+  flex-direction: column;
+}
+.ss-message__content--user-attaching_file-required {
+  color: #ff7e00;
+  font-size: 12px;
+  font-weight: 400;
+}
+.ss-message__content--user-attaching_file {
+}
+.ss-message__content--user-attaching_file-btn {
+  width: 100%;
+}
+
+/* user: type = 'calender' */
+.ss-message__content--user-calender-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ss-message__content--user-calender-title {
+  font-weight: 400;
+  color: black;
+  font-size: 12px;
+  margin-right: 8px;
+}
+.ss-message__content--user-calender-required {
+  color: #ff7e00;
+  font-size: 12px;
+  font-weight: 400;
+}
+/* calendar: type = 'date_selection' || 'start_end_date' */
+.ss-message__content--user-calender-date_selection {
+  margin-bottom: 8px;
+  position: relative;
+  width: 100%;
+  height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+.ss-message__content--user-calender-date_selection:last-child {
+  margin-bottom: 0;
+}
+.ss-message__content--user-calender-icon-date_selection {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 10px;
+  cursor: default !important;
+}
+/* calendar: type = 'embedded' */
+.ss-message__content--user-calender-embedded {
+  display: flex;
+  justify-content: center;
+}
+
+/* user: type = 'agree_to_term' */
+.ss-message__content--user-agree_to_term-top {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ss-message__content--user-agree_to_term-title {
+  font-weight: 400;
+  color: black;
+  font-size: 12px;
+  margin-right: 8px;
+}
+.ss-message__content--user-agree_to_term-required {
+  color: #ff7e00;
+  font-size: 12px;
+  font-weight: 400;
+}
+.ss-message__content--user-agree_to_term-bottom {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+}
+.ss-message__content--user-agree_to_term-bottom > span {
+  margin: 0 0 0 8px;
+  font-weight: 400;
+  font-size: 14px;
+}
+/* agree_to_term: type = 'detail_content' */
+.ss-message__content--user-agree_to_term-detail_content {
+}
+/* agree_to_term: type = 'post_link_only' */
+.ss-message__content--user-agree_to_term-post_link_only {
+  display: flex;
+  align-items: center;
+}
+.ss-message__content--user-agree_to_term-post_link_only > span {
+  font-weight: 400;
+  font-size: 14px;
+}
 
 /* chat option */
 .ss-chat-option {
@@ -682,4 +791,86 @@ input#ss-message__content--user-checkbox--checkbox_img {
 /* user setting */
 .ss-user-chat-detail-setting {
   width: 100%;
+}
+.ss-user-setting {
+  padding: 10px;
+  height: 100%;
+}
+/* user setting: top */
+.ss-user-setting__top {
+}
+.ss-user-setting__name-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.ss-user-setting__name-wrapper > span {
+  font-weight: 400;
+  font-size: 14px;
+  margin-right: 8px;
+}
+.ss-user-setting__name-input {
+  flex: 1;
+}
+.ss-user-setting__name-error {
+  display: inline-block;
+  color: #ff7e00;
+  font-weight: 400;
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+/* user setting: main */
+.ss-user-setting__main {
+  overflow-y: auto;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  height: 65%;
+  margin: 10px 0;
+  background-color: #f8f9fa;
+  padding: 6px 10px;
+}
+.ss-user-setting__item {
+  padding: 10px 5px;
+  background-color: white;
+  border-radius: 5px;
+  border: 1px solid #a4b1bf;
+}
+.ss-user-setting__item--active {
+}
+.ss-user-setting__item-delete-btn {
+}
+/* user: type = 'text_input' */
+.ss-user-setting__item-text_input-top {
+}
+.ss-user-setting__item-text_input-save-variable-wrapper {
+}
+.ss-user-setting__item-text_input-use-api-wrapper {
+}
+
+/* user setting: bottom */
+.ss-user-setting__bottom {
+}
+.ss-user-setting__select-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 65%;
+  margin: 0 auto;
+}
+.ss-user-setting__select-btn-add {
+  background-color: #78a8f3;
+  margin-left: 10px;
+}
+.ss-user-setting__checkbox-wrapper {
+  display: flex;
+  align-items: center;
+}
+.ss-user-setting__checkbox-wrapper > input {
+}
+.ss-user-setting__checkbox-wrapper > span {
+  font-weight: 400;
+  font-size: 14px;
+  display: inline-block;
+  margin-left: 8px;
 }
