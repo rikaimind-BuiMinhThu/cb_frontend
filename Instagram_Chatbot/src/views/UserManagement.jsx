@@ -15,6 +15,7 @@ import ModalShort from './Popup/ModalShort';
 // import { Pagination } from "element-react";
 import $ from 'jquery';
 
+
 function UserManagement() {
   var [dataList, setDataList] = useState([]);
   var [detailData, setDetailData] = useState({});

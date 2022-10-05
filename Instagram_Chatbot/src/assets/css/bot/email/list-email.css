@@ -1,0 +1,53 @@
+.mail__list-item{
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #c7d0d9;
+}
+.mail-block{
+    display: flex;
+    justify-content: space-between;
+}
+.mail-table{
+    width: 30%;
+    border: 1px solid #7186a0;
+    border-radius: 3px;
+}
+tr{
+    border-bottom: 1px solid #c7d0d9;
+}
+th{
+    text-align: center;
+    border-right: 1px solid #c7d0d9;
+}
+td{
+    padding:0 10px;
+}
+tr:last-child{
+    border: 1px solid #7186a0;
+}
+
+
+.mail-detail{
+    width: 45%;
+}
+.email-detail--subject{
+    border: 1px solid #7186a0;
+    border-radius: 3px;
+    padding: 10px;
+}
+.mail-detail--text{
+    border: 1px solid #7186a0;
+    border-radius: 3px;
+    margin-top: 10px;
+    min-height: 200px;
+    padding: 10px;
+}
+.mail-actions{
+    width: 20%;
+}
+.mail-actions--btn{
+    display: block;
+    min-width: 150px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
