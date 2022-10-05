@@ -97,7 +97,7 @@ function BasicSetting() {
                   <div className='field-container'>
                     <span className='field-lable'>Business category</span>
                     <div className='field-input'>
-                      <select name='business_division' defaultValue={userDetail.business_division}>
+                      <select name='business_division' value={userDetail.business_division}>
                         <option value='sole_proprietorship'>Sole proprietorship</option>
                         <option value='corporation'>Corporation</option>
                       </select>
@@ -170,7 +170,7 @@ function BasicSetting() {
                   <div className='field-container'>
                     <span className='field-lable'>language</span>
                     <div className='field-input'>
-                      <select name='language' defaultValue={userDetail.language}>
+                      <select name='language' value={userDetail.language}>
                         <option value='japanese'>Japanese</option>
                         <option value='english'>English</option>
                         <option value='vietnamese'>Vietnamese</option>
