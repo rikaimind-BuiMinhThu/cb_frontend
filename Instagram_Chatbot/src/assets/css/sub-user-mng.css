@@ -1,0 +1,78 @@
+.sub-user__title::before{
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+    background: #7186a0;
+}
+.sub-user__heading{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+}
+.sub-user__heading p{
+    width: 76%;
+    font-size: 11px;
+}
+.sub-user__heading-btn{
+    width: 20%;
+    text-align: right;
+}
+
+.sub-user__border-table{
+    border: 1px solid #7186a0;
+}
+.sub-user__action-wrapper{
+    display: flex;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  justify-content: space-between;
+}
+.sub-user__btn{
+    width: 50%;
+}
+.sub-user__btn-edit{
+    color: #327aed;
+  font-weight: 700;
+  border: none;
+  background: #ffffff;
+}
+.sub-user__btn-delete{
+    color: #f46835;
+  font-weight: 700;
+  border: none;
+  background: #ffffff;
+}
+
+/* add and edit */
+.sub-user__field-container{
+    width: 70%;
+    display: flex;
+    align-items: flex-start;
+}
+.sub-user__field-lable{
+    width: 20%;
+    color: #000;
+    font-size: 13px;
+    text-align: right;
+    margin-right: 23px;
+    margin-top: 14px;
+}
+.sub-user__field-input{
+    width: 60%;
+    margin-bottom: 15px;
+    position: relative;
+}
+.sub-user__err-format{
+    color: red;
+}
+.sub-user__field-btn{
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #c7d0d9;
+    display: flex;
+    justify-content: space-between;
+}
