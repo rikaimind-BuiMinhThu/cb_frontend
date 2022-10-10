@@ -62,7 +62,7 @@ const json = [
                     range: '', // 8 values: no_input, alphabet, single_byte, alphanumeric_hyphen,
                     //alphanumeric, double_byte, double_byte_hiragana, full_width_katakana
                     character_limit_from: 1, //number
-                    haracter_limit_to: 1000, //number
+                    character_limit_to: 1000, //number
                     placeholder: '', //string
                     comment: '', //string
                   },
@@ -93,7 +93,7 @@ const json = [
                   required: 'yes', //yes-no
                   title_require: 'yes', //yes-no
                   title: '', //string
-                  type: 'text_input', // 3 values: text_input, invalid_input, comsume_api_response(Pending)
+                  type: 'text_input', // 3 values: text_input, invalid_input, consume_api_response(Pending)
                   text_input: {
                     character_limit_from: 1, //number
                     character_limit_to: 30, //number
@@ -106,7 +106,7 @@ const json = [
                   required: 'yes', //yes-no
                   title_require: 'yes', //yes-no
                   title: '', //string
-                  radio_button_type: 'dafault', //4 values: dafault, radio_button_img, block_style,comsume_api_response(Pending)
+                  radio_button_type: 'default', //4 values: default, radio_button_img, block_style,consume_api_response(Pending)
                   default: {
                     default_text: '', //string
                     default_value: '', //string
@@ -118,7 +118,7 @@ const json = [
                     img_value: '', //string
                     initial_selection: 'yes', // yes-no
                   },
-                  comsume_api_response: '', //Pending
+                  consume_api_response: '', //Pending
                   block_style: {
                     text: '', //string
                     value: '', //string
@@ -131,27 +131,26 @@ const json = [
                   title_require: 'yes', //yes-no
                   title: '', //string
                   all_item_checked: 'yes', //yes-no
-                  checkbox_type: 'default', // 4 values: default, checkbox_img, comsume_api_response(Pending)
-                  dafault: {
-                    dafault_text: '', //string
-                    dafault_value: '', //string
+                  checkbox_type: 'default', // 3 values: default, checkbox_img, consume_api_response(Pending)
+                  default: {
+                    default_text: '', //string
+                    default_value: '', //string
                   },
                   checkbox_img: {
                     img: '', //base64
                     checkbox_img_title: '', //string
                     checkbox_img_value: '', //string
                   },
-                  comsume_api_response: '', //(Pending)
+                  consume_api_response: '', //(Pending)
                 },
                 pull_down: {
                   save_input_content: '', //string
                   required: 'yes', //yes-no
                   title_require: 'yes', //yes-no
                   title: '', //string
-                  type: 'customization', // values: customization, time_hm, date_ymd, date_md, date_ym, date_ym_hm,dob_ymd,dob_ym,
-                  //timezone_from_to, period_from_to,prefectures, up_to_municipality,
+                  type: 'customization', // 12 values: customization, time_hm, date_ymd, date_md, date_ym, date_ym_hm,dob_ymd,dob_ym, timezone_from_to, period_from_to,prefectures, up_to_municipality,
                   customization: {
-                    time_from_to_commnet: '', //string
+                    time_from_to_comment: '', //string
                     time_from_to: 'yes', //yes-no
                     times: [
                       {
@@ -283,9 +282,9 @@ const json = [
                     '2022/09/27',
                     '2022/09/28', //...
                   ],
-                  agreegration_target_period_from: 2, //number
-                  agreegration_target_period_to: 6, //number
-                  calendar_type: 'calendar_type', //3 values: calendar_type, embedded, start_end_date
+                  aggregation_target_period_from: 2, //number
+                  aggregation_target_period_to: 6, //number
+                  calendar_type: 'date_selection', //3 values: date_selection, embedded, start_end_date
                   date_selection: {
                     date_select: '', //string
                   },
