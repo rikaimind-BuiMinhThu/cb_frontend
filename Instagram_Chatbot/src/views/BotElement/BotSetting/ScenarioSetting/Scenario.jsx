@@ -1565,39 +1565,40 @@ const Scenario = () => {
                         <span className="ss-user-setting__name-error ">* required</span>
                       </div>
                       <div className="ss-user-setting__main">
-                        {/* pause there */}
-                        {data.map((message) => (
-                          <>
-                            <div className="ss-user-setting__item ss-user-setting__item--active">
-                              <MDBIcon
-                                fas
-                                icon="times-circle"
-                                className="ss-user-setting__item-delete-btn"
-                              />
-                              {/* user: type = 'text_input' */}
-                              {message.type === 'text_input' && (
-                                <>
-                                  <div className="ss-user-setting__item-text_input-top">
-                                    <div className="ss-user-setting__item-text_input-save-variable-wrapper">
-                                      <input
-                                        type="checkbox"
-                                        name="ss-user-setting__item-text_input-save-variable"
-                                      />
-                                      <span>Save the input contents in a variable.</span>
+                        {data
+                          .filter((message) => message.belong_to === 'user')
+                          .map((message) => (
+                            <>
+                              <div className="ss-user-setting__item ss-user-setting__item--active">
+                                <MDBIcon
+                                  fas
+                                  icon="times-circle"
+                                  className="ss-user-setting__item-delete-btn"
+                                />
+                                {/* user: type = 'text_input' */}
+                                {message.type === 'text_input' && (
+                                  <>
+                                    <div className="ss-user-setting__item-text_input-top">
+                                      <div className="ss-user-setting__item-text_input-save-variable-wrapper">
+                                        <input
+                                          type="checkbox"
+                                          name="ss-user-setting__item-text_input-save-variable"
+                                        />
+                                        <span>Save the input contents in a variable.</span>
+                                      </div>
+                                      <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                        <input
+                                          type="checkbox"
+                                          name="ss-user-setting__item-text_input-use-api"
+                                        />
+                                        <span>Use APIs to validate input values.</span>
+                                      </div>
                                     </div>
-                                    <div className="ss-user-setting__item-text_input-use-api-wrapper">
-                                      <input
-                                        type="checkbox"
-                                        name="ss-user-setting__item-text_input-use-api"
-                                      />
-                                      <span>Use APIs to validate input values.</span>
-                                    </div>
-                                  </div>
-                                </>
-                              )}
-                            </div>
-                          </>
-                        ))}
+                                  </>
+                                )}
+                              </div>
+                            </>
+                          ))}
                       </div>
                       <div className="ss-user-setting__bottom">
                         <div className="ss-user-setting__select-wrapper">

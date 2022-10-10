@@ -835,17 +835,45 @@ input#ss-message__content--user-checkbox--checkbox_img {
   background-color: white;
   border-radius: 5px;
   border: 1px solid #a4b1bf;
+  position: relative;
 }
 .ss-user-setting__item--active {
+  border-color: #327aed;
+  box-shadow: 0 0 3px #327aed;
 }
 .ss-user-setting__item-delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
 /* user: type = 'text_input' */
 .ss-user-setting__item-text_input-top {
 }
 .ss-user-setting__item-text_input-save-variable-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ss-user-setting__item-text_input-save-variable-wrapper > input {
+  cursor: pointer;
+}
+.ss-user-setting__item-text_input-save-variable-wrapper > span {
+  margin-left: 8px;
+  font-weight: 400;
+  font-size: 14px;
 }
 .ss-user-setting__item-text_input-use-api-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.ss-user-setting__item-text_input-use-api-wrapper > input {
+  cursor: pointer;
+}
+.ss-user-setting__item-text_input-use-api-wrapper > span {
+  margin-left: 8px;
+  font-weight: 400;
+  font-size: 14px;
 }
 
 /* user setting: bottom */
