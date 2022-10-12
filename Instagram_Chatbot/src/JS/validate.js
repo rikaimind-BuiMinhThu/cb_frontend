@@ -59,7 +59,7 @@ export function checkInput(inputId, errId, label) {
 }
 
 
-export function checkAddress(inputId, errId, label) {
+export function checkEmailRequired(inputId, errId, label) {
     checkEmail(inputId, errId, label);
     checkRequired(inputId, errId, label);
     if (checkRequired(inputId, errId, label) &&

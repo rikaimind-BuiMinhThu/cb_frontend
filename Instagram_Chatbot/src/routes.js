@@ -61,7 +61,6 @@ import TimeAndLang from "views/BotElement/BotSetting/AdvanceSetting/TimeAndLang"
 import WithdrawalPrevention from "views/BotElement/BotSetting/AdvanceSetting/WithdrawalPrevention";
 import BotAdmin from "views/BotElement/BotSetting/AdvanceSetting/BotAdmin";
 import AddSubUserMng from "views/BotElement/AddSubUserMng";
-import EditSubUserMng from "views/BotElement/EditSubUserMng";
 
 var routes = [
   {
@@ -208,12 +207,6 @@ var routes = [
     path: "/add-sub-user",
     name: "Add Sub User Managament",
     component: AddSubUserMng,
-    layout: "/admin",
-  },
-  {
-    path: "/edit-sub-user",
-    name: "Edit Sub User Managament",
-    component: EditSubUserMng,
     layout: "/admin",
   },
   {
