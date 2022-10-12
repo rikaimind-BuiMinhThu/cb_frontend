@@ -33,11 +33,13 @@ function ScenarioList() {
     const [isOpenNoti, setIsOpenNoti] = useState(false);
     const [messageNoti, setMessageNoti] = useState('');
     const [listScenario, setListScenario] = useState([]);
-    const [isActiveChecked, setIsActiveChecked] = useState(false);
+    const [scenarioSelected, setScenarioSelected] = useState(false);
+    const [scenarioSelectedClone, setScenarioSelectedClone] = useState(false);
 
     useEffect(() => {
         setBotId(Cookies.get('bot_id'))
     })
+
     // side effects
     useEffect(() => {
         document.title = 'Scenario List';
@@ -52,16 +54,9 @@ function ScenarioList() {
     const getListScenario = () => {
         api.get(`/api/v1/managements/chatbots/${Cookies.get('bot_id')}/scenarios?page=1`).then((res) => {
             console.log(res.data);
-            res.data.data[2].is_active = true;
-            let scenarios = [...res.data.data];
-            let scenarioChecked;
-            for(let i = 0; i < scenarios.length; i++) {
-                if(scenarios[i].is_active) {
-                    scenarioChecked = scenarios[i].id;
-                    break;
-                }
-            }
-            setIsActiveChecked(scenarioChecked);
+            let scenarios = [...res.data.data];            
+            setScenarioSelected(res.data.scenario_selected);
+            setScenarioSelectedClone(res.data.scenario_selected);
             setListScenario(scenarios);
         }).catch((error) => { console.error(error) });
     }
@@ -83,6 +78,7 @@ function ScenarioList() {
             return true;
         }
     }
+    
     // create scenario
     const createScenario = () => {
         let inputName = document.getElementById('sl-popup-create-scenario-input').value;
@@ -143,7 +139,7 @@ function ScenarioList() {
             if (res.data.code === 1) {
                 setMessageNoti('Delete scenario successfully');
             } else if (res.data.code === 2) {
-                setMessageNoti('Delete scenario failed');
+                setMessageNoti(res.data.message);
             }
             getListScenario();
             setTimeout(() => {
@@ -153,6 +149,27 @@ function ScenarioList() {
             setIsOpenDeleteScenario(false);
         })
     };
+
+    const handleSaveSelectScenario = () => {
+        let data = {
+            scenario_selected: scenarioSelected
+        };
+        api.post(`/api/v1/managements/chatbots/${botId}/scenario_selected`, data)
+        .then(res => {
+            console.log(res);
+            setIsOpenNoti(true);
+            if (res.data.code === 1) {
+                setMessageNoti('Save list scenario successfully');
+            } else if (res.data.code === 2) {
+                setMessageNoti(res.data.message);
+            }
+            getListScenario();
+            setTimeout(() => {
+                setIsOpenNoti(false);
+                setMessageNoti('');
+            }, 2000);
+        })
+    }
 
     return (
         <div className="content">
@@ -168,7 +185,7 @@ function ScenarioList() {
                                     >
                                         Create Scenario
                                     </Button>
-                                    <Button className="sl-btn-save-scenario">Save</Button>
+                                    <Button className="sl-btn-save-scenario" onClick={() => handleSaveSelectScenario()}>Save</Button>
                                 </div>
                             </CardHeader>
                             <CardBody>
@@ -183,15 +200,14 @@ function ScenarioList() {
                                                                 type="radio"
                                                                 // name="sl-radio-active"
                                                                 id="sl-active"
-                                                                defaultChecked={scenario.is_active}
-                                                                checked={isActiveChecked === scenario.id}
-                                                                onChange={() => setIsActiveChecked(scenario.id)}
+                                                                checked={scenarioSelected === scenario.id}
+                                                                onChange={() => setScenarioSelected(scenario.id)}
                                                             />
                                                         </div>
                                                         <div className="sl-info">
                                                             <div className="sl-info-top">
-                                                                <div className={`sl-status ${scenario.is_active && 'active'}`}>
-                                                                    <span>{scenario.is_active ? 'In operation' : 'Not used'}</span>
+                                                                <div className={`sl-status ${scenarioSelectedClone === scenario.id && 'active'}`}>
+                                                                    <span>{scenarioSelectedClone === scenario.id ? 'In operation' : 'Not used'}</span>
                                                                 </div>
                                                                 <div className="sl-last-update">
                                                                     <span>last updated: {moment(scenario.updated_at).format('YYYY/MM/DD')}</span>
@@ -213,7 +229,7 @@ function ScenarioList() {
                                                         >
                                                             Duplication
                                                         </Button>
-                                                        {!scenario.is_active ? (
+                                                        {scenarioSelectedClone !== scenario.id ? (
                                                             <Button
                                                                 className="sl-btn-action-delete"
                                                                 onClick={() => handleDeleteScenario(scenario.id)}

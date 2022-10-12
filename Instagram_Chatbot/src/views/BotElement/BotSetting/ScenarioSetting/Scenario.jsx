@@ -1,6 +1,8 @@
 import '../../../../assets/css/bot/scenario/scenario-single.css';
-import { useEffect, useState } from 'react';
-import { Col, Row, Card, CardBody, Button } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import {
+  Col, Row, Card, CardBody, Button
+} from 'reactstrap';
 import icon from '../../../../assets/img/bot-icon/man1_new.png';
 import { MDBIcon } from 'mdbreact';
 import DatePicker from 'react-datepicker';
@@ -23,6 +25,52 @@ let data = [
   },
 ];
 
+let dropDownTitle = [
+  {
+    key: 'yes',
+    value: 'No title'
+  },
+  {
+    key: 'no',
+    value: 'With title'
+  }
+]
+
+let rangeText = [
+  {
+    key: 'no_input',
+    value: 'No input limit'
+  },
+  {
+    key: 'alphabet',
+    value: 'Alphabet only'
+  },
+  {
+    key: 'single_byte',
+    value: 'Single-byte numbers'
+  },
+  {
+    key: 'alphanumeric_hyphen',
+    value: 'Alphanumeric and hyphen'
+  },
+  {
+    key: 'alphanumeric',
+    value: "Alphanumeric ('AZ';'az';0-9')"
+  },
+  {
+    key: 'double_byte',
+    value: 'Double-byte characters'
+  },
+  {
+    key: 'double_byte_hiragana',
+    value: 'Double-byte hiragana'
+  },
+  {
+    key: 'full_width_katakana',
+    value: 'Full-width katakana'
+  }
+]
+
 const Scenario = () => {
   // states
   const [scenarioName, setScenarioName] = useState('');
@@ -36,6 +84,9 @@ const Scenario = () => {
   const [botDelayValue, setBotDelayValue] = useState(1);
   const [botIsScrollAuto, setBotIsScrollAuto] = useState(false);
   const [botIsTurnOnTyping, setBotIsTurnOnTyping] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const toggle = () => setDropdownOpen((prevState) => !prevState);
+
 
   // user setting values
 
@@ -120,6 +171,10 @@ const Scenario = () => {
       }
     });
   };
+
+  const handleAddMessageSetting = () => {
+
+  }
 
   return (
     <div className="content">
@@ -330,31 +385,31 @@ const Scenario = () => {
                                         message.message_detail.type === 'email_address' ||
                                         message.message_detail.type === 'phone_number' ||
                                         message.message_detail.type === 'password') && (
-                                        <input
-                                          className="ss-message__content--user-text-input ss-input-value"
-                                          readOnly
-                                          value={''}
-                                          disabled
-                                        ></input>
-                                      )}
+                                          <input
+                                            className="ss-message__content--user-text-input ss-input-value"
+                                            readOnly
+                                            value={''}
+                                            disabled
+                                          ></input>
+                                        )}
                                       {(message.message_detail.type === 'email_confirmation' ||
                                         message.message_detail.type ===
-                                          'password_confirmation') && (
-                                        <>
-                                          <input
-                                            className="ss-message__content--user-text-input ss-input-value"
-                                            readOnly
-                                            value={''}
-                                            disabled
-                                          ></input>
-                                          <input
-                                            className="ss-message__content--user-text-input ss-input-value"
-                                            readOnly
-                                            value={''}
-                                            disabled
-                                          ></input>
-                                        </>
-                                      )}
+                                        'password_confirmation') && (
+                                          <>
+                                            <input
+                                              className="ss-message__content--user-text-input ss-input-value"
+                                              readOnly
+                                              value={''}
+                                              disabled
+                                            ></input>
+                                            <input
+                                              className="ss-message__content--user-text-input ss-input-value"
+                                              readOnly
+                                              value={''}
+                                              disabled
+                                            ></input>
+                                          </>
+                                        )}
                                     </>
                                   )}
                                   {/* type == 'label' */}
@@ -383,13 +438,13 @@ const Scenario = () => {
                                       </div>
                                       {(message.message_detail.type === 'text_input' ||
                                         message.message_detail.type === 'invalid_input') && (
-                                        <textarea
-                                          className="ss-message__content--user-textarea ss-input-value"
-                                          readOnly
-                                          value={''}
-                                          rows={3}
-                                        ></textarea>
-                                      )}
+                                          <textarea
+                                            className="ss-message__content--user-textarea ss-input-value"
+                                            readOnly
+                                            value={''}
+                                            rows={3}
+                                          ></textarea>
+                                        )}
                                       {message.message_detail.type === 'consume_api_response' && (
                                         <textarea
                                           className="ss-message__content--user-textarea ss-input-value"
@@ -648,94 +703,94 @@ const Scenario = () => {
                                           message.message_detail.type === 'date_md' ||
                                           message.message_detail.type === 'date_ym' ||
                                           message.message_detail.type === 'dob_ym') && (
-                                          <>
-                                            <div className="ss-message__content--user-pull_down--time_hm">
-                                              <div className="ss-message__content--user-pull_down-row">
-                                                <div className="ss-message__content--user-pull_down-col col-6">
-                                                  <select
-                                                    name="ss-message__content--user-pull_down--time_hm"
-                                                    defaultValue={'default'}
-                                                    className="ss-input-value"
-                                                  >
-                                                    <option value="default" hidden disabled>
-                                                      Please select
-                                                    </option>
-                                                    <option value="option1">Option 1</option>
-                                                  </select>
+                                            <>
+                                              <div className="ss-message__content--user-pull_down--time_hm">
+                                                <div className="ss-message__content--user-pull_down-row">
+                                                  <div className="ss-message__content--user-pull_down-col col-6">
+                                                    <select
+                                                      name="ss-message__content--user-pull_down--time_hm"
+                                                      defaultValue={'default'}
+                                                      className="ss-input-value"
+                                                    >
+                                                      <option value="default" hidden disabled>
+                                                        Please select
+                                                      </option>
+                                                      <option value="option1">Option 1</option>
+                                                    </select>
+                                                  </div>
+                                                  <div className="ss-message__content--user-pull_down-col col-6">
+                                                    <select
+                                                      name="ss-message__content--user-pull_down--time_hm"
+                                                      defaultValue={'default'}
+                                                      className="ss-input-value"
+                                                    >
+                                                      <option value="default" hidden disabled>
+                                                        Please select
+                                                      </option>
+                                                      <option value="option1">Option 1</option>
+                                                    </select>
+                                                  </div>
                                                 </div>
-                                                <div className="ss-message__content--user-pull_down-col col-6">
-                                                  <select
-                                                    name="ss-message__content--user-pull_down--time_hm"
-                                                    defaultValue={'default'}
-                                                    className="ss-input-value"
-                                                  >
-                                                    <option value="default" hidden disabled>
-                                                      Please select
-                                                    </option>
-                                                    <option value="option1">Option 1</option>
-                                                  </select>
+                                                <div
+                                                  className="ss-message__content--user-pull_down-comment"
+                                                  style={{ marginTop: '4px' }}
+                                                >
+                                                  <span>comment</span>
                                                 </div>
                                               </div>
-                                              <div
-                                                className="ss-message__content--user-pull_down-comment"
-                                                style={{ marginTop: '4px' }}
-                                              >
-                                                <span>comment</span>
-                                              </div>
-                                            </div>
-                                          </>
-                                        )}
+                                            </>
+                                          )}
                                         {(message.message_detail.type === 'date_ymd' ||
                                           message.message_detail.type === 'dob_ymd') && (
-                                          <>
-                                            <div className="ss-message__content--user-pull_down--date_ymd">
-                                              <div className="ss-message__content--user-pull_down-row">
-                                                <div className="ss-message__content--user-pull_down-col col-4">
-                                                  <select
-                                                    name="ss-message__content--user-pull_down--date_ymd"
-                                                    defaultValue={'default'}
-                                                    className="ss-input-value"
-                                                  >
-                                                    <option value="default" hidden disabled>
-                                                      Please select
-                                                    </option>
-                                                    <option value="option1">Option 1</option>
-                                                  </select>
+                                            <>
+                                              <div className="ss-message__content--user-pull_down--date_ymd">
+                                                <div className="ss-message__content--user-pull_down-row">
+                                                  <div className="ss-message__content--user-pull_down-col col-4">
+                                                    <select
+                                                      name="ss-message__content--user-pull_down--date_ymd"
+                                                      defaultValue={'default'}
+                                                      className="ss-input-value"
+                                                    >
+                                                      <option value="default" hidden disabled>
+                                                        Please select
+                                                      </option>
+                                                      <option value="option1">Option 1</option>
+                                                    </select>
+                                                  </div>
+                                                  <div className="ss-message__content--user-pull_down-col col-4">
+                                                    <select
+                                                      name="ss-message__content--user-pull_down--date_ymd"
+                                                      defaultValue={'default'}
+                                                      className="ss-input-value"
+                                                    >
+                                                      <option value="default" hidden disabled>
+                                                        Please select
+                                                      </option>
+                                                      <option value="option1">Option 1</option>
+                                                    </select>
+                                                  </div>
+                                                  <div className="ss-message__content--user-pull_down-col col-4">
+                                                    <select
+                                                      name="ss-message__content--user-pull_down--date_ymd"
+                                                      defaultValue={'default'}
+                                                      className="ss-input-value"
+                                                    >
+                                                      <option value="default" hidden disabled>
+                                                        Please select
+                                                      </option>
+                                                      <option value="option1">Option 1</option>
+                                                    </select>
+                                                  </div>
                                                 </div>
-                                                <div className="ss-message__content--user-pull_down-col col-4">
-                                                  <select
-                                                    name="ss-message__content--user-pull_down--date_ymd"
-                                                    defaultValue={'default'}
-                                                    className="ss-input-value"
-                                                  >
-                                                    <option value="default" hidden disabled>
-                                                      Please select
-                                                    </option>
-                                                    <option value="option1">Option 1</option>
-                                                  </select>
-                                                </div>
-                                                <div className="ss-message__content--user-pull_down-col col-4">
-                                                  <select
-                                                    name="ss-message__content--user-pull_down--date_ymd"
-                                                    defaultValue={'default'}
-                                                    className="ss-input-value"
-                                                  >
-                                                    <option value="default" hidden disabled>
-                                                      Please select
-                                                    </option>
-                                                    <option value="option1">Option 1</option>
-                                                  </select>
+                                                <div
+                                                  className="ss-message__content--user-pull_down-comment"
+                                                  style={{ marginTop: '4px' }}
+                                                >
+                                                  <span>comment</span>
                                                 </div>
                                               </div>
-                                              <div
-                                                className="ss-message__content--user-pull_down-comment"
-                                                style={{ marginTop: '4px' }}
-                                              >
-                                                <span>comment</span>
-                                              </div>
-                                            </div>
-                                          </>
-                                        )}
+                                            </>
+                                          )}
                                         {/* {message.message_detail.type === 'date_md' && <></>} */}
                                         {/* {message.message_detail.type === 'date_ym' && <></>} */}
                                         {message.message_detail.type === 'date_ym_hm' && (
@@ -1561,8 +1616,8 @@ const Scenario = () => {
                             placeholder="Enter chat name"
                             className="ss-user-setting__name-input ss-input-value"
                           />
+                          <span className="ss-user-setting__name-error">* required</span>
                         </div>
-                        <span className="ss-user-setting__name-error ">* required</span>
                       </div>
                       <div className="ss-user-setting__main">
                         {data
@@ -1587,11 +1642,77 @@ const Scenario = () => {
                                         <span>Save the input contents in a variable.</span>
                                       </div>
                                       <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                        <div>
+                                          <input
+                                            type="checkbox"
+                                            name="ss-user-setting__item-text_input-use-api"
+                                          />
+                                          <span>Use APIs to validate input values.</span>
+                                        </div>
+                                        <div className="ss-user-setting__item-text_input-use-api-required">
+                                          <input
+                                            type="checkbox"
+                                            name="ss-user-setting__item-text_input-use-api"
+                                          />
+                                          <span>Required</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="ss-user-setting__item-bottom">
+                                      <div className="ss-user-setting__item-select-bottom-wrapper">
+                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                          <div className="ss-user-setting__item-select-bottom">
+                                            <SelectCustom
+                                              id="title"
+                                              data={dropDownTitle}
+                                              onChange={e => console.log(e)}
+                                              keyValue="value"
+                                            />
+                                          </div>
+                                          <div className="ss-user-setting__item-select-bottom">
+                                            <SelectCustom
+                                              id="type"
+                                              data={rangeText}
+                                              onChange={e => console.log(e)}
+                                              keyValue="key"
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="ss-user-setting__item-select-bottom">
+                                          <SelectCustom
+                                            id="range"
+                                            defaultValue="no_input"
+                                            data={rangeText}
+                                            onChange={e => console.log(e)}
+                                            keyValue="key"
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="ss-user-setting__item-bottom-flex-start">
+                                      <span className="ss-user-setting-lable">character limit</span>
+                                      <input
+                                        type="number"
+                                        name="ss-user-setting__name"
+                                        placeholder="0000"
+                                        className="ss-user-setting-input-limit-character ss-input-value"
+                                      />
+                                      <span style={{ fontSize: '30px', marginLeft: '10px', opacity: '0.4' }}>~</span>
+                                      <input
+                                        type="number"
+                                        name="ss-user-setting__name"
+                                        placeholder="0000"
+                                        className="ss-user-setting-input-limit-character ss-input-value"
+                                      />
+                                    </div>
+                                    <div className="ss-user-setting__item-bottom">
+                                      <div className="ss-user-setting__item-select-bottom-wrapper">
                                         <input
-                                          type="checkbox"
-                                          name="ss-user-setting__item-text_input-use-api"
+                                          type="text"
+                                          name="ss-user-setting__name"
+                                          placeholder="Enter chat name"
+                                          className="ss-user-setting__item-input-bottom ss-input-value"
                                         />
-                                        <span>Use APIs to validate input values.</span>
                                       </div>
                                     </div>
                                   </>
@@ -1638,5 +1759,88 @@ const Scenario = () => {
     </div>
   );
 };
+
+const SelectCustom = ({ id, data, defaultValue, onChange, keyValue }) => {
+  const [valueSelected, setValueSelected] = useState(() => {
+    if (keyValue === 'key') {
+      let value = data.find(value => value.key === defaultValue)?.value;
+      return value;
+    } else {
+      return defaultValue;
+    }
+  });
+  const [isToggleSelect, setIsToggleSelect] = useState(false);
+  const [indexCurSelected, setIndexCurSelected] = useState('');
+  const [keySelected, setKeySelected] = useState('');
+
+  function handleClickSelect(e) {
+    setIsToggleSelect(prevState => !prevState);
+    e.stopPropagation();
+  }
+
+  function handleClickOutSelect() {
+    setIsToggleSelect(false);
+  }
+
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutSelect);
+    // document.getElementById(`ss-select-custom-${id}`).addEventListener('click', handleClickSelect);
+  }, []);
+
+  const onChangeSelectValue = (value, key) => {
+    setValueSelected(value);
+    keyValue === 'value' ? onChange(value) : onChange(key);
+  }
+
+  const handleHoverSelect = (index, value) => {
+    if (valueSelected !== value) {
+      document.querySelector(`.ss-select-item-${index}`).style.backgroundColor = '#DDDDDD';
+      document.querySelector(`.ss-select-item-${index}`).style.color = 'black';
+    }
+  }
+
+  const handleOutSelect = (index, value) => {
+    if (valueSelected !== value) {
+      document.querySelector(`.ss-select-item-${index}`).style.backgroundColor = '#5997FB';
+      document.querySelector(`.ss-select-item-${index}`).style.color = '#fff';
+    }
+  }
+
+  return (
+    <React.Fragment>
+      <div
+        onClick={(e) => handleClickSelect(e)}
+        id={`ss-select-custom-${id}`} className="ss-select-custom">
+        <input
+          name="ss-user-setting__select-type"
+          id="ss-user-setting__select-type"
+          className="ss-input-value"
+          value={valueSelected}
+          readOnly
+        ></input>
+        <i className="ss-custom-arrow-select arrow down"></i>
+        <div style={!isToggleSelect ? { display: 'none' } : {}} className="ss-select-value-dropdown">
+          <ul className="ss-select-value-items">
+            {data.map(({ value, key }, index) => {
+              return (
+                <li
+                  // onMouseOver={() => handleHoverSelect(index === value, value)}
+                  // onMouseOut={() => handleOutSelect(index, value)}
+                  className={`ss-select-item-${index}`}
+                  onClick={() => onChangeSelectValue(value, key)}
+                  style={valueSelected === value ? { backgroundColor: '#DDDDDD', color: 'black' } : {}}
+                  key={index}
+                  value={key}
+                >
+                  {value}
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      </div>
+    </React.Fragment>
+  )
+}
 
 export default Scenario;
