@@ -60,6 +60,7 @@ import BasicInformation from "views/BotElement/BotSetting/AdvanceSetting/BasicIn
 import TimeAndLang from "views/BotElement/BotSetting/AdvanceSetting/TimeAndLang";
 import WithdrawalPrevention from "views/BotElement/BotSetting/AdvanceSetting/WithdrawalPrevention";
 import BotAdmin from "views/BotElement/BotSetting/AdvanceSetting/BotAdmin";
+import FileManagement from "views/BotElement/BotSetting/FileManagement";
 
 var routes = [
   {
@@ -301,6 +302,13 @@ var routes = [
     layout: "/admin",
   },
   {
+    path: "/file-management",
+    name: "File Management",
+    // icon: "nc-icon nc-single-02",
+    component: FileManagement,
+    layout: "/admin",
+  },
+  {
     path: "/create-api",
     name: "Create API",
     // icon: "nc-icon nc-single-02",
@@ -364,7 +372,7 @@ var routes = [
     component: ConversionInfo,
     layout: "/admin",
   },
-  { 
+  {
     path: "/statistics",
     name: "Statistics",
     // icon: "nc-icon nc-single-02",
@@ -378,19 +386,19 @@ var routes = [
     // icon: "nc-icon nc-single-02",
     component: BasicInformation,
     layout: "/admin",
-  },{
+  }, {
     path: "/tz-lang",
     name: "Timezone and Language",
     // icon: "nc-icon nc-single-02",
     component: TimeAndLang,
     layout: "/admin",
-  },{
+  }, {
     path: "/withdrawal-prevention",
     name: "Withdrawal Prevention",
     // icon: "nc-icon nc-single-02",
     component: WithdrawalPrevention,
     layout: "/admin",
-  },{
+  }, {
     path: "/bot-admin",
     name: "Bot Admin",
     // icon: "nc-icon nc-single-02",
