@@ -7,6 +7,7 @@ import api from '../../../../api/api-management';
 import ModalNoti from '../../../../views/Popup/ModalNoti';
 import Cookies from 'js-cookie';
 import moment from 'moment';
+import Pagination from '@material-ui/lab/Pagination';
 
 let data = [
     {
@@ -36,9 +37,13 @@ function ScenarioList() {
     const [scenarioSelected, setScenarioSelected] = useState(false);
     const [scenarioSelectedClone, setScenarioSelectedClone] = useState(false);
 
+    var [pageIndex, setPageIndex] = useState(1);
+    var [totalPage, setTotalPage] = useState();
+    var [page, setPage] = useState(1);
+
     useEffect(() => {
         setBotId(Cookies.get('bot_id'))
-    })
+    }, [])
 
     // side effects
     useEffect(() => {
@@ -48,13 +53,15 @@ function ScenarioList() {
 
     //Get list scenario
     useEffect(() => {
-        getListScenario();
+        getListScenario(1);
     }, []);
 
-    const getListScenario = () => {
-        api.get(`/api/v1/managements/chatbots/${Cookies.get('bot_id')}/scenarios?page=1`).then((res) => {
+    const getListScenario = (pgIndex) => {
+        api.get(`/api/v1/managements/chatbots/${Cookies.get('bot_id')}/scenarios?page=${pgIndex}`).then((res) => {
             console.log(res.data);
-            let scenarios = [...res.data.data];            
+            let scenarios = [...res.data.data];
+            let totalPage = Math.ceil(res.data.total / 25);
+            setTotalPage(totalPage);
             setScenarioSelected(res.data.scenario_selected);
             setScenarioSelectedClone(res.data.scenario_selected);
             setListScenario(scenarios);
@@ -78,7 +85,7 @@ function ScenarioList() {
             return true;
         }
     }
-    
+
     // create scenario
     const createScenario = () => {
         let inputName = document.getElementById('sl-popup-create-scenario-input').value;
@@ -94,7 +101,7 @@ function ScenarioList() {
                 } else if (res.data.code === 2) {
                     setMessageNoti(res.data.message);
                 }
-                getListScenario();
+                getListScenario(pageIndex);
                 setTimeout(() => {
                     setIsOpenNoti(false);
                     setMessageNoti('');
@@ -121,7 +128,7 @@ function ScenarioList() {
                 setIsOpenNoti(false);
                 setMessageNoti('');
             }, 2000);
-            getListScenario();
+            getListScenario(pageIndex);
         }).catch(err => { console.error(err); });
     };
 
@@ -141,7 +148,7 @@ function ScenarioList() {
             } else if (res.data.code === 2) {
                 setMessageNoti(res.data.message);
             }
-            getListScenario();
+            getListScenario(pageIndex);
             setTimeout(() => {
                 setIsOpenNoti(false);
                 setMessageNoti('');
@@ -155,20 +162,32 @@ function ScenarioList() {
             scenario_selected: scenarioSelected
         };
         api.post(`/api/v1/managements/chatbots/${botId}/scenario_selected`, data)
-        .then(res => {
-            console.log(res);
-            setIsOpenNoti(true);
-            if (res.data.code === 1) {
-                setMessageNoti('Save list scenario successfully');
-            } else if (res.data.code === 2) {
-                setMessageNoti(res.data.message);
-            }
-            getListScenario();
-            setTimeout(() => {
-                setIsOpenNoti(false);
-                setMessageNoti('');
-            }, 2000);
-        })
+            .then(res => {
+                console.log(res);
+                setIsOpenNoti(true);
+                if (res.data.code === 1) {
+                    setMessageNoti('Save list scenario successfully');
+                } else if (res.data.code === 2) {
+                    setMessageNoti(res.data.message);
+                }
+                getListScenario(pageIndex);
+                setTimeout(() => {
+                    setIsOpenNoti(false);
+                    setMessageNoti('');
+                }, 2000);
+            })
+    }
+
+    function handleChange(event, value) {
+        console.log(value);
+        if (totalPage > 1) {
+            // console.log('pageIndex: ', value);
+            setPage(parseInt(value));
+            setPageIndex(value);
+            getListScenario(value);
+            // window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.querySelector('.main-panel').scrollTop = 0;
+        }
     }
 
     return (
@@ -236,14 +255,22 @@ function ScenarioList() {
                                                             >
                                                                 Delete
                                                             </Button>
-                                                        ) : <div style={{width: '92.73px'}}></div>}
+                                                        ) : <div style={{ width: '92.73px' }}></div>}
                                                     </div>
                                                 </div>
                                             </li>
                                         )) : null}
                                     </ul>
                                 </div>
+                                <br/>
+                                <Pagination
+                                    count={totalPage}
+                                    variant="outlined"
+                                    page={page}
+                                    onChange={handleChange}
+                                />
                             </CardBody>
+
                         </Card>
                     </div>
                 </Col>
