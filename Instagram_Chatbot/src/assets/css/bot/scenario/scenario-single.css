@@ -65,7 +65,7 @@
 
 /* ss overview */
 .ss-overview-detail {
-  width: 120%;
+  width: 140%;
   height: 100%;
   margin-top: 10px;
   border-radius: 5px;
@@ -74,7 +74,7 @@
   padding: 10px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 145px;
+  padding-right: 41%;
 }
 
 .ss-message-wrapper {
@@ -1061,21 +1061,28 @@ input#ss-message__content--user-checkbox--checkbox_img {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
+  margin-bottom: 10px;
+  width: 100%;
+  align-items: center;
 }
 
 .ss-user-setting__item-select-bottom-wrapper-flex {
   display: flex;
-  width: 100%;
+  width: 90%;
   justify-content: space-between;
-  margin-bottom: 7px;
 }
 
-.ss-user-setting__item-select-bottom-wrapper-flex>div {
+.ss-user-setting__item-select-bottom-wrapper > div {
+  width: 49%;
+}
+
+.ss-user-setting__item-select-bottom-wrapper-flex > div {
   width: 49%;
 }
 
 .ss-user-setting__item-select-bottom-wrapper {
   width: 90%;
+  display: flex;
 }
 
 .ss-select-value-dropdown {
@@ -1128,10 +1135,12 @@ input#ss-message__content--user-checkbox--checkbox_img {
 
 .ss-select-custom {
   position: relative;
+  width: 90%;
 }
 
 .ss-user-setting__item-select-bottom {
   width: 100%;
+  /* margin-bottom: 10px; */
 }
 
 .ss-user-setting-label {
@@ -1143,6 +1152,9 @@ input#ss-message__content--user-checkbox--checkbox_img {
 .ss-user-setting__item-bottom-flex-start {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+  height: 35px;
+  margin-bottom: 10px;
 }
 
 .ss-user-setting-input-limit-character {
@@ -1156,4 +1168,73 @@ input#ss-message__content--user-checkbox--checkbox_img {
 
 .ss-user-setting-item-textarea-label {
   width: 90%;
+}
+
+.ss-input-text-comment {
+  display: flex;
+  align-items: center;
+}
+
+.ss-input-text-comment input:nth-child(2) {
+  width: 60%;
+}
+
+.ss-plus-circle-option-icon {
+  font-size: 25px!important;
+  color: #347AED!important;
+  margin-left: 7px;
+}
+
+::placeholder { 
+  color: #ccc;
+  font-size: 14px;
+}
+
+.ss-user-setting-phone-number-hyphens {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ss-user-setting-phone-number-hyphens > input {
+  width: 28%;
+}
+
+.ss-user-setting-double-input {
+  display: flex;
+  align-items: center;
+  width: 90%;
+}
+
+.ss-user-setting-double-input input:first-child {
+  border-bottom-right-radius: unset;
+  border-top-right-radius: unset;
+}
+
+.ss-user-setting-double-input input:nth-child(2) {
+  border-left: 0px;
+  border-bottom-left-radius: unset;
+  border-top-left-radius: unset;
+}
+
+.ss-user-setting-item {
+  width: 90%;
+}
+
+.ss-user-radio-custom-class {
+  width: 100%!important;
+}
+
+.ss-plus-circle-option-icon-times {
+  margin-left: 5px;
+  font-size: 25px !important;
+}
+
+.ss-user-setting__item-input-zip-code {
+  width: 75%;
+}
+
+.ss-user-setting-checkbox-custom {
+  margin-left: 1%;
+  margin-right: 13%;
 }
