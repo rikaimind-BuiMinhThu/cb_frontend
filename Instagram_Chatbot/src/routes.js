@@ -60,6 +60,7 @@ import BasicInformation from "views/BotElement/BotSetting/AdvanceSetting/BasicIn
 import TimeAndLang from "views/BotElement/BotSetting/AdvanceSetting/TimeAndLang";
 import WithdrawalPrevention from "views/BotElement/BotSetting/AdvanceSetting/WithdrawalPrevention";
 import BotAdmin from "views/BotElement/BotSetting/AdvanceSetting/BotAdmin";
+import AddSubUserMng from "views/BotElement/AddSubUserMng";
 
 var routes = [
   {
@@ -200,6 +201,12 @@ var routes = [
     name: "Sub User Management",
     // icon: "nc-icon nc-single-02",
     component: SubUserManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/add-sub-user",
+    name: "Add Sub User Managament",
+    component: AddSubUserMng,
     layout: "/admin",
   },
   {
@@ -364,7 +371,7 @@ var routes = [
     component: ConversionInfo,
     layout: "/admin",
   },
-  { 
+  {
     path: "/statistics",
     name: "Statistics",
     // icon: "nc-icon nc-single-02",
@@ -378,19 +385,19 @@ var routes = [
     // icon: "nc-icon nc-single-02",
     component: BasicInformation,
     layout: "/admin",
-  },{
+  }, {
     path: "/tz-lang",
     name: "Timezone and Language",
     // icon: "nc-icon nc-single-02",
     component: TimeAndLang,
     layout: "/admin",
-  },{
+  }, {
     path: "/withdrawal-prevention",
     name: "Withdrawal Prevention",
     // icon: "nc-icon nc-single-02",
     component: WithdrawalPrevention,
     layout: "/admin",
-  },{
+  }, {
     path: "/bot-admin",
     name: "Bot Admin",
     // icon: "nc-icon nc-single-02",

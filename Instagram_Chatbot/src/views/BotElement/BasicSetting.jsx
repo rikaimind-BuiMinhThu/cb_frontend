@@ -33,7 +33,7 @@ function BasicSetting() {
     utils.checkMaxLength('companyName', 'errCompanyname', 'Company name', 50);
     utils.checkMaxLength('department', 'errDepartment', 'Department', 50);
     utils.checkMaxLength('job_title', 'errPosition', 'Position', 50);
-    utils.checkAddress('emailAddress', 'errEmailAddress', 'Email address');
+    utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'Email address');
     utils.checkMaxLength('phone_number', 'errPhone', 'phone number', 12);
     utils.checkMaxLength('post_code', 'errPostCost', 'post code', 50);
     utils.checkMaxLength('address', 'errAddress', 'address', 50);
@@ -41,7 +41,7 @@ function BasicSetting() {
       utils.checkMaxLength('companyName', 'errCompanyname', 'Company name', 50) &&
       utils.checkMaxLength('department', 'errDepartment', 'Department', 50) &&
       utils.checkMaxLength('job_title', 'errPosition', 'Position', 50) &&
-      utils.checkAddress('emailAddress', 'errEmailAddress', 'Email address') &&
+      utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'Email address') &&
       utils.checkMaxLength('phone_number', 'errPhone', 'phone number', 12) &&
       utils.checkMaxLength('post_code', 'errPostCost', 'post code', 50) &&
       utils.checkMaxLength('address', 'errAddress', 'address', 50)) {
@@ -135,7 +135,7 @@ function BasicSetting() {
                     <span className='bs-field-lable'>Email address</span>
                     <div className='bs-field-input'>
                       <input id='emailAddress' type='text' placeholder='enter input ...' name='email' defaultValue={userDetail.email}
-                        onChange={() => utils.checkAddress('emailAddress', 'errEmailAddress', 'Email address')}></input>
+                        onChange={() => utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'Email address')}></input>
                       <span id="errEmailAddress" className='bs-err-format'></span>
                     </div>
                   </div>
