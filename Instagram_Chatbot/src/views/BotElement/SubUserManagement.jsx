@@ -6,11 +6,11 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import api from '../../api/api-management';
+import Pagination from '@material-ui/lab/Pagination';
 import Cookies from 'js-cookie';
 import ModalShortTem from "./../Popup/ModalShortTem";
 import ModalShort from '../../views/Popup/ModalShort';
 import ModalNoti from '../../views/Popup/ModalNoti';
-import * as utils from './../../JS/validate.js'
 
 
 
@@ -22,6 +22,9 @@ function SubUserManagement() {
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState('');
   const [isOpenEdit, setIsOpenEdit] = useState(false);
+  const [pageIndex, setPageIndex] = useState(1);
+  const [totalPage, setTotalPage] = useState();
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
@@ -31,7 +34,7 @@ function SubUserManagement() {
     loadData();
   }, [])
 
-  function loadData() {
+  function loadData(pageIndex) {
     api.get(`/api/v1/managements/user_chatbots?chatbot_id=${Cookies.get('bot_id')}`).then(res => {
       if (res.data.code === 1) {
         console.log(res.data.data.user_chatbots);
@@ -110,6 +113,16 @@ function SubUserManagement() {
   }
 
 
+  function handleChange(event, value) {
+    if (totalPage > 1) {
+      setPage(parseInt(value));
+      setPageIndex(value);
+      loadData(value);
+      document.querySelector('.main-panel').scrollTop = 0;
+    }
+  }
+
+
   return (
     <>
       <div className="content">
@@ -164,6 +177,13 @@ function SubUserManagement() {
                     ))}
                   </tbody>
                 </Table>
+
+                <Pagination
+                  count={totalPage}
+                  variant="outlined"
+                  page={page}
+                  onChange={handleChange}
+                />
               </CardBody>
             </Card>
           </Col>
