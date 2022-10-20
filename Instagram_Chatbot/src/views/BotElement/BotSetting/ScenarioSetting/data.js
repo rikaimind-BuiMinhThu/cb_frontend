@@ -7,6 +7,7 @@ let dataClone = {
             belong_to: 'user',
             message_content: [
                 {
+                    id: 1,
                     type: 'text',
                     text_input: {
                         //txtIn: text_input
@@ -31,7 +32,10 @@ let dataClone = {
                             cfEmlAdd_email: '', //string
                             cfEmlAdd_confirm_email: '', //string
                         },
-                        phone_number: '', //string
+                        phone_number: {
+                            withHyphen: false,
+                            number: '' //string
+                        }, 
                         password: {
                             character_limit_from: 1, //number
                             character_limit_to: 30, //number
@@ -67,14 +71,14 @@ let dataClone = {
                         title: '', //string
                         type: 'default', //4 values: default, radio_button_img, block_style,consume_api_response(Pending)
                         default: {
-                            default_text: '', //string
-                            default_value: '', //string
+                            text: '', //string
+                            value: '', //string
                             initial_selection: 'yes', //yes-no
                         },
                         radio_button_img: {
                             img: '', //base64
-                            img_title: '', //string
-                            img_value: '', //string
+                            text: '', //string
+                            value: '', //string
                             initial_selection: 'yes', // yes-no
                         },
                         consume_api_response: '', //Pending
@@ -208,7 +212,7 @@ let dataClone = {
                         save_input_content: 'yes', // yes-no
                         use_api_input_value: 'yes', // yes-no
                         require: 'yes', //yes-no
-                        all_item_checked: 'yes', //yes-no
+                        all_items_require: 'yes', //yes-no
                         split_postal_code: 'yes', //yes-no
                         post_code: '', //string
                         use_drop_down: 'yes', //yes-no
@@ -237,6 +241,7 @@ let dataClone = {
                         start_date: '', //string
                         end_date: '', //string
                         non_select_date_time: '', //string
+                        select_fixed_date: '',
                         fixed_date: [
                             '2022/09/27',
                             '2022/09/28', //...

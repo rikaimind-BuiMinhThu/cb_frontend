@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { MDBIcon } from 'mdbreact';
 import CheckboxCustom from './CheckboxCustom';
-import Select from './Select';
+import Select from './SelectCustom';
 
-const InputCustom = ({ id, value, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false }) => {
+const InputCustom = ({ id, value, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false, style }) => {
 
     return (
         <React.Fragment>
-            {console.log(icon)}
-            {label && <span style={{ fontSize: '14px', fontWeight: '400', width: '15%' }}>{label}</span>}
+            {label && <span style={{ fontSize: '14px', fontWeight: '400', width: 'fit-content' }}>{label}</span>}
             <input
                 id={id}
                 type="text"
@@ -16,7 +15,7 @@ const InputCustom = ({ id, value, onChange, placeholder, className, label, icon,
                 className={`ss-input-value ss-user-setting-item ${className}`}
                 placeholder={placeholder}
                 value={value}
-                style={handleCheckBox && { width: '40%' }}
+                style={style}
                 onChange={e => onChange(e.target.value)}
             />
             {handleCheckBox &&

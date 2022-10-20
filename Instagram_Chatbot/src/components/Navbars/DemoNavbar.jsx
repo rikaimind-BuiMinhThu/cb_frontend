@@ -103,6 +103,7 @@ function Header(props) {
     // removeCookie('token', '/admin/admin/chatbot')
     Cookies.remove('user_role')
     Cookies.remove('page_access_token')
+    Cookies.remove('scenario_id')
     window.location.href ='/'
     // window.location.href ='/'
   }

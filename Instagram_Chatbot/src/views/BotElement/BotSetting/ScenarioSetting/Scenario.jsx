@@ -8,12 +8,16 @@ import { MDBIcon } from 'mdbreact';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Link } from 'react-router-dom';
-import SelectCustom from './scenarioComon/Select';
+import SelectCustom from './scenarioComon/SelectCustom';
 import CheckboxCustom from './scenarioComon/CheckboxCustom';
 import InputNum from './scenarioComon/InputNum';
 import InputDouble from './scenarioComon/InputDouble';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from './scenarioComon/InputCustom';
+import moment from 'moment';
+import api from '../../../../api/api-management';
+import Cookies from 'js-cookie';
+import ModalNoti from '../../../../views/Popup/ModalNoti';
 
 let data = [
   {
@@ -36,25 +40,275 @@ let data = [
   },
 ];
 
+let dataHour = [];
+for (let i = 1; i <= 24; i++) {
+  dataHour.push({
+    key: i + '',
+    value: i + ''
+  });
+}
+
+let dataMinutes = [];
+for (let i = 1; i <= 59; i++) {
+  dataMinutes.push({
+    key: i + '',
+    value: i + ''
+  });
+}
+
+let dataYear = [];
+for (let i = 1935; i <= 2072; i++) {
+  dataYear.push({
+    key: i + '',
+    value: i + ''
+  });
+}
+
+let dataMonth = [];
+for (let i = 1; i <= 12; i++) {
+  dataMonth.push({
+    key: i + '',
+    value: i + ''
+  });
+}
+
+let dataDay = [];
+for (let i = 1; i <= 31; i++) {
+  dataDay.push({
+    key: i + '',
+    value: i + ''
+  });
+}
+
+let dataEveryMinute = [
+  {
+    key: '00',
+    value: '00'
+  },
+  {
+    key: '05',
+    value: '05'
+  },
+  {
+    key: '10',
+    value: '10'
+  },
+  {
+    key: '15',
+    value: '15'
+  },
+  {
+    key: '30',
+    value: '30'
+  },
+];
+
+
 let dataClone = {
   name: '',
   messages: [
     {
-      id: '1',
+      id: 1,
+      name: '',
       hidden: true,
       belong_to: 'user',
       message_content: [
         {
+          id: 11,
+          type: 'pull_down',
+          pull_down: {
+            save_input_content: '', //string
+            required: true, //yes-no
+            title_require: true, //yes-no
+            title: '', //string
+            type: 'customization', // 12 values: customization, time_hm, date_ymd, date_md, date_ym, date_ymd_hm, dob_ymd, dob_ym, timezone_from_to, period_from_to,prefectures, up_to_municipality,
+            customization: {
+              title_comment: '', //string
+              comment: '', //string
+              is_comment: true, //yes-no,
+              display_unselected: '',
+              options_with_comment: [
+                {
+                  id: 1,
+                  text: '',
+                  value: '',
+                  text2: '',
+                  value2: ''
+                }
+              ],
+              options_without_comment: [
+                {
+                  id: 1,
+                  text: '',
+                  value: ''
+                }
+              ],
+            },
+            time_hm: {
+              start_at: '2', //number
+              end_at: '5', //number
+              time: '2', //number
+              minute: '30', //number
+              every_minute: '0', //6 values: 0, 5, 10, 15, 30
+              comment: '', //string
+            },
+            date_ymd: {
+              start_year: 2022, //number
+              end_year: 2022, //number
+              year: 2022, //number
+              month: 10, //number
+              day: 25, //number
+              comment: '', //string
+            },
+            date_md: {
+              month: '', //string
+              day: '', //string
+              comment: '', //string
+            },
+            date_ym: {
+              start_year: 2022, //number
+              end_year: 2022, //number
+              year: 2022, //number
+              month: 10, //number
+              comment: '', //string
+            },
+            date_ymd_hm: {
+              year: 2022, //string
+              month: 10, //number
+              day: 25, //number
+              start_at: 2, //number
+              end_at: 5, //number
+              time: 2, //number
+              minute: 30, //number
+              every_minute: '0', //6 values: 0, 5, 10, 15, 30
+              comment: '', //string
+            },
+            dob_ymd: {
+              start_year: 2022, //number
+              end_year: 2022, //number
+              sort: 'asc', //asc-desc
+              year: 2022, //number
+              month: 10, //number
+              day: 25, //number
+              comment: '', //string
+            },
+            dob_ym: {
+              start_year: 2022, //number
+              end_year: 2022, //number
+              sort: 'asc', //asc-desc
+              year: 2022, //number
+              month: 10, //number
+              comment: '', //string
+            },
+            timezone_from_to: {
+              range_start: 2, //number
+              range_end: 5, //number
+              hour_start_at: 2, //number
+              hour_end_at: 3, //number
+              minute_start_at: 10, //number
+              minute_end_at: 15, //number
+              every_minute_start_at: '5', //6 values: 0, 5, 10, 15, 30
+              every_minute_end_at: '10', //6 values: 0, 5, 10, 15, 30
+              comment: '', //string
+            },
+            period_from_to: {
+              year_start_at: 2022, //number
+              year_end_at: 2022, //number
+              month_start_at: 10, //number
+              month_end_at: 11, //number
+              day_start_at: 25, //number
+              day_end_at: 25, //number
+              comment: '', //string
+            },
+            prefectures: '', //string
+            up_to_municipality: {
+              prefecture_comment: '', //string
+              prefecture: '', //string
+              city: '', //string
+              city_comment: '', //string
+            },
+            comsume_api_response: '', //(Pending)
+          },
+        },
+        {
+          id: 10,
+          type: 'agree_term',
+          agree_term: {
+            title_require: true, //yes-no
+            title: '', //string
+            type: 'detail_content', //2 values: detail_content, post_link_only
+            term: '', //string
+            detail_content: {
+              content: '', //string
+            },
+            post_link_only: [
+              {
+                title_comment: '', //string
+                title: '', //string
+                urls: '', //string
+                url_comment: '', //string
+              },
+            ],
+          },
+        },
+        {
+          id: 9,
+          type: 'calendar',
+          calendar: {
+            save_input_content: true, // yes-no
+            required: true, //yes-no
+            use_api_input_value: true, // yes-no
+            initial_selection: true, // yes-no
+            title_require: true, //yes-no
+            title: '', //string
+            start_date: '', //string
+            end_date: '', //string
+            non_select_date_time: [], //string
+            aggregation_target_period_from: 2, //number
+            aggregation_target_period_to: 6, //number
+            type: 'date_selection', //3 values: date_selection, embedded, start_end_date
+            fixed_date: [
+              '2022/09/27',
+              '2022/09/28', //...
+            ],
+            date_selection: {
+              date_select: '', //string
+            },
+            embedded: {
+              date_select: '', //string
+            },
+            start_end_date: {
+              date_select: '', //string
+              specified_period_from: 5, //number
+              specified_period_to: 10, //number
+            },
+          }
+        },
+        {
+          id: 8,
+          type: 'attaching_file',
+          attaching_file: {
+            save_input_content: true, // yes-no
+            require: true, //yes-no
+            multifile_upload: true, //yes-no
+            file_type: [
+              'jpg',
+              'png', //.....
+            ],
+            file_content: '', //base64
+          },
+        },
+        {
           id: 7,
           type: 'zip_code_address',
           zip_code_address: {
-            save_input_content: 'yes', // yes-no
-            use_api_input_value: 'yes', // yes-no
-            require: 'yes', //yes-no
-            all_items_require: 'yes', //yes-no
-            split_postal_code: 'yes', //yes-no
+            save_input_content: true, // yes-no
+            use_api_input_value: true, // yes-no
+            require: true, //yes-no
+            all_items_require: true, //yes-no
+            split_postal_code: true, //yes-no
             post_code: '', //string
-            use_drop_down: 'yes', //yes-no
+            use_drop_down: true, //yes-no
             prefecture: '', //string
             municipality: '', //string
             address: '', //string
@@ -419,18 +673,8 @@ let dataClone = {
         {
           id: 2,
           type: 'label',
-          textarea: {
-            save_input_content: '', //string
-            required: true, //yes-no
-            title_require: true, //yes-no
-            title: '', //string
-            type: 'text_input', // 3 values: text_input, invalid_input, consume_api_response(Pending)
-            text_input: {
-              character_limit_from: 1, //number
-              character_limit_to: 30, //number
-              content: '', //string
-            },
-            invalid_input_content: '', //string
+          label: {
+            lbl_content: '', //string
           },
         },
         {
@@ -479,12 +723,45 @@ let dataClone = {
       ]
     },
     {
-      id: '2',
+      id: 2,
       hidden: true,
       belong_to: 'bot',
       message_content: [
         {
-          type: 'text',
+          type: 'text_input',
+          text: {
+            content: '', //string
+            scroll_auto: true, //yes-no
+          },
+          email: {
+            email_id: '', //id get from list email
+          },
+          file: {
+            file_upload: '', //base64
+            scroll_auto: true, //yes-no
+            file_type: '', //string
+          },
+          script: {
+            script_content: '', //string
+          },
+          delay: {
+            delay_second: 1, // number(range: 1-10)
+            typing_on: true, //yes-no
+          },
+          api_link_age: {
+            //Pending
+            api_id: '', // get from api list(pending)
+          },
+        }
+      ]
+    },
+    {
+      id: 3,
+      hidden: true,
+      belong_to: 'bot',
+      message_content: [
+        {
+          type: 'text_input',
           text: {
             content: '', //string
             scroll_auto: true, //yes-no
@@ -514,8 +791,139 @@ let dataClone = {
   ]
 }
 
+let dataConsumeApiResponse = [];
+
+let agreeTermType = [
+  {
+    key: 'detail_content',
+    value: 'Detail content display',
+  },
+  {
+    key: 'post_link_only',
+    value: 'Post link only',
+  },
+]
+
+let dataTypeFile = [
+  {
+    key: 'jpegs',
+    value: 'jpegs',
+  },
+  {
+    key: 'jpg',
+    value: 'jpg',
+  },
+  {
+    key: 'png',
+    value: 'png',
+  },
+  {
+    key: 'gifs',
+    value: 'gifs',
+  },
+  {
+    key: 'zip',
+    value: 'zip',
+  },
+  {
+    key: 'rar',
+    value: 'rar',
+  },
+  {
+    key: 'doc',
+    value: 'doc',
+  },
+  {
+    key: 'docx',
+    value: 'docx',
+  },
+  {
+    key: 'numbers',
+    value: 'numbers',
+  },
+  {
+    key: 'pdf',
+    value: 'pdf',
+  },
+  {
+    key: 'mp4',
+    value: 'mp4',
+  },
+  {
+    key: 'webm',
+    value: 'webm',
+  },
+  {
+    key: 'ogv',
+    value: 'ogv',
+  },
+  {
+    key: 'csv',
+    value: 'csv',
+  },
+  {
+    key: 'xlsm',
+    value: 'xlsm',
+  },
+  {
+    key: 'xlsx',
+    value: 'xlsx',
+  },
+  {
+    key: 'xls',
+    value: 'xls',
+  },
+  {
+    key: 'TXT',
+    value: 'TXT',
+  },
+  {
+    key: 'ppt',
+    value: 'ppt',
+  },
+  {
+    key: 'pptx',
+    value: 'pptx',
+  },
+  {
+    key: 'pages',
+    value: 'pages',
+  },
+  {
+    key: 'key',
+    value: 'key',
+  },
+  {
+    key: 'odds',
+    value: 'odds',
+  },
+  {
+    key: 'odt',
+    value: 'odt',
+  },
+  {
+    key: 'odp',
+    value: 'odp',
+  },
+]
+
 let inputContentVar = [
 
+]
+
+let typeCalendar = [
+  {
+    key: 'date_selection',
+    value: 'Date selection'
+  },
+  {
+    key: 'embedded',
+    value: 'Embedded'
+  },
+  {
+    key: 'start_end_date',
+    value: 'Start date to end date'
+  }
 ]
 
 let dropDownTitle = [
@@ -655,6 +1063,112 @@ let typeCheckbox = [
   }
 ]
 
+let dataSelectDateTime = [
+  {
+    key: 'today',
+    value: 'Today'
+  },
+  {
+    key: 'tomorrow',
+    value: 'Tomorrow'
+  },
+  {
+    key: 'day_after_tomorrow',
+    value: 'Day after tomorrow'
+  },
+  {
+    key: 'past',
+    value: 'Past'
+  },
+  {
+    key: 'future',
+    value: 'Future'
+  },
+  {
+    key: 'moon',
+    value: 'Moon'
+  },
+  {
+    key: 'fire',
+    value: 'Fire'
+  },
+  {
+    key: 'water',
+    value: 'Water'
+  },
+  {
+    key: 'wood',
+    value: 'Wood'
+  },
+  {
+    key: 'money',
+    value: 'Money'
+  },
+  {
+    key: 'soil',
+    value: 'Soil'
+  },
+  {
+    key: 'day',
+    value: 'Day'
+  }
+];
+
+let dataTypePullDown = [
+  {
+    key: 'customization',
+    value: 'Customization'
+  },
+  {
+    key: 'time_hm',
+    value: 'Time (H:m)'
+  },
+  {
+    key: 'date_ymd',
+    value: 'Date (Ymd)'
+  },
+  {
+    key: 'date_md',
+    value: 'Date (Md)'
+  },
+  {
+    key: 'date_ym',
+    value: 'Date (Ym)'
+  },
+  {
+    key: 'date_ymd_hm',
+    value: 'Date and time (Ymd H:m)'
+  },
+  {
+    key: 'dob_ymd',
+    value: 'Date of birth (Ymd)'
+  },
+  {
+    key: 'dob_ym',
+    value: 'Date of birth (Ym)'
+  },
+  {
+    key: 'timezone_from_to',
+    value: 'Time zone (H:m to H:m)'
+  },
+  {
+    key: 'period_from_to',
+    value: 'Period (Ymd to Ymd)'
+  },
+  {
+    key: 'prefectures',
+    value: 'Prefectures'
+  },
+  {
+    key: 'up_to_municipality',
+    value: 'Up to municipality'
+  },
+  {
+    key: 'comsume_api_response',
+    value: 'Consume API response'
+  }
+];
+
 const Scenario = () => {
   // states
   const [scenarioName, setScenarioName] = useState('');
@@ -674,17 +1188,49 @@ const Scenario = () => {
 
   const [isClickPlus, setIsClickPlus] = useState(false);
 
+  const [startDateClone, setStartDateClone] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+
   // user setting values
   const [dataMessages, setDataMessages] = useState([]);
+
+  const [dataPrefectures, setDataPrefectures] = useState([]);
+
+  const [botId, setBotId] = useState(Cookies.get('bot_id'));
+  const [scenarioId, setScenarioId] = useState(Cookies.get('scenario_id'));
+
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [messageNoti, setMessageNoti] = useState('');
   // side effects
+
   useEffect(() => {
-    document.title = 'Edit Scenario';
-    window.scrollTo(0, 0);
-  }, []);
+    setBotId(Cookies.get('bot_id'));
+    setScenarioId(Cookies.get('scenario_id'));
+  }, [])
+
+  // useEffect(() => {
+  //   api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`).then((res) => {
+  //     console.log(res.data.data);
+  //     setDataMessages(res.data.data?.conversation?.messages);
+  //   }).catch((error) => { console.error(error) });
+  // }, [])
+
 
   useEffect(() => {
     setDataMessages(dataClone.messages);
   }, [])
+
+  useEffect(() => {
+    api.get(`/api/v1/prefectures`).then((res) => {
+      // console.log(res.data.data);
+      setDataPrefectures(res.data.data);
+    }).catch((error) => { console.error(error) });
+  }, [])
+
+  useEffect(() => {
+    document.title = 'Edit Scenario';
+    window.scrollTo(0, 0);
+  }, []);
 
   function botUploadFile() {
     document.getElementById('ss-bot-file-upload').click();
@@ -724,6 +1270,7 @@ const Scenario = () => {
   // handle select message
   const handleSelectMessage = (index, belongTo, type) => {
     console.log(type, 'check type');
+    if (!type) return;
     let indexLastEle = dataMessages[index].message_content.length - 1;
 
     Array.isArray(type) ? setMessageType(type[type.length - 1]?.type) : setMessageType(type);
@@ -772,39 +1319,77 @@ const Scenario = () => {
   };
 
   // handle change bot statement type
-  const handleChangeBotStatementType = (e) => {
-    setMessageType(e.target.value);
-    dataMessages.forEach((message, index) => {
-      console.log(index, indexMessageSelect, 'checklkkkkasdlahjs');
-      if (indexMessageSelect && index === indexMessageSelect) {
-        message.message_content[0].type = e.target.value;
+  const handleChangeBotStatementType = (value) => {
+    setMessageType(value);
+    // dataMessages && dataMessages.forEach((message, index) => {
+    //   console.log(index, indexMessageSelect, value, message, 'checklkkkkasdlahjs');
+    //   if (indexMessageSelect && index === indexMessageSelect) {
+    //     message.message_content[0].type = value;
+    //   }
+    // });
+    let data = [...dataMessages];
+    if (data) {
+      for (let i = 0; i < data.length; i++) {
+        if (indexMessageSelect !== undefined && i === indexMessageSelect) {
+          console.log(i, indexMessageSelect, value, 'checklkkkkasdlahjs');
+          data[i].message_content[0].type = value;
+        }
       }
-    });
+    }
+    console.log(data, 'chekckkkajsdlajsld');
+    // setDataMessages([...data]);
   };
 
   const handleAddItemSetting = (messageType) => {
-    let indexLastEle = dataMessages[indexMessageSelect].message_content.length - 1;
+    let idMax = Math.max(...dataMessages[indexMessageSelect].message_content.map(item => item.id)) + 1;
     let typeTextInput;
-    if (messageType === 'text_input') typeTextInput = 'text';
-    dataMessages[indexMessageSelect].message_content.push(
-      {
-        id: indexLastEle,
-        type: messageType,
-        [messageType]: {
-          title_require: false,
-          type: typeTextInput
+    console.log(messageType);
+    if (messageType === 'zip_code_address') {
+      dataMessages[indexMessageSelect].message_content.push(
+        {
+          id: idMax,
+          type: messageType,
+          [messageType]: {
+            post_code: '',
+            use_drop_down: 'yes',
+            prefecture: '',
+            municipality: '',
+            address: '',
+            building_name: ''
+          }
         }
-      }
-    )
+      );
+    } else {
+      if (messageType === 'text_input') typeTextInput = 'text';
+
+      dataMessages[indexMessageSelect].message_content.push(
+        {
+          id: idMax,
+          type: messageType,
+          [messageType]: {
+            title_require: false,
+            type: typeTextInput
+          }
+        }
+      );
+    }
+
     setDataMessages([
       ...dataMessages]);
   }
 
   const handleCopyMessage = (index) => {
-    let messageCopy = dataMessages[index];
+    console.log(index);
+    let idMax = Math.max(...dataMessages.map(item => item.id)) + 1;
+    let arrMessageClone = [...dataMessages];
+    let message = arrMessageClone[index];
+    let dataObject = { ...message };
+    dataObject.id = idMax;
+    console.log(dataObject, 'check data object');
     setDataMessages([
       ...dataMessages,
-      messageCopy]);
+      dataObject
+    ]);
 
   }
 
@@ -845,8 +1430,42 @@ const Scenario = () => {
         id: idMax
       });
     }
+    setDataMessages([...dataMessages]);
+  }
 
+  const handleAddItemCustomizePullDown = (indexMessage, indexContent, contentType, pullDownType, name) => {
+    let arr = dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name];
+    console.log(arr, contentType);
+    if (arr === undefined || arr === null) {
+      dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name] = [];
+      arr = dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name];
+    }
+    let idMax;
+    if (arr.length !== 0) {
+      idMax = Math.max(...arr.map(item => item.id)) + 1;
+    } else {
+      idMax = 1;
+    }
 
+    arr.push({
+      id: idMax
+    });
+    setDataMessages([...dataMessages]);
+  }
+
+  const handleAddItemAgreeTerm = (indexMessage, indexContent, type, contentType) => {
+    let arr = dataMessages[indexMessage].message_content[indexContent][type][contentType];
+    if (arr === undefined || arr === null) {
+      dataMessages[indexMessage].message_content[indexContent][type][contentType] = [];
+      arr = dataMessages[indexMessage].message_content[indexContent][type][contentType];
+    }
+
+    arr.push({
+      title_comment: '', //string
+      title: '', //string
+      urls: '', //string
+      url_comment: '', //string
+    });
     setDataMessages([...dataMessages]);
   }
 
@@ -879,10 +1498,32 @@ const Scenario = () => {
     setDataMessages([...dataMessages]);
   }
 
-  const onChangeValueMessageContent = (indexMessage, indexContent, type, value, name, subField, indexSubField) => {
+  const handleDragEndPullDown = (result, idContent, type, contentType, subContentType) => {
+    console.log(result)
+    if (!result.destination) return;
+    // let messageArr = dataMessages.filter((message, index) => message.belong_to === 'user' && index === indexMessageSelect)[0].message_content
+    //   .filter(content => content.id === idContent)[0][type][contentType];
+    let messageArr = dataMessages[indexMessageSelect].message_content.filter(content => content.id === idContent)[0][type][contentType][subContentType]
+    const items = Array.from(messageArr);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    let indexItem;
+    for (let i = 0; i < dataMessages[indexMessageSelect].message_content.length; i++) {
+      if (dataMessages[indexMessageSelect].message_content[i].id === idContent) {
+        indexItem = i;
+      }
+    }
+    dataMessages[indexMessageSelect].message_content[indexItem][type][contentType][subContentType] = items;
+    setDataMessages([...dataMessages]);
+  }
+
+  const onChangeValueMessageContent = (indexMessage, indexContent, type, value, name, subField, indexSubField, subName) => {
     console.log(indexMessage, indexContent, type, name, subField, indexSubField, value);
 
-    if (indexSubField) {
+    if (subName) {
+      dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField][subName] = value;
+    } else if (indexSubField) {
       dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField] = value;
     } else if (subField) {
       dataMessages[indexMessage].message_content[indexContent][type][name][subField] = value;
@@ -895,17 +1536,101 @@ const Scenario = () => {
     setDataMessages([...dataMessages]);
   }
 
-  const handleRemoveItemRadioCheckbox = (indexMessage, indexContent, type, contentType, indexItem) => {
+  const onChangeFixedDate = (indexMessage, indexContent, type, value, name) => {
+
+    dataMessages[indexMessage].message_content[indexContent][type][name].push(moment(value).format('YYYY/MM/DD'));
+    console.log(dataMessages[indexMessage].message_content[indexContent][type][name])
+    dataMessages[indexMessage].message_content[indexContent][type].select_fixed_date = value;
+    setDataMessages([...dataMessages]);
+  }
+
+  const handleChangeValueRequireZipCode = (indexMessage, indexContent, type, value, name) => {
+    console.log(indexMessage, indexContent, type, value, name);
+    if (value === true && name === 'require') {
+      onChangeValueMessageContent(indexMessage, indexContent, type, false, 'all_items_require');
+      onChangeValueMessageContent(indexMessage, indexContent, type, value, 'require');
+    } else if (value === true && name === 'all_items_require') {
+      onChangeValueMessageContent(indexMessage, indexContent, type, false, 'require');
+      onChangeValueMessageContent(indexMessage, indexContent, type, value, 'all_items_require');
+    } else {
+      onChangeValueMessageContent(indexMessage, indexContent, type, value, name);
+    }
+  }
+
+  const handleRemoveItemContent = (indexMessage, indexContent, type, contentType, indexItem) => {
     let newArrRadio = dataMessages[indexMessage].message_content[indexContent][type][contentType].filter((item, index) => index !== indexItem);
-    console.log(newArrRadio, 'check newArrRadio');
     dataMessages[indexMessage].message_content[indexContent][type][contentType] = newArrRadio;
+    setDataMessages([...dataMessages]);
+  }
+
+  const handleRemoveItemCustomizePullDown = (indexMessage, indexContent, contentType, pullDownType, name, indexPullDown) => {
+    let newArrRadio = dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name].filter((item, index) => index !== indexPullDown);
+    dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name] = newArrRadio;
+    setDataMessages([...dataMessages]);
+  }
+
+  const handleRemoveItemZipCodeAddress = (indexMessage, indexContent, contentType, field) => {
+    console.log(indexMessage, indexContent, contentType, field);
+    let newArr = dataMessages[indexMessage].message_content[indexContent][contentType];
+    delete newArr[field];
+    console.log(newArr);
+    dataMessages[indexMessage].message_content[indexContent][contentType] = newArr;
+    setDataMessages([...dataMessages]);
+  }
+
+  const onChangeValueNameMessage = (indexMessage, vari, value) => {
+    dataMessages[indexMessage][vari] = value;
+    setDataMessages([...dataMessages]);
+  }
+
+  const onClickSaveScenario = () => {
+    console.log('asads');
+    let data = {
+      conversation: {
+        messages: [...dataMessages]
+      }
+    }
+    api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
+      console.log(res.data);
+      setIsOpenNoti(true);
+      if (res.data.code === 1) {
+        setMessageNoti('Save scenario successfully');
+      } else if (res.data.code === 2) {
+        setMessageNoti(res.data.message);
+      }
+      setTimeout(() => {
+        setIsOpenNoti(false);
+        setMessageNoti('');
+      }, 2000);
+    })
+  }
+
+  const onClickCreateBotStatement = (indexMessage, belongTo) => {
+    console.log(dataMessages);
+    let dataMessages = [];
+    if (indexMessage === 0) {
+      dataMessages = [
+        {
+          id: 1,
+          hidden: false,
+          belong_to: belongTo,
+          message_content: [
+            {
+              id: 1,
+              type: 'text_input',
+            }
+          ]
+        }
+      ];
+    }
+
     setDataMessages([...dataMessages]);
   }
 
   return (
     <div className="content">
       <div className="ss-actions">
-        <Button>Save</Button>
+        <Button onClick={() => onClickSaveScenario()}>Save</Button>
         <Button>Save and preview</Button>
       </div>
       <Row>
@@ -926,140 +1651,213 @@ const Scenario = () => {
                   {/* Overview scenario */}
                   <div style={{ height: 'calc(100% - 44px)', backgroundColor: '#f6fbff' }}>
                     <div className="ss-overview-detail">
-                      {console.log(dataMessages)}
-                      {dataMessages.map((message, index) => {
+                      {!dataMessages &&
+                        <div className="ss-add-action-wrapper-empty-data">
+                          <MDBIcon fas icon="plus-circle" className="ss-add-icon"></MDBIcon>
+                          <div className="ss-add-message-option-wrapper">
+                            <div className="ss-option-wrapper" onClick={() => onClickCreateBotStatement(0, 'bot')}>
+                              <MDBIcon
+                                fas
+                                icon="comment"
+                                className="ss-add-option-icon"
+                              ></MDBIcon>
+                              <span>Bot statement</span>
+                            </div>
+                            <div className="ss-option-wrapper" onClick={() => onClickCreateBotStatement(0, 'user')}>
+                              <MDBIcon
+                                fas
+                                icon="comment"
+                                className="ss-add-option-icon"
+                              ></MDBIcon>
+                              <span>User input</span>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                      {dataMessages && dataMessages.map((message, index) => {
                         let content;
                         if (message.belong_to === 'bot') content = message.message_content[0];
-
+                        console.log(content);
                         return message.belong_to === 'bot' ? (
-                          <div key={index} className="ss-bot-chat-wrapper ss-message-wrapper">
+                          <div id={`message_${index}`} key={index} className="ss-bot-chat-wrapper ss-message-wrapper">
                             <div
                               className={`ss-bot-chat ss-message ss-message--select ss-message-${index}`}
                             >
                               <div
                                 className="ss-bot-chat-detail ss-message__detail"
                                 onClick={() =>
-                                  handleSelectMessage(index, message.belong_to, content.type)
+                                  handleSelectMessage(index, message.belong_to, content?.type)
                                 }
                               >
                                 <img className="ss-bot-ava" src={icon} alt="" />
-                                {/* bot: type == 'text' */}
-                                {content.type === 'text' && (
-                                  <textarea
-                                    className="ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value"
-                                    value={botTextValue}
-                                    readOnly
-                                  ></textarea>
-                                )}
-                                {/* bot: type == 'file' */}
-                                {/* file type: jpeg, jpg, png */}
-                                {/* {content.type === 'file' && (
-                                <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-img">
-                                  <img
-                                    src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/63354faaba626.jpg"
-                                    alt=""
-                                  />
-                                </div>
-                              )} */}
+                                {content ?
+                                  <React.Fragment>
+                                    {/* bot: type == 'text_input' */}
+                                    {content.type === 'text_input' && (
+                                      <textarea
+                                        className="ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value"
+                                        value={botTextValue}
+                                        readOnly
+                                      ></textarea>
+                                    )}
+                                    {/* bot: type == 'file' */}
+                                    {/* file type: jpeg, jpg, png */}
+                                    {/* {content.type === 'file' && (
+                                      <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-img">
+                                        <img
+                                          src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/63354faaba626.jpg"
+                                          alt=""
+                                        />
+                                      </div>
+                                    )} */}
 
-                                {/* file type: gif, mp4 */}
-                                {/* {content.type === 'file' && (
-                                <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-video">
-                                  <video
-                                    src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/633551125f613.mp4"
-                                    controls="controls"
-                                  ></video>
-                                </div>
-                              )} */}
+                                    {/* file type: gif, mp4 */}
+                                    {/* {content.type === 'file' && (
+                                      <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-video">
+                                        <video
+                                          src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/633551125f613.mp4"
+                                          controls="controls"
+                                        ></video>
+                                      </div>
+                                    )} */}
 
-                                {/* file type: pdf */}
-                                {content.type === 'file' && (
-                                  // <textarea
-                                  //   className="ss-bot-chat-detail-content ss-message__content--bot-file-pdf ss-input-value"
-                                  //   value={
-                                  //     'https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/6335523536dd4.pdf'
-                                  //   }
-                                  //   readOnly
-                                  // ></textarea>
-                                  <span
-                                    style={{
-                                      cursor: 'pointer',
-                                      color: 'blue',
-                                      fontWeight: '400',
-                                      fontSize: '15px',
-                                    }}
-                                  >
-                                    Download this file
-                                  </span>
-                                )}
+                                    {/* file type: pdf */}
+                                    {content.type === 'file' && (
+                                      // <textarea
+                                      //   className="ss-bot-chat-detail-content ss-message__content--bot-file-pdf ss-input-value"
+                                      //   value={
+                                      //     'https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/6335523536dd4.pdf'
+                                      //   }
+                                      //   readOnly
+                                      // ></textarea>
+                                      <span
+                                        style={{
+                                          cursor: 'pointer',
+                                          color: 'blue',
+                                          fontWeight: '400',
+                                          fontSize: '15px',
+                                        }}
+                                      >
+                                        Download this file
+                                      </span>
+                                    )}
 
-                                {/* bot: type == 'email' */}
-                                {content.type === 'email' && (
-                                  <textarea
-                                    className="ss-bot-chat-detail-content ss-message__content--bot-email ss-input-value"
-                                    value={''}
-                                    readOnly
-                                  ></textarea>
-                                )}
+                                    {/* bot: type == 'email' */}
+                                    {content.type === 'email' && (
+                                      <textarea
+                                        className="ss-bot-chat-detail-content ss-message__content--bot-email ss-input-value"
+                                        value={''}
+                                        readOnly
+                                      ></textarea>
+                                    )}
 
-                                {/* bot: type == 'script' */}
-                                {content.type === 'script' && (
-                                  <textarea
-                                    className="ss-bot-chat-detail-content ss-message__content--bot-script ss-input-value"
-                                    value={botScriptValue}
-                                    readOnly
-                                  ></textarea>
-                                )}
-                                {/* bot: type == 'delay' */}
-                                {content.type === 'delay' && (
-                                  <textarea
-                                    className="ss-bot-chat-detail-content ss-message__content--bot-delay ss-input-value"
-                                    value={`${botDelayValue} 秒`}
-                                    readOnly
-                                  ></textarea>
-                                )}
-
-                                <div className="ss-chat-option">
-                                  <MDBIcon
-                                    fas
-                                    icon="pencil-alt"
-                                    // style={{ marginTop: '10px' }}
-                                    onClick={() => handleEditIconClick(index)}
-                                  ></MDBIcon>
-                                  <MDBIcon
-                                    fas
-                                    icon="grip-vertical"
-                                    style={{ marginTop: '10px' }}
-                                  ></MDBIcon>
-                                  <div
-                                    className={`ss-edit-option-wrapper ss-edit-option-wrapper-${index}`}
-                                  >
-                                    <div onClick={() => handleCopyMessage(index)} className="ss-option-wrapper">
+                                    {/* bot: type == 'script' */}
+                                    {content.type === 'script' && (
+                                      <textarea
+                                        className="ss-bot-chat-detail-content ss-message__content--bot-script ss-input-value"
+                                        value={botScriptValue}
+                                        readOnly
+                                      ></textarea>
+                                    )}
+                                    {/* bot: type == 'delay' */}
+                                    {content.type === 'delay' && (
+                                      <textarea
+                                        className="ss-bot-chat-detail-content ss-message__content--bot-delay ss-input-value"
+                                        value={`${botDelayValue} 秒`}
+                                        readOnly
+                                      ></textarea>
+                                    )}
+                                    <div className="ss-chat-option">
                                       <MDBIcon
                                         fas
-                                        icon="copy"
-                                        className="ss-add-option-icon"
+                                        icon="pencil-alt"
+                                        // style={{ marginTop: '10px' }}
+                                        onClick={() => handleEditIconClick(index)}
                                       ></MDBIcon>
-                                      <span>Copy</span>
-                                    </div>
-                                    <div className="ss-option-wrapper">
                                       <MDBIcon
                                         fas
-                                        icon="eye-slash"
-                                        className="ss-add-option-icon"
+                                        icon="grip-vertical"
+                                        style={{ marginTop: '10px' }}
                                       ></MDBIcon>
-                                      <span>Hidden</span>
+                                      <div
+                                        className={`ss-edit-option-wrapper ss-edit-option-wrapper-${index}`}
+                                      >
+                                        <div onClick={() => handleCopyMessage(index)} className="ss-option-wrapper">
+                                          <MDBIcon
+                                            fas
+                                            icon="copy"
+                                            className="ss-add-option-icon"
+                                          ></MDBIcon>
+                                          <span>Copy</span>
+                                        </div>
+                                        <div className="ss-option-wrapper">
+                                          <MDBIcon
+                                            fas
+                                            icon="eye-slash"
+                                            className="ss-add-option-icon"
+                                          ></MDBIcon>
+                                          <span>Hidden</span>
+                                        </div>
+                                        <div className="ss-option-wrapper">
+                                          <MDBIcon
+                                            fas
+                                            icon="trash"
+                                            className="ss-add-option-icon"
+                                          ></MDBIcon>
+                                          <span>Delete</span>
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div className="ss-option-wrapper">
+                                  </React.Fragment> :
+                                  <React.Fragment>
+                                    <textarea
+                                      className="ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value"
+                                      value={botTextValue}
+                                      readOnly
+                                    ></textarea>
+                                    <div className="ss-chat-option">
                                       <MDBIcon
                                         fas
-                                        icon="trash"
-                                        className="ss-add-option-icon"
+                                        icon="pencil-alt"
+                                        // style={{ marginTop: '10px' }}
+                                        onClick={() => handleEditIconClick(index)}
                                       ></MDBIcon>
-                                      <span>Delete</span>
+                                      <MDBIcon
+                                        fas
+                                        icon="grip-vertical"
+                                        style={{ marginTop: '10px' }}
+                                      ></MDBIcon>
+                                      <div
+                                        className={`ss-edit-option-wrapper ss-edit-option-wrapper-${index}`}
+                                      >
+                                        <div onClick={() => handleCopyMessage(index)} className="ss-option-wrapper">
+                                          <MDBIcon
+                                            fas
+                                            icon="copy"
+                                            className="ss-add-option-icon"
+                                          ></MDBIcon>
+                                          <span>Copy</span>
+                                        </div>
+                                        <div className="ss-option-wrapper">
+                                          <MDBIcon
+                                            fas
+                                            icon="eye-slash"
+                                            className="ss-add-option-icon"
+                                          ></MDBIcon>
+                                          <span>Hidden</span>
+                                        </div>
+                                        <div className="ss-option-wrapper">
+                                          <MDBIcon
+                                            fas
+                                            icon="trash"
+                                            className="ss-add-option-icon"
+                                          ></MDBIcon>
+                                          <span>Delete</span>
+                                        </div>
+                                      </div>
                                     </div>
-                                  </div>
-                                </div>
+                                  </React.Fragment>
+                                }
                               </div>
                               <div className="ss-add-action-wrapper">
                                 <MDBIcon fas icon="plus-circle" className="ss-add-icon"></MDBIcon>
@@ -1083,7 +1881,9 @@ const Scenario = () => {
                                 </div>
                               </div>
                             </div>
+
                           </div>
+
                         ) : (
                           <div key={index} className="ss-user-chat-wrapper ss-message-wrapper">
                             <div
@@ -2217,7 +3017,6 @@ const Scenario = () => {
                           </div>
                         )
                       })}
-
                     </div>
                   </div>
                 </div>
@@ -2234,9 +3033,9 @@ const Scenario = () => {
                           id="ss-bot-statement-type"
                           className="ss-bot-statement-type ss-input-value"
                           value={messageType}
-                          onChange={handleChangeBotStatementType}
+                          onChange={e => handleChangeBotStatementType(e.target.value)}
                         >
-                          <option value="text">Text</option>
+                          <option value="text_input">Text</option>
                           <option value="file">File</option>
                           <option value="email">Email</option>
                           <option value="script">Script</option>
@@ -2244,8 +3043,8 @@ const Scenario = () => {
                           {/* <option value="api_link_age">Text</option> Pending */}
                         </select>
 
-                        {/* type: text */}
-                        {messageType === 'text' && (
+                        {/* type: text_input */}
+                        {messageType === 'text_input' && (
                           <div className="ss-bot-statement-wrapper">
                             <div
                               id="ss-bot-statement-type-text"
@@ -2407,11 +3206,10 @@ const Scenario = () => {
                             <span>Name</span>
                             <span className="ss-user-setting__name-error" style={{ marginLeft: '5px' }}>* required</span>
                           </div>
-                          <input
-                            type="text"
-                            name="ss-user-setting__name"
+                          <InputCustom
                             placeholder="Enter chat name"
-                            className="ss-user-setting__name-input ss-input-value"
+                            onChange={value => onChangeValueNameMessage(indexMessageSelect, 'name', value)}
+                            value={dataMessages[indexMessageSelect].name}
                           />
                         </div>
                       </div>
@@ -2419,11 +3217,10 @@ const Scenario = () => {
                         <Droppable droppableId='messages'>
                           {(provided) => (
                             <div className="ss-user-setting__main" {...provided.droppableProps} ref={provided.innerRef}>
-                              {
+                              {dataMessages &&
                                 dataMessages
                                   .filter((message, index) => message.belong_to === 'user' && index === indexMessageSelect)[0].message_content
                                   .map((content, indexContent, arr) => {
-                                    console.log(content, indexContent);
                                     let textInput = content.text_input;
                                     let label = content.label;
                                     let textarea = content.textarea;
@@ -2432,7 +3229,7 @@ const Scenario = () => {
                                     let pullDown = content.pull_down;
                                     let zipCodeAddress = content.zip_code_address;
                                     let attachingFile = content.attaching_file;
-                                    let calender = content.calendar;
+                                    let calendar = content.calendar;
                                     let agreeTerm = content.agree_term;
                                     return (
                                       <Draggable draggable={true} key={content.id} draggableId={content.id + ''} index={indexContent}>
@@ -2495,6 +3292,7 @@ const Scenario = () => {
                                                     <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                       <SelectCustom
                                                         id="title"
+                                                        style={{ width: '49%' }}
                                                         value={textInput.title_require}
                                                         data={dropDownTitle}
                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'text_input', value, 'title_require')}
@@ -2502,6 +3300,7 @@ const Scenario = () => {
                                                       />
                                                       <SelectCustom
                                                         id="type"
+                                                        style={{ width: '49%' }}
                                                         value={textInput.type}
                                                         data={type}
                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'text_input', value, 'type')}
@@ -2513,11 +3312,10 @@ const Scenario = () => {
                                                   {textInput?.title_require === true &&
                                                     <div className="ss-user-setting__item-bottom">
                                                       <div className="ss-user-setting__item-select-bottom-wrapper">
-                                                        <input
-                                                          type="text"
-                                                          name="ss-user-setting__item-text_input-use-api"
-                                                          className="ss-input-value"
+                                                        <InputCustom
                                                           placeholder="title"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
+                                                          value={textInput.title}
                                                         />
                                                       </div>
                                                     </div>
@@ -2540,19 +3338,25 @@ const Scenario = () => {
                                                           placeholder="0000"
                                                           className="ss-user-setting-input-limit-character"
                                                           min={1}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'character_limit_from')}
+                                                          value={textInput[textInput.type].character_limit_from}
                                                         />
                                                         <span style={{ fontSize: '30px', marginLeft: '10px', opacity: '0.4' }}>~</span>
                                                         <InputNum
                                                           placeholder="0000"
                                                           className="ss-user-setting-input-limit-character"
                                                           min={1}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'character_limit_to')}
+                                                          value={textInput[textInput.type].character_limit_to}
                                                         />
                                                       </div>
                                                       <div className="ss-user-setting__item-bottom">
                                                         <InputDouble
-                                                          leftWidth={'50%'}
+                                                          rightWidth={'50%'}
                                                           icon="plus-circle"
-                                                          onChange={(value, name) => console.log(value, name)}
+                                                          valueLeft={textInput[textInput.type].placeholder}
+                                                          valueRight={textInput[textInput.type].comment}
+                                                          onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, name === 'left' ? 'placeholder' : 'comment')}
                                                           onClickIcon={() => setIsClickPlus(!isClickPlus)}
                                                           placeholder={['placeholder', 'comment']}
                                                         />
@@ -2563,11 +3367,10 @@ const Scenario = () => {
                                                   {textInput.type === 'urls' &&
                                                     <div className="ss-user-setting__item-bottom">
                                                       <div className="ss-user-setting__item-select-bottom-wrapper">
-                                                        <input
-                                                          type="text"
-                                                          name="ss-user-setting__item-text_input-use-api"
-                                                          className="ss-input-value"
+                                                        <InputCustom
                                                           placeholder="placeholder"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type)}
+                                                          value={textInput[textInput.type]}
                                                         />
                                                       </div>
                                                     </div>
@@ -2576,11 +3379,10 @@ const Scenario = () => {
                                                   {textInput.type === 'email_address' &&
                                                     <div className="ss-user-setting__item-bottom">
                                                       <div className="ss-user-setting__item-select-bottom-wrapper">
-                                                        <input
-                                                          type="text"
-                                                          name="ss-user-setting__item-text_input-use-api"
-                                                          className="ss-input-value"
+                                                        <InputCustom
                                                           placeholder="placeholder"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type)}
+                                                          value={textInput[textInput.type]}
                                                         />
                                                       </div>
                                                     </div>
@@ -2589,24 +3391,18 @@ const Scenario = () => {
                                                   {textInput.type === 'email_confirmation' &&
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-bottom">
-                                                        <div className="ss-user-setting__item-select-bottom-wrapper">
-                                                          <input
-                                                            type="text"
-                                                            name="ss-user-setting__item-text_input-use-api"
-                                                            className="ss-input-value"
-                                                            placeholder="placeholder"
-                                                          />
-                                                        </div>
+                                                        <InputCustom
+                                                          placeholder="placeholder"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'cfEmlAdd_email')}
+                                                          value={textInput[textInput.type].cfEmlAdd_email}
+                                                        />
                                                       </div>
                                                       <div className="ss-user-setting__item-bottom">
-                                                        <div className="ss-user-setting__item-select-bottom-wrapper">
-                                                          <input
-                                                            type="text"
-                                                            name="ss-user-setting__item-text_input-use-api"
-                                                            className="ss-input-value"
-                                                            placeholder="placeholder"
-                                                          />
-                                                        </div>
+                                                        <InputCustom
+                                                          placeholder="placeholder"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'cfEmlAdd_confirm_email')}
+                                                          value={textInput[textInput.type].cfEmlAdd_confirm_email}
+                                                        />
                                                       </div>
                                                     </React.Fragment>
                                                   }
@@ -2618,7 +3414,7 @@ const Scenario = () => {
                                                           id="range"
                                                           value={textInput.phone_number.withHyphen}
                                                           data={hyphenPhoneNumber}
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'text_input', value, 'phone_number', 'withHyphen')}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'withHyphen')}
                                                           keyValue="key"
                                                         />
                                                       </div>
@@ -2627,25 +3423,22 @@ const Scenario = () => {
                                                         <React.Fragment>
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper ss-user-setting-phone-number-hyphens">
-                                                              <input
-                                                                type="text"
-                                                                name="ss-user-setting__item-text_input-use-api"
-                                                                className="ss-input-value"
+                                                              <InputCustom
                                                                 placeholder="placeholder"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'number1')}
+                                                                value={textInput[textInput.type].number1}
                                                               />
                                                               <span style={{ fontSize: '20px' }}>-</span>
-                                                              <input
-                                                                type="text"
-                                                                name="ss-user-setting__item-text_input-use-api"
-                                                                className="ss-input-value"
+                                                              <InputCustom
                                                                 placeholder="placeholder"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'number2')}
+                                                                value={textInput[textInput.type].number2}
                                                               />
                                                               <span style={{ fontSize: '20px' }}>-</span>
-                                                              <input
-                                                                type="text"
-                                                                name="ss-user-setting__item-text_input-use-api"
-                                                                className="ss-input-value"
+                                                              <InputCustom
                                                                 placeholder="placeholder"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'number3')}
+                                                                value={textInput[textInput.type].number3}
                                                               />
                                                             </div>
                                                           </div>
@@ -2656,11 +3449,10 @@ const Scenario = () => {
                                                         <React.Fragment>
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper">
-                                                              <input
-                                                                type="text"
-                                                                name="ss-user-setting__item-text_input-use-api"
-                                                                className="ss-input-value"
+                                                              <InputCustom
                                                                 placeholder="placeholder"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'number')}
+                                                                value={textInput[textInput.type].number}
                                                               />
                                                             </div>
                                                           </div>
@@ -2677,21 +3469,24 @@ const Scenario = () => {
                                                           placeholder="0000"
                                                           className="ss-user-setting-input-limit-character"
                                                           min={1}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'character_limit_from')}
+                                                          value={textInput[textInput.type].character_limit_from}
                                                         />
                                                         <span style={{ fontSize: '30px', marginLeft: '10px', opacity: '0.4' }}>~</span>
                                                         <InputNum
                                                           placeholder="0000"
                                                           className="ss-user-setting-input-limit-character"
                                                           min={1}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'character_limit_to')}
+                                                          value={textInput[textInput.type].character_limit_to}
                                                         />
                                                       </div>
                                                       <div className="ss-user-setting__item-bottom">
                                                         <div className="ss-user-setting__item-select-bottom-wrapper ss-input-text-comment">
-                                                          <input
-                                                            type="text"
-                                                            name="ss-user-setting__name"
-                                                            placeholder="Enter chat name"
-                                                            className="ss-user-setting__item-input-bottom ss-input-value"
+                                                          <InputCustom
+                                                            placeholder="placeholder"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'password')}
+                                                            value={textInput[textInput.type].confirm_password}
                                                           />
                                                         </div>
                                                       </div>
@@ -2699,11 +3494,10 @@ const Scenario = () => {
                                                       {(textInput.type === 'password_confirmation') && (
                                                         <div className="ss-user-setting__item-bottom">
                                                           <div className="ss-user-setting__item-select-bottom-wrapper ss-input-text-comment">
-                                                            <input
-                                                              type="text"
-                                                              name="ss-user-setting__name"
-                                                              placeholder="Enter chat name"
-                                                              className="ss-user-setting__item-input-bottom ss-input-value"
+                                                            <InputCustom
+                                                              placeholder="placeholder"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'confirm_password')}
+                                                              value={textInput[textInput.type].confirm_password}
                                                             />
                                                           </div>
                                                         </div>
@@ -2720,6 +3514,8 @@ const Scenario = () => {
                                                       className="ss-user-setting-item-textarea-label ss-input-value"
                                                       placeholder="input"
                                                       rows="5"
+                                                      value={label.lbl_content}
+                                                      onChange={e => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.value, 'lbl_content')}
                                                     ></textarea>
                                                   </div>
                                                 </>
@@ -2760,6 +3556,7 @@ const Scenario = () => {
                                                     <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                       <SelectCustom
                                                         id="title"
+                                                        style={{ width: '49%' }}
                                                         value={textarea?.title_require}
                                                         data={dropDownTitle}
                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'textarea', value, 'title_require')}
@@ -2767,6 +3564,7 @@ const Scenario = () => {
                                                       />
                                                       <SelectCustom
                                                         id="type"
+                                                        style={{ width: '49%' }}
                                                         value={textarea.type}
                                                         data={typeTextarea}
                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'textarea', value, 'type')}
@@ -2778,11 +3576,10 @@ const Scenario = () => {
                                                   {textarea.title_require === true &&
                                                     <div className="ss-user-setting__item-bottom">
                                                       <div className="ss-user-setting__item-select-bottom-wrapper">
-                                                        <input
-                                                          type="text"
-                                                          name="ss-user-setting__item-text_input-use-api"
-                                                          className="ss-input-value"
+                                                        <InputCustom
                                                           placeholder="title"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
+                                                          value={textarea?.title}
                                                         />
                                                       </div>
                                                     </div>
@@ -2817,7 +3614,7 @@ const Scenario = () => {
                                                         placeholder="placeholder"
                                                         rows="5"
                                                         value={textarea.text_input?.content}
-                                                        onChange={e => onChangeValueMessageContent(indexMessageSelect, indexContent, 'textarea', e.target.value, 'text_input', 'content')}
+                                                        onChange={e => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.value, 'text_input', 'content')}
                                                       ></textarea>
                                                     </div>
                                                   )}
@@ -2827,7 +3624,7 @@ const Scenario = () => {
                                                       <SelectCustom
                                                         id="range"
                                                         value={textarea.consume_api_response}
-                                                        data={[]}
+                                                        data={dataConsumeApiResponse}
                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'textarea', value, 'text_input', 'consume_api_response')}
                                                         keyValue="key"
                                                       />
@@ -2868,12 +3665,14 @@ const Scenario = () => {
                                                     <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                       <SelectCustom
                                                         id="title"
+                                                        style={{ width: '49%' }}
                                                         value={radioButton?.title_require}
                                                         data={dropDownTitle}
                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'radio_button', value, 'title_require')}
                                                       />
                                                       <SelectCustom
                                                         id="type"
+                                                        style={{ width: '49%' }}
                                                         value={radioButton?.type}
                                                         data={typeRadio}
                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'radio_button', value, 'type')}
@@ -2883,11 +3682,10 @@ const Scenario = () => {
                                                   {/* radioButton: withTitle = true */}
                                                   {radioButton.title_require === true &&
                                                     <div className="ss-user-setting__item-bottom">
-                                                      <input
-                                                        type="text"
-                                                        name="ss-user-setting__item-text_input-use-api"
-                                                        className="ss-input-value ss-user-setting-item"
+                                                      <InputCustom
                                                         placeholder="title"
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
+                                                        value={radioButton?.title}
                                                       />
                                                     </div>
                                                   }
@@ -2897,7 +3695,7 @@ const Scenario = () => {
                                                       <SelectCustom
                                                         id="range"
                                                         value={radioButton.consume_api_response}
-                                                        data={[]}
+                                                        data={dataConsumeApiResponse}
                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'radioButton', value, 'consume_api_response')}
                                                         keyValue="key"
                                                       />
@@ -2928,21 +3726,21 @@ const Scenario = () => {
                                                                               {radioButton.type === 'radio_button_img' &&
                                                                                 <React.Fragment>
                                                                                   <div className="ss-user-setting__item-bottom">
-                                                                                    <input
-                                                                                      type="text"
-                                                                                      name="ss-user-setting__item-text_input-use-api"
-                                                                                      className="ss-input-value ss-user-setting-item"
+                                                                                    <InputCustom
                                                                                       placeholder="title"
+                                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, 'img')}
+                                                                                      value={radioButton[radioButton.type][indexRadio].img}
                                                                                     />
                                                                                   </div>
                                                                                   <InputDouble
                                                                                     classCustom="ss-user-radio-custom-class"
-                                                                                    // leftWidth={'100%'}
-                                                                                    onChange={(value, name) => console.log(value, name)}
-                                                                                    onClickIcon={() => handleRemoveItemRadioCheckbox(indexMessageSelect, indexContent, content.type, radioButton.type, indexRadio)}
+                                                                                    onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, name === 'left' ? 'text' : 'value')}
+                                                                                    onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, radioButton.type, indexRadio)}
                                                                                     icon={array.length >= 2 ? "times-circle" : ""}
                                                                                     placeholder={['title', 'value']}
                                                                                     classIcon="ss-plus-circle-option-icon-times"
+                                                                                    valueLeft={radioButton[radioButton.type][indexRadio].text}
+                                                                                    valueRight={radioButton[radioButton.type][indexRadio].value}
                                                                                   />
                                                                                   <CheckboxCustom
                                                                                     label="Initial selection setting"
@@ -2955,16 +3753,17 @@ const Scenario = () => {
                                                                                 <React.Fragment>
                                                                                   <InputDouble
                                                                                     classCustom="ss-user-radio-custom-class"
-                                                                                    // leftWidth={'100%'}
                                                                                     icon={array.length >= 2 ? "times-circle" : ""}
-                                                                                    onChange={(value, name) => console.log(value, name)}
+                                                                                    onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, name === 'left' ? 'text' : 'value')}
+                                                                                    valueLeft={radioButton[radioButton.type][indexRadio].text}
+                                                                                    valueRight={radioButton[radioButton.type][indexRadio].value}
                                                                                     placeholder={['title', 'value']}
                                                                                     classIcon="ss-plus-circle-option-icon-times"
-                                                                                    onClickIcon={() => handleRemoveItemRadioCheckbox(indexMessageSelect, indexContent, content.type, radioButton.type, indexRadio)}
+                                                                                    onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, radioButton.type, indexRadio)}
                                                                                   />
                                                                                   <CheckboxCustom
                                                                                     label="Initial selection setting"
-                                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'radio_button', value, radioButton.type, indexRadio, 'initial_selection')}
+                                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, 'initial_selection')}
                                                                                     value={radioButton[radioButton.type][indexRadio].initial_selection}
                                                                                   />
                                                                                 </React.Fragment>
@@ -3026,12 +3825,14 @@ const Scenario = () => {
                                                     <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                       <SelectCustom
                                                         id="title"
+                                                        style={{ width: '49%' }}
                                                         value={checkbox?.title_require}
                                                         data={dropDownTitle}
                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
                                                       />
                                                       <SelectCustom
                                                         id="type"
+                                                        style={{ width: '49%' }}
                                                         value={checkbox?.type}
                                                         data={typeCheckbox}
                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
@@ -3080,7 +3881,7 @@ const Scenario = () => {
                                                       <SelectCustom
                                                         id="range"
                                                         value={checkbox.consume_api_response}
-                                                        data={[]}
+                                                        data={dataConsumeApiResponse}
                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'checkbox', value, 'consume_api_response')}
                                                         keyValue="key"
                                                       />
@@ -3117,8 +3918,10 @@ const Scenario = () => {
                                                                                   </div>
                                                                                   <InputDouble
                                                                                     classCustom="ss-user-radio-custom-class"
-                                                                                    onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'checkbox_img_title' : 'checkbox_img_value')}
-                                                                                    onClickIcon={() => handleRemoveItemRadioCheckbox(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
+                                                                                    onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'text' : 'value')}
+                                                                                    onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
+                                                                                    valueLeft={checkbox[checkbox.type][indexCheckbox].text}
+                                                                                    valueRight={checkbox[checkbox.type][indexCheckbox].value}
                                                                                     icon={array.length >= 2 ? "times-circle" : ""}
                                                                                     placeholder={['title', 'value']}
                                                                                     classIcon="ss-plus-circle-option-icon-times"
@@ -3135,10 +3938,12 @@ const Scenario = () => {
                                                                                   <InputDouble
                                                                                     classCustom="ss-user-radio-custom-class"
                                                                                     icon={array.length >= 2 ? "times-circle" : ""}
-                                                                                    onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'default_text' : 'default_value')}
+                                                                                    onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'text' : 'value')}
+                                                                                    valueLeft={checkbox[checkbox.type][indexCheckbox].text}
+                                                                                    valueRight={checkbox[checkbox.type][indexCheckbox].value}
                                                                                     placeholder={['text', 'value']}
                                                                                     classIcon="ss-plus-circle-option-icon-times"
-                                                                                    onClickIcon={() => handleRemoveItemRadioCheckbox(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
+                                                                                    onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
                                                                                   />
                                                                                   <CheckboxCustom
                                                                                     label="Initial selection setting"
@@ -3173,7 +3978,7 @@ const Scenario = () => {
                                               )}
                                               {/* user: type = 'zip_code_address' */}
                                               {content.type === 'zip_code_address' && (
-                                                <>
+                                                <React.Fragment>
                                                   <div className="ss-user-setting__item-text_input-top">
                                                     <div className="ss-user-setting__item-text_input-save-variable-wrapper">
                                                       <CheckboxCustom
@@ -3207,14 +4012,14 @@ const Scenario = () => {
                                                       <div>
                                                         <CheckboxCustom
                                                           label="Required"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
+                                                          onChange={value => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, content.type, value, 'require')}
                                                           value={zipCodeAddress.require}
                                                         />
                                                       </div>
                                                       <div className="ss-user-setting__item-text_input-use-api-required">
                                                         <CheckboxCustom
                                                           label="All items required"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'all_items_require')}
+                                                          onChange={value => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, content.type, value, 'all_items_require')}
                                                           value={zipCodeAddress.all_items_require}
                                                         />
                                                       </div>
@@ -3227,87 +4032,1247 @@ const Scenario = () => {
                                                       />
                                                     </div>
                                                   </div>
+                                                  {zipCodeAddress.post_code !== undefined && (
+                                                    zipCodeAddress.split_postal_code ?
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <InputCustom
+                                                          label="Post code"
+                                                          className={"ss-user-setting__item-input-zip-code"}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code')}
+                                                          onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'post_code')}
+                                                          value={zipCodeAddress.post_code}
+                                                          icon="times-circle"
+                                                          placeholder="000 000"
+                                                          classIcon="ss-plus-circle-option-icon-times"
+                                                        />
+                                                      </div> :
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <InputCustom
+                                                          label="Post code"
+                                                          className={"ss-user-setting__item-input-zip-code"}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code')}
+                                                          value={zipCodeAddress.post_code}
+                                                          placeholder="000"
+                                                          style={{ width: '17%', marginRight: '4%' }}
+                                                        />
+                                                        <InputCustom
+                                                          className={"ss-user-setting__item-input-zip-code"}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code')}
+                                                          value={zipCodeAddress.post_code}
+                                                          placeholder="0000"
+                                                          style={{ width: '20%', marginRight: '34%' }}
+                                                        />
+                                                        <MDBIcon
+                                                          style={{ width: '5%' }}
+                                                          // onClick={onClickIcon}
+                                                          onClick={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'post_code')}
+                                                          fas
+                                                          icon="times-circle"
+                                                          className={"ss-plus-circle-option-icon-times"}
+                                                        />
+                                                      </div>
+                                                  )}
+                                                  {zipCodeAddress.prefecture !== undefined &&
+                                                    <div className="ss-user-setting__item-bottom">
+                                                      <span style={{ fontSize: '14px', fontWeight: '400', width: '15%' }}>Prefecture</span>
+                                                      {zipCodeAddress.is_use_dropdown ?
+                                                        <SelectCustom
+                                                          style={{ width: '40%' }}
+                                                          id="title"
+                                                          value={zipCodeAddress?.save_input_content}
+                                                          data={inputContentVar}
+                                                          placeholder="placeholder"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'prefecture')}
+                                                        /> :
+                                                        <input
+                                                          type="text"
+                                                          name="ss-user-setting__item-text_input-use-api"
+                                                          className={"ss-input-value ss-user-setting-item ss-user-setting__item-input-zip-code"}
+                                                          placeholder={"placeholder"}
+                                                          value={zipCodeAddress.prefecture}
+                                                          style={{ width: '40%' }}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'prefecture')}
+                                                        />
+                                                      }
+                                                      <CheckboxCustom
+                                                        label="Use the dropdown"
+                                                        className="ss-user-setting-checkbox-custom"
+                                                        onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_use_dropdown')}
+                                                        value={zipCodeAddress.is_use_dropdown}
+                                                      />
+                                                      <MDBIcon
+                                                        style={{ width: '5%' }}
+                                                        // onClick={onClickIcon}
+                                                        onClick={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'prefecture')}
+                                                        fas
+                                                        icon="times-circle"
+                                                        className={"ss-plus-circle-option-icon-times"}
+                                                      />
+                                                    </div>
+                                                  }
+                                                  {zipCodeAddress.municipality !== undefined &&
+                                                    <div className="ss-user-setting__item-bottom">
+                                                      <InputCustom
+                                                        label="Municipalities"
+                                                        className={"ss-user-setting__item-input-zip-code"}
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'municipality')}
+                                                        onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'municipality')}
+                                                        value={zipCodeAddress.post_code}
+                                                        icon="times-circle"
+                                                        placeholder="placeholder"
+                                                        classIcon="ss-plus-circle-option-icon-times"
+                                                      />
+                                                    </div>
+                                                  }
+                                                  {zipCodeAddress.address !== undefined &&
+                                                    <div className="ss-user-setting__item-bottom">
+                                                      <InputCustom
+                                                        label="Address"
+                                                        className={"ss-user-setting__item-input-zip-code"}
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'address')}
+                                                        onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'address')}
+                                                        value={zipCodeAddress.post_code}
+                                                        icon="times-circle"
+                                                        placeholder="placeholder"
+                                                        classIcon="ss-plus-circle-option-icon-times"
+                                                      />
+                                                    </div>
+                                                  }
+                                                  {zipCodeAddress.building_name !== undefined &&
+                                                    <div className="ss-user-setting__item-bottom">
+                                                      <InputCustom
+                                                        label="Building name"
+                                                        className={"ss-user-setting__item-input-zip-code"}
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'building_name')}
+                                                        value={zipCodeAddress.post_code}
+                                                        icon="times-circle"
+                                                        onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'building_name')}
+                                                        placeholder="placeholder"
+                                                        classIcon="ss-plus-circle-option-icon-times"
+                                                      />
+                                                    </div>
+                                                  }
+                                                </React.Fragment>
+                                              )}
+                                              {/* user: type = 'attaching_file' */}
+                                              {content.type === 'attaching_file' && (
+                                                <React.Fragment>
+                                                  <div className="ss-user-setting__item-text_input-top">
+                                                    <div className="ss-user-setting__item-text_input-save-variable-wrapper">
+                                                      <CheckboxCustom
+                                                        label="Save the input contents in a variable."
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
+                                                        value={attachingFile.save_input_content}
+                                                      />
+                                                    </div>
+                                                    {attachingFile.save_input_content &&
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            id="title"
+                                                            style={{ width: '100%', marginRight: '10px' }}
+                                                            value={attachingFile?.save_input_content}
+                                                            data={inputContentVar}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
+                                                          />
+                                                          <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add">Addition</Button>
+                                                        </div>
+                                                      </div>
+                                                    }
+                                                    <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                                      <div>
+                                                        <CheckboxCustom
+                                                          label="Required"
+                                                          onChange={value => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, content.type, value, 'require')}
+                                                          value={attachingFile.require}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-text_input-use-api-required">
+                                                        <CheckboxCustom
+                                                          label="Multiple file upload"
+                                                          onChange={value => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, content.type, value, 'multifile_upload')}
+                                                          value={attachingFile.multifile_upload}
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                    <div className="ss-user-setting__item-bottom">
+                                                      <SelectCustom
+                                                        style={{ width: '90%' }}
+                                                        data={dataTypeFile}
+                                                        mode="multiple"
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'file_type')}
+                                                        value={attachingFile.file_type}
+                                                      />
+                                                    </div>
+                                                    <div className="ss-user-setting__item-bottom">
+                                                      <Button className="ss-user-setting__select-btn-add" style={{ backgroundColor: '#A3B1BF', margin: '0px' }} onClick={() => console.log('Click select file')}>Select file</Button>
+                                                    </div>
+                                                  </div>
+                                                </React.Fragment>
+                                              )}
+                                              {/* user: type = 'calendar' */}
+                                              {content.type === 'calendar' && (
+                                                <React.Fragment>
+                                                  <div className="ss-user-setting__item-text_input-top">
+                                                    <div className="ss-user-setting__item-text_input-save-variable-wrapper">
+                                                      <CheckboxCustom
+                                                        label="Save the input contents in a variable."
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
+                                                        value={calendar.save_input_content}
+                                                      />
+                                                    </div>
+                                                    {calendar.save_input_content &&
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            style={{ width: '100%', marginRight: '10px' }}
+                                                            value={calendar?.save_input_content}
+                                                            data={inputContentVar}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
+                                                          />
+                                                          <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add">Addition</Button>
+                                                        </div>
+                                                      </div>
+                                                    }
+                                                    <div className="ss-user-setting__item-text_input-save-variable-wrapper">
+                                                      <CheckboxCustom
+                                                        label="Required"
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
+                                                        value={calendar.require}
+                                                      />
+                                                    </div>
+                                                    <div className="ss-user-setting__item-bottom">
+                                                      <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                        <SelectCustom
+                                                          style={{ width: '49%' }}
+                                                          value={calendar?.title_require}
+                                                          data={dropDownTitle}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
+                                                        />
+                                                        <SelectCustom
+                                                          style={{ width: '49%' }}
+                                                          value={calendar?.type}
+                                                          data={typeCalendar}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                    {/* calendar: withTitle = true */}
+                                                    {calendar.title_require === true &&
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <InputCustom
+                                                          placeholder="title"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
+                                                          value={calendar.title}
+                                                        />
+                                                      </div>
+                                                    }
+                                                    <div className="ss-user-setting__item-bottom-flex-start">
+                                                      <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>start date</span>
+                                                      <DatePicker
+                                                        selected={calendar.start_date}
+                                                        onChange={(date) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, date, 'start_date')}
+                                                        className="ss-input-value"
+                                                      />
+                                                      <span style={{ fontSize: '30px', marginLeft: '10px', opacity: '0.4', marginRight: '10px' }}>~</span>
+                                                      <DatePicker
+                                                        selected={calendar.end_date}
+                                                        onChange={(date) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, date, 'end_date')}
+                                                        className="ss-input-value"
+                                                      />
+                                                    </div>
+                                                    <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                                      <div>
+                                                        <CheckboxCustom
+                                                          label="Use APIs to validate input values"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_api_input_value')}
+                                                          value={calendar.use_api_input_value}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-text_input-use-api-required">
+                                                        <CheckboxCustom
+                                                          label="Initial selection (shortest date from today)"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'initial_selection')}
+                                                          value={calendar.initial_selection}
+                                                        />
+                                                      </div>
+                                                    </div>
+                                                    <div className="ss-user-setting__item-bottom">
+                                                      <SelectCustom
+                                                        label="Non-selectable date and time:"
+                                                        mode="multiple"
+                                                        style={{ width: '66%' }}
+                                                        data={dataSelectDateTime}
+                                                        onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'non_select_date_time')}
+                                                        value={calendar.non_select_date_time}
+                                                      />
+                                                    </div>
+                                                    <div className="ss-user-setting__item-bottom-flex-start ss-user-setting__item-custom">
+                                                      <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>fixed date</span>
+                                                      <DatePicker
+                                                        selected={calendar.select_fixed_date}
+                                                        onChange={(date) => onChangeFixedDate(indexMessageSelect, indexContent, content.type, date, 'fixed_date')}
+                                                        className="ss-input-value ss-date-picker-custom"
+                                                        style={{ width: '100%' }}
+                                                      />
+                                                    </div>
+                                                    <div className="ss-user-setting__item-bottom">
+                                                      {console.log(calendar.fixed_date)}
+                                                      <SelectCustom
+                                                        mode="multiple"
+                                                        style={{ width: '99%', minHeight: '20px' }}
+                                                        data={calendar.fixed_date}
+                                                        onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'fixed_date')}
+                                                        value={calendar.fixed_date}
+                                                      />
+                                                    </div>
+                                                    <div className="ss-user-setting__item-bottom-flex-start" style={{ display: 'block' }}>
+                                                      <div><span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Selectable dates (ranges based on "today")</span></div>
+                                                      <div><span className="ss-user-setting-label" style={{ marginRight: '10px' }}>*Both positive and negative numbers can be specified.</span></div>
+                                                    </div>
+                                                    <div className="ss-user-setting__item-bottom-flex-start">
+                                                      <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Aggregation target period</span>
+                                                      <InputNum
+                                                        placeholder="0000"
+                                                        className="ss-user-setting-input-limit-character"
+                                                        min={1}
+                                                        max={999}
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'aggregation_target_period_from')}
+                                                        value={calendar.aggregation_target_period_from}
+                                                      />
+                                                      <span style={{ fontSize: '30px', marginLeft: '10px', opacity: '0.4' }}>~</span>
+                                                      <InputNum
+                                                        placeholder="0000"
+                                                        className="ss-user-setting-input-limit-character"
+                                                        min={1}
+                                                        max={999}
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'aggregation_target_period_to')}
+                                                        value={calendar.aggregation_target_period_to}
+                                                      />
+                                                    </div>
+                                                    {calendar.type === 'date_selection' &&
+                                                      <div className="ss-user-setting__item-bottom-flex-start">
+                                                        <DatePicker
+                                                          // selected={calendar.select_fixed_date}
+                                                          className="ss-input-value ss-date-picker-custom"
+                                                        // style={{ width: '100%' }}
+                                                        />
+                                                        <MDBIcon style={{ color: 'grey', marginLeft: '10px', fontSize: '21px' }} far icon="calendar-alt" />
+                                                      </div>
+                                                    }
+                                                    {calendar.type === 'embedded' &&
+                                                      <div className="ss-user-setting__item-bottom-flex-start" style={{ height: '280px' }}>
+                                                        <DatePicker
+                                                          // selected={calendar.select_fixed_date}
+                                                          className="ss-input-value ss-date-picker-custom"
+                                                          // style={{ width: '100%' }}
+                                                          inline
+                                                        />
+                                                      </div>
+                                                    }
+                                                    {calendar.type === 'start_end_date' &&
+                                                      <div className="ss-user-setting__item-bottom-flex-start ss-user-setting-flex-date">
+                                                        <DatePicker
+                                                          selected={startDateClone}
+                                                          onChange={(date) => setStartDateClone(date)}
+                                                          selectsStart
+                                                          startDate={startDateClone}
+                                                          endDate={endDate}
+                                                          className="ss-input-value ss-date-picker-custom"
+                                                        />
+                                                        <DatePicker
+                                                          selected={endDate}
+                                                          onChange={(date) => setEndDate(date)}
+                                                          selectsEnd
+                                                          startDate={startDateClone}
+                                                          endDate={endDate}
+                                                          minDate={startDateClone}
+                                                          className="ss-input-value ss-date-picker-custom"
+                                                        />
+                                                        <MDBIcon style={{ color: 'grey', marginLeft: '10px', fontSize: '21px' }} far icon="calendar-alt" />
+                                                      </div>
+                                                    }
+                                                  </div>
+                                                </React.Fragment>
+                                              )}
+                                              {/* user: type = 'agree_term' */}
+                                              {content.type === 'agree_term' && (
+                                                <React.Fragment>
                                                   <div className="ss-user-setting__item-bottom">
-                                                    <InputCustom
-                                                      label="Post code"
-                                                      className={"ss-user-setting__item-input-zip-code"}
-                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code')}
-                                                      value={zipCodeAddress.post_code}
-                                                      icon="times-circle"
-                                                      placeholder="000 000"
-                                                      classIcon="ss-plus-circle-option-icon-times"
+                                                    <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                      <SelectCustom
+                                                        style={{ width: '49%' }}
+                                                        value={agreeTerm?.title_require}
+                                                        data={dropDownTitle}
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
+                                                      />
+                                                      <SelectCustom
+                                                        style={{ width: '49%' }}
+                                                        value={agreeTerm?.type}
+                                                        data={agreeTermType}
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
+                                                      />
+                                                    </div>
+                                                  </div>
+                                                  {/* calendar: withTitle = true */}
+                                                  {agreeTerm.title_require === true &&
+                                                    <div className="ss-user-setting__item-bottom">
+                                                      <InputCustom
+                                                        placeholder="title"
+                                                        value={agreeTerm.title}
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
+                                                      />
+                                                    </div>
+                                                  }
+                                                  {/* agreeTerm: type = detail_content */}
+                                                  {agreeTerm.type === 'detail_content' &&
+                                                    <div className="ss-user-setting__item-bottom">
+                                                      <textarea
+                                                        style={{ width: '90%' }}
+                                                        className="ss-user-setting-item-textarea-label ss-input-value"
+                                                        placeholder="text"
+                                                        rows="5"
+                                                        value={agreeTerm.detail_content.content}
+                                                        onChange={e => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.value, 'detail_content', 'content')}
+                                                      ></textarea>
+                                                    </div>
+                                                  }
+                                                  {/* agreeTerm: type = post_link_only */}
+                                                  {agreeTerm.type === 'post_link_only' &&
+                                                    <React.Fragment>
+                                                      {
+                                                        Array.isArray(agreeTerm.post_link_only) &&
+                                                        agreeTerm.post_link_only.map((agreeTermItem, indexAgree, array) => {
+                                                          return (
+                                                            <div key={indexAgree} className="ss-user-setting__item-bottom">
+                                                              <div className="ss-user-setting-item-radio-button-drag" style={{ width: '87%' }}>
+                                                                <div style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px' }}>
+                                                                  {console.log(agreeTermItem)}
+                                                                  <InputCustom
+                                                                    icon={array.length >= 2 ? "times-circle" : ""}
+                                                                    classIcon="ss-plus-circle-option-icon-times"
+                                                                    onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, agreeTerm.type, indexAgree)}
+                                                                    style={{ width: '94%', marginBottom: '10px' }}
+                                                                    placeholder="comment"
+                                                                    value={agreeTermItem.title_comment}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, agreeTerm.type, indexAgree, 'title_comment')}
+                                                                  />
+                                                                  <InputDouble
+                                                                    classCustom="ss-user-setting-custom-double-input"
+                                                                    onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, agreeTerm.type, indexAgree, name === 'left' ? 'title' : 'urls')}
+                                                                    valueLeft={agreeTermItem.title}
+                                                                    valueRight={agreeTermItem.urls}
+                                                                    placeholder={['title', 'URLs']}
+                                                                  />
+                                                                  <InputCustom
+                                                                    style={{ width: '100%', marginBottom: '10px' }}
+                                                                    placeholder="comment"
+                                                                    value={agreeTermItem.url_comment}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, agreeTerm.type, indexAgree, 'url_comment')}
+                                                                  />
+                                                                </div>
+                                                              </div>
+                                                            </div>
+                                                          )
+                                                        })
+                                                      }
+                                                      <div className="ss-user-setting__item-bottom" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                                        <MDBIcon
+                                                          fas
+                                                          icon="plus-circle"
+                                                          className="ss-plus-circle-option-icon"
+                                                          onClick={() => handleAddItemAgreeTerm(indexMessageSelect, indexContent, content.type, agreeTerm.type)}
+                                                        />
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  <div className="ss-user-setting__item-bottom">
+                                                    <CheckboxCustom
+                                                      className="ss-user-setting__item-custom-input-checkbox"
+                                                      styleSpan={{ width: '100%' }}
+                                                      disabled
+                                                      label={
+                                                        <InputCustom
+                                                          placeholder="text"
+                                                          style={{ width: '100%' }}
+                                                          value={agreeTerm.term}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'term')}
+                                                        />
+                                                      }
+                                                      onChange={value => console.log(value)}
+                                                      value={false}
                                                     />
                                                   </div>
-                                                  <div className="ss-user-setting__item-bottom">
-                                                    <span style={{ fontSize: '14px', fontWeight: '400', width: '15%' }}>Prefecture</span>
-                                                    {zipCodeAddress.is_use_dropdown ?
-                                                      <SelectCustom
-                                                        style={{ width: '40%' }}
-                                                        id="title"
-                                                        value={zipCodeAddress?.save_input_content}
-                                                        data={inputContentVar}
-                                                        placeholder="placeholder"
-                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
-                                                      /> :
-                                                      <input
-                                                        type="text"
-                                                        name="ss-user-setting__item-text_input-use-api"
-                                                        className={"ss-input-value ss-user-setting-item ss-user-setting__item-input-zip-code"}
-                                                        placeholder={"placeholder"}
-                                                        value={zipCodeAddress.prefecture}
-                                                        style={{ width: '40%' }}
-                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'prefecture')}
-                                                      />
+                                                </React.Fragment>
+                                              )}
+                                              {/* user: type = 'pull_down' */}
+                                              {content.type === 'pull_down' && (
+                                                <React.Fragment>
+                                                  <div className="ss-user-setting__item-text_input-top">
+                                                    <CheckboxCustom
+                                                      label="Save the input contents in a variable"
+                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
+                                                      value={pullDown.save_input_content}
+                                                    />
+                                                    {pullDown.save_input_content &&
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            style={{ width: '100%', marginRight: '10px' }}
+                                                            id="title"
+                                                            value={pullDown?.save_input_content}
+                                                            data={inputContentVar}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
+                                                          />
+                                                          <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add">Addition</Button>
+                                                        </div>
+                                                      </div>
                                                     }
                                                     <CheckboxCustom
-                                                      label="Use the dropdown"
-                                                      className="ss-user-setting-checkbox-custom"
-                                                      onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_use_dropdown')}
-                                                      value={zipCodeAddress.is_use_dropdown}
-                                                    />
-                                                    <MDBIcon
-                                                      style={{ width: '5%' }}
-                                                      // onClick={onClickIcon}
-                                                      fas
-                                                      icon="times-circle"
-                                                      className={"ss-plus-circle-option-icon-times"}
+                                                      label="Required"
+                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'required')}
+                                                      value={pullDown.required}
                                                     />
                                                   </div>
                                                   <div className="ss-user-setting__item-bottom">
-                                                    <InputCustom
-                                                      label="Municipalities"
-                                                      className={"ss-user-setting__item-input-zip-code"}
-                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code')}
-                                                      value={zipCodeAddress.post_code}
-                                                      icon="times-circle"
-                                                      placeholder="placeholder"                                               
-                                                      classIcon="ss-plus-circle-option-icon-times"
-                                                    />
+                                                    <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                      <SelectCustom
+                                                        id="title"
+                                                        style={{ width: '49%' }}
+                                                        value={pullDown?.title_require}
+                                                        data={dropDownTitle}
+                                                        placeholder="title"
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
+                                                      />
+                                                      <SelectCustom
+                                                        id="type"
+                                                        style={{ width: '49%' }}
+                                                        value={pullDown?.type}
+                                                        placeholder="type"
+                                                        data={dataTypePullDown}
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
+                                                      />
+                                                    </div>
                                                   </div>
-                                                  <div className="ss-user-setting__item-bottom">
-                                                    <InputCustom
-                                                      label="Address"
-                                                      className={"ss-user-setting__item-input-zip-code"}
-                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code')}
-                                                      value={zipCodeAddress.post_code}
-                                                      icon="times-circle"
-                                                      placeholder="placeholder"                                                      
-                                                      classIcon="ss-plus-circle-option-icon-times"
-                                                    />
-                                                  </div>
-                                                  <div className="ss-user-setting__item-bottom">
-                                                    <InputCustom
-                                                      label="Building name"
-                                                      className={"ss-user-setting__item-input-zip-code"}
-                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code')}
-                                                      value={zipCodeAddress.post_code}
-                                                      icon="times-circle"
-                                                      onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'building_name')}
-                                                      placeholder="placeholder"                                                      
-                                                      classIcon="ss-plus-circle-option-icon-times"
-                                                    />
-                                                  </div>
-                                                </>
+                                                  {/* pull_down: withTitle = true */}
+                                                  {pullDown.title_require === true &&
+                                                    <div className="ss-user-setting__item-bottom">
+                                                      <InputCustom
+                                                        placeholder="title"
+                                                        value={pullDown.title}
+                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
+                                                      />
+                                                    </div>
+                                                  }
+                                                  {/* pull_down: type = customization */}
+                                                  {pullDown.type === 'customization' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <InputCustom
+                                                          icon={pullDown[pullDown.type].is_comment ? "times-circle" : "plus-circle"}
+                                                          onClickIcon={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, !pullDown[pullDown.type].is_comment, pullDown.type, 'is_comment')}
+                                                          style={{ width: '84%', marginBottom: '10px' }}
+                                                          placeholder="comment"
+                                                          classIcon="ss-user-times-icon-custom"
+                                                          value={pullDown[pullDown.type].title_comment}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'title_comment')}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div style={{ backgroundColor: '#F8F9FA', width: '90%', padding: '5px' }} >
+                                                          <InputCustom
+                                                            label="Display text while unselected"
+                                                            style={{ width: '60%', marginBottom: '10px', marginLeft: '10px' }}
+                                                            placeholder="comment"
+                                                            value={pullDown[pullDown.type].display_unselected || '選択してください'}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'display_unselected')}
+                                                          />
+                                                          <DragDropContext onDragEnd={result => handleDragEndPullDown(result, content.id, content.type, pullDown.type, pullDown[pullDown.type].is_comment ? 'options_with_comment' : 'options_without_comment')}>
+                                                            <Droppable droppableId='customize-pull-down'>
+                                                              {(providedChild) => {
+                                                                let isComment = pullDown[pullDown.type].is_comment;
+                                                                let arrOptions = isComment ? pullDown[pullDown.type].options_with_comment : pullDown[pullDown.type].options_without_comment;
+                                                                return <div className="ss-user-setting-item-pull-down-drag" {...providedChild.droppableProps} ref={providedChild.innerRef} style={{ width: '103%' }}>
+                                                                  {
+                                                                    Array.isArray(arrOptions) && arrOptions
+                                                                      .map((itemPullDown, indexPullDown, array) => {
+                                                                        return (
+                                                                          <Draggable draggable={true} key={itemPullDown.id} draggableId={itemPullDown.id + ''} index={indexPullDown}>
+                                                                            {(providedChild) => (
+                                                                              <div
+                                                                                {...providedChild.draggableProps}
+                                                                                {...providedChild.dragHandleProps}
+                                                                                ref={providedChild.innerRef}
+                                                                                style={{ marginBottom: '10px', width: '98%', backgroundColor: '#F8F9FA', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                                                                              >
+                                                                                <MDBIcon fas icon="th" />
+                                                                                <InputDouble
+                                                                                  classCustom={isComment ? "ss-user-setting-custom-double-input-custom" : ""}
+                                                                                  onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text' : 'value')}
+                                                                                  valueLeft={itemPullDown.text}
+                                                                                  valueRight={itemPullDown.value}
+                                                                                  placeholder={['text', 'value']}
+                                                                                />
+                                                                                {pullDown[pullDown.type].is_comment === true &&
+                                                                                  <React.Fragment>
+                                                                                    <span>~</span>
+                                                                                    <InputDouble
+                                                                                      classCustom="ss-user-setting-custom-double-input-custom"
+                                                                                      onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text2' : 'value2')}
+                                                                                      valueLeft={itemPullDown.text2}
+                                                                                      valueRight={itemPullDown.value2}
+                                                                                      placeholder={['text', 'value']}
+                                                                                    />
+                                                                                  </React.Fragment>
+                                                                                }
+                                                                                <MDBIcon
+                                                                                  fas
+                                                                                  style={{ fontSize: '25px' }}
+                                                                                  icon="times-circle"
+                                                                                  onClick={(e) => handleRemoveItemCustomizePullDown(indexMessageSelect, indexContent, content.type, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown)}
+                                                                                />
+                                                                              </div>
+                                                                            )}
+                                                                          </Draggable>
+                                                                        )
+                                                                      })
+                                                                  }
+                                                                  {providedChild.placeholder}
+                                                                </div>
+                                                              }}
+                                                            </Droppable>
+                                                          </DragDropContext>
+                                                          <div className="ss-user-setting__item-bottom" style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                                            <MDBIcon
+                                                              fas
+                                                              icon="plus-circle"
+                                                              className="ss-plus-circle-option-icon"
+                                                              onClick={() => handleAddItemCustomizePullDown(indexMessageSelect, indexContent, content.type, pullDown.type, pullDown[pullDown.type].is_comment ? 'options_with_comment' : 'options_without_comment')}
+                                                            />
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <InputCustom
+                                                          style={{ width: '90%', marginBottom: '10px' }}
+                                                          placeholder="comment"
+                                                          value={pullDown[pullDown.type].comment}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'comment')}
+                                                        />
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  {/* pull_down: type = time_hm */}
+                                                  {pullDown.type === 'time_hm' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom-flex-start">
+                                                        <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Range setting</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          value={pullDown?.[pullDown.type].start_at}
+                                                          placeholder="At start"
+                                                          data={dataHour}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at')}
+                                                        />
+                                                        <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          placeholder="When finished"
+                                                          value={pullDown?.[pullDown.type].end_at}
+                                                          data={dataHour}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at')}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            style={{ width: '24%' }}
+                                                            value={pullDown?.[pullDown.type].time}
+                                                            data={dataHour}
+                                                            placeholder="Time"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'time')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '24%' }}
+                                                            value={pullDown?.[pullDown.type].minute}
+                                                            data={dataMinutes}
+                                                            placeholder="Minutes"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'minute')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '24%' }}
+                                                            value={pullDown?.[pullDown.type].every_minute}
+                                                            data={dataEveryMinute}
+                                                            placeholder="Every minute"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'every_minute')}
+                                                          />
+                                                          <InputCustom
+                                                            style={{ width: '24%' }}
+                                                            placeholder="comment"
+                                                            value={pullDown[pullDown.type].comment}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'comment')}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  {/* pull_down: type = date_ymd */}
+                                                  {pullDown.type === 'date_ymd' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom-flex-start">
+                                                        <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Range setting</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          value={pullDown?.[pullDown.type].start_year}
+                                                          placeholder="Start year"
+                                                          data={dataYear}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_year')}
+                                                        />
+                                                        <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          placeholder="End year"
+                                                          value={pullDown?.[pullDown.type].end_year}
+                                                          data={dataYear}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_year')}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            style={{ width: '24%' }}
+                                                            value={pullDown?.[pullDown.type].year}
+                                                            data={dataYear}
+                                                            placeholder="Year"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'year')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '24%' }}
+                                                            value={pullDown?.[pullDown.type].month}
+                                                            data={dataMonth}
+                                                            placeholder="Month"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'month')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '24%' }}
+                                                            value={pullDown?.[pullDown.type].day}
+                                                            data={dataDay}
+                                                            placeholder="Day"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'day')}
+                                                          />
+                                                          <InputCustom
+                                                            style={{ width: '24%' }}
+                                                            placeholder="comment"
+                                                            value={pullDown[pullDown.type].comment}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'comment')}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  {/* pull_down: type = date_md */}
+                                                  {pullDown.type === 'date_md' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            style={{ width: '32%' }}
+                                                            value={pullDown?.[pullDown.type].month}
+                                                            data={dataMonth}
+                                                            placeholder="Month"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'month')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '32%' }}
+                                                            value={pullDown?.[pullDown.type].day}
+                                                            data={dataDay}
+                                                            placeholder="Day"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'day')}
+                                                          />
+                                                          <InputCustom
+                                                            style={{ width: '32%' }}
+                                                            placeholder="comment"
+                                                            value={pullDown[pullDown.type].comment}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'comment')}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  {/* pull_down: type = date_ym */}
+                                                  {pullDown.type === 'date_ym' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom-flex-start">
+                                                        <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Range setting</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          value={pullDown?.[pullDown.type].start_year}
+                                                          placeholder="Start year"
+                                                          data={dataYear}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_year')}
+                                                        />
+                                                        <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          placeholder="End year"
+                                                          value={pullDown?.[pullDown.type].end_year}
+                                                          data={dataYear}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_year')}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            style={{ width: '32%' }}
+                                                            value={pullDown?.[pullDown.type].year}
+                                                            data={dataYear}
+                                                            placeholder="Year"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'year')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '32%' }}
+                                                            value={pullDown?.[pullDown.type].month}
+                                                            data={dataMonth}
+                                                            placeholder="Month"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'month')}
+                                                          />
+                                                          <InputCustom
+                                                            style={{ width: '32%' }}
+                                                            placeholder="comment"
+                                                            value={pullDown[pullDown.type].comment}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'comment')}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  {/* pull_down: type = date_ymd_hm */}
+                                                  {pullDown.type === 'date_ymd_hm' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            style={{ width: '32%' }}
+                                                            value={pullDown?.[pullDown.type].year}
+                                                            data={dataYear}
+                                                            placeholder="Year"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'year')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '32%' }}
+                                                            value={pullDown?.[pullDown.type].month}
+                                                            data={dataMonth}
+                                                            placeholder="Month"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'month')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '32%' }}
+                                                            value={pullDown?.[pullDown.type].day}
+                                                            data={dataDay}
+                                                            placeholder="Day"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'day')}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom-flex-start">
+                                                        <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Range setting</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          value={pullDown?.[pullDown.type].start_at}
+                                                          placeholder="At start"
+                                                          data={dataHour}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at')}
+                                                        />
+                                                        <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          placeholder="When finished"
+                                                          value={pullDown?.[pullDown.type].end_at}
+                                                          data={dataHour}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at')}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            style={{ width: '24%' }}
+                                                            value={pullDown?.[pullDown.type].time}
+                                                            data={dataHour}
+                                                            placeholder="Time"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'time')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '24%' }}
+                                                            value={pullDown?.[pullDown.type].minute}
+                                                            data={dataMinutes}
+                                                            placeholder="Minutes"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'minute')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '24%' }}
+                                                            value={pullDown?.[pullDown.type].every_minute}
+                                                            data={dataEveryMinute}
+                                                            placeholder="Every minute"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'every_minute')}
+                                                          />
+                                                          <InputCustom
+                                                            style={{ width: '24%' }}
+                                                            placeholder="comment"
+                                                            value={pullDown[pullDown.type].comment}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'comment')}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  {/* pull_down: type = dob_ymd */}
+                                                  {pullDown.type === 'dob_ymd' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom-flex-start">
+                                                        <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Range setting</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          value={pullDown?.[pullDown.type].start_at}
+                                                          placeholder="Start year"
+                                                          data={dataYear}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at')}
+                                                        />
+                                                        <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          placeholder="End year"
+                                                          value={pullDown?.[pullDown.type].end_at}
+                                                          data={dataYear}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at')}
+                                                        />
+                                                        <SelectCustom
+                                                          style={{ width: '29%', marginLeft: '10%' }}
+                                                          placeholder="Sort"
+                                                          value={pullDown?.[pullDown.type].sort}
+                                                          data={[
+                                                            { key: 'asc', value: 'ascending order' },
+                                                            { key: 'desc', value: 'descending order' }
+                                                          ]}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'sort')}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom" style={{ justifyContent: 'flex-start', padding: '0px 31px' }}>
+                                                        <span style={{ marginBottom: '-10px', color: 'grey' }}>*Initally selected date of birth</span>
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex" style={{ flexWrap: 'wrap' }}>
+                                                          <SelectCustom
+                                                            style={{ width: '32%' }}
+                                                            value={pullDown?.[pullDown.type].year}
+                                                            data={dataYear}
+                                                            placeholder="Year"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'year')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '32%' }}
+                                                            value={pullDown?.[pullDown.type].month}
+                                                            data={dataMonth}
+                                                            placeholder="Month"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'month')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '32%' }}
+                                                            value={pullDown?.[pullDown.type].day}
+                                                            data={dataDay}
+                                                            placeholder="Day"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'day')}
+                                                          />
+                                                          <InputCustom
+                                                            style={{ width: '32%', marginTop: '10px' }}
+                                                            placeholder="comment"
+                                                            value={pullDown[pullDown.type].comment}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'comment')}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  {/* pull_down: type = dob_ym */}
+                                                  {pullDown.type === 'dob_ym' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom-flex-start">
+                                                        <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Range setting</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          value={pullDown?.[pullDown.type].start_at}
+                                                          placeholder="Start year"
+                                                          data={dataYear}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at')}
+                                                        />
+                                                        <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          placeholder="End year"
+                                                          value={pullDown?.[pullDown.type].end_at}
+                                                          data={dataYear}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at')}
+                                                        />
+                                                        <SelectCustom
+                                                          style={{ width: '29%', marginLeft: '10%' }}
+                                                          placeholder="Sort"
+                                                          value={pullDown?.[pullDown.type].sort}
+                                                          data={[
+                                                            { key: 'asc', value: 'ascending order' },
+                                                            { key: 'desc', value: 'descending order' }
+                                                          ]}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'sort')}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom" style={{ justifyContent: 'flex-start', padding: '0px 31px' }}>
+                                                        <span style={{ marginBottom: '-10px', color: 'grey' }}>*Initally selected date of birth</span>
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex" style={{ flexWrap: 'wrap' }}>
+                                                          <SelectCustom
+                                                            style={{ width: '32%' }}
+                                                            value={pullDown?.[pullDown.type].year}
+                                                            data={dataYear}
+                                                            placeholder="Year"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'year')}
+                                                          />
+                                                          <SelectCustom
+                                                            style={{ width: '32%' }}
+                                                            value={pullDown?.[pullDown.type].month}
+                                                            data={dataMonth}
+                                                            placeholder="Month"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'month')}
+                                                          />
+                                                          <InputCustom
+                                                            style={{ width: '32%' }}
+                                                            placeholder="comment"
+                                                            value={pullDown[pullDown.type].comment}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'comment')}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  {/* pull_down: type = timezone_from_to */}
+                                                  {pullDown.type === 'timezone_from_to' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom-flex-start">
+                                                        <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Range setting</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          value={pullDown?.[pullDown.type].range_start}
+                                                          placeholder="At start"
+                                                          data={dataHour}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'range_start')}
+                                                        />
+                                                        <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
+                                                        <SelectCustom
+                                                          style={{ width: '18%' }}
+                                                          placeholder="When finished"
+                                                          value={pullDown?.[pullDown.type].range_end}
+                                                          data={dataHour}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'range_end')}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom" style={{ flexWrap: 'nowrap' }}>
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex" style={{ alignItems: 'center' }}>
+                                                          <div className="ss-user-setting__item-select-bottom-wrapper-flex" style={{ flexWrap: 'wrap', width: '46%' }}>
+                                                            <SelectCustom
+                                                              style={{ width: '48%' }}
+                                                              value={pullDown?.[pullDown.type].hour_start_at}
+                                                              data={dataHour}
+                                                              placeholder="Time"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'hour_start_at')}
+                                                            />
+                                                            <SelectCustom
+                                                              style={{ width: '48%' }}
+                                                              value={pullDown?.[pullDown.type].minute_start_at}
+                                                              data={dataMinutes}
+                                                              placeholder="Minutes"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'minute_start_at')}
+                                                            />
+                                                            <SelectCustom
+                                                              style={{ width: '48%', marginTop: '10px' }}
+                                                              value={pullDown?.[pullDown.type].every_minute_start_at}
+                                                              data={dataEveryMinute}
+                                                              placeholder="Every minute"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'every_minute_start_at')}
+                                                            />
+                                                          </div>
+                                                          <span>~</span>
+                                                          <div className="ss-user-setting__item-select-bottom-wrapper-flex" style={{ flexWrap: 'wrap', width: '46%' }}>
+                                                            <SelectCustom
+                                                              style={{ width: '48%' }}
+                                                              value={pullDown?.[pullDown.type].hour_end_at}
+                                                              data={dataHour}
+                                                              placeholder="Time"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'hour_end_at')}
+                                                            />
+                                                            <SelectCustom
+                                                              style={{ width: '48%' }}
+                                                              value={pullDown?.[pullDown.type].minute_end_at}
+                                                              data={dataMinutes}
+                                                              placeholder="Minutes"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'minute_end_at')}
+                                                            />
+                                                            <SelectCustom
+                                                              style={{ width: '48%', marginTop: '10px' }}
+                                                              value={pullDown?.[pullDown.type].every_minute_end_at}
+                                                              data={dataEveryMinute}
+                                                              placeholder="Every minute"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'every_minute_end_at')}
+                                                            />
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <InputCustom
+                                                          style={{ width: '90%' }}
+                                                          placeholder="comment"
+                                                          value={pullDown[pullDown.type].comment}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'comment')}
+                                                        />
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  {/* pull_down: type = period_from_to */}
+                                                  {pullDown.type === 'period_from_to' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom" style={{ flexWrap: 'nowrap' }}>
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex" style={{ alignItems: 'center' }}>
+                                                          <div className="ss-user-setting__item-select-bottom-wrapper-flex" style={{ flexWrap: 'wrap', width: '46%' }}>
+                                                            <SelectCustom
+                                                              style={{ width: '48%' }}
+                                                              value={pullDown?.[pullDown.type].year_start_at}
+                                                              data={dataYear}
+                                                              placeholder="Year"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'year_start_at')}
+                                                            />
+                                                            <SelectCustom
+                                                              style={{ width: '48%' }}
+                                                              value={pullDown?.[pullDown.type].month_start_at}
+                                                              data={dataMonth}
+                                                              placeholder="Month"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'month_start_at')}
+                                                            />
+                                                            <SelectCustom
+                                                              style={{ width: '48%', marginTop: '10px' }}
+                                                              value={pullDown?.[pullDown.type].day_start_at}
+                                                              data={dataDay}
+                                                              placeholder="Day"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'day_start_at')}
+                                                            />
+                                                          </div>
+                                                          <span>~</span>
+                                                          <div className="ss-user-setting__item-select-bottom-wrapper-flex" style={{ flexWrap: 'wrap', width: '46%' }}>
+                                                            <SelectCustom
+                                                              style={{ width: '48%' }}
+                                                              value={pullDown?.[pullDown.type].year_end_at}
+                                                              data={dataYear}
+                                                              placeholder="Year"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'year_end_at')}
+                                                            />
+                                                            <SelectCustom
+                                                              style={{ width: '48%' }}
+                                                              value={pullDown?.[pullDown.type].month_end_at}
+                                                              data={dataMonth}
+                                                              placeholder="Month"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'month_end_at')}
+                                                            />
+                                                            <SelectCustom
+                                                              style={{ width: '48%', marginTop: '10px' }}
+                                                              value={pullDown?.[pullDown.type].day_end_at}
+                                                              data={dataDay}
+                                                              placeholder="Day"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'day_end_at')}
+                                                            />
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <InputCustom
+                                                          style={{ width: '90%' }}
+                                                          placeholder="comment"
+                                                          value={pullDown[pullDown.type].comment}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'comment')}
+                                                        />
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  {/* pull_down: type = prefectures */}
+                                                  {pullDown.type === 'prefectures' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        {dataPrefectures &&
+                                                          dataPrefectures.map((item, index) => {
+                                                            return (
+                                                              <InputDouble
+                                                                classCustom={"ss-user-setting-double-input-custom"}
+                                                                disabled
+                                                                // onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text' : 'value')}
+                                                                valueLeft={item.name}
+                                                                valueRight={index + 1}
+                                                                rightWidth={{ width: '50%' }}
+                                                              // placeholder={['text', 'value']}
+                                                              />
+                                                            )
+                                                          })
+                                                        }
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  {/* pull_down: type = up_to_municipality */}
+                                                  {pullDown.type === 'up_to_municipality' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <InputCustom
+                                                          style={{ width: '90%' }}
+                                                          placeholder="comment"
+                                                          value={pullDown[pullDown.type].prefecture_comment}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'prefecture_comment')}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <SelectCustom
+                                                          style={{ width: '42%' }}
+                                                          value={pullDown?.[pullDown.type].prefecture}
+                                                          placeholder="Select prefecture"
+                                                          data={dataPrefectures}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'prefecture')}
+                                                        />
+                                                        <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
+                                                        <SelectCustom
+                                                          style={{ width: '42%' }}
+                                                          placeholder="Select city"
+                                                          value={pullDown?.[pullDown.type].city}
+                                                          data={dataHour}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'city')}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <InputCustom
+                                                          style={{ width: '90%' }}
+                                                          placeholder="comment"
+                                                          value={pullDown[pullDown.type].city_comment}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'city_comment')}
+                                                        />
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                  {/* pull_down: type = comsume_api_response */}
+                                                  {pullDown.type === 'comsume_api_response' &&
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <SelectCustom
+                                                          style={{ width: '90%' }}
+                                                          value={pullDown?.[pullDown.type]}
+                                                          placeholder="Select api"
+                                                          data={dataConsumeApiResponse}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type)}
+                                                        />
+                                                      </div>
+                                                    </React.Fragment>
+                                                  }
+                                                </React.Fragment>
                                               )}
                                             </div>
                                           </div>
@@ -3339,8 +5304,8 @@ const Scenario = () => {
                             <option value="pull_down">Pull down</option>
                             <option value="zip_code_address">Zip code and address</option>
                             <option value="attaching_file">Attaching file</option>
-                            <option value="calender">Calendar</option>
-                            <option value="agree_to_term">Agree to terms</option>
+                            <option value="calendar">Calendar</option>
+                            <option value="agree_term">Agree to terms</option>
                           </select>
                           <Button className="ss-user-setting__select-btn-add" onClick={() => handleAddItemSetting(messageType)}>Addition</Button>
                         </div>
@@ -3357,7 +5322,12 @@ const Scenario = () => {
           </Card>
         </Col>
       </Row>
-    </div>
+      <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+        <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+          <span style={{ fontSize: '16px' }}>{messageNoti}</span>
+        </div>
+      </ModalNoti>
+    </div >
   );
 };
 

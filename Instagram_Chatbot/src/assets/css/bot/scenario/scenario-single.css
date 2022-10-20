@@ -765,6 +765,18 @@ input#ss-message__content--user-checkbox--checkbox_img {
   display: block;
 }
 
+.ss-add-action-wrapper-empty-data {
+  position: relative;
+  display: inline-block;
+}
+
+.ss-add-action-wrapper-empty-data .ss-add-message-option-wrapper {
+  display: block;
+  top: 137%;
+}
+
+
+
 .ss-add-message-option-wrapper {
   min-width: 140px;
   width: 140px;
@@ -1094,6 +1106,10 @@ input#ss-message__content--user-checkbox--checkbox_img {
   width: 100%;
 }
 
+.ss-user-setting__item-select-custom {
+  width: 80%!important;
+}
+
 .ss-select-value-items {
   list-style: none;
   padding-left: 0;
@@ -1237,4 +1253,60 @@ input#ss-message__content--user-checkbox--checkbox_img {
 .ss-user-setting-checkbox-custom {
   margin-left: 1%;
   margin-right: 13%;
+}
+
+.react-datepicker-wrapper {
+  width: 20%;
+}
+
+.ant-select-selector {
+  border: 1px solid gray!important;
+  font-weight: 400;
+  font-size: 14px;
+  border-radius: 5px!important;
+  min-height: 36px!important;
+  
+}
+
+.ss-user-setting__item-custom .react-datepicker-wrapper {
+  width: 88%;
+}
+
+.ss-user-setting__item-custom-2 .react-datepicker-wrapper {
+  width: 50%;
+} 
+
+.ss-user-setting-flex-date .react-datepicker-wrapper {
+  margin-right: 10px;
+} 
+
+.ss-user-setting__item-custom-input-checkbox {
+  width: 90%
+}
+
+.ss-user-setting-custom-double-input {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.fa-plus-circle {
+  color: #347AED!important;
+}
+
+.fa-times-circle {
+  color: #ccc!important;
+}
+
+.ss-user-times-icon-custom {
+  margin-bottom: 10px;
+  font-size: 25px!important;
+  margin-left: 7px;
+}
+
+.ss-user-setting-custom-double-input-custom {
+  width: 42%;
+}
+
+.ss-user-setting-double-input-custom {
+  margin-bottom: 5px;
 }

@@ -190,6 +190,10 @@ function ScenarioList() {
         }
     }
 
+    const onclickEditScenario = (id) => {
+            Cookies.set('scenario_id',id);
+    }
+
     return (
         <div className="content">
             <Row>
@@ -239,7 +243,7 @@ function ScenarioList() {
                                                     </div>
                                                     <div className="sl-item-right">
                                                         <Link to={`/admin/scenario-setting`}>
-                                                            <Button className="sl-btn-action-edit">Edit</Button>
+                                                            <Button className="sl-btn-action-edit" onClick={() => onclickEditScenario(scenario.id)}>Edit</Button>
                                                         </Link>
                                                         <Button className="sl-btn-action-preview">Preview</Button>
                                                         <Button

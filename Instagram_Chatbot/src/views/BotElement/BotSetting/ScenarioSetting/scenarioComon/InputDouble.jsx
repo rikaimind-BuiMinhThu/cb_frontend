@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { MDBIcon } from 'mdbreact';
 
-const InputDouble = ({ id, valueLeft, valueRight, onChange, leftWidth, icon, onClickIcon, placeholder, classCustom, isReverseIcon = false, classIcon }) => {
+const InputDouble = ({ id, valueLeft, valueRight, onChange, rightWidth, icon, onClickIcon, placeholder, classCustom, isReverseIcon = false, classIcon, disabled = false }) => {
 
     return (
         <React.Fragment>
-            <div className={`ss-user-setting-double-input ${classCustom}`}>
+            <div className={`ss-user-setting-double-input ${classCustom ? classCustom : ''}`}>
                 {/* {icon && isReverseIcon &&
                     <MDBIcon
                         onClick={onClickIcon}
@@ -21,13 +21,15 @@ const InputDouble = ({ id, valueLeft, valueRight, onChange, leftWidth, icon, onC
                     type="placeholder"
                     name="ss-user-setting__name"
                     placeholder={placeholder?.[0]}
+                    disabled={disabled}
                     className="ss-user-setting__item-input-bottom ss-input-value"
                 />
                 <input
                     onChange={e => onChange(e.target.value, 'right')}
                     value={valueRight}
-                    style={leftWidth ? { width: '50%' } : {}}
+                    style={rightWidth ? { width: '50%' } : {}}
                     type="text"
+                    disabled={disabled}
                     name="ss-user-setting__name"
                     placeholder={placeholder?.[1]}
                     className="ss-user-setting__item-input-bottom ss-input-value"
