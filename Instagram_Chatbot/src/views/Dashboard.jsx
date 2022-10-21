@@ -28,6 +28,14 @@ function Dashboard() {
     if (cook === 'admin_deel') {
       setIsAdminDeel(true);
     }
+    if(cook !== "admin_deel"){
+      document.getElementById('client_management').style.display = 'none'
+      document.getElementById('user_management').style.display = 'none'
+    }else{
+      document.getElementById('client_management').style.display = 'block'
+      document.getElementById('user_management').style.display = 'block'
+    }
+    console.log("cook: ", cook)
   }, []);
 
   React.useEffect(() => {
@@ -200,7 +208,7 @@ function Dashboard() {
     <>
       <div className="content">
         <Row>
-          <Col lg="3" md="6" sm="6">
+          <Col lg="3" md="6" sm="6" id='client_management'>
             <a href="/admin/client-management">
               <Card className="card-stats">
                 <CardBody>
@@ -227,7 +235,7 @@ function Dashboard() {
               </Card>
             </a>
           </Col>
-          <Col lg="3" md="6" sm="6">
+          <Col lg="3" md="6" sm="6" id='user_management'>
             <a href="/admin/user-management">
               <Card className="card-stats">
                 <CardBody>

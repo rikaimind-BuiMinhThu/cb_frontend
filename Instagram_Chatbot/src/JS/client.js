@@ -63,7 +63,7 @@ export function checkDateEndIn(endDateIn, inputStartDate) {
     document.getElementById(`newClientEndErrMsg`).style.display = 'block';
     document.getElementById(
       `newClientEndErrMsg`
-    ).innerHTML = `終了日は開始日の前ではない必要です。`;
+    ).innerHTML = `終了日を開始日の前に設定することはできません`;
   } else {
     document.getElementById(`newClientEndErrMsg`).style.display = 'none';
     document.getElementById(`newClientEndErrMsg`).innerHTML = ``;
@@ -76,7 +76,7 @@ export function checkDateEnd(startDateIn, endDateIn) {
   var endDate = parseInt(endDateIn.replaceAll('-', ''));
   if (startDateIn !== '' && endDateIn !== '' && startDate > endDate) {
     document.getElementById(`dateCheckErrMsg`).style.display = 'block';
-    document.getElementById(`dateCheckErrMsg`).innerHTML = `終了日は開始日の前ではない必要です。`;
+    document.getElementById(`dateCheckErrMsg`).innerHTML = `終了日を開始日の前に設定することはできません`;
   } else {
     document.getElementById(`dateCheckErrMsg`).style.display = 'none';
     document.getElementById(`dateCheckErrMsg`).innerHTML = ``;
