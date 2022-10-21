@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap';
 import { useRef } from 'react';
 import { useState } from 'react';
 import ModalShort from './../../../views/Popup/ModalShort';
-
+import noImage from './../../../assets/img/no-image.jpg';
 
 
 function FileManagement() {
@@ -35,7 +35,7 @@ function FileManagement() {
         if (imageTypes.includes(file.type)) {
             setSrc(URL.createObjectURL(file));
         } else {
-            setSrc('https://www.fridgerepairs.co.za/wp-content/uploads/2022/04/no-image.jpg')
+            setSrc(noImage)
         }
         setIsOpenPreview(true);
     }
