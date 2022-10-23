@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const CheckboxCustom = ({ id, label, value = false, onChange, className, styleSpan, disabled = false }) => {
+const CheckboxCustom = ({ id, label, value = false, onChange, isOnChange = true, className, styleSpan, disabled = false }) => {
     const [data, setData] = useState(value || false);
 
     const handleChange = (valueChange) => {
@@ -13,8 +13,8 @@ const CheckboxCustom = ({ id, label, value = false, onChange, className, styleSp
                 <input
                     disabled={disabled}
                     id={id}
-                    checked={data}
-                    onChange={e => handleChange(e.target.checked)}
+                    checked={isOnChange ? data : value}
+                    onChange={isOnChange ? e => handleChange(e.target.checked) : onChange}
                     type="checkbox"
                     name="ss-user-setting__item-text_input-save-variable"
                 />

@@ -1310,3 +1310,15 @@ input#ss-message__content--user-checkbox--checkbox_img {
 .ss-user-setting-double-input-custom {
   margin-bottom: 5px;
 }
+
+.ss-user-setting-input-delay {
+  width: 16%;
+}
+
+.ss-custom-label-zip-code {
+  width: 15%!important;
+}
+
+.fa-minus-circle {
+  color: #ccc!important;
+}
