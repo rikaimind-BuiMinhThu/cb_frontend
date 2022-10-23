@@ -5901,9 +5901,9 @@ const Scenario = () => {
                                   <InputCustom
                                     style={{ height: '38.2px', margin: '10px', width: '22%' }}
                                     label="Registration button name"
-                                    value={dataMessages[indexMessageSelect].conditions.buttonName}
+                                    value={dataMessages[indexMessageSelect].buttonNameCondition}
                                     onChange={(value) => {
-                                      dataMessages[indexMessageSelect].conditions.buttonName = value;
+                                      dataMessages[indexMessageSelect].buttonNameCondition = value;
                                       setDataMessages([...dataMessages]);
                                     }}
                                   />
