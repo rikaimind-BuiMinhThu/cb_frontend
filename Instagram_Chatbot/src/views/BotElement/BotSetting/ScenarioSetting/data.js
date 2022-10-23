@@ -5,6 +5,14 @@ let dataClone = {
             id: '1',
             hidden: true,
             belong_to: 'user',
+            conditions: [
+                {
+                    linkCondition: 'and',
+                    nameCondition: '',
+                    condition: '',
+                    inputCondition: ''
+                }
+            ],
             message_content: [
                 {
                     id: 1,

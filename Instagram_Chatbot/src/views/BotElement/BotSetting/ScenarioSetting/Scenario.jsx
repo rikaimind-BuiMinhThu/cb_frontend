@@ -1170,6 +1170,164 @@ let dataTypePullDown = [
   }
 ];
 
+let dataCondition = [
+  {
+    key: 'current_url',
+    value: 'current_url'
+  },
+  {
+    key: 'current_url_param',
+    value: 'current_url_param'
+  },
+  {
+    key: 'current_url_title',
+    value: 'current_url_title'
+  },
+  {
+    key: 'user_id',
+    value: 'user_id'
+  },
+  {
+    key: 'bot_id',
+    value: 'bot_id'
+  },
+  {
+    key: 'preview_flg',
+    value: 'preview_flg'
+  },
+  {
+    key: 'user_ip_address',
+    value: 'user_ip_address'
+  },
+  {
+    key: 'user_country',
+    value: 'user_country'
+  },
+  {
+    key: 'user_city',
+    value: 'user_city'
+  },
+  {
+    key: 'user_device',
+    value: 'user_device'
+  },
+  {
+    key: 'user_browser',
+    value: 'user_browser'
+  },
+  {
+    key: 'user_agent',
+    value: 'user_agent'
+  },
+  {
+    key: 'cv_flg',
+    value: 'cv_flg'
+  },
+  {
+    key: 'start_datetime',
+    value: 'start_datetime'
+  },
+  {
+    key: 'user_referer_firstopen',
+    value: 'user_referer_firstopen'
+  },
+  {
+    key: 'user_referer_current',
+    value: 'user_referer_current'
+  },
+  {
+    key: 'churn_block_passed',
+    value: 'churn_block_passed'
+  },
+  {
+    key: 'prevention_block_passed',
+    value: 'prevention_block_passed'
+  },
+  {
+    key: 'churn_request_flag',
+    value: 'churn_request_flag'
+  },
+  {
+    key: 'Phone number_hyphen',
+    value: 'Phone number_hyphen'
+  },
+  {
+    key: 'Address_zip code 1',
+    value: 'Address_zip code 1'
+  },
+  {
+    key: 'Address_Building name',
+    value: 'Address_Building name'
+  },
+  {
+    key: 'address',
+    value: 'address'
+  },
+  {
+    key: 'email address',
+    value: 'email address'
+  },
+  {
+    key: 'phone number',
+    value: 'phone number'
+  },
+  {
+    key: 'sex',
+    value: 'sex'
+  },
+  {
+    key: 'date of birth',
+    value: 'date of birth'
+  },
+  {
+    key: 'Address_zip code',
+    value: 'Address_zip code'
+  },
+  {
+    key: 'Address_postal code with hyphens',
+    value: 'Address_postal code with hyphens'
+  },
+  {
+    key: 'Address_zip code 1h',
+    value: 'Address_zip code 1h'
+  },
+  {
+    key: 'Address_zip code 2',
+    value: 'Address_zip code 2'
+  },
+  {
+    key: 'Address_Prefecture',
+    value: 'Address_Prefecture'
+  },
+  {
+    key: 'Address_City',
+    value: 'Address_City'
+  },
+  {
+    key: 'street address',
+    value: 'street address'
+  }
+];
+
+let dataSubCondition = [
+  {
+    key: 'is',
+    value: 'is'
+  },
+  {
+    key: 'is_not',
+    value: 'is not'
+  },
+  {
+    key: 'include',
+    value: 'include'
+  },
+  {
+    key: 'not_include',
+    value: 'not include'
+  }
+]
+
 const Scenario = () => {
   // states
   const [scenarioName, setScenarioName] = useState('');
@@ -1205,7 +1363,10 @@ const Scenario = () => {
 
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState('');
-  const [dataEmail, setDataEmail] = useState([])
+  const [dataEmail, setDataEmail] = useState([]);
+
+  const [isConditionUp, setIsConditionUp] = useState(false);
+  const [conditions, setConditions] = useState([]);
   // side effects
 
   useEffect(() => {
@@ -1214,11 +1375,7 @@ const Scenario = () => {
   }, [])
 
   useEffect(() => {
-    api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`).then((res) => {
-      console.log(res.data.data);
-      setDataMessages(res.data.data?.conversation?.messages);
-      setScenarioName(res.data.data?.conversation?.scenarioName || '');
-    }).catch((error) => { console.error(error) });
+    handleGetMessage();
   }, [])
 
 
@@ -1237,6 +1394,14 @@ const Scenario = () => {
     document.title = 'Edit Scenario';
     window.scrollTo(0, 0);
   }, []);
+
+  const handleGetMessage = () => {
+    api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`).then((res) => {
+      console.log(res.data.data);
+      setDataMessages(res.data.data?.conversation?.messages);
+      setScenarioName(res.data.data?.conversation?.scenarioName || '');
+    }).catch((error) => { console.error(error) });
+  }
 
   function botUploadFile() {
     document.getElementById('ss-bot-file-upload').click();
@@ -1284,6 +1449,12 @@ const Scenario = () => {
     setBelongTo(belongTo);
     setMessageType(dataMessages[index].message_content[indexLastEle]?.type || 'text_input');
     setIndexMessageSelect(index);
+    setIsConditionUp(false);
+    if (belongTo === 'bot' && document.querySelector('.ss-bot-setting-condition-container')) {
+      document.querySelector('.ss-bot-setting-condition-container').style.height = '20%';
+    } else if (belongTo === 'user' && document.querySelector('.ss-user-setting__main')) {
+      document.querySelector('.ss-user-setting__main').style.height = '57%';
+    }
 
     //Change border color for last ele message content
     document.querySelector(`.ss-user-setting__item-${indexLastEle}`) && document.querySelector(`.ss-user-setting__item-${indexLastEle}`).classList.add('ss-user-setting__item--active');
@@ -1648,6 +1819,16 @@ const Scenario = () => {
     setDataMessages([...dataMessages]);
   }
 
+  const handleDragEndMessageOverview = (result) => {
+    if (!result.destination) return;
+    let messageArr = [...dataMessages];
+    const items = Array.from(messageArr);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setDataMessages([...items]);
+  }
+
   const handleDragEndRadioCheckbox = (result, idContent, type, contentType) => {
     if (!result.destination) return;
     let messageArr = dataMessages.filter((message, index) => message.belong_to === 'user' && index === indexMessageSelect)[0].message_content
@@ -1779,6 +1960,7 @@ const Scenario = () => {
       } else if (res.data.code === 2) {
         setMessageNoti(res.data.message);
       }
+      handleGetMessage();
       setTimeout(() => {
         setIsOpenNoti(false);
         setMessageNoti('');
@@ -1787,14 +1969,15 @@ const Scenario = () => {
   }
 
   const onClickCreateStatement = (belongTo, indexMessage) => {
-    // let dataMessagesClone = dataMessages;
-    console.log(dataMessages, indexMessage);
-    if (indexMessage === undefined) {
-      dataMessages = [
+    let dataMessagesClone = [...dataMessages];
+    console.log(dataMessagesClone, indexMessage);
+    if (indexMessage === undefined && belongTo === 'bot') {
+      dataMessagesClone = [
         {
           id: 1,
           hidden: false,
           belong_to: belongTo,
+          conditions: [],
           message_content: [
             {
               id: 1,
@@ -1803,34 +1986,93 @@ const Scenario = () => {
           ]
         }
       ];
+    } else if (indexMessage === undefined && belongTo === 'user') {
+      dataMessagesClone = [
+        {
+          id: 1,
+          hidden: false,
+          belong_to: belongTo,
+          conditions: [],
+          message_content: []
+        }
+      ];
     } else if (belongTo === 'bot') {
-      let idMax = Math.max(...dataMessages.map(item => item.id)) + 1;
-      dataMessages.splice(indexMessage + 1, 0,
+      let idMax = Math.max(...dataMessagesClone.map(item => item.id)) + 1;
+      dataMessagesClone.splice(indexMessage + 1, 0,
         {
           id: idMax,
           hidden: false,
           belong_to: belongTo,
+          conditions: [],
           message_content: [
             {
               id: 1,
-              type: 'text_input'
+              type: 'text_input',
+              text_input: {
+                text: {},
+                email_confirmation: {},
+                phone_number: {},
+                password: {},
+                password_confirmation: {},
+              }
             }
           ]
         }
       )
     } else if (belongTo === 'user') {
-      let idMax = Math.max(...dataMessages.map(item => item.id)) + 1;
-      dataMessages.splice(indexMessage + 1, 0,
+      let idMax = Math.max(...dataMessagesClone.map(item => item.id)) + 1;
+      dataMessagesClone.splice(indexMessage + 1, 0,
         {
           id: idMax,
           hidden: false,
           belong_to: belongTo,
-          message_content: [
-          ]
+          conditions: [],
+          message_content: []
         }
       )
     }
+    console.log(dataMessagesClone)
+    setDataMessages([...dataMessagesClone]);
+  }
 
+  const handlePannelCondition = (isUpCondition, role = 'bot') => {
+    console.log(isUpCondition);
+    setIsConditionUp(isUpCondition);
+    if (role === 'bot') {
+      if (isUpCondition) {
+        document.querySelector('.ss-bot-setting-condition-container').style.height = '52%';
+      } else {
+        document.querySelector('.ss-bot-setting-condition-container').style.height = '20%';
+      }
+    } else if (role === 'user') {
+      if (isUpCondition) {
+        document.querySelector('.ss-user-setting__main').style.height = '25%';
+      } else {
+        document.querySelector('.ss-user-setting__main').style.height = '57%';
+      }
+    }
+  }
+
+  const onChangeValueCondition = (index, value, name) => {
+    dataMessages[indexMessageSelect].conditions[index][name] = value;
+    setConditions([...conditions])
+  }
+
+  const onClickAddCondition = () => {
+    console.log('onClickAddCondition')
+    dataMessages[indexMessageSelect].conditions.push({
+      linkCondition: 'and',
+      condition: 'is',
+      nameCondition: 'current_url',
+      inputCondition: ''
+    });
+    setDataMessages([...dataMessages]);
+  }
+
+  const handleDeleteCondition = (indexCondition) => {
+    let dataMessageClone = [...dataMessages];
+    let dataConditionFilter = dataMessageClone[indexMessageSelect].conditions.filter((item, index) => index !== indexCondition);
+    dataMessageClone[indexMessageSelect].conditions = dataConditionFilter;
     setDataMessages([...dataMessages]);
   }
 
@@ -1858,7 +2100,7 @@ const Scenario = () => {
                   {/* Overview scenario */}
                   <div style={{ height: 'calc(100% - 44px)', backgroundColor: '#f6fbff' }}>
                     <div className="ss-overview-detail">
-                      {!dataMessages &&
+                      {(!dataMessages || dataMessages.length === 0) &&
                         <div className="ss-add-action-wrapper-empty-data">
                           <MDBIcon fas icon="plus-circle" className="ss-add-icon"></MDBIcon>
                           <div className="ss-add-message-option-wrapper">
@@ -1881,37 +2123,42 @@ const Scenario = () => {
                           </div>
                         </div>
                       }
-                      {dataMessages && dataMessages.map((message, index, arr) => {
-                        let content;
-
-                        if (message.belong_to === 'bot') content = message.message_content[0];
-                        return message.belong_to === 'bot' ? (
-                          <div id={`message_${index}`} key={index} className="ss-bot-chat-wrapper ss-message-wrapper">
-                            <div
-                              className={`ss-bot-chat ss-message ss-message--select ss-message-${index}`}
-                            >
-                              {content.type !== 'text_input' && <span style={{ marginLeft: '49px' }}>{content.type}</span>}
-                              <div
-                                className="ss-bot-chat-detail ss-message__detail"
-                                onClick={() =>
-                                  handleSelectMessage(index, message.belong_to, content?.type)
-                                }
-                              >
-                                <img className="ss-bot-ava" src={icon} alt="" />
-                                {content ?
-                                  <React.Fragment>
-                                    {/* bot: type == 'text_input' */}
-                                    {content.type === 'text_input' && (
-                                      <textarea
-                                        className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                        value={content[content.type]?.content || ''}
-                                        // onChange={() => onChangeValueMessageContent(indexMessageSelect, index, content.type, value, 'content')}
-                                        readOnly
-                                      ></textarea>
-                                    )}
-                                    {/* bot: type == 'file' */}
-                                    {/* file type: jpeg, jpg, png */}
-                                    {/* {content.type === 'file' && (
+                      <DragDropContext onDragEnd={handleDragEndMessageOverview}>
+                        <Droppable droppableId="messages-overview">
+                          {(provided) => (
+                            <div className="" {...provided.droppableProps} ref={provided.innerRef}>
+                              {dataMessages && dataMessages.map((message, index, arr) => {
+                                let content;
+                                if (message.belong_to === 'bot') content = message.message_content[0];
+                                return message.belong_to === 'bot' ? (
+                                  <Draggable key={message.id} draggableId={message.id.toString()} index={index}>
+                                    {(provided) => (
+                                      <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef} id={`message_${index}`} key={index} className="ss-bot-chat-wrapper ss-message-wrapper">
+                                        <div
+                                          className={`ss-bot-chat ss-message ss-message--select ss-message-${index}`}
+                                        >
+                                          {content.type !== 'text_input' && <span style={{ marginLeft: '49px' }}>{content.type}</span>}
+                                          <div
+                                            className="ss-bot-chat-detail ss-message__detail"
+                                            onClick={() =>
+                                              handleSelectMessage(index, message.belong_to, content?.type)
+                                            }
+                                          >
+                                            <img className="ss-bot-ava" src={icon} alt="" />
+                                            {content ?
+                                              <React.Fragment>
+                                                {/* bot: type == 'text_input' */}
+                                                {content.type === 'text_input' && (
+                                                  <textarea
+                                                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                    value={content[content.type]?.content || ''}
+                                                    // onChange={() => onChangeValueMessageContent(indexMessageSelect, index, content.type, value, 'content')}
+                                                    readOnly
+                                                  ></textarea>
+                                                )}
+                                                {/* bot: type == 'file' */}
+                                                {/* file type: jpeg, jpg, png */}
+                                                {/* {content.type === 'file' && (
                                       <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-img">
                                         <img
                                           src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/63354faaba626.jpg"
@@ -1920,8 +2167,8 @@ const Scenario = () => {
                                       </div>
                                     )} */}
 
-                                    {/* file type: gif, mp4 */}
-                                    {/* {content.type === 'file' && (
+                                                {/* file type: gif, mp4 */}
+                                                {/* {content.type === 'file' && (
                                       <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-video">
                                         <video
                                           src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/633551125f613.mp4"
@@ -1930,1221 +2177,1253 @@ const Scenario = () => {
                                       </div>
                                     )} */}
 
-                                    {/* file type: pdf */}
-                                    {content.type === 'file' && (
-                                      // <textarea
-                                      //   className="ss-bot-chat-detail-content ss-message__content--bot-file-pdf ss-input-value"
-                                      //   value={
-                                      //     'https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/6335523536dd4.pdf'
-                                      //   }
-                                      //   readOnly
-                                      // ></textarea>
-                                      <span
-                                        style={{
-                                          cursor: 'pointer',
-                                          color: 'blue',
-                                          fontWeight: '400',
-                                          fontSize: '15px',
-                                        }}
-                                      >
-                                        Download this file
-                                      </span>
-                                    )}
-
-                                    {/* bot: type == 'email' */}
-                                    {content.type === 'email' && (
-                                      <textarea
-                                        className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                        value={content[content.type]?.content || ''}
-                                        readOnly
-                                      ></textarea>
-                                    )}
-
-                                    {/* bot: type == 'script' */}
-                                    {content.type === 'script' && (
-                                      <textarea
-                                        className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                        value={content[content.type]?.content || ''}
-                                        readOnly
-                                      ></textarea>
-                                    )}
-                                    {/* bot: type == 'delay' */}
-                                    {content.type === 'delay' && (
-                                      <textarea
-                                        className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                        value={`${content[content.type]?.content || 0} 秒`}
-                                        readOnly
-                                      ></textarea>
-                                    )}
-                                    <div className="ss-chat-option">
-                                      <MDBIcon
-                                        fas
-                                        icon="pencil-alt"
-                                        // style={{ marginTop: '10px' }}
-                                        onClick={() => handleEditIconClick(index)}
-                                      ></MDBIcon>
-                                      <MDBIcon
-                                        fas
-                                        icon="grip-vertical"
-                                        style={{ marginTop: '10px' }}
-                                      ></MDBIcon>
-                                      <div
-                                        className={`ss-edit-option-wrapper ss-edit-option-wrapper-${index}`}
-                                      >
-                                        <div onClick={() => handleCopyMessage(index)} className="ss-option-wrapper">
-                                          <MDBIcon
-                                            fas
-                                            icon="copy"
-                                            className="ss-add-option-icon"
-                                          ></MDBIcon>
-                                          <span>Copy</span>
-                                        </div>
-                                        <div className="ss-option-wrapper" onClick={() => handleHiddenMessage(index, 'bot')}>
-                                          {message.hidden ?
-                                            <React.Fragment>
-                                              <MDBIcon
-                                                fas
-                                                icon="angle-double-up"
-                                                className="ss-add-option-icon"
-                                              ></MDBIcon>
-                                              <span>To enable</span>
-                                            </React.Fragment> :
-                                            <React.Fragment>
-                                              <MDBIcon
-                                                fas
-                                                icon="eye-slash"
-                                                className="ss-add-option-icon"
-                                              ></MDBIcon>
-                                              <span>Hidden</span>
-                                            </React.Fragment>
-                                          }
-                                        </div>
-                                        <div className="ss-option-wrapper" onClick={() => handleDeleteMessage(index)}>
-                                          <MDBIcon
-                                            fas
-                                            icon="trash"
-                                            className="ss-add-option-icon"
-                                          ></MDBIcon>
-                                          <span>Delete</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </React.Fragment> :
-                                  <React.Fragment>
-                                    <textarea
-                                      className="ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value"
-                                      value={botTextValue}
-                                      readOnly
-                                    ></textarea>
-                                    <div className="ss-chat-option">
-                                      <MDBIcon
-                                        fas
-                                        icon="pencil-alt"
-                                        // style={{ marginTop: '10px' }}
-                                        onClick={() => handleEditIconClick(index)}
-                                      ></MDBIcon>
-                                      <MDBIcon
-                                        fas
-                                        icon="grip-vertical"
-                                        style={{ marginTop: '10px' }}
-                                      ></MDBIcon>
-                                      <div
-                                        className={`ss-edit-option-wrapper ss-edit-option-wrapper-${index}`}
-                                      >
-                                        <div onClick={() => handleCopyMessage(index)} className="ss-option-wrapper">
-                                          <MDBIcon
-                                            fas
-                                            icon="copy"
-                                            className="ss-add-option-icon"
-                                          ></MDBIcon>
-                                          <span>Copy</span>
-                                        </div>
-                                        <div className="ss-option-wrapper">
-                                          <MDBIcon
-                                            fas
-                                            icon="eye-slash"
-                                            className="ss-add-option-icon"
-                                          ></MDBIcon>
-                                          <span>Hidden</span>
-                                        </div>
-                                        <div className="ss-option-wrapper">
-                                          <MDBIcon
-                                            fas
-                                            icon="trash"
-                                            className="ss-add-option-icon"
-                                          ></MDBIcon>
-                                          <span>Delete</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </React.Fragment>
-                                }
-                              </div>
-                              <div className="ss-add-action-wrapper">
-                                <MDBIcon fas icon="plus-circle" className="ss-add-icon"></MDBIcon>
-                                <div className="ss-add-message-option-wrapper">
-                                  <div className="ss-option-wrapper" onClick={() => onClickCreateStatement('bot', index)}>
-                                    <MDBIcon
-                                      fas
-                                      icon="comment"
-                                      className="ss-add-option-icon"
-                                    ></MDBIcon>
-                                    <span>Bot statement</span>
-                                  </div>
-                                  <div className="ss-option-wrapper" onClick={() => onClickCreateStatement('user', index)}>
-                                    <MDBIcon
-                                      fas
-                                      icon="comment"
-                                      className="ss-add-option-icon"
-                                    ></MDBIcon>
-                                    <span>User input</span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-
-                        ) : (
-                          <div key={index} className="ss-user-chat-wrapper ss-message-wrapper">
-                            <div
-                              className={`ss-user-chat ss-message ss-message--error ss-message-${index}`}
-                            // style={message?.message_content.length === 0 ? {width: '30%'}: {}}
-                            >
-                              <div
-                                className="ss-user-chat-detail ss-message__detail"
-                                onClick={() =>
-                                  handleSelectMessage(index, message.belong_to, message.message_content[message.message_content.length - 1])
-                                }
-                              >
-                                <div className="ss-user-chat-detail-content">
-                                  <div className="ss-user-message__content-wrapper">
-                                    {message?.message_content.map((content, index) => {
-                                      let textInput = content.text_input;
-                                      let label = content.label;
-                                      let textarea = content.textarea;
-                                      let radioButton = content.radio_button;
-                                      let checkbox = content.checkbox;
-                                      let pullDown = content.pull_down;
-                                      let zipCodeAddress = content.zip_code_address;
-                                      let attachingFile = content.attaching_file;
-                                      let calendar = content.calendar;
-                                      let agreeTerm = content.agree_term;
-
-                                      return (
-                                        <React.Fragment>
-                                          {/* type == 'text_input' */}
-                                          {
-                                            content.type === 'text_input' && (
-                                              <>
-                                                {(textInput.title || textInput.require) &&
-                                                  <div className="ss-message__content--user-text-input-top">
-                                                    <span className="ss-message__content--user-text-input-title">
-                                                      {textInput.title}
-                                                    </span>
-                                                    {textInput.require === true &&
-                                                      <span className="ss-message__content--user-text-input-required">
-                                                        * required
-                                                      </span>
-                                                    }
-                                                  </div>
-                                                }
-                                                {(textInput.type === 'text') &&
-                                                  (textInput.text.isSplitInput ?
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                      <input
-                                                        className="ss-message__content--user-text-input ss-input-value"
-                                                        readOnly
-                                                        placeholder={textInput.text?.placeholderLeft}
-                                                        style={{ width: '49%', marginBottom: '0px' }}
-                                                        disabled
-                                                      ></input>
-                                                      <input
-                                                        className="ss-message__content--user-text-input ss-input-value"
-                                                        readOnly
-                                                        placeholder={textInput.text?.placeholderRight}
-                                                        style={{ width: '49%' }}
-                                                        disabled
-                                                      ></input>
-                                                    </div> :
-                                                    <React.Fragment>
-                                                      <input
-                                                        className="ss-message__content--user-text-input ss-input-value"
-                                                        readOnly
-                                                        style={{ marginBottom: '0px' }}
-                                                        placeholder={textInput[textInput.type]?.placeholderLeft}
-                                                        disabled
-                                                      ></input>
-                                                      <span style={{ fontWeight: '400', color: 'black', fontSize: '12px', marginLeft: '18px' }}>{textInput.text?.placeholderRight}</span>
-                                                    </React.Fragment>
-                                                  )
-                                                }
-                                                {(textInput.type === 'phone_number') &&
-                                                  <React.Fragment>
-                                                    {textInput.phone_number.withHyphen === false ?
-                                                      <input
-                                                        className="ss-message__content--user-text-input ss-input-value"
-                                                        readOnly
-                                                        style={{ marginBottom: '0px' }}
-                                                        placeholder={textInput[textInput.type]?.number}
-                                                        disabled
-                                                      ></input> :
-                                                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                        <input
-                                                          className="ss-message__content--user-text-input ss-input-value"
-                                                          readOnly
-                                                          style={{ marginBottom: '0px', width: '32%' }}
-                                                          placeholder={textInput[textInput.type]?.number1}
-                                                          disabled
-                                                        ></input>
-                                                        <input
-                                                          className="ss-message__content--user-text-input ss-input-value"
-                                                          readOnly
-                                                          style={{ marginBottom: '0px', width: '32%' }}
-                                                          placeholder={textInput[textInput.type]?.number2}
-                                                          disabled
-                                                        ></input>
-                                                        <input
-                                                          className="ss-message__content--user-text-input ss-input-value"
-                                                          readOnly
-                                                          style={{ marginBottom: '0px', width: '32%' }}
-                                                          placeholder={textInput[textInput.type]?.number3}
-                                                          disabled
-                                                        ></input>
-                                                      </div>
-                                                    }
-                                                  </React.Fragment>
-                                                }
-                                                {(textInput.type === 'password') &&
-                                                  <React.Fragment>
-                                                    <input
-                                                      className="ss-message__content--user-text-input ss-input-value"
-                                                      readOnly
-                                                      style={{ marginBottom: '0px' }}
-                                                      placeholder={textInput[textInput.type]?.password}
-                                                      disabled
-                                                    ></input>
-                                                  </React.Fragment>
-                                                }
-                                                {(textInput.type === 'urls' ||
-                                                  textInput.type === 'email_address') &&
-                                                  <React.Fragment>
-                                                    <input
-                                                      className="ss-message__content--user-text-input ss-input-value"
-                                                      readOnly
-                                                      style={{ marginBottom: '0px' }}
-                                                      placeholder={textInput[textInput.type]}
-                                                      disabled
-                                                    ></input>
-                                                  </React.Fragment>
-                                                }
-                                                {(textInput.type === 'email_confirmation') &&
-                                                  (<>
-                                                    <input
-                                                      className="ss-message__content--user-text-input ss-input-value"
-                                                      readOnly
-                                                      disabled
-                                                      placeholder={textInput[textInput.type].cfEmlAdd_email}
-                                                    ></input>
-                                                    <input
-                                                      className="ss-message__content--user-text-input ss-input-value"
-                                                      readOnly
-                                                      placeholder={textInput[textInput.type].cfEmlAdd_confirm_email}
-                                                      disabled
-                                                    ></input>
-                                                  </>
-                                                  )}
-                                                {(textInput.type === 'password_confirmation') &&
-                                                  (<>
-                                                    <input
-                                                      className="ss-message__content--user-text-input ss-input-value"
-                                                      readOnly
-                                                      disabled
-                                                      placeholder={textInput[textInput.type].password}
-                                                    ></input>
-                                                    <input
-                                                      className="ss-message__content--user-text-input ss-input-value"
-                                                      readOnly
-                                                      placeholder={textInput[textInput.type].confirm_password}
-                                                      disabled
-                                                    ></input>
-                                                  </>
-                                                  )}
-                                              </>
-                                            )
-                                          }
-                                          {/* type == 'label' */}
-                                          {
-                                            content.type === 'label' && (
-                                              <>
-                                                <div className="ss-message__content--user-label-top">
-                                                  <span className="ss-message__content--user-label-title">
-                                                    {label.lbl_content}
+                                                {/* file type: pdf */}
+                                                {content.type === 'file' && (
+                                                  // <textarea
+                                                  //   className="ss-bot-chat-detail-content ss-message__content--bot-file-pdf ss-input-value"
+                                                  //   value={
+                                                  //     'https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/6335523536dd4.pdf'
+                                                  //   }
+                                                  //   readOnly
+                                                  // ></textarea>
+                                                  <span
+                                                    style={{
+                                                      cursor: 'pointer',
+                                                      color: 'blue',
+                                                      fontWeight: '400',
+                                                      fontSize: '15px',
+                                                    }}
+                                                  >
+                                                    Download this file
                                                   </span>
-                                                  {label?.require === true &&
-                                                    <span className="ss-message__content--user-required">
-                                                      * required
-                                                    </span>
-                                                  }
-                                                </div>
-                                              </>
-                                            )
-                                          }
-                                          {/* type == 'textarea' */}
-                                          {
-                                            content.type === 'textarea' && (
-                                              <>
-                                                <div className="ss-message__content--user-textarea-top">
-                                                  <span className="ss-message__content--user-textarea-title">
-                                                    {textarea.title}
-                                                  </span>
-                                                  {textarea.require === true &&
-                                                    <span className="ss-message__content--user-text-input-required">
-                                                      * required
-                                                    </span>
-                                                  }
-                                                </div>
-                                                {(textarea?.type === 'text_input' ||
-                                                  textarea?.type === 'invalid_input') && (
-                                                    <textarea
-                                                      className="ss-message__content--user-textarea ss-input-value"
-                                                      readOnly
-                                                      placeholder={textarea[textarea.type]?.content}
-                                                      rows={3}
-                                                    ></textarea>
-                                                  )}
-                                                {textarea?.type === 'consume_api_response' && (
+                                                )}
+
+                                                {/* bot: type == 'email' */}
+                                                {content.type === 'email' && (
                                                   <textarea
-                                                    className="ss-message__content--user-textarea ss-input-value"
+                                                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                    value={content[content.type]?.content || ''}
                                                     readOnly
-                                                    value={'入力値の検証にAPIを利用する'}
-                                                    rows={3}
                                                   ></textarea>
                                                 )}
-                                              </>
-                                            )
-                                          }
-                                          {/* type == 'radio_button' */}
-                                          {
-                                            content.type === 'radio_button' && (
-                                              <>
-                                                {console.log(radioButton, 'chcekkkradioButton')}
 
-                                                <div className="ss-message__content--user-radio_button-top">
-                                                  <span className="ss-message__content--user-radio_button-title">
-                                                    {radioButton.title}
-                                                  </span>
-                                                  {radioButton.require === true &&
-                                                    <span className="ss-message__content--user-text-input-required">
-                                                      * required
-                                                    </span>
-                                                  }
+                                                {/* bot: type == 'script' */}
+                                                {content.type === 'script' && (
+                                                  <textarea
+                                                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                    value={content[content.type]?.content || ''}
+                                                    readOnly
+                                                  ></textarea>
+                                                )}
+                                                {/* bot: type == 'delay' */}
+                                                {content.type === 'delay' && (
+                                                  <textarea
+                                                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                    value={`${content[content.type]?.content || 0} 秒`}
+                                                    readOnly
+                                                  ></textarea>
+                                                )}
+                                                <div className="ss-chat-option">
+                                                  <MDBIcon
+                                                    fas
+                                                    icon="pencil-alt"
+                                                    // style={{ marginTop: '10px' }}
+                                                    onClick={() => handleEditIconClick(index)}
+                                                  ></MDBIcon>
+                                                  <MDBIcon
+                                                    fas
+                                                    icon="grip-vertical"
+                                                    style={{ marginTop: '10px' }}
+                                                  ></MDBIcon>
+                                                  <div
+                                                    className={`ss-edit-option-wrapper ss-edit-option-wrapper-${index}`}
+                                                  >
+                                                    <div onClick={() => handleCopyMessage(index)} className="ss-option-wrapper">
+                                                      <MDBIcon
+                                                        fas
+                                                        icon="copy"
+                                                        className="ss-add-option-icon"
+                                                      ></MDBIcon>
+                                                      <span>Copy</span>
+                                                    </div>
+                                                    <div className="ss-option-wrapper" onClick={() => handleHiddenMessage(index, 'bot')}>
+                                                      {message.hidden ?
+                                                        <React.Fragment>
+                                                          <MDBIcon
+                                                            fas
+                                                            icon="angle-double-up"
+                                                            className="ss-add-option-icon"
+                                                          ></MDBIcon>
+                                                          <span>To enable</span>
+                                                        </React.Fragment> :
+                                                        <React.Fragment>
+                                                          <MDBIcon
+                                                            fas
+                                                            icon="eye-slash"
+                                                            className="ss-add-option-icon"
+                                                          ></MDBIcon>
+                                                          <span>Hidden</span>
+                                                        </React.Fragment>
+                                                      }
+                                                    </div>
+                                                    <div className="ss-option-wrapper" onClick={() => handleDeleteMessage(index)}>
+                                                      <MDBIcon
+                                                        fas
+                                                        icon="trash"
+                                                        className="ss-add-option-icon"
+                                                      ></MDBIcon>
+                                                      <span>Delete</span>
+                                                    </div>
+                                                  </div>
                                                 </div>
-                                                <div className="ss-message__content--user-radio_button-wrapper">
-                                                  {radioButton.type === 'default' && (
-                                                    radioButton[radioButton.type].map((item, index) => {
-                                                      return <div key={index} className="ss-message__content--user-radio_button">
-                                                        <input
-                                                          type="radio"
-                                                          name="ss-message__content--user-radio_button"
-                                                          id="ss-message__content--user-radio_button"
-                                                          disabled
-                                                          checked={radioButton.initial_selection === item.id}
-                                                        />
-                                                        {item.text &&
-                                                          <label htmlFor="ss-message__content--user-radio_button">
-                                                            {item.text}
-                                                          </label>
-                                                        }
-                                                      </div>
-                                                    })
-                                                  )}
-                                                  {radioButton.type === 'radio_button_img' && (
-                                                    radioButton[radioButton.type].map((item, index) => {
-                                                      return <div key={index} className="ss-message__content--user-radio_button--radio_button_img">
-                                                        <input
-                                                          type="radio"
-                                                          name="ss-message__content--user-radio_button--radio_button_img"
-                                                          id="ss-message__content--user-radio_button--radio_button_img"
-                                                          disabled
-                                                          checked={radioButton.initial_selection === item.id}
-                                                        />
-                                                        <img
-                                                          src={item.img}
-                                                          alt=""
-                                                        />
-                                                      </div>
-                                                    })
-                                                  )}
-                                                  {radioButton.type === 'consume_api_response' && (
-                                                    <>
-                                                      <div className="ss-message__content--user-radio_button">
-                                                        <input
-                                                          type="radio"
-                                                          name="ss-message__content--user-radio_button"
-                                                          id="ss-message__content--user-radio_button"
-                                                          disabled
-                                                        />
-                                                        <label htmlFor="ss-message__content--user-radio_button">
-                                                          label
-                                                        </label>
-                                                      </div>
-                                                      <div className="ss-message__content--user-radio_button">
-                                                        <input
-                                                          type="radio"
-                                                          name="ss-message__content--user-radio_button"
-                                                          id="ss-message__content--user-radio_button"
-                                                          disabled
-                                                        />
-                                                        <label htmlFor="ss-message__content--user-radio_button">
-                                                          label
-                                                        </label>
-                                                      </div>
-                                                    </>
-                                                  )}
-                                                  {radioButton.type === 'block_style' && (
-                                                    radioButton[radioButton.type].map((item, index) => {
-                                                      return item.text && <div style={{ marginBottom: '10px' }} key={index} className="ss-message__content--user-radio_button--block_style">
-                                                        <span>{item.text}</span>
-                                                      </div>
-                                                    })
-                                                  )}
-                                                </div>
-                                              </>
-                                            )
-                                          }
-                                          {/* type == 'checkbox' */}
-                                          {
-                                            content.type === 'checkbox' && (
+                                              </React.Fragment> :
                                               <React.Fragment>
-                                                <div className="ss-message__content--user-checkbox-top">
-                                                  <span className="ss-message__content--user-checkbox-title">
-                                                    {checkbox.title}
-                                                  </span>
-                                                  {checkbox.require === true &&
-                                                    <span className="ss-message__content--user-text-input-required">
-                                                      * required
-                                                    </span>
-                                                  }
-                                                </div>
-                                                <div className="ss-message__content--user-checkbox-wrapper">
-                                                  {checkbox.type === 'default' && (
-                                                    checkbox[checkbox.type].map((item, index) => {
-                                                      return <div key={index} className="ss-message__content--user-checkbox">
-                                                        <input
-                                                          type="checkbox"
-                                                          name="ss-message__content--user-checkbox"
-                                                          id="ss-message__content--user-checkbox"
-                                                          disabled
-                                                          checked={checkbox.all_item_checked}
-                                                        />
-                                                        <label htmlFor="ss-message__content--user-checkbox">
-                                                          {item.text}
-                                                        </label>
-                                                      </div>
-                                                    })
-                                                  )}
-                                                  {checkbox.type === 'checkbox_img' && (
-                                                    checkbox[checkbox.type].map((item, index) => {
-                                                      return <div key={index} className="ss-message__content--user-checkbox--checkbox_img" style={{ marginBottom: '10px' }}>
-                                                        <input
-                                                          type="checkbox"
-                                                          name="ss-message__content--user-checkbox--checkbox_img"
-                                                          id="ss-message__content--user-checkbox--checkbox_img"
-                                                          disabled
-                                                          checked={checkbox.all_item_checked}
-                                                        />
-                                                        <img
-                                                          src={item.img}
-                                                          alt=""
-                                                        />
-                                                        <div style={{ textAlign: 'center' }}>{item.text}</div>
-                                                      </div>
-                                                    })
-                                                  )}
-                                                  {checkbox.type === 'consume_api_response' && (
-                                                    <>
-                                                      <div className="ss-message__content--user-checkbox">
-                                                        <input
-                                                          type="checkbox"
-                                                          name="ss-message__content--user-checkbox"
-                                                          id="ss-message__content--user-checkbox"
-                                                          disabled
-                                                        />
-                                                        <label htmlFor="ss-message__content--user-checkbox">
-                                                          label
-                                                        </label>
-                                                      </div>
-                                                      <div className="ss-message__content--user-checkbox">
-                                                        <input
-                                                          type="checkbox"
-                                                          name="ss-message__content--user-checkbox"
-                                                          id="ss-message__content--user-checkbox"
-                                                          disabled
-                                                        />
-                                                        <label htmlFor="ss-message__content--user-checkbox">
-                                                          label
-                                                        </label>
-                                                      </div>
-                                                    </>
-                                                  )}
+                                                <textarea
+                                                  className="ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value"
+                                                  value={botTextValue}
+                                                  readOnly
+                                                ></textarea>
+                                                <div className="ss-chat-option">
+                                                  <MDBIcon
+                                                    fas
+                                                    icon="pencil-alt"
+                                                    // style={{ marginTop: '10px' }}
+                                                    onClick={() => handleEditIconClick(index)}
+                                                  ></MDBIcon>
+                                                  <MDBIcon
+                                                    fas
+                                                    icon="grip-vertical"
+                                                    style={{ marginTop: '10px' }}
+                                                  ></MDBIcon>
+                                                  <div
+                                                    className={`ss-edit-option-wrapper ss-edit-option-wrapper-${index}`}
+                                                  >
+                                                    <div onClick={() => handleCopyMessage(index)} className="ss-option-wrapper">
+                                                      <MDBIcon
+                                                        fas
+                                                        icon="copy"
+                                                        className="ss-add-option-icon"
+                                                      ></MDBIcon>
+                                                      <span>Copy</span>
+                                                    </div>
+                                                    <div className="ss-option-wrapper">
+                                                      <MDBIcon
+                                                        fas
+                                                        icon="eye-slash"
+                                                        className="ss-add-option-icon"
+                                                      ></MDBIcon>
+                                                      <span>Hidden</span>
+                                                    </div>
+                                                    <div className="ss-option-wrapper">
+                                                      <MDBIcon
+                                                        fas
+                                                        icon="trash"
+                                                        className="ss-add-option-icon"
+                                                      ></MDBIcon>
+                                                      <span>Delete</span>
+                                                    </div>
+                                                  </div>
                                                 </div>
                                               </React.Fragment>
-                                            )
-                                          }
-                                          {/* type == 'pull_down' */}
-                                          {
-                                            content.type === 'pull_down' && (
-                                              <>
-                                                <div className="ss-message__content--user-pull_down-top">
-                                                  {pullDown.title_require &&
-                                                    <span className="ss-message__content--user-pull_down-title">
-                                                      {pullDown.title}
-                                                    </span>
-                                                  }
-                                                  {pullDown.require === true &&
-                                                    <span className="ss-message__content--user-text-input-required">
-                                                      * required
-                                                    </span>
-                                                  }
-                                                </div>
-                                                <div className="ss-message__content--user-pull_down-wrapper">
-                                                  {pullDown.type === 'customization' && (
-                                                    <>
-                                                      <div className="ss-message__content--user-pull_down--customization">
-                                                        <div
-                                                          className="ss-message__content--user-pull_down-comment"
-                                                          style={{ marginBottom: '4px' }}
-                                                        >
-                                                          <span>{pullDown[pullDown.type].title_comment}</span>
-                                                        </div>
-                                                        <div className="ss-message__content--user-pull_down-row">
-                                                          {
-                                                            pullDown[pullDown.type].is_comment === false ?
-                                                              <div className="ss-message__content--user-pull_down-col col-12">
-                                                                <SelectCustom
-                                                                  data={pullDown[pullDown.type].options_without_comment}
-                                                                  keyValue="value"
+                                            }
+                                          </div>
+                                          <div className="ss-add-action-wrapper">
+                                            <MDBIcon fas icon="plus-circle" className="ss-add-icon"></MDBIcon>
+                                            <div className="ss-add-message-option-wrapper">
+                                              <div className="ss-option-wrapper" onClick={() => onClickCreateStatement('bot', index)}>
+                                                <MDBIcon
+                                                  fas
+                                                  icon="comment"
+                                                  className="ss-add-option-icon"
+                                                ></MDBIcon>
+                                                <span>Bot statement</span>
+                                              </div>
+                                              <div className="ss-option-wrapper" onClick={() => onClickCreateStatement('user', index)}>
+                                                <MDBIcon
+                                                  fas
+                                                  icon="comment"
+                                                  className="ss-add-option-icon"
+                                                ></MDBIcon>
+                                                <span>User input</span>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                ) : (
+                                  <Draggable key={message.id} draggableId={message.id.toString()} index={index}>
+                                    {(provided) => (
+                                      <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef} key={index} className="ss-user-chat-wrapper ss-message-wrapper">
+                                        <div
+                                          className={`ss-user-chat ss-message ss-message--error ss-message-${index}`}
+                                        // style={message?.message_content.length === 0 ? {width: '30%'}: {}}
+                                        >
+                                          <div
+                                            className="ss-user-chat-detail ss-message__detail"
+                                            onClick={() =>
+                                              handleSelectMessage(index, message.belong_to, message.message_content[message.message_content.length - 1])
+                                            }
+                                          >
+                                            <div className="ss-user-chat-detail-content">
+                                              <div className="ss-user-message__content-wrapper">
+                                                {message?.message_content.map((content, indexContent) => {
+                                                  let textInput = content.text_input;
+                                                  let label = content.label;
+                                                  let textarea = content.textarea;
+                                                  let radioButton = content.radio_button;
+                                                  let checkbox = content.checkbox;
+                                                  let pullDown = content.pull_down;
+                                                  let zipCodeAddress = content.zip_code_address;
+                                                  let attachingFile = content.attaching_file;
+                                                  let calendar = content.calendar;
+                                                  let agreeTerm = content.agree_term;
+                                                  console.log(content, 'check content')
+                                                  return (
+                                                    <React.Fragment key={indexContent}>
+                                                      {/* type == 'text_input' */}
+                                                      {
+                                                        content.type === 'text_input' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {(textInput.title_require || textInput.require) &&
+                                                              <div className="ss-message__content--user-text-input-top">
+                                                                {textInput.title_require &&
+                                                                  <span className="ss-message__content--user-text-input-title">
+                                                                    {textInput.title}
+                                                                  </span>
+                                                                }
+                                                                {textInput.require === true &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
+                                                            {(textInput.type === 'text') &&
+                                                              (textInput.text.isSplitInput ?
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                  <input
+                                                                    className="ss-message__content--user-text-input ss-input-value"
+                                                                    readOnly
+                                                                    placeholder={textInput.text?.placeholderLeft}
+                                                                    style={{ width: '49%', marginBottom: '0px' }}
+                                                                    disabled
+                                                                  ></input>
+                                                                  <input
+                                                                    className="ss-message__content--user-text-input ss-input-value"
+                                                                    readOnly
+                                                                    placeholder={textInput.text?.placeholderRight}
+                                                                    style={{ width: '49%' }}
+                                                                    disabled
+                                                                  ></input>
+                                                                </div> :
+                                                                <React.Fragment>
+                                                                  <input
+                                                                    className="ss-message__content--user-text-input ss-input-value"
+                                                                    readOnly
+                                                                    style={{ marginBottom: '0px' }}
+                                                                    placeholder={textInput[textInput.type]?.placeholderLeft}
+                                                                    disabled
+                                                                  ></input>
+                                                                  <span style={{ fontWeight: '400', color: 'black', fontSize: '12px', marginLeft: '18px' }}>{textInput.text?.placeholderRight}</span>
+                                                                </React.Fragment>
+                                                              )
+                                                            }
+                                                            {(textInput.type === 'phone_number') &&
+                                                              <React.Fragment>
+                                                                {textInput.phone_number.withHyphen === false ?
+                                                                  <input
+                                                                    className="ss-message__content--user-text-input ss-input-value"
+                                                                    readOnly
+                                                                    style={{ marginBottom: '0px' }}
+                                                                    placeholder={textInput[textInput.type]?.number}
+                                                                    disabled
+                                                                  ></input> :
+                                                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                    <input
+                                                                      className="ss-message__content--user-text-input ss-input-value"
+                                                                      readOnly
+                                                                      style={{ marginBottom: '0px', width: '32%' }}
+                                                                      placeholder={textInput[textInput.type]?.number1}
+                                                                      disabled
+                                                                    ></input>
+                                                                    <input
+                                                                      className="ss-message__content--user-text-input ss-input-value"
+                                                                      readOnly
+                                                                      style={{ marginBottom: '0px', width: '32%' }}
+                                                                      placeholder={textInput[textInput.type]?.number2}
+                                                                      disabled
+                                                                    ></input>
+                                                                    <input
+                                                                      className="ss-message__content--user-text-input ss-input-value"
+                                                                      readOnly
+                                                                      style={{ marginBottom: '0px', width: '32%' }}
+                                                                      placeholder={textInput[textInput.type]?.number3}
+                                                                      disabled
+                                                                    ></input>
+                                                                  </div>
+                                                                }
+                                                              </React.Fragment>
+                                                            }
+                                                            {(textInput.type === 'password') &&
+                                                              <React.Fragment>
+                                                                <input
+                                                                  className="ss-message__content--user-text-input ss-input-value"
+                                                                  readOnly
+                                                                  style={{ marginBottom: '0px' }}
+                                                                  placeholder={textInput[textInput.type]?.password}
+                                                                  disabled
+                                                                ></input>
+                                                              </React.Fragment>
+                                                            }
+                                                            {(textInput.type === 'urls' ||
+                                                              textInput.type === 'email_address') &&
+                                                              <React.Fragment>
+                                                                <input
+                                                                  className="ss-message__content--user-text-input ss-input-value"
+                                                                  readOnly
+                                                                  style={{ marginBottom: '0px' }}
+                                                                  placeholder={textInput[textInput.type]}
+                                                                  disabled
+                                                                ></input>
+                                                              </React.Fragment>
+                                                            }
+                                                            {(textInput.type === 'email_confirmation') &&
+                                                              (<>
+                                                                <input
+                                                                  className="ss-message__content--user-text-input ss-input-value"
+                                                                  readOnly
+                                                                  disabled
+                                                                  placeholder={textInput[textInput.type].cfEmlAdd_email}
+                                                                ></input>
+                                                                <input
+                                                                  className="ss-message__content--user-text-input ss-input-value"
+                                                                  readOnly
+                                                                  placeholder={textInput[textInput.type].cfEmlAdd_confirm_email}
+                                                                  disabled
+                                                                ></input>
+                                                              </>
+                                                              )}
+                                                            {(textInput.type === 'password_confirmation') &&
+                                                              (<>
+                                                                <input
+                                                                  className="ss-message__content--user-text-input ss-input-value"
+                                                                  readOnly
+                                                                  disabled
+                                                                  placeholder={textInput[textInput.type].password}
+                                                                ></input>
+                                                                <input
+                                                                  className="ss-message__content--user-text-input ss-input-value"
+                                                                  readOnly
+                                                                  placeholder={textInput[textInput.type].confirm_password}
+                                                                  disabled
+                                                                ></input>
+                                                              </>
+                                                              )}
+                                                          </div>
+                                                        )
+                                                      }
+                                                      {/* type == 'label' */}
+                                                      {
+                                                        (content.type === 'label' && label.lbl_content) && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            <div className="ss-message__content--user-label-top">
+                                                              <span className="ss-message__content--user-label-title">
+                                                                {label.lbl_content}
+                                                              </span>
+                                                              {label?.require === true &&
+                                                                <span className="ss-message__content--user-required">
+                                                                  * required
+                                                                </span>
+                                                              }
+                                                            </div>
+                                                          </div>
+                                                        )
+                                                      }
+                                                      {/* type == 'textarea' */}
+                                                      {
+                                                        content.type === 'textarea' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {(textarea.title_require || textarea.require) &&
+                                                              <div className="ss-message__content--user-textarea-top">
+                                                                {textarea.title_require &&
+                                                                  <span className="ss-message__content--user-textarea-title">
+                                                                    {textarea.title}
+                                                                  </span>
+                                                                }
+                                                                {textarea.require === true &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
+                                                            {(textarea?.type === 'text_input' ||
+                                                              textarea?.type === 'invalid_input') && (
+                                                                <textarea
+                                                                  className="ss-message__content--user-textarea ss-input-value"
+                                                                  readOnly
+                                                                  placeholder={textarea[textarea.type]?.content}
+                                                                  rows={3}
+                                                                ></textarea>
+                                                              )}
+                                                            {textarea?.type === 'consume_api_response' && (
+                                                              <textarea
+                                                                className="ss-message__content--user-textarea ss-input-value"
+                                                                readOnly
+                                                                value={'入力値の検証にAPIを利用する'}
+                                                                rows={3}
+                                                              ></textarea>
+                                                            )}
+                                                          </div>
+                                                        )
+                                                      }
+                                                      {/* type == 'radio_button' */}
+                                                      {
+                                                        content.type === 'radio_button' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {(radioButton.title_require || radioButton.require) &&
+                                                              <div className="ss-message__content--user-radio_button-top">
+                                                                {radioButton.title_require &&
+                                                                  <span className="ss-message__content--user-radio_button-title">
+                                                                    {radioButton.title}
+                                                                  </span>
+                                                                }
+                                                                {radioButton.require === true &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
+                                                            <div className="ss-message__content--user-radio_button-wrapper">
+                                                              {radioButton.type === 'default' && (
+                                                                radioButton[radioButton.type].map((item, index) => {
+                                                                  return <div key={index} className="ss-message__content--user-radio_button">
+                                                                    <input
+                                                                      type="radio"
+                                                                      name="ss-message__content--user-radio_button"
+                                                                      id="ss-message__content--user-radio_button"
+                                                                      disabled
+                                                                      checked={radioButton.initial_selection === item.id}
+                                                                    />
+                                                                    {item.text &&
+                                                                      <label htmlFor="ss-message__content--user-radio_button">
+                                                                        {item.text}
+                                                                      </label>
+                                                                    }
+                                                                  </div>
+                                                                })
+                                                              )}
+                                                              {radioButton.type === 'radio_button_img' && (
+                                                                radioButton[radioButton.type].map((item, index) => {
+                                                                  return <div key={index} className="ss-message__content--user-radio_button--radio_button_img">
+                                                                    <input
+                                                                      type="radio"
+                                                                      name="ss-message__content--user-radio_button--radio_button_img"
+                                                                      id="ss-message__content--user-radio_button--radio_button_img"
+                                                                      disabled
+                                                                      checked={radioButton.initial_selection === item.id}
+                                                                    />
+                                                                    <img
+                                                                      src={item.img}
+                                                                      alt=""
+                                                                    />
+                                                                  </div>
+                                                                })
+                                                              )}
+                                                              {radioButton.type === 'consume_api_response' && (
+                                                                <>
+                                                                  <div className="ss-message__content--user-radio_button">
+                                                                    <input
+                                                                      type="radio"
+                                                                      name="ss-message__content--user-radio_button"
+                                                                      id="ss-message__content--user-radio_button"
+                                                                      disabled
+                                                                    />
+                                                                    <label htmlFor="ss-message__content--user-radio_button">
+                                                                      label
+                                                                    </label>
+                                                                  </div>
+                                                                  <div className="ss-message__content--user-radio_button">
+                                                                    <input
+                                                                      type="radio"
+                                                                      name="ss-message__content--user-radio_button"
+                                                                      id="ss-message__content--user-radio_button"
+                                                                      disabled
+                                                                    />
+                                                                    <label htmlFor="ss-message__content--user-radio_button">
+                                                                      label
+                                                                    </label>
+                                                                  </div>
+                                                                </>
+                                                              )}
+                                                              {radioButton.type === 'block_style' && (
+                                                                radioButton[radioButton.type].map((item, index) => {
+                                                                  return item.text && <div style={{ marginBottom: '10px' }} key={index} className="ss-message__content--user-radio_button--block_style">
+                                                                    <span>{item.text}</span>
+                                                                  </div>
+                                                                })
+                                                              )}
+                                                            </div>
+                                                          </div>
+                                                        )
+                                                      }
+                                                      {/* type == 'checkbox' */}
+                                                      {
+                                                        content.type === 'checkbox' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {(checkbox.title_require || checkbox.require) &&
+                                                              <div className="ss-message__content--user-checkbox-top">
+                                                                {checkbox.title_require &&
+                                                                  <span className="ss-message__content--user-checkbox-title">
+                                                                    {checkbox.title}
+                                                                  </span>
+                                                                }
+                                                                {checkbox.require === true &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
+                                                            <div className="ss-message__content--user-checkbox-wrapper">
+                                                              {checkbox.type === 'default' && (
+                                                                checkbox[checkbox.type].map((item, index) => {
+                                                                  return <div key={index} className="ss-message__content--user-checkbox">
+                                                                    <input
+                                                                      type="checkbox"
+                                                                      name="ss-message__content--user-checkbox"
+                                                                      id="ss-message__content--user-checkbox"
+                                                                      disabled
+                                                                      checked={checkbox.all_item_checked}
+                                                                    />
+                                                                    <label htmlFor="ss-message__content--user-checkbox">
+                                                                      {item.text}
+                                                                    </label>
+                                                                  </div>
+                                                                })
+                                                              )}
+                                                              {checkbox.type === 'checkbox_img' && (
+                                                                checkbox[checkbox.type].map((item, index) => {
+                                                                  return <div key={index} className="ss-message__content--user-checkbox--checkbox_img" style={{ marginBottom: '10px' }}>
+                                                                    <input
+                                                                      type="checkbox"
+                                                                      name="ss-message__content--user-checkbox--checkbox_img"
+                                                                      id="ss-message__content--user-checkbox--checkbox_img"
+                                                                      disabled
+                                                                      checked={checkbox.all_item_checked}
+                                                                    />
+                                                                    <img
+                                                                      src={item.img}
+                                                                      alt=""
+                                                                    />
+                                                                    <div style={{ textAlign: 'center' }}>{item.text}</div>
+                                                                  </div>
+                                                                })
+                                                              )}
+                                                              {checkbox.type === 'consume_api_response' && (
+                                                                <>
+                                                                  <div className="ss-message__content--user-checkbox">
+                                                                    <input
+                                                                      type="checkbox"
+                                                                      name="ss-message__content--user-checkbox"
+                                                                      id="ss-message__content--user-checkbox"
+                                                                      disabled
+                                                                    />
+                                                                    <label htmlFor="ss-message__content--user-checkbox">
+                                                                      label
+                                                                    </label>
+                                                                  </div>
+                                                                  <div className="ss-message__content--user-checkbox">
+                                                                    <input
+                                                                      type="checkbox"
+                                                                      name="ss-message__content--user-checkbox"
+                                                                      id="ss-message__content--user-checkbox"
+                                                                      disabled
+                                                                    />
+                                                                    <label htmlFor="ss-message__content--user-checkbox">
+                                                                      label
+                                                                    </label>
+                                                                  </div>
+                                                                </>
+                                                              )}
+                                                            </div>
+                                                          </div>
+                                                        )
+                                                      }
+                                                      {/* type == 'pull_down' */}
+                                                      {
+                                                        content.type === 'pull_down' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {(pullDown.title_require || pullDown.require) &&
+                                                              <div className="ss-message__content--user-pull_down-top">
+                                                                {pullDown.title_require &&
+                                                                  <span className="ss-message__content--user-pull_down-title">
+                                                                    {pullDown.title}
+                                                                  </span>
+                                                                }
+                                                                {pullDown.require === true &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
+                                                            <div className="ss-message__content--user-pull_down-wrapper">
+                                                              {pullDown.type === 'customization' && (
+                                                                <>
+                                                                  <div className="ss-message__content--user-pull_down--customization">
+                                                                    <div
+                                                                      className="ss-message__content--user-pull_down-comment"
+                                                                      style={{ marginBottom: '4px' }}
+                                                                    >
+                                                                      <span>{pullDown[pullDown.type].title_comment}</span>
+                                                                    </div>
+                                                                    <div className="ss-message__content--user-pull_down-row">
+                                                                      {
+                                                                        pullDown[pullDown.type].is_comment === false ?
+                                                                          <div className="ss-message__content--user-pull_down-col col-12">
+                                                                            <SelectCustom
+                                                                              data={pullDown[pullDown.type].options_without_comment}
+                                                                              keyValue="value"
+                                                                              style={{ width: '100%' }}
+                                                                              placeholder={pullDown[pullDown.type].display_unselected}
+                                                                              nameValue="text"
+                                                                            />
+                                                                          </div> :
+                                                                          <div className="ss-message__content--user-pull_down-col col-12" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                            <SelectCustom
+                                                                              data={pullDown[pullDown.type].options_with_comment}
+                                                                              keyValue="value"
+                                                                              style={{ width: '49%' }}
+                                                                              placeholder={pullDown[pullDown.type].display_unselected}
+                                                                              nameValue="text"
+                                                                            />
+                                                                            <SelectCustom
+                                                                              data={pullDown[pullDown.type].options_with_comment}
+                                                                              keyValue="value2"
+                                                                              style={{ width: '49%' }}
+                                                                              placeholder={pullDown[pullDown.type].display_unselected}
+                                                                              nameValue="text2"
+                                                                            />
+                                                                          </div>
+                                                                      }
+
+                                                                    </div>
+                                                                    <div
+                                                                      className="ss-message__content--user-pull_down-comment"
+                                                                      style={{ marginTop: '4px' }}
+                                                                    >
+                                                                      <span>{pullDown[pullDown.type].comment}</span>
+                                                                    </div>
+                                                                  </div>
+                                                                </>
+                                                              )}
+                                                              {(pullDown.type === 'time_hm') && (
+                                                                <React.Fragment>
+                                                                  <div className="ss-message__content--user-pull_down--time_hm">
+                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                      <SelectCustom
+                                                                        data={dataHour}
+                                                                        placeholder="Time"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                      <SelectCustom
+                                                                        data={dataMinutes}
+                                                                        placeholder="Minutes"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                      <div
+                                                                        className="ss-message__content--user-pull_down-comment"
+                                                                        style={{ marginTop: '4px', width: '32%' }}
+                                                                      >
+                                                                        <span>{pullDown[pullDown.type].comment}</span>
+                                                                      </div>
+                                                                    </div>
+                                                                  </div>
+                                                                </React.Fragment>
+                                                              )}
+                                                              {(pullDown.type === 'date_ymd' ||
+                                                                pullDown.type === 'dob_ymd') && (
+                                                                  <React.Fragment>
+                                                                    <div className="ss-message__content--user-pull_down--time_hm">
+                                                                      <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                                                                        <SelectCustom
+                                                                          data={dataYear}
+                                                                          placeholder="Year"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                        <SelectCustom
+                                                                          data={dataMonth}
+                                                                          placeholder="Month"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                        <SelectCustom
+                                                                          data={dataDay}
+                                                                          placeholder="Day"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                        <div
+                                                                          className="ss-message__content--user-pull_down-comment"
+                                                                          style={{ width: '32%' }}
+                                                                        >
+                                                                          <span>{pullDown[pullDown.type].comment}</span>
+                                                                        </div>
+                                                                      </div>
+                                                                    </div>
+                                                                  </React.Fragment>
+                                                                )}
+                                                              {(pullDown.type === 'date_md') && (
+                                                                <React.Fragment>
+                                                                  <div className="ss-message__content--user-pull_down--time_hm">
+                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                      <SelectCustom
+                                                                        data={dataMonth}
+                                                                        placeholder="Month"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                      <SelectCustom
+                                                                        data={dataDay}
+                                                                        placeholder="Day"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                      <div
+                                                                        className="ss-message__content--user-pull_down-comment"
+                                                                        style={{ marginTop: '4px', width: '32%' }}
+                                                                      >
+                                                                        <span>{pullDown[pullDown.type].comment}</span>
+                                                                      </div>
+                                                                    </div>
+                                                                  </div>
+                                                                </React.Fragment>
+                                                              )}
+                                                              {(pullDown.type === 'date_ym' ||
+                                                                pullDown.type === 'dob_ym') && (
+                                                                  <React.Fragment>
+                                                                    <div className="ss-message__content--user-pull_down--time_hm">
+                                                                      <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                        <SelectCustom
+                                                                          data={dataYear}
+                                                                          placeholder="Year"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                        <SelectCustom
+                                                                          data={dataMonth}
+                                                                          placeholder="Month"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                        <div
+                                                                          className="ss-message__content--user-pull_down-comment"
+                                                                          style={{ marginTop: '4px', width: '32%' }}
+                                                                        >
+                                                                          <span>{pullDown[pullDown.type].comment}</span>
+                                                                        </div>
+                                                                      </div>
+                                                                    </div>
+                                                                  </React.Fragment>
+                                                                )}
+                                                              {(pullDown.type === 'date_ymd_hm') && (
+                                                                <React.Fragment>
+                                                                  <div className="ss-message__content--user-pull_down--time_hm">
+                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                      <SelectCustom
+                                                                        data={dataYear}
+                                                                        placeholder="Year"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                      <SelectCustom
+                                                                        data={dataMonth}
+                                                                        placeholder="Month"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                      <SelectCustom
+                                                                        data={dataDay}
+                                                                        placeholder="Day"
+                                                                        style={{ width: '32%', marginBottom: '10px' }}
+                                                                      />
+                                                                      <SelectCustom
+                                                                        data={dataHour}
+                                                                        placeholder="Time"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                      <SelectCustom
+                                                                        data={dataMinutes}
+                                                                        placeholder="Minutes"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                      <div
+                                                                        className="ss-message__content--user-pull_down-comment"
+                                                                        style={{ marginTop: '4px', width: '32%' }}
+                                                                      >
+                                                                        <span>{pullDown[pullDown.type].comment}</span>
+                                                                      </div>
+                                                                    </div>
+                                                                  </div>
+                                                                </React.Fragment>
+                                                              )}
+                                                              {pullDown.type === 'timezone_from_to' && (
+                                                                <React.Fragment>
+                                                                  <div className="ss-message__content--user-pull_down--time_hm">
+                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                      <SelectCustom
+                                                                        data={dataHour}
+                                                                        placeholder="Time"
+                                                                        style={{ width: '49%' }}
+                                                                      />
+                                                                      <SelectCustom
+                                                                        data={dataMinutes}
+                                                                        placeholder="Minutes"
+                                                                        style={{ width: '49%' }}
+                                                                      />
+                                                                    </div>
+                                                                    <div style={{ textAlign: 'center' }}>~</div>
+                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                      <SelectCustom
+                                                                        data={dataHour}
+                                                                        placeholder="Time"
+                                                                        style={{ width: '49%' }}
+                                                                      />
+                                                                      <SelectCustom
+                                                                        data={dataMinutes}
+                                                                        placeholder="Minutes"
+                                                                        style={{ width: '49%' }}
+                                                                      />
+                                                                    </div>
+                                                                    <div
+                                                                      className="ss-message__content--user-pull_down-comment"
+                                                                      style={{ marginTop: '4px', width: '32%' }}
+                                                                    >
+                                                                      <span>{pullDown[pullDown.type].comment}</span>
+                                                                    </div>
+                                                                  </div>
+                                                                </React.Fragment>
+                                                              )}
+                                                              {pullDown.type === 'period_from_to' && (
+                                                                <React.Fragment>
+                                                                  <div className="ss-message__content--user-pull_down--time_hm">
+                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                      <SelectCustom
+                                                                        data={dataYear}
+                                                                        placeholder="Year"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                      <SelectCustom
+                                                                        data={dataMonth}
+                                                                        placeholder="Month"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                      <SelectCustom
+                                                                        data={dataDay}
+                                                                        placeholder="Day"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                    </div>
+                                                                    <div style={{ textAlign: 'center' }}>~</div>
+                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                      <SelectCustom
+                                                                        data={dataYear}
+                                                                        placeholder="Year"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                      <SelectCustom
+                                                                        data={dataMonth}
+                                                                        placeholder="Month"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                      <SelectCustom
+                                                                        data={dataDay}
+                                                                        placeholder="Day"
+                                                                        style={{ width: '32%' }}
+                                                                      />
+                                                                    </div>
+                                                                    <div
+                                                                      className="ss-message__content--user-pull_down-comment"
+                                                                      style={{ marginTop: '4px', width: '32%' }}
+                                                                    >
+                                                                      <span>{pullDown[pullDown.type].comment}</span>
+                                                                    </div>
+                                                                  </div>
+                                                                </React.Fragment>
+                                                              )}
+                                                              {pullDown.type === 'prefectures' && (
+                                                                <React.Fragment>
+                                                                  <SelectCustom
+                                                                    data={dataPrefectures}
+                                                                    placeholder="Please select"
+                                                                    style={{ width: '100%' }}
+                                                                    keyValue="id"
+                                                                    nameValue="name"
+                                                                  />
+                                                                </React.Fragment>
+                                                              )}
+                                                              {pullDown.type === 'up_to_municipality' && (
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                  <span>{pullDown[pullDown.type].prefecture_comment}</span>
+                                                                  <SelectCustom
+                                                                    data={dataPrefectures}
+                                                                    placeholder="Select prefecture"
+                                                                    style={{ width: '45%' }}
+                                                                    keyValue="id"
+                                                                    nameValue="name"
+                                                                  />
+                                                                  <span>~</span>
+                                                                  <SelectCustom
+                                                                    data={dataCity}
+                                                                    placeholder="Select city"
+                                                                    style={{ width: '45%' }}
+                                                                    keyValue="id"
+                                                                    nameValue="name"
+                                                                  />
+                                                                  <span>{pullDown[pullDown.type].city_comment}</span>
+                                                                </div>
+                                                              )}
+                                                            </div>
+                                                          </div>
+                                                        )
+                                                      }
+                                                      {/* type == 'zip_code_address' */}
+                                                      {
+                                                        content.type === 'zip_code_address' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {(zipCodeAddress.title_require || zipCodeAddress.require) &&
+                                                              <div className="ss-message__content--user-pull_down-top">
+                                                                {zipCodeAddress.title_require &&
+                                                                  <span className="ss-message__content--user-pull_down-title">
+                                                                    {zipCodeAddress.title}
+                                                                  </span>
+                                                                }
+                                                                {(zipCodeAddress.isCheckRequire === 'all_items_require' ||
+                                                                  zipCodeAddress.isCheckRequire === 'require') &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
+                                                            {zipCodeAddress.post_code !== undefined && (
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '5px' }}>
+                                                                  Post code
+                                                                </div>
+                                                                {zipCodeAddress.split_postal_code !== true ?
+                                                                  <InputCustom
+                                                                    placeholder={zipCodeAddress.post_code}
+                                                                    disabled={true}
+                                                                    style={{ width: '100%' }}
+                                                                  /> :
+                                                                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                                                    <InputCustom
+                                                                      placeholder={zipCodeAddress.post_code_left}
+                                                                      disabled={true}
+                                                                      style={{ width: '49%' }}
+                                                                    />
+                                                                    <InputCustom
+                                                                      placeholder={zipCodeAddress.post_code_right}
+                                                                      disabled={true}
+                                                                      style={{ width: '49%' }}
+                                                                    />
+                                                                  </div>
+                                                                }
+                                                              </div>
+                                                            )}
+                                                            {zipCodeAddress.prefecture !== undefined &&
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                  Prefectures
+                                                                </div>
+                                                                <InputCustom
+                                                                  placeholder={zipCodeAddress.prefecture}
+                                                                  disabled={true}
                                                                   style={{ width: '100%' }}
-                                                                  placeholder={pullDown[pullDown.type].display_unselected}
-                                                                  nameValue="text"
-                                                                />
-                                                              </div> :
-                                                              <div className="ss-message__content--user-pull_down-col col-12" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                <SelectCustom
-                                                                  data={pullDown[pullDown.type].options_with_comment}
-                                                                  keyValue="value"
-                                                                  style={{ width: '49%' }}
-                                                                  placeholder={pullDown[pullDown.type].display_unselected}
-                                                                  nameValue="text"
-                                                                />
-                                                                <SelectCustom
-                                                                  data={pullDown[pullDown.type].options_with_comment}
-                                                                  keyValue="value2"
-                                                                  style={{ width: '49%' }}
-                                                                  placeholder={pullDown[pullDown.type].display_unselected}
-                                                                  nameValue="text2"
                                                                 />
                                                               </div>
-                                                          }
-
-                                                        </div>
-                                                        <div
-                                                          className="ss-message__content--user-pull_down-comment"
-                                                          style={{ marginTop: '4px' }}
-                                                        >
-                                                          <span>{pullDown[pullDown.type].comment}</span>
-                                                        </div>
-                                                      </div>
-                                                    </>
-                                                  )}
-                                                  {(pullDown.type === 'time_hm') && (
-                                                    <React.Fragment>
-                                                      <div className="ss-message__content--user-pull_down--time_hm">
-                                                        <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                          <SelectCustom
-                                                            data={dataHour}
-                                                            placeholder="Time"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                          <SelectCustom
-                                                            data={dataMinutes}
-                                                            placeholder="Minutes"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                          <div
-                                                            className="ss-message__content--user-pull_down-comment"
-                                                            style={{ marginTop: '4px', width: '32%' }}
-                                                          >
-                                                            <span>{pullDown[pullDown.type].comment}</span>
+                                                            }
+                                                            {zipCodeAddress.municipality !== undefined &&
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                  Municipalities
+                                                                </div>
+                                                                <InputCustom
+                                                                  placeholder={zipCodeAddress.municipality}
+                                                                  disabled={true}
+                                                                  style={{ width: '100%' }}
+                                                                />
+                                                              </div>
+                                                            }
+                                                            {zipCodeAddress.address !== undefined &&
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                  Address
+                                                                </div>
+                                                                <InputCustom
+                                                                  placeholder={zipCodeAddress.address}
+                                                                  disabled={true}
+                                                                  style={{ width: '100%' }}
+                                                                />
+                                                              </div>
+                                                            }
+                                                            {zipCodeAddress.building_name !== undefined &&
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                  Building name
+                                                                </div>
+                                                                <InputCustom
+                                                                  placeholder={zipCodeAddress.building_name}
+                                                                  disabled={true}
+                                                                  style={{ width: '100%' }}
+                                                                />
+                                                              </div>
+                                                            }
                                                           </div>
-                                                        </div>
-                                                      </div>
-                                                    </React.Fragment>
-                                                  )}
-                                                  {(pullDown.type === 'date_ymd' ||
-                                                    pullDown.type === 'dob_ymd') && (
-                                                      <React.Fragment>
-                                                        <div className="ss-message__content--user-pull_down--time_hm">
-                                                          <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                                                            <SelectCustom
-                                                              data={dataYear}
-                                                              placeholder="Year"
-                                                              style={{ width: '32%' }}
-                                                            />
-                                                            <SelectCustom
-                                                              data={dataMonth}
-                                                              placeholder="Month"
-                                                              style={{ width: '32%' }}
-                                                            />
-                                                            <SelectCustom
-                                                              data={dataDay}
-                                                              placeholder="Day"
-                                                              style={{ width: '32%' }}
-                                                            />
-                                                            <div
-                                                              className="ss-message__content--user-pull_down-comment"
-                                                              style={{ width: '32%' }}
-                                                            >
-                                                              <span>{pullDown[pullDown.type].comment}</span>
+                                                        )
+                                                      }
+                                                      {/* type == 'attaching_file' */}
+                                                      {
+                                                        content.type === 'attaching_file' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {(attachingFile.require) &&
+                                                              <div className="ss-message__content--user-attaching_file-top">
+                                                                {attachingFile.require === true &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
+                                                            {!attachingFile.file_content && <span style={{ fontWeight: '400', fontSize: '12px' }}>Not selected</span>}
+                                                            <div className="ss-message__content--user-attaching_file">
+                                                              <Button className="ss-message__content--user-attaching_file-btn" style={{ backgroundColor: '#A3B1BF', marginTop: '0px' }}>
+                                                                Select file
+                                                              </Button>
                                                             </div>
                                                           </div>
-                                                        </div>
-                                                      </React.Fragment>
-                                                    )}
-                                                  {(pullDown.type === 'date_md') && (
-                                                    <React.Fragment>
-                                                      <div className="ss-message__content--user-pull_down--time_hm">
-                                                        <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                          <SelectCustom
-                                                            data={dataMonth}
-                                                            placeholder="Month"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                          <SelectCustom
-                                                            data={dataDay}
-                                                            placeholder="Day"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                          <div
-                                                            className="ss-message__content--user-pull_down-comment"
-                                                            style={{ marginTop: '4px', width: '32%' }}
-                                                          >
-                                                            <span>{pullDown[pullDown.type].comment}</span>
+                                                        )
+                                                      }
+                                                      {/* type == 'calendar' */}
+                                                      {
+                                                        content.type === 'calendar' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {(calendar.title_require || calendar.require) &&
+                                                              <div className="ss-message__content--user-calender-top">
+                                                                {calendar.title_require &&
+                                                                  <span className="ss-message__content--user-calender-title">
+                                                                    {calendar.title}
+                                                                  </span>
+                                                                }
+                                                                {calendar.require === true &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
+                                                            {/* calendar: type = 'date_selection' */}
+                                                            {calendar.type === 'date_selection' && (
+                                                              <React.Fragment>
+                                                                <div className="ss-message__content--user-calender-date_selection" style={{ backgroundColor: '#FAFAFA', height: '36px', border: '1px solid gray' }}>
+                                                                  {/* <MDBIcon
+                                                        fas
+                                                        icon="calendar"
+                                                      /> */}
+                                                                  <MDBIcon far icon="calendar-alt"
+                                                                    className="ss-message__content--user-calender-icon-date_selection"
+                                                                  />
+                                                                </div>
+                                                              </React.Fragment>
+                                                            )}
+                                                            {/* calendar: type = 'embedded' */}
+                                                            {calendar.type === 'embedded' && (
+                                                              <React.Fragment>
+                                                                <div className="ss-message__content--user-calender-embedded">
+                                                                  <DatePicker
+                                                                    selected={startDate}
+                                                                    onChange={(date) => setStartDate(date)}
+                                                                    inline
+                                                                  />
+                                                                </div>
+                                                              </React.Fragment>
+                                                            )}
+                                                            {/* calendar: type = 'start_end_date' */}
+                                                            {calendar.type === 'start_end_date' && (
+                                                              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                <div className="ss-message__content--user-calender-date_selection" style={{ width: '49%', backgroundColor: '#FAFAFA', height: '36px', border: '1px solid gray' }}>
+                                                                  {/* <MDBIcon
+                                                        fas
+                                                        icon="calendar"
+                                                      /> */}
+                                                                  <MDBIcon far icon="calendar-alt"
+                                                                    className="ss-message__content--user-calender-icon-date_selection"
+                                                                  />
+                                                                </div>
+                                                                <div className="ss-message__content--user-calender-date_selection" style={{ width: '49%', backgroundColor: '#FAFAFA', height: '36px', border: '1px solid gray' }}>
+                                                                  {/* <MDBIcon
+                                                        fas
+                                                        icon="calendar"
+                                                      /> */}
+                                                                  <MDBIcon far icon="calendar-alt"
+                                                                    className="ss-message__content--user-calender-icon-date_selection"
+                                                                  />
+                                                                </div>
+                                                              </div>
+                                                            )}
                                                           </div>
-                                                        </div>
-                                                      </div>
-                                                    </React.Fragment>
-                                                  )}
-                                                  {(pullDown.type === 'date_ym' ||
-                                                    pullDown.type === 'dob_ym') && (
-                                                      <React.Fragment>
-                                                        <div className="ss-message__content--user-pull_down--time_hm">
-                                                          <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                            <SelectCustom
-                                                              data={dataYear}
-                                                              placeholder="Year"
-                                                              style={{ width: '32%' }}
-                                                            />
-                                                            <SelectCustom
-                                                              data={dataMonth}
-                                                              placeholder="Month"
-                                                              style={{ width: '32%' }}
-                                                            />
-                                                            <div
-                                                              className="ss-message__content--user-pull_down-comment"
-                                                              style={{ marginTop: '4px', width: '32%' }}
-                                                            >
-                                                              <span>{pullDown[pullDown.type].comment}</span>
-                                                            </div>
+                                                        )
+                                                      }
+                                                      {/* type == 'agree_term' */}
+                                                      {
+                                                        content.type === 'agree_term' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {(agreeTerm.title_require || agreeTerm.require) &&
+                                                              <div className="ss-message__content--user-agree_to_term-top">
+                                                                {agreeTerm.title_require &&
+                                                                  <span className="ss-message__content--user-agree_to_term-title">
+                                                                    {agreeTerm.title}
+                                                                  </span>
+                                                                }
+                                                                <span className="ss-message__content--user-text-input-required">
+                                                                  * required
+                                                                </span>
+                                                              </div>
+                                                            }
+                                                            {/* agreeTerm: type = 'detail_content' */}
+                                                            {agreeTerm.type === 'detail_content' && (
+                                                              <React.Fragment>
+                                                                <div className="ss-message__content--user-agree_to_term-detail_content">
+                                                                  <textarea
+                                                                    name="ss-message__content--user-agree_to_term-detail_content"
+                                                                    id=""
+                                                                    rows="5"
+                                                                    value={agreeTerm[agreeTerm.type].content}
+                                                                    className="ss-input-value"
+                                                                    readOnly
+                                                                  ></textarea>
+                                                                  <CheckboxCustom
+                                                                    onChange={value => console.log(value)}
+                                                                    label={agreeTerm.term}
+                                                                  />
+                                                                </div>
+                                                              </React.Fragment>
+                                                            )}
+                                                            {/* agreeTerm: type = 'post_link_only' */}
+                                                            {agreeTerm.type === 'post_link_only' && (
+                                                              <div>
+                                                                {agreeTerm[agreeTerm.type].map((item, index) => {
+                                                                  return <div key={index} className="ss-message__content--user-agree_to_term-post_link_only">
+                                                                    <span style={{ marginRight: '8px' }}>{item.title_comment}</span>
+                                                                    <a href={item.urls} target="_blank">{item.title}</a>
+                                                                    <span style={{ marginLeft: '8px' }}>{item.url_comment}</span>
+                                                                  </div>
+                                                                })}
+                                                                <CheckboxCustom
+                                                                  onChange={value => console.log(value)}
+                                                                  label={agreeTerm.term}
+                                                                />
+                                                              </div>
+                                                            )}
                                                           </div>
-                                                        </div>
-                                                      </React.Fragment>
-                                                    )}
-                                                  {(pullDown.type === 'date_ymd_hm') && (
-                                                    <React.Fragment>
-                                                      <div className="ss-message__content--user-pull_down--time_hm">
-                                                        <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                          <SelectCustom
-                                                            data={dataYear}
-                                                            placeholder="Year"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                          <SelectCustom
-                                                            data={dataMonth}
-                                                            placeholder="Month"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                          <SelectCustom
-                                                            data={dataDay}
-                                                            placeholder="Day"
-                                                            style={{ width: '32%', marginBottom: '10px' }}
-                                                          />
-                                                          <SelectCustom
-                                                            data={dataHour}
-                                                            placeholder="Time"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                          <SelectCustom
-                                                            data={dataMinutes}
-                                                            placeholder="Minutes"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                          <div
-                                                            className="ss-message__content--user-pull_down-comment"
-                                                            style={{ marginTop: '4px', width: '32%' }}
-                                                          >
-                                                            <span>{pullDown[pullDown.type].comment}</span>
-                                                          </div>
-                                                        </div>
-                                                      </div>
+                                                        )
+                                                      }
                                                     </React.Fragment>
-                                                  )}
-                                                  {pullDown.type === 'timezone_from_to' && (
-                                                    <React.Fragment>
-                                                      <div className="ss-message__content--user-pull_down--time_hm">
-                                                        <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                          <SelectCustom
-                                                            data={dataHour}
-                                                            placeholder="Time"
-                                                            style={{ width: '49%' }}
-                                                          />
-                                                          <SelectCustom
-                                                            data={dataMinutes}
-                                                            placeholder="Minutes"
-                                                            style={{ width: '49%' }}
-                                                          />
-                                                        </div>
-                                                        <div style={{ textAlign: 'center' }}>~</div>
-                                                        <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                          <SelectCustom
-                                                            data={dataHour}
-                                                            placeholder="Time"
-                                                            style={{ width: '49%' }}
-                                                          />
-                                                          <SelectCustom
-                                                            data={dataMinutes}
-                                                            placeholder="Minutes"
-                                                            style={{ width: '49%' }}
-                                                          />
-                                                        </div>
-                                                        <div
-                                                          className="ss-message__content--user-pull_down-comment"
-                                                          style={{ marginTop: '4px', width: '32%' }}
-                                                        >
-                                                          <span>{pullDown[pullDown.type].comment}</span>
-                                                        </div>
-                                                      </div>
-                                                    </React.Fragment>
-                                                  )}
-                                                  {pullDown.type === 'period_from_to' && (
-                                                    <React.Fragment>
-                                                      <div className="ss-message__content--user-pull_down--time_hm">
-                                                        <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                          <SelectCustom
-                                                            data={dataYear}
-                                                            placeholder="Year"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                          <SelectCustom
-                                                            data={dataMonth}
-                                                            placeholder="Month"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                          <SelectCustom
-                                                            data={dataDay}
-                                                            placeholder="Day"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                        </div>
-                                                        <div style={{ textAlign: 'center' }}>~</div>
-                                                        <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                          <SelectCustom
-                                                            data={dataYear}
-                                                            placeholder="Year"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                          <SelectCustom
-                                                            data={dataMonth}
-                                                            placeholder="Month"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                          <SelectCustom
-                                                            data={dataDay}
-                                                            placeholder="Day"
-                                                            style={{ width: '32%' }}
-                                                          />
-                                                        </div>
-                                                        <div
-                                                          className="ss-message__content--user-pull_down-comment"
-                                                          style={{ marginTop: '4px', width: '32%' }}
-                                                        >
-                                                          <span>{pullDown[pullDown.type].comment}</span>
-                                                        </div>
-                                                      </div>
-                                                    </React.Fragment>
-                                                  )}
-                                                  {pullDown.type === 'prefectures' && (
-                                                    <React.Fragment>
-                                                      <SelectCustom
-                                                        data={dataPrefectures}
-                                                        placeholder="Please select"
-                                                        style={{ width: '100%' }}
-                                                        keyValue="id"
-                                                        nameValue="name"
-                                                      />
-                                                    </React.Fragment>
-                                                  )}
-                                                  {pullDown.type === 'up_to_municipality' && (
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                      <span>{pullDown[pullDown.type].prefecture_comment}</span>
-                                                      <SelectCustom
-                                                        data={dataPrefectures}
-                                                        placeholder="Select prefecture"
-                                                        style={{ width: '45%' }}
-                                                        keyValue="id"
-                                                        nameValue="name"
-                                                      />
-                                                      <span>~</span>
-                                                      <SelectCustom
-                                                        data={dataCity}
-                                                        placeholder="Select city"
-                                                        style={{ width: '45%' }}
-                                                        keyValue="id"
-                                                        nameValue="name"
-                                                      />
-                                                      <span>{pullDown[pullDown.type].city_comment}</span>
-                                                    </div>
-                                                  )}
-                                                </div>
-                                              </>
-                                            )
-                                          }
-                                          {/* type == 'zip_code_address' */}
-                                          {
-                                            content.type === 'zip_code_address' && (
-                                              <React.Fragment>
-                                                <div className="ss-message__content--user-pull_down-top">
-                                                  {zipCodeAddress.title_require &&
-                                                    <span className="ss-message__content--user-pull_down-title">
-                                                      {zipCodeAddress.title}
-                                                    </span>
-                                                  }
-                                                  {(zipCodeAddress.isCheckRequire === 'all_items_require' ||
-                                                    zipCodeAddress.isCheckRequire === 'require') &&
-                                                    <span className="ss-message__content--user-text-input-required">
-                                                      * required
-                                                    </span>
-                                                  }
-                                                </div>
-                                                {zipCodeAddress.post_code !== undefined && (
-                                                  <div className="ss-user-setting__item-bottom">
-                                                    <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '5px' }}>
-                                                      Post code
-                                                    </div>
-                                                    {zipCodeAddress.split_postal_code !== true ?
-                                                      <InputCustom
-                                                        placeholder={zipCodeAddress.post_code}
-                                                        disabled={true}
-                                                        style={{ width: '100%' }}
-                                                      /> :
-                                                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                                        <InputCustom
-                                                          placeholder={zipCodeAddress.post_code_left}
-                                                          disabled={true}
-                                                          style={{ width: '49%' }}
-                                                        />
-                                                        <InputCustom
-                                                          placeholder={zipCodeAddress.post_code_right}
-                                                          disabled={true}
-                                                          style={{ width: '49%' }}
-                                                        />
-                                                      </div>
-                                                    }
-                                                  </div>
-                                                )}
-                                                {zipCodeAddress.prefecture !== undefined &&
-                                                  <div className="ss-user-setting__item-bottom">
-                                                    <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                      Prefectures
-                                                    </div>
-                                                    <InputCustom
-                                                      placeholder={zipCodeAddress.prefecture}
-                                                      disabled={true}
-                                                      style={{ width: '100%' }}
-                                                    />
-                                                  </div>
-                                                }
-                                                {zipCodeAddress.municipality !== undefined &&
-                                                  <div className="ss-user-setting__item-bottom">
-                                                    <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                      Municipalities
-                                                    </div>
-                                                    <InputCustom
-                                                      placeholder={zipCodeAddress.municipality}
-                                                      disabled={true}
-                                                      style={{ width: '100%' }}
-                                                    />
-                                                  </div>
-                                                }
-                                                {zipCodeAddress.address !== undefined &&
-                                                  <div className="ss-user-setting__item-bottom">
-                                                    <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                      Address
-                                                    </div>
-                                                    <InputCustom
-                                                      placeholder={zipCodeAddress.address}
-                                                      disabled={true}
-                                                      style={{ width: '100%' }}
-                                                    />
-                                                  </div>
-                                                }
-                                                {zipCodeAddress.building_name !== undefined &&
-                                                  <div className="ss-user-setting__item-bottom">
-                                                    <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                      Building name
-                                                    </div>
-                                                    <InputCustom
-                                                      placeholder={zipCodeAddress.building_name}
-                                                      disabled={true}
-                                                      style={{ width: '100%' }}
-                                                    />
-                                                  </div>
-                                                }
-                                              </React.Fragment>
-                                            )
-                                          }
-                                          {/* type == 'attaching_file' */}
-                                          {
-                                            content.type === 'attaching_file' && (
-                                              <>
-                                                <div className="ss-message__content--user-attaching_file-top">
-                                                  {attachingFile.require === true &&
-                                                    <span className="ss-message__content--user-text-input-required">
-                                                      * required
-                                                    </span>
-                                                  }
-                                                </div>
-                                                {!attachingFile.file_content && <span style={{ fontWeight: '400', fontSize: '12px' }}>Not selected</span>}
-                                                <div className="ss-message__content--user-attaching_file">
-                                                  <Button className="ss-message__content--user-attaching_file-btn" style={{ backgroundColor: '#A3B1BF', marginTop: '0px' }}>
-                                                    Select file
+                                                  )
+                                                })}
+                                              </div>
+                                              {message?.message_content.length !== 0 &&
+                                                <div className="ss-user-message__action-wrapper">
+                                                  <Button className="ss-user-message__action-btn">
+                                                    To the next
                                                   </Button>
                                                 </div>
-                                              </>
-                                            )
-                                          }
-                                          {/* type == 'calendar' */}
-                                          {
-                                            content.type === 'calendar' && (
-                                              <React.Fragment>
-                                                <div className="ss-message__content--user-calender-top">
-                                                  {calendar.title_require &&
-                                                    <span className="ss-message__content--user-calender-title">
-                                                      {calendar.title}
-                                                    </span>
-                                                  }
-                                                  {calendar.require === true &&
-                                                    <span className="ss-message__content--user-text-input-required">
-                                                      * required
-                                                    </span>
-                                                  }
-                                                </div>
-                                                {/* calendar: type = 'date_selection' */}
-                                                {calendar.type === 'date_selection' && (
-                                                  <React.Fragment>
-                                                    <div className="ss-message__content--user-calender-date_selection" style={{ backgroundColor: '#FAFAFA', height: '36px', border: '1px solid gray' }}>
-                                                      {/* <MDBIcon
-                                                        fas
-                                                        icon="calendar"
-                                                      /> */}
-                                                      <MDBIcon far icon="calendar-alt"
-                                                        className="ss-message__content--user-calender-icon-date_selection"
-                                                      />
-                                                    </div>
-                                                  </React.Fragment>
-                                                )}
-                                                {/* calendar: type = 'embedded' */}
-                                                {calendar.type === 'embedded' && (
-                                                  <React.Fragment>
-                                                    <div className="ss-message__content--user-calender-embedded">
-                                                      <DatePicker
-                                                        selected={startDate}
-                                                        onChange={(date) => setStartDate(date)}
-                                                        inline
-                                                      />
-                                                    </div>
-                                                  </React.Fragment>
-                                                )}
-                                                {/* calendar: type = 'start_end_date' */}
-                                                {calendar.type === 'start_end_date' && (
-                                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                    <div className="ss-message__content--user-calender-date_selection" style={{ width: '49%', backgroundColor: '#FAFAFA', height: '36px', border: '1px solid gray' }}>
-                                                      {/* <MDBIcon
-                                                        fas
-                                                        icon="calendar"
-                                                      /> */}
-                                                      <MDBIcon far icon="calendar-alt"
-                                                        className="ss-message__content--user-calender-icon-date_selection"
-                                                      />
-                                                    </div>
-                                                    <div className="ss-message__content--user-calender-date_selection" style={{ width: '49%', backgroundColor: '#FAFAFA', height: '36px', border: '1px solid gray' }}>
-                                                      {/* <MDBIcon
-                                                        fas
-                                                        icon="calendar"
-                                                      /> */}
-                                                      <MDBIcon far icon="calendar-alt"
-                                                        className="ss-message__content--user-calender-icon-date_selection"
-                                                      />
-                                                    </div>
-                                                  </div>
-                                                )}
-                                              </React.Fragment>
-                                            )
-                                          }
-                                          {/* type == 'agree_term' */}
-                                          {
-                                            content.type === 'agree_term' && (
-                                              <React.Fragment>
-                                                <div className="ss-message__content--user-agree_to_term-top">
-                                                  {agreeTerm.title_require &&
-                                                    <span className="ss-message__content--user-agree_to_term-title">
-                                                      {agreeTerm.title}
-                                                    </span>
-                                                  }
-                                                  <span className="ss-message__content--user-text-input-required">
-                                                    * required
-                                                  </span>
-                                                </div>
-                                                {/* agreeTerm: type = 'detail_content' */}
-                                                {agreeTerm.type === 'detail_content' && (
-                                                  <React.Fragment>
-                                                    <div className="ss-message__content--user-agree_to_term-detail_content">
-                                                      <textarea
-                                                        name="ss-message__content--user-agree_to_term-detail_content"
-                                                        id=""
-                                                        rows="5"
-                                                        value={agreeTerm[agreeTerm.type].content}
-                                                        className="ss-input-value"
-                                                        readOnly
-                                                      ></textarea>
-                                                      <CheckboxCustom
-                                                        onChange={value => console.log(value)}
-                                                        label={agreeTerm.term}
-                                                      />
-                                                    </div>
-                                                  </React.Fragment>
-                                                )}
-                                                {/* agreeTerm: type = 'post_link_only' */}
-                                                {agreeTerm.type === 'post_link_only' && (
-                                                  <div>
-                                                    {agreeTerm[agreeTerm.type].map((item, index) => {
-                                                      return <div key={index} className="ss-message__content--user-agree_to_term-post_link_only">
-                                                        <span style={{ marginRight: '8px' }}>{item.title_comment}</span>
-                                                        <a href={item.urls} target="_blank">{item.title}</a>
-                                                        <span style={{ marginLeft: '8px' }}>{item.url_comment}</span>
-                                                      </div>
-                                                    })}
-                                                    <CheckboxCustom
-                                                      onChange={value => console.log(value)}
-                                                      label={agreeTerm.term}
-                                                    />
-                                                  </div>
-                                                )}
-                                              </React.Fragment>
-                                            )
-                                          }
-                                        </React.Fragment>
-                                      )
-                                    })}
-                                  </div>
-                                  {message?.message_content.length !== 0 &&
-                                    <div className="ss-user-message__action-wrapper">
-                                      <Button className="ss-user-message__action-btn">
-                                        To the next
-                                      </Button>
-                                    </div>
-                                  }
-                                </div>
+                                              }
+                                            </div>
 
-                                <div className="ss-chat-option">
-                                  <MDBIcon
-                                    fas
-                                    icon="pencil-alt"
-                                    // style={{ marginTop: '10px' }}
-                                    onClick={() => handleEditIconClick(index)}
-                                  ></MDBIcon>
-                                  <MDBIcon
-                                    fas
-                                    icon="grip-vertical"
-                                    style={{ marginTop: '10px' }}
-                                  ></MDBIcon>
-                                  <div
-                                    className={`ss-edit-option-wrapper ss-edit-option-wrapper-${index}`}
-                                  >
-                                    <div onClick={() => handleCopyMessage(index)} className="ss-option-wrapper">
-                                      <MDBIcon
-                                        fas
-                                        icon="copy"
-                                        className="ss-add-option-icon"
-                                      ></MDBIcon>
-                                      <span>Copy</span>
-                                    </div>
-                                    <div className="ss-option-wrapper" onClick={() => handleHiddenMessage(index, 'user')}>
-                                      {message.hidden ?
-                                        <React.Fragment>
-                                          <MDBIcon
-                                            fas
-                                            icon="angle-double-up"
-                                            className="ss-add-option-icon"
-                                          ></MDBIcon>
-                                          <span>To enable</span>
-                                        </React.Fragment> :
-                                        <React.Fragment>
-                                          <MDBIcon
-                                            fas
-                                            icon="eye-slash"
-                                            className="ss-add-option-icon"
-                                          ></MDBIcon>
-                                          <span>Hidden</span>
-                                        </React.Fragment>
-                                      }
-                                    </div>
-                                    <div className="ss-option-wrapper" onClick={() => handleDeleteMessage(index)}>
-                                      <MDBIcon
-                                        fas
-                                        icon="trash"
-                                        className="ss-add-option-icon"
-                                      ></MDBIcon>
-                                      <span>Delete</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="ss-add-action-wrapper">
-                                <MDBIcon fas icon="plus-circle" className="ss-add-icon"></MDBIcon>
-                                <div className="ss-add-message-option-wrapper">
-                                  <div className="ss-option-wrapper" onClick={() => onClickCreateStatement('bot', index)}>
-                                    <MDBIcon
-                                      fas
-                                      icon="comment"
-                                      className="ss-add-option-icon"
-                                    ></MDBIcon>
-                                    <span>Bot statement</span>
-                                  </div>
-                                  <div className="ss-option-wrapper" onClick={() => onClickCreateStatement('user', index)}>
-                                    <MDBIcon
-                                      fas
-                                      icon="comment"
-                                      className="ss-add-option-icon"
-                                    ></MDBIcon>
-                                    <span>User input</span>
-                                  </div>
-                                </div>
-                              </div>
+                                            <div className="ss-chat-option">
+                                              <MDBIcon
+                                                fas
+                                                icon="pencil-alt"
+                                                // style={{ marginTop: '10px' }}
+                                                onClick={() => handleEditIconClick(index)}
+                                              ></MDBIcon>
+                                              <MDBIcon
+                                                fas
+                                                icon="grip-vertical"
+                                                style={{ marginTop: '10px' }}
+                                              ></MDBIcon>
+                                              <div
+                                                className={`ss-edit-option-wrapper ss-edit-option-wrapper-${index}`}
+                                              >
+                                                <div onClick={() => handleCopyMessage(index)} className="ss-option-wrapper">
+                                                  <MDBIcon
+                                                    fas
+                                                    icon="copy"
+                                                    className="ss-add-option-icon"
+                                                  ></MDBIcon>
+                                                  <span>Copy</span>
+                                                </div>
+                                                <div className="ss-option-wrapper" onClick={() => handleHiddenMessage(index, 'user')}>
+                                                  {message.hidden ?
+                                                    <React.Fragment>
+                                                      <MDBIcon
+                                                        fas
+                                                        icon="angle-double-up"
+                                                        className="ss-add-option-icon"
+                                                      ></MDBIcon>
+                                                      <span>To enable</span>
+                                                    </React.Fragment> :
+                                                    <React.Fragment>
+                                                      <MDBIcon
+                                                        fas
+                                                        icon="eye-slash"
+                                                        className="ss-add-option-icon"
+                                                      ></MDBIcon>
+                                                      <span>Hidden</span>
+                                                    </React.Fragment>
+                                                  }
+                                                </div>
+                                                <div className="ss-option-wrapper" onClick={() => handleDeleteMessage(index)}>
+                                                  <MDBIcon
+                                                    fas
+                                                    icon="trash"
+                                                    className="ss-add-option-icon"
+                                                  ></MDBIcon>
+                                                  <span>Delete</span>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                          <div className="ss-add-action-wrapper">
+                                            <MDBIcon fas icon="plus-circle" className="ss-add-icon"></MDBIcon>
+                                            <div className="ss-add-message-option-wrapper">
+                                              <div className="ss-option-wrapper" onClick={() => onClickCreateStatement('bot', index)}>
+                                                <MDBIcon
+                                                  fas
+                                                  icon="comment"
+                                                  className="ss-add-option-icon"
+                                                ></MDBIcon>
+                                                <span>Bot statement</span>
+                                              </div>
+                                              <div className="ss-option-wrapper" onClick={() => onClickCreateStatement('user', index)}>
+                                                <MDBIcon
+                                                  fas
+                                                  icon="comment"
+                                                  className="ss-add-option-icon"
+                                                ></MDBIcon>
+                                                <span>User input</span>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                )
+                              })}
+                              {provided.placeholder}
                             </div>
-                          </div>
-                        )
-                      })}
+                          )}
+                        </Droppable>
+                      </DragDropContext>
                     </div>
                   </div>
                 </div>
@@ -3155,139 +3434,140 @@ const Scenario = () => {
                   {dataMessages[indexMessageSelect] &&
                     <React.Fragment>
                       {belongTo === 'bot' && dataMessages[indexMessageSelect].message_content.length !== 0 && (
-                        <div id="bot-statement" className="ss-bot-statement-detail-setting">
-                          {/* Bot setting detail below */}
-                          <div style={{ padding: '10px' }}>
-                            <label htmlFor="ss-bot-statement-title">Type</label>
-                            <select
-                              name="bot_statement_type"
-                              id="ss-bot-statement-type"
-                              className="ss-bot-statement-type ss-input-value"
-                              value={messageType}
-                              onChange={e => handleChangeBotStatementType(e.target.value)}
-                            >
-                              <option value="text_input">Text</option>
-                              <option value="file">File</option>
-                              <option value="email">Email</option>
-                              <option value="script">Script</option>
-                              <option value="delay">Delay</option>
-                              {/* <option value="api_link_age">Text</option> Pending */}
-                            </select>
+                        <div className="ss-bot-setting-container">
+                          <div id="bot-statement" className="ss-bot-statement-detail-setting">
+                            {/* Bot setting detail below */}
+                            <div style={{ padding: '10px' }}>
+                              <label htmlFor="ss-bot-statement-title">Type</label>
+                              <select
+                                name="bot_statement_type"
+                                id="ss-bot-statement-type"
+                                className="ss-bot-statement-type ss-input-value"
+                                value={messageType}
+                                onChange={e => handleChangeBotStatementType(e.target.value)}
+                              >
+                                <option value="text_input">Text</option>
+                                <option value="file">File</option>
+                                <option value="email">Email</option>
+                                <option value="script">Script</option>
+                                <option value="delay">Delay</option>
+                                {/* <option value="api_link_age">Text</option> Pending */}
+                              </select>
 
-                            {/* type: text_input */}
-                            {messageType === 'text_input' && (
-                              <div className="ss-bot-statement-wrapper">
-                                <div
-                                  id="ss-bot-statement-type-text"
-                                  className="ss-bot-statement-type-text ss-bot-statement-type"
-                                >
-                                  <textarea
-                                    name="bot-statement-type-text-content"
-                                    id="bot-statement-type-text-content"
-                                    className="ss-bot-statement-type-text-content ss-input-value"
-                                    rows={5}
-                                    placeholder="Input..."
-                                    value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
-                                    onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'content')}
-                                  ></textarea>
+                              {/* type: text_input */}
+                              {messageType === 'text_input' && (
+                                <div className="ss-bot-statement-wrapper">
+                                  <div
+                                    id="ss-bot-statement-type-text"
+                                    className="ss-bot-statement-type-text ss-bot-statement-type"
+                                  >
+                                    <textarea
+                                      name="bot-statement-type-text-content"
+                                      id="bot-statement-type-text-content"
+                                      className="ss-bot-statement-type-text-content ss-input-value"
+                                      rows={5}
+                                      placeholder="Input..."
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
+                                      onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'content')}
+                                    ></textarea>
+                                  </div>
+                                  <div className="ss-bot-checkbox-scroll-auto">
+                                    <CheckboxCustom
+                                      label="Do not scroll automatically"
+                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'scroll_auto')}
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['scroll_auto'] || ''}
+                                    />
+                                  </div>
                                 </div>
-                                <div className="ss-bot-checkbox-scroll-auto">
-                                  <CheckboxCustom
-                                    label="Do not scroll automatically"
-                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'scroll_auto')}
-                                    value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['scroll_auto'] || ''}
-                                  />
-                                </div>
-                              </div>
-                            )}
+                              )}
 
-                            {/* type: file */}
-                            {messageType === 'file' && (
-                              <div className="ss-bot-statement-wrapper">
-                                <div
-                                  id="ss-bot-statement-type-file"
-                                  className="ss-bot-statement-type-file ss-bot-statement-type"
-                                >
-                                  {/* <img
+                              {/* type: file */}
+                              {messageType === 'file' && (
+                                <div className="ss-bot-statement-wrapper">
+                                  <div
+                                    id="ss-bot-statement-type-file"
+                                    className="ss-bot-statement-type-file ss-bot-statement-type"
+                                  >
+                                    {/* <img
                                 src=""
                                 id="bot-file-upload-img"
                                 className="ss-bot-file-upload-img"
                                 alt=""
                               /> */}
-                                  <textarea
-                                    name="bot-statement-type-file-content"
-                                    id="ss-bot-statement-type-file-content"
-                                    className="ss-bot-statement-type-file-content ss-input-value"
-                                    rows={5}
-                                    placeholder="File URL"
-                                    value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
-                                    onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'content')}
-                                  ></textarea>
-                                  <input
-                                    type="file"
-                                    id="ss-bot-file-upload"
-                                    name="bot-file-upload"
-                                    hidden
-                                    onChange={(e) => getBaseUrl(e)}
-                                  />
-                                  <div className="ss-file-upload-wrapper">
-                                    <span id="ss-bot-file-upload-name"></span>
-                                    <button className="ss-bot-file-upload-btn" onClick={botUploadFile}>
-                                      Upload
-                                    </button>
+                                    <textarea
+                                      name="bot-statement-type-file-content"
+                                      id="ss-bot-statement-type-file-content"
+                                      className="ss-bot-statement-type-file-content ss-input-value"
+                                      rows={5}
+                                      placeholder="File URL"
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
+                                      onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'content')}
+                                    ></textarea>
+                                    <input
+                                      type="file"
+                                      id="ss-bot-file-upload"
+                                      name="bot-file-upload"
+                                      hidden
+                                      onChange={(e) => getBaseUrl(e)}
+                                    />
+                                    <div className="ss-file-upload-wrapper">
+                                      <span id="ss-bot-file-upload-name"></span>
+                                      <button className="ss-bot-file-upload-btn" onClick={botUploadFile}>
+                                        Upload
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
 
-                            {/* type: email */}
-                            {messageType === 'email' && (
-                              <div className="ss-bot-statement-wrapper">
-                                <div
-                                  id="ss-bot-statement-type-email"
-                                  className="ss-bot-statement-type-email ss-bot-statement-type"
-                                >
-                                  <SelectCustom
-                                    style={{ width: '100%' }}
-                                    id="title"
-                                    data={dataEmail}
-                                    value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
-                                    onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content')}
-                                  />
+                              {/* type: email */}
+                              {messageType === 'email' && (
+                                <div className="ss-bot-statement-wrapper">
+                                  <div
+                                    id="ss-bot-statement-type-email"
+                                    className="ss-bot-statement-type-email ss-bot-statement-type"
+                                  >
+                                    <SelectCustom
+                                      style={{ width: '100%' }}
+                                      id="title"
+                                      data={dataEmail}
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
+                                      onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content')}
+                                    />
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
 
-                            {/* type: script */}
-                            {messageType === 'script' && (
-                              <div className="ss-bot-statement-wrapper">
-                                <div
-                                  id="ss-bot-statement-type-script"
-                                  className="ss-bot-statement-type-script ss-bot-statement-type"
-                                >
-                                  <textarea
-                                    name="bot-statement-type-script-content"
-                                    id="bot-statement-type-script-content"
-                                    className="ss-bot-statement-type-script-content ss-input-value"
-                                    rows={5}
-                                    placeholder="Script..."
-                                    value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
-                                    onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'content')}
-                                  ></textarea>
+                              {/* type: script */}
+                              {messageType === 'script' && (
+                                <div className="ss-bot-statement-wrapper">
+                                  <div
+                                    id="ss-bot-statement-type-script"
+                                    className="ss-bot-statement-type-script ss-bot-statement-type"
+                                  >
+                                    <textarea
+                                      name="bot-statement-type-script-content"
+                                      id="bot-statement-type-script-content"
+                                      className="ss-bot-statement-type-script-content ss-input-value"
+                                      rows={5}
+                                      placeholder="Script..."
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
+                                      onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'content')}
+                                    ></textarea>
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
 
-                            {/* type: delay */}
-                            {messageType === 'delay' && (
-                              <div className="ss-bot-statement-wrapper">
-                                <div
-                                  id="ss-bot-statement-type-delay"
-                                  className="ss-bot-statement-type-delay ss-bot-statement-type"
-                                >
-                                  <div className="ss-user-setting__item-bottom-flex-start">
-                                    <span style={{ marginRight: '10px' }}>Delay (seconds)</span>
-                                    {/* <input
+                              {/* type: delay */}
+                              {messageType === 'delay' && (
+                                <div className="ss-bot-statement-wrapper">
+                                  <div
+                                    id="ss-bot-statement-type-delay"
+                                    className="ss-bot-statement-type-delay ss-bot-statement-type"
+                                  >
+                                    <div className="ss-user-setting__item-bottom-flex-start">
+                                      <span style={{ marginRight: '10px' }}>Delay (seconds)</span>
+                                      {/* <input
                                     type="number"
                                     name="ss-bot-statement-type-delay__num"
                                     id="ss-bot-statement-type-delay__num"
@@ -3297,25 +3577,96 @@ const Scenario = () => {
                                     value={dataMessages[indexMessageSelect].message_content[0][messageType]['content']}
                                     onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'content')}
                                   /> */}
-                                    <InputNum
-                                      placeholder="00"
-                                      className="ss-user-setting-input-delay"
-                                      min={0}
-                                      max={10}
-                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
-                                      onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content')}
-                                    />
-                                  </div>
-                                  <div className="ss-bot-statement-type-delay__checkbox-wrapper">
-                                    <CheckboxCustom
-                                      label="Turn on typing index"
-                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'typing_on')}
-                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['typing_on'] || ''}
-                                    />
+                                      <InputNum
+                                        placeholder="00"
+                                        className="ss-user-setting-input-delay"
+                                        min={0}
+                                        max={10}
+                                        value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
+                                        onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content')}
+                                      />
+                                    </div>
+                                    <div className="ss-bot-statement-type-delay__checkbox-wrapper">
+                                      <CheckboxCustom
+                                        label="Turn on typing index"
+                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'typing_on')}
+                                        value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['typing_on'] || ''}
+                                      />
+                                    </div>
                                   </div>
                                 </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="ss-bot-setting-condition-container">
+                            <div className="ss-bot-setting-condition-header">
+                              <div className="ss-bot-setting-condition-header-left">
+                                <span style={{ fontWeight: '400' }}>Display target user condition setting</span>
+                                <MDBIcon far icon="question-circle" style={{ color: '#FF7E00' }} />
+                                <span className="ss-bot-setting-condition-icon-label">Standard</span>
+                                <span className="ss-bot-setting-condition-icon-label" style={{ width: '50px', backgroundColor: '#7A52A3' }}>Pro</span>
                               </div>
-                            )}
+                              <div className="ss-bot-setting-condition-header-right">
+                                {isConditionUp ? <MDBIcon fas icon="caret-up" onClick={() => handlePannelCondition(false)} /> : <MDBIcon fas icon="caret-down" onClick={() => handlePannelCondition(true)} />}
+                              </div>
+                            </div>
+                            <div className="ss-bot-setting-condition-sub-header">
+                              <span style={{ fontWeight: '400' }}>*If set, if will be displayed only for users who meet the conditions</span>
+                            </div>
+                            {isConditionUp &&
+                              <div className="ss-bot-setting-condition-contents">
+                                {dataMessages[indexMessageSelect]?.conditions &&
+                                  dataMessages[indexMessageSelect]?.conditions.map((condition, indexCondition) => {
+                                    return <div key={indexCondition} className="ss-bot-setting-condition-content-container">
+                                      <div className="ss-bot-setting-condition-content">
+                                        {indexCondition !== 0 ?
+                                          <SelectCustom
+                                            style={{ width: '14%' }}
+                                            data={[{ key: 'and', value: 'AND' }, { key: 'or', value: 'OR' }]}
+                                            value={condition.linkCondition}
+                                            onChange={value => onChangeValueCondition(indexCondition, value, 'linkCondition')}
+                                          /> :
+                                          <div style={{ width: '14%' }}></div>
+                                        }
+                                        <SelectCustom
+                                          style={{ width: '59%', marginBottom: '5px' }}
+                                          data={dataCondition}
+                                          value={condition.nameCondition}
+                                          onChange={value => onChangeValueCondition(indexCondition, value, 'nameCondition')}
+                                        />
+                                        <SelectCustom
+                                          style={{ width: '24%' }}
+                                          data={dataSubCondition}
+                                          value={condition.condition}
+                                          onChange={value => onChangeValueCondition(indexCondition, value, 'condition')}
+                                        />
+                                        <InputCustom
+                                          style={{ width: '100%' }}
+                                          value={condition.inputCondition}
+                                          onChange={value => onChangeValueCondition(indexCondition, value, 'inputCondition')}
+                                        />
+                                      </div>
+                                      <div className="ss-bot-setting-condition-times-icon">
+                                        <MDBIcon fas icon="times-circle" onClick={() => handleDeleteCondition(indexCondition)} />
+                                      </div>
+                                    </div>
+                                  })}
+                              </div>
+                            }
+                            <div className="ss-bot-setting-condition-footer-button">
+                              {isConditionUp &&
+                                <div className="ss-bot-setting-condition-add-condition-button">
+                                  <Button onClick={() => onClickAddCondition()} className="ss-bot-setting-add-condition-button" style={{ backgroundColor: '#347AED' }}>
+                                    Add condition
+                                  </Button>
+                                </div>
+                              }
+                              <div className="ss-bot-setting-condition-bottom-button">
+                                <Button className="ss-bot-setting-condition-keep-button">
+                                  keep
+                                </Button>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -5480,8 +5831,90 @@ const Scenario = () => {
                             <div className="ss-user-setting__checkbox-wrapper">
                               <input type="checkbox" name="ss-user-setting__checkbox" />
                               <span>Align to the beginning and stop</span>
+                              <MDBIcon fas icon="question-circle" style={{ color: '#347AED', fontSize: '12px', marginLeft: '5px' }} />
+                            </div>
+                            <div className="ss-user-setting-condition-container">
+
+                              <div className="ss-bot-setting-condition-header">
+                                <div className="ss-bot-setting-condition-header-left">
+                                  <span style={{ fontWeight: '400' }}>Display target user condition setting</span>
+                                  <MDBIcon far icon="question-circle" style={{ color: '#FF7E00' }} />
+                                  <span className="ss-bot-setting-condition-icon-label">Standard</span>
+                                  <span className="ss-bot-setting-condition-icon-label" style={{ width: '50px', backgroundColor: '#7A52A3' }}>Pro</span>
+                                </div>
+                                <div className="ss-bot-setting-condition-header-right">
+                                  {isConditionUp ? <MDBIcon fas icon="caret-up" onClick={() => handlePannelCondition(false, 'user')} /> : <MDBIcon fas icon="caret-down" onClick={() => handlePannelCondition(true, 'user')} />}
+                                </div>
+                              </div>
+                              <div className="ss-bot-setting-condition-sub-header">
+                                <span style={{ fontWeight: '400' }}>*If set, if will be displayed only for users who meet the conditions</span>
+                              </div>
+                              {isConditionUp &&
+                                <div className="ss-bot-setting-condition-contents">
+                                  {dataMessages[indexMessageSelect]?.conditions &&
+                                    dataMessages[indexMessageSelect]?.conditions.map((condition, indexCondition) => {
+                                      return <div key={indexCondition} className="ss-bot-setting-condition-content-container">
+                                        <div className="ss-bot-setting-condition-content">
+                                          {indexCondition !== 0 ?
+                                            <SelectCustom
+                                              style={{ width: '14%' }}
+                                              data={[{ key: 'and', value: 'AND' }, { key: 'or', value: 'OR' }]}
+                                              value={condition.linkCondition}
+                                              onChange={value => onChangeValueCondition(indexCondition, value, 'linkCondition')}
+                                            /> :
+                                            <div style={{ width: '14%' }}></div>
+                                          }
+                                          <SelectCustom
+                                            style={{ width: '59%', marginBottom: '5px' }}
+                                            data={dataCondition}
+                                            value={condition.nameCondition}
+                                            onChange={value => onChangeValueCondition(indexCondition, value, 'nameCondition')}
+                                          />
+                                          <SelectCustom
+                                            style={{ width: '24%' }}
+                                            data={dataSubCondition}
+                                            value={condition.condition}
+                                            onChange={value => onChangeValueCondition(indexCondition, value, 'condition')}
+                                          />
+                                          <InputCustom
+                                            style={{ width: '100%' }}
+                                            value={condition.inputCondition}
+                                            onChange={value => onChangeValueCondition(indexCondition, value, 'inputCondition')}
+                                          />
+                                        </div>
+                                        <div className="ss-bot-setting-condition-times-icon">
+                                          <MDBIcon fas icon="times-circle" onClick={() => handleDeleteCondition(indexCondition)} />
+                                        </div>
+                                      </div>
+                                    })}
+                                </div>
+                              }
+                              <div className="ss-user-setting-condition-footer-button">
+                                {isConditionUp &&
+                                  <div className="ss-bot-setting-condition-add-condition-button">
+                                    <Button onClick={() => onClickAddCondition()} className="ss-bot-setting-add-condition-button" style={{ backgroundColor: '#347AED' }}>
+                                      Add condition
+                                    </Button>
+                                  </div>
+                                }
+                                <div className="ss-user-setting-condition-bottom-button">
+                                  <InputCustom
+                                    style={{ height: '38.2px', margin: '10px', width: '22%' }}
+                                    label="Registration button name"
+                                    value={dataMessages[indexMessageSelect].conditions.buttonName}
+                                    onChange={(value) => {
+                                      dataMessages[indexMessageSelect].conditions.buttonName = value;
+                                      setDataMessages([...dataMessages]);
+                                    }}
+                                  />
+                                  <Button className="ss-bot-setting-condition-keep-button">
+                                    keep
+                                  </Button>
+                                </div>
+                              </div>
                             </div>
                           </div>
+
                         </div>
                       )}
                     </React.Fragment>

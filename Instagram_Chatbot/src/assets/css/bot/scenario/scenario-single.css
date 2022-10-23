@@ -975,7 +975,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
   overflow-y: auto;
   border-top: 1px solid black;
   border-bottom: 1px solid black;
-  height: 65%;
+  height: 57%;
   margin: 10px 0;
   background-color: #f8f9fa;
   padding: 6px 10px;
@@ -1058,6 +1058,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 .ss-user-setting__checkbox-wrapper {
   display: flex;
   align-items: center;
+  margin-bottom: 7px;
 }
 
 .ss-user-setting__checkbox-wrapper>input {}
@@ -1084,11 +1085,11 @@ input#ss-message__content--user-checkbox--checkbox_img {
   justify-content: space-between;
 }
 
-.ss-user-setting__item-select-bottom-wrapper > div {
+.ss-user-setting__item-select-bottom-wrapper>div {
   width: 49%;
 }
 
-.ss-user-setting__item-select-bottom-wrapper-flex > div {
+.ss-user-setting__item-select-bottom-wrapper-flex>div {
   width: 49%;
 }
 
@@ -1107,7 +1108,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-setting__item-select-custom {
-  width: 80%!important;
+  width: 80% !important;
 }
 
 .ss-select-value-items {
@@ -1196,12 +1197,12 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-plus-circle-option-icon {
-  font-size: 25px!important;
-  color: #347AED!important;
+  font-size: 25px !important;
+  color: #347AED !important;
   margin-left: 7px;
 }
 
-::placeholder { 
+::placeholder {
   color: #ccc;
   font-size: 14px;
 }
@@ -1212,7 +1213,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
   align-items: center;
 }
 
-.ss-user-setting-phone-number-hyphens > input {
+.ss-user-setting-phone-number-hyphens>input {
   width: 28%;
 }
 
@@ -1238,7 +1239,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-radio-custom-class {
-  width: 100%!important;
+  width: 100% !important;
 }
 
 .ss-plus-circle-option-icon-times {
@@ -1260,12 +1261,12 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ant-select-selector {
-  border: 1px solid gray!important;
+  border: 1px solid gray !important;
   font-weight: 400;
   font-size: 14px;
-  border-radius: 5px!important;
-  min-height: 36px!important;
-  
+  border-radius: 5px !important;
+  min-height: 36px !important;
+
 }
 
 .ss-user-setting__item-custom .react-datepicker-wrapper {
@@ -1274,11 +1275,11 @@ input#ss-message__content--user-checkbox--checkbox_img {
 
 .ss-user-setting__item-custom-2 .react-datepicker-wrapper {
   width: 50%;
-} 
+}
 
 .ss-user-setting-flex-date .react-datepicker-wrapper {
   margin-right: 10px;
-} 
+}
 
 .ss-user-setting__item-custom-input-checkbox {
   width: 90%
@@ -1290,16 +1291,16 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .fa-plus-circle {
-  color: #347AED!important;
+  color: #347AED !important;
 }
 
 .fa-times-circle {
-  color: #ccc!important;
+  color: #ccc !important;
 }
 
 .ss-user-times-icon-custom {
   margin-bottom: 10px;
-  font-size: 25px!important;
+  font-size: 25px !important;
   margin-left: 7px;
 }
 
@@ -1316,9 +1317,129 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-custom-label-zip-code {
-  width: 15%!important;
+  width: 15% !important;
 }
 
 .fa-minus-circle {
-  color: #ccc!important;
+  color: #ccc !important;
+}
+
+.ss-bot-setting-container {
+  position: relative;
+  height: 100%
+}
+
+.ss-bot-setting-condition-container {
+  position: absolute;
+  bottom: 0;
+  padding: 10px;
+  border-top: 1px solid #E2E4E8;
+  width: 100%;
+  height: 20%;
+}
+
+.ss-bot-setting-condition-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.ss-bot-setting-condition-header-left {
+  width: 60%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ss-bot-setting-condition-header-left .fa-question-circle {
+  font-size: 20px!important;
+  font-weight: 300;
+}
+
+.ss-bot-setting-condition-header-right {}
+
+.ss-bot-setting-condition-header-right .fas {
+  font-size: 35px!important;
+  color: #7185A0;
+}
+
+.ss-bot-setting-condition-sub-header {}
+
+.ss-bot-setting-condition-sub-header span {
+  font-size: 13px;
+}
+
+.ss-bot-setting-condition-bottom-button {
+  display: flex;
+  justify-content: center;
+}
+
+.ss-user-setting-condition-bottom-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.ss-bot-setting-condition-keep-button {
+  background-color: #034AB9;
+}
+
+.ss-bot-setting-condition-icon-label {
+  padding: 2px;
+  background-color: #347AED;
+  border-radius: 5px;
+  width: 76px;
+  text-align: center;
+  color: #fff;
+  font-weight: 400;
+  font-size: 12px;
+}
+
+.ss-bot-setting-condition-add-condition-button {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ss-bot-setting-condition-footer-button {
+  position: absolute;
+  bottom: 0;
+  width: 97%;
+}
+
+.ss-user-setting-condition-footer-button {
+  position: absolute;
+  bottom: 0;
+  width: 97%;
+}
+
+.ss-bot-setting-condition-contents {
+  height: 212px;
+  overflow-y: auto;
+}
+
+.ss-bot-setting-condition-content-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.ss-bot-setting-condition-content {
+  width: 94%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.ss-bot-setting-condition-times-icon {
+  width: 5%;
+}
+
+.ss-user-setting-condition-container {
+  margin-left: -10px;
+  width: 103%;
+  padding: 10px;
+  border-top: 1px solid #E2E4E8;
+  height: 20%;
 }
