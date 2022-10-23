@@ -18,6 +18,7 @@ import moment from 'moment';
 import api from '../../../../api/api-management';
 import Cookies from 'js-cookie';
 import ModalNoti from '../../../../views/Popup/ModalNoti';
+import ModalShort from '../../../Popup/ModalShort';
 const _ = require('lodash');
 
 let data = [
@@ -1340,10 +1341,7 @@ const Scenario = () => {
   const [checkInitialRaido, setCheckInitialRaido] = useState();
   // bot setting values
   const [botTextValue, setBotTextValue] = useState('');
-  const [botScriptValue, setBotScriptValue] = useState('');
-  const [botDelayValue, setBotDelayValue] = useState(1);
-  const [botIsScrollAuto, setBotIsScrollAuto] = useState(false);
-  const [botIsTurnOnTyping, setBotIsTurnOnTyping] = useState(false);
+  const [isOpenAddVariable, setIsOpenAddVariable] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const toggle = () => setDropdownOpen((prevState) => !prevState);
 
@@ -1367,6 +1365,9 @@ const Scenario = () => {
 
   const [isConditionUp, setIsConditionUp] = useState(false);
   const [conditions, setConditions] = useState([]);
+
+  const [variableName, setVariableName] = useState('');
+  const [defaultName, setDefaultName] = useState('');
   // side effects
 
   useEffect(() => {
@@ -1942,6 +1943,14 @@ const Scenario = () => {
   const onChangeValueNameMessage = (indexMessage, vari, value) => {
     dataMessages[indexMessage][vari] = value;
     setDataMessages([...dataMessages]);
+  }
+
+  const createVariable = () => {
+    inputContentVar.push({
+      name: variableName,
+      key: defaultName
+    });
+    setIsOpenAddVariable(false);
   }
 
   const onClickSaveScenario = () => {
@@ -3741,7 +3750,7 @@ const Scenario = () => {
                                                                 data={inputContentVar}
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'text_input', value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add">Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -4009,7 +4018,7 @@ const Scenario = () => {
                                                                   data={inputContentVar}
                                                                   onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                                 />
-                                                                <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add">Addition</Button>
+                                                                <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
                                                               </div>
                                                             </div>
                                                           }
@@ -4117,7 +4126,7 @@ const Scenario = () => {
                                                                 data={inputContentVar}
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add">Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -4274,7 +4283,7 @@ const Scenario = () => {
                                                                 data={inputContentVar}
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add">Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -4462,7 +4471,7 @@ const Scenario = () => {
                                                                 data={inputContentVar}
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add">Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -4667,7 +4676,7 @@ const Scenario = () => {
                                                                 data={inputContentVar}
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add">Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -4722,7 +4731,7 @@ const Scenario = () => {
                                                                 data={inputContentVar}
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add">Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -5043,7 +5052,7 @@ const Scenario = () => {
                                                                 data={inputContentVar}
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add">Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -5930,6 +5939,44 @@ const Scenario = () => {
           <span style={{ fontSize: '16px' }}>{messageNoti}</span>
         </div>
       </ModalNoti>
+      <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
+        <div className="sl-popup-create-scenario-wrapper">
+          <h4>Add variable</h4>
+          <div className="sl-popup-create-scenario-input-wrapper">
+            <span>Variable name</span>
+            <input
+              type="text"
+              name="sl-popup-create-scenario-input"
+              id="sl-popup-create-scenario-input"
+              onChange={(e) => setVariableName(e.target.value)}
+            />
+          </div>
+          <div className="sl-popup-create-scenario-input-wrapper">
+            <span>Default name</span>
+            <input
+              type="text"
+              name="sl-popup-create-scenario-input"
+              id="sl-popup-create-scenario-input"
+              onChange={(e) => setDefaultName(e.target.value)}
+            />
+          </div>
+          <span id="sl-err-create-scenario" style={{ color: "red" }}></span>
+          <div className="sl-popup-create-scenario-btn-wrapper">
+            <Button
+              className="sl-popup-create-scenario-create-btn"
+              onClick={() => setIsOpenAddVariable(false)}
+            >
+              Close
+            </Button>
+            <Button
+              className="sl-popup-create-scenario-cancel-btn"
+              onClick={() => createVariable()}
+            >
+              Keep
+            </Button>
+          </div>
+        </div>
+      </ModalShort>
     </div >
   );
 };
