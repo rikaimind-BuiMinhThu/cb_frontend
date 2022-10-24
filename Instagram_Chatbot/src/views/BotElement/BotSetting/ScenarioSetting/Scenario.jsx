@@ -1399,7 +1399,7 @@ const Scenario = () => {
   const handleGetMessage = () => {
     api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`).then((res) => {
       console.log(res.data.data);
-      setDataMessages(res.data.data?.conversation?.messages);
+      setDataMessages(res.data.data?.conversation?.messages || []);
       setScenarioName(res.data.data?.conversation?.scenarioName || '');
     }).catch((error) => { console.error(error) });
   }
@@ -3490,7 +3490,6 @@ const Scenario = () => {
 
                 {/* ss setting */}
                 <div className="ss-sc-content ss-setting-wrapper">
-                  {console.log(dataMessages[indexMessageSelect])}
                   {dataMessages[indexMessageSelect] &&
                     <React.Fragment>
                       {belongTo === 'bot' && dataMessages[indexMessageSelect].message_content.length !== 0 && (
