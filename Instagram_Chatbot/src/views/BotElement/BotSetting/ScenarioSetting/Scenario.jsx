@@ -1431,10 +1431,14 @@ const Scenario = () => {
     reader.onloadend = function () {
       baseString = reader.result;
       // setInputImage(baseString);
-      document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
+      // document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
       if (baseString !== undefined || baseString !== '') {
         // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
+        console.log(baseString)
+        dataMessages[indexMessageSelect].message_content[0].file.content = baseString;
+        setDataMessages([...dataMessages]);
       }
+
     };
     reader.readAsDataURL(file);
   }
@@ -1472,15 +1476,25 @@ const Scenario = () => {
     document.querySelector(`.ss-message-${index}`).classList.add('ss-message--select');
   };
 
-  const handleHiddenMessage = (index) => {
+  const handleHiddenMessage = (index, role) => {
     dataMessages[index].hidden = !dataMessages[index].hidden;
 
-    document.querySelectorAll('.ss-bot-chat-detail-content').forEach((ele) => {
-      if (ele.classList.contains(`ss-bot-chat-overview-${index}`)) {
-        if (!dataMessages[index].hidden) ele.style.opacity = '1'
-        if (dataMessages[index].hidden) ele.style.opacity = '0.4'
-      }
-    });
+    if (role === 'bot') {
+      document.querySelectorAll('.ss-bot-chat-detail-content').forEach((ele) => {
+        if (ele.classList.contains(`ss-bot-chat-overview-${index}`)) {
+          if (!dataMessages[index].hidden) ele.style.opacity = '1'
+          if (dataMessages[index].hidden) ele.style.opacity = '0.4'
+        }
+      });
+    } else if (role === 'user') {
+      document.querySelectorAll('.ss-user-chat-detail-content').forEach((ele) => {
+        if (ele.classList.contains(`ss-user-chat-detail-content-${index}`)) {
+          if (!dataMessages[index].hidden) ele.style.opacity = '1'
+          if (dataMessages[index].hidden) ele.style.opacity = '0.4'
+        }
+      });
+    }
+
     setDataMessages([...dataMessages]);
   }
 
@@ -1732,7 +1746,7 @@ const Scenario = () => {
         dataMessages[i].message_content = [...startArr, ...lastArr];
       }
     }
-    console.log(messageType);
+    console.log(arrMessage);
     setDataMessages([...dataMessages]);
   }
 
@@ -1745,6 +1759,7 @@ const Scenario = () => {
 
     let startArr = dataMessages.slice(0, index);
     let lastArr = dataMessages.slice(index + 1, dataMessages.length);
+    console.log(dataMessages[index])
     setDataMessages([...startArr, ...lastArr]);
   }
 
@@ -1811,7 +1826,7 @@ const Scenario = () => {
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
-    let messageArr = dataMessages.filter((message, index) => message.belong_to === 'user' && index === indexMessageSelect)[0].message_content;
+    let messageArr = [...dataMessages[indexMessageSelect].message_content];
     const items = Array.from(messageArr);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
@@ -1827,6 +1842,8 @@ const Scenario = () => {
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
 
+    handleSelectMessage(result.destination.index, 'user');
+    // setIndexMessageSelect(result.destination.index);
     setDataMessages([...items]);
   }
 
@@ -1977,7 +1994,7 @@ const Scenario = () => {
     })
   }
 
-  const onClickCreateStatement = (belongTo, indexMessage) => {
+  const onClickCreateStatement = async (belongTo, indexMessage) => {
     let dataMessagesClone = [...dataMessages];
     console.log(dataMessagesClone, indexMessage);
     if (indexMessage === undefined && belongTo === 'bot') {
@@ -1989,8 +2006,13 @@ const Scenario = () => {
           conditions: [],
           message_content: [
             {
-              id: 1,
-              type: 'text_input'
+              type: 'text_input',
+              text_input: {},
+              email: {},
+              file: {},
+              script: {},
+              delay: {},
+              api_link_age: {}
             }
           ]
         }
@@ -2015,15 +2037,13 @@ const Scenario = () => {
           conditions: [],
           message_content: [
             {
-              id: 1,
               type: 'text_input',
-              text_input: {
-                text: {},
-                email_confirmation: {},
-                phone_number: {},
-                password: {},
-                password_confirmation: {},
-              }
+              text_input: {},
+              email: {},
+              file: {},
+              script: {},
+              delay: {},
+              api_link_age: {}
             }
           ]
         }
@@ -2041,7 +2061,10 @@ const Scenario = () => {
       )
     }
     console.log(dataMessagesClone)
+
+    setBelongTo('');
     setDataMessages([...dataMessagesClone]);
+    // handleSelectMessage(indexMessage ? indexMessage + 1 : indexMessage, belongTo);
   }
 
   const handlePannelCondition = (isUpCondition, role = 'bot') => {
@@ -2083,6 +2106,17 @@ const Scenario = () => {
     let dataConditionFilter = dataMessageClone[indexMessageSelect].conditions.filter((item, index) => index !== indexCondition);
     dataMessageClone[indexMessageSelect].conditions = dataConditionFilter;
     setDataMessages([...dataMessages]);
+  }
+
+  const handleDownloadFile = (file) => {
+    console.log(file);
+    let link = document.createElement('a');
+    link.href = file;
+    link.download = "file"
+    document.body.appendChild(link);
+
+    link.click();
+    link.remove();
   }
 
   return (
@@ -2144,7 +2178,7 @@ const Scenario = () => {
                                     {(provided) => (
                                       <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef} id={`message_${index}`} key={index} className="ss-bot-chat-wrapper ss-message-wrapper">
                                         <div
-                                          className={`ss-bot-chat ss-message ss-message--select ss-message-${index}`}
+                                          className={`ss-bot-chat ss-message ss-message-${index}`}
                                         >
                                           {content.type !== 'text_input' && <span style={{ marginLeft: '49px' }}>{content.type}</span>}
                                           <div
@@ -2195,16 +2229,27 @@ const Scenario = () => {
                                                   //   }
                                                   //   readOnly
                                                   // ></textarea>
-                                                  <span
-                                                    style={{
-                                                      cursor: 'pointer',
-                                                      color: 'blue',
-                                                      fontWeight: '400',
-                                                      fontSize: '15px',
-                                                    }}
-                                                  >
-                                                    Download this file
-                                                  </span>
+                                                  content[content.type]?.content ? (
+                                                    <React.Fragment>
+                                                      {(content[content.type]?.content.includes('jpeg') || content[content.type]?.content.includes('png')) ?
+                                                        <img
+                                                          src={content[content.type]?.content}
+                                                          alt=""
+                                                          style={{ width: '27%' }}
+                                                        /> :
+                                                        <span
+                                                          style={{ color: '#089BE5', fontSize: '17px' }}
+                                                          onClick={() => handleDownloadFile(content[content.type]?.content)}
+                                                        // className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                        >Download this file</span>
+                                                      }
+                                                    </React.Fragment>
+                                                  ) :
+                                                    <textarea
+                                                      className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                      value={''}
+                                                      readOnly
+                                                    ></textarea>
                                                 )}
 
                                                 {/* bot: type == 'email' */}
@@ -2366,7 +2411,7 @@ const Scenario = () => {
                                     {(provided) => (
                                       <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef} key={index} className="ss-user-chat-wrapper ss-message-wrapper">
                                         <div
-                                          className={`ss-user-chat ss-message ss-message--error ss-message-${index}`}
+                                          className={`ss-user-chat ss-message ss-message-${index}`}
                                         // style={message?.message_content.length === 0 ? {width: '30%'}: {}}
                                         >
                                           <div
@@ -2375,7 +2420,7 @@ const Scenario = () => {
                                               handleSelectMessage(index, message.belong_to, message.message_content[message.message_content.length - 1])
                                             }
                                           >
-                                            <div className="ss-user-chat-detail-content">
+                                            <div className={`ss-user-chat-detail-content ss-user-chat-detail-content-${index}`}>
                                               <div className="ss-user-message__content-wrapper">
                                                 {message?.message_content.map((content, indexContent) => {
                                                   let textInput = content.text_input;
@@ -2396,7 +2441,7 @@ const Scenario = () => {
                                                         content.type === 'text_input' && (
                                                           <div style={{ marginBottom: '10px' }}>
                                                             {(textInput.title_require || textInput.require) &&
-                                                              <div className="ss-message__content--user-text-input-top">
+                                                              <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
                                                                 {textInput.title_require &&
                                                                   <span className="ss-message__content--user-text-input-title">
                                                                     {textInput.title}
@@ -2435,7 +2480,9 @@ const Scenario = () => {
                                                                     placeholder={textInput[textInput.type]?.placeholderLeft}
                                                                     disabled
                                                                   ></input>
-                                                                  <span style={{ fontWeight: '400', color: 'black', fontSize: '12px', marginLeft: '18px' }}>{textInput.text?.placeholderRight}</span>
+                                                                  {textInput.text?.placeholderRight &&
+                                                                    <span style={{ fontWeight: '400', color: 'black', fontSize: '12px', marginLeft: '18px' }}>{textInput.text?.placeholderRight}</span>
+                                                                  }
                                                                 </React.Fragment>
                                                               )
                                                             }
@@ -2555,7 +2602,7 @@ const Scenario = () => {
                                                         content.type === 'textarea' && (
                                                           <div style={{ marginBottom: '10px' }}>
                                                             {(textarea.title_require || textarea.require) &&
-                                                              <div className="ss-message__content--user-textarea-top">
+                                                              <div className="ss-message__content--user-textarea-top" style={{ marginBottom: '0px' }}>
                                                                 {textarea.title_require &&
                                                                   <span className="ss-message__content--user-textarea-title">
                                                                     {textarea.title}
@@ -2593,7 +2640,7 @@ const Scenario = () => {
                                                         content.type === 'radio_button' && (
                                                           <div style={{ marginBottom: '10px' }}>
                                                             {(radioButton.title_require || radioButton.require) &&
-                                                              <div className="ss-message__content--user-radio_button-top">
+                                                              <div className="ss-message__content--user-radio_button-top" style={{ marginBottom: '0px' }}>
                                                                 {radioButton.title_require &&
                                                                   <span className="ss-message__content--user-radio_button-title">
                                                                     {radioButton.title}
@@ -2639,6 +2686,11 @@ const Scenario = () => {
                                                                       src={item.img}
                                                                       alt=""
                                                                     />
+                                                                    {item.text &&
+                                                                      <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                                        {item.text}
+                                                                      </div>
+                                                                    }
                                                                   </div>
                                                                 })
                                                               )}
@@ -2684,7 +2736,7 @@ const Scenario = () => {
                                                         content.type === 'checkbox' && (
                                                           <div style={{ marginBottom: '10px' }}>
                                                             {(checkbox.title_require || checkbox.require) &&
-                                                              <div className="ss-message__content--user-checkbox-top">
+                                                              <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
                                                                 {checkbox.title_require &&
                                                                   <span className="ss-message__content--user-checkbox-title">
                                                                     {checkbox.title}
@@ -2767,7 +2819,7 @@ const Scenario = () => {
                                                         content.type === 'pull_down' && (
                                                           <div style={{ marginBottom: '10px' }}>
                                                             {(pullDown.title_require || pullDown.require) &&
-                                                              <div className="ss-message__content--user-pull_down-top">
+                                                              <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
                                                                 {pullDown.title_require &&
                                                                   <span className="ss-message__content--user-pull_down-title">
                                                                     {pullDown.title}
@@ -2819,7 +2871,6 @@ const Scenario = () => {
                                                                             />
                                                                           </div>
                                                                       }
-
                                                                     </div>
                                                                     <div
                                                                       className="ss-message__content--user-pull_down-comment"
@@ -3096,8 +3147,8 @@ const Scenario = () => {
                                                       {
                                                         content.type === 'zip_code_address' && (
                                                           <div style={{ marginBottom: '10px' }}>
-                                                            {(zipCodeAddress.title_require || zipCodeAddress.require) &&
-                                                              <div className="ss-message__content--user-pull_down-top">
+                                                            {(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire) &&
+                                                              <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
                                                                 {zipCodeAddress.title_require &&
                                                                   <span className="ss-message__content--user-pull_down-title">
                                                                     {zipCodeAddress.title}
@@ -3215,7 +3266,7 @@ const Scenario = () => {
                                                         content.type === 'calendar' && (
                                                           <div style={{ marginBottom: '10px' }}>
                                                             {(calendar.title_require || calendar.require) &&
-                                                              <div className="ss-message__content--user-calender-top">
+                                                              <div className="ss-message__content--user-calender-top" style={{ marginBottom: '0px' }}>
                                                                 {calendar.title_require &&
                                                                   <span className="ss-message__content--user-calender-title">
                                                                     {calendar.title}
@@ -3285,7 +3336,7 @@ const Scenario = () => {
                                                         content.type === 'agree_term' && (
                                                           <div style={{ marginBottom: '10px' }}>
                                                             {(agreeTerm.title_require || agreeTerm.require) &&
-                                                              <div className="ss-message__content--user-agree_to_term-top">
+                                                              <div className="ss-message__content--user-agree_to_term-top" style={{ marginBottom: '0px' }}>
                                                                 {agreeTerm.title_require &&
                                                                   <span className="ss-message__content--user-agree_to_term-title">
                                                                     {agreeTerm.title}
@@ -3519,11 +3570,16 @@ const Scenario = () => {
                                       hidden
                                       onChange={(e) => getBaseUrl(e)}
                                     />
+                                    <CheckboxCustom
+                                      label={<span>do not scroll automatically<MDBIcon fas icon="question-circle" style={{ color: '#347AED', marginLeft: '5px', fontSize: '13px' }} /></span>}
+                                    />
                                     <div className="ss-file-upload-wrapper">
-                                      <span id="ss-bot-file-upload-name"></span>
-                                      <button className="ss-bot-file-upload-btn" onClick={botUploadFile}>
-                                        Upload
-                                      </button>
+                                      <Button className="ss-bot-file-reference-btn">
+                                        file reference
+                                      </Button>
+                                      <Button className="ss-bot-file-upload-btn" onClick={botUploadFile}>
+                                        addition
+                                      </Button>
                                     </div>
                                   </div>
                                 </div>
@@ -3736,7 +3792,7 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-text_input-save-variable-wrapper">
                                                           <CheckboxCustom
                                                             label="Save the input contents in a variable."
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'text_input', value, 'save_input_content')}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                             value={textInput.save_input_content}
                                                           />
                                                         </div>
@@ -3748,7 +3804,7 @@ const Scenario = () => {
                                                                 id="title"
                                                                 value={textInput?.save_input_content}
                                                                 data={inputContentVar}
-                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'text_input', value, 'save_input_content')}
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
                                                               <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
                                                             </div>
@@ -3758,19 +3814,30 @@ const Scenario = () => {
                                                           <div>
                                                             <CheckboxCustom
                                                               label="Use APIs to validate input values"
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'text_input', value, 'use_api_input_value')}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_api_input_value')}
                                                               value={textInput.use_api_input_value}
                                                             />
                                                           </div>
                                                           <div className="ss-user-setting__item-text_input-use-api-required">
                                                             <CheckboxCustom
                                                               label="Required"
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'text_input', value, 'require')}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
                                                               value={textInput.require}
                                                             />
                                                           </div>
                                                         </div>
                                                       </div>
+                                                      {textInput.use_api_input_value &&
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <SelectCustom
+                                                            // style={{ width: '49%' }}
+                                                            value={textInput.data_use_api_input_value}
+                                                            data={[]}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'data_use_api_input_value')}
+                                                            keyValue="key"
+                                                          />
+                                                        </div>
+                                                      }
                                                       <div className="ss-user-setting__item-bottom">
                                                         <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                           <SelectCustom
@@ -5838,7 +5905,7 @@ const Scenario = () => {
                               <Button className="ss-user-setting__select-btn-add" onClick={() => handleAddItemSetting(messageType || 'text_input')}>Addition</Button>
                             </div>
                             <div className="ss-user-setting__checkbox-wrapper">
-                              <input type="checkbox" name="ss-user-setting__checkbox" />
+                              <input style={{ width: '15px' }} type="checkbox" name="ss-user-setting__checkbox" />
                               <span>Align to the beginning and stop</span>
                               <MDBIcon fas icon="question-circle" style={{ color: '#347AED', fontSize: '12px', marginLeft: '5px' }} />
                             </div>

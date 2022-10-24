@@ -13,6 +13,7 @@ const CheckboxCustom = ({ id, label, value = false, onChange, isOnChange = true,
                 <input
                     disabled={disabled}
                     id={id}
+                    style={{width: '15px'}}
                     checked={isOnChange ? data : value}
                     onChange={isOnChange ? e => handleChange(e.target.checked) : onChange}
                     type="checkbox"
