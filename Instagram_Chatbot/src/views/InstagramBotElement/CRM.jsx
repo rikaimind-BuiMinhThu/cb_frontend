@@ -566,6 +566,7 @@ function CRM() {
                       placeholder="クライアント名..."
                     ></input>
                   )}
+                  <span style={{fontWeight:"600"}}>友人切り替え中</span>
                   <Switch
                     onChange={activeSearchChange}
                     onColor="#64c1ff"
