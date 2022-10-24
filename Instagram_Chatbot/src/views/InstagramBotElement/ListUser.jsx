@@ -514,6 +514,8 @@ function ListUser() {
 
   const headers = [
     { label: 'ユーザー名', key: 'username' },
+    //add new link to account of instagram user
+    { label: 'アカウントリンク', key: 'account' },
     { label: '名前', key: 'full_name' },
     { label: 'フォロワー数', key: 'follower_count' },
     { label: 'インスタグラムID', key: 'instagram_id' },
@@ -529,9 +531,12 @@ function ListUser() {
   function setDataExport() {
     var data = [];
     var datae = instaUser;
+    console.log(datae);
     datae.forEach((it) => {
       data.push({
         username: it.username,
+        //add new link to account of instagram user
+        account: `https://www.instagram.com/${it.username}`,
         full_name: it.full_name,
         follower_count: it.follower_count,
         instagram_id: it.instagram_id,
@@ -543,6 +548,8 @@ function ListUser() {
         const cm_live = it[i];
         data.push({
           username: cm_live.username,
+          //add new link to account of instagram user
+          account: cm_live.username,
           full_name: cm_live.full_name,
           follower_count: cm_live.follower_count,
           instagram_id: cm_live.instagram_id,
