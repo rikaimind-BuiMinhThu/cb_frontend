@@ -104,7 +104,8 @@ function Header(props) {
     Cookies.remove('user_role')
     Cookies.remove('user_id')
     Cookies.remove('page_access_token')
-    window.location.href = '/'
+    Cookies.remove('scenario_id')
+    window.location.href ='/'
     // window.location.href ='/'
   }
   return (
