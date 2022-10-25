@@ -13,6 +13,8 @@
 .btn-add-bot {
   float: right;
   border: none;
+  color:white;
+  font-weight: 600;
   background-color: #51cbce;
   padding: 5px 15px 5px 15px;
   border-radius: 5px;

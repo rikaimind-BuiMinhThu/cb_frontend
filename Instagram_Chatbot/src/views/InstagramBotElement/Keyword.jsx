@@ -11,6 +11,7 @@ import Cookies from 'js-cookie';
 import ModalShort from './../Popup/ModalShort';
 import { useEffect } from 'react';
 import { Pagination } from '@material-ui/lab';
+import { setToken} from './../../api/auth'
 
 function Keyword() {
   var [customDiv, setCustomDiv] = useState([]);
@@ -49,25 +50,53 @@ function Keyword() {
     }
   }, []);
 
+  //This API handle token doesn't exist anymore
   React.useEffect(() => {
     var path = window.location.pathname;
-
     api
       .get(`/api/v1/message_managements/keyword_settings?page=1`)
       .then((res) => {
-        // console.log('keyword_settings: ', res.data);
+        console.log('keyword_settings: ', res.data);
         setTotalPage(Math.ceil(res.data?.total / 15));
         setListKeyword(res.data?.data);
         // var listkey = res.data.data
         // console.log(listkey.length)
       })
       .catch((error) => {
-        console.log(error);
-        // if (error.response.data.code === 3) {
-        //     requestNewToken(path)
+        console.log(error.message);
+        // if (error.response?.data.code === 0) {
+            requestNewToken.post(`/api/v1/refresh_token`).then(res =>{
+              console.log(res.data.token)
+              // Cookies.set('token', res.data.token)
+              setToken(res.data.token, path)
+              getFirstKeyword()
+            })
         // }
       });
   }, []);
+  //this function refresh token.
+  function getFirstKeyword(){
+    var path = window.location.pathname;
+    api
+      .get(`/api/v1/message_managements/keyword_settings?page=1`)
+      .then((res) => {
+        console.log('keyword_settings: ', res.data);
+        setTotalPage(Math.ceil(res.data?.total / 15));
+        setListKeyword(res.data?.data);
+        // var listkey = res.data.data
+        // console.log(listkey.length)
+      })
+      .catch((error) => {
+        console.log(error.message);
+        // if (error.response?.data.code === 0) {
+            requestNewToken.post(`/api/v1/refresh_token`).then(res =>{
+              console.log(res.data.token)
+              // Cookies.set('token', res.data.token)
+              setToken(res.data.token, path)
+            })
+        // }
+      });
+  }
 
   function reloadListKW() {
     var path = window.location.pathname;
@@ -118,9 +147,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response.data.code === 3) {
-          requestNewToken(path);
-        }
+        // if (error.response?.data.code === 0) {
+          // requestNewToken();
+        // }
       });
   }, []);
 
