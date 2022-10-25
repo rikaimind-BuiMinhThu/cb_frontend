@@ -1448,3 +1448,10 @@ input#ss-message__content--user-checkbox--checkbox_img {
   border-top: 1px solid #E2E4E8;
   height: 20%;
 }
+
+.ss-user-setting-item-checkbox-button-drag {
+  width: 90%
+}
+
+.ss-user-setting-item-pull-down-drag {
+}
