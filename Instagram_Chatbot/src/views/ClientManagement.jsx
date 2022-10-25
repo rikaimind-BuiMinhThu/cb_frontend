@@ -1550,7 +1550,7 @@ function ClientManagement() {
                     ステータス {/*Status*/}
                     <span className="span-require">*必須</span>
                   </label>
-                  <span value={contract}>
+                  <span style={{ display: 'flex' }} value={contract}>
                     <input
                       name="status"
                       type="radio"
@@ -2464,7 +2464,7 @@ function ClientManagement() {
                     ステータス {/*Status*/}
                     <span className="span-require">*必須</span>
                   </label>
-                  <span>
+                  <span style={{ display: 'flex' }}>
                     <input
                       name="status"
                       type="radio"

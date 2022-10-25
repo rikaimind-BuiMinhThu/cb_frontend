@@ -60,7 +60,9 @@
   opacity: 1; /* Firefox */
 }
 .radioButtonAddClient {
+  white-space: nowrap;
   padding-right: 15px;
+  padding-top: 10px;
   margin-left: 5px;
 }
 .long-label {
