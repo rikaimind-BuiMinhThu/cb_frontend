@@ -42,47 +42,47 @@ let data = [
   },
 ];
 
-let dataHour = [];
+let dataHourFixed = [];
 for (let i = 1; i <= 24; i++) {
-  dataHour.push({
+  dataHourFixed.push({
     key: i + '',
     value: i + ''
   });
 }
 
-let dataMinutes = [];
+let dataMinutesFixed = [];
 for (let i = 1; i <= 59; i++) {
-  dataMinutes.push({
+  dataMinutesFixed.push({
     key: i + '',
     value: i + ''
   });
 }
 
-let dataYear = [];
+let dataYearFixed = [];
 for (let i = 1935; i <= 2072; i++) {
-  dataYear.push({
+  dataYearFixed.push({
     key: i + '',
     value: i + ''
   });
 }
 
-let dataMonth = [];
+let dataMonthFixed = [];
 for (let i = 1; i <= 12; i++) {
-  dataMonth.push({
+  dataMonthFixed.push({
     key: i + '',
     value: i + ''
   });
 }
 
-let dataDay = [];
+let dataDayFixed = [];
 for (let i = 1; i <= 31; i++) {
-  dataDay.push({
+  dataDayFixed.push({
     key: i + '',
     value: i + ''
   });
 }
 
-let dataEveryMinute = [
+let dataEveryMinuteFixed = [
   {
     key: '00',
     value: '00'
@@ -1339,6 +1339,8 @@ const Scenario = () => {
   const [indexMessageContentSelect, setIndexMessageContentSelect] = useState('');
   const [dataSelecteFixed, setDataSelecteFixed] = useState(new Date());
   const [checkInitialRaido, setCheckInitialRaido] = useState();
+  const [dataMessageUser, setDataMessageUser] = useState([]);
+
   // bot setting values
   const [botTextValue, setBotTextValue] = useState('');
   const [isOpenAddVariable, setIsOpenAddVariable] = useState(false);
@@ -1368,6 +1370,14 @@ const Scenario = () => {
 
   const [variableName, setVariableName] = useState('');
   const [defaultName, setDefaultName] = useState('');
+
+  //state data pull_down
+  const [dataHour, setDataHour] = useState(dataHourFixed);
+  const [dataMinutes, setDataMinutes] = useState(dataMinutesFixed);
+  const [dataEveryMinute, setDataEveryMinute] = useState(dataEveryMinuteFixed);
+  const [dataYear, setDataYear] = useState(dataYearFixed);
+  const [dataMonth, setDataMonth] = useState(dataMonthFixed);
+  const [dataDay, setDataDay] = useState(dataDayFixed);
   // side effects
 
   useEffect(() => {
@@ -1401,6 +1411,7 @@ const Scenario = () => {
       console.log(res.data.data);
       setDataMessages(res.data.data?.conversation?.messages || []);
       setScenarioName(res.data.data?.conversation?.scenarioName || '');
+
     }).catch((error) => { console.error(error) });
   }
 
@@ -1578,6 +1589,7 @@ const Scenario = () => {
           [messageType]: {
             title_require: false,
             type: 'default',
+            initial_selection: 1,
             default: [{ id: 1 }],
             radio_button_img: [{ id: 1 }],
             block_style: [{ id: 1 }]
@@ -1631,8 +1643,8 @@ const Scenario = () => {
             customization: {
               display_unselected: '選択してください',
               is_comment: false,
-              options_with_comment: [],
-              options_without_comment: []
+              options_with_comment: [{ id: 1 }],
+              options_without_comment: [{ id: 1 }]
             },
             time_hm: {},
             date_ymd: {},
@@ -1883,6 +1895,25 @@ const Scenario = () => {
     }
     dataMessages[indexMessageSelect].message_content[indexItem][type][contentType][subContentType] = items;
     setDataMessages([...dataMessages]);
+  }
+
+  const onChangeTimePullDown = (indexMessage, indexContent, type, value, name, subField, typeData) => {
+    onChangeValueMessageContent(indexMessage, indexContent, type, value, name, subField);
+    let field = dataMessages[indexMessage].message_content[indexContent][type][name];
+    console.log(field, 'checkkk');
+    if (typeData === 'dataHour') {
+      if (subField === 'start_at') {
+        setDataHour(dataHourFixed.filter(item => (parseInt(item.key) >= parseInt(value || 0) && parseInt(item.key) <= parseInt(field.end_at || 24))));
+      } else if (subField === 'end_at') {
+        setDataHour(dataHourFixed.filter(item => (parseInt(item.key) <= parseInt(value || 24) && parseInt(item.key) >= parseInt(field.start_at || 0))));
+      }
+    }else if (typeData === 'dataYear') {
+      if (subField === 'start_year') {
+        setDataYear(dataYearFixed.filter(item => (parseInt(item.key) >= parseInt(value || 1935) && parseInt(item.key) <= parseInt(field.end_year || 2072))));
+      } else if (subField === 'end_year') {
+        setDataYear(dataYearFixed.filter(item => (parseInt(item.key) <= parseInt(value || 2072) && parseInt(item.key) >= parseInt(field.start_year || 1935))));
+      }
+    }
   }
 
   const onChangeValueMessageContent = (indexMessage, indexContent, type, value, name, subField, indexSubField, subName) => {
@@ -2842,7 +2873,7 @@ const Scenario = () => {
                                                                     >
                                                                       <span>{pullDown[pullDown.type].title_comment}</span>
                                                                     </div>
-                                                                    <div className="ss-message__content--user-pull_down-row">
+                                                                    <div className="">
                                                                       {
                                                                         pullDown[pullDown.type].is_comment === false ?
                                                                           <div className="ss-message__content--user-pull_down-col col-12">
@@ -2884,7 +2915,7 @@ const Scenario = () => {
                                                               {(pullDown.type === 'time_hm') && (
                                                                 <React.Fragment>
                                                                   <div className="ss-message__content--user-pull_down--time_hm">
-                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                                       <SelectCustom
                                                                         data={dataHour}
                                                                         placeholder="Time"
@@ -2909,7 +2940,7 @@ const Scenario = () => {
                                                                 pullDown.type === 'dob_ymd') && (
                                                                   <React.Fragment>
                                                                     <div className="ss-message__content--user-pull_down--time_hm">
-                                                                      <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                                                                      <div className="" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                                                                         <SelectCustom
                                                                           data={dataYear}
                                                                           placeholder="Year"
@@ -2927,7 +2958,7 @@ const Scenario = () => {
                                                                         />
                                                                         <div
                                                                           className="ss-message__content--user-pull_down-comment"
-                                                                          style={{ width: '32%' }}
+                                                                          style={{ marginTop: '4px', width: '32%' }}
                                                                         >
                                                                           <span>{pullDown[pullDown.type].comment}</span>
                                                                         </div>
@@ -2938,7 +2969,7 @@ const Scenario = () => {
                                                               {(pullDown.type === 'date_md') && (
                                                                 <React.Fragment>
                                                                   <div className="ss-message__content--user-pull_down--time_hm">
-                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                                       <SelectCustom
                                                                         data={dataMonth}
                                                                         placeholder="Month"
@@ -2963,7 +2994,7 @@ const Scenario = () => {
                                                                 pullDown.type === 'dob_ym') && (
                                                                   <React.Fragment>
                                                                     <div className="ss-message__content--user-pull_down--time_hm">
-                                                                      <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                      <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                                         <SelectCustom
                                                                           data={dataYear}
                                                                           placeholder="Year"
@@ -2987,7 +3018,7 @@ const Scenario = () => {
                                                               {(pullDown.type === 'date_ymd_hm') && (
                                                                 <React.Fragment>
                                                                   <div className="ss-message__content--user-pull_down--time_hm">
-                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                                                                       <SelectCustom
                                                                         data={dataYear}
                                                                         placeholder="Year"
@@ -3026,7 +3057,7 @@ const Scenario = () => {
                                                               {pullDown.type === 'timezone_from_to' && (
                                                                 <React.Fragment>
                                                                   <div className="ss-message__content--user-pull_down--time_hm">
-                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                                       <SelectCustom
                                                                         data={dataHour}
                                                                         placeholder="Time"
@@ -3039,7 +3070,7 @@ const Scenario = () => {
                                                                       />
                                                                     </div>
                                                                     <div style={{ textAlign: 'center' }}>~</div>
-                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                                       <SelectCustom
                                                                         data={dataHour}
                                                                         placeholder="Time"
@@ -3063,7 +3094,7 @@ const Scenario = () => {
                                                               {pullDown.type === 'period_from_to' && (
                                                                 <React.Fragment>
                                                                   <div className="ss-message__content--user-pull_down--time_hm">
-                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                                       <SelectCustom
                                                                         data={dataYear}
                                                                         placeholder="Year"
@@ -3081,7 +3112,7 @@ const Scenario = () => {
                                                                       />
                                                                     </div>
                                                                     <div style={{ textAlign: 'center' }}>~</div>
-                                                                    <div className="ss-message__content--user-pull_down-row" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                                       <SelectCustom
                                                                         data={dataYear}
                                                                         placeholder="Year"
@@ -3119,24 +3150,26 @@ const Scenario = () => {
                                                                 </React.Fragment>
                                                               )}
                                                               {pullDown.type === 'up_to_municipality' && (
-                                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                  <span>{pullDown[pullDown.type].prefecture_comment}</span>
-                                                                  <SelectCustom
-                                                                    data={dataPrefectures}
-                                                                    placeholder="Select prefecture"
-                                                                    style={{ width: '45%' }}
-                                                                    keyValue="id"
-                                                                    nameValue="name"
-                                                                  />
-                                                                  <span>~</span>
-                                                                  <SelectCustom
-                                                                    data={dataCity}
-                                                                    placeholder="Select city"
-                                                                    style={{ width: '45%' }}
-                                                                    keyValue="id"
-                                                                    nameValue="name"
-                                                                  />
-                                                                  <span>{pullDown[pullDown.type].city_comment}</span>
+                                                                <div>
+                                                                  <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].prefecture_comment}</div>
+                                                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                    <SelectCustom
+                                                                      data={dataPrefectures}
+                                                                      placeholder="Select prefecture"
+                                                                      style={{ width: '45%' }}
+                                                                      keyValue="id"
+                                                                      nameValue="name"
+                                                                    />
+                                                                    <span>~</span>
+                                                                    <SelectCustom
+                                                                      data={dataCity}
+                                                                      placeholder="Select city"
+                                                                      style={{ width: '45%' }}
+                                                                      keyValue="id"
+                                                                      nameValue="name"
+                                                                    />
+                                                                  </div>
+                                                                  <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].city_comment}</div>
                                                                 </div>
                                                               )}
                                                             </div>
@@ -3335,18 +3368,18 @@ const Scenario = () => {
                                                       {
                                                         content.type === 'agree_term' && (
                                                           <div style={{ marginBottom: '10px' }}>
-                                                            {(agreeTerm.title_require || agreeTerm.require) &&
-                                                              <div className="ss-message__content--user-agree_to_term-top" style={{ marginBottom: '0px' }}>
-                                                                {agreeTerm.title_require &&
-                                                                  <span className="ss-message__content--user-agree_to_term-title">
-                                                                    {agreeTerm.title}
-                                                                  </span>
-                                                                }
-                                                                <span className="ss-message__content--user-text-input-required">
-                                                                  * required
+                                                            {/* {(agreeTerm.title_require || agreeTerm.require) && */}
+                                                            <div className="ss-message__content--user-agree_to_term-top" style={{ marginBottom: '0px' }}>
+                                                              {agreeTerm.title_require &&
+                                                                <span className="ss-message__content--user-agree_to_term-title">
+                                                                  {agreeTerm.title}
                                                                 </span>
-                                                              </div>
-                                                            }
+                                                              }
+                                                              <span className="ss-message__content--user-text-input-required">
+                                                                * required
+                                                              </span>
+                                                            </div>
+                                                            {/* } */}
                                                             {/* agreeTerm: type = 'detail_content' */}
                                                             {agreeTerm.type === 'detail_content' && (
                                                               <React.Fragment>
@@ -3752,11 +3785,12 @@ const Scenario = () => {
                           </div>
                           <DragDropContext onDragEnd={handleDragEnd}>
                             <Droppable droppableId="messages">
-                              {(provided) => (
-                                <div className="ss-user-setting__main" {...provided.droppableProps} ref={provided.innerRef}>
-                                  {dataMessages &&
-                                    dataMessages
-                                      .filter((message, index) => message.belong_to === 'user' && index === indexMessageSelect)[0]?.message_content
+                              {(provided) => {
+                                let messageUserSelect = dataMessages && dataMessages.filter((message, index) => (message.belong_to === 'user' && index === indexMessageSelect))[0]?.message_content;
+                                console.log(messageUserSelect, 'checkk messageUserSelect');
+                                return <div className="ss-user-setting__main" {...provided.droppableProps} ref={provided.innerRef}>
+                                  {messageUserSelect &&
+                                    messageUserSelect
                                       .map((content, indexContent, arr) => {
                                         let textInput = content.text_input;
                                         let label = content.label;
@@ -3772,11 +3806,12 @@ const Scenario = () => {
                                         return (
                                           <Draggable key={content.id} draggableId={content.id.toString()} index={indexContent}>
                                             {(provided) => (
-                                              <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef} style={{ marginBottom: '10px' }}>
+                                              <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
                                                 <div
                                                   id={indexContent === (arr.length - 1) ? 'last-element' : ''}
                                                   className={`ss-user-setting__item ss-user-setting__item-${indexContent} ${indexContent === (arr.length - 1) ? 'ss-user-setting__item--active' : ''}`}
                                                   onClick={() => handleSelectContentMessage(indexContent, content.type)}
+                                                  style={{ marginBottom: '10px' }}
                                                 >
                                                   <MDBIcon
                                                     fas
@@ -4257,55 +4292,61 @@ const Scenario = () => {
                                                                           return (
                                                                             <Draggable draggable={true} key={itemRadio.id} draggableId={itemRadio.id + ''} index={indexRadio}>
                                                                               {(providedChild) => (
-                                                                                <div {...providedChild.draggableProps} {...providedChild.dragHandleProps} ref={providedChild.innerRef} style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px' }}>
+                                                                                <div {...providedChild.draggableProps} {...providedChild.dragHandleProps} ref={providedChild.innerRef}>
                                                                                   {console.log(itemRadio)}
-                                                                                  {radioButton.type === 'radio_button_img' &&
-                                                                                    <React.Fragment>
-                                                                                      <div className="ss-user-setting__item-bottom">
-                                                                                        <InputCustom
-                                                                                          placeholder="File URL"
-                                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, 'img')}
-                                                                                          value={itemRadio.img}
+                                                                                  <div style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px' }}>
+                                                                                    {radioButton.type === 'radio_button_img' &&
+                                                                                      <React.Fragment>
+                                                                                        <div className="ss-user-setting__item-bottom">
+                                                                                          <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
+                                                                                          <InputCustom
+                                                                                            placeholder="File URL"
+                                                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, 'img')}
+                                                                                            value={itemRadio.img}
+                                                                                          />
+                                                                                        </div>
+                                                                                        <InputDouble
+                                                                                          classCustom="ss-user-radio-custom-class"
+                                                                                          onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, name === 'left' ? 'text' : 'value')}
+                                                                                          onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, radioButton.type, indexRadio)}
+                                                                                          icon={array.length >= 2 ? "times-circle" : ""}
+                                                                                          placeholder={['title', 'value']}
+                                                                                          classIcon="ss-plus-circle-option-icon-times"
+                                                                                          valueLeft={itemRadio.text}
+                                                                                          valueRight={itemRadio.value}
                                                                                         />
-                                                                                      </div>
-                                                                                      <InputDouble
-                                                                                        classCustom="ss-user-radio-custom-class"
-                                                                                        onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, name === 'left' ? 'text' : 'value')}
-                                                                                        onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, radioButton.type, indexRadio)}
-                                                                                        icon={array.length >= 2 ? "times-circle" : ""}
-                                                                                        placeholder={['title', 'value']}
-                                                                                        classIcon="ss-plus-circle-option-icon-times"
-                                                                                        valueLeft={itemRadio.text}
-                                                                                        valueRight={itemRadio.value}
-                                                                                      />
-                                                                                      <CheckboxCustom
-                                                                                        label="Initial selection setting"
-                                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.id, 'initial_selection')}
-                                                                                        value={radioButton.initial_selection === itemRadio.id}
-                                                                                        isOnChange={false}
-                                                                                      />
-                                                                                    </React.Fragment>
-                                                                                  }
-                                                                                  {(radioButton.type === 'default' || radioButton.type === 'block_style') &&
-                                                                                    <React.Fragment>
-                                                                                      <InputDouble
-                                                                                        classCustom="ss-user-radio-custom-class"
-                                                                                        icon={array.length >= 2 ? "times-circle" : ""}
-                                                                                        onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, name === 'left' ? 'text' : 'value')}
-                                                                                        valueLeft={itemRadio.text}
-                                                                                        valueRight={itemRadio.value}
-                                                                                        placeholder={['title', 'value']}
-                                                                                        classIcon="ss-plus-circle-option-icon-times"
-                                                                                        onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, radioButton.type, indexRadio)}
-                                                                                      />
-                                                                                      <CheckboxCustom
-                                                                                        label="Initial selection setting"
-                                                                                        onChange={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.id, 'initial_selection')}
-                                                                                        value={radioButton.initial_selection === itemRadio.id}
-                                                                                        isOnChange={false}
-                                                                                      />
-                                                                                    </React.Fragment>
-                                                                                  }
+                                                                                        <CheckboxCustom
+                                                                                          label="Initial selection setting"
+                                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.id, 'initial_selection')}
+                                                                                          value={radioButton.initial_selection === itemRadio.id}
+                                                                                          isOnChange={false}
+                                                                                        />
+                                                                                      </React.Fragment>
+                                                                                    }
+                                                                                    {(radioButton.type === 'default' || radioButton.type === 'block_style') &&
+                                                                                      <React.Fragment>
+                                                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                                                          <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
+                                                                                          <InputDouble
+                                                                                            classCustom="ss-user-radio-custom-class"
+                                                                                            icon={array.length >= 2 ? "times-circle" : ""}
+                                                                                            onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, name === 'left' ? 'text' : 'value')}
+                                                                                            valueLeft={itemRadio.text}
+                                                                                            valueRight={itemRadio.value}
+                                                                                            placeholder={['title', 'value']}
+                                                                                            classIcon="ss-plus-circle-option-icon-times"
+                                                                                            onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, radioButton.type, indexRadio)}
+                                                                                          />
+                                                                                        </div>
+                                                                                        <CheckboxCustom
+                                                                                          label="Initial selection setting"
+                                                                                          onChange={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.id, 'initial_selection')}
+                                                                                          value={radioButton.initial_selection === itemRadio.id}
+                                                                                          isOnChange={false}
+                                                                                        />
+                                                                                      </React.Fragment>
+                                                                                    }
+                                                                                  </div>
                                                                                 </div>
                                                                               )}
                                                                             </Draggable>
@@ -4437,61 +4478,63 @@ const Scenario = () => {
                                                                   //   arrMap
                                                                   // }
 
-                                                                  return <div className="ss-user-setting-item-radio-button-drag" {...providedChild.droppableProps} ref={providedChild.innerRef} style={{ width: '90%' }}>
+                                                                  return <div className="ss-user-setting-item-checkbox-button-drag" {...providedChild.droppableProps} ref={providedChild.innerRef}>
                                                                     {
                                                                       Array.isArray(checkbox?.[checkbox.type]) && checkbox?.[checkbox.type]
                                                                         .map((itemCheckbox, indexCheckbox, array) => {
                                                                           return (
                                                                             <Draggable draggable={true} key={itemCheckbox.id} draggableId={itemCheckbox.id + ''} index={indexCheckbox}>
                                                                               {(providedChild) => (
-                                                                                <div {...providedChild.draggableProps} {...providedChild.dragHandleProps} ref={providedChild.innerRef} style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px' }}>
-                                                                                  {checkbox.type === 'checkbox_img' &&
-                                                                                    <React.Fragment>
-                                                                                      <div className="ss-user-setting__item-bottom" style={{ display: 'flex', alignItems: 'center' }}>
-                                                                                        <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
-                                                                                        <InputCustom
-                                                                                          placeholder="File URL"
-                                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, 'img')}
-                                                                                          value={checkbox[checkbox.type][indexCheckbox].img}
+                                                                                <div {...providedChild.draggableProps} {...providedChild.dragHandleProps} ref={providedChild.innerRef} >
+                                                                                  <div style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px' }}>
+                                                                                    {checkbox.type === 'checkbox_img' &&
+                                                                                      <React.Fragment>
+                                                                                        <div className="ss-user-setting__item-bottom" style={{ display: 'flex', alignItems: 'center' }}>
+                                                                                          <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
+                                                                                          <InputCustom
+                                                                                            placeholder="File URL"
+                                                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, 'img')}
+                                                                                            value={checkbox[checkbox.type][indexCheckbox].img}
+                                                                                          />
+                                                                                        </div>
+                                                                                        <InputDouble
+                                                                                          classCustom="ss-user-radio-custom-class"
+                                                                                          onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'text' : 'value')}
+                                                                                          onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
+                                                                                          valueLeft={checkbox[checkbox.type][indexCheckbox].text}
+                                                                                          valueRight={checkbox[checkbox.type][indexCheckbox].value}
+                                                                                          icon={array.length >= 2 ? "times-circle" : ""}
+                                                                                          placeholder={['title', 'value']}
+                                                                                          classIcon="ss-plus-circle-option-icon-times"
                                                                                         />
+                                                                                        {/* <CheckboxCustom
+                                                                                        label="Initial selection setting"
+                                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, 'initial_selection')}
+                                                                                        value={checkbox[checkbox.type][indexCheckbox].initial_selection}
+                                                                                      /> */}
+                                                                                      </React.Fragment>
+                                                                                    }
+                                                                                    {(checkbox.type === 'default') &&
+                                                                                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                                                        <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
+                                                                                        <InputDouble
+                                                                                          classCustom="ss-user-radio-custom-class"
+                                                                                          icon={array.length >= 2 ? "times-circle" : ""}
+                                                                                          onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'text' : 'value')}
+                                                                                          valueLeft={checkbox[checkbox.type][indexCheckbox].text}
+                                                                                          valueRight={checkbox[checkbox.type][indexCheckbox].value}
+                                                                                          placeholder={['text', 'value']}
+                                                                                          classIcon="ss-plus-circle-option-icon-times"
+                                                                                          onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
+                                                                                        />
+                                                                                        {/* <CheckboxCustom
+                                                                                        label="Initial selection setting"
+                                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, 'initial_selection')}
+                                                                                        value={checkbox[checkbox.type][indexCheckbox].initial_selection}
+                                                                                      /> */}
                                                                                       </div>
-                                                                                      <InputDouble
-                                                                                        classCustom="ss-user-radio-custom-class"
-                                                                                        onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'text' : 'value')}
-                                                                                        onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
-                                                                                        valueLeft={checkbox[checkbox.type][indexCheckbox].text}
-                                                                                        valueRight={checkbox[checkbox.type][indexCheckbox].value}
-                                                                                        icon={array.length >= 2 ? "times-circle" : ""}
-                                                                                        placeholder={['title', 'value']}
-                                                                                        classIcon="ss-plus-circle-option-icon-times"
-                                                                                      />
-                                                                                      {/* <CheckboxCustom
-                                                                                        label="Initial selection setting"
-                                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, 'initial_selection')}
-                                                                                        value={checkbox[checkbox.type][indexCheckbox].initial_selection}
-                                                                                      /> */}
-                                                                                    </React.Fragment>
-                                                                                  }
-                                                                                  {(checkbox.type === 'default') &&
-                                                                                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                                                      <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
-                                                                                      <InputDouble
-                                                                                        classCustom="ss-user-radio-custom-class"
-                                                                                        icon={array.length >= 2 ? "times-circle" : ""}
-                                                                                        onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'text' : 'value')}
-                                                                                        valueLeft={checkbox[checkbox.type][indexCheckbox].text}
-                                                                                        valueRight={checkbox[checkbox.type][indexCheckbox].value}
-                                                                                        placeholder={['text', 'value']}
-                                                                                        classIcon="ss-plus-circle-option-icon-times"
-                                                                                        onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
-                                                                                      />
-                                                                                      {/* <CheckboxCustom
-                                                                                        label="Initial selection setting"
-                                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, 'initial_selection')}
-                                                                                        value={checkbox[checkbox.type][indexCheckbox].initial_selection}
-                                                                                      /> */}
-                                                                                    </div>
-                                                                                  }
+                                                                                    }
+                                                                                  </div>
                                                                                 </div>
                                                                               )}
                                                                             </Draggable>
@@ -5046,7 +5089,7 @@ const Scenario = () => {
                                                                         icon={array.length >= 2 ? "times-circle" : ""}
                                                                         classIcon="ss-plus-circle-option-icon-times"
                                                                         onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, agreeTerm.type, indexAgree)}
-                                                                        style={{ width: '94%', marginBottom: '10px' }}
+                                                                        style={{ width: '94%', marginBottom: '10px', display: 'inline' }}
                                                                         placeholder="comment"
                                                                         value={agreeTermItem.title_comment}
                                                                         onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, agreeTerm.type, indexAgree, 'title_comment')}
@@ -5186,7 +5229,7 @@ const Scenario = () => {
                                                                   {(providedChild) => {
                                                                     let isComment = pullDown[pullDown.type]?.is_comment;
                                                                     let arrOptions = isComment ? pullDown[pullDown.type]?.options_with_comment : pullDown[pullDown.type]?.options_without_comment;
-                                                                    return <div className="ss-user-setting-item-pull-down-drag" {...providedChild.droppableProps} ref={providedChild.innerRef} style={{ width: '103%' }}>
+                                                                    return <div className="ss-user-setting-item-pull-down-drag" {...providedChild.droppableProps} ref={providedChild.innerRef}>
                                                                       {
                                                                         Array.isArray(arrOptions) && arrOptions
                                                                           .map((itemPullDown, indexPullDown, array) => {
@@ -5197,34 +5240,35 @@ const Scenario = () => {
                                                                                     {...providedChild.draggableProps}
                                                                                     {...providedChild.dragHandleProps}
                                                                                     ref={providedChild.innerRef}
-                                                                                    style={{ marginBottom: '10px', width: '98%', backgroundColor: '#F8F9FA', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
                                                                                   >
-                                                                                    <MDBIcon fas icon="grip-horizontal" />
-                                                                                    <InputDouble
-                                                                                      classCustom={isComment ? "ss-user-setting-custom-double-input-custom" : ""}
-                                                                                      onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text' : 'value')}
-                                                                                      valueLeft={itemPullDown.text}
-                                                                                      valueRight={itemPullDown.value}
-                                                                                      placeholder={['text', 'value']}
-                                                                                    />
-                                                                                    {pullDown[pullDown.type]?.is_comment === true &&
-                                                                                      <React.Fragment>
-                                                                                        <span>~</span>
-                                                                                        <InputDouble
-                                                                                          classCustom="ss-user-setting-custom-double-input-custom"
-                                                                                          onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text2' : 'value2')}
-                                                                                          valueLeft={itemPullDown.text2}
-                                                                                          valueRight={itemPullDown.value2}
-                                                                                          placeholder={['text2', 'value2']}
-                                                                                        />
-                                                                                      </React.Fragment>
-                                                                                    }
-                                                                                    <MDBIcon
-                                                                                      fas
-                                                                                      style={{ fontSize: '25px' }}
-                                                                                      icon="times-circle"
-                                                                                      onClick={(e) => handleRemoveItemCustomizePullDown(indexMessageSelect, indexContent, content.type, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown)}
-                                                                                    />
+                                                                                    <div style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                                                      <MDBIcon fas icon="grip-horizontal" />
+                                                                                      <InputDouble
+                                                                                        classCustom={isComment ? "ss-user-setting-custom-double-input-custom" : ""}
+                                                                                        onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text' : 'value')}
+                                                                                        valueLeft={itemPullDown.text}
+                                                                                        valueRight={itemPullDown.value}
+                                                                                        placeholder={['text', 'value']}
+                                                                                      />
+                                                                                      {pullDown[pullDown.type]?.is_comment === true &&
+                                                                                        <React.Fragment>
+                                                                                          <span>~</span>
+                                                                                          <InputDouble
+                                                                                            classCustom="ss-user-setting-custom-double-input-custom"
+                                                                                            onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text2' : 'value2')}
+                                                                                            valueLeft={itemPullDown.text2}
+                                                                                            valueRight={itemPullDown.value2}
+                                                                                            placeholder={['text2', 'value2']}
+                                                                                          />
+                                                                                        </React.Fragment>
+                                                                                      }
+                                                                                      <MDBIcon
+                                                                                        fas
+                                                                                        style={{ fontSize: '25px' }}
+                                                                                        icon="times-circle"
+                                                                                        onClick={(e) => handleRemoveItemCustomizePullDown(indexMessageSelect, indexContent, content.type, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown)}
+                                                                                      />
+                                                                                    </div>
                                                                                   </div>
                                                                                 )}
                                                                               </Draggable>
@@ -5265,16 +5309,16 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               value={pullDown?.[pullDown.type]?.start_at}
                                                               placeholder="At start"
-                                                              data={dataHour}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at')}
+                                                              data={dataHourFixed}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at', 'dataHour')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
                                                             <SelectCustom
                                                               style={{ width: '18%' }}
                                                               placeholder="When finished"
                                                               value={pullDown?.[pullDown.type]?.end_at}
-                                                              data={dataHour}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at')}
+                                                              data={dataHourFixed}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at', 'dataHour')}
                                                             />
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom">
@@ -5319,16 +5363,16 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               value={pullDown?.[pullDown.type]?.start_year}
                                                               placeholder="Start year"
-                                                              data={dataYear}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_year')}
+                                                              data={dataYearFixed}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_year', 'dataYear')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
                                                             <SelectCustom
                                                               style={{ width: '18%' }}
                                                               placeholder="End year"
                                                               value={pullDown?.[pullDown.type]?.end_year}
-                                                              data={dataYear}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_year')}
+                                                              data={dataYearFixed}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_year', 'dataYear')}
                                                             />
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom">
@@ -5372,14 +5416,14 @@ const Scenario = () => {
                                                               <SelectCustom
                                                                 style={{ width: '32%' }}
                                                                 value={pullDown?.[pullDown.type]?.month}
-                                                                data={dataMonth}
+                                                                data={dataMonthFixed}
                                                                 placeholder="Month"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'month')}
                                                               />
                                                               <SelectCustom
                                                                 style={{ width: '32%' }}
                                                                 value={pullDown?.[pullDown.type].day}
-                                                                data={dataDay}
+                                                                data={dataDayFixed}
                                                                 placeholder="Day"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'day')}
                                                               />
@@ -5402,16 +5446,16 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               value={pullDown?.[pullDown.type]?.start_year}
                                                               placeholder="Start year"
-                                                              data={dataYear}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_year')}
+                                                              data={dataYearFixed}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_year', 'dataYear')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
                                                             <SelectCustom
                                                               style={{ width: '18%' }}
                                                               placeholder="End year"
                                                               value={pullDown?.[pullDown.type]?.end_year}
-                                                              data={dataYear}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_year')}
+                                                              data={dataYearFixed}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_year', 'dataYear')}
                                                             />
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom">
@@ -5448,21 +5492,21 @@ const Scenario = () => {
                                                               <SelectCustom
                                                                 style={{ width: '32%' }}
                                                                 value={pullDown?.[pullDown.type]?.year}
-                                                                data={dataYear}
+                                                                data={[{ key: '2022', value: '2022' }, { key: '2023', value: '2023' }]}
                                                                 placeholder="Year"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'year')}
                                                               />
                                                               <SelectCustom
                                                                 style={{ width: '32%' }}
                                                                 value={pullDown?.[pullDown.type]?.month}
-                                                                data={dataMonth}
+                                                                data={dataMonthFixed}
                                                                 placeholder="Month"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'month')}
                                                               />
                                                               <SelectCustom
                                                                 style={{ width: '32%' }}
                                                                 value={pullDown?.[pullDown.type]?.day}
-                                                                data={dataDay}
+                                                                data={dataDayFixed}
                                                                 placeholder="Day"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'day')}
                                                               />
@@ -5474,16 +5518,17 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               value={pullDown?.[pullDown.type]?.start_at}
                                                               placeholder="At start"
-                                                              data={dataHour}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at')}
+                                                              data={dataHourFixed}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at', 'dataHour')}
+
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
                                                             <SelectCustom
                                                               style={{ width: '18%' }}
                                                               placeholder="When finished"
                                                               value={pullDown?.[pullDown.type]?.end_at}
-                                                              data={dataHour}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at')}
+                                                              data={dataHourFixed}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at', 'dataHour')}
                                                             />
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom">
@@ -5526,18 +5571,18 @@ const Scenario = () => {
                                                             <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Range setting</span>
                                                             <SelectCustom
                                                               style={{ width: '18%' }}
-                                                              value={pullDown?.[pullDown.type]?.start_at}
+                                                              value={pullDown?.[pullDown.type]?.start_year}
                                                               placeholder="Start year"
-                                                              data={dataYear}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at')}
+                                                              data={dataYearFixed}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_year', 'dataYear')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
                                                             <SelectCustom
                                                               style={{ width: '18%' }}
                                                               placeholder="End year"
-                                                              value={pullDown?.[pullDown.type]?.end_at}
-                                                              data={dataYear}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at')}
+                                                              value={pullDown?.[pullDown.type]?.end_year}
+                                                              data={dataYearFixed}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_year', 'dataYear')}
                                                             />
                                                             <SelectCustom
                                                               style={{ width: '29%', marginLeft: '10%' }}
@@ -5558,21 +5603,21 @@ const Scenario = () => {
                                                               <SelectCustom
                                                                 style={{ width: '32%' }}
                                                                 value={pullDown?.[pullDown.type]?.year}
-                                                                data={dataYear}
+                                                                data={dataYearFixed}
                                                                 placeholder="Year"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'year')}
                                                               />
                                                               <SelectCustom
                                                                 style={{ width: '32%' }}
                                                                 value={pullDown?.[pullDown.type]?.month}
-                                                                data={dataMonth}
+                                                                data={dataMonthFixed}
                                                                 placeholder="Month"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'month')}
                                                               />
                                                               <SelectCustom
                                                                 style={{ width: '32%' }}
                                                                 value={pullDown?.[pullDown.type]?.day}
-                                                                data={dataDay}
+                                                                data={dataDayFixed}
                                                                 placeholder="Day"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'day')}
                                                               />
@@ -5593,18 +5638,18 @@ const Scenario = () => {
                                                             <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Range setting</span>
                                                             <SelectCustom
                                                               style={{ width: '18%' }}
-                                                              value={pullDown?.[pullDown.type]?.start_at}
+                                                              value={pullDown?.[pullDown.type]?.start_year}
                                                               placeholder="Start year"
                                                               data={dataYear}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at')}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_year', 'dataYear')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
                                                             <SelectCustom
                                                               style={{ width: '18%' }}
                                                               placeholder="End year"
-                                                              value={pullDown?.[pullDown.type]?.end_at}
+                                                              value={pullDown?.[pullDown.type]?.end_year}
                                                               data={dataYear}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at')}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_year', 'dataYear')}
                                                             />
                                                             <SelectCustom
                                                               style={{ width: '29%', marginLeft: '10%' }}
@@ -5653,18 +5698,18 @@ const Scenario = () => {
                                                             <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Range setting</span>
                                                             <SelectCustom
                                                               style={{ width: '18%' }}
-                                                              value={pullDown?.[pullDown.type]?.range_start}
+                                                              value={pullDown?.[pullDown.type]?.start_at}
                                                               placeholder="At start"
                                                               data={dataHour}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'range_start')}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at', 'dataHour')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
                                                             <SelectCustom
                                                               style={{ width: '18%' }}
                                                               placeholder="When finished"
-                                                              value={pullDown?.[pullDown.type]?.range_end}
+                                                              value={pullDown?.[pullDown.type]?.end_at}
                                                               data={dataHour}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'range_end')}
+                                                              onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at', 'dataHour')}
                                                             />
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom" style={{ flexWrap: 'nowrap' }}>
@@ -5831,6 +5876,8 @@ const Scenario = () => {
                                                               value={pullDown?.[pullDown.type]?.prefecture}
                                                               placeholder="Select prefecture"
                                                               data={dataPrefectures}
+                                                              keyValue="id"
+                                                              nameValue="name"
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'prefecture')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
@@ -5838,7 +5885,7 @@ const Scenario = () => {
                                                               style={{ width: '42%' }}
                                                               placeholder="Select city"
                                                               value={pullDown?.[pullDown.type]?.city}
-                                                              data={dataHour}
+                                                              data={[]}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'city')}
                                                             />
                                                           </div>
@@ -5877,7 +5924,7 @@ const Scenario = () => {
                                   }
                                   {provided.placeholder}
                                 </div>
-                              )}
+                              }}
                             </Droppable>
                           </DragDropContext>
                           <div className="ss-user-setting__bottom">
