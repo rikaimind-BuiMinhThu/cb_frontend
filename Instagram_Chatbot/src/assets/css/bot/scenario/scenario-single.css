@@ -1261,7 +1261,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
   margin-right: 13%;
 }
 
-.react-datepicker-wrapper {
+.ss-user-setting__item-bottom-flex-start .react-datepicker-wrapper {
   width: 20%;
 }
 
@@ -1454,4 +1454,10 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-setting-item-pull-down-drag {
+}
+
+.ss-popup-add-variable-input-close-button {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #7185A0;
 }
