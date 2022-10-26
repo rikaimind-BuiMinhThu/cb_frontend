@@ -60,6 +60,42 @@ function BotManagement() {
     window.location.href = '/admin/scenario-setting';
   }
 
+  function duplicateBot(id){
+    api
+      .post(`/api/v1/managements/chatbots/${id}/duplicate`)
+      .then((res) => {
+        console.log('duplicate: ', res.data);
+        if(res.data.code ==1){
+          setIsOpenNoti(true);
+            setMsgNoti("Duplicate bot successfully!");
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti('');
+            }, 2000);
+            api
+              .get(`/api/v1/managements/chatbots?pages=1`)
+              .then((res) => {
+                console.log('bot list get data: ', res.data);
+                setBotList(res.data?.data);
+                setTotalPage(Math.ceil(res.data?.total / 10));
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+        }else if(res.data.code ==2){
+          setIsOpenNoti(true);
+            setMsgNoti(res.data?.message);
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti('');
+            }, 2000);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   // handle change page
   const handleChangePage = (event, value) => {
     setPage(parseInt(value));
@@ -224,6 +260,9 @@ function BotManagement() {
                           <div className="action-wrapper">
                             <button className="btn-edit-bot" onClick={() => openBotSetting(bot.id)}>
                               Edit
+                            </button>
+                            <button className="btn-duplicate-bot" onClick={() => duplicateBot(bot.id)}>
+                              Duplicate
                             </button>
                             <Link to={`/admin/demo-bot/${bot?.id}`}>
                               <button className="btn-demo-bot">Demo</button>

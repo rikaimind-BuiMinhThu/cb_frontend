@@ -26,6 +26,13 @@
   border: none;
   background: #ffffff;
 }
+.btn-duplicate-bot {
+  /* width: 25%; */
+  color: #FF9900;
+  font-weight: 700;
+  border: none;
+  background: #ffffff;
+}
 .btn-demo-bot {
   /* width: 25%; */
   color: #327aed;
