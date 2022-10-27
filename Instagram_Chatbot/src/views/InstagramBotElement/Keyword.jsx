@@ -11,7 +11,8 @@ import Cookies from 'js-cookie';
 import ModalShort from './../Popup/ModalShort';
 import { useEffect } from 'react';
 import { Pagination } from '@material-ui/lab';
-import { setToken} from './../../api/auth'
+import { setToken } from './../../api/auth'
+import { tokenExpired } from 'api/tokenExpired';
 
 function Keyword() {
   var [customDiv, setCustomDiv] = useState([]);
@@ -64,18 +65,14 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error.message);
-        // if (error.response?.data.code === 0) {
-            requestNewToken.post(`/api/v1/refresh_token`).then(res =>{
-              console.log(res.data.token)
-              // Cookies.set('token', res.data.token)
-              setToken(res.data.token, path)
-              getFirstKeyword()
-            })
-        // }
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
+    // getFirstKeyword()
   }, []);
   //this function refresh token.
-  function getFirstKeyword(){
+  function getFirstKeyword() {
     var path = window.location.pathname;
     api
       .get(`/api/v1/message_managements/keyword_settings?page=1`)
@@ -88,13 +85,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error.message);
-        // if (error.response?.data.code === 0) {
-            requestNewToken.post(`/api/v1/refresh_token`).then(res =>{
-              console.log(res.data.token)
-              // Cookies.set('token', res.data.token)
-              setToken(res.data.token, path)
-            })
-        // }
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
   }
 
@@ -112,9 +105,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //     requestNewToken(path)
-        // }
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
   }
 
@@ -134,6 +127,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -147,9 +143,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response?.data.code === 0) {
-          // requestNewToken();
-        // }
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -180,6 +176,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
   }
 
@@ -204,6 +203,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
   }
 
@@ -325,6 +327,9 @@ function Keyword() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 2) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -427,6 +432,9 @@ function Keyword() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 2) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -454,6 +462,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
   }
 
@@ -497,6 +508,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
   }
 
@@ -547,6 +561,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
   }
 
@@ -567,6 +584,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
   };
 
@@ -583,6 +603,9 @@ function Keyword() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 2) {
+            tokenExpired()
+          }
         });
     }
   }, [instagramSettingData]);
@@ -612,6 +635,9 @@ function Keyword() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 2) {
+            tokenExpired()
+          }
         });
     } else {
       const defaultReplyBagError = document.getElementById('bag-reply-err');
@@ -631,6 +657,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
   };
 
@@ -658,6 +687,9 @@ function Keyword() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 2) {
+                tokenExpired()
+              }
             });
         } else {
           setListKeyword(res.data?.data);
@@ -666,6 +698,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 2) {
+          tokenExpired()
+        }
       });
     document.querySelector('.main-panel').scrollTop = 0;
   };

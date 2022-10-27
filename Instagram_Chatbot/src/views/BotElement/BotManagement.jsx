@@ -60,35 +60,35 @@ function BotManagement() {
     window.location.href = '/admin/scenario-setting';
   }
 
-  function duplicateBot(id){
+  function duplicateBot(id) {
     api
       .post(`/api/v1/managements/chatbots/${id}/duplicate`)
       .then((res) => {
         console.log('duplicate: ', res.data);
-        if(res.data.code ==1){
+        if (res.data.code == 1) {
           setIsOpenNoti(true);
-            setMsgNoti("Duplicate bot successfully!");
-            setTimeout(() => {
-              setIsOpenNoti(false);
-              setMsgNoti('');
-            }, 2000);
-            api
-              .get(`/api/v1/managements/chatbots?pages=1`)
-              .then((res) => {
-                console.log('bot list get data: ', res.data);
-                setBotList(res.data?.data);
-                setTotalPage(Math.ceil(res.data?.total / 10));
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-        }else if(res.data.code ==2){
+          setMsgNoti("Duplicate bot successfully!");
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti('');
+          }, 2000);
+          api
+            .get(`/api/v1/managements/chatbots?pages=1`)
+            .then((res) => {
+              console.log('bot list get data: ', res.data);
+              setBotList(res.data?.data);
+              setTotalPage(Math.ceil(res.data?.total / 10));
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        } else if (res.data.code == 2) {
           setIsOpenNoti(true);
-            setMsgNoti(res.data?.message);
-            setTimeout(() => {
-              setIsOpenNoti(false);
-              setMsgNoti('');
-            }, 2000);
+          setMsgNoti(res.data?.message);
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti('');
+          }, 2000);
         }
       })
       .catch((error) => {
@@ -210,7 +210,13 @@ function BotManagement() {
   const handleStopBot = (id, status) => {
     setIsStop(true);
     setIsOpenPopupConfirm(true);
-    setMsgConfirm('Are you sure you want to stop this bot?');
+    // alert(status)
+    if(status == 'on'){
+      setMsgConfirm('Are you sure you want to start this bot?');
+    }else if(status == 'off'){
+      setMsgConfirm('Are you sure you want to stop this bot?');
+    }
+    
     setIdSelected(id);
     setStatusSelected(status);
   };
@@ -245,7 +251,7 @@ function BotManagement() {
                       <th style={{ width: '15%' }}>Status</th>
                       <th style={{ width: '20%' }}>Owner name</th>
                       <th style={{ width: '15%' }}>My authority</th>
-                      <th style={{ width: '250px', minWidth: '250px' }}>Action</th>
+                      <th style={{ width: '300px', minWidth: '300px' }}>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -259,25 +265,25 @@ function BotManagement() {
                         <td className="border-table-bot action-table-bot">
                           <div className="action-wrapper">
                             <button className="btn-edit-bot" onClick={() => openBotSetting(bot.id)}>
-                              Edit
+                              編集
                             </button>
                             <button className="btn-duplicate-bot" onClick={() => duplicateBot(bot.id)}>
-                              Duplicate
+                              複製
                             </button>
                             <Link to={`/admin/demo-bot/${bot?.id}`}>
-                              <button className="btn-demo-bot">Demo</button>
+                              <button className="btn-demo-bot">デモ</button>
                             </Link>
                             <button
                               className="btn-stop-bot"
                               onClick={() => handleStopBot(bot?.id, bot?.status)}
                             >
-                              {bot?.status === 'off' ? 'Start' : 'Stop'}
+                              {bot?.status === 'off' ? 'スタート' : 'ストップ'}
                             </button>
                             <button
                               className="btn-delete-bot"
                               onClick={() => handleDeleteBot(bot?.id)}
                             >
-                              Delete
+                              削除
                             </button>
                           </div>
                         </td>
