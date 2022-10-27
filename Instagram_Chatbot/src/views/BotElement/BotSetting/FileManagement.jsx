@@ -5,11 +5,13 @@ import { useRef } from 'react';
 import { useState } from 'react';
 import ModalShort from './../../../views/Popup/ModalShort';
 import noImage from './../../../assets/img/no-image.jpg';
+import './../../../assets/css/file-mng.css'
 
 
 function FileManagement() {
 
     const [files, setFiles] = useState([]);
+    const [newFile, setNewFile] = useState(null);
     const [src, setSrc] = React.useState('');
     const [isOpenPreview, setIsOpenPreview] = useState(false);
     const inputRef = useRef(null);
@@ -19,13 +21,18 @@ function FileManagement() {
     }
 
     function handleChangeFile(e) {
-        console.log(e.target.files[0]);
-        if (files == []) setFiles([e.target.files[0]]);
-        else {
-            setFiles([...files, e.target.files[0]]);
-        }
-        console.log(files);
+        // if (files == []) setFiles([e.target.files[0]]);
+        // else {
+        //     setFiles([...files, e.target.files[0]]);
+        // }
+
+        setNewFile(e.target.files[0]);
     }
+
+    function handleSave() {
+        console.log(newFile);
+    }
+
 
     function handlePreview(file) {
         console.log(file);
@@ -51,8 +58,23 @@ function FileManagement() {
                     <Col md="12">
                         <Card>
                             <CardHeader>
-                                <Button onClick={() => { handleUpload() }}>Upload File</Button>
+                                <Button className={newFile !== null ? 'disabled' : ''} onClick={() => { handleUpload() }}>Upload File</Button>
                                 <input hidden ref={inputRef} type='file' onChange={(e) => handleChangeFile(e)}></input>
+                                <div>
+                                    {newFile !== null ? (
+                                        <div className='file-mng__preview'>
+                                            {['image/gif', 'image/jpeg', 'image/png'].includes(newFile.type) ?
+                                                (
+                                                    <img src={URL.createObjectURL(newFile)} alt={newFile.name} />
+                                                ) : <img src={noImage} alt="" />}
+                                            <p className='file-mng__preview-name'>{newFile.name}</p>
+                                            <p className='file-mng__preview-type'>{newFile.type}</p>
+                                            <button className='btn btn-outline-default' onClick={() => { setNewFile(null) }}>Cancle</button>
+                                            <button className='btn btn-outline-primary' onClick={() => handleSave()}>Save</button>
+                                        </div>
+                                    ) : ''}
+
+                                </div>
                             </CardHeader>
                             <CardBody>
                                 <Table>
@@ -69,16 +91,16 @@ function FileManagement() {
                                     <tbody>
                                         {files.map((file, i) => (
                                             <tr key={i}>
-                                                <td className="border-table-bot">{i}</td>
-                                                <td className="border-table-bot">{file.name}</td>
-                                                <td className="border-table-bot">{file.type}</td>
-                                                <td className="border-table-bot">{file.size}</td>
-                                                <td className="border-table-bot">{URL.createObjectURL(file)}</td>
-                                                <td className="border-table-bot action-table-bot">
-                                                    <div className="action-wrapper">
-                                                        <button className="btn-edit-bot" onClick={() => handlePreview(file)}>Preview</button>
-                                                        <button className="btn-stop-bot">Copy</button>
-                                                        <button className="btn-delete-bot" onClick={() => handleDelete(file)}>Delete</button>
+                                                <td className="file-mng__border-table">{i}</td>
+                                                <td className="file-mng__border-table">{file.name}</td>
+                                                <td className="file-mng__border-table">{file.type}</td>
+                                                <td className="file-mng__border-table">{file.size}</td>
+                                                <td className="file-mng__border-table">{URL.createObjectURL(file)}</td>
+                                                <td className="file-mng__border-table file-mng__action-table">
+                                                    <div className="file-mng__action-wrapper">
+                                                        <button className="file-mng__btn-edit" onClick={() => handlePreview(file)}>Preview</button>
+                                                        <button className="file-mng__btn-stop">Copy</button>
+                                                        <button className="file-mng__btn-delete" onClick={() => handleDelete(file)}>Delete</button>
                                                     </div>
                                                 </td>
                                             </tr>
