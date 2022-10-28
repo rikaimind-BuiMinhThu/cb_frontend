@@ -19,6 +19,7 @@ import api from '../../../../api/api-management';
 import Cookies from 'js-cookie';
 import ModalNoti from '../../../../views/Popup/ModalNoti';
 import ModalShort from '../../../Popup/ModalShort';
+import Preview from '../Preview';
 const _ = require('lodash');
 
 let data = [
@@ -909,10 +910,6 @@ let dataTypeFile = [
   },
 ]
 
-let inputContentVar = [
-
-]
-
 let typeCalendar = [
   {
     key: 'date_selection',
@@ -1338,8 +1335,8 @@ const Scenario = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [indexMessageContentSelect, setIndexMessageContentSelect] = useState('');
   const [dataSelecteFixed, setDataSelecteFixed] = useState(new Date());
-  const [checkInitialRaido, setCheckInitialRaido] = useState();
-  const [dataMessageUser, setDataMessageUser] = useState([]);
+  const [dataInputVar, setDataInputVar] = useState([]);
+  const [isOpenPreview, setIsOpenPreview] = useState(false);
 
   // bot setting values
   const [botTextValue, setBotTextValue] = useState('');
@@ -1369,7 +1366,7 @@ const Scenario = () => {
   const [conditions, setConditions] = useState([]);
 
   const [variableName, setVariableName] = useState('');
-  const [defaultName, setDefaultName] = useState('');
+  const [defaultValue, setDefaultValue] = useState('');
 
   //state data pull_down
   const [dataHour, setDataHour] = useState(dataHourFixed);
@@ -1378,6 +1375,8 @@ const Scenario = () => {
   const [dataYear, setDataYear] = useState(dataYearFixed);
   const [dataMonth, setDataMonth] = useState(dataMonthFixed);
   const [dataDay, setDataDay] = useState(dataDayFixed);
+
+  const [errorVariable, setErrorVariable] = useState('');
   // side effects
 
   useEffect(() => {
@@ -1389,6 +1388,15 @@ const Scenario = () => {
     handleGetMessage();
   }, [])
 
+  useEffect(() => {
+    getListVariable();
+  }, [])
+
+  useEffect(() => {
+    api.get(`/api/v1/managements/emails?page=all&chatbot_id=${botId}`).then(res => {
+      setDataEmail(res.data.data);
+    }).catch((error) => { console.error(error) })
+  }, [])
 
   // useEffect(() => {
   //   setDataMessages(dataClone.messages);
@@ -1406,11 +1414,15 @@ const Scenario = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    handleOpenPreview(isOpenPreview);
+  }, [])
+
   const handleGetMessage = () => {
     api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`).then((res) => {
       console.log(res.data.data);
       setDataMessages(res.data.data?.conversation?.messages || []);
-      setScenarioName(res.data.data?.conversation?.scenarioName || '');
+      setScenarioName(res.data.data?.scenario_name || '');
 
     }).catch((error) => { console.error(error) });
   }
@@ -1907,7 +1919,7 @@ const Scenario = () => {
       } else if (subField === 'end_at') {
         setDataHour(dataHourFixed.filter(item => (parseInt(item.key) <= parseInt(value || 24) && parseInt(item.key) >= parseInt(field.start_at || 0))));
       }
-    }else if (typeData === 'dataYear') {
+    } else if (typeData === 'dataYear') {
       if (subField === 'start_year') {
         setDataYear(dataYearFixed.filter(item => (parseInt(item.key) >= parseInt(value || 1935) && parseInt(item.key) <= parseInt(field.end_year || 2072))));
       } else if (subField === 'end_year') {
@@ -1993,21 +2005,48 @@ const Scenario = () => {
     setDataMessages([...dataMessages]);
   }
 
-  const createVariable = () => {
-    inputContentVar.push({
-      name: variableName,
-      key: defaultName
+  const getListVariable = () => {
+    api.get(`/api/v1/managements/chatbots/${botId}/variables?page=all`).then(res => {
+      console.log(res.data);
+      setDataInputVar(res.data.data);
     });
-    setIsOpenAddVariable(false);
+  }
+
+  const createVariable = () => {
+    if (!variableName) {
+      setErrorVariable("Variable name can't be empty");
+      return;
+    }
+    let data = {
+      variable: {
+        variable_name: variableName,
+        default_value: defaultValue
+      }
+    }
+    api.post(`/api/v1/managements/chatbots/${botId}/variables`, data).then(res => {
+      console.log(res.data);
+      setIsOpenAddVariable(false);
+      setIsOpenNoti(true);
+      if (res.data.code === 1) {
+        setMessageNoti('Create variable successfully');
+      } else if (res.data.code === 2) {
+        setMessageNoti(res.data.message);
+      }
+      getListVariable();
+      setTimeout(() => {
+        setIsOpenNoti(false);
+        setMessageNoti('');
+      }, 2000);
+    });
   }
 
   const onClickSaveScenario = () => {
-    console.log('asads');
+    console.log(scenarioName);
     let data = {
       conversation: {
         messages: [...dataMessages],
-        scenarioName
-      }
+      },
+      scenario_name: scenarioName
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       console.log(res.data);
@@ -2150,11 +2189,56 @@ const Scenario = () => {
     link.remove();
   }
 
+  const handleOpenPreview = (isOpen) => {
+    if (isOpen) {
+      document.getElementById('cp-container').style.height = "610px";
+      document.getElementById('cp-header').style.position = "static";
+      document.getElementById('cp-header').style.borderBottomLeftRadius = "0px";
+      document.getElementById('cp-header').style.borderBottomRightRadius = "0px";
+      document.getElementById('cp-process-bar').style.display = "block";
+      document.getElementById('cp-body').style.display = "block";
+    } else {
+      document.getElementById('cp-container').style.height = "0px";
+      document.getElementById('cp-process-bar').style.display = "none";
+      document.getElementById('cp-body').style.display = "none";
+      document.getElementById('cp-header').style.borderBottomLeftRadius = "25px";
+      document.getElementById('cp-header').style.borderBottomRightRadius = "25px";
+      document.getElementById('cp-header').style.position = "absolute";
+      document.getElementById('cp-header').style.bottom = "13px";
+
+    }
+    setIsOpenPreview(!isOpenPreview);
+  }
+
+  const onClickSavePreview = () => {
+    let data = {
+      conversation: {
+        messages: [...dataMessages],
+        scenarioName
+      }
+    }
+    api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
+      console.log(res.data);
+      setIsOpenNoti(true);
+      if (res.data.code === 1) {
+        setMessageNoti('Save scenario successfully');
+      } else if (res.data.code === 2) {
+        setMessageNoti(res.data.message);
+      }
+      handleGetMessage();
+      setTimeout(() => {
+        setIsOpenNoti(false);
+        setMessageNoti('');
+      }, 2000);
+    })
+    setIsOpenPreview(true);
+  }
+
   return (
     <div className="content">
       <div className="ss-actions">
         <Button onClick={() => onClickSaveScenario()}>Save</Button>
-        <Button>Save and preview</Button>
+        <Button onClick={() => onClickSavePreview()}>Save and preview</Button>
       </div>
       <Row>
         <Col>
@@ -2164,13 +2248,12 @@ const Scenario = () => {
                 {/* ss overview */}
                 <div className="ss-sc-content ss-overview">
                   {/* Input name of scenario */}
-                  <input
-                    className="ss-scenario-name ss-input-value"
-                    type="text"
+                  <InputCustom
+                    style={{ width: '100%' }}
                     value={scenarioName}
-                    onChange={(e) => setScenarioName(e.target.value)}
+                    onChange={value => setScenarioName(value)}
                     placeholder="Enter scenario name"
-                  ></input>
+                  />
                   {/* Overview scenario */}
                   <div style={{ height: 'calc(100% - 44px)', backgroundColor: '#f6fbff' }}>
                     <div className="ss-overview-detail">
@@ -2876,7 +2959,7 @@ const Scenario = () => {
                                                                     <div className="">
                                                                       {
                                                                         pullDown[pullDown.type].is_comment === false ?
-                                                                          <div className="ss-message__content--user-pull_down-col col-12">
+                                                                          <div className="ss-message__content--user-pull_down-col col-12" style={{ padding: '0' }}>
                                                                             <SelectCustom
                                                                               data={pullDown[pullDown.type].options_without_comment}
                                                                               keyValue="value"
@@ -2885,7 +2968,7 @@ const Scenario = () => {
                                                                               nameValue="text"
                                                                             />
                                                                           </div> :
-                                                                          <div className="ss-message__content--user-pull_down-col col-12" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                          <div className="ss-message__content--user-pull_down-col col-12" style={{ display: 'flex', justifyContent: 'space-between', padding: '0' }}>
                                                                             <SelectCustom
                                                                               data={pullDown[pullDown.type].options_with_comment}
                                                                               keyValue="value"
@@ -3628,6 +3711,8 @@ const Scenario = () => {
                                       style={{ width: '100%' }}
                                       id="title"
                                       data={dataEmail}
+                                      keyValue={"email_template_name"}
+                                      nameValue={"email_template_name"}
                                       value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
                                       onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content')}
                                     />
@@ -3826,18 +3911,20 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-text_input-save-variable-wrapper">
                                                           <CheckboxCustom
                                                             label="Save the input contents in a variable."
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
-                                                            value={textInput.save_input_content}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                            value={textInput.is_save_input_content}
                                                           />
                                                         </div>
-                                                        {textInput.save_input_content &&
+                                                        {textInput.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                               <SelectCustom
                                                                 style={{ width: '100%', marginRight: '10px' }}
                                                                 id="title"
                                                                 value={textInput?.save_input_content}
-                                                                data={inputContentVar}
+                                                                data={dataInputVar}
+                                                                keyValue="variable_name"
+                                                                nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
                                                               <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
@@ -4106,17 +4193,19 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-text_input-top">
                                                           <CheckboxCustom
                                                             label="Save the input contents in a variable"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'textarea', value, 'save_input_content')}
-                                                            value={textarea.save_input_content}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'textarea', value, 'is_save_input_content')}
+                                                            value={textarea.is_save_input_content}
                                                           />
-                                                          {textarea.save_input_content &&
+                                                          {textarea.is_save_input_content &&
                                                             <div className="ss-user-setting__item-bottom">
                                                               <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                                 <SelectCustom
                                                                   style={{ width: '100%', marginRight: '10px' }}
                                                                   id="title"
                                                                   value={textarea?.save_input_content}
-                                                                  data={inputContentVar}
+                                                                  data={dataInputVar}
+                                                                  keyValue="variable_name"
+                                                                  nameValue="variable_name"
                                                                   onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                                 />
                                                                 <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
@@ -4214,17 +4303,19 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
                                                           label="Save the input contents in a variable"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
-                                                          value={radioButton.save_input_content}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                          value={radioButton.is_save_input_content}
                                                         />
-                                                        {radioButton.save_input_content &&
+                                                        {radioButton.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                               <SelectCustom
                                                                 style={{ width: '100%', marginRight: '10px' }}
                                                                 id="title"
                                                                 value={radioButton?.save_input_content}
-                                                                data={inputContentVar}
+                                                                data={dataInputVar}
+                                                                keyValue="variable_name"
+                                                                nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
                                                               <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
@@ -4377,17 +4468,19 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
                                                           label="Save the input contents in a variable"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
-                                                          value={checkbox.save_input_content}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                          value={checkbox.is_save_input_content}
                                                         />
-                                                        {checkbox.save_input_content &&
+                                                        {checkbox.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                               <SelectCustom
                                                                 style={{ width: '100%', marginRight: '10px' }}
                                                                 id="title"
                                                                 value={checkbox?.save_input_content}
-                                                                data={inputContentVar}
+                                                                data={dataInputVar}
+                                                                keyValue="variable_name"
+                                                                nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
                                                               <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
@@ -4566,18 +4659,20 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-text_input-save-variable-wrapper">
                                                           <CheckboxCustom
                                                             label="Save the input contents in a variable."
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
-                                                            value={zipCodeAddress.save_input_content}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                            value={zipCodeAddress.is_save_input_content}
                                                           />
                                                         </div>
-                                                        {zipCodeAddress.save_input_content &&
+                                                        {zipCodeAddress.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                               <SelectCustom
                                                                 style={{ width: '100%', marginRight: '10px' }}
                                                                 id="title"
                                                                 value={zipCodeAddress?.save_input_content}
-                                                                data={inputContentVar}
+                                                                data={dataInputVar}
+                                                                keyValue="variable_name"
+                                                                nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
                                                               <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
@@ -4597,7 +4692,9 @@ const Scenario = () => {
                                                               style={{ width: '90%' }}
                                                               id="title"
                                                               value={zipCodeAddress?.use_api_input_value}
-                                                              data={inputContentVar}
+                                                              data={dataInputVar}
+                                                              keyValue="variable_name"
+                                                              nameValue="variable_name"
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_api_input_value')}
                                                             />
                                                           </div>
@@ -4771,18 +4868,20 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-text_input-save-variable-wrapper">
                                                           <CheckboxCustom
                                                             label="Save the input contents in a variable."
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
-                                                            value={attachingFile.save_input_content}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                            value={attachingFile.is_save_input_content}
                                                           />
                                                         </div>
-                                                        {attachingFile.save_input_content &&
+                                                        {attachingFile.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                               <SelectCustom
                                                                 id="title"
                                                                 style={{ width: '100%', marginRight: '10px' }}
                                                                 value={attachingFile?.save_input_content}
-                                                                data={inputContentVar}
+                                                                data={dataInputVar}
+                                                                keyValue="variable_name"
+                                                                nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
                                                               <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
@@ -4827,17 +4926,19 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-text_input-save-variable-wrapper">
                                                           <CheckboxCustom
                                                             label="Save the input contents in a variable."
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
-                                                            value={calendar.save_input_content}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                            value={calendar.is_save_input_content}
                                                           />
                                                         </div>
-                                                        {calendar.save_input_content &&
+                                                        {calendar.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                               <SelectCustom
                                                                 style={{ width: '100%', marginRight: '10px' }}
                                                                 value={calendar?.save_input_content}
-                                                                data={inputContentVar}
+                                                                data={dataInputVar}
+                                                                keyValue="variable_name"
+                                                                nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
                                                               <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
@@ -5148,17 +5249,19 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
                                                           label="Save the input contents in a variable"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
-                                                          value={pullDown.save_input_content}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                          value={pullDown.is_save_input_content}
                                                         />
-                                                        {pullDown.save_input_content &&
+                                                        {pullDown.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                               <SelectCustom
                                                                 style={{ width: '100%', marginRight: '10px' }}
                                                                 id="title"
                                                                 value={pullDown?.save_input_content}
-                                                                data={inputContentVar}
+                                                                data={dataInputVar}
+                                                                keyValue="variable_name"
+                                                                nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
                                                               <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
@@ -6055,34 +6158,44 @@ const Scenario = () => {
       <ModalShort open={isOpenAddVariable} onClose={() => setIsOpenAddVariable(false)}>
         <div className="sl-popup-create-scenario-wrapper">
           <h4>Add variable</h4>
-          <div className="sl-popup-create-scenario-input-wrapper">
-            <span>Variable name</span>
-            <input
-              type="text"
-              name="sl-popup-create-scenario-input"
-              id="sl-popup-create-scenario-input"
-              onChange={(e) => setVariableName(e.target.value)}
-            />
+          <div style={{ marginBottom: '10px' }}>
+            <div className="sl-popup-create-scenario-input-wrapper" style={{ marginBottom: '0px' }}>
+              <span style={{ width: '100px' }}>Variable name</span>
+              <input
+                type="text"
+                name="sl-popup-create-scenario-input"
+                id="sl-popup-create-scenario-input"
+                onChange={(e) => {
+                  setErrorVariable('');
+                  setVariableName(e.target.value);
+                }}
+              />
+
+            </div>
+            {errorVariable &&
+              <div style={{ textAlign: 'center', color: 'red' }}>{errorVariable}</div>
+            }
           </div>
           <div className="sl-popup-create-scenario-input-wrapper">
-            <span>Default name</span>
+            <span style={{ width: '100px' }}>Default name</span>
             <input
               type="text"
               name="sl-popup-create-scenario-input"
               id="sl-popup-create-scenario-input"
-              onChange={(e) => setDefaultName(e.target.value)}
+              onChange={(e) => setDefaultValue(e.target.value)}
             />
           </div>
           <span id="sl-err-create-scenario" style={{ color: "red" }}></span>
           <div className="sl-popup-create-scenario-btn-wrapper">
             <Button
-              className="sl-popup-create-scenario-create-btn"
+              className="ss-popup-add-variable-input-close-button"
               onClick={() => setIsOpenAddVariable(false)}
             >
               Close
             </Button>
             <Button
-              className="sl-popup-create-scenario-cancel-btn"
+              style={{ backgroundColor: '#024BB9' }}
+              className="ss-popup-add-variable-input-keep-button"
               onClick={() => createVariable()}
             >
               Keep
@@ -6090,6 +6203,7 @@ const Scenario = () => {
           </div>
         </div>
       </ModalShort>
+      <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioId={scenarioId} />
     </div >
   );
 };

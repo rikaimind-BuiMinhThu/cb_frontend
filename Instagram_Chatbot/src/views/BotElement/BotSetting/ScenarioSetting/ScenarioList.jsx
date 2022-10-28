@@ -8,6 +8,7 @@ import ModalNoti from '../../../../views/Popup/ModalNoti';
 import Cookies from 'js-cookie';
 import moment from 'moment';
 import Pagination from '@material-ui/lab/Pagination';
+import Preview from '../Preview';
 
 let data = [
     {
@@ -37,12 +38,15 @@ function ScenarioList() {
     const [scenarioSelected, setScenarioSelected] = useState(false);
     const [scenarioSelectedClone, setScenarioSelectedClone] = useState(false);
 
+    const [isOpenPreview, setIsOpenPreview] = useState(false);
     var [pageIndex, setPageIndex] = useState(1);
     var [totalPage, setTotalPage] = useState();
     var [page, setPage] = useState(1);
 
+    const [scenarioId, setScenarioId] = useState('');
+
     useEffect(() => {
-        setBotId(Cookies.get('bot_id'))
+        setBotId(Cookies.get('bot_id'));
     }, [])
 
     // side effects
@@ -55,6 +59,32 @@ function ScenarioList() {
     useEffect(() => {
         getListScenario(1);
     }, []);
+
+    const handleOpenPreview = (isOpen) => {
+        if(isOpen) {
+            document.getElementById('cp-container').style.height = "610px";
+            document.getElementById('cp-header').style.position = "static";
+            document.getElementById('cp-header').style.borderBottomLeftRadius = "0px";
+            document.getElementById('cp-header').style.borderBottomRightRadius = "0px";
+            document.getElementById('cp-process-bar').style.display = "block";
+            document.getElementById('cp-body').style.display = "block";
+        } else {
+            document.getElementById('cp-container').style.height = "0px";
+            document.getElementById('cp-process-bar').style.display = "none";
+            document.getElementById('cp-body').style.display = "none";
+            document.getElementById('cp-header').style.borderBottomLeftRadius = "25px";
+            document.getElementById('cp-header').style.borderBottomRightRadius = "25px";
+            document.getElementById('cp-header').style.position = "absolute";
+            document.getElementById('cp-header').style.bottom = "13px";
+
+        }
+        setIsOpenPreview(!isOpenPreview);
+    }
+
+    const onClickPreview = (scenarioId) => {
+        setScenarioId(scenarioId);
+        setIsOpenPreview(true);
+    }
 
     const getListScenario = (pgIndex) => {
         api.get(`/api/v1/managements/chatbots/${Cookies.get('bot_id')}/scenarios?page=${pgIndex}`).then((res) => {
@@ -191,8 +221,8 @@ function ScenarioList() {
     }
 
     const onclickEditScenario = (id) => {
-            Cookies.set('scenario_id',id);
-    }
+        Cookies.set('scenario_id', id);
+    }   
 
     return (
         <div className="content">
@@ -245,7 +275,10 @@ function ScenarioList() {
                                                         <Link to={`/admin/scenario-setting`}>
                                                             <Button className="sl-btn-action-edit" onClick={() => onclickEditScenario(scenario.id)}>Edit</Button>
                                                         </Link>
-                                                        <Button className="sl-btn-action-preview">Preview</Button>
+                                                        <Button
+                                                            className="sl-btn-action-preview"
+                                                            onClick={() => onClickPreview(scenario.id)}
+                                                        >Preview</Button>
                                                         <Button
                                                             className="sl-btn-action-duplication"
                                                             onClick={() => handleDuplicationScenario(scenario.id)}
@@ -266,7 +299,7 @@ function ScenarioList() {
                                         )) : null}
                                     </ul>
                                 </div>
-                                <br/>
+                                <br />
                                 <Pagination
                                     count={totalPage}
                                     variant="outlined"
@@ -324,6 +357,7 @@ function ScenarioList() {
                     <span style={{ fontSize: '16px' }}>{messageNoti}</span>
                 </div>
             </ModalNoti>
+            <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioId={scenarioId}/>
         </div>
     );
 }
