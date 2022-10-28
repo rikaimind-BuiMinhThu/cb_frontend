@@ -3711,7 +3711,7 @@ const Scenario = () => {
                                       style={{ width: '100%' }}
                                       id="title"
                                       data={dataEmail}
-                                      keyValue={"id"}
+                                      keyValue={"email_template_name"}
                                       nameValue={"email_template_name"}
                                       value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
                                       onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content')}
