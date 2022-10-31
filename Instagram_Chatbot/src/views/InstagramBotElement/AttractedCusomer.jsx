@@ -5,6 +5,7 @@ import api from './../../api/api-management';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import * as utils from '../../JS/client.js';
+import { tokenExpired } from 'api/tokenExpired';
 
 function AttractedCustomer() {
   // states
@@ -97,6 +98,9 @@ function AttractedCustomer() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -153,6 +157,9 @@ function AttractedCustomer() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -257,6 +264,9 @@ function AttractedCustomer() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       const datePickerInputs = document.querySelectorAll(
@@ -293,6 +303,9 @@ function AttractedCustomer() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       const datePickerInputs = document.querySelectorAll(
@@ -445,8 +458,8 @@ function AttractedCustomer() {
                             : 0} */}
                           {CVAL.dm_instagram_user_count !== 0
                             ? (
-                                CVAL.dm_instagram_message_count / CVAL.dm_instagram_user_count
-                              ).toFixed(2)
+                              CVAL.dm_instagram_message_count / CVAL.dm_instagram_user_count
+                            ).toFixed(2)
                             : 0}
                         </td>
                         {/* <td>{dmData.totalPurchase}</td> */}
@@ -454,8 +467,8 @@ function AttractedCustomer() {
                         <td>
                           {CVAL.dm_instagram_message_count !== 0
                             ? (CVAL.dm_conversion_count / CVAL.dm_instagram_message_count).toFixed(
-                                2
-                              )
+                              2
+                            )
                             : `0.00`}
                           %
                         </td>
@@ -474,8 +487,8 @@ function AttractedCustomer() {
                             : 0} */}
                           {CVAL.story_instagram_user_count !== 0
                             ? (
-                                CVAL.story_instagram_message_count / CVAL.story_instagram_user_count
-                              ).toFixed(2)
+                              CVAL.story_instagram_message_count / CVAL.story_instagram_user_count
+                            ).toFixed(2)
                             : 0}
                         </td>
                         {/* <td>{scData.totalPurchase}</td> */}
@@ -483,8 +496,8 @@ function AttractedCustomer() {
                         <td>
                           {CVAL.story_instagram_message_count !== 0
                             ? (
-                                CVAL.story_conversion_count / CVAL.story_instagram_message_count
-                              ).toFixed(2)
+                              CVAL.story_conversion_count / CVAL.story_instagram_message_count
+                            ).toFixed(2)
                             : `0.00`}
                           %
                         </td>
@@ -513,8 +526,8 @@ function AttractedCustomer() {
                             : `0.00`} */}
                           {CVAL.live_instagram_message_count !== 0
                             ? (
-                                CVAL.live_conversion_count / CVAL.live_instagram_message_count
-                              ).toFixed(2)
+                              CVAL.live_conversion_count / CVAL.live_instagram_message_count
+                            ).toFixed(2)
                             : `0.00`}
                           %
                         </td>

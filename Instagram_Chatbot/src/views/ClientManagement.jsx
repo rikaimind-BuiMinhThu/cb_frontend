@@ -15,6 +15,7 @@ import ModalShort from './Popup/ModalShort';
 import $ from 'jquery';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { tokenExpired } from 'api/tokenExpired';
 
 function ClientManagement() {
   var [dataList, setDataList] = useState([]);
@@ -127,9 +128,9 @@ function ClientManagement() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -170,6 +171,9 @@ function ClientManagement() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       } else {
         utils.checkDateEnd(
@@ -210,9 +214,9 @@ function ClientManagement() {
         })
         .catch((error) => {
           console.log(error);
-          // if (error.response.data.code === 3) {
-          //   requestNewToken(path)
-          // }
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -246,9 +250,9 @@ function ClientManagement() {
         })
         .catch((error) => {
           console.log(error);
-          // if (error.response.data.code === 3) {
-          //   requestNewToken(path)
-          // }
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else if (startDatePreview && !endDatePreview) {
       const datePickerInputs = document.querySelectorAll(
@@ -279,6 +283,9 @@ function ClientManagement() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -354,6 +361,9 @@ function ClientManagement() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     // setIsOpen(true)
     // setDisableInput(true)
@@ -436,6 +446,9 @@ function ClientManagement() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -462,8 +475,8 @@ function ClientManagement() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response.data.code === 3) {
-          requestNewToken(path);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
         }
       });
   }
@@ -613,11 +626,10 @@ function ClientManagement() {
           setIsOpenNoti(true);
         })
         .catch((error) => {
-          // alert(error)
           console.log(error);
-          // if (error.response.data.code === 3) {
-          //   requestNewToken(path)
-          // }
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       if (emailCheck == false) {
@@ -866,11 +878,10 @@ function ClientManagement() {
           }
         })
         .catch((error) => {
-          // alert(error)
           console.log(error);
-          // if (error.response.data.code === 3) {
-          //   requestNewToken(path)
-          // }
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
 
       // }
@@ -1195,6 +1206,9 @@ function ClientManagement() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         } else {
           api
@@ -1209,6 +1223,9 @@ function ClientManagement() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         }
       } else {
@@ -1249,6 +1266,9 @@ function ClientManagement() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         } else {
           api
@@ -1263,6 +1283,9 @@ function ClientManagement() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         }
       } else {
@@ -1429,19 +1452,19 @@ function ClientManagement() {
                             {item.plan == 'startup'
                               ? 'スタートアップ'
                               : item.plan == 'expert'
-                              ? 'エキスパート'
-                              : item.plan == 'complete'
-                              ? '完全成果報酬'
-                              : 'プレミアム'}
+                                ? 'エキスパート'
+                                : item.plan == 'complete'
+                                  ? '完全成果報酬'
+                                  : 'プレミアム'}
                           </td>
                           <td>
                             {item?.status === 'pause'
                               ? '休止'
                               : item?.status === 'ended'
-                              ? '解約'
-                              : item?.status === 'trial'
-                              ? 'お試し'
-                              : '契約'}
+                                ? '解約'
+                                : item?.status === 'trial'
+                                  ? 'お試し'
+                                  : '契約'}
                           </td>
                           <td>{item.price}</td>
                           <td id="dateStart">
@@ -1651,7 +1674,7 @@ function ClientManagement() {
                     value={
                       inputStartDate !== '' ? inputStartDate?.replace(/-/g, '/') : 'yyyy/mm/dd'
                     }
-                    onChange={() => {}}
+                    onChange={() => { }}
                     className="input-field"
                     disabled={disableInput === true ? true : false}
                     readOnly
@@ -1679,7 +1702,7 @@ function ClientManagement() {
                   <input
                     type="text"
                     value={inputEndDate !== '' ? inputEndDate?.replace(/-/g, '/') : 'yyyy/mm/dd'}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     className="input-field"
                     disabled={disableInput === true ? true : false}
                     readOnly
@@ -2555,7 +2578,7 @@ function ClientManagement() {
                   <input
                     type="text"
                     value={inputStartDate ? inputStartDate?.replace(/-/g, '/') : 'yyyy/mm/dd'}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     className="input-field"
                     readOnly
                   />
@@ -2580,7 +2603,7 @@ function ClientManagement() {
                   <input
                     type="text"
                     value={inputEndDate ? inputEndDate?.replace(/-/g, '/') : 'yyyy/mm/dd'}
-                    onChange={() => {}}
+                    onChange={() => { }}
                     className="input-field"
                     readOnly
                   />

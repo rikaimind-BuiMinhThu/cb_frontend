@@ -12,6 +12,7 @@ import Cookies from 'js-cookie';
 import ModalNoti from './../Popup/ModalNoti';
 import Switch from 'react-switch';
 import { Pagination } from '@material-ui/lab';
+import { tokenExpired } from 'api/tokenExpired';
 
 function CRM() {
   const [isOpenDetailUser, setIsOpenDetailUser] = useState(false);
@@ -65,6 +66,9 @@ function CRM() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -122,6 +126,9 @@ function CRM() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     // api.get(`/api/v1/instagram_users/custom_items/${id}`).then(res => {
     //   console.log("custom_items: ",res.data)
@@ -169,6 +176,9 @@ function CRM() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -220,6 +230,9 @@ function CRM() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -239,6 +252,9 @@ function CRM() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
     // else{
@@ -366,6 +382,9 @@ function CRM() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -382,6 +401,9 @@ function CRM() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -409,6 +431,9 @@ function CRM() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -438,6 +463,9 @@ function CRM() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -458,6 +486,9 @@ function CRM() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       let searchInstagramVal = document.getElementById('searchInstagramUser')?.value;
@@ -473,6 +504,9 @@ function CRM() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -509,6 +543,9 @@ function CRM() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         } else {
           setListInstagramUser(res.data?.data?.instagram_users);
@@ -517,6 +554,9 @@ function CRM() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   };
 
@@ -566,7 +606,7 @@ function CRM() {
                       placeholder="クライアント名..."
                     ></input>
                   )}
-                  <span style={{fontWeight:"600"}}>友人切り替え中</span>
+                  <span style={{ fontWeight: "600" }}>友人切り替え中</span>
                   <Switch
                     onChange={activeSearchChange}
                     onColor="#64c1ff"
@@ -856,13 +896,12 @@ function CRM() {
                     <div
                       style={{
                         marginTop: '10px',
-                        display: `${
-                          instagramUser !== undefined
+                        display: `${instagramUser !== undefined
                             ? instagramUser.email == null
                               ? 'none'
                               : 'block'
                             : 'none'
-                        }`,
+                          }`,
                       }}
                     >
                       <span>
@@ -877,13 +916,12 @@ function CRM() {
                     <div
                       style={{
                         marginTop: '10px',
-                        display: `${
-                          instagramUser !== undefined
+                        display: `${instagramUser !== undefined
                             ? instagramUser.phone_number == null
                               ? 'none'
                               : 'block'
                             : 'none'
-                        }`,
+                          }`,
                       }}
                     >
                       <span>
@@ -920,9 +958,9 @@ function CRM() {
                         開始日:{' '}
                         {instagramUser !== undefined
                           ? instagramUser.created_at
-                              .slice(0, 16)
-                              .replace('T', ' ')
-                              .replaceAll('-', '/')
+                            .slice(0, 16)
+                            .replace('T', ' ')
+                            .replaceAll('-', '/')
                           : ''}{' '}
                       </span>
                     </div>
@@ -931,22 +969,21 @@ function CRM() {
                         最終更新:{' '}
                         {instagramUser !== undefined
                           ? instagramUser.updated_at
-                              .slice(0, 16)
-                              .replace('T', ' ')
-                              .replaceAll('-', '/')
+                            .slice(0, 16)
+                            .replace('T', ' ')
+                            .replaceAll('-', '/')
                           : ''}
                       </span>
                     </div>
                     <div
                       style={{
                         marginTop: '10px',
-                        display: `${
-                          instagramUser !== undefined
+                        display: `${instagramUser !== undefined
                             ? instagramUser.real_name == null
                               ? 'none'
                               : 'block'
                             : 'none'
-                        }`,
+                          }`,
                       }}
                     >
                       <span>
@@ -961,13 +998,12 @@ function CRM() {
                     <div
                       style={{
                         marginTop: '10px',
-                        display: `${
-                          instagramUser !== undefined
+                        display: `${instagramUser !== undefined
                             ? instagramUser.company_name == null
                               ? 'none'
                               : 'block'
                             : 'none'
-                        }`,
+                          }`,
                       }}
                     >
                       <span>
@@ -982,13 +1018,12 @@ function CRM() {
                     <div
                       style={{
                         marginTop: '10px',
-                        display: `${
-                          instagramUser !== undefined
+                        display: `${instagramUser !== undefined
                             ? instagramUser.company_role == null
                               ? 'none'
                               : 'block'
                             : 'none'
-                        }`,
+                          }`,
                       }}
                     >
                       <span>
@@ -1003,13 +1038,12 @@ function CRM() {
                     <div
                       style={{
                         marginTop: '10px',
-                        display: `${
-                          instagramUser !== undefined
+                        display: `${instagramUser !== undefined
                             ? instagramUser.website == null
                               ? 'none'
                               : 'block'
                             : 'none'
-                        }`,
+                          }`,
                       }}
                     >
                       <span>
@@ -1024,13 +1058,12 @@ function CRM() {
                     <div
                       style={{
                         marginTop: '10px',
-                        display: `${
-                          instagramUser !== undefined
+                        display: `${instagramUser !== undefined
                             ? instagramUser.propose == null
                               ? 'none'
                               : 'block'
                             : 'none'
-                        }`,
+                          }`,
                       }}
                     >
                       <span>
@@ -1045,13 +1078,12 @@ function CRM() {
                     <div
                       style={{
                         marginTop: '10px',
-                        display: `${
-                          instagramUser !== undefined
+                        display: `${instagramUser !== undefined
                             ? instagramUser.know_product_in == null
                               ? 'none'
                               : 'block'
                             : 'none'
-                        }`,
+                          }`,
                       }}
                     >
                       <span>

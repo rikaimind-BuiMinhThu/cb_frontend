@@ -65,7 +65,7 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error.message);
-        if (error.response?.data.code === 2) {
+        if (error.response?.data.code === 0) {
           tokenExpired()
         }
       });
@@ -85,7 +85,7 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error.message);
-        if (error.response?.data.code === 2) {
+        if (error.response?.data.code === 0) {
           tokenExpired()
         }
       });
@@ -105,7 +105,7 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 2) {
+        if (error.response?.data.code === 0) {
           tokenExpired()
         }
       });
@@ -127,9 +127,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 2) {
-          tokenExpired()
-        }
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
       });
   }, []);
 
@@ -143,9 +143,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 2) {
-          tokenExpired()
-        }
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
       });
   }, []);
 
@@ -176,7 +176,7 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 2) {
+        if (error.response?.data.code === 0) {
           tokenExpired()
         }
       });
@@ -203,7 +203,7 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 2) {
+        if (error.response?.data.code === 0) {
           tokenExpired()
         }
       });
@@ -327,7 +327,7 @@ function Keyword() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 2) {
+          if (error.response?.data.code === 0) {
             tokenExpired()
           }
         });
@@ -432,7 +432,7 @@ function Keyword() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 2) {
+          if (error.response?.data.code === 0) {
             tokenExpired()
           }
         });
@@ -462,7 +462,7 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 2) {
+        if (error.response?.data.code === 0) {
           tokenExpired()
         }
       });
@@ -508,7 +508,7 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 2) {
+        if (error.response?.data.code === 0) {
           tokenExpired()
         }
       });
@@ -561,7 +561,7 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 2) {
+        if (error.response?.data.code === 0) {
           tokenExpired()
         }
       });
@@ -584,7 +584,7 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 2) {
+        if (error.response?.data.code === 0) {
           tokenExpired()
         }
       });
@@ -603,7 +603,7 @@ function Keyword() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 2) {
+          if (error.response?.data.code === 0) {
             tokenExpired()
           }
         });
@@ -635,7 +635,7 @@ function Keyword() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 2) {
+          if (error.response?.data.code === 0) {
             tokenExpired()
           }
         });
@@ -657,7 +657,7 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 2) {
+        if (error.response?.data.code === 0) {
           tokenExpired()
         }
       });
@@ -687,7 +687,7 @@ function Keyword() {
             })
             .catch((error) => {
               console.log(error);
-              if (error.response?.data.code === 2) {
+              if (error.response?.data.code === 0) {
                 tokenExpired()
               }
             });
@@ -698,7 +698,7 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 2) {
+        if (error.response?.data.code === 0) {
           tokenExpired()
         }
       });

@@ -9,6 +9,7 @@ import {
 } from 'variables/charts.js';
 import ReactApexChart from 'react-apexcharts';
 import api from '../api/api-management';
+import { tokenExpired } from 'api/tokenExpired';
 
 function Dashboard() {
   const [monthECUDisplay, setMonthECUDisplay] = useState(['1', '2', '3', '4']);
@@ -89,6 +90,9 @@ function Dashboard() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     ////////////////////////////////////////////////
     api
@@ -104,6 +108,9 @@ function Dashboard() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     ///////////////////////////////////////////////
     api
@@ -119,6 +126,9 @@ function Dashboard() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     ///////////////////////////////////////////////
     api
@@ -137,6 +147,9 @@ function Dashboard() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 

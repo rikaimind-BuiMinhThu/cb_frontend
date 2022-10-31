@@ -23,6 +23,7 @@ import ModalNoti from './../Popup/ModalNoti';
 import axios from 'axios';
 import { useEffect } from 'react';
 import ModalShort from './../Popup/ModalShort';
+import { tokenExpired } from 'api/tokenExpired';
 
 function Release() {
   const [listGroup, setListGroup] = useState([]);
@@ -98,6 +99,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -126,8 +130,8 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response.data.code === 3) {
-          requestNewToken(path);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
         }
       });
   }, []);
@@ -146,6 +150,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }, []);
@@ -159,6 +166,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -174,6 +184,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -186,6 +199,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -225,9 +241,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //     requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -264,9 +280,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //     requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -295,6 +311,9 @@ function Release() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         }
         // setTimeout(() => {
@@ -312,6 +331,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -331,6 +353,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
   function getPMAL() {
@@ -349,6 +374,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -366,6 +394,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -383,6 +414,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -408,6 +442,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -433,6 +470,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -518,6 +558,9 @@ function Release() {
                     })
                     .catch((error) => {
                       console.log(error);
+                      if (error.response?.data.code === 0) {
+                        tokenExpired()
+                      }
                     });
                 }
                 for (var i = 0; i < listkey.length; i++) {
@@ -553,6 +596,9 @@ function Release() {
                     })
                     .catch((error) => {
                       console.log(error);
+                      if (error.response?.data.code === 0) {
+                        tokenExpired()
+                      }
                     });
                 }
                 for (var i = 0; i < listkey.length; i++) {
@@ -588,11 +634,17 @@ function Release() {
                     })
                     .catch((error) => {
                       console.log(error);
+                      if (error.response?.data.code === 0) {
+                        tokenExpired()
+                      }
                     });
                 }
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
 
             setDmOnOff(res.data.data.dm_bag_status);
@@ -610,6 +662,9 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
             api
               .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
@@ -619,6 +674,9 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
             api
               .get(`/api/v1/message_managements/message_bags/${res.data.data.live_comment_bag_id}`)
@@ -628,6 +686,9 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
             // api.get(`/api/v1/message_managements/message_bags/${res.data.data.dm_bag_id}`).then(res => {
             //   // setLiveCommentBagName(res.data.data.message_bag.bag_name)
@@ -640,6 +701,9 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
             // if (error.response.data.code === 3) {
             //   requestNewToken(path)
             // }
@@ -647,6 +711,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -719,6 +786,9 @@ function Release() {
                 })
                 .catch((error) => {
                   console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 });
             }
             for (var i = 0; i < listkey.length; i++) {
@@ -754,6 +824,9 @@ function Release() {
                 })
                 .catch((error) => {
                   console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 });
             }
             for (var i = 0; i < listkey.length; i++) {
@@ -789,11 +862,17 @@ function Release() {
                 })
                 .catch((error) => {
                   console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 });
             }
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
 
         setDmOnOff(res.data.data.dm_bag_status);
@@ -811,6 +890,9 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
@@ -820,6 +902,9 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.live_comment_bag_id}`)
@@ -829,6 +914,9 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
         // api.get(`/api/v1/message_managements/message_bags/${res.data.data.dm_bag_id}`).then(res => {
         //   // setLiveCommentBagName(res.data.data.message_bag.bag_name)
@@ -841,9 +929,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -1084,6 +1172,9 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
@@ -1093,17 +1184,20 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
-  
+
   function getFAQAL() {
     var path = window.location.pathname;
     api
@@ -1129,6 +1223,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -1185,9 +1282,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -1232,6 +1329,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }, [storyGroupId, storyGroupBagId]);
@@ -1255,6 +1355,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }, [liveGroupId, liveGroupBagId]);
@@ -1278,6 +1381,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }, [postGroupId, postGroupBagId]);
@@ -1300,6 +1406,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   };
 
@@ -1321,6 +1430,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   };
 
@@ -1343,6 +1455,9 @@ function Release() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         }
         setTimeout(() => {
@@ -1361,8 +1476,8 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response.data.code === 3) {
-          requestNewToken(path);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
         }
       });
   }
@@ -1412,9 +1527,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -1502,9 +1617,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -1536,9 +1651,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -1571,9 +1686,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
   function selectedLiveGroup(value, key) {
@@ -1605,9 +1720,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -1640,9 +1755,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -1675,9 +1790,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -1710,9 +1825,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
   function selectedGroupFMUP(value, key) {
@@ -1744,9 +1859,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -1860,6 +1975,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
   function selectedBagLive(value) {
@@ -1892,6 +2010,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -1921,6 +2042,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -1985,9 +2109,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -2024,6 +2148,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -2060,9 +2187,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -2097,9 +2224,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
   function changeFAQOnOff() {
@@ -2121,6 +2248,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       api
@@ -2136,6 +2266,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -2165,6 +2298,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       api
@@ -2187,6 +2323,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -2363,6 +2502,9 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
         // setMsgNoti('FAQを修正しました。');
         // setIsOpenNoti(true);
@@ -2374,9 +2516,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -2479,11 +2621,17 @@ function Release() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
           reloadFixedMenu();
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -2572,6 +2720,9 @@ function Release() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
           setMsgNoti(' FAQを追加しました。');
           setIsOpenNoti(true);
@@ -2582,9 +2733,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          // if (error.response.data.code === 3) {
-          //   requestNewToken(path)
-          // }
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -2692,12 +2843,18 @@ function Release() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
           reloadFixedMenu();
           cancelFixed();
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -2815,9 +2972,12 @@ function Release() {
       var ig_setting = { instagram_setting: { story_comment_bag_status: 'direct_message' } };
       api
         .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-        .then((res) => {})
+        .then((res) => { })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       api
         .patch(`/api/v1/instagram_settings/${instaSettingId}`, update)
@@ -2832,6 +2992,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else if (reply == 'keyword') {
       for (var i = 0; i < story_actived.length; i++) {
@@ -2867,10 +3030,16 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       }
 
@@ -2878,9 +3047,12 @@ function Release() {
         var ig_setting = { instagram_setting: { story_comment_bag_status: 'keyword' } };
         api
           .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-          .then((res) => {})
+          .then((res) => { })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
         api
           .patch(
@@ -2894,6 +3066,9 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
             // }
           });
       }, 1500);
@@ -2921,9 +3096,12 @@ function Release() {
       };
       api
         .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-        .then((res) => {})
+        .then((res) => { })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       api
         .patch(`/api/v1/instagram_settings/${instaSettingId}`, update)
@@ -2940,9 +3118,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          // if (error.response.data.code === 3) {
-          //   requestNewToken(path)
-          // }
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       for (var i = 0; i < live_actived.length; i++) {
@@ -2979,10 +3157,16 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       }
       setTimeout(function () {
@@ -2991,9 +3175,12 @@ function Release() {
         };
         api
           .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-          .then((res) => {})
+          .then((res) => { })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
         api
           .patch(`/api/v1/message_managements/keyword_settings/${new_live_kw_id}`, live_kw_setting)
@@ -3004,7 +3191,9 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            // }
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       }, 1500);
     }
@@ -3033,9 +3222,12 @@ function Release() {
       };
       api
         .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-        .then((res) => {})
+        .then((res) => { })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       api
         .patch(`/api/v1/instagram_settings/${instaSettingId}`, update)
@@ -3052,9 +3244,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          // if (error.response.data.code === 3) {
-          //   requestNewToken(path)
-          // }
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       for (var i = 0; i < cm_actived.length; i++) {
@@ -3093,10 +3285,16 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       }
       setTimeout(function () {
@@ -3105,9 +3303,12 @@ function Release() {
         };
         api
           .patch(`/api/v1/instagram_setting_change_status/${instaSettingId}`, ig_setting)
-          .then((res) => {})
+          .then((res) => { })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
         // console.log(cm_kw_setting)
         api
@@ -3119,7 +3320,9 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            // }
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       }, 1500);
     }
@@ -3158,9 +3361,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -3180,11 +3383,11 @@ function Release() {
   function isURL(str) {
     var pattern = new RegExp(
       '^(https?:\\/\\/)?' + // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
-        '(\\#[-a-z\\d_]*)?$',
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.?)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$',
       'i'
     ); // fragment locator
     return pattern.test(str);
@@ -3241,9 +3444,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     // console.log("getPastPost: ", getPastPost)
     var past_post = [];
@@ -3258,6 +3461,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
     console.log(past_post);
@@ -3287,6 +3493,9 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
             setMsgNoti('固定メッセージを削除しました。');
             setIsOpenNoti(true);
@@ -3298,6 +3507,9 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       }
     }
@@ -3321,6 +3533,9 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
             setMsgNoti('削除しました。');
             setIsOpenNoti(true);
@@ -3332,9 +3547,9 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            // if (error.response.data.code === 3) {
-            //   requestNewToken(path)
-            // }
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       }
     }
@@ -3394,90 +3609,90 @@ function Release() {
                   <div id="addFAQContent" style={{ width: '100%' }}>
                     {listFAQ != undefined
                       ? listFAQ.map((item, i) => (
-                          <form key={item.id} id={`form-faq-${item.id}`}>
-                            <div
-                              className="div-add-aq"
-                              style={{ display: 'flex' }}
-                              onLoad={loadFAQ(item)}
-                            >
-                              <input
-                                id={`faq-q-${item.id}`}
-                                className="new-faq-q"
-                                defaultValue={item.question}
-                                name={`faq_key${item.question}`}
-                                readOnly="readonly"
-                              ></input>
-                              {/* <input id={`faq-a-${item.id}`} className="new-faq-q" defaultValue={item.answer}
+                        <form key={item.id} id={`form-faq-${item.id}`}>
+                          <div
+                            className="div-add-aq"
+                            style={{ display: 'flex' }}
+                            onLoad={loadFAQ(item)}
+                          >
+                            <input
+                              id={`faq-q-${item.id}`}
+                              className="new-faq-q"
+                              defaultValue={item.question}
+                              name={`faq_key${item.question}`}
+                              readOnly="readonly"
+                            ></input>
+                            {/* <input id={`faq-a-${item.id}`} className="new-faq-q" defaultValue={item.answer}
                             name={`faq_answer${item.answer}`} readOnly="readonly"></input> */}
-                              <select
-                                id={`listGroupFAQ${item.id}`}
-                                // defaultValue={''}
-                                onChange={(e) => selectedGroup(e.target.value, item.id)}
-                                className="new-faq-q-so"
-                                name={`group_id_${numFAQ}`}
-                              >
-                                {/* <option value="" disabled hidden>
+                            <select
+                              id={`listGroupFAQ${item.id}`}
+                              // defaultValue={''}
+                              onChange={(e) => selectedGroup(e.target.value, item.id)}
+                              className="new-faq-q-so"
+                              name={`group_id_${numFAQ}`}
+                            >
+                              {/* <option value="" disabled hidden>
                                 {item.message_group_name}
                               </option> */}
-                                {listGroup?.map((group, i) => {
-                                  return (
-                                    <option key={i} value={group.id}>
-                                      {group.group_name}
-                                    </option>
-                                  );
-                                })}
-                              </select>
-                              <select
-                                id={`listBagFAQ${item.id}`}
-                                className="new-faq-q-so"
-                                // defaultValue={''}
-                                onChange={(e) => selectedBag(e.target.value)}
-                                name={`bag_id_${numFAQ}`}
-                              >
-                                {/* <option value="" disabled hidden>
+                              {listGroup?.map((group, i) => {
+                                return (
+                                  <option key={i} value={group.id}>
+                                    {group.group_name}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                            <select
+                              id={`listBagFAQ${item.id}`}
+                              className="new-faq-q-so"
+                              // defaultValue={''}
+                              onChange={(e) => selectedBag(e.target.value)}
+                              name={`bag_id_${numFAQ}`}
+                            >
+                              {/* <option value="" disabled hidden>
                                 {item.msg_bag_name}
                               </option> */}
-                              </select>
-                              <div
-                                id={`ene-faq-${item.id}`}
-                                onClick={() => enableEdit(item.id)}
-                                style={{ width: '5%' }}
-                              >
-                                <i
-                                  className="nc-icon nc-align-center nc-3x"
-                                  style={{
-                                    fontSize: '30px',
-                                    marginTop: '5px',
-                                    marginRight: '30px',
-                                  }}
-                                ></i>
-                              </div>
-                              <div
-                                id={`sav-faq-${item.id}`}
-                                onClick={() => editFAQInList(item.id)}
-                                style={{ width: '5%', display: 'none' }}
-                              >
-                                <i
-                                  className="nc-icon nc-cloud-download-93 nc-3x"
-                                  style={{
-                                    fontSize: '30px',
-                                    marginTop: '5px',
-                                    marginRight: '30px',
-                                  }}
-                                ></i>
-                              </div>
-                              <div
-                                id={`deleteFAQfromList${item.id}`}
-                                onClick={() => deleteFAQInList(item.id)}
-                              >
-                                <i
-                                  className="nc-icon nc-box nc-3x"
-                                  style={{ fontSize: '30px', marginTop: '5px' }}
-                                ></i>
-                              </div>
+                            </select>
+                            <div
+                              id={`ene-faq-${item.id}`}
+                              onClick={() => enableEdit(item.id)}
+                              style={{ width: '5%' }}
+                            >
+                              <i
+                                className="nc-icon nc-align-center nc-3x"
+                                style={{
+                                  fontSize: '30px',
+                                  marginTop: '5px',
+                                  marginRight: '30px',
+                                }}
+                              ></i>
                             </div>
-                          </form>
-                        ))
+                            <div
+                              id={`sav-faq-${item.id}`}
+                              onClick={() => editFAQInList(item.id)}
+                              style={{ width: '5%', display: 'none' }}
+                            >
+                              <i
+                                className="nc-icon nc-cloud-download-93 nc-3x"
+                                style={{
+                                  fontSize: '30px',
+                                  marginTop: '5px',
+                                  marginRight: '30px',
+                                }}
+                              ></i>
+                            </div>
+                            <div
+                              id={`deleteFAQfromList${item.id}`}
+                              onClick={() => deleteFAQInList(item.id)}
+                            >
+                              <i
+                                className="nc-icon nc-box nc-3x"
+                                style={{ fontSize: '30px', marginTop: '5px' }}
+                              ></i>
+                            </div>
+                          </div>
+                        </form>
+                      ))
                       : ''}
                     <form action="" id="new_FAQ">
                       <div style={{ width: '100%' }} id="faq_add">
@@ -4008,127 +4223,127 @@ function Release() {
                     <div id="addFixedMenuContent" style={{ width: '100%' }}>
                       {listFixedMenu != undefined
                         ? listFixedMenu.map((item) => (
-                            <form key={item.id} id={`fixed-menu-${item.id}`}>
-                              <div
-                                className="div-add-aq"
-                                style={{ display: 'flex' }}
-                                onLoad={loadFixedMenu(item)}
+                          <form key={item.id} id={`fixed-menu-${item.id}`}>
+                            <div
+                              className="div-add-aq"
+                              style={{ display: 'flex' }}
+                              onLoad={loadFixedMenu(item)}
+                            >
+                              <input
+                                name={`title-fixed-menu-${item.id}`}
+                                id={`title-fixed-menu-${item.id}`}
+                                className="new-faq-q-so"
+                                onChange={() => onChangeEditFM(`title-fixed-menu-${item.id}`)}
+                                defaultValue={item.title}
+                                type="text"
+                                readOnly="readonly"
+                                style={{ width: '20%' }}
+                              />
+                              <select
+                                style={{ width: '20%' }}
+                                id={`fixed-mnl-type${item.id}`}
+                                readOnly="readonly"
+                                onChange={(e) => selectFixedMenuUP(e.target.value, item.id)}
+                                className="new-faq-q-so"
+                                name={`fixed-option-${item.id}`}
                               >
-                                <input
-                                  name={`title-fixed-menu-${item.id}`}
-                                  id={`title-fixed-menu-${item.id}`}
-                                  className="new-faq-q-so"
-                                  onChange={() => onChangeEditFM(`title-fixed-menu-${item.id}`)}
-                                  defaultValue={item.title}
-                                  type="text"
-                                  readOnly="readonly"
-                                  style={{ width: '20%' }}
-                                />
-                                <select
-                                  style={{ width: '20%' }}
-                                  id={`fixed-mnl-type${item.id}`}
-                                  readOnly="readonly"
-                                  onChange={(e) => selectFixedMenuUP(e.target.value, item.id)}
-                                  className="new-faq-q-so"
-                                  name={`fixed-option-${item.id}`}
-                                >
-                                  <option value="" disabled hidden>
-                                    メッセージタイプ選択 ...
-                                  </option>
-                                  <option value="message">メッセージ</option>
-                                  <option value="website">ウェブサイト</option>
-                                  <option value="support">有人対応に切り替え</option>
-                                </select>
-                                <select
-                                  id={`listGroupFixedMenu${item.id}`}
-                                  style={{
-                                    width: '20%',
-                                    display: `${item.message_bag_id == null ? 'none' : 'block'}`,
-                                  }}
-                                  // defaultValue={''}
-                                  onChange={(e) => selectedGroupFMUP(e.target.value, item.id)}
-                                  className="new-faq-q-so"
-                                  name="client_id"
-                                >
-                                  {/* <option value="" disabled hidden>
+                                <option value="" disabled hidden>
+                                  メッセージタイプ選択 ...
+                                </option>
+                                <option value="message">メッセージ</option>
+                                <option value="website">ウェブサイト</option>
+                                <option value="support">有人対応に切り替え</option>
+                              </select>
+                              <select
+                                id={`listGroupFixedMenu${item.id}`}
+                                style={{
+                                  width: '20%',
+                                  display: `${item.message_bag_id == null ? 'none' : 'block'}`,
+                                }}
+                                // defaultValue={''}
+                                onChange={(e) => selectedGroupFMUP(e.target.value, item.id)}
+                                className="new-faq-q-so"
+                                name="client_id"
+                              >
+                                {/* <option value="" disabled hidden>
                                   {item.message_group_name}
                                 </option> */}
-                                  {listGroup?.map((group, i) => {
-                                    return (
-                                      <option key={i} value={group.id}>
-                                        {group.group_name}
-                                      </option>
-                                    );
-                                  })}
-                                </select>
-                                <select
-                                  id={`listBagFixedMenu${item.id}`}
-                                  style={{
-                                    width: '20%',
-                                    display: `${item.message_bag_id == null ? 'none' : 'block'}`,
-                                  }}
-                                  // defaultValue={''}
-                                  onChange={(e) => selectedBagFM(e.target.value)}
-                                  className="new-faq-q-so"
-                                  name={`msgbag_id${item.id}`}
-                                >
-                                  {/* <option value="" disabled hidden>
+                                {listGroup?.map((group, i) => {
+                                  return (
+                                    <option key={i} value={group.id}>
+                                      {group.group_name}
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                              <select
+                                id={`listBagFixedMenu${item.id}`}
+                                style={{
+                                  width: '20%',
+                                  display: `${item.message_bag_id == null ? 'none' : 'block'}`,
+                                }}
+                                // defaultValue={''}
+                                onChange={(e) => selectedBagFM(e.target.value)}
+                                className="new-faq-q-so"
+                                name={`msgbag_id${item.id}`}
+                              >
+                                {/* <option value="" disabled hidden>
                                   {item.message_bag_name}
                                 </option> */}
-                                </select>
-                                <input
-                                  name={`answer-${item.id}`}
-                                  id={`anw-mnl-type${item.id}`}
-                                  className="new-faq-q-so"
-                                  type="text"
-                                  readOnly="readonly"
-                                  style={{
-                                    width: '43%',
-                                    display: `${item.message_bag_id == null ? 'block' : 'none'}`,
-                                  }}
-                                />
+                              </select>
+                              <input
+                                name={`answer-${item.id}`}
+                                id={`anw-mnl-type${item.id}`}
+                                className="new-faq-q-so"
+                                type="text"
+                                readOnly="readonly"
+                                style={{
+                                  width: '43%',
+                                  display: `${item.message_bag_id == null ? 'block' : 'none'}`,
+                                }}
+                              />
 
-                                <div style={{ width: '5%' }}></div>
-                                <div
-                                  id={`ene-fixed-${item.id}`}
-                                  onClick={() => enableEditFixed(item.id)}
-                                  style={{ width: '5%' }}
-                                >
-                                  <i
-                                    className="nc-icon nc-align-center nc-3x"
-                                    style={{
-                                      fontSize: '30px',
-                                      marginTop: '5px',
-                                      marginRight: '30px',
-                                    }}
-                                  ></i>
-                                </div>
-                                <div
-                                  id={`sav-fixed-${item.id}`}
-                                  onClick={() => editFixedInList(item.id)}
-                                  style={{ width: '5%', display: 'none' }}
-                                >
-                                  <i
-                                    className="nc-icon nc-cloud-download-93 nc-3x"
-                                    style={{
-                                      fontSize: '30px',
-                                      marginTop: '5px',
-                                      marginRight: '30px',
-                                    }}
-                                  ></i>
-                                </div>
-                                <div onClick={() => deleteFixedInList(item.id)}>
-                                  <i
-                                    className="nc-icon nc-box nc-3x"
-                                    style={{
-                                      fontSize: '30px',
-                                      marginTop: '5px',
-                                    }}
-                                  ></i>
-                                </div>
+                              <div style={{ width: '5%' }}></div>
+                              <div
+                                id={`ene-fixed-${item.id}`}
+                                onClick={() => enableEditFixed(item.id)}
+                                style={{ width: '5%' }}
+                              >
+                                <i
+                                  className="nc-icon nc-align-center nc-3x"
+                                  style={{
+                                    fontSize: '30px',
+                                    marginTop: '5px',
+                                    marginRight: '30px',
+                                  }}
+                                ></i>
                               </div>
-                            </form>
-                          ))
+                              <div
+                                id={`sav-fixed-${item.id}`}
+                                onClick={() => editFixedInList(item.id)}
+                                style={{ width: '5%', display: 'none' }}
+                              >
+                                <i
+                                  className="nc-icon nc-cloud-download-93 nc-3x"
+                                  style={{
+                                    fontSize: '30px',
+                                    marginTop: '5px',
+                                    marginRight: '30px',
+                                  }}
+                                ></i>
+                              </div>
+                              <div onClick={() => deleteFixedInList(item.id)}>
+                                <i
+                                  className="nc-icon nc-box nc-3x"
+                                  style={{
+                                    fontSize: '30px',
+                                    marginTop: '5px',
+                                  }}
+                                ></i>
+                              </div>
+                            </div>
+                          </form>
+                        ))
                         : ''}
                       <form action="" id="fixed-menu">
                         <div style={{ width: '100%' }} id="fixed_add">
