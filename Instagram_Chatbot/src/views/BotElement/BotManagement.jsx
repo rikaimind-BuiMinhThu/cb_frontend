@@ -57,7 +57,7 @@ function BotManagement() {
     Cookies.remove('bot_id')
     Cookies.set('bot_type', 'bot');
     Cookies.set('bot_id', `${id}`);
-    window.location.href = '/admin/scenario-setting';
+    window.location.href = '/admin/scenario-list';
   }
 
   function duplicateBot(id) {
