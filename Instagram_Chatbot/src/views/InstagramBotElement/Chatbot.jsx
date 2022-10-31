@@ -22,6 +22,7 @@ import ModalShortTem from "./../Popup/ModalShortTem";
 // import chatbot from "../views/Popup/chatbot.png"
 import { Pagination } from '@material-ui/lab';
 import { MDBIcon } from 'mdbreact';
+import { tokenExpired } from "api/tokenExpired";
 
 function Chatbot() {
   const [groupList, setGroupList] = useState([])
@@ -104,7 +105,10 @@ function Chatbot() {
         Cookies.set('page_access_token', res.data.data[0].page_access_token);
         Cookies.set('ig_id', res.data.data[0].ig_id);
       }).catch(error => {
-        console.log(error)
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       })
     }
 
@@ -134,10 +138,10 @@ function Chatbot() {
         }
       }, 1000)
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }, [])
 
@@ -165,10 +169,10 @@ function Chatbot() {
         }
       }, 1000)
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -191,9 +195,9 @@ function Chatbot() {
         }
       }, 1000)
     }).catch(error => {
-      console.log(error)
-      if (error.response.data.code === 3) {
-        requestNewToken(path)
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
       }
     })
   }
@@ -231,7 +235,7 @@ function Chatbot() {
             var liMesBag = document.createElement('li')
             liMesBag.setAttribute('id', `liMesBag${idli[i]}`)
             document.getElementById(`ulMesBag${idli[i]}`).appendChild(liMesBag)
-            
+
             // console.log(idli)
             // setTimeout(() => {
             //   var i = idli.length - 1
@@ -247,9 +251,9 @@ function Chatbot() {
               document.getElementById(`ulMesBag${idli[i]}`).innerHTML = ""
               var liMesBag = document.createElement('li')
               // if (document.getElementById('liMesBag') !== null) {
-                liMesBag.setAttribute('id', `liMesBag${idli[i]}`)
-                document.getElementById(`ulMesBag${idli[i]}`).appendChild(liMesBag)
-                
+              liMesBag.setAttribute('id', `liMesBag${idli[i]}`)
+              document.getElementById(`ulMesBag${idli[i]}`).appendChild(liMesBag)
+
               // }
 
             }
@@ -261,10 +265,10 @@ function Chatbot() {
 
 
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -281,10 +285,10 @@ function Chatbot() {
       setHotTem(tem)
 
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }, [])
 
@@ -299,10 +303,10 @@ function Chatbot() {
       setHotTemSelect(tem)
 
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }, [])
 
@@ -317,10 +321,10 @@ function Chatbot() {
       setHotTem(tem)
 
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -335,10 +339,10 @@ function Chatbot() {
       setHotTem(tem)
 
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -1163,7 +1167,10 @@ function Chatbot() {
                   getBagMsg(group, id)
                   // getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
                 }).catch(error => {
-                  console.log(error)
+                  console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 })
               })
             }
@@ -1188,7 +1195,10 @@ function Chatbot() {
                   }, 2000);
                   getBagMsg(group, id)
                 }).catch(error => {
-                  console.log(error)
+                  console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 })
               })
 
@@ -1252,7 +1262,10 @@ function Chatbot() {
               }, 2000);
               getBagMsg(group, id)
             }).catch(error => {
-              console.log(error)
+              console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             })
           })
 
@@ -1468,7 +1481,10 @@ function Chatbot() {
                   }, 2000);
                   getBagMsg(group, id)
                 }).catch(error => {
-                  console.log(error)
+                  console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 })
               }
             }
@@ -1796,7 +1812,10 @@ function Chatbot() {
                   }, 2000);
                   getBagMsg(id, id)
                 }).catch(error => {
-                  console.log(error)
+                  console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 })
               })
             }
@@ -1818,7 +1837,10 @@ function Chatbot() {
                   }, 2000);
                   getBagMsg(id, id)
                 }).catch(error => {
-                  console.log(error)
+                  console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 })
               })
             }
@@ -1850,7 +1872,10 @@ function Chatbot() {
               }, 2000);
               getBagMsg(group, id)
             }).catch(error => {
-              console.log(error)
+              console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             })
           })
 
@@ -2044,7 +2069,10 @@ function Chatbot() {
                 }, 2000);
                 getBagMsg(id, id)
               }).catch(error => {
-                console.log(error)
+                console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               })
             }
             // var upd = {
@@ -2441,7 +2469,10 @@ function Chatbot() {
                   }, 2000);
                   getBagMsg(id, id)
                 }).catch(error => {
-                  console.log(error)
+                  console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 })
               })
             }
@@ -2463,7 +2494,10 @@ function Chatbot() {
                   }, 2000);
                   getBagMsg(id, id)
                 }).catch(error => {
-                  console.log(error)
+                  console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 })
               })
             }
@@ -2490,7 +2524,10 @@ function Chatbot() {
               }, 2000);
               getBagMsg(group, id)
             }).catch(error => {
-              console.log(error)
+              console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             })
           })
 
@@ -2705,7 +2742,10 @@ function Chatbot() {
                     }, 2000);
                     getBagMsg(id, id)
                   }).catch(error => {
-                    console.log(error)
+                    console.log(error);
+                    if (error.response?.data.code === 0) {
+                      tokenExpired()
+                    }
                   })
 
                 }
@@ -3054,7 +3094,10 @@ function Chatbot() {
               }, 2000);
               getBagMsg(group, id)
             }).catch(error => {
-              console.log(error)
+              console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             })
           })
 
@@ -3165,10 +3208,10 @@ function Chatbot() {
       // }
       // console.log(bagMsg)
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
 
     // Sortable.create(document.getElementById("div_custom"), {
@@ -3242,10 +3285,10 @@ function Chatbot() {
       // refreshMsgGroup()
       // reloadMsgBag()
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //     requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -3319,10 +3362,10 @@ function Chatbot() {
       // refreshMsgGroup()
       // reloadMsgBag()
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //     requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
   function changeBagtoGrDr(e, idGr) {
@@ -3515,10 +3558,10 @@ function Chatbot() {
       // }
       // setIdmsgB(`mgsBBB${id}`)
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
 
     // document.getElementById('itemBag').style.display = "block"
@@ -3795,10 +3838,10 @@ function Chatbot() {
       // }
       // setIdmsgB(`mgsBBB${id}`)
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
 
 
@@ -4563,10 +4606,10 @@ function Chatbot() {
           enableAddNewMsg()
           getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
         }).catch(error => {
-          console.log(error)
-          // if (error.response.data.code === 3) {
-          //     requestNewToken(path)
-          // }
+          console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         })
       }
 
@@ -4832,7 +4875,10 @@ function Chatbot() {
             // getBagMsg(id, id)
 
           }).catch(error => {
-            console.log(error)
+            console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           })
         }
       }
@@ -5068,10 +5114,10 @@ function Chatbot() {
         enableAddNewMsg()
         getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
       }).catch(error => {
-        console.log(error)
-        // if (error.response.data.code === 3) {
-        //     requestNewToken(path)
-        // }
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       })
     })
   }
@@ -5293,7 +5339,10 @@ function Chatbot() {
         // getBagMsg(id, id)
         getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
       }).catch(error => {
-        console.log(error)
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       })
 
 
@@ -5593,10 +5642,10 @@ function Chatbot() {
             enableAddNewMsg()
             getBagMsg(idReloadMsgBagFromGetMSG, idReloadMsgBagFromGetMSG)
           }).catch(error => {
-            console.log(error)
-            // if (error.response.data.code === 3) {
-            //     requestNewToken(path)
-            // }
+            console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           })
           // }
         }
@@ -5670,7 +5719,10 @@ function Chatbot() {
     api.delete(`/api/v1/message_managements/messages/${idDelete}`).then(res => {
       alert('deleted')
     }).catch(error => {
-      console.log(error)
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
     // var element = document.getElementById(`chatbot_image_msg${idDelete}`)
     // var elementMsgOV = document.getElementById(`ovMsgCB${idDelete}`)
@@ -5831,11 +5883,10 @@ function Chatbot() {
       }, 1500)
       setIsOpenNoti(true)
     }).catch(error => {
-      // alert(error)
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
 
     // bo comment doan tren
@@ -5863,11 +5914,10 @@ function Chatbot() {
           setIsOpenNoti(false)
         }, 2500)
       }).catch(error => {
-        // alert(error)
-        console.log(error)
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       })
     }
 
@@ -5885,7 +5935,7 @@ function Chatbot() {
     setIsOpenCopyMsgBag(true)
     setIdCopyMsgGr(id)
   }
-const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
+  const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
   function moveMsgBagPop(id) {
     setIdGrGetMsgBag(id)
     setIsOpenMoveMsgBagPage(true)
@@ -5893,8 +5943,8 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
     console.log(idMsgBagMovePage)
   }
 
-  function moveBagToGr(){
-    var msgGr = {message_group_id: idGrGetMsgBag}
+  function moveBagToGr() {
+    var msgGr = { message_group_id: idGrGetMsgBag }
     api.post(`/api/v1/message_managements/message_bags/${idMsgBagMovePage}/move`, msgGr).then(res => {
       setIsOpenMoveMsgBagPage(false)
       console.log(res)
@@ -5909,7 +5959,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
       // }, 1500)
 
     }).catch(error => {
-      console.log(error)
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
   //
@@ -5938,11 +5991,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
           // refreshMsgGroup()
         }, 1500)
       }).catch(error => {
-        // alert(error)
-        console.log(error)
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       })
     }
   }
@@ -6026,8 +6078,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
         // }, 1500)
         refreshMsgGroup()
       }).catch(error => {
-        // alert(error)
-        console.log(error)
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       })
     }
   }
@@ -6052,8 +6106,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
         reloadMsgBag()
         getBagMsg(idMsgBagRename, idMsgBagRename)
       }).catch(error => {
-        // alert(error)
-        console.log(error)
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       })
     }
   }
@@ -6075,7 +6131,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
       // }, 1500)
 
     }).catch(error => {
-      console.log(error)
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
   //copyMessageBag
@@ -6096,7 +6155,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
       // }, 1500)
 
     }).catch(error => {
-      console.log(error)
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -6124,7 +6186,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
       // }, 1500)
 
     }).catch(error => {
-      console.log(error)
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
   //deleteMessageBag
@@ -6156,7 +6221,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
       // }, 1500)
 
     }).catch(error => {
-      console.log(error)
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -6183,7 +6251,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
         past_post.push(res.data)
 
       }).catch(error => {
-        console.log(error)
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       })
     }
 
@@ -6248,10 +6319,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
       // }
       // console.log(group)
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -6284,10 +6355,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
       // }
       // console.log(group)
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -6316,10 +6387,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
       // }
       // console.log(group)
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //   requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -7484,7 +7555,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
         // getBagMsg(id, id)
         enableAddNewMsg()
       }).catch(error => {
-        console.log(error)
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       })
     })
   }
@@ -7507,7 +7581,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
       // }, 1500)
 
     }).catch(error => {
-      console.log(error)
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -7591,10 +7668,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
         reloadHotTemp()
         deleteHotTemp(i)
       }).catch(error => {
-        console.log(error)
-        // if (error.response.data.code === 3) {
-        //     requestNewToken(path)
-        // }
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       })
     }
   }
@@ -7613,10 +7690,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
       }, 2000);
       reloadHotTemp()
     }).catch(error => {
-      console.log(error)
-      // if (error.response.data.code === 3) {
-      //     requestNewToken(path)
-      // }
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -7649,10 +7726,10 @@ const [idGrGetMsgBag, setIdGrGetMsgBag] = useState()
         }, 2000);
         reloadHotTemp()
       }).catch(error => {
-        console.log(error)
-        // if (error.response.data.code === 3) {
-        //     requestNewToken(path)
-        // }
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       })
     }
   }
