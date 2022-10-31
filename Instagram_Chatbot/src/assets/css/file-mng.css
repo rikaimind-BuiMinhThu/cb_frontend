@@ -63,3 +63,13 @@
   border: none;
   background: #ffffff;
 }
+.file-mng__preview_img {
+  color: '#51cbce';
+  text-align: center;
+}
+.file-mng__preview_img img {
+  object-fit: cover;
+  max-width: 500px;
+  max-height: 500px;
+  margin: 10px;
+}
