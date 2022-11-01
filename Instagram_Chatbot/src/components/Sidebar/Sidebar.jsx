@@ -362,6 +362,12 @@ function Sidebar(props) {
                     </li>
                   </ul>
                 </li>
+                <li className={activeRoute('file-management') + (true ? " active-pro" : "")} key={'file-management'}>
+                  <NavLink to="/admin/file-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                    <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                    <p style={{ color: "black" }}>File Management</p>
+                  </NavLink>
+                </li>
                 <li className={activeRoute('sub-user') + (true ? " active-pro" : "")} key={'sub-user'}>
                   <NavLink to="/admin/sub-user" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />

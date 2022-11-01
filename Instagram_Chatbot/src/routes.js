@@ -60,6 +60,7 @@ import BasicInformation from "views/BotElement/BotSetting/AdvanceSetting/BasicIn
 import TimeAndLang from "views/BotElement/BotSetting/AdvanceSetting/TimeAndLang";
 import WithdrawalPrevention from "views/BotElement/BotSetting/AdvanceSetting/WithdrawalPrevention";
 import BotAdmin from "views/BotElement/BotSetting/AdvanceSetting/BotAdmin";
+import FileManagement from "views/BotElement/BotSetting/FileManagement";
 import AddSubUserMng from "views/BotElement/AddSubUserMng";
 
 var routes = [
@@ -305,6 +306,13 @@ var routes = [
     name: "Bot Demo",
     // icon: "nc-icon nc-single-02",
     component: BotDemo,
+    layout: "/admin",
+  },
+  {
+    path: "/file-management",
+    name: "File Management",
+    // icon: "nc-icon nc-single-02",
+    component: FileManagement,
     layout: "/admin",
   },
   {
