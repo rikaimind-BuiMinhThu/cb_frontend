@@ -8,6 +8,7 @@ import api from '../../api/api-management';
 import { Pagination } from '@material-ui/lab';
 import ModalShort from '../../views/Popup/ModalShort';
 import ModalNoti from '../../views/Popup/ModalNoti';
+import { tokenExpired } from 'api/tokenExpired';
 
 function BotManagement() {
   // states
@@ -49,6 +50,9 @@ function BotManagement() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -81,6 +85,9 @@ function BotManagement() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         } else if (res.data.code == 2) {
           setIsOpenNoti(true);
@@ -93,6 +100,9 @@ function BotManagement() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -109,6 +119,9 @@ function BotManagement() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   };
 
@@ -142,6 +155,9 @@ function BotManagement() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
           } else if (res.data?.code === 2) {
             setIsStop(false);
@@ -159,6 +175,9 @@ function BotManagement() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
     if (isDelete) {
@@ -186,6 +205,9 @@ function BotManagement() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
           } else if (res.data?.code === 2) {
             setIsDelete(false);
@@ -202,6 +224,9 @@ function BotManagement() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   };
@@ -211,12 +236,12 @@ function BotManagement() {
     setIsStop(true);
     setIsOpenPopupConfirm(true);
     // alert(status)
-    if(status == 'on'){
+    if (status == 'on') {
       setMsgConfirm('Are you sure you want to start this bot?');
-    }else if(status == 'off'){
+    } else if (status == 'off') {
       setMsgConfirm('Are you sure you want to stop this bot?');
     }
-    
+
     setIdSelected(id);
     setStatusSelected(status);
   };

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 import './../../assets/css/account-info.css';
 import api from '../../api/api-management';
+import { tokenExpired } from 'api/tokenExpired';
 
 function AccountInformation() {
   const [userIdEC, setUserIdEC] = useState();
@@ -21,6 +22,9 @@ function AccountInformation() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
   return (

@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import api from '../../api/api-management';
 import ModalNoti from './../Popup/ModalNoti';
+import { tokenExpired } from 'api/tokenExpired';
 
 function BasicSetting() {
   const [userIdEC, setUsreIdEC] = useState();
@@ -28,6 +29,9 @@ function BasicSetting() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -79,6 +83,9 @@ function BasicSetting() {
         })
         .catch((err) => {
           console.log(err);
+          if (err.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }

@@ -7,6 +7,7 @@ import IconManDefault from '../../assets/img/bot-icon/man1_new.png';
 import IconWomenDefault from '../../assets/img/bot-icon/women1_new.png';
 import ModalNoti from '../../views/Popup/ModalNoti';
 import { Link } from 'react-router-dom';
+import { tokenExpired } from 'api/tokenExpired';
 
 const colors = [
   {
@@ -162,6 +163,9 @@ function AddBotchat() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       // if (!scenario) {
