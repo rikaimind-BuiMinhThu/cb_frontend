@@ -1,8 +1,238 @@
-import React from 'react'
+import React from 'react';
+import { Card, CardHeader, CardBody, Table, Row, Col } from 'reactstrap';
+import { Button } from 'react-bootstrap';
+import './../../assets/css/sub-user-mng.css';
+import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import api from '../../api/api-management';
+import Pagination from '@material-ui/lab/Pagination';
+import Cookies from 'js-cookie';
+import ModalShortTem from "./../Popup/ModalShortTem";
+import ModalShort from '../../views/Popup/ModalShort';
+import ModalNoti from '../../views/Popup/ModalNoti';
+
+
 
 function SubUserManagement() {
+  const [botId, setBotId] = useState();
+  const [subUsers, setSubUsers] = useState([]);
+  const [detailUser, setDetailUser] = useState([]);
+  const [isOpenPopupDelete, setIsOpenPopupDelete] = useState(false);
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [msgNoti, setMsgNoti] = useState('');
+  const [isOpenEdit, setIsOpenEdit] = useState(false);
+  const [pageIndex, setPageIndex] = useState(1);
+  const [totalPage, setTotalPage] = useState();
+  const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setBotId(Cookies.get('bot_id'));
+  }, [])
+
+  useEffect(() => {
+    loadData();
+  }, [])
+
+  function loadData(pageIndex) {
+    api.get(`/api/v1/managements/user_chatbots?chatbot_id=${Cookies.get('bot_id')}`).then(res => {
+      if (res.data.code === 1) {
+        console.log(res.data.data.user_chatbots);
+        setSubUsers(res.data.data.user_chatbots);
+      }
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  function openPopupDelete(user) {
+    setIsOpenPopupDelete(true);
+    setDetailUser(user);
+  }
+  function handleDelete() {
+    api.delete(`/api/v1/managements/user_chatbots/${detailUser.id}`).then(res => {
+      console.log(res);
+      if (res.data.code === 1) {
+        setIsOpenPopupDelete(false);
+        setIsOpenNoti(true);
+        setMsgNoti(`Delete successfully`);
+        loadData()
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMsgNoti('');
+        }, 2000)
+      } else if (res.data.code === 2) {
+        setIsOpenPopupDelete(false);
+        setIsOpenNoti(true);
+        setMsgNoti(res.data.message || res.data.data);
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMsgNoti('');
+        }, 2000)
+
+      }
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  function openPopupEdit(user) {
+    setIsOpenEdit(true);
+    setDetailUser(user);
+  }
+  function handleEdit() {
+    const formEdit = document.getElementById('sub-user__edit-form');
+    let edit = {};
+    for (let i = 0; i < formEdit.clientHeight; i++) {
+      edit[formEdit[1].name] = formEdit[1].value;
+    }
+
+    api.patch(`/api/v1/managements/user_chatbots/${detailUser.id}`, { "user_chatbot": edit }).then(res => {
+      console.log(res);
+      if (res.data.code === 1) {
+        setIsOpenNoti(true);
+        setMsgNoti(`Edit successfully`);
+        loadData();
+        setIsOpenEdit(false);
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMsgNoti('');
+        }, 2000)
+      } else if (res.data.code === 2) {
+        setIsOpenNoti(true);
+        setMsgNoti(res.data.message || res.data.data);
+        setIsOpenEdit(false);
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMsgNoti('');
+        }, 2000)
+      }
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+
+  function handleChange(event, value) {
+    if (totalPage > 1) {
+      setPage(parseInt(value));
+      setPageIndex(value);
+      loadData(value);
+      document.querySelector('.main-panel').scrollTop = 0;
+    }
+  }
+
+
   return (
-    <div>SubUserManagement</div>
+    <>
+      <div className="content">
+        <Row id="screenAll">
+          <Col md="12">
+            <Card>
+              <CardHeader>
+                <div className='sub-user__title'>Sub User Management</div>
+                <div className='sub-user__heading'>
+                  <p>View users who have been added as bot admins for your plan.
+                    <br />
+                    If you want to add a user without a BOTCHAN account as an administrator, invite the user from the invite button on the right and then add the bot administrator.
+                  </p>
+                  <div className='sub-user__heading-btn'>
+                    <Link to={'/admin/add-sub-user'}>
+                      <button className='btn btn-primary'>User invitation</button>
+
+                    </Link>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardBody>
+                <Table>
+                  <thead className="text-primary">
+                    <tr>
+                      <th style={{ width: '10%' }}>No</th>
+                      <th style={{ width: '20%' }}>Full name</th>
+                      <th style={{ width: '20%' }}>email address</th>
+                      <th style={{ width: '15%' }}>authority</th>
+                      <th style={{ width: '10%' }}>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {subUsers.map((user, i) => (
+                      <tr key={i}>
+                        <td className="sub-user__border-table">{user.id}</td>
+                        <td className="sub-user__border-table">{user.full_name}</td>
+                        <td className="sub-user__border-table">{user.email}</td>
+                        <td className="sub-user__border-table">{user.role}</td>
+                        <td className="sub-user__border-table">
+                          <div className="sub-user__action-wrapper">
+                            <div className='sub-user__btn'>
+                              <button className="sub-user__btn-edit" onClick={() => openPopupEdit(user)}>Edit</button>
+
+                            </div>
+                            <div className='sub-user__btn'>
+                              <button className="sub-user__btn-delete" onClick={() => openPopupDelete(user)}>Delete</button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+
+                <Pagination
+                  count={totalPage}
+                  variant="outlined"
+                  page={page}
+                  onChange={handleChange}
+                />
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+
+        <ModalShortTem open={isOpenEdit} onClose={() => setIsOpenEdit(false)}>
+          <div style={{ width: "800px", color: "#51cbce" }}>
+            <h4>Sub UserEdit</h4>
+            <form id='sub-user__edit-form'>
+              <div className='sub-user__field-container sub-user__field-container-edit'>
+                <span className='sub-user__field-lable'>Full name</span>
+                <div className='sub-user__field-input'>
+                  <input type='text' disabled name='full_name' defaultValue={detailUser.full_name}
+                  ></input>
+                  <span id="errEditFullname" className='sub-user__err-format'></span>
+                </div>
+              </div>
+              <div className='sub-user__field-container sub-user__field-container-edit'>
+                <span className='sub-user__field-lable'>authority</span>
+                <div className='sub-user__field-input'>
+                  <select name='role' defaultValue={detailUser.role}>
+                    <option value='bot_admin'>Administrator</option>
+                    <option value='editor'>Editor</option>
+                    <option value='reader'>Reader</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+            <div className='btn-edit'>
+              <button className='btn btn-primary' onClick={() => handleEdit()}>Edit</button>
+            </div>
+          </div>
+        </ModalShortTem>
+
+        <ModalShort open={isOpenPopupDelete} onClose={() => setIsOpenPopupDelete(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <h4>Do you delete?</h4>
+            <Button onClick={() => handleDelete()}>Yes</Button>
+            <Button onClick={() => setIsOpenPopupDelete(false)}>No</Button>
+          </div>
+        </ModalShort>
+
+        <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
+          </div>
+        </ModalNoti>
+      </div>
+    </>
   )
 }
 

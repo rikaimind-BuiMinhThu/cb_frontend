@@ -11,6 +11,8 @@ import Cookies from 'js-cookie';
 import ModalShort from './../Popup/ModalShort';
 import { useEffect } from 'react';
 import { Pagination } from '@material-ui/lab';
+import { setToken } from './../../api/auth'
+import { tokenExpired } from 'api/tokenExpired';
 
 function Keyword() {
   var [customDiv, setCustomDiv] = useState([]);
@@ -49,25 +51,45 @@ function Keyword() {
     }
   }, []);
 
+  //This API handle token doesn't exist anymore
   React.useEffect(() => {
     var path = window.location.pathname;
-
     api
       .get(`/api/v1/message_managements/keyword_settings?page=1`)
       .then((res) => {
-        // console.log('keyword_settings: ', res.data);
+        console.log('keyword_settings: ', res.data);
         setTotalPage(Math.ceil(res.data?.total / 15));
         setListKeyword(res.data?.data);
         // var listkey = res.data.data
         // console.log(listkey.length)
       })
       .catch((error) => {
-        console.log(error);
-        // if (error.response.data.code === 3) {
-        //     requestNewToken(path)
-        // }
+        console.log(error.message);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
+    // getFirstKeyword()
   }, []);
+  //this function refresh token.
+  function getFirstKeyword() {
+    var path = window.location.pathname;
+    api
+      .get(`/api/v1/message_managements/keyword_settings?page=1`)
+      .then((res) => {
+        console.log('keyword_settings: ', res.data);
+        setTotalPage(Math.ceil(res.data?.total / 15));
+        setListKeyword(res.data?.data);
+        // var listkey = res.data.data
+        // console.log(listkey.length)
+      })
+      .catch((error) => {
+        console.log(error.message);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
+      });
+  }
 
   function reloadListKW() {
     var path = window.location.pathname;
@@ -83,9 +105,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //     requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -105,6 +127,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
       });
   }, []);
 
@@ -118,9 +143,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response.data.code === 3) {
-          requestNewToken(path);
-        }
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
       });
   }, []);
 
@@ -151,6 +176,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -175,6 +203,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -296,6 +327,9 @@ function Keyword() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -398,6 +432,9 @@ function Keyword() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -425,6 +462,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -468,6 +508,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -518,6 +561,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -538,6 +584,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   };
 
@@ -554,6 +603,9 @@ function Keyword() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }, [instagramSettingData]);
@@ -583,6 +635,9 @@ function Keyword() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       const defaultReplyBagError = document.getElementById('bag-reply-err');
@@ -602,6 +657,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   };
 
@@ -629,6 +687,9 @@ function Keyword() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         } else {
           setListKeyword(res.data?.data);
@@ -637,6 +698,9 @@ function Keyword() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     document.querySelector('.main-panel').scrollTop = 0;
   };

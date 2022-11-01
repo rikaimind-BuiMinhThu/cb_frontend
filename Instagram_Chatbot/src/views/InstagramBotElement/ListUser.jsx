@@ -9,6 +9,7 @@ import Cookies from 'js-cookie';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import * as utils from './../../JS/client.js';
+import { tokenExpired } from 'api/tokenExpired';
 
 function ListUser() {
   const [startDate, setStartDate] = useState(new Date());
@@ -91,6 +92,9 @@ function ListUser() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     ////////////////////////////////////////////////
     api
@@ -114,6 +118,9 @@ function ListUser() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     ////////////////////////////////////////////////
     api
@@ -134,6 +141,9 @@ function ListUser() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     ///////////////////////////////////////////////
     api
@@ -152,12 +162,14 @@ function ListUser() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     ///////////////////////////////////////////////
     api
       .get(
-        `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${
-          month - 6
+        `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${month - 6
         }-15&end_date=${dateEnd}`
       )
       .then((res) => {
@@ -170,13 +182,15 @@ function ListUser() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
 
     ///////////////////////////////////////////////
     api
       .get(
-        `/api/v1/analytics/chatbot_usages/user?begin_date=${dateStart.slice(0, 5)}${
-          month - 6
+        `/api/v1/analytics/chatbot_usages/user?begin_date=${dateStart.slice(0, 5)}${month - 6
         }-15&end_date=${dateEnd}`
       )
       .then((res) => {
@@ -190,6 +204,9 @@ function ListUser() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     ///////////////////////////////////////////////
     api
@@ -209,6 +226,9 @@ function ListUser() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
 
     ///////////////////////////////////////////////
@@ -220,6 +240,9 @@ function ListUser() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -360,6 +383,9 @@ function ListUser() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       ////////////////////////////////////////////////
       api
@@ -377,6 +403,9 @@ function ListUser() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       ///////////////////////////////////////////////
       api
@@ -392,6 +421,9 @@ function ListUser() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       ///////////////////////////////////////////////
       api
@@ -407,6 +439,9 @@ function ListUser() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       const datePickerInputs = document.querySelectorAll(
@@ -514,6 +549,8 @@ function ListUser() {
 
   const headers = [
     { label: 'ユーザー名', key: 'username' },
+    //add new link to account of instagram user
+    { label: 'アカウントリンク', key: 'account' },
     { label: '名前', key: 'full_name' },
     { label: 'フォロワー数', key: 'follower_count' },
     { label: 'インスタグラムID', key: 'instagram_id' },
@@ -529,9 +566,12 @@ function ListUser() {
   function setDataExport() {
     var data = [];
     var datae = instaUser;
+    console.log(datae);
     datae.forEach((it) => {
       data.push({
         username: it.username,
+        //add new link to account of instagram user
+        account: `https://www.instagram.com/${it.username}`,
         full_name: it.full_name,
         follower_count: it.follower_count,
         instagram_id: it.instagram_id,
@@ -543,6 +583,8 @@ function ListUser() {
         const cm_live = it[i];
         data.push({
           username: cm_live.username,
+          //add new link to account of instagram user
+          account: cm_live.username,
           full_name: cm_live.full_name,
           follower_count: cm_live.follower_count,
           instagram_id: cm_live.instagram_id,
@@ -595,6 +637,9 @@ function ListUser() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       ////////////////////////////////////////////////
       api
@@ -612,6 +657,9 @@ function ListUser() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       ///////////////////////////////////////////////
       api
@@ -627,6 +675,9 @@ function ListUser() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       ///////////////////////////////////////////////
       api
@@ -642,6 +693,9 @@ function ListUser() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       const datePickerInputs = document.querySelectorAll(
@@ -816,8 +870,8 @@ function ListUser() {
                             1
                           ) >= 0
                             ? parseFloat(
-                                (percentECnew / (percentECold + percentECnew)) * 100
-                              ).toFixed(1)
+                              (percentECnew / (percentECold + percentECnew)) * 100
+                            ).toFixed(1)
                             : `0.0`}
                           %
                         </span>

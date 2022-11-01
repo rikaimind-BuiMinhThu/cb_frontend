@@ -8,10 +8,22 @@ export default function requestNewToken(pathname) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('refreshToken')}`;
     
     axios
-        .post("http://ec2-107-21-168-134.compute-1.amazonaws.com/api/v1/refresh_token", header)
+        .post("https://ec-chatbot-test1.com/api/v1/refresh_token", header)
         .then(data => {
-            setToken(data.data.access_token, pathname);
+            // console.log("data ne: ", data.data.token)
+            // setToken('token', data.data.access_token);
+            // setToken('token', data.data.access_token, pathname);
         }).catch(error => {
             console.log(error)
         });
 };
+
+// var service1 = axios.create(
+//     {
+//         // baseURL: 'http://rikai-dev.ddns.net:8000',
+//         baseURL: 'https://ec-chatbot-test1.com',
+//         data:'',
+//         headers: { 'Authorization': 'Bearer ' + Cookies.get('refreshToken') }
+//     });
+
+// export default service1

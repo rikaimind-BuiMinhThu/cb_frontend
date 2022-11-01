@@ -14,6 +14,7 @@ import ava from './Popup/ava.png';
 import ModalShort from './Popup/ModalShort';
 // import { Pagination } from "element-react";
 import $ from 'jquery';
+import { tokenExpired } from 'api/tokenExpired';
 
 
 function UserManagement() {
@@ -98,8 +99,8 @@ function UserManagement() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response.data.code === 3) {
-          requestNewToken(path);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
         }
       });
   }, []);
@@ -123,9 +124,9 @@ function UserManagement() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -151,9 +152,9 @@ function UserManagement() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -178,9 +179,9 @@ function UserManagement() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //   requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
   $('#screenAll').keydown(function (event) {
@@ -231,8 +232,8 @@ function UserManagement() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response.data.code === 3) {
-          requestNewToken(path);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
         }
       });
   }
@@ -315,10 +316,9 @@ function UserManagement() {
           setIsOpenNoti(true);
         })
         .catch((error) => {
-          alert(error);
           console.log(error);
-          if (error.response.data.code === 3) {
-            requestNewToken(path);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
           }
         });
     } else {
@@ -443,10 +443,9 @@ function UserManagement() {
           }
         })
         .catch((error) => {
-          alert(error);
           console.log(error);
-          if (error.response.data.code === 3) {
-            requestNewToken(path);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
           }
         });
     } else {

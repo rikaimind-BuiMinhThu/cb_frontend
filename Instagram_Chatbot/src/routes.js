@@ -61,6 +61,7 @@ import TimeAndLang from "views/BotElement/BotSetting/AdvanceSetting/TimeAndLang"
 import WithdrawalPrevention from "views/BotElement/BotSetting/AdvanceSetting/WithdrawalPrevention";
 import BotAdmin from "views/BotElement/BotSetting/AdvanceSetting/BotAdmin";
 import FileManagement from "views/BotElement/BotSetting/FileManagement";
+import AddSubUserMng from "views/BotElement/AddSubUserMng";
 
 var routes = [
   {
@@ -201,6 +202,12 @@ var routes = [
     name: "Sub User Management",
     // icon: "nc-icon nc-single-02",
     component: SubUserManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/add-sub-user",
+    name: "Add Sub User Managament",
+    component: AddSubUserMng,
     layout: "/admin",
   },
   {

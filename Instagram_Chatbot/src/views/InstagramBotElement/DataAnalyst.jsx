@@ -12,6 +12,7 @@ import requestNewToken from 'api/request-new-token';
 import * as utils from './../../JS/client.js';
 import { Pagination } from '@material-ui/lab';
 import { useEffect } from 'react';
+import { tokenExpired } from 'api/tokenExpired';
 // const categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
 
 function DataAnalyst() {
@@ -91,9 +92,9 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
-        // if (error.response.data.code === 3) {
-        //     requestNewToken(path)
-        // }
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -315,6 +316,9 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
 
     ////////////////////////////////////////////////
@@ -336,6 +340,9 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     ///////////////////////////////////////////////
     api
@@ -354,12 +361,14 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
     ///////////////////////////////////////////////
     api
       .get(
-        `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${
-          month - 6
+        `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${month - 6
         }-15&end_date=${dateEnd}`
       )
       .then((res) => {
@@ -373,6 +382,9 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -424,6 +436,9 @@ function DataAnalyst() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         }
         // console.log('msgDataAll: ', msgDataAll);
@@ -431,6 +446,9 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -623,6 +641,9 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       ////////////////////////////////////////////////
       api
@@ -653,6 +674,9 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       ///////////////////////////////////////////////
       // api
@@ -685,6 +709,9 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
           });
       } else {
         api
@@ -698,6 +725,9 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       }
       ///////////////////////////////////////////////
@@ -720,6 +750,9 @@ function DataAnalyst() {
                 })
                 .catch((error) => {
                   console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 });
             }
             // console.log('msgDataAll: ', msgDataAll);
@@ -727,6 +760,9 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       } else {
         api
@@ -746,6 +782,9 @@ function DataAnalyst() {
                 })
                 .catch((error) => {
                   console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 });
             }
             // console.log('msgDataAll: ', msgDataAll);
@@ -753,6 +792,9 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       }
     } else {
@@ -935,6 +977,9 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       ////////////////////////////////////////////////
       api
@@ -950,6 +995,9 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       ///////////////////////////////////////////////
       api
@@ -965,6 +1013,9 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
       ///////////////////////////////////////////////
       // api
@@ -995,6 +1046,9 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       } else {
         api
@@ -1008,6 +1062,9 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       }
       ///////////////////////////////////////////////
@@ -1030,6 +1087,9 @@ function DataAnalyst() {
                 })
                 .catch((error) => {
                   console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 });
             }
             // console.log('msgDataAll: ', msgDataAll);
@@ -1037,6 +1097,9 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       } else {
         api
@@ -1056,6 +1119,9 @@ function DataAnalyst() {
                 })
                 .catch((error) => {
                   console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 });
             }
             // console.log('msgDataAll: ', msgDataAll);
@@ -1063,6 +1129,9 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired()
+            }
           });
       }
     } else {
@@ -1092,6 +1161,9 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   };
 
@@ -1117,6 +1189,9 @@ function DataAnalyst() {
             })
             .catch((error) => {
               console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         }
         // console.log('msgDataAll: ', msgDataAll);
@@ -1124,6 +1199,9 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   };
 
@@ -1185,6 +1263,9 @@ function DataAnalyst() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
           } else {
             setLiveData(res.data?.live_usages);
@@ -1193,6 +1274,9 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       api
@@ -1211,6 +1295,9 @@ function DataAnalyst() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
           } else {
             setLiveData(res.data?.live_usages);
@@ -1219,6 +1306,9 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   };
@@ -1257,6 +1347,9 @@ function DataAnalyst() {
                     })
                     .catch((error) => {
                       console.log(error);
+                      if (error.response?.data.code === 0) {
+                        tokenExpired()
+                      }
                     });
                 }
                 // console.log('msgDataAll: ', msgDataAll);
@@ -1264,6 +1357,9 @@ function DataAnalyst() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
           } else {
             setListGroup(res?.data?.data);
@@ -1276,6 +1372,9 @@ function DataAnalyst() {
                 })
                 .catch((error) => {
                   console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 });
             }
             // console.log('msgDataAll: ', msgDataAll);
@@ -1284,6 +1383,9 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       api
@@ -1312,6 +1414,9 @@ function DataAnalyst() {
                     })
                     .catch((error) => {
                       console.log(error);
+                      if (error.response?.data.code === 0) {
+                        tokenExpired()
+                      }
                     });
                 }
                 // console.log('msgDataAll: ', msgDataAll);
@@ -1319,6 +1424,9 @@ function DataAnalyst() {
               })
               .catch((error) => {
                 console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
               });
           } else {
             setListGroup(res?.data?.data);
@@ -1331,6 +1439,9 @@ function DataAnalyst() {
                 })
                 .catch((error) => {
                   console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 });
             }
             // console.log('msgDataAll: ', msgDataAll);
@@ -1339,6 +1450,9 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   };
