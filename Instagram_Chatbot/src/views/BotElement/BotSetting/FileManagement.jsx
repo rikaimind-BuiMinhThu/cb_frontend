@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
+import { Card, CardHeader, CardBody, Table, Row, Col } from 'reactstrap';
 import { Button } from 'react-bootstrap';
 import { useRef } from 'react';
 import { useState } from 'react';
@@ -13,7 +13,7 @@ import ModalNoti from 'views/Popup/ModalNoti';
 function FileManagement() {
   const [files, setFiles] = useState([]);
   const [newFile, setNewFile] = useState(null);
-  const [src, setSrc] = React.useState('');
+  const [srcPreview, setSrcPreview] = useState('');
   const [isOpenPreview, setIsOpenPreview] = useState(false);
   const inputRef = useRef(null);
   const [fileError, setFileError] = useState('');
@@ -29,7 +29,6 @@ function FileManagement() {
 
   function reload() {
     api.get(`/api/v1//managements/file`).then((res) => {
-      console.log('files', res.data.data);
       setFiles(res.data.data);
     });
   }
@@ -43,10 +42,7 @@ function FileManagement() {
   }
 
   function handleSave() {
-    console.log(newFile);
     const type = newFile.name.split('.')[1];
-    //jpeg, jpg, png
-
     const trueFile = ['jpeg', 'jpg', 'png'].includes(type);
     if (trueFile) {
       const file = { user_file: { file_type: type } };
@@ -75,6 +71,7 @@ function FileManagement() {
                 reload();
                 setMsgNoti(`Add successfully!`);
                 setIsOpenNoti(true);
+                setNewFile(null);
                 setTimeout(() => {
                   setIsOpenNoti(false);
                   setMsgNoti(``);
@@ -101,10 +98,7 @@ function FileManagement() {
   }
 
   function handlePreview(file_url) {
-    console.log(file_url);
-    // console.log(URL.createObjectURL(file_url));
-    // const imageTypes = ['image/gif', 'image/jpeg', 'image/png'];
-    setSrc(`https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file_url}`);
+    setSrcPreview(`https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file_url}`);
     setIsOpenPreview(true);
   }
 
@@ -118,7 +112,6 @@ function FileManagement() {
       .delete(`/api/v1/managements/file/${idFile}`)
       .then((res) => {
         if (res.data.code == 1) {
-          console.log(res);
           setIsOpenDelete(false);
           setMsgNoti(`Delete successfully!`);
           setIsOpenNoti(true);
@@ -207,10 +200,8 @@ function FileManagement() {
                   <thead className="text-primary">
                     <tr>
                       <th style={{ width: '10%' }}>ID</th>
-                      {/* <th style={{ width: '20%' }}>File name</th> */}
                       <th style={{ width: '15%' }}>Type</th>
-                      {/* <th style={{ width: '20%' }}>Size</th> */}
-                      <th style={{ width: '20%' }}>Url</th>
+                      <th style={{ width: '40%' }}>Url</th>
                       <th style={{ width: '250px', minWidth: '250px' }}>Action</th>
                     </tr>
                   </thead>
@@ -218,10 +209,7 @@ function FileManagement() {
                     {files.map((file, i) => (
                       <tr key={i}>
                         <td className="file-mng__border-table">{file.id}</td>
-                        {/* <td className="file-mng__border-table">{file.name}</td> */}
                         <td className="file-mng__border-table">{file.file_type}</td>
-                        {/* <td className="file-mng__border-table">{file.size}</td> */}
-                        {/* <td className="file-mng__border-table">{URL.createObjectURL(file)}</td> */}
                         <td className="file-mng__border-table">{`https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file.file_url}`}</td>
                         <td className="file-mng__border-table file-mng__action-table">
                           <div className="file-mng__action-wrapper">
@@ -261,7 +249,7 @@ function FileManagement() {
 
         <ModalShort open={isOpenPreview} onClose={() => setIsOpenPreview(false)}>
           <div className="file-mng__preview_img">
-            <img src={src} alt="" />
+            <img src={srcPreview} alt="" />
             <Button onClick={() => setIsOpenPreview(false)}>Close</Button>
           </div>
         </ModalShort>
