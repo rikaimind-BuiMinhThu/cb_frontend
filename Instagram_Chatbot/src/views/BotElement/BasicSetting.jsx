@@ -32,23 +32,23 @@ function BasicSetting() {
   }, []);
 
   function onSave() {
-    utils.checkInput('fullname', 'errFullname', 'Full name');
-    utils.checkMaxLength('companyName', 'errCompanyname', 'Company name', 50);
+    utils.checkInput('fullname', 'errFullname', 'The name');
+    utils.checkInput('companyName', 'errCompanyname', 'Company name');
     utils.checkMaxLength('department', 'errDepartment', 'Department', 50);
     utils.checkMaxLength('job_title', 'errPosition', 'Position', 50);
-    utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'Email address');
-    utils.checkMaxLength('phone_number', 'errPhone', 'phone number', 12);
-    utils.checkMaxLength('post_code', 'errPostCost', 'post code', 50);
-    utils.checkMaxLength('address', 'errAddress', 'address', 50);
+    utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'The Mail address');
+    utils.checkTel('phone_number', 'errPhone', 'The Tel');
+    utils.checkInput('post_code', 'errPostCost', 'The Zip code');
+    utils.checkInput('address', 'errAddress', 'The Address');
     if (
-      utils.checkInput('fullname', 'errFullname', 'Full name') &&
-      utils.checkMaxLength('companyName', 'errCompanyname', 'Company name', 50) &&
+      utils.checkInput('fullname', 'errFullname', 'The name') &&
+      utils.checkInput('companyName', 'errCompanyname', 'Company name') &&
       utils.checkMaxLength('department', 'errDepartment', 'Department', 50) &&
       utils.checkMaxLength('job_title', 'errPosition', 'Position', 50) &&
-      utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'Email address') &&
-      utils.checkMaxLength('phone_number', 'errPhone', 'phone number', 12) &&
-      utils.checkMaxLength('post_code', 'errPostCost', 'post code', 50) &&
-      utils.checkMaxLength('address', 'errAddress', 'address', 50)
+      utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'The Mail address') &&
+      utils.checkTel('phone_number', 'errPhone', 'The Tel') &&
+      utils.checkInput('post_code', 'errPostCost', 'The Zip code') &&
+      utils.checkInput('address', 'errAddress', 'The Address')
     ) {
       const form = document.getElementById('form-basic-setting');
       const obj = {};
@@ -100,7 +100,7 @@ function BasicSetting() {
                         placeholder="enter input ..."
                         name="full_name"
                         defaultValue={userDetail.full_name}
-                        onChange={() => utils.checkInput('fullname', 'errFullname', 'Full name')}
+                        onChange={() => utils.checkInput('fullname', 'errFullname', 'The name')}
                       ></input>
                       <span id="errFullname" className="bs-err-format"></span>
                     </div>
@@ -126,7 +126,7 @@ function BasicSetting() {
                         name="company_name"
                         defaultValue={userDetail.company_name}
                         onChange={() =>
-                          utils.checkMaxLength('companyName', 'errCompanyname', 'Company name', 50)
+                          utils.checkInput('companyName', 'errCompanyname', 'Company name')
                         }
                       ></input>
                       <span id="errCompanyname" className="bs-err-format"></span>
@@ -180,7 +180,7 @@ function BasicSetting() {
                           utils.checkEmailRequired(
                             'emailAddress',
                             'errEmailAddress',
-                            'Email address'
+                            'The Mail address'
                           )
                         }
                       ></input>
@@ -189,7 +189,7 @@ function BasicSetting() {
                   </div>
 
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">phone number</span>
+                    <span className="bs-field-lable">Phone number</span>
                     <div className="bs-field-input">
                       <input
                         id="phone_number"
@@ -197,16 +197,14 @@ function BasicSetting() {
                         placeholder="enter input ..."
                         name="phone_number"
                         defaultValue={userDetail.phone_number}
-                        onChange={() =>
-                          utils.checkMaxLength('phone_number', 'errPhone', 'phone number', 12)
-                        }
+                        onChange={() => utils.checkTel('phone_number', 'errPhone', 'The Tel')}
                       ></input>
                       <span id="errPhone" className="bs-err-format"></span>
                     </div>
                   </div>
 
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">post code</span>
+                    <span className="bs-field-lable">Post code</span>
                     <div className="bs-field-input">
                       <input
                         id="post_code"
@@ -215,7 +213,7 @@ function BasicSetting() {
                         name="post_code"
                         defaultValue={userDetail.post_code}
                         onChange={() =>
-                          utils.checkMaxLength('post_code', 'errPostCost', 'post code', 50)
+                          utils.checkInput('post_code', 'errPostCost', 'The Zip code')
                         }
                       ></input>
                       <span id="errPostCost" className="bs-err-format"></span>
@@ -223,7 +221,7 @@ function BasicSetting() {
                   </div>
 
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">address</span>
+                    <span className="bs-field-lable">Address</span>
                     <div className="bs-field-input">
                       <input
                         id="address"
@@ -231,16 +229,14 @@ function BasicSetting() {
                         placeholder="enter input ..."
                         name="address"
                         defaultValue={userDetail.address}
-                        onChange={() =>
-                          utils.checkMaxLength('address', 'errAddress', 'address', 50)
-                        }
+                        onChange={() => utils.checkInput('address', 'errAddress', 'The Address')}
                       ></input>
                       <span id="errAddress" className="bs-err-format"></span>
                     </div>
                   </div>
 
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">language</span>
+                    <span className="bs-field-lable">Language</span>
                     <div className="bs-field-input">
                       <select name="language" value={userDetail.language}>
                         <option value="japanese">Japanese</option>
