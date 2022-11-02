@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { MDBIcon } from 'mdbreact';
 
-const InputDouble = ({ id, valueLeft, valueRight, onChange, rightWidth, icon, onClickIcon, placeholder, classCustom, isReverseIcon = false, classIcon, disabled = false }) => {
+const InputDouble = ({ id, valueLeft, valueRight, onChange, rightWidth, icon, onClickIcon, placeholder, classCustom, isReverseIcon = false, classIcon, disabled = false, style }) => {
 
     return (
         <React.Fragment>
-            <div className={`ss-user-setting-double-input ${classCustom ? classCustom : ''}`}>
+            <div style={style} className={`ss-user-setting-double-input ${classCustom ? classCustom : ''}`}>
                 {/* {icon && isReverseIcon &&
                     <MDBIcon
                         onClick={onClickIcon}

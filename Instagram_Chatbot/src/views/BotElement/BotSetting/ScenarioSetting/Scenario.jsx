@@ -20,6 +20,8 @@ import Cookies from 'js-cookie';
 import ModalNoti from '../../../../views/Popup/ModalNoti';
 import ModalShort from '../../../Popup/ModalShort';
 import Preview from '../Preview';
+import FileReferencePopup from './FileReferencePopup';
+import axios from 'axios';
 const _ = require('lodash');
 
 let data = [
@@ -1329,6 +1331,8 @@ let dataSubCondition = [
 const Scenario = () => {
   // states
   const [scenarioName, setScenarioName] = useState('');
+  const [errorScenarioName, setErrorScenarioName] = useState('');
+
   const [belongTo, setBelongTo] = useState('bot');
   const [messageType, setMessageType] = useState('text_input');
   const [indexMessageSelect, setIndexMessageSelect] = useState('');
@@ -1337,6 +1341,8 @@ const Scenario = () => {
   const [dataSelecteFixed, setDataSelecteFixed] = useState(new Date());
   const [dataInputVar, setDataInputVar] = useState([]);
   const [isOpenPreview, setIsOpenPreview] = useState(false);
+
+  const [isOpenFileReference, setIsOpenFileReference] = useState(false);
 
   // bot setting values
   const [botTextValue, setBotTextValue] = useState('');
@@ -1432,10 +1438,63 @@ const Scenario = () => {
   }
 
   function getBaseUrl(event) {
-    var file = document.querySelector('input[type=file]')['files'][0];
+    var fileInput = document.querySelector('input[type=file]')['files'][0];
+    const type = fileInput.name.slice(fileInput.name.lastIndexOf('.') + 1);
+    console.log(fileInput, type)
+    const trueFile = ['jpeg', 'jpg', 'png'].includes(type);
+    if (trueFile) {
+      const file = { user_file: { file_type: type } };
+      api
+        .post(`/api/v1/managements/file/upload`, file)
+        .then((res) => {
+          const urlFile = res.data.data.url;
+          let filePost = { user_file: { file_type: type, file_url: res.data.data.path } };
+          // axios
+          //   .put(urlFile, file, {
+          //     headers: {
+          //       'ContentType': `image/${type}`,
+          //     },
+          //   })
+          //   .then((res) => {
+          //     console.log('response`: ', res);
+          //   })
+          //   .catch((err) => {
+          //     console.log('err: ', err);
+          //   });
+          api
+            .post(`/api/v1/managements/file`, filePost)
+            .then((res) => {
+              if (res.data.code == 1) {
+                console.log(res);
+                // setMsgNoti(`Add successfully!`);
+                // setIsOpenNoti(true);
+                // setNewFile(null);
+                setTimeout(() => {
+                  // setIsOpenNoti(false);
+                  // setMsgNoti(``);
+                }, 2000);
+              } else {
+                // setMsgNoti(`Add failed!`);
+                // setIsOpenNoti(true);
+                setTimeout(() => {
+                  // setIsOpenNoti(false);
+                  // setMsgNoti(``);
+                }, 2000);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      alert(`You need enter format file is jpeg/ jpg/ png.`);
+    }
     // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
-    var reader = new FileReader();
-    var baseString;
+    // var reader = new FileReader();
+    // var baseString;
     // var imgUrl = URL.createObjectURL(event.target.files[0]);
     // if (
     //   file?.type === 'image/png' ||
@@ -1451,19 +1510,19 @@ const Scenario = () => {
     //   document.getElementById(`bot-file-upload-img`).src = '';
     // }
 
-    reader.onloadend = function () {
-      baseString = reader.result;
-      // setInputImage(baseString);
-      // document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
-      if (baseString !== undefined || baseString !== '') {
-        // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
-        console.log(baseString)
-        dataMessages[indexMessageSelect].message_content[0].file.content = baseString;
-        setDataMessages([...dataMessages]);
-      }
+    // reader.onloadend = function () {
+    //   baseString = reader.result;
+    //   // setInputImage(baseString);
+    //   // document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
+    //   if (baseString !== undefined || baseString !== '') {
+    //     // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
+    //     console.log(baseString)
+    //     dataMessages[indexMessageSelect].message_content[0].file.content = baseString;
+    //     setDataMessages([...dataMessages]);
+    //   }
 
-    };
-    reader.readAsDataURL(file);
+    // };
+    // reader.readAsDataURL(file);
   }
 
   // handle select message
@@ -1620,8 +1679,8 @@ const Scenario = () => {
               range: 'no_input',
               isSplitInput: false
             },
-            url: '', //string
-            email_address: '', //string
+            urls: {}, //string
+            email_address: {}, //string
             email_confirmation: {},
             phone_number: {
               withHyphen: false,
@@ -1655,8 +1714,8 @@ const Scenario = () => {
             customization: {
               display_unselected: '選択してください',
               is_comment: false,
-              options_with_comment: [{ id: 1 }],
-              options_without_comment: [{ id: 1 }]
+              options_with_comment: [{ id: 1}],
+              options_without_comment: [{ id: 1}]
             },
             time_hm: {},
             date_ymd: {},
@@ -1703,6 +1762,7 @@ const Scenario = () => {
           id: idMax,
           type: messageType,
           [messageType]: {
+            require: true,
             title_require: false,
             type: 'detail_content',
             detail_content: {},
@@ -1933,22 +1993,23 @@ const Scenario = () => {
 
     if (subName) {
       if (dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField] === undefined) {
-        dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField] = {}
+        dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField] = {};
       }
       dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField][subName] = value;
     } else if (indexSubField) {
       if (dataMessages[indexMessage].message_content[indexContent][type][name][subField] === undefined) {
-        dataMessages[indexMessage].message_content[indexContent][type][name][subField] = {}
+        dataMessages[indexMessage].message_content[indexContent][type][name][subField] = {};
       }
       dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField] = value;
     } else if (subField) {
       if (dataMessages[indexMessage].message_content[indexContent][type][name] === undefined) {
-        dataMessages[indexMessage].message_content[indexContent][type][name] = {}
+        dataMessages[indexMessage].message_content[indexContent][type][name] = {};
       }
+      console.log(dataMessages[indexMessage].message_content[indexContent])
       dataMessages[indexMessage].message_content[indexContent][type][name][subField] = value;
     } else if (name) {
       if (dataMessages[indexMessage].message_content[indexContent][type] === undefined) {
-        dataMessages[indexMessage].message_content[indexContent][type] = {}
+        dataMessages[indexMessage].message_content[indexContent][type] = {};
       }
       dataMessages[indexMessage].message_content[indexContent][type][name] = value;
     } else {
@@ -2040,8 +2101,45 @@ const Scenario = () => {
     });
   }
 
+  const onClickSavePreview = () => {
+    console.log(scenarioName);
+    if (!scenarioName) {
+      setErrorScenarioName("This field cant't be empty");
+      return;
+    }
+    let data = {
+      conversation: {
+        messages: [...dataMessages],
+      },
+      scenario_name: scenarioName
+    }
+    api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
+      console.log(res.data);
+      setIsOpenNoti(true);
+      if (res.data.code === 1) {
+        setMessageNoti('Save scenario successfully');
+      } else if (res.data.code === 2) {
+        setMessageNoti(res.data.message);
+      }
+      handleGetMessage();
+      setIsOpenPreview(false);
+      setTimeout(() => {
+        setIsOpenPreview(true);
+      }, 200);
+      setTimeout(() => {
+        setIsOpenNoti(false);
+        setMessageNoti('');
+
+      }, 2000);
+    })
+  }
+
   const onClickSaveScenario = () => {
     console.log(scenarioName);
+    if (!scenarioName) {
+      setErrorScenarioName("This field cant't be empty");
+      return;
+    }
     let data = {
       conversation: {
         messages: [...dataMessages],
@@ -2190,6 +2288,7 @@ const Scenario = () => {
   }
 
   const handleOpenPreview = (isOpen) => {
+    if (!isOpenPreview) return;
     if (isOpen) {
       document.getElementById('cp-container').style.height = "610px";
       document.getElementById('cp-header').style.position = "static";
@@ -2205,33 +2304,8 @@ const Scenario = () => {
       document.getElementById('cp-header').style.borderBottomRightRadius = "25px";
       document.getElementById('cp-header').style.position = "absolute";
       document.getElementById('cp-header').style.bottom = "13px";
-
     }
     setIsOpenPreview(!isOpenPreview);
-  }
-
-  const onClickSavePreview = () => {
-    let data = {
-      conversation: {
-        messages: [...dataMessages],
-        scenarioName
-      }
-    }
-    api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
-      console.log(res.data);
-      setIsOpenNoti(true);
-      if (res.data.code === 1) {
-        setMessageNoti('Save scenario successfully');
-      } else if (res.data.code === 2) {
-        setMessageNoti(res.data.message);
-      }
-      handleGetMessage();
-      setTimeout(() => {
-        setIsOpenNoti(false);
-        setMessageNoti('');
-      }, 2000);
-    })
-    setIsOpenPreview(true);
   }
 
   return (
@@ -2248,12 +2322,17 @@ const Scenario = () => {
                 {/* ss overview */}
                 <div className="ss-sc-content ss-overview">
                   {/* Input name of scenario */}
-                  <InputCustom
-                    style={{ width: '100%' }}
-                    value={scenarioName}
-                    onChange={value => setScenarioName(value)}
-                    placeholder="Enter scenario name"
-                  />
+
+                  <div>
+                    <InputCustom
+                      style={{ width: '100%' }}
+                      value={scenarioName}
+                      onChange={value => setScenarioName(value)}
+                      placeholder="Enter scenario name"
+                    />
+                    {errorScenarioName && <span style={{ fontSize: '12px', color: '#FF621D' }}>{errorScenarioName}</span>}
+
+                  </div>
                   {/* Overview scenario */}
                   <div style={{ height: 'calc(100% - 44px)', backgroundColor: '#f6fbff' }}>
                     <div className="ss-overview-detail">
@@ -2345,17 +2424,22 @@ const Scenario = () => {
                                                   // ></textarea>
                                                   content[content.type]?.content ? (
                                                     <React.Fragment>
-                                                      {(content[content.type]?.content.includes('jpeg') || content[content.type]?.content.includes('png')) ?
+                                                      {(content[content.type]?.content.includes('jpeg') || content[content.type]?.content.includes('png') || content[content.type]?.content.includes('jpg')) ?
                                                         <img
                                                           src={content[content.type]?.content}
                                                           alt=""
                                                           style={{ width: '27%' }}
                                                         /> :
-                                                        <span
-                                                          style={{ color: '#089BE5', fontSize: '17px' }}
-                                                          onClick={() => handleDownloadFile(content[content.type]?.content)}
-                                                        // className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                        >Download this file</span>
+                                                        // <span
+                                                        //   style={{ color: '#089BE5', fontSize: '17px' }}
+                                                        //   onClick={() => handleDownloadFile(content[content.type]?.content)}
+                                                        // // className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                        // >Download this file</span>
+                                                        <textarea
+                                                          className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                          value={content[content.type]?.content}
+                                                          readOnly
+                                                        ></textarea>
                                                       }
                                                     </React.Fragment>
                                                   ) :
@@ -2654,7 +2738,7 @@ const Scenario = () => {
                                                                   className="ss-message__content--user-text-input ss-input-value"
                                                                   readOnly
                                                                   style={{ marginBottom: '0px' }}
-                                                                  placeholder={textInput[textInput.type]}
+                                                                  placeholder={textInput[textInput.type].placeholder}
                                                                   disabled
                                                                 ></input>
                                                               </React.Fragment>
@@ -3675,7 +3759,7 @@ const Scenario = () => {
                                       className="ss-bot-statement-type-file-content ss-input-value"
                                       rows={5}
                                       placeholder="File URL"
-                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.content || ''}
                                       onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'content')}
                                     ></textarea>
                                     <input
@@ -3687,9 +3771,11 @@ const Scenario = () => {
                                     />
                                     <CheckboxCustom
                                       label={<span>do not scroll automatically<MDBIcon fas icon="question-circle" style={{ color: '#347AED', marginLeft: '5px', fontSize: '13px' }} /></span>}
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.is_scroll_auto || false}
+                                      onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'is_scroll_auto')}
                                     />
                                     <div className="ss-file-upload-wrapper">
-                                      <Button className="ss-bot-file-reference-btn">
+                                      <Button className="ss-bot-file-reference-btn" onClick={() => setIsOpenFileReference(true)}>
                                         file reference
                                       </Button>
                                       <Button className="ss-bot-file-upload-btn" onClick={botUploadFile}>
@@ -3872,7 +3958,6 @@ const Scenario = () => {
                             <Droppable droppableId="messages">
                               {(provided) => {
                                 let messageUserSelect = dataMessages && dataMessages.filter((message, index) => (message.belong_to === 'user' && index === indexMessageSelect))[0]?.message_content;
-                                console.log(messageUserSelect, 'checkk messageUserSelect');
                                 return <div className="ss-user-setting__main" {...provided.droppableProps} ref={provided.innerRef}>
                                   {messageUserSelect &&
                                     messageUserSelect
@@ -3887,7 +3972,6 @@ const Scenario = () => {
                                         let attachingFile = content.attaching_file;
                                         let calendar = content.calendar;
                                         let agreeTerm = content.agree_term;
-                                        console.log(content, 'ecehchejckc')
                                         return (
                                           <Draggable key={content.id} draggableId={content.id.toString()} index={indexContent}>
                                             {(provided) => (
@@ -4037,8 +4121,8 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-bottom">
                                                           <InputCustom
                                                             placeholder="placeholder"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type)}
-                                                            value={textInput[textInput.type]}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'placeholder')}
+                                                            value={textInput[textInput.type]?.placeholder}
                                                           />
                                                         </div>
                                                       }
@@ -4047,8 +4131,8 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-bottom">
                                                           <InputCustom
                                                             placeholder="placeholder"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type)}
-                                                            value={textInput[textInput.type]}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'placeholder')}
+                                                            value={textInput[textInput.type].placeholder}
                                                           />
                                                         </div>
                                                       }
@@ -5347,6 +5431,7 @@ const Scenario = () => {
                                                                                     <div style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                                                                       <MDBIcon fas icon="grip-horizontal" />
                                                                                       <InputDouble
+                                                                                        style={array.length === 1 && !pullDown[pullDown.type]?.is_comment ? { width: '95%' } : {}}
                                                                                         classCustom={isComment ? "ss-user-setting-custom-double-input-custom" : ""}
                                                                                         onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text' : 'value')}
                                                                                         valueLeft={itemPullDown.text}
@@ -5365,12 +5450,14 @@ const Scenario = () => {
                                                                                           />
                                                                                         </React.Fragment>
                                                                                       }
-                                                                                      <MDBIcon
-                                                                                        fas
-                                                                                        style={{ fontSize: '25px' }}
-                                                                                        icon="times-circle"
-                                                                                        onClick={(e) => handleRemoveItemCustomizePullDown(indexMessageSelect, indexContent, content.type, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown)}
-                                                                                      />
+                                                                                      {array.length >= 2 &&
+                                                                                        <MDBIcon
+                                                                                          fas
+                                                                                          style={{ fontSize: '25px' }}
+                                                                                          icon="times-circle"
+                                                                                          onClick={(e) => handleRemoveItemCustomizePullDown(indexMessageSelect, indexContent, content.type, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown)}
+                                                                                        />
+                                                                                      }
                                                                                     </div>
                                                                                   </div>
                                                                                 )}
@@ -6203,7 +6290,18 @@ const Scenario = () => {
           </div>
         </div>
       </ModalShort>
-      <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioId={scenarioId} />
+      <ModalShort open={isOpenFileReference} onClose={() => setIsOpenFileReference(false)}>
+        <div className="ss-popup-file-reference-scenario">
+          <FileReferencePopup
+            onCancel={() => setIsOpenFileReference(false)}
+            onReferFile={(file_url) => {
+              onChangeValueMessageContent(indexMessageSelect, 0, messageType, file_url, 'content')
+              setIsOpenFileReference(false)
+            }}
+          />
+        </div>
+      </ModalShort>
+      {isOpenPreview && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioId={scenarioId} />}
     </div >
   );
 };

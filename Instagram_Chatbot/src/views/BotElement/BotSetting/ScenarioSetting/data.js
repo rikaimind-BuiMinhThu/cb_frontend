@@ -16,7 +16,7 @@ let dataClone = {
             message_content: [
                 {
                     id: 1,
-                    type: 'text',
+                    type: 'text_input',
                     text_input: {
                         //txtIn: text_input
                         save_input_content: 'yes', // yes-no
@@ -1043,4 +1043,8 @@ let dataClone2 = {
         ]
       }
     ]
+  }
+
+  let dataMessage = {
+    
   }
