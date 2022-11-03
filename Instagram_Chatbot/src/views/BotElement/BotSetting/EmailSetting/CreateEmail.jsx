@@ -92,61 +92,80 @@ function CreateEmail() {
   function checkListcc(value, listcc) {
     var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
     if (value.match(mailformat)) {
-      listcc.push(value);
-      setCcAll(listcc);
-
-      let cc = document.getElementById('list-cc');
-      var newCc = document.createElement('div');
-      newCc.setAttribute('id', `cc${ccNum}`);
-      newCc.innerHTML = `
-        <div style="margin:0px 5px 0px 0px; border-radius:5px; width:max-content; background-color:#e0e0e0; display:flex">
-        <span style="width:max-content;">${value}</span>&ensp; 
-        <span id="deleteCc${ccNum}FI">X</span></div>
-        `;
-      cc.appendChild(newCc);
-      document.getElementById(`deleteCc${ccNum}FI`).addEventListener('click', () => {
-        var ele = document.getElementById(`cc${ccNum}`);
-        ele.parentNode.removeChild(ele);
-        listcc.splice(ccNum, 1);
-        setCcAll(listcc);
-        setListCcDetail(listcc);
+      let i = 0;
+      listcc.forEach((cc) => {
+        if (cc === value) i = i + 1;
       });
-      document.getElementById('cc').value = '';
-      setCcNum(ccNum + 1);
-      document.getElementById('errCcMail').style.display = 'none';
+      if (i === 0) {
+        listcc.push(value);
+        setCcAll(listcc);
+
+        let cc = document.getElementById('list-cc');
+        var newCc = document.createElement('div');
+        newCc.setAttribute('id', `cc${ccNum}`);
+        newCc.innerHTML = `
+          <div style="margin:0px 5px 0px 0px; border-radius:5px; width:max-content; background-color:#e0e0e0; display:flex">
+          <span style="width:max-content;">${value}</span>&ensp; 
+          <span id="deleteCc${ccNum}FI">X</span></div>
+          `;
+        cc.appendChild(newCc);
+        document.getElementById(`deleteCc${ccNum}FI`).addEventListener('click', () => {
+          var ele = document.getElementById(`cc${ccNum}`);
+          ele.parentNode.removeChild(ele);
+          listcc.splice(ccNum, 1);
+          setCcAll(listcc);
+          setListCcDetail(listcc);
+        });
+        document.getElementById('cc').value = '';
+        setCcNum(ccNum + 1);
+        document.getElementById('errCcMail').style.display = 'none';
+      } else {
+        document.getElementById('errCcMail').style.display = 'block';
+        document.getElementById('errCcMail').innerText = 'Duplicate email!';
+      }
     } else {
       document.getElementById('errCcMail').style.display = 'block';
+      document.getElementById('errCcMail').innerText = 'Please input right format of email';
     }
   }
 
   function checkListBcc(value, listbcc) {
     var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
     if (value.match(mailformat)) {
-      listbcc.push(value);
-      setBccAll(listbcc);
-
-      let bcc = document.getElementById('list-bcc');
-      var newBcc = document.createElement('div');
-      newBcc.setAttribute('id', `bcc${bccNum}`);
-      newBcc.innerHTML = `
-      <div style="margin:0px 5px 0px 0px; border-radius:5px; width:max-content; background-color:#e0e0e0; display:flex">
-      <span style="width:max-content;">${value}</span>&ensp; 
-      <span id="deleteBCc${bccNum}FI">X</span></div>
-      `;
-      bcc.appendChild(newBcc);
-      document.getElementById(`deleteBCc${bccNum}FI`).addEventListener('click', () => {
-        console.log('clicked delete bcc');
-        var ele = document.getElementById(`bcc${bccNum}`);
-        ele.parentNode.removeChild(ele);
-        listbcc.splice(bccNum, 1);
-        setBccAll(listbcc);
-        setListBccDetail(listbcc);
+      let i = 0;
+      listbcc.forEach((bcc) => {
+        if (bcc === value) i = i + 1;
       });
-      document.getElementById('bcc').value = '';
-      setBccNum(bccNum + 1);
-      document.getElementById('errBccMail').style.display = 'none';
+      if (i === 0) {
+        listbcc.push(value);
+        setBccAll(listbcc);
+
+        let bcc = document.getElementById('list-bcc');
+        var newBcc = document.createElement('div');
+        newBcc.setAttribute('id', `bcc${bccNum}`);
+        newBcc.innerHTML = `
+        <div style="margin:0px 5px 0px 0px; border-radius:5px; width:max-content; background-color:#e0e0e0; display:flex">
+        <span style="width:max-content;">${value}</span>&ensp; 
+        <span id="deleteBCc${bccNum}FI">X</span></div>
+        `;
+        bcc.appendChild(newBcc);
+        document.getElementById(`deleteBCc${bccNum}FI`).addEventListener('click', () => {
+          console.log('clicked delete bcc');
+          var ele = document.getElementById(`bcc${bccNum}`);
+          ele.parentNode.removeChild(ele);
+          listbcc.splice(bccNum, 1);
+          setBccAll(listbcc);
+          setListBccDetail(listbcc);
+        });
+        document.getElementById('bcc').value = '';
+        setBccNum(bccNum + 1);
+        document.getElementById('errBccMail').style.display = 'none';
+      } else {
+        document.getElementById('errBccMail').innerText = 'Duplicate email!';
+      }
     } else {
       document.getElementById('errBccMail').style.display = 'block';
+      document.getElementById('errBccMail').innerText = 'Please input right format of email';
     }
   }
 
@@ -388,9 +407,7 @@ function CreateEmail() {
                         onKeyUp={(e) => addCC(e)}
                       ></input>
                       {/* <textarea className='textarea-email' placeholder='no-reply@botchan.chat' name='cc'></textarea> */}
-                      <span id="errCcMail" className="err-email-format">
-                        Please input right format of email
-                      </span>
+                      <span id="errCcMail" className="err-email-format"></span>
                     </div>
                   </div>
 
@@ -405,9 +422,7 @@ function CreateEmail() {
                         onKeyUp={(e) => addBCC(e)}
                       ></input>
                       {/* <textarea className='textarea-email' placeholder='no-reply@botchan.chat' name='bcc'></textarea> */}
-                      <span id="errBccMail" className="err-email-format">
-                        PLease input right format of email
-                      </span>
+                      <span id="errBccMail" className="err-email-format"></span>
                     </div>
                   </div>
 
