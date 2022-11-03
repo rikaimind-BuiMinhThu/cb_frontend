@@ -156,6 +156,7 @@ function AddBotchat() {
           if (res.data.code === 1 || res.data.code === '1') {
             setMsgNoti('Add new bot chat successfully!');
             setIsOpenNoti(true);
+            window.location.href = '/admin/bot'
           } else if (res.data?.code === 2 || res.data?.code === '2') {
             setMsgNoti(res.data.message);
             setIsOpenNoti(true);
