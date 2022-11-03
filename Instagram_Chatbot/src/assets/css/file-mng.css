@@ -50,14 +50,12 @@
 }
 
 .file-mng__btn-stop {
-  /* width: 25%; */
   color: #7186a0;
   font-weight: 500;
   border: none;
   background: #ffffff;
 }
 .file-mng__btn-delete {
-  /* width: 25%; */
   color: #f46835;
   font-weight: 700;
   border: none;
@@ -68,8 +66,8 @@
   text-align: center;
 }
 .file-mng__preview_img img {
-  object-fit: cover;
-  max-width: 500px;
-  max-height: 500px;
+  object-fit: contain;
+  width: 300px;
+  height: 300px;
   margin: 10px;
 }
