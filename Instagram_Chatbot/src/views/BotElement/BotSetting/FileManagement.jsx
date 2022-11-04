@@ -42,7 +42,7 @@ function FileManagement() {
   }
 
   function handleSave() {
-    const type = newFile.name.split('.')[1];
+    const type = newFile.name.split('.')[1].toLowerCase();
     const trueFile = ['jpeg', 'jpg', 'png'].includes(type);
     if (trueFile) {
       const file = { user_file: { file_type: type } };
