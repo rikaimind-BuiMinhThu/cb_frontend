@@ -63,8 +63,8 @@ function VariableManagement() {
 
   //save new variable
   function saveNewVar(index) {
-    checkInput(`variable_name_${index}`, `errVarName_${index}`, 'Variavble name');
-    if (checkInput(`variable_name_${index}`, `errVarName_${index}`, 'Variavble name')) {
+    checkInput(`variable_name_${index}`, `errVarName_${index}`, 'Variable name');
+    if (checkInput(`variable_name_${index}`, `errVarName_${index}`, 'Variable name')) {
       let name = document.getElementById(`variable_name_${index}`).value;
       let dfvalue = document.getElementById(`variable_value_${index}`).value;
       let add = { variable: { variable_name: name, default_value: dfvalue } };
@@ -138,8 +138,8 @@ function VariableManagement() {
 
   //funtion update variable
   function updateVariable(id, index) {
-    checkInput(`up_variable_name_${index}`, `errUpVarName_${index}`, 'Variavble name');
-    if (checkInput(`up_variable_name_${index}`, `errUpVarName_${index}`, 'Variavble name')) {
+    checkInput(`up_variable_name_${index}`, `errUpVarName_${index}`, 'Variable name');
+    if (checkInput(`up_variable_name_${index}`, `errUpVarName_${index}`, 'Variable name')) {
       let name = document.getElementById(`up_variable_name_${index}`).value;
       let dfvalue = document.getElementById(`up_variable_value_${index}`).value;
       let editVariable = {
@@ -218,19 +218,19 @@ function VariableManagement() {
                             <input
                               id={`up_variable_name_${i}`}
                               defaultValue={item.variable_name}
-                              placeholder="Please input variavble name"
+                              placeholder="Please input Variable name"
                               onChange={() =>
                                 checkInput(
                                   `up_variable_name_${i}`,
                                   `errUpVarName_${i}`,
-                                  'Variavble name'
+                                  'Variable name'
                                 )
                               }
                               onBlur={() =>
                                 checkInput(
                                   `up_variable_name_${i}`,
                                   `errUpVarName_${i}`,
-                                  'Variavble name'
+                                  'Variable name'
                                 )
                               }
                             />
@@ -268,20 +268,12 @@ function VariableManagement() {
                           <div className="var-form__variable-name">
                             <input
                               id={`variable_name_${i}`}
-                              placeholder="Please input variavble name"
+                              placeholder="Please input Variable name"
                               onChange={() =>
-                                checkInput(
-                                  `variable_name_${i}`,
-                                  `errVarName_${i}`,
-                                  'Variavble name'
-                                )
+                                checkInput(`variable_name_${i}`, `errVarName_${i}`, 'Variable name')
                               }
                               onBlur={() =>
-                                checkInput(
-                                  `variable_name_${i}`,
-                                  `errVarName_${i}`,
-                                  'Variavble name'
-                                )
+                                checkInput(`variable_name_${i}`, `errVarName_${i}`, 'Variable name')
                               }
                             />
                             <span id={`errVarName_${i}`} className="err-varriable"></span>
