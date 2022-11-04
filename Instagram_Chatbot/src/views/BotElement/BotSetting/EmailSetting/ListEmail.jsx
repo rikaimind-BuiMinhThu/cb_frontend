@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { useEffect } from 'react';
 import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 import './../../../../assets/css/bot/email/list-email.css';
@@ -10,9 +10,7 @@ import ModalNoti from 'views/Popup/ModalNoti';
 import Cookies from 'js-cookie';
 import { Pagination } from '@material-ui/lab';
 
-
 function ListEmail() {
-
   const [emailList, setEmailList] = useState([]);
   const [isOpenDuplicate, setIsOpenDuplicate] = useState(false);
   const [idEmail, setIdEmail] = useState();
@@ -24,36 +22,45 @@ function ListEmail() {
   var [page, setPage] = useState(1);
 
   useEffect(() => {
-    var bot_id = Cookies.get('bot_id')
-    api.get(`/api/v1/managements/emails?page=1&chatbot_id=${bot_id}`).then(res => {
-      console.log(res.data);
-      var totalPage = Math.ceil(res.data.total_count / 25);
-      setTotalPage(totalPage);
-      if (res.data.code == 1) {
-        setEmailList(res.data.data);
-      }
-    }).catch(err => {
-      console.log(err);
-    })
-  }, [])
+    var bot_id = Cookies.get('bot_id');
+    api
+      .get(`/api/v1/managements/emails?page=1&chatbot_id=${bot_id}`)
+      .then((res) => {
+        console.log(res.data);
+        var totalPage = Math.ceil(res.data.total_count / 25);
+        setTotalPage(totalPage);
+        if (res.data.code == 1) {
+          setEmailList(res.data.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   function reLoad(pgIndex) {
-    var bot_id = Cookies.get('bot_id')
-    api.get(`/api/v1/managements/emails?page=${pgIndex}&chatbot_id=${bot_id}`).then(res => {
-      var totalPage = Math.ceil(res.data.total_count / 25);
-      if (pgIndex > totalPage) {
-        api.get(`/api/v1/managements/emails?page=${totalPage}&chatbot_id=${bot_id}`).then(res => {
+    var bot_id = Cookies.get('bot_id');
+    api
+      .get(`/api/v1/managements/emails?page=${pgIndex}&chatbot_id=${bot_id}`)
+      .then((res) => {
+        var totalPage = Math.ceil(res.data.total_count / 25);
+        if (pgIndex > totalPage) {
+          api
+            .get(`/api/v1/managements/emails?page=${totalPage}&chatbot_id=${bot_id}`)
+            .then((res) => {
+              setEmailList(res.data.data);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        } else {
           setEmailList(res.data.data);
-        }).catch(err => {
-          console.log(err);
-        })
-      } else {
-        setEmailList(res.data.data);
-      }
-      setTotalPage(totalPage);
-    }).catch(err => {
-      console.log(err);
-    })
+        }
+        setTotalPage(totalPage);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   function openDuplicate(id) {
@@ -62,28 +69,31 @@ function ListEmail() {
   }
 
   function duplicateEmail() {
-    api.post(`/api/v1/managements/emails/${idEmail}/duplicate`).then(res => {
-      if (res.data.code == 1) {
-        setIsOpenDuplicate(false);
-        setIsOpenNoti(true);
-        setMsgNoti(`Dulicate successfully!`);
-        reLoad();
-        setTimeout(() => {
-          setIsOpenNoti(false);
-          setMsgNoti(``);
-        }, 2000)
-      } else if (res.data.code == 2) {
-        setIsOpenDuplicate(false);
-        setIsOpenNoti(true);
-        setMsgNoti(res.data.message);
-        setTimeout(() => {
-          setIsOpenNoti(false);
-          setMsgNoti(``);
-        }, 2000)
-      }
-    }).catch(err => {
-      console.log(err);
-    })
+    api
+      .post(`/api/v1/managements/emails/${idEmail}/duplicate`)
+      .then((res) => {
+        if (res.data.code == 1) {
+          setIsOpenDuplicate(false);
+          setIsOpenNoti(true);
+          setMsgNoti(`Dulicate successfully!`);
+          reLoad();
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+          }, 2000);
+        } else if (res.data.code == 2) {
+          setIsOpenDuplicate(false);
+          setIsOpenNoti(true);
+          setMsgNoti(res.data.message);
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+          }, 2000);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
   function openDelete(id) {
@@ -92,28 +102,31 @@ function ListEmail() {
   }
 
   function deleteEmail() {
-    api.delete(`/api/v1/managements/emails/${idEmail}`).then(res => {
-      if (res.data.code == 1) {
-        setIsOpenDelete(false);
-        setIsOpenNoti(true);
-        setMsgNoti(`Delete successfully!`);
-        reLoad();
-        setTimeout(() => {
-          setIsOpenNoti(false);
-          setMsgNoti(``);
-        }, 2000)
-      } else if (res.data.code == 2) {
-        setIsOpenDelete(false);
-        setIsOpenNoti(true);
-        setMsgNoti(res.data.message);
-        setTimeout(() => {
-          setIsOpenNoti(false);
-          setMsgNoti(``);
-        }, 2000)
-      }
-    }).catch(err => {
-      console.log(err);
-    })
+    api
+      .delete(`/api/v1/managements/emails/${idEmail}`)
+      .then((res) => {
+        if (res.data.code == 1) {
+          setIsOpenDelete(false);
+          setIsOpenNoti(true);
+          setMsgNoti(`Delete successfully!`);
+          reLoad();
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+          }, 2000);
+        } else if (res.data.code == 2) {
+          setIsOpenDelete(false);
+          setIsOpenNoti(true);
+          setMsgNoti(res.data.message);
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti(``);
+          }, 2000);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
   function handleChange(event, value) {
     setPage(parseInt(value));
@@ -131,16 +144,20 @@ function ListEmail() {
             <Card>
               <CardHeader>
                 <h4 style={{ margin: '10px 0' }}>List Email</h4>
-                <button className='btn btn-primary'>Add new email</button>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => (window.location.href = '/admin/create-email')}
+                >
+                  Add new email
+                </button>
               </CardHeader>
               <CardBody>
-                <div className='mail__list'>
-
+                <div className="mail__list">
                   {emailList?.map((item, i) => (
-                    <div className='mail__list-item' key={i}>
+                    <div className="mail__list-item" key={i}>
                       <p>Test</p>
-                      <div className='mail-block'>
-                        <table className='mail-table'>
+                      <div className="mail-block">
+                        <table className="mail-table">
                           <tbody>
                             <tr>
                               <th>From</th>
@@ -154,8 +171,9 @@ function ListEmail() {
                               <th>CC</th>
                               <td>
                                 {item.cc?.map((cc, ic) => (
-                                  <span key={ic} style={{ fontWeight: "400" }}>
-                                    {cc.to} <br /></span>
+                                  <span key={ic} style={{ fontWeight: '400' }}>
+                                    {cc.to} <br />
+                                  </span>
                                 ))}
                               </td>
                               {/* <td>aaa@gmail.com <br />aaab@gmail.com</td> */}
@@ -164,8 +182,9 @@ function ListEmail() {
                               <th>BCC</th>
                               <td>
                                 {item.bcc?.map((bcc, ib) => (
-                                  <span key={ib} style={{ fontWeight: "400" }}>
-                                    {bcc.to} <br /></span>
+                                  <span key={ib} style={{ fontWeight: '400' }}>
+                                    {bcc.to} <br />
+                                  </span>
                                 ))}
                               </td>
                             </tr>
@@ -176,23 +195,41 @@ function ListEmail() {
                           </tbody>
                         </table>
 
-                        <div className='mail-detail'>
-                          <div className='email-detail--subject' type='text' >
-                            <span>Subject: </span>{item.subject}</div>
-                          <div className='mail-detail--text' >
+                        <div className="mail-detail">
+                          <div className="email-detail--subject" type="text">
+                            <span>Subject: </span>
+                            {item.subject}
+                          </div>
+                          <div className="mail-detail--text">
                             <span>Text: </span>
                             <p>{item.content}</p>
                           </div>
                         </div>
 
-                        <div className='mail-actions'>
-                          <button className='mail-actions--btn btn btn-default' onClick={() => { window.location.href = `/admin/edit-email/${item?.id}` }}>Edit</button>
-                          <button className='mail-actions--btn btn btn-success' onClick={() => openDuplicate(item.id)}>Duplication</button>
-                          <button className='mail-actions--btn btn btn-danger' onClick={() => openDelete(item.id)}>Delete</button>
+                        <div className="mail-actions">
+                          <button
+                            className="mail-actions--btn btn btn-default"
+                            onClick={() => {
+                              window.location.href = `/admin/edit-email/${item?.id}`;
+                            }}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            className="mail-actions--btn btn btn-success"
+                            onClick={() => openDuplicate(item.id)}
+                          >
+                            Duplication
+                          </button>
+                          <button
+                            className="mail-actions--btn btn btn-danger"
+                            onClick={() => openDelete(item.id)}
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
                     </div>
-
                   ))}
                 </div>
 
@@ -230,7 +267,7 @@ function ListEmail() {
         </ModalNoti>
       </div>
     </>
-  )
+  );
 }
 
-export default ListEmail
+export default ListEmail;
