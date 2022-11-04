@@ -11,6 +11,7 @@ import Cookies from 'js-cookie';
 import ModalShortTem from "./../Popup/ModalShortTem";
 import ModalShort from '../../views/Popup/ModalShort';
 import ModalNoti from '../../views/Popup/ModalNoti';
+import { tokenExpired } from 'api/tokenExpired';
 
 
 
@@ -42,6 +43,9 @@ function SubUserManagement() {
       }
     }).catch(err => {
       console.log(err);
+      if (err.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -73,6 +77,9 @@ function SubUserManagement() {
       }
     }).catch(err => {
       console.log(err);
+      if (err.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -109,6 +116,9 @@ function SubUserManagement() {
       }
     }).catch(err => {
       console.log(err);
+      if (err.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 

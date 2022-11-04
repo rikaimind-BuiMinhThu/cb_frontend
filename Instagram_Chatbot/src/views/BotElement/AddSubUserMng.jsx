@@ -7,6 +7,7 @@ import { useState } from 'react';
 import Cookies from 'js-cookie';
 import ModalNoti from '../../views/Popup/ModalNoti';
 import * as utils from './../../JS/validate.js'
+import { tokenExpired } from 'api/tokenExpired';
 
 
 
@@ -52,6 +53,9 @@ function AddSubUserMng() {
                 }
             }).catch(err => {
                 console.log(err);
+                if (err.response?.data.code === 0) {
+                    tokenExpired()
+                }
             })
         }
     }

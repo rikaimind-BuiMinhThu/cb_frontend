@@ -272,7 +272,7 @@ function Sidebar(props) {
                   </NavLink>
 
                 </li>
-                <li className={activeRoute('plan-selection') + (true ? " active-pro" : "")} key={'plan-selection'}>
+                {/* <li className={activeRoute('plan-selection') + (true ? " active-pro" : "")} key={'plan-selection'}>
                   <NavLink to="/admin/plan-selection" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
                     <p style={{ color: "black" }}>Plan Selection</p>
@@ -289,7 +289,7 @@ function Sidebar(props) {
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
                     <p style={{ color: "black" }}>Payment History</p>
                   </NavLink>
-                </li>
+                </li> */}
               </ul>
             </li>
 

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Login from './Login';
 import Admin from '../../layouts/Admin';
 import { BrowserRouter, Route, Switch, Redirect, Link } from "react-router-dom";
+import HtmlScreen from 'views/HtmlScreen';
 class App extends Component {
   render() {
     return (
@@ -16,6 +17,8 @@ class App extends Component {
             <Link to="/admin/dashboard">Dashboard</Link>
           </div> */}
           <Switch>
+            <Route exact path="/" component={Login} />
+            <Route exact path="/top" component={HtmlScreen} />
             <Route exact path="/" component={Login} />
             <Route path="/sign-in" component={Login} />
             <Route path="/admin" render={(props) => <Admin {...props} />} />

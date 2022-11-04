@@ -62,6 +62,7 @@ import WithdrawalPrevention from "views/BotElement/BotSetting/AdvanceSetting/Wit
 import BotAdmin from "views/BotElement/BotSetting/AdvanceSetting/BotAdmin";
 import FileManagement from "views/BotElement/BotSetting/FileManagement";
 import AddSubUserMng from "views/BotElement/AddSubUserMng";
+import HtmlScreen from "views/HtmlScreen";
 
 var routes = [
   {
@@ -124,7 +125,7 @@ var routes = [
     path: "/policy",
     name: "Policy",
     // icon: "nc-icon nc-bell-55",
-    component: Policy,
+    component: HtmlScreen,
     layout: "/admin",
   },
   {
