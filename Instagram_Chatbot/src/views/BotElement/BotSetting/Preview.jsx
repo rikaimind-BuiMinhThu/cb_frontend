@@ -74,6 +74,8 @@ let dataEveryMinute = [
   },
 ];
 
+let SCAN_REGEX = /\{\{(.*?)\}\}/g;
+
 function Preview({ onOpenPreview, isOpen, scenarioId }) {
 
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
@@ -83,6 +85,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
   const [renderMessageArr, setRenderMessageArr] = useState([]);
   const [messageBot, setMessageBot] = useState([]);
   const [errors, setErrors] = useState({});
+  const [variables, setVariables] = useState([]);
 
   useEffect(() => {
     api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
@@ -101,6 +104,8 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
           let messageArr = [...res.data.data?.conversation?.messages];
           console.log(messageArr, 'check messageArr');
           setDataMessages(messageArr);
+          console.log(res.data.variables, 'checjehckjhekjc')
+          setVariables([...res.data.variables]);
           let renderMessage = [];
           let index;
           let delayRender;
@@ -206,7 +211,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
   // }, [indexMessageRender])
 
   const stringNullOrEmpty = (string) => {
-    if (string === undefined || string === null || string === "") return true
+    if (string === undefined || string === null || (string && (string + "")?.trim() === "") || string === "") return true
     return false
   }
 
@@ -214,58 +219,89 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
     let contentArr = [...dataMessages[indexMessageRender].message_content];
     let isValid = true;
     let errors = {};
-    let isValidSum = true;
 
     let messageError = "These are required fields."
     for (let i = 0; i < contentArr.length; i++) {
       let contentType = contentArr[i][contentArr[i].type];
       if (contentType.require) {
-        console.log(contentType)
-        if (contentType.type === 'text') {
+        console.log(contentArr[i])
+        let limitFrom = contentType[contentType.type]?.character_limit_from;
+        let limitTo = contentType[contentType.type]?.character_limit_to;
+        if (contentType.type === 'text' || contentType.type === 'password') {
           if (contentType[contentType.type].isSplitInput) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
+              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              isValid = false;
+            } else if (contentType[contentType.type].valueLeft.length < limitFrom
+              || contentType[contentType.type].valueLeft.length > limitTo
+              || contentType[contentType.type].valueRight.length < limitFrom
+              || contentType[contentType.type].valueRight.length > limitTo) {
+              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          } else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
             isValid = false;
           }
         } else if (contentType.type === 'phone_number') {
           if (contentType[contentType.type].withHyphen) {
             if (stringNullOrEmpty(contentType[contentType.type].value1) || stringNullOrEmpty(contentType[contentType.type].value2)) {
+              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'email_confirmation' || contentType.type === 'password_confirmation') {
+          let limitFrom = contentType[contentType.type]?.character_limit_from;
+          let limitTo = contentType[contentType.type]?.character_limit_to;
           if (stringNullOrEmpty(contentType[contentType.type].value) || stringNullOrEmpty(contentType[contentType.type].valueConfirm)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          } else if (contentType.type === 'password_confirmation' &&
+            (contentType[contentType.type].value.length < limitFrom
+              || contentType[contentType.type].value.length > limitTo
+              || contentType[contentType.type].valueConfirm.length < limitFrom
+              || contentType[contentType.type].valueConfirm.length > limitTo)) {
+            console.log('asdhkjahdkjashdjkashdjkashd')
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
             isValid = false;
           }
         } else if (contentType.type === 'customization') {
           if (contentType[contentType.type].is_comment) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
+              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'time_hm') {
           if (stringNullOrEmpty(contentType[contentType.type].valueHour) || stringNullOrEmpty(contentType[contentType.type].valueMinute)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_ymd'
           || contentType.type === 'dob_ymd') {
           if (stringNullOrEmpty(contentType[contentType.type].valueYear) || stringNullOrEmpty(contentType[contentType.type].valueMonth)
             || stringNullOrEmpty(contentType[contentType.type].valueDay)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_md') {
           if (stringNullOrEmpty(contentType[contentType.type].valueMonth) || stringNullOrEmpty(contentType[contentType.type].valueDay)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_ym'
           || contentType.type === 'dob_ym') {
           if (stringNullOrEmpty(contentType[contentType.type].valueYear) || stringNullOrEmpty(contentType[contentType.type].valueMonth)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_ymd_hm') {
@@ -274,6 +310,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
             || stringNullOrEmpty(contentType[contentType.type].valueDay)
             || stringNullOrEmpty(contentType[contentType.type].valueHour)
             || stringNullOrEmpty(contentType[contentType.type].valueMinutes)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'timezone_from_to') {
@@ -281,6 +318,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
             || stringNullOrEmpty(contentType[contentType.type].valueMinutes1)
             || stringNullOrEmpty(contentType[contentType.type].valueHour2)
             || stringNullOrEmpty(contentType[contentType.type].valueMinutes2)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'period_from_to') {
@@ -290,11 +328,13 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
             || stringNullOrEmpty(contentType[contentType.type].valueYear2)
             || stringNullOrEmpty(contentType[contentType.type].valueMonth2)
             || stringNullOrEmpty(contentType[contentType.type].valueDay2)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'up_to_municipality') {
           if (stringNullOrEmpty(contentType[contentType.type].prefecture)
             || stringNullOrEmpty(contentType[contentType.type].city)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'zip_code_address') {
@@ -302,56 +342,125 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
             if (contentType.split_postal_code) {
               if (stringNullOrEmpty(contentType.value_post_code_left)
                 || stringNullOrEmpty(contentType.value_post_code_right)) {
+                errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
                 isValid = false;
               }
             } else if (stringNullOrEmpty(contentType.value_post_code)) {
+              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
             }
           }
           if (contentType.prefecture && stringNullOrEmpty(contentType.value_prefecture)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
           if (contentType.municipality && stringNullOrEmpty(contentType.value_municipality)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
           if (contentType.address && stringNullOrEmpty(contentType.value_address)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
           if (contentType.building_name && stringNullOrEmpty(contentType.value_building_name)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
           if (isValid === false) {
             errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = true;
-            isValidSum = false;
+            isValid = false;
           }
         } else if (contentArr[i].type === 'attaching_file') {
-
+          if (stringNullOrEmpty(contentType.content)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
         } else if (contentArr[i].type === 'agree_term') {
           if (stringNullOrEmpty(contentType.isAgree) || contentType.isAgree === false) {
             errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
-            isValidSum = false;
+            isValid = false;
           }
+        } else if (contentArr[i].type === 'radio_button') {
+          console.log(contentType, 'checkkkkk')
+          if (stringNullOrEmpty(contentType.initial_selection)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === 'checkbox') {
+          console.log(contentType, 'checkkkkk')
+          if (contentType.checkedValue && contentType.checkedValue.length === 0) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          } else if ((contentType.selection_limit_from || contentType.selection_limit_to) && (contentType.checkedValue.length < parseInt(contentType.selection_limit_from) || contentType.checkedValue.length > parseInt(contentType.selection_limit_to))) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select from ${contentType.selection_limit_from} to ${contentType.selection_limit_to} for this item.`;
+            isValid = false;
+          }
+        } else if (contentType.type === 'invalid_input') {
+
         } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+          isValid = false;
+        } else if ((limitFrom || limitTo) && (contentType[contentType.type]?.value?.length < limitFrom || contentType[contentType.type]?.value?.length > limitTo)) {
+          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
           isValid = false;
         }
       }
-      if (!isValid) {
-        errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
-        isValidSum = false;
-      } else {
-        errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = '';
+      if (contentType[contentType.type].range && contentType[contentType.type].range !== 'no_input'
+        && (!stringNullOrEmpty(contentType[contentType.type].value) || !stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))) {
+        let REGEX_CHECK;
+        let messageLog = '';
+        switch (contentType[contentType.type].range) {
+          case 'alphabet':
+            REGEX_CHECK = /[^A-Za-z ]+/;
+            messageLog = "Only alphabets are allowed.";
+            break;
+          case 'single_byte':
+            REGEX_CHECK = /[^0-9 ]+/;
+            messageLog = "Please enter a number.";
+            break;
+          case 'alphanumeric_hyphen':
+            REGEX_CHECK = /[^A-Za-z0-9-_ ]+/;
+            messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9'), hyphens and underscores ('-', '_') can be used.";
+            break;
+          case 'alphanumeric':
+            REGEX_CHECK = /[^A-Za-z0-9 ]+/;
+            messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.";
+            break;
+          default:
+            REGEX_CHECK = "";
+            break;
+        }
+        if (REGEX_CHECK !== "" && (REGEX_CHECK.test(contentType[contentType.type].valueLeft)
+          || REGEX_CHECK.test(contentType[contentType.type].valueRight)
+          || REGEX_CHECK.test(contentType[contentType.type].value))) {
+          isValid = false;
+          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
+        } else if ((contentType[contentType.type].range === 'double_byte'
+          || contentType[contentType.type].range === 'full_width_katakana'
+          || contentType[contentType.type].range === 'double_byte_hiragana')
+          && ucs2ToBinaryString(contentType[contentType.type].value).length === contentType[contentType.type].value.length * 3) {
+          isValid = false;
+          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
+        }
       }
-      isValid = true;
     }
-    // if (!isValid) {
-    //   errors[`error_${indexMessageRender}`] = 'These are required fields.';
-    // } else {
-    //   errors[`error_${indexMessageRender}`] = '';
-    // }    
+    if (isValid) {
+      errors = {};
+    }
     console.log(errors)
     setErrors(errors);
-    return isValidSum;
+    return isValid;
+  }
+
+  function ucs2ToBinaryString(str) {
+    var escstr = encodeURIComponent(str)
+    var binstr = escstr.replace(/%([0-9A-F]{2})/ig, function (match, hex) {
+      var i = parseInt(hex, 16)
+      return String.fromCharCode(i)
+    })
+    console.log(binstr);
+    return binstr
   }
 
   const onClickNext = (indexMessage) => {
@@ -360,21 +469,31 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
     }
     renderMessageArr[indexMessage].disabled = true;
     let renderMessage = [...renderMessageArr];
-    let delayRender;
     let index;
-
-    console.log(dataMessages, indexMessage, indexMessageRender);
+    let delayRender;
+    // let REGEX = /\{\{(.*?)\}\}/ig;
     if (!dataMessages[indexMessageRender + 1]) return;
     if (dataMessages[indexMessageRender + 1].belong_to === 'bot') {
       for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
         if (dataMessages[i].belong_to === 'bot') {
           let promise = new Promise((resolve) => {
             return delayRender = setTimeout(() => {
+              console.log(dataMessages[i])
+              if (dataMessages[i].message_content[0].type === 'text_input') {
+                dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                  console.log(variable)
+                  for (let j = 0; j < variables.length; j++) {
+                    if (variables[j].variable_name === variable) {
+                      return variables[j].default_value;
+                    }
+                  }
+                })
+              }
+
               resolve({ ...dataMessages[i] });
             }, (i - indexMessageRender) * 1000);
           })
           promise.then(data => {
-            console.log(data, 'check dataaaa2');
             renderMessage.push(data);
             setRenderMessageArr([
               ...renderMessage
@@ -389,7 +508,6 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
             }, (i - indexMessageRender) * 1000);
           })
           promise.then(data => {
-            console.log(data, 'check dataaaa2');
             renderMessage.push(data);
             setRenderMessageArr([
               ...renderMessage
@@ -428,6 +546,14 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
         dataMessages[indexMessageRender].message_content[indexContent][contentType] = {}
       }
       dataMessages[indexMessageRender].message_content[indexContent][contentType][field] = value;
+    }
+
+    if (dataMessages[indexMessageRender].message_content[indexContent][contentType].is_save_input_content) {
+      variables.forEach(item => {
+        if (dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content === item.variable_name) {
+          item.default_value = value;
+        }
+      })
     }
     setDataMessages([...dataMessages]);
   }
@@ -475,18 +601,17 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                   {message.belong_to === 'user' &&
                     <div className="cp-body-user-side">
                       <div className="cp-body-user-side-messages">
+                        {
+                          console.log(message, 'check messss')
+                        }
                         <UserMessage
-                          messageContent={message.message_content}
+                          messageContentProps={message.message_content}
                           disabled={message.disabled}
                           onChangeValue={(indexContent, contentType, value, field, subFiled) => onChangeValue(indexContent, contentType, value, field, subFiled)}
                           indexMessageRender={indexMessageRender}
-                          errors={errors}
+                          indexMessage={indexMessage}
+                          errorsProps={errors}
                         />
-                        {/* {errors[`error_${indexMessageRender}`] &&
-                          <div style={{ color: '#FF7E00', fontSize: '12px', marginTop: '-8px', marginBottom: '10px' }}>
-                            {errors[`error_${indexMessageRender}`]}
-                          </div>
-                        } */}
                         {message?.message_content.length !== 0 &&
                           <div className="ss-user-message__action-wrapper">
                             <Button disabled={message.disabled} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
@@ -567,12 +692,25 @@ const BotMessage = ({ content, index, botInfor }) => {
   )
 }
 
-const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMessageRender, errors }) => {
+const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
   const [dataCity, setDataCity] = useState([]);
   const [dataPrefectures, setDataPrefectures] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
+  const [messageContent, setMessageContent] = useState(messageContentProps);
+  const [errors, setErrors] = useState(errorsProps);
+
+  const [checked, setChecked] = useState([]);
+
+  useEffect(() => {
+    setErrors(errorsProps);
+  }, [errorsProps])
+
+  useEffect(() => {
+    console.log(messageContentProps);
+    setMessageContent(messageContentProps);
+  }, [messageContentProps])
 
   useEffect(() => {
     api.get(`/api/v1/prefectures`).then((res) => {
@@ -582,12 +720,77 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
   }, [])
 
   const onChangeValueCheckbox = (indexContent, contentType, value, field) => {
-    messageContent[indexContent][contentType][field] = value;
+
+    setChecked(prev => {
+      const isChecked = checked.includes(value);
+      if (isChecked) {
+        messageContent[indexContent][contentType][field] = [...checked.filter(item => item !== value)];
+        setMessageContent([...messageContent])
+        return checked.filter(item => item !== value);
+      } else {
+        messageContent[indexContent][contentType][field] = [...prev, value];
+        setMessageContent([...messageContent])
+        return [...prev, value];
+      }
+    })
+
+
+  }
+
+  function botUploadFile() {
+    document.getElementById('ss-bot-file-upload').click();
+  }
+
+  function getBaseUrl(event, indexContent) {
+    var file = document.querySelector('input[type=file]')['files'][0];
+    const type = file.name.slice(file.name.lastIndexOf('.') + 1);
+    if (!messageContent[indexContent].attaching_file.file_type.includes(type)) {
+      errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = `Please specify a ${messageContent[indexContent].attaching_file.file_type.join(", ")} type file for the file.`;
+      setErrors({ ...errors })
+      return;
+    } else {
+      errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = ""
+    }
+    // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
+    // var reader = new FileReader(file);
+    console.log(file)
+
+    messageContent[indexContent].attaching_file.content = file.name;
+    setMessageContent([...messageContent]);
+    // var baseString;
+    // var imgUrl = URL.createObjectURL(event.target.files[0]);
+    // if (
+    //   file?.type === 'image/png' ||
+    //   file?.type === 'image/jpeg' ||
+    //   file?.type === 'image/jpg' ||
+    //   file?.type === 'image/gif' ||
+    //   file?.type === 'image/img'
+    // ) {
+    //   document.getElementById(`bot-file-upload-img`).style.display = 'block';
+    //   document.getElementById(`bot-file-upload-img`).src = imgUrl;
+    // } else {
+    //   document.getElementById(`bot-file-upload-img`).style.display = 'none';
+    //   document.getElementById(`bot-file-upload-img`).src = '';
+    // }
+
+    // reader.onloadend = function () {
+    //   baseString = reader.result;
+    //   // setInputImage(baseString);
+    //   // document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
+    //   if (baseString !== undefined || baseString !== '') {
+    //     // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
+    //     console.log(baseString)
+
+    //   }
+
+    // };
+    // reader.readAsDataURL(file);
   }
 
   return (
     <div className="ss-user-message__content-wrapper">
-      {messageContent.map((content, indexContent) => {
+      {console.log(messageContent)}
+      {messageContent?.map((content, indexContent) => {
         let textInput = content.text_input;
         let label = content.label;
         let textarea = content.textarea;
@@ -759,6 +962,7 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                         value={textInput[textInput.type]?.valueConfirm}
                       ></input> */}
                       <InputCustom
+                        style={{ marginBottom: '5px' }}
                         disabled={disabled}
                         placeholder={textInput[textInput.type].password}
                         onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
@@ -808,7 +1012,7 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                           {textarea.title}
                         </span>
                       }
-                      {textarea.require === true &&
+                      {textarea.require === true && textarea?.type === 'text_input' &&
                         <span className="ss-message__content--user-text-input-required">
                           * required
                         </span>
@@ -859,10 +1063,9 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                           <input
                             disabled={disabled}
                             type="radio"
-                            name="ss-message__content--user-radio_button"
                             id="ss-message__content--user-radio_button"
-                            checked={radioButton.value ? radioButton.value === item.id : radioButton.initial_selection === item.id}
-                            onChange={() => onChangeValue(indexContent, content.type, item.id, 'value')}
+                            checked={radioButton.initial_selection === item.id}
+                            onChange={() => onChangeValue(indexContent, content.type, item.id, 'initial_selection')}
                           />
                           {item.text &&
                             <label htmlFor="ss-message__content--user-radio_button">
@@ -880,8 +1083,8 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                             type="radio"
                             name="ss-message__content--user-radio_button--radio_button_img"
                             id="ss-message__content--user-radio_button--radio_button_img"
-                            checked={radioButton.value === item.id}
-                            onChange={() => onChangeValue(indexContent, content.type, item.id, 'value')}
+                            checked={radioButton.initial_selection === item.id}
+                            onChange={() => onChangeValue(indexContent, content.type, item.id, 'initial_selection')}
                           />
                           <img
                             src={item.img}
@@ -921,7 +1124,12 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                     )}
                     {radioButton.type === 'block_style' && (
                       radioButton[radioButton.type].map((item, index) => {
-                        return item.text && <div style={{ marginBottom: '10px' }} key={index} className="ss-message__content--user-radio_button--block_style">
+                        return item.text && <div
+                          style={{ marginBottom: '10px', cursor: 'pointer', backgroundColor: radioButton.value ? (radioButton.value === item.id ? '#347AED' : '') : (radioButton.initial_selection === item.id ? '#347AED' : '') }}
+                          key={index}
+                          className="ss-message__content--user-radio_button--block_style"
+                          onClick={() => onChangeValue(indexContent, content.type, item.id, 'initial_selection')}
+                        >
                           <span>{item.text}</span>
                         </div>
                       })
@@ -957,13 +1165,19 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                     {checkbox.type === 'default' && (
                       checkbox[checkbox.type].map((item, index) => {
                         return <div key={index} className="ss-message__content--user-checkbox">
-                          <input
+                          {/* <input
                             disabled={disabled}
                             type="checkbox"
                             name="ss-message__content--user-checkbox"
                             id="ss-message__content--user-checkbox"
                           // onChange={() => onChangeValueCheckbox(indexContent, content.type, item.id, 'value')}
                           // value={checkbox.checkedValue.includes(item.id)}
+                          /> */}
+                          <CheckboxCustom
+                            disabled={disabled}
+                            onChange={() => onChangeValueCheckbox(indexContent, content.type, item.id, 'checkedValue')}
+                            value={checkbox.checkedValue.includes(item.id)}
+                            isOnChange={false}
                           />
                           <label htmlFor="ss-message__content--user-checkbox">
                             {item.text}
@@ -976,7 +1190,7 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                         return <div key={index} className="ss-message__content--user-checkbox--checkbox_img" style={{ marginBottom: '10px' }}>
                           <CheckboxCustom
                             disabled={disabled}
-                            onChange={() => onChangeValueCheckbox(indexContent, content.type, item.id, 'value')}
+                            onChange={() => onChangeValueCheckbox(indexContent, content.type, item.id, 'checkedValue')}
                             value={checkbox.checkedValue.includes(item.id)}
                             isOnChange={false}
                           />
@@ -1013,9 +1227,9 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                       </>
                     )}
                   </div>
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${checkbox.type}`] &&
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${checkbox.type}`]}
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -1103,7 +1317,7 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
                               disabled={disabled}
-                              data={dataHour}
+                              data={dataHour.filter(item => item.value >= (pullDown[pullDown.type].start_at || "1") && item.value <= (pullDown[pullDown.type].end_at || "24"))}
                               placeholder="Time"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour')}
@@ -1134,7 +1348,7 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                             <div className="" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                               <SelectCustom
                                 disabled={disabled}
-                                data={dataYear}
+                                data={dataYear.filter(item => item.value >= (pullDown[pullDown.type].start_year || "1935") && item.value <= (pullDown[pullDown.type].end_year || "2072"))}
                                 placeholder="Year"
                                 style={{ width: '32%' }}
                                 onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear')}
@@ -1203,7 +1417,7 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                             <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <SelectCustom
                                 disabled={disabled}
-                                data={dataYear}
+                                data={dataYear.filter(item => item.value >= (pullDown[pullDown.type].start_year || "1935") && item.value <= (pullDown[pullDown.type].end_year || "2072"))}
                                 placeholder="Year"
                                 style={{ width: '32%' }}
                                 onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear')}
@@ -1233,7 +1447,7 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                             <SelectCustom
                               disabled={disabled}
-                              data={dataYear}
+                              data={dataYear.filter(item => item.value >= (pullDown[pullDown.type].start_year || "1935") && item.value <= (pullDown[pullDown.type].end_year || "2072"))}
                               placeholder="Year"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear')}
@@ -1257,7 +1471,7 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                             />
                             <SelectCustom
                               disabled={disabled}
-                              data={dataHour}
+                              data={dataHour.filter(item => item.value >= (pullDown[pullDown.type].start_at || "1") && item.value <= (pullDown[pullDown.type].end_at || "24"))}
                               placeholder="Time"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour')}
@@ -1287,7 +1501,7 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
                               disabled={disabled}
-                              data={dataHour}
+                              data={dataHour.filter(item => item.value >= (pullDown[pullDown.type].start_at || "1") && item.value <= (pullDown[pullDown.type].end_at || "24"))}
                               placeholder="Time"
                               style={{ width: '49%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour1')}
@@ -1306,7 +1520,7 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
                               disabled={disabled}
-                              data={dataHour}
+                              data={dataHour.filter(item => item.value >= (pullDown[pullDown.type].start_at || "1") && item.value <= (pullDown[pullDown.type].end_at || "24"))}
                               placeholder="Time"
                               style={{ width: '49%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour2')}
@@ -1336,7 +1550,7 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
                               disabled={disabled}
-                              data={dataYear}
+                              data={dataYear.filter(item => item.value >= (pullDown[pullDown.type].start_year || "1935") && item.value <= (pullDown[pullDown.type].end_year || "2072"))}
                               placeholder="Year"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear1')}
@@ -1363,7 +1577,7 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
                               disabled={disabled}
-                              data={dataYear}
+                              data={dataYear.filter(item => item.value >= pullDown[pullDown.type].start_year && item.value <= pullDown[pullDown.type].end_year)}
                               placeholder="Year"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear2')}
@@ -1575,9 +1789,21 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                       }
                     </div>
                   }
-                  {!attachingFile.file_content && <span style={{ fontWeight: '400', fontSize: '12px' }}>Not selected</span>}
                   <div className="ss-message__content--user-attaching_file">
-                    <Button className="ss-message__content--user-attaching_file-btn" style={{ backgroundColor: '#A3B1BF', marginTop: '0px' }}>
+                    <InputCustom
+                      value={attachingFile.content}
+                      disabled={disabled}
+                    />
+                    <input
+                      type="file"
+                      id="ss-bot-file-upload"
+                      name="bot-file-upload"
+                      hidden
+                      onChange={(e) => getBaseUrl(e, indexContent)}
+                    />
+                    <Button id={`sp-button-upload-${indexContent}`} className="ss-message__content--user-attaching_file-btn" style={{ backgroundColor: '#A3B1BF', marginTop: '3px', width: '100%' }}
+                      disabled={disabled}
+                      onClick={botUploadFile}>
                       Select file
                     </Button>
                   </div>
@@ -1719,9 +1945,9 @@ const UserMessage = ({ messageContent, onChangeValue, disabled = false, indexMes
                       />
                     </div>
                   )}
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${agreeTerm.type}`] &&
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${agreeTerm.type}`]}
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>

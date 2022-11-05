@@ -5,7 +5,6 @@ import 'antd/dist/antd.css';
 const { Option } = Select;
 
 const SelectCustom = ({ id, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label, disabled = false }) => {
-
   return (
     <React.Fragment>
       {label && <span style={{ marginRight: '2%', fontSize: '14px', fontWeight: '400' }}>{label}</span>}
@@ -19,7 +18,7 @@ const SelectCustom = ({ id, data, value, onChange, keyValue = "key", style, plac
         disabled={disabled}
       >
         {
-          data && data.map((item, index) => {
+          data && data.map((item, index) => {            
             return (item[keyValue] || item[nameValue]) && <Option key={index} value={item[keyValue]}>{item[nameValue]}</Option>
           })
         }

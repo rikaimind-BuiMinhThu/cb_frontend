@@ -1182,6 +1182,21 @@ input#ss-message__content--user-checkbox--checkbox_img {
 .ss-user-setting-input-limit-character {
   width: 20%;
   margin-left: 10px;
+  padding: 3px 0px 0px;
+  height: 36px;
+}
+
+.ss-user-setting-input-limit-character:hover {
+  border-color: gray!important;
+}
+
+.ss-user-setting-input-limit-character:focus {
+  border-color: gray!important;
+  box-shadow: none!important;
+}
+
+.ant-input-number-focused {
+  box-shadow: none!important;
 }
 
 .ss-user-setting-item-textarea-lable {
@@ -1356,14 +1371,14 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-bot-setting-condition-header-left .fa-question-circle {
-  font-size: 20px!important;
+  font-size: 20px !important;
   font-weight: 300;
 }
 
 .ss-bot-setting-condition-header-right {}
 
 .ss-bot-setting-condition-header-right .fas {
-  font-size: 35px!important;
+  font-size: 35px !important;
   color: #7185A0;
 }
 
@@ -1453,8 +1468,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
   width: 90%
 }
 
-.ss-user-setting-item-pull-down-drag {
-}
+.ss-user-setting-item-pull-down-drag {}
 
 .ss-popup-add-variable-input-close-button {
   background-color: #fff;
@@ -1463,12 +1477,11 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-popup-file-reference-scenario {
-  width: 700px;
+  width: 919px;
 }
 
 
-.fr-popup-container {
-}
+.fr-popup-container {}
 
 .fr-popup-header {
   display: flex;
@@ -1490,12 +1503,13 @@ input#ss-message__content--user-checkbox--checkbox_img {
 
 .fr-popup-body {
   min-height: 350px;
-  max-height: 600px;
+  max-height: 500px;
   display: flex;
   flex-wrap: wrap;
-  padding-top: 30px;
+  padding: 5px 2px;
+  margin-top: 25px;
   overflow-x: auto;
-  justify-content: space-around;
+  justify-content: flex-start;
 }
 
 .fr-popup-body-container {
@@ -1503,6 +1517,8 @@ input#ss-message__content--user-checkbox--checkbox_img {
   height: 220px;
   padding: 10px 0px;
   border: 1px solid #C7D0D9;
+  margin-bottom: 8px;
+  margin-right: 5px;
 }
 
 .fr-popup-body-img {

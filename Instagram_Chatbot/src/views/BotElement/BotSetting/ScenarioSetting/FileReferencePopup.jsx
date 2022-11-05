@@ -45,6 +45,7 @@ function FileReferencePopup({ onCancel, onReferFile }) {
                                 console.log(item.file_url === fileChose)
                                 return (
                                     <div
+                                        key={index}
                                         className="fr-popup-body-container"
                                         onClick={() => setFileChose(item.file_url)}
                                         style={fileChose === item.file_url ? { boxShadow: '0 0 5px 5px #93D8FE', border: '1px solid #337BED' } : {}}
