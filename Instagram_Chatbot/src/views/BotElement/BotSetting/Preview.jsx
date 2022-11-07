@@ -74,6 +74,8 @@ let dataEveryMinute = [
   },
 ];
 
+let SCAN_REGEX = /\{\{(.*?)\}\}/g;
+
 function Preview({ onOpenPreview, isOpen, scenarioId }) {
 
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
@@ -82,6 +84,8 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
   const [indexMessageRender, setIndexMessageRender] = useState(0);
   const [renderMessageArr, setRenderMessageArr] = useState([]);
   const [messageBot, setMessageBot] = useState([]);
+  const [errors, setErrors] = useState({});
+  const [variables, setVariables] = useState([]);
 
   useEffect(() => {
     api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
@@ -94,75 +98,103 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
 
   useEffect(() => {
     if (scenarioId) {
-      api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`).then(res => {
+      api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/preview`).then(res => {
         console.log(res.data);
         if (res.data.code == 1) {
           let messageArr = [...res.data.data?.conversation?.messages];
           console.log(messageArr, 'check messageArr');
           setDataMessages(messageArr);
+          console.log(res.data.variables, 'checjehckjhekjc')
+          setVariables([...res.data.variables]);
           let renderMessage = [];
           let index;
           let delayRender;
 
           for (let i = 0; i < messageArr.length; i++) {
-            console.log(messageArr[i])
             if (messageArr[0].belong_to === 'bot') {
+              console.log(messageArr[i], 'check messageArr[i]');
               if (messageArr[i]?.message_content[0].type === 'delay') {
-                console.log(parseInt(messageArr[i]?.message_content[0].delay.content.split(' ')[0]))
-                let promise = new Promise((resolve) => (
-                  delayRender = setTimeout(() => {
-                    resolve({ ...messageArr[i + 1] })
-                  }, parseInt(messageArr[i]?.message_content[0].delay.content.split(' ')[0]) * 1000)
-                ))
-                promise.then(res => {
-                  console.log(res)
-                  // renderMessage.push(res);         
-                  console.log(i)
-                  setRenderMessageArr([
-                    ...renderMessage,
-                    res
-                  ]);
-                  renderMessage.push(res);
-                  index = i;
-                  console.log(i);
-                  return renderMessage;
-                }).then((renderMessage) => {
-                  console.log(renderMessage);
-                  for (let j = i + 1; j < messageArr.length; j++) {
-                    console.log(messageArr[i], 'check messageArr[i]');
-                    if (messageArr[j].belong_to !== 'bot') {
-                      renderMessage.push(messageArr[j]);
-                      index = i;
-                      break;
-                    } else {
-                      renderMessage.push(messageArr[i]);
-                    }
-                  }
-                  setRenderMessageArr(renderMessage);
+                let promise = new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    resolve();
+                  }, (parseInt(messageArr[i]?.message_content[0].delay.content.split(' ')[0]) * 1000 + (i + 1) * 1000) || 2000);
                 });
-                break;
-                // setIndexMessageRender(i);
+                index = i;
+                console.log(parseInt(messageArr[i]?.message_content[0].delay.content.split(' ')[0]) * 1000 + (i + 1) * 1000)
+                // promise.then(data => {
+                //   console.log(data, 'check dataaaa1');
+                //   renderMessage.push(data);
+                //   setRenderMessageArr([
+                //     ...renderMessage
+                //   ]);
+                // })
               } else if (messageArr[i].belong_to !== 'bot') {
-                renderMessage.push(messageArr[i]);
+                let promise = new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    resolve({ ...messageArr[i] });
+                  }, (i + 1) * 1000);
+                })
+                promise.then(data => {
+                  renderMessage.push(data);
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
+                })
                 index = i;
                 break;
               } else {
-                renderMessage.push(messageArr[i]);
+                let promise = new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    resolve({ ...messageArr[i] });
+                  }, (i + 1) * 1000);
+                })
+                promise.then(data => {
+                  console.log(data, 'check dataaaa3');
+                  renderMessage.push(data);
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
+                })
+                index = i;
               }
             } else if (messageArr[0].belong_to === 'user') {
               if (messageArr[i].belong_to !== 'user') {
-                renderMessage.push(messageArr[i]);
+                let promise = new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    resolve({ ...messageArr[i] });
+                  }, (i + 1) * 1000);
+                })
+                promise.then(data => {
+                  console.log(data, 'check dataaaa4');
+                  renderMessage.push(data);
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
+                })
+                index = i;
+              } else {
+                let promise = new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    resolve({ ...messageArr[i] });
+                  }, (i + 1) * 1000);
+                })
+                promise.then(data => {
+                  console.log(data, 'check dataaaa5');
+                  renderMessage.push(data);
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
+                })
                 index = i;
                 break;
-              } else {
-                renderMessage.push(messageArr[i]);
               }
             }
           }
+
           console.log(renderMessage);
 
           setIndexMessageRender(index);
-          setRenderMessageArr(renderMessage);
+          // setRenderMessageArr(renderMessage);
           return () => {
             clearTimeout(delayRender);
           }
@@ -171,37 +203,359 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
     }
   }, [scenarioId])
 
-  useEffect(() => {
-    console.log(indexMessageRender, 'chcek indexMessageRender', renderMessageArr)
-    if (indexMessageRender && indexMessageRender !== 0) {
+  // useEffect(() => {
+  //   console.log(indexMessageRender, 'chcek indexMessageRender', renderMessageArr)
+  //   if (indexMessageRender && indexMessageRender !== 0) {
 
+  //   }
+  // }, [indexMessageRender])
+
+  const stringNullOrEmpty = (string) => {
+    if (string === undefined || string === null || (string && (string + "")?.trim() === "") || string === "") return true
+    return false
+  }
+
+  const handleValidateField = () => {
+    let contentArr = [...dataMessages[indexMessageRender].message_content];
+    let isValid = true;
+    let errors = {};
+
+    let messageError = "These are required fields."
+    for (let i = 0; i < contentArr.length; i++) {
+      let contentType = contentArr[i][contentArr[i].type];
+      if (contentType.require) {
+        console.log(contentArr[i])
+        let limitFrom = contentType[contentType.type]?.character_limit_from;
+        let limitTo = contentType[contentType.type]?.character_limit_to;
+        if (contentType.type === 'text' || contentType.type === 'password') {
+          if (contentType[contentType.type].isSplitInput) {
+            if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
+              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              isValid = false;
+            } else if (contentType[contentType.type].valueLeft.length < limitFrom
+              || contentType[contentType.type].valueLeft.length > limitTo
+              || contentType[contentType.type].valueRight.length < limitFrom
+              || contentType[contentType.type].valueRight.length > limitTo) {
+              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+              isValid = false;
+            }
+          } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          } else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+            isValid = false;
+          }
+        } else if (contentType.type === 'phone_number') {
+          if (contentType[contentType.type].withHyphen) {
+            if (stringNullOrEmpty(contentType[contentType.type].value1) || stringNullOrEmpty(contentType[contentType.type].value2)) {
+              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              isValid = false;
+            }
+          } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'email_confirmation' || contentType.type === 'password_confirmation') {
+          let limitFrom = contentType[contentType.type]?.character_limit_from;
+          let limitTo = contentType[contentType.type]?.character_limit_to;
+          if (stringNullOrEmpty(contentType[contentType.type].value) || stringNullOrEmpty(contentType[contentType.type].valueConfirm)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          } else if (contentType.type === 'password_confirmation' &&
+            (contentType[contentType.type].value.length < limitFrom
+              || contentType[contentType.type].value.length > limitTo
+              || contentType[contentType.type].valueConfirm.length < limitFrom
+              || contentType[contentType.type].valueConfirm.length > limitTo)) {
+            console.log('asdhkjahdkjashdjkashdjkashd')
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+            isValid = false;
+          }
+        } else if (contentType.type === 'customization') {
+          if (contentType[contentType.type].is_comment) {
+            if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
+              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              isValid = false;
+            }
+          } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'time_hm') {
+          if (stringNullOrEmpty(contentType[contentType.type].valueHour) || stringNullOrEmpty(contentType[contentType.type].valueMinute)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'date_ymd'
+          || contentType.type === 'dob_ymd') {
+          if (stringNullOrEmpty(contentType[contentType.type].valueYear) || stringNullOrEmpty(contentType[contentType.type].valueMonth)
+            || stringNullOrEmpty(contentType[contentType.type].valueDay)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'date_md') {
+          if (stringNullOrEmpty(contentType[contentType.type].valueMonth) || stringNullOrEmpty(contentType[contentType.type].valueDay)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'date_ym'
+          || contentType.type === 'dob_ym') {
+          if (stringNullOrEmpty(contentType[contentType.type].valueYear) || stringNullOrEmpty(contentType[contentType.type].valueMonth)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'date_ymd_hm') {
+          if (stringNullOrEmpty(contentType[contentType.type].valueYear)
+            || stringNullOrEmpty(contentType[contentType.type].valueMonth)
+            || stringNullOrEmpty(contentType[contentType.type].valueDay)
+            || stringNullOrEmpty(contentType[contentType.type].valueHour)
+            || stringNullOrEmpty(contentType[contentType.type].valueMinutes)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'timezone_from_to') {
+          if (stringNullOrEmpty(contentType[contentType.type].valueHour1)
+            || stringNullOrEmpty(contentType[contentType.type].valueMinutes1)
+            || stringNullOrEmpty(contentType[contentType.type].valueHour2)
+            || stringNullOrEmpty(contentType[contentType.type].valueMinutes2)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'period_from_to') {
+          if (stringNullOrEmpty(contentType[contentType.type].valueYear1)
+            || stringNullOrEmpty(contentType[contentType.type].valueMonth1)
+            || stringNullOrEmpty(contentType[contentType.type].valueDay1)
+            || stringNullOrEmpty(contentType[contentType.type].valueYear2)
+            || stringNullOrEmpty(contentType[contentType.type].valueMonth2)
+            || stringNullOrEmpty(contentType[contentType.type].valueDay2)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'up_to_municipality') {
+          if (stringNullOrEmpty(contentType[contentType.type].prefecture)
+            || stringNullOrEmpty(contentType[contentType.type].city)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === 'zip_code_address') {
+          if (contentType.post_code) {
+            if (contentType.split_postal_code) {
+              if (stringNullOrEmpty(contentType.value_post_code_left)
+                || stringNullOrEmpty(contentType.value_post_code_right)) {
+                errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+                isValid = false;
+              }
+            } else if (stringNullOrEmpty(contentType.value_post_code)) {
+              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              isValid = false;
+            }
+          }
+          if (contentType.prefecture && stringNullOrEmpty(contentType.value_prefecture)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+          if (contentType.municipality && stringNullOrEmpty(contentType.value_municipality)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+          if (contentType.address && stringNullOrEmpty(contentType.value_address)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+          if (contentType.building_name && stringNullOrEmpty(contentType.value_building_name)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+          if (isValid === false) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = true;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === 'attaching_file') {
+          if (stringNullOrEmpty(contentType.content)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === 'agree_term') {
+          if (stringNullOrEmpty(contentType.isAgree) || contentType.isAgree === false) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === 'radio_button') {
+          console.log(contentType, 'checkkkkk')
+          if (stringNullOrEmpty(contentType.initial_selection)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === 'checkbox') {
+          console.log(contentType, 'checkkkkk')
+          if (contentType.checkedValue && contentType.checkedValue.length === 0) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          } else if ((contentType.selection_limit_from || contentType.selection_limit_to) && (contentType.checkedValue.length < parseInt(contentType.selection_limit_from) || contentType.checkedValue.length > parseInt(contentType.selection_limit_to))) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select from ${contentType.selection_limit_from} to ${contentType.selection_limit_to} for this item.`;
+            isValid = false;
+          }
+        } else if (contentType.type === 'invalid_input') {
+
+        } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+          isValid = false;
+        } else if ((limitFrom || limitTo) && (contentType[contentType.type]?.value?.length < limitFrom || contentType[contentType.type]?.value?.length > limitTo)) {
+          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+          isValid = false;
+        }
+      }
+      if (contentType[contentType.type].range && contentType[contentType.type].range !== 'no_input'
+        && (!stringNullOrEmpty(contentType[contentType.type].value) || !stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))) {
+        let REGEX_CHECK;
+        let messageLog = '';
+        switch (contentType[contentType.type].range) {
+          case 'alphabet':
+            REGEX_CHECK = /[^A-Za-z ]+/;
+            messageLog = "Only alphabets are allowed.";
+            break;
+          case 'single_byte':
+            REGEX_CHECK = /[^0-9 ]+/;
+            messageLog = "Please enter a number.";
+            break;
+          case 'alphanumeric_hyphen':
+            REGEX_CHECK = /[^A-Za-z0-9-_ ]+/;
+            messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9'), hyphens and underscores ('-', '_') can be used.";
+            break;
+          case 'alphanumeric':
+            REGEX_CHECK = /[^A-Za-z0-9 ]+/;
+            messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.";
+            break;
+          default:
+            REGEX_CHECK = "";
+            break;
+        }
+        if (REGEX_CHECK !== "" && (REGEX_CHECK.test(contentType[contentType.type].valueLeft)
+          || REGEX_CHECK.test(contentType[contentType.type].valueRight)
+          || REGEX_CHECK.test(contentType[contentType.type].value))) {
+          isValid = false;
+          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
+        } else if ((contentType[contentType.type].range === 'double_byte'
+          || contentType[contentType.type].range === 'full_width_katakana'
+          || contentType[contentType.type].range === 'double_byte_hiragana')
+          && ucs2ToBinaryString(contentType[contentType.type].value).length === contentType[contentType.type].value.length * 3) {
+          isValid = false;
+          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
+        }
+      }
     }
-  }, [indexMessageRender])
+    if (isValid) {
+      errors = {};
+    }
+    console.log(errors)
+    setErrors(errors);
+    return isValid;
+  }
+
+  function ucs2ToBinaryString(str) {
+    var escstr = encodeURIComponent(str)
+    var binstr = escstr.replace(/%([0-9A-F]{2})/ig, function (match, hex) {
+      var i = parseInt(hex, 16)
+      return String.fromCharCode(i)
+    })
+    console.log(binstr);
+    return binstr
+  }
 
   const onClickNext = (indexMessage) => {
+    if (!handleValidateField()) {
+      return;
+    }
     renderMessageArr[indexMessage].disabled = true;
-    let dataRender = [];
-    console.log();
-    if(!dataMessages[indexMessage + 1]) return;
-    if (dataMessages[indexMessage + 1].belong_to === 'bot') {
-      for (let i = indexMessage + 1; i < dataMessages.length; i++) {
-        console.log(dataMessages[i]);
-        dataRender.push(dataMessages[i]);
-        if (dataMessages[i].belong_to === 'user') break;
+    let renderMessage = [...renderMessageArr];
+    let index;
+    let delayRender;
+    // let REGEX = /\{\{(.*?)\}\}/ig;
+    if (!dataMessages[indexMessageRender + 1]) return;
+    if (dataMessages[indexMessageRender + 1].belong_to === 'bot') {
+      for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
+        if (dataMessages[i].belong_to === 'bot') {
+          let promise = new Promise((resolve) => {
+            return delayRender = setTimeout(() => {
+              console.log(dataMessages[i])
+              if (dataMessages[i].message_content[0].type === 'text_input') {
+                dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                  console.log(variable)
+                  for (let j = 0; j < variables.length; j++) {
+                    if (variables[j].variable_name === variable) {
+                      return variables[j].default_value;
+                    }
+                  }
+                })
+              }
+
+              resolve({ ...dataMessages[i] });
+            }, (i - indexMessageRender) * 1000);
+          })
+          promise.then(data => {
+            renderMessage.push(data);
+            setRenderMessageArr([
+              ...renderMessage
+            ]);
+          })
+          index = i;
+        } else if (dataMessages[i].belong_to === 'user') {
+          console.log(dataMessages[i], i - indexMessageRender)
+          let promise = new Promise((resolve) => {
+            return delayRender = setTimeout(() => {
+              resolve({ ...dataMessages[i] });
+            }, (i - indexMessageRender) * 1000);
+          })
+          promise.then(data => {
+            renderMessage.push(data);
+            setRenderMessageArr([
+              ...renderMessage
+            ]);
+          })
+          index = i;
+          break;
+        }
       }
-      console.log(dataRender, ' check dataRender')
+      console.log(renderMessage, ' check dataRender');
+      setIndexMessageRender(index);
       setRenderMessageArr([
-        ...renderMessageArr,
-        ...dataRender
+        ...renderMessage
       ]);
     } else {
       setRenderMessageArr([
-        ...renderMessageArr,
-        dataMessages[indexMessage + 1]
+        ...renderMessage,
+        dataMessages[indexMessageRender + 1]
       ]);
+      setIndexMessageRender(indexMessageRender + 1);
     }
 
+    // clearTimeout(delayRender);
+
     // renderMessageArr
+  }
+
+  const onChangeValue = (indexContent, contentType, value, field, subFiled) => {
+    if (subFiled) {
+      if (dataMessages[indexMessageRender].message_content[indexContent][contentType][field] === undefined) {
+        dataMessages[indexMessageRender].message_content[indexContent][contentType][field] = {}
+      }
+      dataMessages[indexMessageRender].message_content[indexContent][contentType][field][subFiled] = value;
+    } else if (field) {
+      if (dataMessages[indexMessageRender].message_content[indexContent][contentType] === undefined) {
+        dataMessages[indexMessageRender].message_content[indexContent][contentType] = {}
+      }
+      dataMessages[indexMessageRender].message_content[indexContent][contentType][field] = value;
+    }
+
+    if (dataMessages[indexMessageRender].message_content[indexContent][contentType].is_save_input_content) {
+      variables.forEach(item => {
+        if (dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content === item.variable_name) {
+          item.default_value = value;
+        }
+      })
+    }
+    setDataMessages([...dataMessages]);
   }
 
   return (
@@ -247,8 +601,16 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                   {message.belong_to === 'user' &&
                     <div className="cp-body-user-side">
                       <div className="cp-body-user-side-messages">
+                        {
+                          console.log(message, 'check messss')
+                        }
                         <UserMessage
-                          messageContent={message.message_content}
+                          messageContentProps={message.message_content}
+                          disabled={message.disabled}
+                          onChangeValue={(indexContent, contentType, value, field, subFiled) => onChangeValue(indexContent, contentType, value, field, subFiled)}
+                          indexMessageRender={indexMessageRender}
+                          indexMessage={indexMessage}
+                          errorsProps={errors}
                         />
                         {message?.message_content.length !== 0 &&
                           <div className="ss-user-message__action-wrapper">
@@ -285,7 +647,7 @@ const BotMessage = ({ content, index, botInfor }) => {
 
   return (
     <div key={index} className="cp-body-bot-side">
-      {content.type === 'text_input' && (
+      {(content.type === 'text_input' || content.type === 'file') && (
         <div className="cp-body-bot-side-avatar cp-avatar">
           <img src={"https://ec-chatbot-test1.com/" + botInfor?.icon?.url} />
         </div>
@@ -307,11 +669,11 @@ const BotMessage = ({ content, index, botInfor }) => {
             {content.type === 'file' && (
               content[content.type]?.content ? (
                 <React.Fragment>
-                  {(content[content.type]?.content.includes('jpeg') || content[content.type]?.content.includes('png')) ?
+                  {(content[content.type]?.content.includes('jpeg') || content[content.type]?.content.includes('png') || content[content.type]?.content.includes('jpg')) ?
                     <img
                       src={content[content.type]?.content}
                       alt=""
-                      style={{ width: '27%' }} /> :
+                      style={{ width: '50%', marginLeft: '8px' }} /> :
                     <span
                       style={{ color: '#089BE5', fontSize: '17px' }}
                       onClick={() => handleDownloadFile(content[content.type]?.content)}
@@ -330,12 +692,25 @@ const BotMessage = ({ content, index, botInfor }) => {
   )
 }
 
-const UserMessage = ({ messageContent, onChangeValue }) => {
+const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
   const [dataCity, setDataCity] = useState([]);
   const [dataPrefectures, setDataPrefectures] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
+  const [messageContent, setMessageContent] = useState(messageContentProps);
+  const [errors, setErrors] = useState(errorsProps);
+
+  const [checked, setChecked] = useState([]);
+
+  useEffect(() => {
+    setErrors(errorsProps);
+  }, [errorsProps])
+
+  useEffect(() => {
+    console.log(messageContentProps);
+    setMessageContent(messageContentProps);
+  }, [messageContentProps])
 
   useEffect(() => {
     api.get(`/api/v1/prefectures`).then((res) => {
@@ -344,9 +719,78 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
     }).catch((error) => { console.error(error) });
   }, [])
 
+  const onChangeValueCheckbox = (indexContent, contentType, value, field) => {
+
+    setChecked(prev => {
+      const isChecked = checked.includes(value);
+      if (isChecked) {
+        messageContent[indexContent][contentType][field] = [...checked.filter(item => item !== value)];
+        setMessageContent([...messageContent])
+        return checked.filter(item => item !== value);
+      } else {
+        messageContent[indexContent][contentType][field] = [...prev, value];
+        setMessageContent([...messageContent])
+        return [...prev, value];
+      }
+    })
+
+
+  }
+
+  function botUploadFile() {
+    document.getElementById('ss-bot-file-upload').click();
+  }
+
+  function getBaseUrl(event, indexContent) {
+    var file = document.querySelector('input[type=file]')['files'][0];
+    const type = file.name.slice(file.name.lastIndexOf('.') + 1);
+    if (!messageContent[indexContent].attaching_file.file_type.includes(type)) {
+      errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = `Please specify a ${messageContent[indexContent].attaching_file.file_type.join(", ")} type file for the file.`;
+      setErrors({ ...errors })
+      return;
+    } else {
+      errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = ""
+    }
+    // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
+    // var reader = new FileReader(file);
+    console.log(file)
+
+    messageContent[indexContent].attaching_file.content = file.name;
+    setMessageContent([...messageContent]);
+    // var baseString;
+    // var imgUrl = URL.createObjectURL(event.target.files[0]);
+    // if (
+    //   file?.type === 'image/png' ||
+    //   file?.type === 'image/jpeg' ||
+    //   file?.type === 'image/jpg' ||
+    //   file?.type === 'image/gif' ||
+    //   file?.type === 'image/img'
+    // ) {
+    //   document.getElementById(`bot-file-upload-img`).style.display = 'block';
+    //   document.getElementById(`bot-file-upload-img`).src = imgUrl;
+    // } else {
+    //   document.getElementById(`bot-file-upload-img`).style.display = 'none';
+    //   document.getElementById(`bot-file-upload-img`).src = '';
+    // }
+
+    // reader.onloadend = function () {
+    //   baseString = reader.result;
+    //   // setInputImage(baseString);
+    //   // document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
+    //   if (baseString !== undefined || baseString !== '') {
+    //     // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
+    //     console.log(baseString)
+
+    //   }
+
+    // };
+    // reader.readAsDataURL(file);
+  }
+
   return (
     <div className="ss-user-message__content-wrapper">
-      {messageContent.map((content, indexContent) => {
+      {console.log(messageContent)}
+      {messageContent?.map((content, indexContent) => {
         let textInput = content.text_input;
         let label = content.label;
         let textarea = content.textarea;
@@ -357,7 +801,7 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
         let attachingFile = content.attaching_file;
         let calendar = content.calendar;
         let agreeTerm = content.agree_term;
-        console.log(content, 'check content')
+
         return (
           <React.Fragment key={indexContent}>
             {/* type == 'text_input' */}
@@ -381,27 +825,29 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                   {(textInput.type === 'text') &&
                     (textInput.text.isSplitInput ?
                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <input
-                          className="ss-message__content--user-text-input ss-input-value"
+                        <InputCustom
+                          disabled={disabled}
                           placeholder={textInput.text?.placeholderLeft}
                           style={{ width: '49%', marginBottom: '0px' }}
-
-                        ></input>
-                        {/* <InputCustom
-                          value={textInput}
-                        /> */}
-                        <input
-                          className="ss-message__content--user-text-input ss-input-value"
+                          onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'valueLeft')}
+                          value={textInput[textInput.type]?.valueLeft}
+                        ></InputCustom>
+                        <InputCustom
+                          disabled={disabled}
                           placeholder={textInput.text?.placeholderRight}
                           style={{ width: '49%' }}
-                        ></input>
+                          onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'valueRight')}
+                          value={textInput[textInput.type]?.valueRight}
+                        ></InputCustom>
                       </div> :
                       <React.Fragment>
-                        <input
-                          className="ss-message__content--user-text-input ss-input-value"
+                        <InputCustom
+                          disabled={disabled}
                           style={{ marginBottom: '0px' }}
                           placeholder={textInput[textInput.type]?.placeholderLeft}
-                        ></input>
+                          onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
+                          value={textInput[textInput.type]?.value}
+                        ></InputCustom>
                         {textInput.text?.placeholderRight &&
                           <span style={{ fontWeight: '400', color: 'black', fontSize: '12px', marginLeft: '18px' }}>{textInput.text?.placeholderRight}</span>
                         }
@@ -411,77 +857,130 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                   {(textInput.type === 'phone_number') &&
                     <React.Fragment>
                       {textInput.phone_number.withHyphen === false ?
-                        <input
-                          className="ss-message__content--user-text-input ss-input-value"
+                        <InputCustom
+                          disabled={disabled}
+                          // className="ss-message__content--user-text-input ss-input-value"
                           style={{ marginBottom: '0px' }}
                           placeholder={textInput[textInput.type]?.number}
-                        ></input> :
+                          onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
+                          value={textInput[textInput.type]?.value}
+                        ></InputCustom> :
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                          <input
+                          <InputCustom
+                            disabled={disabled}
                             className="ss-message__content--user-text-input ss-input-value"
                             style={{ marginBottom: '0px', width: '32%' }}
                             placeholder={textInput[textInput.type]?.number1}
-                          ></input>
-                          <input
+                            onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value1')}
+                            value={textInput[textInput.type]?.value1}
+                          ></InputCustom>
+                          <InputCustom
+                            disabled={disabled}
                             className="ss-message__content--user-text-input ss-input-value"
-                            readOnly
                             style={{ marginBottom: '0px', width: '32%' }}
                             placeholder={textInput[textInput.type]?.number2}
-                          ></input>
-                          <input
-                            className="ss-message__content--user-text-input ss-input-value"
+                            onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value2')}
+                            value={textInput[textInput.type]?.value2}
+                          ></InputCustom>
+                          <InputCustom
+                            disabled={disabled}
+                            // className="ss-message__content--user-text-input ss-input-value"
                             style={{ marginBottom: '0px', width: '32%' }}
                             placeholder={textInput[textInput.type]?.number3}
-                          ></input>
+                            onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value3')}
+                            value={textInput[textInput.type]?.value3}
+                          ></InputCustom>
                         </div>
                       }
                     </React.Fragment>
                   }
                   {(textInput.type === 'password') &&
                     <React.Fragment>
-                      <input
-                        className="ss-message__content--user-text-input ss-input-value"
+                      <InputCustom
+                        disabled={disabled}
+                        // className="ss-message__content--user-text-input ss-input-value"
                         style={{ marginBottom: '0px' }}
                         placeholder={textInput[textInput.type]?.password}
-                        disabled
-                      ></input>
+                        onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
+                        value={textInput[textInput.type]?.value}
+                      ></InputCustom>
                     </React.Fragment>
                   }
                   {(textInput.type === 'urls' ||
                     textInput.type === 'email_address') &&
                     <React.Fragment>
-                      <input
-                        className="ss-message__content--user-text-input ss-input-value"
+                      <InputCustom
+                        disabled={disabled}
+                        // className="ss-message__content--user-text-input ss-input-value"
                         style={{ marginBottom: '0px' }}
-                        placeholder={textInput[textInput.type]}
-                        disabled
-                      ></input>
+                        placeholder={textInput[textInput.type].placeholder}
+                        onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
+                        value={textInput[textInput.type]?.value}
+                      ></InputCustom>
                     </React.Fragment>
                   }
                   {(textInput.type === 'email_confirmation') &&
                     (<>
-                      <input
+                      {/* <input
                         className="ss-message__content--user-text-input ss-input-value"
                         placeholder={textInput[textInput.type].cfEmlAdd_email}
-                      ></input>
-                      <input
+                        onChange={onChangeValue(indexContent, content.type, textInput.type, 'value')}
+                        value={textInput[textInput.type]?.value}
+                      ></input> */}
+                      <InputCustom
+                        disabled={disabled}
+                        placeholder={textInput[textInput.type].cfEmlAdd_email}
+                        onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
+                        value={textInput[textInput.type]?.value}
+                      />
+                      {/* <input
                         className="ss-message__content--user-text-input ss-input-value"
                         placeholder={textInput[textInput.type].cfEmlAdd_confirm_email}
-                      ></input>
+                        onChange={onChangeValue(indexContent, content.type, textInput.type, 'valueConfirm')}
+                        value={textInput[textInput.type]?.valueConfirm}
+                      ></input> */}
+                      <InputCustom
+                        disabled={disabled}
+                        placeholder={textInput[textInput.type].cfEmlAdd_confirm_email}
+                        onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'valueConfirm')}
+                        value={textInput[textInput.type]?.valueConfirm}
+                      />
                     </>
                     )}
                   {(textInput.type === 'password_confirmation') &&
                     (<>
-                      <input
+                      {/* <input
                         className="ss-message__content--user-text-input ss-input-value"
                         placeholder={textInput[textInput.type].password}
-                      ></input>
-                      <input
+                        onChange={onChangeValue(indexContent, content.type, textInput.type, 'value')}
+                        value={textInput[textInput.type]?.value}
+                      ></input> */}
+                      {/* <input
                         className="ss-message__content--user-text-input ss-input-value"
                         placeholder={textInput[textInput.type].confirm_password}
-                      ></input>
+                        onChange={onChangeValue(indexContent, content.type, textInput.type, 'valueConfirm')}
+                        value={textInput[textInput.type]?.valueConfirm}
+                      ></input> */}
+                      <InputCustom
+                        style={{ marginBottom: '5px' }}
+                        disabled={disabled}
+                        placeholder={textInput[textInput.type].password}
+                        onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
+                        value={textInput[textInput.type]?.value}
+                      />
+                      <InputCustom
+                        disabled={disabled}
+                        placeholder={textInput[textInput.type].confirm_password}
+                        onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'valueConfirm')}
+                        value={textInput[textInput.type]?.valueConfirm}
+                      />
                     </>
                     )}
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${textInput.type}`] &&
+                    <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${textInput.type}`]}
+                    </div>
+                  }
                 </div>
               )
             }
@@ -513,7 +1012,7 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                           {textarea.title}
                         </span>
                       }
-                      {textarea.require === true &&
+                      {textarea.require === true && textarea?.type === 'text_input' &&
                         <span className="ss-message__content--user-text-input-required">
                           * required
                         </span>
@@ -523,18 +1022,19 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                   {(textarea?.type === 'text_input' ||
                     textarea?.type === 'invalid_input') && (
                       <textarea
+                        disabled={disabled}
                         className="ss-message__content--user-textarea ss-input-value"
                         placeholder={textarea[textarea.type]?.content}
                         rows={3}
+                        onChange={e => onChangeValue(indexContent, content.type, e.target.value, textarea?.type, 'value')}
+                        value={textarea[textarea.type]?.value}
                       ></textarea>
                     )}
-                  {textarea?.type === 'consume_api_response' && (
-                    <textarea
-                      className="ss-message__content--user-textarea ss-input-value"
-                      value={'入力値の検証にAPIを利用する'}
-                      rows={3}
-                    ></textarea>
-                  )}
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${textarea.type}`] &&
+                    <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${textarea.type}`]}
+                    </div>
+                  }
                 </div>
               )
             }
@@ -561,10 +1061,11 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                       radioButton[radioButton.type].map((item, index) => {
                         return <div key={index} className="ss-message__content--user-radio_button">
                           <input
+                            disabled={disabled}
                             type="radio"
-                            name="ss-message__content--user-radio_button"
                             id="ss-message__content--user-radio_button"
                             checked={radioButton.initial_selection === item.id}
+                            onChange={() => onChangeValue(indexContent, content.type, item.id, 'initial_selection')}
                           />
                           {item.text &&
                             <label htmlFor="ss-message__content--user-radio_button">
@@ -578,10 +1079,12 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                       radioButton[radioButton.type].map((item, index) => {
                         return <div key={index} className="ss-message__content--user-radio_button--radio_button_img">
                           <input
+                            disabled={disabled}
                             type="radio"
                             name="ss-message__content--user-radio_button--radio_button_img"
                             id="ss-message__content--user-radio_button--radio_button_img"
                             checked={radioButton.initial_selection === item.id}
+                            onChange={() => onChangeValue(indexContent, content.type, item.id, 'initial_selection')}
                           />
                           <img
                             src={item.img}
@@ -621,12 +1124,22 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                     )}
                     {radioButton.type === 'block_style' && (
                       radioButton[radioButton.type].map((item, index) => {
-                        return item.text && <div style={{ marginBottom: '10px' }} key={index} className="ss-message__content--user-radio_button--block_style">
+                        return item.text && <div
+                          style={{ marginBottom: '10px', cursor: 'pointer', backgroundColor: radioButton.value ? (radioButton.value === item.id ? '#347AED' : '') : (radioButton.initial_selection === item.id ? '#347AED' : '') }}
+                          key={index}
+                          className="ss-message__content--user-radio_button--block_style"
+                          onClick={() => onChangeValue(indexContent, content.type, item.id, 'initial_selection')}
+                        >
                           <span>{item.text}</span>
                         </div>
                       })
                     )}
                   </div>
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${radioButton.type}`] &&
+                    <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${radioButton.type}`]}
+                    </div>
+                  }
                 </div>
               )
             }
@@ -652,11 +1165,19 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                     {checkbox.type === 'default' && (
                       checkbox[checkbox.type].map((item, index) => {
                         return <div key={index} className="ss-message__content--user-checkbox">
-                          <input
+                          {/* <input
+                            disabled={disabled}
                             type="checkbox"
                             name="ss-message__content--user-checkbox"
                             id="ss-message__content--user-checkbox"
-                            checked={checkbox.all_item_checked}
+                          // onChange={() => onChangeValueCheckbox(indexContent, content.type, item.id, 'value')}
+                          // value={checkbox.checkedValue.includes(item.id)}
+                          /> */}
+                          <CheckboxCustom
+                            disabled={disabled}
+                            onChange={() => onChangeValueCheckbox(indexContent, content.type, item.id, 'checkedValue')}
+                            value={checkbox.checkedValue.includes(item.id)}
+                            isOnChange={false}
                           />
                           <label htmlFor="ss-message__content--user-checkbox">
                             {item.text}
@@ -667,11 +1188,11 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                     {checkbox.type === 'checkbox_img' && (
                       checkbox[checkbox.type].map((item, index) => {
                         return <div key={index} className="ss-message__content--user-checkbox--checkbox_img" style={{ marginBottom: '10px' }}>
-                          <input
-                            type="checkbox"
-                            name="ss-message__content--user-checkbox--checkbox_img"
-                            id="ss-message__content--user-checkbox--checkbox_img"
-                            checked={checkbox.all_item_checked}
+                          <CheckboxCustom
+                            disabled={disabled}
+                            onChange={() => onChangeValueCheckbox(indexContent, content.type, item.id, 'checkedValue')}
+                            value={checkbox.checkedValue.includes(item.id)}
+                            isOnChange={false}
                           />
                           <img
                             src={item.img}
@@ -706,6 +1227,11 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                       </>
                     )}
                   </div>
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                    <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                    </div>
+                  }
                 </div>
               )
             }
@@ -742,27 +1268,36 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                               pullDown[pullDown.type].is_comment === false ?
                                 <div className="ss-message__content--user-pull_down-col col-12">
                                   <SelectCustom
+                                    disabled={disabled}
                                     data={pullDown[pullDown.type].options_without_comment}
                                     keyValue="value"
                                     style={{ width: '100%' }}
                                     placeholder={pullDown[pullDown.type].display_unselected}
                                     nameValue="text"
+                                    onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'value')}
+                                    value={pullDown[pullDown.type].value}
                                   />
                                 </div> :
                                 <div className="ss-message__content--user-pull_down-col col-12" style={{ display: 'flex', justifyContent: 'space-between' }}>
                                   <SelectCustom
+                                    disabled={disabled}
                                     data={pullDown[pullDown.type].options_with_comment}
                                     keyValue="value"
                                     style={{ width: '49%' }}
                                     placeholder={pullDown[pullDown.type].display_unselected}
                                     nameValue="text"
+                                    onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueLeft')}
+                                    value={pullDown[pullDown.type].valueLeft}
                                   />
                                   <SelectCustom
+                                    disabled={disabled}
                                     data={pullDown[pullDown.type].options_with_comment}
                                     keyValue="value2"
                                     style={{ width: '49%' }}
                                     placeholder={pullDown[pullDown.type].display_unselected}
                                     nameValue="text2"
+                                    onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueRight')}
+                                    value={pullDown[pullDown.type].valueRight}
                                   />
                                 </div>
                             }
@@ -781,14 +1316,20 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                         <div className="ss-message__content--user-pull_down--time_hm">
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
-                              data={dataHour}
+                              disabled={disabled}
+                              data={dataHour.filter(item => item.value >= (pullDown[pullDown.type].start_at || "1") && item.value <= (pullDown[pullDown.type].end_at || "24"))}
                               placeholder="Time"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour')}
+                              value={pullDown[pullDown.type].valueHour}
                             />
                             <SelectCustom
+                              disabled={disabled}
                               data={dataMinutes}
                               placeholder="Minutes"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinute')}
+                              value={pullDown[pullDown.type].valueMinute}
                             />
                             <div
                               className="ss-message__content--user-pull_down-comment"
@@ -806,19 +1347,28 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                           <div className="ss-message__content--user-pull_down--time_hm">
                             <div className="" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                               <SelectCustom
-                                data={dataYear}
+                                disabled={disabled}
+                                data={dataYear.filter(item => item.value >= (pullDown[pullDown.type].start_year || "1935") && item.value <= (pullDown[pullDown.type].end_year || "2072"))}
                                 placeholder="Year"
                                 style={{ width: '32%' }}
+                                onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear')}
+                                value={pullDown[pullDown.type].valueYear}
                               />
                               <SelectCustom
+                                disabled={disabled}
                                 data={dataMonth}
                                 placeholder="Month"
                                 style={{ width: '32%' }}
+                                onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMonth')}
+                                value={pullDown[pullDown.type].valueMonth}
                               />
                               <SelectCustom
+                                disabled={disabled}
                                 data={dataDay}
                                 placeholder="Day"
                                 style={{ width: '32%' }}
+                                onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueDay')}
+                                value={pullDown[pullDown.type].valueDay}
                               />
                               <div
                                 className="ss-message__content--user-pull_down-comment"
@@ -835,14 +1385,20 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                         <div className="ss-message__content--user-pull_down--time_hm">
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
+                              disabled={disabled}
                               data={dataMonth}
                               placeholder="Month"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMonth')}
+                              value={pullDown[pullDown.type].valueMonth}
                             />
                             <SelectCustom
+                              disabled={disabled}
                               data={dataDay}
                               placeholder="Day"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueDay')}
+                              value={pullDown[pullDown.type].valueDay}
                             />
                             <div
                               className="ss-message__content--user-pull_down-comment"
@@ -860,14 +1416,20 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                           <div className="ss-message__content--user-pull_down--time_hm">
                             <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <SelectCustom
-                                data={dataYear}
+                                disabled={disabled}
+                                data={dataYear.filter(item => item.value >= (pullDown[pullDown.type].start_year || "1935") && item.value <= (pullDown[pullDown.type].end_year || "2072"))}
                                 placeholder="Year"
                                 style={{ width: '32%' }}
+                                onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear')}
+                                value={pullDown[pullDown.type].valueYear}
                               />
                               <SelectCustom
+                                disabled={disabled}
                                 data={dataMonth}
                                 placeholder="Month"
                                 style={{ width: '32%' }}
+                                onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMonth')}
+                                value={pullDown[pullDown.type].valueMonth}
                               />
                               <div
                                 className="ss-message__content--user-pull_down-comment"
@@ -884,29 +1446,44 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                         <div className="ss-message__content--user-pull_down--time_hm">
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                             <SelectCustom
-                              data={dataYear}
+                              disabled={disabled}
+                              data={dataYear.filter(item => item.value >= (pullDown[pullDown.type].start_year || "1935") && item.value <= (pullDown[pullDown.type].end_year || "2072"))}
                               placeholder="Year"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear')}
+                              value={pullDown[pullDown.type].valueYear}
                             />
                             <SelectCustom
+                              disabled={disabled}
                               data={dataMonth}
                               placeholder="Month"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMonth')}
+                              value={pullDown[pullDown.type].valueMonth}
                             />
                             <SelectCustom
+                              disabled={disabled}
                               data={dataDay}
                               placeholder="Day"
                               style={{ width: '32%', marginBottom: '10px' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueDay')}
+                              value={pullDown[pullDown.type].valueDay}
                             />
                             <SelectCustom
-                              data={dataHour}
+                              disabled={disabled}
+                              data={dataHour.filter(item => item.value >= (pullDown[pullDown.type].start_at || "1") && item.value <= (pullDown[pullDown.type].end_at || "24"))}
                               placeholder="Time"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour')}
+                              value={pullDown[pullDown.type].valueHour}
                             />
                             <SelectCustom
+                              disabled={disabled}
                               data={dataMinutes}
                               placeholder="Minutes"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinutes')}
+                              value={pullDown[pullDown.type].valueMinutes}
                             />
                             <div
                               className="ss-message__content--user-pull_down-comment"
@@ -923,27 +1500,39 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                         <div className="ss-message__content--user-pull_down--time_hm">
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
-                              data={dataHour}
+                              disabled={disabled}
+                              data={dataHour.filter(item => item.value >= (pullDown[pullDown.type].start_at || "1") && item.value <= (pullDown[pullDown.type].end_at || "24"))}
                               placeholder="Time"
                               style={{ width: '49%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour1')}
+                              value={pullDown[pullDown.type].valueHour1}
                             />
                             <SelectCustom
+                              disabled={disabled}
                               data={dataMinutes}
                               placeholder="Minutes"
                               style={{ width: '49%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinutes1')}
+                              value={pullDown[pullDown.type].valueMinutes1}
                             />
                           </div>
                           <div style={{ textAlign: 'center' }}>~</div>
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
-                              data={dataHour}
+                              disabled={disabled}
+                              data={dataHour.filter(item => item.value >= (pullDown[pullDown.type].start_at || "1") && item.value <= (pullDown[pullDown.type].end_at || "24"))}
                               placeholder="Time"
                               style={{ width: '49%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour2')}
+                              value={pullDown[pullDown.type].valueHour2}
                             />
                             <SelectCustom
+                              disabled={disabled}
                               data={dataMinutes}
                               placeholder="Minutes"
                               style={{ width: '49%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinutes2')}
+                              value={pullDown[pullDown.type].valueMinutes2}
                             />
                           </div>
                           <div
@@ -960,37 +1549,55 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                         <div className="ss-message__content--user-pull_down--time_hm">
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
-                              data={dataYear}
+                              disabled={disabled}
+                              data={dataYear.filter(item => item.value >= (pullDown[pullDown.type].start_year || "1935") && item.value <= (pullDown[pullDown.type].end_year || "2072"))}
                               placeholder="Year"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear1')}
+                              value={pullDown[pullDown.type].valueYear1}
                             />
                             <SelectCustom
+                              disabled={disabled}
                               data={dataMonth}
                               placeholder="Month"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMonth1')}
+                              value={pullDown[pullDown.type].valueMonth1}
                             />
                             <SelectCustom
+                              disabled={disabled}
                               data={dataDay}
                               placeholder="Day"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueDay1')}
+                              value={pullDown[pullDown.type].valueDay1}
                             />
                           </div>
                           <div style={{ textAlign: 'center' }}>~</div>
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
-                              data={dataYear}
+                              disabled={disabled}
+                              data={dataYear.filter(item => item.value >= pullDown[pullDown.type].start_year && item.value <= pullDown[pullDown.type].end_year)}
                               placeholder="Year"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear2')}
+                              value={pullDown[pullDown.type].valueYear2}
                             />
                             <SelectCustom
+                              disabled={disabled}
                               data={dataMonth}
                               placeholder="Month"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMonth2')}
+                              value={pullDown[pullDown.type].valueMonth2}
                             />
                             <SelectCustom
+                              disabled={disabled}
                               data={dataDay}
                               placeholder="Day"
                               style={{ width: '32%' }}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueDay2')}
+                              value={pullDown[pullDown.type].valueDay2}
                             />
                           </div>
                           <div
@@ -1005,11 +1612,14 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                     {pullDown.type === 'prefectures' && (
                       <React.Fragment>
                         <SelectCustom
+                          disabled={disabled}
                           data={dataPrefectures}
                           placeholder="Please select"
                           style={{ width: '100%' }}
                           keyValue="id"
                           nameValue="name"
+                          onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'value')}
+                          value={pullDown[pullDown.type].value}
                         />
                       </React.Fragment>
                     )}
@@ -1018,25 +1628,36 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                         <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].prefecture_comment}</div>
                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                           <SelectCustom
+                            disabled={disabled}
                             data={dataPrefectures}
                             placeholder="Select prefecture"
                             style={{ width: '45%' }}
                             keyValue="id"
                             nameValue="name"
+                            onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'prefecture')}
+                            value={pullDown[pullDown.type].prefecture}
                           />
                           <span>~</span>
                           <SelectCustom
+                            disabled={disabled}
                             data={dataCity}
                             placeholder="Select city"
                             style={{ width: '45%' }}
                             keyValue="id"
                             nameValue="name"
+                            onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'city')}
+                            value={pullDown[pullDown.type].city}
                           />
                         </div>
                         <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].city_comment}</div>
                       </div>
                     )}
                   </div>
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${pullDown.type}`] &&
+                    <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${pullDown.type}`]}
+                    </div>
+                  }
                 </div>
               )
             }
@@ -1067,19 +1688,25 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                       {zipCodeAddress.split_postal_code !== true ?
                         <InputCustom
                           placeholder={zipCodeAddress.post_code}
-                          disabled={true}
+                          disabled={disabled}
                           style={{ width: '100%' }}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'value_post_code')}
+                          value={zipCodeAddress.value_post_code}
                         /> :
                         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                           <InputCustom
                             placeholder={zipCodeAddress.post_code_left}
-                            disabled={true}
+                            disabled={disabled}
                             style={{ width: '49%' }}
+                            onChange={value => onChangeValue(indexContent, content.type, value, 'value_post_code_left')}
+                            value={zipCodeAddress.value_post_code_left}
                           />
                           <InputCustom
                             placeholder={zipCodeAddress.post_code_right}
-                            disabled={true}
+                            disabled={disabled}
                             style={{ width: '49%' }}
+                            onChange={value => onChangeValue(indexContent, content.type, value, 'value_post_code_right')}
+                            value={zipCodeAddress.value_post_code_right}
                           />
                         </div>
                       }
@@ -1092,8 +1719,10 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                       </div>
                       <InputCustom
                         placeholder={zipCodeAddress.prefecture}
-                        disabled={true}
+                        disabled={disabled}
                         style={{ width: '100%' }}
+                        onChange={value => onChangeValue(indexContent, content.type, value, 'value_prefecture')}
+                        value={zipCodeAddress.value_prefecture}
                       />
                     </div>
                   }
@@ -1104,8 +1733,10 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                       </div>
                       <InputCustom
                         placeholder={zipCodeAddress.municipality}
-                        disabled={true}
+                        disabled={disabled}
                         style={{ width: '100%' }}
+                        onChange={value => onChangeValue(indexContent, content.type, value, 'value_municipality')}
+                        value={zipCodeAddress.value_municipality}
                       />
                     </div>
                   }
@@ -1116,8 +1747,10 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                       </div>
                       <InputCustom
                         placeholder={zipCodeAddress.address}
-                        disabled={true}
+                        disabled={disabled}
                         style={{ width: '100%' }}
+                        onChange={value => onChangeValue(indexContent, content.type, value, 'value_address')}
+                        value={zipCodeAddress.value_address}
                       />
                     </div>
                   }
@@ -1128,9 +1761,16 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                       </div>
                       <InputCustom
                         placeholder={zipCodeAddress.building_name}
-                        disabled={true}
+                        disabled={disabled}
                         style={{ width: '100%' }}
+                        onChange={value => onChangeValue(indexContent, content.type, value, 'value_building_name')}
+                        value={zipCodeAddress.value_building_name}
                       />
+                    </div>
+                  }
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                    <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -1149,12 +1789,29 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                       }
                     </div>
                   }
-                  {!attachingFile.file_content && <span style={{ fontWeight: '400', fontSize: '12px' }}>Not selected</span>}
                   <div className="ss-message__content--user-attaching_file">
-                    <Button className="ss-message__content--user-attaching_file-btn" style={{ backgroundColor: '#A3B1BF', marginTop: '0px' }}>
+                    <InputCustom
+                      value={attachingFile.content}
+                      disabled={disabled}
+                    />
+                    <input
+                      type="file"
+                      id="ss-bot-file-upload"
+                      name="bot-file-upload"
+                      hidden
+                      onChange={(e) => getBaseUrl(e, indexContent)}
+                    />
+                    <Button id={`sp-button-upload-${indexContent}`} className="ss-message__content--user-attaching_file-btn" style={{ backgroundColor: '#A3B1BF', marginTop: '3px', width: '100%' }}
+                      disabled={disabled}
+                      onClick={botUploadFile}>
                       Select file
                     </Button>
                   </div>
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                    <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                    </div>
+                  }
                 </div>
               )
             }
@@ -1225,6 +1882,11 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                       </div>
                     </div>
                   )}
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${calendar.type}`] &&
+                    <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${calendar.type}`]}
+                    </div>
+                  }
                 </div>
               )
             }
@@ -1254,10 +1916,13 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                           rows="5"
                           value={agreeTerm[agreeTerm.type].content}
                           className="ss-input-value"
+                          readOnly
                         ></textarea>
                         <CheckboxCustom
-                          onChange={value => console.log(value)}
+                          disabled={disabled}
                           label={agreeTerm.term}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'isAgree')}
+                          value={agreeTerm.isAgree}
                         />
                       </div>
                     </React.Fragment>
@@ -1273,11 +1938,18 @@ const UserMessage = ({ messageContent, onChangeValue }) => {
                         </div>
                       })}
                       <CheckboxCustom
-                        onChange={value => console.log(value)}
+                        disabled={disabled}
+                        onChange={value => onChangeValue(indexContent, content.type, value, 'isAgree')}
+                        value={agreeTerm.isAgree}
                         label={agreeTerm.term}
                       />
                     </div>
                   )}
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                    <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                    </div>
+                  }
                 </div>
               )
             }

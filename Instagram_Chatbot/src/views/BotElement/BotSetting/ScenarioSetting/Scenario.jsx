@@ -20,6 +20,12 @@ import Cookies from 'js-cookie';
 import ModalNoti from '../../../../views/Popup/ModalNoti';
 import ModalShort from '../../../Popup/ModalShort';
 import Preview from '../Preview';
+import FileReferencePopup from './FileReferencePopup';
+import axios from 'axios';
+import {
+  S3_UPLOAD_URL
+} from '../../../../variables/constants';
+
 const _ = require('lodash');
 
 let data = [
@@ -1168,142 +1174,142 @@ let dataTypePullDown = [
   }
 ];
 
-let dataCondition = [
+let dataConditionFixed = [
   {
-    key: 'current_url',
-    value: 'current_url'
+    variable_name: 'current_url',
+    default_value: 'current_url'
   },
   {
-    key: 'current_url_param',
-    value: 'current_url_param'
+    variable_name: 'current_url_param',
+    default_value: 'current_url_param'
   },
   {
-    key: 'current_url_title',
-    value: 'current_url_title'
+    variable_name: 'current_url_title',
+    default_value: 'current_url_title'
   },
   {
-    key: 'user_id',
-    value: 'user_id'
+    variable_name: 'user_id',
+    default_value: 'user_id'
   },
   {
-    key: 'bot_id',
-    value: 'bot_id'
+    variable_name: 'bot_id',
+    default_value: 'bot_id'
   },
   {
-    key: 'preview_flg',
-    value: 'preview_flg'
+    variable_name: 'preview_flg',
+    default_value: 'preview_flg'
   },
   {
-    key: 'user_ip_address',
-    value: 'user_ip_address'
+    variable_name: 'user_ip_address',
+    default_value: 'user_ip_address'
   },
   {
-    key: 'user_country',
-    value: 'user_country'
+    variable_name: 'user_country',
+    default_value: 'user_country'
   },
   {
-    key: 'user_city',
-    value: 'user_city'
+    variable_name: 'user_city',
+    default_value: 'user_city'
   },
   {
-    key: 'user_device',
-    value: 'user_device'
+    variable_name: 'user_device',
+    default_value: 'user_device'
   },
   {
-    key: 'user_browser',
-    value: 'user_browser'
+    variable_name: 'user_browser',
+    default_value: 'user_browser'
   },
   {
-    key: 'user_agent',
-    value: 'user_agent'
+    variable_name: 'user_agent',
+    default_value: 'user_agent'
   },
   {
-    key: 'cv_flg',
-    value: 'cv_flg'
+    variable_name: 'cv_flg',
+    default_value: 'cv_flg'
   },
   {
-    key: 'start_datetime',
-    value: 'start_datetime'
+    variable_name: 'start_datetime',
+    default_value: 'start_datetime'
   },
   {
-    key: 'user_referer_firstopen',
-    value: 'user_referer_firstopen'
+    variable_name: 'user_referer_firstopen',
+    default_value: 'user_referer_firstopen'
   },
   {
-    key: 'user_referer_current',
-    value: 'user_referer_current'
+    variable_name: 'user_referer_current',
+    default_value: 'user_referer_current'
   },
   {
-    key: 'churn_block_passed',
-    value: 'churn_block_passed'
+    variable_name: 'churn_block_passed',
+    default_value: 'churn_block_passed'
   },
   {
-    key: 'prevention_block_passed',
-    value: 'prevention_block_passed'
+    variable_name: 'prevention_block_passed',
+    default_value: 'prevention_block_passed'
   },
   {
-    key: 'churn_request_flag',
-    value: 'churn_request_flag'
+    variable_name: 'churn_request_flag',
+    default_value: 'churn_request_flag'
   },
   {
-    key: 'Phone number_hyphen',
-    value: 'Phone number_hyphen'
+    variable_name: 'Phone number_hyphen',
+    default_value: 'Phone number_hyphen'
   },
   {
-    key: 'Address_zip code 1',
-    value: 'Address_zip code 1'
+    variable_name: 'Address_zip code 1',
+    default_value: 'Address_zip code 1'
   },
   {
-    key: 'Address_Building name',
-    value: 'Address_Building name'
+    variable_name: 'Address_Building name',
+    default_value: 'Address_Building name'
   },
   {
-    key: 'address',
-    value: 'address'
+    variable_name: 'address',
+    default_value: 'address'
   },
   {
-    key: 'email address',
-    value: 'email address'
+    variable_name: 'email address',
+    default_value: 'email address'
   },
   {
-    key: 'phone number',
-    value: 'phone number'
+    variable_name: 'phone number',
+    default_value: 'phone number'
   },
   {
-    key: 'sex',
-    value: 'sex'
+    variable_name: 'sex',
+    default_value: 'sex'
   },
   {
-    key: 'date of birth',
-    value: 'date of birth'
+    variable_name: 'date of birth',
+    default_value: 'date of birth'
   },
   {
-    key: 'Address_zip code',
-    value: 'Address_zip code'
+    variable_name: 'Address_zip code',
+    default_value: 'Address_zip code'
   },
   {
-    key: 'Address_postal code with hyphens',
-    value: 'Address_postal code with hyphens'
+    variable_name: 'Address_postal code with hyphens',
+    default_value: 'Address_postal code with hyphens'
   },
   {
-    key: 'Address_zip code 1h',
-    value: 'Address_zip code 1h'
+    variable_name: 'Address_zip code 1h',
+    default_value: 'Address_zip code 1h'
   },
   {
-    key: 'Address_zip code 2',
-    value: 'Address_zip code 2'
+    variable_name: 'Address_zip code 2',
+    default_value: 'Address_zip code 2'
   },
   {
-    key: 'Address_Prefecture',
-    value: 'Address_Prefecture'
+    variable_name: 'Address_Prefecture',
+    default_value: 'Address_Prefecture'
   },
   {
-    key: 'Address_City',
-    value: 'Address_City'
+    variable_name: 'Address_City',
+    default_value: 'Address_City'
   },
   {
-    key: 'street address',
-    value: 'street address'
+    variable_name: 'street address',
+    default_value: 'street address'
   }
 ];
 
@@ -1329,6 +1335,8 @@ let dataSubCondition = [
 const Scenario = () => {
   // states
   const [scenarioName, setScenarioName] = useState('');
+  const [errorScenarioName, setErrorScenarioName] = useState('');
+
   const [belongTo, setBelongTo] = useState('bot');
   const [messageType, setMessageType] = useState('text_input');
   const [indexMessageSelect, setIndexMessageSelect] = useState('');
@@ -1337,6 +1345,9 @@ const Scenario = () => {
   const [dataSelecteFixed, setDataSelecteFixed] = useState(new Date());
   const [dataInputVar, setDataInputVar] = useState([]);
   const [isOpenPreview, setIsOpenPreview] = useState(false);
+
+  const [varFileReference, setVarFileReference] = useState({});
+  const [isOpenFileReference, setIsOpenFileReference] = useState(false);
 
   // bot setting values
   const [botTextValue, setBotTextValue] = useState('');
@@ -1377,6 +1388,8 @@ const Scenario = () => {
   const [dataDay, setDataDay] = useState(dataDayFixed);
 
   const [errorVariable, setErrorVariable] = useState('');
+
+  const [dataCondition, setDataCondition] = useState([]);
   // side effects
 
   useEffect(() => {
@@ -1432,10 +1445,58 @@ const Scenario = () => {
   }
 
   function getBaseUrl(event) {
-    var file = document.querySelector('input[type=file]')['files'][0];
+    var fileInput = document.querySelector('input[type=file]')['files'][0];
+    const type = fileInput.name.slice(fileInput.name.lastIndexOf('.') + 1);
+    console.log(fileInput, type)
+    const trueFile = ['jpeg', 'jpg', 'png'].includes(type);
+    if (trueFile) {
+      const file = { user_file: { file_type: type } };
+      api
+        .post(`/api/v1/managements/file/upload`, file)
+        .then((res) => {
+          const urlFile = res.data.data.url;
+          let filePost = { user_file: { file_type: type, file_url: res.data.data.path } };
+          axios
+            .put(urlFile, fileInput, {
+              headers: {
+                'Content-Type': `image/${type}`,
+              },
+            })
+            .then((res) => {
+              console.log('response`: ', res);
+            })
+            .catch((err) => {
+              console.log('err: ', err);
+            });
+          api
+            .post(`/api/v1/managements/file`, filePost)
+            .then((res) => {
+              if (res.data.code == 1) {
+                console.log(res);
+                dataMessages[indexMessageSelect].message_content[0].file.content = S3_UPLOAD_URL + res.data.data.file_url;
+                setDataMessages([...dataMessages]);
+              } else {
+                // setMsgNoti(`Add failed!`);
+                // setIsOpenNoti(true);
+                setTimeout(() => {
+                  // setIsOpenNoti(false);
+                  // setMsgNoti(``);
+                }, 2000);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      alert(`You need enter format file is jpeg/ jpg/ png.`);
+    }
     // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
-    var reader = new FileReader();
-    var baseString;
+    // var reader = new FileReader();
+    // var baseString;
     // var imgUrl = URL.createObjectURL(event.target.files[0]);
     // if (
     //   file?.type === 'image/png' ||
@@ -1451,19 +1512,19 @@ const Scenario = () => {
     //   document.getElementById(`bot-file-upload-img`).src = '';
     // }
 
-    reader.onloadend = function () {
-      baseString = reader.result;
-      // setInputImage(baseString);
-      // document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
-      if (baseString !== undefined || baseString !== '') {
-        // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
-        console.log(baseString)
-        dataMessages[indexMessageSelect].message_content[0].file.content = baseString;
-        setDataMessages([...dataMessages]);
-      }
+    // reader.onloadend = function () {
+    //   baseString = reader.result;
+    //   // setInputImage(baseString);
+    //   // document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
+    //   if (baseString !== undefined || baseString !== '') {
+    //     // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
+    //     console.log(baseString)
+    //     dataMessages[indexMessageSelect].message_content[0].file.content = baseString;
+    //     setDataMessages([...dataMessages]);
+    //   }
 
-    };
-    reader.readAsDataURL(file);
+    // };
+    // reader.readAsDataURL(file);
   }
 
   // handle select message
@@ -1620,8 +1681,8 @@ const Scenario = () => {
               range: 'no_input',
               isSplitInput: false
             },
-            url: '', //string
-            email_address: '', //string
+            urls: {}, //string
+            email_address: {}, //string
             email_confirmation: {},
             phone_number: {
               withHyphen: false,
@@ -1641,6 +1702,7 @@ const Scenario = () => {
             type: 'default',
             default: [{ id: 1 }],
             checkbox_img: [{ id: 1 }],
+            checkedValue: []
           }
         }
       );
@@ -1703,6 +1765,7 @@ const Scenario = () => {
           id: idMax,
           type: messageType,
           [messageType]: {
+            require: true,
             title_require: false,
             type: 'detail_content',
             detail_content: {},
@@ -1933,22 +1996,23 @@ const Scenario = () => {
 
     if (subName) {
       if (dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField] === undefined) {
-        dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField] = {}
+        dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField] = {};
       }
       dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField][subName] = value;
     } else if (indexSubField) {
       if (dataMessages[indexMessage].message_content[indexContent][type][name][subField] === undefined) {
-        dataMessages[indexMessage].message_content[indexContent][type][name][subField] = {}
+        dataMessages[indexMessage].message_content[indexContent][type][name][subField] = {};
       }
       dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField] = value;
     } else if (subField) {
       if (dataMessages[indexMessage].message_content[indexContent][type][name] === undefined) {
-        dataMessages[indexMessage].message_content[indexContent][type][name] = {}
+        dataMessages[indexMessage].message_content[indexContent][type][name] = {};
       }
+      console.log(dataMessages[indexMessage].message_content[indexContent])
       dataMessages[indexMessage].message_content[indexContent][type][name][subField] = value;
     } else if (name) {
       if (dataMessages[indexMessage].message_content[indexContent][type] === undefined) {
-        dataMessages[indexMessage].message_content[indexContent][type] = {}
+        dataMessages[indexMessage].message_content[indexContent][type] = {};
       }
       dataMessages[indexMessage].message_content[indexContent][type][name] = value;
     } else {
@@ -2008,9 +2072,16 @@ const Scenario = () => {
   const getListVariable = () => {
     api.get(`/api/v1/managements/chatbots/${botId}/variables?page=all`).then(res => {
       console.log(res.data);
-      setDataInputVar(res.data.data);
-    });
+      if (res.data.code === 1) {
+        setDataCondition([
+          ...dataConditionFixed,
+          ...res.data.data
+        ]);
+        setDataInputVar(res.data.data);
+      }
+    }).catch((error) => { console.error(error) });
   }
+  { console.log(dataCondition, 'chaschkashckjas') }
 
   const createVariable = () => {
     if (!variableName) {
@@ -2040,8 +2111,50 @@ const Scenario = () => {
     });
   }
 
+  const onClickSavePreview = () => {
+    console.log(scenarioName);
+    if (!scenarioName) {
+      setErrorScenarioName("This field cant't be empty");
+      return;
+    } else {
+      setErrorScenarioName("");
+    }
+
+    let data = {
+      conversation: {
+        messages: [...dataMessages],
+      },
+      scenario_name: scenarioName
+    }
+    api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
+      console.log(res.data);
+      setIsOpenNoti(true);
+      if (res.data.code === 1) {
+        setMessageNoti('Save scenario successfully');
+      } else if (res.data.code === 2) {
+        setMessageNoti(res.data.message);
+      }
+      handleGetMessage();
+      setIsOpenPreview(false);
+      setTimeout(() => {
+        setIsOpenPreview(true);
+      }, 200);
+      setTimeout(() => {
+        setIsOpenNoti(false);
+        setMessageNoti('');
+
+      }, 2000);
+    })
+  }
+
   const onClickSaveScenario = () => {
     console.log(scenarioName);
+    if (!scenarioName) {
+      setErrorScenarioName("This field cant't be empty");
+      return;
+    } else {
+      setErrorScenarioName("");
+    }
     let data = {
       conversation: {
         messages: [...dataMessages],
@@ -2190,6 +2303,7 @@ const Scenario = () => {
   }
 
   const handleOpenPreview = (isOpen) => {
+    if (!isOpenPreview) return;
     if (isOpen) {
       document.getElementById('cp-container').style.height = "610px";
       document.getElementById('cp-header').style.position = "static";
@@ -2205,33 +2319,8 @@ const Scenario = () => {
       document.getElementById('cp-header').style.borderBottomRightRadius = "25px";
       document.getElementById('cp-header').style.position = "absolute";
       document.getElementById('cp-header').style.bottom = "13px";
-
     }
     setIsOpenPreview(!isOpenPreview);
-  }
-
-  const onClickSavePreview = () => {
-    let data = {
-      conversation: {
-        messages: [...dataMessages],
-        scenarioName
-      }
-    }
-    api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
-      console.log(res.data);
-      setIsOpenNoti(true);
-      if (res.data.code === 1) {
-        setMessageNoti('Save scenario successfully');
-      } else if (res.data.code === 2) {
-        setMessageNoti(res.data.message);
-      }
-      handleGetMessage();
-      setTimeout(() => {
-        setIsOpenNoti(false);
-        setMessageNoti('');
-      }, 2000);
-    })
-    setIsOpenPreview(true);
   }
 
   return (
@@ -2248,12 +2337,17 @@ const Scenario = () => {
                 {/* ss overview */}
                 <div className="ss-sc-content ss-overview">
                   {/* Input name of scenario */}
-                  <InputCustom
-                    style={{ width: '100%' }}
-                    value={scenarioName}
-                    onChange={value => setScenarioName(value)}
-                    placeholder="Enter scenario name"
-                  />
+
+                  <div>
+                    <InputCustom
+                      style={{ width: '100%' }}
+                      value={scenarioName}
+                      onChange={value => setScenarioName(value)}
+                      placeholder="Enter scenario name"
+                    />
+                    {errorScenarioName && <span style={{ fontSize: '12px', color: '#FF621D' }}>{errorScenarioName}</span>}
+
+                  </div>
                   {/* Overview scenario */}
                   <div style={{ height: 'calc(100% - 44px)', backgroundColor: '#f6fbff' }}>
                     <div className="ss-overview-detail">
@@ -2288,7 +2382,7 @@ const Scenario = () => {
                                 let content;
                                 if (message.belong_to === 'bot') content = message.message_content[0];
                                 return message.belong_to === 'bot' ? (
-                                  <Draggable key={message.id} draggableId={message.id.toString()} index={index}>
+                                  <Draggable key={message.id} draggableId={message.id?.toString()} index={index}>
                                     {(provided) => (
                                       <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef} id={`message_${index}`} key={index} className="ss-bot-chat-wrapper ss-message-wrapper">
                                         <div
@@ -2345,17 +2439,22 @@ const Scenario = () => {
                                                   // ></textarea>
                                                   content[content.type]?.content ? (
                                                     <React.Fragment>
-                                                      {(content[content.type]?.content.includes('jpeg') || content[content.type]?.content.includes('png')) ?
+                                                      {(content[content.type]?.content.includes('jpeg') || content[content.type]?.content.includes('png') || content[content.type]?.content.includes('jpg')) ?
                                                         <img
                                                           src={content[content.type]?.content}
                                                           alt=""
                                                           style={{ width: '27%' }}
                                                         /> :
-                                                        <span
-                                                          style={{ color: '#089BE5', fontSize: '17px' }}
-                                                          onClick={() => handleDownloadFile(content[content.type]?.content)}
-                                                        // className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                        >Download this file</span>
+                                                        // <span
+                                                        //   style={{ color: '#089BE5', fontSize: '17px' }}
+                                                        //   onClick={() => handleDownloadFile(content[content.type]?.content)}
+                                                        // // className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                        // >Download this file</span>
+                                                        <textarea
+                                                          className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                          value={content[content.type]?.content}
+                                                          readOnly
+                                                        ></textarea>
                                                       }
                                                     </React.Fragment>
                                                   ) :
@@ -2521,7 +2620,7 @@ const Scenario = () => {
                                     )}
                                   </Draggable>
                                 ) : (
-                                  <Draggable key={message.id} draggableId={message.id.toString()} index={index}>
+                                  <Draggable key={message.id} draggableId={message.id?.toString()} index={index}>
                                     {(provided) => (
                                       <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef} key={index} className="ss-user-chat-wrapper ss-message-wrapper">
                                         <div
@@ -2654,7 +2753,7 @@ const Scenario = () => {
                                                                   className="ss-message__content--user-text-input ss-input-value"
                                                                   readOnly
                                                                   style={{ marginBottom: '0px' }}
-                                                                  placeholder={textInput[textInput.type]}
+                                                                  placeholder={textInput[textInput.type].placeholder}
                                                                   disabled
                                                                 ></input>
                                                               </React.Fragment>
@@ -2722,7 +2821,7 @@ const Scenario = () => {
                                                                     {textarea.title}
                                                                   </span>
                                                                 }
-                                                                {textarea.require === true &&
+                                                                {textarea.require === true && textarea?.type === 'text_input' &&
                                                                   <span className="ss-message__content--user-text-input-required">
                                                                     * required
                                                                   </span>
@@ -3675,7 +3774,7 @@ const Scenario = () => {
                                       className="ss-bot-statement-type-file-content ss-input-value"
                                       rows={5}
                                       placeholder="File URL"
-                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.content || ''}
                                       onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'content')}
                                     ></textarea>
                                     <input
@@ -3687,9 +3786,11 @@ const Scenario = () => {
                                     />
                                     <CheckboxCustom
                                       label={<span>do not scroll automatically<MDBIcon fas icon="question-circle" style={{ color: '#347AED', marginLeft: '5px', fontSize: '13px' }} /></span>}
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.is_scroll_auto || false}
+                                      onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'is_scroll_auto')}
                                     />
                                     <div className="ss-file-upload-wrapper">
-                                      <Button className="ss-bot-file-reference-btn">
+                                      <Button className="ss-bot-file-reference-btn" onClick={() => setIsOpenFileReference(true)}>
                                         file reference
                                       </Button>
                                       <Button className="ss-bot-file-upload-btn" onClick={botUploadFile}>
@@ -3814,6 +3915,8 @@ const Scenario = () => {
                                           style={{ width: '59%', marginBottom: '5px' }}
                                           data={dataCondition}
                                           value={condition.nameCondition}
+                                          keyValue={"variable_name"}
+                                          nameValue={"variable_name"}
                                           onChange={value => onChangeValueCondition(indexCondition, value, 'nameCondition')}
                                         />
                                         <SelectCustom
@@ -3872,7 +3975,6 @@ const Scenario = () => {
                             <Droppable droppableId="messages">
                               {(provided) => {
                                 let messageUserSelect = dataMessages && dataMessages.filter((message, index) => (message.belong_to === 'user' && index === indexMessageSelect))[0]?.message_content;
-                                console.log(messageUserSelect, 'checkk messageUserSelect');
                                 return <div className="ss-user-setting__main" {...provided.droppableProps} ref={provided.innerRef}>
                                   {messageUserSelect &&
                                     messageUserSelect
@@ -3887,9 +3989,8 @@ const Scenario = () => {
                                         let attachingFile = content.attaching_file;
                                         let calendar = content.calendar;
                                         let agreeTerm = content.agree_term;
-                                        console.log(content, 'ecehchejckc')
                                         return (
-                                          <Draggable key={content.id} draggableId={content.id.toString()} index={indexContent}>
+                                          <Draggable key={content.id} draggableId={content.id?.toString()} index={indexContent}>
                                             {(provided) => (
                                               <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
                                                 <div
@@ -3913,6 +4014,7 @@ const Scenario = () => {
                                                             label="Save the input contents in a variable."
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
                                                             value={textInput.is_save_input_content}
+                                                            isOnChange={false}
                                                           />
                                                         </div>
                                                         {textInput.is_save_input_content &&
@@ -3966,7 +4068,7 @@ const Scenario = () => {
                                                             style={{ width: '49%' }}
                                                             value={textInput.title_require}
                                                             data={dropDownTitle}
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'text_input', value, 'title_require')}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
                                                             keyValue="key"
                                                           />
                                                           <SelectCustom
@@ -3974,7 +4076,7 @@ const Scenario = () => {
                                                             style={{ width: '49%' }}
                                                             value={textInput.type}
                                                             data={type}
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'text_input', value, 'type')}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
                                                             keyValue="key"
                                                           />
                                                         </div>
@@ -4006,7 +4108,8 @@ const Scenario = () => {
                                                             <InputNum
                                                               placeholder="0000"
                                                               className="ss-user-setting-input-limit-character"
-                                                              min={1}
+                                                              max={textInput[textInput.type]?.character_limit_to}
+                                                              min={0}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'character_limit_from')}
                                                               value={textInput[textInput.type]?.character_limit_from}
                                                             />
@@ -4014,7 +4117,7 @@ const Scenario = () => {
                                                             <InputNum
                                                               placeholder="0000"
                                                               className="ss-user-setting-input-limit-character"
-                                                              min={1}
+                                                              min={textInput[textInput.type]?.character_limit_from || 0}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'character_limit_to')}
                                                               value={textInput[textInput.type]?.character_limit_to}
                                                             />
@@ -4037,8 +4140,8 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-bottom">
                                                           <InputCustom
                                                             placeholder="placeholder"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type)}
-                                                            value={textInput[textInput.type]}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'placeholder')}
+                                                            value={textInput[textInput.type]?.placeholder}
                                                           />
                                                         </div>
                                                       }
@@ -4047,8 +4150,8 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-bottom">
                                                           <InputCustom
                                                             placeholder="placeholder"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type)}
-                                                            value={textInput[textInput.type]}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'placeholder')}
+                                                            value={textInput[textInput.type].placeholder}
                                                           />
                                                         </div>
                                                       }
@@ -4131,7 +4234,8 @@ const Scenario = () => {
                                                             <InputNum
                                                               placeholder="0000"
                                                               className="ss-user-setting-input-limit-character"
-                                                              min={1}
+                                                              max={textInput[textInput.type]?.character_limit_to}
+                                                              min={0}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'character_limit_from')}
                                                               value={textInput[textInput.type]?.character_limit_from}
                                                             />
@@ -4139,7 +4243,7 @@ const Scenario = () => {
                                                             <InputNum
                                                               placeholder="0000"
                                                               className="ss-user-setting-input-limit-character"
-                                                              min={1}
+                                                              min={textInput[textInput.type]?.character_limit_from || 0}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'character_limit_to')}
                                                               value={textInput[textInput.type]?.character_limit_to}
                                                             />
@@ -4256,7 +4360,8 @@ const Scenario = () => {
                                                           <InputNum
                                                             placeholder="0000"
                                                             className="ss-user-setting-input-limit-character"
-                                                            min={1}
+                                                            max={textarea.text_input?.character_limit_to}
+                                                            min={0}
                                                             value={textarea.text_input?.character_limit_from}
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textarea.type, 'character_limit_from')}
                                                           />
@@ -4264,7 +4369,7 @@ const Scenario = () => {
                                                           <InputNum
                                                             placeholder="0000"
                                                             className="ss-user-setting-input-limit-character"
-                                                            min={1}
+                                                            min={textarea.text_input?.character_limit_from || 0}
                                                             value={textarea.text_input?.character_limit_to}
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textarea.type, 'character_limit_to')}
                                                           />
@@ -4391,9 +4496,17 @@ const Scenario = () => {
                                                                                         <div className="ss-user-setting__item-bottom">
                                                                                           <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
                                                                                           <InputCustom
+                                                                                            style={{ width: '86%' }}
                                                                                             placeholder="File URL"
                                                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, 'img')}
                                                                                             value={itemRadio.img}
+                                                                                          />
+                                                                                          <MDBIcon onClick={() => {
+                                                                                            setIsOpenFileReference(true)
+                                                                                            setVarFileReference({ indexContent, contentType: content.type, subContentType: radioButton.type, indexSubContent: indexRadio, img: 'img' })
+                                                                                          }}
+                                                                                            fas icon="paperclip"
+                                                                                            style={{ marginLeft: '10px', backgroundColor: '#fff', borderRadius: '50%', padding: '6px' }}
                                                                                           />
                                                                                         </div>
                                                                                         <InputDouble
@@ -4533,8 +4646,9 @@ const Scenario = () => {
                                                         <InputNum
                                                           placeholder="0000"
                                                           className="ss-user-setting-input-limit-character"
-                                                          min={1}
-                                                          disabled={!checkbox.required}
+                                                          max={checkbox.selection_limit_to}
+                                                          min={0}
+                                                          disabled={!checkbox.require}
                                                           value={checkbox.selection_limit_from}
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'selection_limit_from')}
                                                         />
@@ -4542,7 +4656,7 @@ const Scenario = () => {
                                                         <InputNum
                                                           placeholder="0000"
                                                           className="ss-user-setting-input-limit-character"
-                                                          min={1}
+                                                          min={checkbox.selection_limit_from || 0}
                                                           value={checkbox.selection_limit_to}
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'selection_limit_to')}
                                                         />
@@ -4585,9 +4699,17 @@ const Scenario = () => {
                                                                                         <div className="ss-user-setting__item-bottom" style={{ display: 'flex', alignItems: 'center' }}>
                                                                                           <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
                                                                                           <InputCustom
+                                                                                            style={{ width: '86%' }}
                                                                                             placeholder="File URL"
                                                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, 'img')}
                                                                                             value={checkbox[checkbox.type][indexCheckbox].img}
+                                                                                          />
+                                                                                          <MDBIcon onClick={() => {
+                                                                                            setIsOpenFileReference(true)
+                                                                                            setVarFileReference({ indexContent, contentType: content.type, subContentType: checkbox.type, indexSubContent: indexCheckbox, img: 'img' })
+                                                                                          }}
+                                                                                            fas icon="paperclip"
+                                                                                            style={{ marginLeft: '10px', backgroundColor: '#fff', borderRadius: '50%', padding: '6px' }}
                                                                                           />
                                                                                         </div>
                                                                                         <InputDouble
@@ -4703,7 +4825,7 @@ const Scenario = () => {
                                                           <div>
                                                             <CheckboxCustom
                                                               label="Required"
-                                                              onChange={value => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, content.type, zipCodeAddress.isCheckRequire === 'require' ? '' : 'require', 'isCheckRequire')}
+                                                              onChange={() => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, content.type, zipCodeAddress.isCheckRequire === 'require' ? '' : 'require', 'isCheckRequire')}
                                                               value={zipCodeAddress.isCheckRequire === 'require'}
                                                               isOnChange={false}
                                                             />
@@ -4892,14 +5014,14 @@ const Scenario = () => {
                                                           <div>
                                                             <CheckboxCustom
                                                               label="Required"
-                                                              onChange={value => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, content.type, value, 'require')}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
                                                               value={attachingFile.require}
                                                             />
                                                           </div>
                                                           <div className="ss-user-setting__item-text_input-use-api-required">
                                                             <CheckboxCustom
                                                               label="Multiple file upload"
-                                                              onChange={value => handleChangeValueRequireZipCode(indexMessageSelect, indexContent, content.type, value, 'multifile_upload')}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'multifile_upload')}
                                                               value={attachingFile.multifile_upload}
                                                             />
                                                           </div>
@@ -5347,6 +5469,7 @@ const Scenario = () => {
                                                                                     <div style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                                                                       <MDBIcon fas icon="grip-horizontal" />
                                                                                       <InputDouble
+                                                                                        style={array.length === 1 && !pullDown[pullDown.type]?.is_comment ? { width: '95%' } : {}}
                                                                                         classCustom={isComment ? "ss-user-setting-custom-double-input-custom" : ""}
                                                                                         onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text' : 'value')}
                                                                                         valueLeft={itemPullDown.text}
@@ -5365,12 +5488,14 @@ const Scenario = () => {
                                                                                           />
                                                                                         </React.Fragment>
                                                                                       }
-                                                                                      <MDBIcon
-                                                                                        fas
-                                                                                        style={{ fontSize: '25px' }}
-                                                                                        icon="times-circle"
-                                                                                        onClick={(e) => handleRemoveItemCustomizePullDown(indexMessageSelect, indexContent, content.type, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown)}
-                                                                                      />
+                                                                                      {array.length >= 2 &&
+                                                                                        <MDBIcon
+                                                                                          fas
+                                                                                          style={{ fontSize: '25px' }}
+                                                                                          icon="times-circle"
+                                                                                          onClick={(e) => handleRemoveItemCustomizePullDown(indexMessageSelect, indexContent, content.type, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown)}
+                                                                                        />
+                                                                                      }
                                                                                     </div>
                                                                                   </div>
                                                                                 )}
@@ -6092,6 +6217,8 @@ const Scenario = () => {
                                           <SelectCustom
                                             style={{ width: '59%', marginBottom: '5px' }}
                                             data={dataCondition}
+                                            keyValue={"variable_name"}
+                                            nameValue={"variable_name"}
                                             value={condition.nameCondition}
                                             onChange={value => onChangeValueCondition(indexCondition, value, 'nameCondition')}
                                           />
@@ -6203,7 +6330,22 @@ const Scenario = () => {
           </div>
         </div>
       </ModalShort>
-      <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioId={scenarioId} />
+      <ModalShort open={isOpenFileReference} onClose={() => setIsOpenFileReference(false)}>
+        <div className="ss-popup-file-reference-scenario">
+          <FileReferencePopup
+            onCancel={() => setIsOpenFileReference(false)}
+            onReferFile={(file_url) => {
+              if (dataMessages[indexMessageSelect].belong_to === 'user') {
+                onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, file_url, varFileReference.subContentType, varFileReference.indexSubContent, varFileReference.img);
+              } else {
+                onChangeValueMessageContent(indexMessageSelect, 0, messageType, file_url, 'content')
+              }
+              setIsOpenFileReference(false)
+            }}
+          />
+        </div>
+      </ModalShort>
+      {isOpenPreview && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioId={scenarioId} />}
     </div >
   );
 };

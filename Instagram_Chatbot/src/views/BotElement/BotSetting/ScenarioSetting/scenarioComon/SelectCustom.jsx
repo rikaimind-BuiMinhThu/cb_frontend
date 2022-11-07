@@ -4,22 +4,22 @@ import 'antd/dist/antd.css';
 
 const { Option } = Select;
 
-const SelectCustom = ({ id, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label }) => {
-
+const SelectCustom = ({ id, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label, disabled = false }) => {
   return (
     <React.Fragment>
-      {label && <span style={{marginRight: '2%', fontSize: '14px', fontWeight: '400'}}>{label}</span>}
+      {label && <span style={{ marginRight: '2%', fontSize: '14px', fontWeight: '400' }}>{label}</span>}
       <Select
         allowClear
-        style={style || {width: '90%'}}
+        style={style || { width: '90%' }}
         placeholder={placeholder}
         mode={mode ? mode : 'combobox'}
         onChange={onChange}
         value={value}
+        disabled={disabled}
       >
         {
-          data && data.map((item, index) => {
-            return <Option key={index} value={item[keyValue]}>{item[nameValue]}</Option>
+          data && data.map((item, index) => {            
+            return (item[keyValue] || item[nameValue]) && <Option key={index} value={item[keyValue]}>{item[nameValue]}</Option>
           })
         }
       </Select>

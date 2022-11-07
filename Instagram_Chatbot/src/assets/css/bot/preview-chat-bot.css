@@ -1,5 +1,5 @@
 .cp-container {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     right: 10px;
     width: 380px;
@@ -7,6 +7,7 @@
     background-color: #EBF7FF;
     border-top-left-radius: 25px;
     border-top-right-radius: 25px;
+    z-index: 101;
 }
 
 .cp-header {
@@ -73,6 +74,10 @@
     height: 84%;
 }
 
+.cp-body input {
+    width: 100%;
+}
+
 .cp-body>div {
     margin-bottom: 7px;
 }
@@ -82,6 +87,23 @@
     width: 89%;
     justify-content: space-between;
 }
+
+/* .cp-body-bot-side::before {
+    width: 89%;
+    animation: reveal 1s reverse forwards;
+    animation-delay: 3s;
+    transform-origin: right;
+}
+
+@keyframes reveal {
+    0% {
+        transform: scaleX(0);
+    }
+
+    100% {
+        transform: scaleX(1);
+    }
+} */
 
 .cp-body-bot-side-avatar {}
 
