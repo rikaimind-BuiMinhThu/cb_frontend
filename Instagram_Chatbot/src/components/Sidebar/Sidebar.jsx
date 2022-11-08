@@ -434,15 +434,16 @@ function Sidebar(props) {
                     <p style={{ color: "black" }}>Conversion</p>
                   </NavLink>
                 </li>
-                <li className={activeRoute('preview') + (true ? " active-pro" : "")} key={'preview'}>
+                {/* <li className={activeRoute('preview') + (true ? " active-pro" : "")} key={'preview'}>
                   <NavLink to="/admin/preview" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
                     <p style={{ color: "black" }}>Preview</p>
                   </NavLink>
-                </li>
+                </li> */}
 
                 <li key={'report'}>
-                  <NavLink onClick={() => displayReportSetting()} to="/admin/report" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                {/* <NavLink onClick={() => displayReportSetting()} to="/admin/report" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}> */}
+                  <NavLink to="/admin/report" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
                     <p style={{ color: "black" }}>Report</p>
                   </NavLink>
