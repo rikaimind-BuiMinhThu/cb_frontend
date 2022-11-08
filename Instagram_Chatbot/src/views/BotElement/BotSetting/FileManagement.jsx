@@ -9,6 +9,7 @@ import './../../../assets/css/file-mng.css';
 import api from '../../../api/api-management';
 import axios from 'axios';
 import ModalNoti from 'views/Popup/ModalNoti';
+import { tokenExpired } from 'api/tokenExpired';
 
 function FileManagement() {
   const [files, setFiles] = useState([]);
@@ -61,7 +62,10 @@ function FileManagement() {
               console.log('response`: ', res);
             })
             .catch((err) => {
-              console.log('err: ', err);
+              console.log(err);
+              if (err.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
           api
             .post(`/api/v1/managements/file`, filePost)
@@ -87,10 +91,16 @@ function FileManagement() {
             })
             .catch((err) => {
               console.log(err);
+              if (err.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         })
         .catch((err) => {
           console.log(err);
+          if (err.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       setFileError(`You need enter format file is jpeg/ jpg/ png.`);
@@ -131,6 +141,9 @@ function FileManagement() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 

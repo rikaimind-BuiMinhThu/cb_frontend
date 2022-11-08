@@ -9,6 +9,7 @@ import { Button } from 'react-bootstrap';
 import ModalNoti from 'views/Popup/ModalNoti';
 import Cookies from 'js-cookie';
 import { Pagination } from '@material-ui/lab';
+import { tokenExpired } from 'api/tokenExpired';
 
 function ListEmail() {
   const [emailList, setEmailList] = useState([]);
@@ -35,6 +36,9 @@ function ListEmail() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -52,6 +56,9 @@ function ListEmail() {
             })
             .catch((err) => {
               console.log(err);
+              if (err.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         } else {
           setEmailList(res.data.data);
@@ -60,6 +67,9 @@ function ListEmail() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -93,6 +103,9 @@ function ListEmail() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -126,6 +139,9 @@ function ListEmail() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
   function handleChange(event, value) {

@@ -52,6 +52,7 @@
     "react-google-charts": "^4.0.0",
     "react-helmet": "^6.1.0",
     "react-hooks-use-modal": "^2.1.0",
+    "react-iframe": "^1.8.5",
     "react-js-pagination": "^3.0.3",
     "react-native-navigation": "^7.28.0",
     "react-notification-alert": "0.0.13",
