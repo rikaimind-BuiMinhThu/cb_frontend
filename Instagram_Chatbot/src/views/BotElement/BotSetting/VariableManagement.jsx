@@ -8,6 +8,7 @@ import api from './../../../api/api-management';
 import ModalNoti from 'views/Popup/ModalNoti';
 import ModalShort from 'views/Popup/ModalShort';
 import { Button } from 'react-bootstrap';
+import { tokenExpired } from 'api/tokenExpired';
 
 function VariableManagement() {
   const [customVariable, setCustomVariable] = useState([]);
@@ -36,6 +37,9 @@ function VariableManagement() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }, []);
 
@@ -48,6 +52,9 @@ function VariableManagement() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -90,6 +97,9 @@ function VariableManagement() {
         })
         .catch((err) => {
           console.log(err);
+          if (err.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -133,6 +143,9 @@ function VariableManagement() {
       })
       .catch((err) => {
         console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired()
+        }
       });
   }
 
@@ -164,6 +177,9 @@ function VariableManagement() {
         })
         .catch((err) => {
           console.log(err);
+          if (err.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }

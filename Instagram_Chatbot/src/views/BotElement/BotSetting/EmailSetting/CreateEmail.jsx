@@ -5,6 +5,7 @@ import './../../../../assets/css/bot/email/create-email.css';
 import api from './../../../../api/api-management';
 import ModalNoti from 'views/Popup/ModalNoti';
 import Cookies from 'js-cookie';
+import { tokenExpired } from 'api/tokenExpired';
 
 function CreateEmail() {
   const [ccNum, setCcNum] = useState(0);
@@ -85,6 +86,9 @@ function CreateEmail() {
         })
         .catch((err) => {
           console.log(err);
+          if (err.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }, []);
@@ -240,6 +244,9 @@ function CreateEmail() {
         })
         .catch((err) => {
           console.log(err);
+          if (err.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
@@ -294,6 +301,9 @@ function CreateEmail() {
         })
         .catch((err) => {
           console.log(err);
+          if (err.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     }
   }
