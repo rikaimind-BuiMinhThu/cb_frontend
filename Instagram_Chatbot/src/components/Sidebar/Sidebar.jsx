@@ -442,7 +442,7 @@ function Sidebar(props) {
                 </li>
 
                 <li key={'report'}>
-                  <NavLink onClick={() => displayReportSetting()} to="/admin/conversion-info" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                  <NavLink onClick={() => displayReportSetting()} to="/admin/report" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
                     <p style={{ color: "black" }}>Report</p>
                   </NavLink>

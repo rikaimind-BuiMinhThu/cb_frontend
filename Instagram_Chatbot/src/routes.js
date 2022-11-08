@@ -63,6 +63,7 @@ import BotAdmin from "views/BotElement/BotSetting/AdvanceSetting/BotAdmin";
 import FileManagement from "views/BotElement/BotSetting/FileManagement";
 import AddSubUserMng from "views/BotElement/AddSubUserMng";
 import HtmlScreen from "views/HtmlScreen";
+import Report from "views/BotElement/BotSetting/Report/Report";
 
 var routes = [
   {
@@ -365,7 +366,13 @@ var routes = [
     component: Conversion,
     layout: "/admin",
   },
-
+  {
+    path: "/report",
+    name: "Report",
+    // icon: "nc-icon nc-single-02",
+    component: Report,
+    layout: "/admin",
+  },
   {
     path: "/preview",
     name: "Preview",
