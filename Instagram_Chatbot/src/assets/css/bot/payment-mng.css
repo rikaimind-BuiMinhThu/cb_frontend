@@ -1,0 +1,16 @@
+.payment-management-option{
+    display: flex;
+}
+.payment-management-option-item{
+    padding: 10px 25px;
+    font-size: 18px;
+    cursor: pointer;
+}
+.payment-management-btn-search{
+    padding: 10px 25px;
+    border: none;
+    color:white;
+    font-weight: 600;
+    border-radius: 10px;
+    background-color: #57c8f0;
+}
