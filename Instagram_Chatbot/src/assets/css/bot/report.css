@@ -8,6 +8,7 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  width: 75%;
 }
 .report__group {
   display: inline-block;
@@ -41,4 +42,8 @@
 }
 .report__item-chart {
   height: 400px;
+}
+.err-date {
+  color: red;
+  display: block;
 }
