@@ -3831,7 +3831,7 @@ const Scenario = () => {
                                     <CheckboxCustom
                                       label={<span>do not scroll automatically<MDBIcon fas icon="question-circle" style={{ color: '#347AED', marginLeft: '5px', fontSize: '13px' }} /></span>}
                                       value={dataMessages[indexMessageSelect].message_content[0][messageType]?.is_scroll_auto || false}
-                                      onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'is_scroll_auto')}
+                                      onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'is_scroll_auto')}
                                     />
                                     <div className="ss-file-upload-wrapper">
                                       <Button className="ss-bot-file-reference-btn" onClick={() => setIsOpenFileReference(true)}>

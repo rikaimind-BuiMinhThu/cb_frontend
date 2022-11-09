@@ -10,6 +10,7 @@ import DatePicker from 'react-datepicker';
 import {
   Button
 } from 'reactstrap';
+import $ from 'jquery';
 
 let dataHourFixed = [];
 for (let i = 1; i <= 24; i++) {
@@ -88,14 +89,24 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
   const [errors, setErrors] = useState({});
   const [variables, setVariables] = useState([]);
   const [objParam, setObjParam] = useState(() => {
-    return {
+    let dataObj = {
       current_url: window.location.href,
       current_url_param: getAllUrlParams(window.location.href),
       current_url_title: document.title,
       user_id: Cookies.get('user_id'),
-      bot_id: Cookies.get('bot_id'),
+      bot_id: Cookies.get('bot_id')
     };
-
+    $.getJSON('https://api.ipregistry.co/?key=tryout', function (data) {
+      console.log(data);
+      dataObj.user_ip_address = data.ip;
+      dataObj.user_country = data.location.country.name;
+      dataObj.user_city = data.location.city;
+      dataObj.user_device = data.user_agent.device.type;
+      dataObj.user_browser = data.user_agent.name;
+      dataObj.user_agent = data.user_agent.header;
+      dataObj.start_datetime = new Date();      
+    });
+    return dataObj;
   });
 
   function getAllUrlParams(url) {
