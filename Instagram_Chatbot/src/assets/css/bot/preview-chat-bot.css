@@ -61,7 +61,7 @@
 }
 
 .cp-process-bar-color {
-    width: 25%;
+    min-width: 25%;
     height: 20px;
     background-color: #70A5FC;
     padding: 0px 5px;
