@@ -64,6 +64,7 @@ import FileManagement from "views/BotElement/BotSetting/FileManagement";
 import AddSubUserMng from "views/BotElement/AddSubUserMng";
 import HtmlScreen from "views/HtmlScreen";
 import Report from "views/BotElement/BotSetting/Report/Report";
+import PaymentManagement from "views/BotElement/PaymentManagement";
 
 var routes = [
   {
@@ -371,6 +372,13 @@ var routes = [
     name: "Report",
     // icon: "nc-icon nc-single-02",
     component: Report,
+    layout: "/admin",
+  },
+  {
+    path: "/payment-management",
+    name: "Payment",
+    // icon: "nc-icon nc-single-02",
+    component: PaymentManagement,
     layout: "/admin",
   },
   {
