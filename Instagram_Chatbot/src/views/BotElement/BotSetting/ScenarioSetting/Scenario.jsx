@@ -25,7 +25,7 @@ import axios from 'axios';
 import {
   S3_UPLOAD_URL
 } from '../../../../variables/constants';
-
+import { tokenExpired } from 'api/tokenExpired';
 const _ = require('lodash');
 
 let data = [
@@ -1408,7 +1408,12 @@ const Scenario = () => {
   useEffect(() => {
     api.get(`/api/v1/managements/emails?page=all&chatbot_id=${botId}`).then(res => {
       setDataEmail(res.data.data);
-    }).catch((error) => { console.error(error) })
+    }).catch((error) => {
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
+    })
   }, [])
 
   // useEffect(() => {
@@ -1419,7 +1424,12 @@ const Scenario = () => {
     api.get(`/api/v1/prefectures`).then((res) => {
       // console.log(res.data.data);
       setDataPrefectures(res.data.data);
-    }).catch((error) => { console.error(error) });
+    }).catch((error) => {
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
+    })
   }, [])
 
   useEffect(() => {
@@ -1437,7 +1447,12 @@ const Scenario = () => {
       setDataMessages(res.data.data?.conversation?.messages || []);
       setScenarioName(res.data.data?.scenario_name || '');
 
-    }).catch((error) => { console.error(error) });
+    }).catch((error) => {
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
+    });
   }
 
   function botUploadFile() {
@@ -1465,8 +1480,11 @@ const Scenario = () => {
             .then((res) => {
               console.log('response`: ', res);
             })
-            .catch((err) => {
-              console.log('err: ', err);
+            .catch((error) => {
+              console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
           api
             .post(`/api/v1/managements/file`, filePost)
@@ -1484,12 +1502,18 @@ const Scenario = () => {
                 }, 2000);
               }
             })
-            .catch((err) => {
-              console.log(err);
+            .catch((error) => {
+              console.log(error);
+              if (error.response?.data.code === 0) {
+                tokenExpired()
+              }
             });
         })
-        .catch((err) => {
-          console.log(err);
+        .catch((error) => {
+          console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
         });
     } else {
       alert(`You need enter format file is jpeg/ jpg/ png.`);
@@ -2079,7 +2103,12 @@ const Scenario = () => {
         ]);
         setDataInputVar(res.data.data);
       }
-    }).catch((error) => { console.error(error) });
+    }).catch((error) => {
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
+    });
   }
   { console.log(dataCondition, 'chaschkashckjas') }
 
@@ -2108,6 +2137,11 @@ const Scenario = () => {
         setIsOpenNoti(false);
         setMessageNoti('');
       }, 2000);
+    }).catch((error) => {
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     });
   }
 
@@ -2144,6 +2178,11 @@ const Scenario = () => {
         setMessageNoti('');
 
       }, 2000);
+    }).catch((error) => {
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -2174,6 +2213,11 @@ const Scenario = () => {
         setIsOpenNoti(false);
         setMessageNoti('');
       }, 2000);
+    }).catch((error) => {
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
     })
   }
 
@@ -4657,6 +4701,7 @@ const Scenario = () => {
                                                           placeholder="0000"
                                                           className="ss-user-setting-input-limit-character"
                                                           min={checkbox.selection_limit_from || 0}
+                                                          max={checkbox?.[checkbox.type].length}
                                                           value={checkbox.selection_limit_to}
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'selection_limit_to')}
                                                         />

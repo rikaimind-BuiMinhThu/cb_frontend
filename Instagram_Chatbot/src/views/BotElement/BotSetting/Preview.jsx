@@ -83,13 +83,60 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
   const [dataMessages, setDataMessages] = useState([]);
   const [indexMessageRender, setIndexMessageRender] = useState(0);
   const [renderMessageArr, setRenderMessageArr] = useState([]);
-  const [messageBot, setMessageBot] = useState([]);
+  const [indexUser, setIndexUser] = useState(0);
+  const [messageUser, setMessageUser] = useState([]);
   const [errors, setErrors] = useState({});
   const [variables, setVariables] = useState([]);
+  const [objParam, setObjParam] = useState(() => {
+    return {
+      current_url: window.location.href,
+      current_url_param: getAllUrlParams(window.location.href),
+      current_url_title: document.title,
+      user_id: Cookies.get('user_id'),
+      bot_id: Cookies.get('bot_id'),
+    };
+
+  });
+
+  function getAllUrlParams(url) {
+    var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
+    var obj = {};
+    if (queryString) {
+      queryString = queryString.split('#')[0];
+      var arr = queryString.split('&');
+      for (var i = 0; i < arr.length; i++) {
+        var a = arr[i].split('=');
+        var paramName = a[0];
+        var paramValue = typeof (a[1]) === 'undefined' ? true : a[1];
+        paramName = paramName.toLowerCase();
+        if (typeof paramValue === 'string') paramValue = paramValue.toLowerCase();
+        if (paramName.match(/\[(\d+)?\]$/)) {
+          var key = paramName.replace(/\[(\d+)?\]/, '');
+          if (!obj[key]) obj[key] = [];
+          if (paramName.match(/\[\d+\]$/)) {
+            var index = /\[(\d+)\]/.exec(paramName)[1];
+            obj[key][index] = paramValue;
+          } else {
+            obj[key].push(paramValue);
+          }
+        } else {
+          if (!obj[paramName]) {
+            obj[paramName] = paramValue;
+          } else if (obj[paramName] && typeof obj[paramName] === 'string') {
+            obj[paramName] = [obj[paramName]];
+            obj[paramName].push(paramValue);
+          } else {
+            obj[paramName].push(paramValue);
+          }
+        }
+      }
+    }
+
+    return obj;
+  }
 
   useEffect(() => {
     api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
-      console.log(res.data);
       if (res.data.code == 1) {
         setBotInfor(res.data.data);
       }
@@ -98,58 +145,112 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
 
   useEffect(() => {
     if (scenarioId) {
-      api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/preview`).then(res => {
-        console.log(res.data);
+      api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/preview`).then(async res => {
         if (res.data.code == 1) {
           let messageArr = [...res.data.data?.conversation?.messages];
-          console.log(messageArr, 'check messageArr');
           setDataMessages(messageArr);
-          console.log(res.data.variables, 'checjehckjhekjc')
           setVariables([...res.data.variables]);
+          res.data.variables.forEach(item => {
+            objParam[item.variable_name] = item.default_value;
+          });
+          setObjParam({ ...objParam });
+          console.log(objParam, 'ceghckkkkkkkkkkkkkkk objParam')
+          let variables = [...res.data.variables];
+          let messageUserVar = messageArr.filter(item => item.belong_to === 'user' && item.message_content.length > 0);
+          setMessageUser([...messageUserVar]);
           let renderMessage = [];
           let index;
           let delayRender;
 
           for (let i = 0; i < messageArr.length; i++) {
+            if (messageArr[i].conditions?.length > 0) {
+              var checked = true;
+              console.log(messageArr[i].conditions, 'check conditions')
+              for (let j = 0; j < messageArr[i].conditions.length; j++) {
+                let conditionItem = messageArr[i].conditions[j];
+                if (j === 0) {
+                  if (conditionItem.condition === 'include') {
+                    checked = objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                  } else if (conditionItem.condition === 'is') {
+                    checked = (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                  } else if (conditionItem.condition === 'not_include') {
+                    checked = (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                  } else if (conditionItem.condition === 'is_not') {
+                    checked = (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                  }
+                } else if (conditionItem?.linkCondition === 'and') {
+                  if (conditionItem.condition === 'include') {
+                    checked = checked && objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                  } else if (conditionItem.condition === 'is') {
+                    checked = checked && (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                  } else if (conditionItem.condition === 'not_include') {
+                    checked = checked && (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                  } else if (conditionItem.condition === 'is_not') {
+                    checked = checked && (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                  }
+                } else if (conditionItem?.linkCondition === 'or') {
+                  if (conditionItem.condition === 'include') {
+                    checked = checked || objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                  } else if (conditionItem.condition === 'is') {
+                    checked = checked || (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                  } else if (conditionItem.condition === 'not_include') {
+                    checked = checked || (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                  } else if (conditionItem.condition === 'is_not') {
+                    checked = checked || (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                  }
+                }
+              }
+              if (checked === false) {
+                if (messageArr[i].belong_to === 'user') setIndexUser(prev => prev + 1);
+                continue;
+              }
+            }
             if (messageArr[0].belong_to === 'bot') {
-              console.log(messageArr[i], 'check messageArr[i]');
+              console.log(i, 'check index message')
+
               if (messageArr[i]?.message_content[0].type === 'delay') {
-                let promise = new Promise((resolve) => {
+                await new Promise((resolve) => {
                   return delayRender = setTimeout(() => {
                     resolve();
-                  }, (parseInt(messageArr[i]?.message_content[0].delay.content.split(' ')[0]) * 1000 + (i + 1) * 1000) || 2000);
+                  }, messageArr[i]?.message_content[0]?.delay?.content * 1000);
                 });
                 index = i;
-                console.log(parseInt(messageArr[i]?.message_content[0].delay.content.split(' ')[0]) * 1000 + (i + 1) * 1000)
                 // promise.then(data => {
-                //   console.log(data, 'check dataaaa1');
                 //   renderMessage.push(data);
                 //   setRenderMessageArr([
                 //     ...renderMessage
                 //   ]);
                 // })
               } else if (messageArr[i].belong_to !== 'bot') {
-                let promise = new Promise((resolve) => {
+                await new Promise((resolve) => {
                   return delayRender = setTimeout(() => {
                     resolve({ ...messageArr[i] });
-                  }, (i + 1) * 1000);
-                })
-                promise.then(data => {
+                  }, 1000);
+                }).then(data => {
                   renderMessage.push(data);
                   setRenderMessageArr([
                     ...renderMessage
                   ]);
                 })
+                setIndexUser(prev => prev + 1);
                 index = i;
                 break;
               } else {
-                let promise = new Promise((resolve) => {
+                console.log(i, 'checkkkkk')
+                await new Promise((resolve) => {
                   return delayRender = setTimeout(() => {
+                    if (messageArr[i].message_content[0].type === 'text_input') {
+                      messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                        for (let j = 0; j < variables.length; j++) {
+                          if (variables[j].variable_name === variable) {
+                            return variables[j].default_value;
+                          }
+                        }
+                      });
+                    }
                     resolve({ ...messageArr[i] });
-                  }, (i + 1) * 1000);
-                })
-                promise.then(data => {
-                  console.log(data, 'check dataaaa3');
+                  }, 1000);
+                }).then(data => {
                   renderMessage.push(data);
                   setRenderMessageArr([
                     ...renderMessage
@@ -159,13 +260,20 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
               }
             } else if (messageArr[0].belong_to === 'user') {
               if (messageArr[i].belong_to !== 'user') {
-                let promise = new Promise((resolve) => {
+                await new Promise((resolve) => {
                   return delayRender = setTimeout(() => {
+                    if (messageArr[i].message_content[0].type === 'text_input') {
+                      messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                        for (let j = 0; j < variables.length; j++) {
+                          if (variables[j].variable_name === variable) {
+                            return variables[j].default_value;
+                          }
+                        }
+                      });
+                    }
                     resolve({ ...messageArr[i] });
-                  }, (i + 1) * 1000);
-                })
-                promise.then(data => {
-                  console.log(data, 'check dataaaa4');
+                  }, 1000);
+                }).then(data => {
                   renderMessage.push(data);
                   setRenderMessageArr([
                     ...renderMessage
@@ -173,26 +281,22 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                 })
                 index = i;
               } else {
-                let promise = new Promise((resolve) => {
+                await new Promise((resolve) => {
                   return delayRender = setTimeout(() => {
                     resolve({ ...messageArr[i] });
-                  }, (i + 1) * 1000);
-                })
-                promise.then(data => {
-                  console.log(data, 'check dataaaa5');
+                  }, 1000);
+                }).then(data => {
                   renderMessage.push(data);
                   setRenderMessageArr([
                     ...renderMessage
                   ]);
                 })
+                setIndexUser(prev => prev + 1);
                 index = i;
                 break;
               }
             }
           }
-
-          console.log(renderMessage);
-
           setIndexMessageRender(index);
           // setRenderMessageArr(renderMessage);
           return () => {
@@ -224,7 +328,6 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
     for (let i = 0; i < contentArr.length; i++) {
       let contentType = contentArr[i][contentArr[i].type];
       if (contentType.require) {
-        console.log(contentArr[i])
         let limitFrom = contentType[contentType.type]?.character_limit_from;
         let limitTo = contentType[contentType.type]?.character_limit_to;
         if (contentType.type === 'text' || contentType.type === 'password') {
@@ -267,7 +370,6 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
               || contentType[contentType.type].value.length > limitTo
               || contentType[contentType.type].valueConfirm.length < limitFrom
               || contentType[contentType.type].valueConfirm.length > limitTo)) {
-            console.log('asdhkjahdkjashdjkashdjkashd')
             errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
             isValid = false;
           }
@@ -382,13 +484,11 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
             isValid = false;
           }
         } else if (contentArr[i].type === 'radio_button') {
-          console.log(contentType, 'checkkkkk')
           if (stringNullOrEmpty(contentType.initial_selection)) {
             errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'checkbox') {
-          console.log(contentType, 'checkkkkk')
           if (contentType.checkedValue && contentType.checkedValue.length === 0) {
             errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
@@ -448,7 +548,6 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
     if (isValid) {
       errors = {};
     }
-    console.log(errors)
     setErrors(errors);
     return isValid;
   }
@@ -459,11 +558,10 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
       var i = parseInt(hex, 16)
       return String.fromCharCode(i)
     })
-    console.log(binstr);
     return binstr
   }
 
-  const onClickNext = (indexMessage) => {
+  const onClickNext = async (indexMessage) => {
     if (!handleValidateField()) {
       return;
     }
@@ -472,42 +570,95 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
     let index;
     let delayRender;
     // let REGEX = /\{\{(.*?)\}\}/ig;
+    setIndexUser(prev => prev + 1);
+
     if (!dataMessages[indexMessageRender + 1]) return;
     if (dataMessages[indexMessageRender + 1].belong_to === 'bot') {
       for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
-        if (dataMessages[i].belong_to === 'bot') {
-          let promise = new Promise((resolve) => {
-            return delayRender = setTimeout(() => {
-              console.log(dataMessages[i])
-              if (dataMessages[i].message_content[0].type === 'text_input') {
-                dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                  console.log(variable)
-                  for (let j = 0; j < variables.length; j++) {
-                    if (variables[j].variable_name === variable) {
-                      return variables[j].default_value;
-                    }
-                  }
-                })
+        if (dataMessages[i].conditions) {
+          var checked = true;
+          for (let j = 0; j < dataMessages[i].conditions.length; j++) {
+            let conditionItem = dataMessages[i].conditions[j];
+            if (j === 0) {
+              if (conditionItem.condition === 'include') {
+                checked = objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+              } else if (conditionItem.condition === 'is') {
+                checked = (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+              } else if (conditionItem.condition === 'not_include') {
+                checked = (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+              } else if (conditionItem.condition === 'is_not') {
+                checked = (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
               }
+            } else if (conditionItem?.linkCondition === 'and') {
+              if (conditionItem.condition === 'include') {
+                checked = checked && objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+              } else if (conditionItem.condition === 'is') {
+                checked = checked && (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+              } else if (conditionItem.condition === 'not_include') {
+                checked = checked && (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+              } else if (conditionItem.condition === 'is_not') {
+                checked = checked && (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+              }
+            } else if (conditionItem?.linkCondition === 'or') {
+              if (conditionItem.condition === 'include') {
+                checked = checked || objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+              } else if (conditionItem.condition === 'is') {
+                checked = checked || (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+              } else if (conditionItem.condition === 'not_include') {
+                checked = checked || (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+              } else if (conditionItem.condition === 'is_not') {
+                checked = checked || (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+              }
+            }
+          }
+          if (checked === false) {
+            if (dataMessages[i].belong_to === 'user') setIndexUser(prev => prev + 1);
+            continue;
+          }
+        }
+        if (dataMessages[i].belong_to === 'bot') {
+          if (dataMessages[i]?.message_content[0].type === 'delay') {
+            await new Promise((resolve) => {
+              return delayRender = setTimeout(() => {
+                resolve();
+              }, (dataMessages[i]?.message_content[0].delay.content * 1000));
+            });
+            index = i;
+            // promise.then(data => {
+            //   renderMessage.push(data);
+            //   setRenderMessageArr([
+            //     ...renderMessage
+            //   ]);
+            // })
+          } else {
+            await new Promise((resolve) => {
+              return delayRender = setTimeout(() => {
+                if (dataMessages[i].message_content[0].type === 'text_input') {
+                  dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                    for (let j = 0; j < variables.length; j++) {
+                      if (variables[j].variable_name === variable) {
+                        return variables[j].default_value;
+                      }
+                    }
+                  })
+                }
 
-              resolve({ ...dataMessages[i] });
-            }, (i - indexMessageRender) * 1000);
-          })
-          promise.then(data => {
-            renderMessage.push(data);
-            setRenderMessageArr([
-              ...renderMessage
-            ]);
-          })
-          index = i;
-        } else if (dataMessages[i].belong_to === 'user') {
-          console.log(dataMessages[i], i - indexMessageRender)
-          let promise = new Promise((resolve) => {
+                resolve({ ...dataMessages[i] });
+              }, 1000);
+            }).then(data => {
+              renderMessage.push(data);
+              setRenderMessageArr([
+                ...renderMessage
+              ]);
+            })
+            index = i;
+          }
+        } else if (dataMessages[i].belong_to === 'user' && dataMessages[i].message_content.length > 0) {
+          await new Promise((resolve) => {
             return delayRender = setTimeout(() => {
               resolve({ ...dataMessages[i] });
-            }, (i - indexMessageRender) * 1000);
-          })
-          promise.then(data => {
+            }, 1000);
+          }).then(data => {
             renderMessage.push(data);
             setRenderMessageArr([
               ...renderMessage
@@ -517,17 +668,31 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
           break;
         }
       }
-      console.log(renderMessage, ' check dataRender');
       setIndexMessageRender(index);
       setRenderMessageArr([
         ...renderMessage
       ]);
     } else {
-      setRenderMessageArr([
-        ...renderMessage,
-        dataMessages[indexMessageRender + 1]
-      ]);
-      setIndexMessageRender(indexMessageRender + 1);
+      if (dataMessages[indexMessageRender + 1].message_content.length > 0) {
+        setRenderMessageArr([
+          ...renderMessage,
+          dataMessages[indexMessageRender + 1]
+        ]);
+        index = indexMessageRender + 1;
+      } else {
+        for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
+          if (dataMessages[i].message_content.length > 0) {
+            setRenderMessageArr([
+              ...renderMessage,
+              dataMessages[i]
+            ]);
+            index = i;
+            break;
+          }
+        }
+      }
+      setIndexMessageRender(index);
+      // setIndexUser(prev => prev );
     }
 
     // clearTimeout(delayRender);
@@ -553,7 +718,9 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
         if (dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content === item.variable_name) {
           item.default_value = value;
         }
-      })
+      });
+      objParam[dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content] = value;
+      setObjParam({ ...objParam });
     }
     setDataMessages([...dataMessages]);
   }
@@ -565,7 +732,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
         <div id="cp-header" className="cp-header" onClick={() => onOpenPreview(!isOpen)}>
           <div className="cp-header-left">
             <div className="cp-header-left-avatar cp-avatar">
-              <img src={"https://ec-chatbot-test1.com/" + botInfor?.icon?.url} />
+              <img src={botInfor?.icon?.url && ("https://ec-chatbot-test1.com/" + botInfor?.icon?.url)} />
             </div>
             <div className="cp-header-left-label">
               <div className="cp-header-left-label-sub-title">{botInfor?.subtitle}</div>
@@ -579,8 +746,8 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
           </div>
         </div>
         <div id="cp-process-bar" className="cp-process-bar">
-          <div className="cp-process-bar-color">
-            5 tasks rest
+          <div className="cp-process-bar-color" style={{ width: `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` }}>
+            {messageUser.length !== (indexUser - 1) ? `${messageUser.length - indexUser + 1} tasks rest` : "Completed!"}
           </div>
         </div>
         <div id="cp-body" className="cp-body">
@@ -601,9 +768,6 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                   {message.belong_to === 'user' &&
                     <div className="cp-body-user-side">
                       <div className="cp-body-user-side-messages">
-                        {
-                          console.log(message, 'check messss')
-                        }
                         <UserMessage
                           messageContentProps={message.message_content}
                           disabled={message.disabled}
@@ -635,7 +799,6 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
 
 const BotMessage = ({ content, index, botInfor }) => {
   const handleDownloadFile = (file) => {
-    console.log(file);
     let link = document.createElement('a');
     link.href = file;
     link.download = "file";
@@ -708,13 +871,11 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   }, [errorsProps])
 
   useEffect(() => {
-    console.log(messageContentProps);
     setMessageContent(messageContentProps);
   }, [messageContentProps])
 
   useEffect(() => {
     api.get(`/api/v1/prefectures`).then((res) => {
-      // console.log(res.data.data);
       setDataPrefectures(res.data.data);
     }).catch((error) => { console.error(error) });
   }, [])
@@ -733,8 +894,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
         return [...prev, value];
       }
     })
-
-
   }
 
   function botUploadFile() {
@@ -753,7 +912,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
     }
     // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
     // var reader = new FileReader(file);
-    console.log(file)
 
     messageContent[indexContent].attaching_file.content = file.name;
     setMessageContent([...messageContent]);
@@ -779,7 +937,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
     //   // document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
     //   if (baseString !== undefined || baseString !== '') {
     //     // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
-    //     console.log(baseString)
 
     //   }
 
@@ -789,7 +946,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
 
   return (
     <div className="ss-user-message__content-wrapper">
-      {console.log(messageContent)}
       {messageContent?.map((content, indexContent) => {
         let textInput = content.text_input;
         let label = content.label;
