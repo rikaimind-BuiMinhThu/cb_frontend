@@ -14,3 +14,70 @@
     border-radius: 10px;
     background-color: #57c8f0;
 }
+.span_end{
+    width: 2%;
+    padding-top: 5px;
+    text-align: center;
+    font-size: 15px;
+}
+
+/* Payment-Gateway-CSS */
+.payment-gatway-btn-add-gateway{
+    padding:10px 70px;
+    background-color: #57c8f1;
+    color: white;
+    border: none;
+    border-radius: 10px;
+}
+.payment-gatway-btn-edit{
+    margin-right: 15px;
+    width: 70px;
+    border:none;
+    background-color: #57c8f0;
+    border-radius: 5px;
+    color:white;
+    padding:10px 10px
+}
+.payment-gatway-btn-delete{
+    margin-left: 15px;
+    width: 70px;
+    border:none;
+    background-color: #f48564;
+    border-radius: 5px;
+    color:white;
+    padding:10px 10px
+}
+/* Add-Payment-Gateway-CSS */
+.add-payment-gateway-add-form{
+    width: 80%;
+    margin: 2% 10%;
+    display: flex;
+}
+.add-payment-gateway-span-form{
+    width:20%;
+    text-align: right;
+    margin-right: 2.5%;
+}
+.add-payment-gateway-input-form{
+    width: 50%;
+    text-align: left;
+    height: 40px;
+}
+.add-payment-gateway-btn-return{
+    padding: 10px 30px;
+    color: white;
+    background-color: #c7cbd6;
+    border: none;
+    width: 120px;
+    margin-right: 10px;
+    border-radius: 5px;
+}
+.add-payment-gateway-btn-save{
+    padding: 10px 30px;
+    color: white;
+    background-color: #57c8f0;
+    border: none;
+    width: 120px;
+    margin-right: 10px;
+    border-radius: 5px;
+}
