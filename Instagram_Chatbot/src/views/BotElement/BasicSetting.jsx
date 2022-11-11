@@ -30,7 +30,7 @@ function BasicSetting() {
       .catch((err) => {
         console.log(err);
         if (err.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }, []);
@@ -42,7 +42,6 @@ function BasicSetting() {
     utils.checkMaxLength('job_title', 'errPosition', 'Position', 50);
     utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'The Mail address');
     utils.checkTel('phone_number', 'errPhone', 'The Tel');
-    utils.checkInput('post_code', 'errPostCost', 'The Zip code');
     utils.checkInput('address', 'errAddress', 'The Address');
     if (
       utils.checkInput('fullname', 'errFullname', 'The name') &&
@@ -51,7 +50,6 @@ function BasicSetting() {
       utils.checkMaxLength('job_title', 'errPosition', 'Position', 50) &&
       utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'The Mail address') &&
       utils.checkTel('phone_number', 'errPhone', 'The Tel') &&
-      utils.checkInput('post_code', 'errPostCost', 'The Zip code') &&
       utils.checkInput('address', 'errAddress', 'The Address')
     ) {
       const form = document.getElementById('form-basic-setting');
@@ -84,7 +82,7 @@ function BasicSetting() {
         .catch((err) => {
           console.log(err);
           if (err.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     }
@@ -219,9 +217,6 @@ function BasicSetting() {
                         placeholder="enter input ..."
                         name="post_code"
                         defaultValue={userDetail.post_code}
-                        onChange={() =>
-                          utils.checkInput('post_code', 'errPostCost', 'The Zip code')
-                        }
                       ></input>
                       <span id="errPostCost" className="bs-err-format"></span>
                     </div>
