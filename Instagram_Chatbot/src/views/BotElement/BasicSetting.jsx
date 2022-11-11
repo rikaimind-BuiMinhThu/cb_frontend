@@ -15,6 +15,8 @@ function BasicSetting() {
   const [userDetail, setUserDetail] = useState({});
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState();
+  const [language, setLanguage] = useState('');
+  const [division, setDivision] = useState('');
 
   useEffect(() => {
     setUsreIdEC(Cookies.get('user_id'));
@@ -24,8 +26,9 @@ function BasicSetting() {
     api
       .get(`/api/v1/managements/users/${Cookies.get('user_id')}`)
       .then((res) => {
-        console.log(res.data.data);
         setUserDetail(res.data.data);
+        setLanguage(res.data.data.language);
+        setDivision(res.data.data.business_division);
       })
       .catch((err) => {
         console.log(err);
@@ -114,7 +117,11 @@ function BasicSetting() {
                   <div className="bs-field-container">
                     <span className="bs-field-lable">Business category</span>
                     <div className="bs-field-input">
-                      <select name="business_division" value={userDetail.business_division}>
+                      <select
+                        name="business_division"
+                        value={division}
+                        onChange={(e) => setDivision(e.target.value)}
+                      >
                         <option value="sole_proprietorship">Sole proprietorship</option>
                         <option value="corporation">Corporation</option>
                       </select>
@@ -236,11 +243,14 @@ function BasicSetting() {
                       <span id="errAddress" className="bs-err-format"></span>
                     </div>
                   </div>
-
                   <div className="bs-field-container">
                     <span className="bs-field-lable">Language</span>
                     <div className="bs-field-input">
-                      <select name="language" value={userDetail.language}>
+                      <select
+                        name="language"
+                        value={language}
+                        onChange={(e) => setLanguage(e.target.value)}
+                      >
                         <option value="japanese">Japanese</option>
                         <option value="english">English</option>
                         <option value="vietnamese">Vietnamese</option>
