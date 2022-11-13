@@ -104,7 +104,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
       dataObj.user_device = data.user_agent.device.type;
       dataObj.user_browser = data.user_agent.name;
       dataObj.user_agent = data.user_agent.header;
-      dataObj.start_datetime = new Date();      
+      dataObj.start_datetime = new Date();
     });
     return dataObj;
   });
@@ -252,10 +252,16 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                   return delayRender = setTimeout(() => {
                     if (messageArr[i].message_content[0].type === 'text_input') {
                       messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                        for (let j = 0; j < variables.length; j++) {
-                          if (variables[j].variable_name === variable) {
-                            return variables[j].default_value;
+                        if (variables.length !== 0) {
+                          for (let j = 0; j < variables.length; j++) {
+                            if (variables[j].variable_name === variable) {
+                              return variables[j].default_value;
+                            } else {
+                              return "";
+                            }
                           }
+                        } else {
+                          return "";
                         }
                       });
                     }
@@ -646,10 +652,16 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
               return delayRender = setTimeout(() => {
                 if (dataMessages[i].message_content[0].type === 'text_input') {
                   dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                    for (let j = 0; j < variables.length; j++) {
-                      if (variables[j].variable_name === variable) {
-                        return variables[j].default_value;
+                    if (variables.length !== 0) {
+                      for (let j = 0; j < variables.length; j++) {
+                        if (variables[j].variable_name === variable) {
+                          return variables[j].default_value;
+                        } else {
+                          return "";
+                        }
                       }
+                    } else {
+                      return "";
                     }
                   })
                 }

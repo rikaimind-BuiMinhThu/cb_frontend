@@ -118,7 +118,7 @@ textarea.ss-message__content--bot-text {
 }
 
 .ss-message.ss-message--select>.ss-message__detail>textarea.ss-message__content--bot-text {
-  border-color: #327aed;
+  border-color: #327aed !important;
   box-shadow: 0 0 3px #327aed;
 }
 
@@ -153,7 +153,7 @@ textarea.ss-message__content--bot-file-pdf {
 }
 
 .ss-message.ss-message--select>.ss-message__detail>textarea.ss-message__content--bot-file-pdf {
-  border-color: #327aed;
+  border-color: #327aed !important;
   box-shadow: 0 0 3px #327aed;
 }
 
@@ -168,7 +168,7 @@ textarea.ss-message__content--bot-email {
 }
 
 .ss-message.ss-message--select>.ss-message__detail>textarea.ss-message__content--bot-email {
-  border-color: #327aed;
+  border-color: #327aed !important;
   box-shadow: 0 0 3px #327aed;
 }
 
@@ -183,7 +183,12 @@ textarea.ss-message__content--bot-script {
 }
 
 .ss-message.ss-message--select>.ss-message__detail>textarea.ss-message__content--bot-script {
-  border-color: #327aed;
+  border-color: #327aed !important;
+  box-shadow: 0 0 3px #327aed;
+}
+
+.ss-message.ss-message--select>.ss-message__detail>.ss-message__content--bot-text {
+  border-color: #327aed !important;
   box-shadow: 0 0 3px #327aed;
 }
 
@@ -1041,7 +1046,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-setting__item-text_input-use-api-required {
-  margin-left: 120px;
+  margin-left: 110px;
 }
 
 /* user setting: bottom */
@@ -1187,16 +1192,16 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-setting-input-limit-character:hover {
-  border-color: gray!important;
+  border-color: gray !important;
 }
 
 .ss-user-setting-input-limit-character:focus {
-  border-color: gray!important;
-  box-shadow: none!important;
+  border-color: gray !important;
+  box-shadow: none !important;
 }
 
 .ant-input-number-focused {
-  box-shadow: none!important;
+  box-shadow: none !important;
 }
 
 .ss-user-setting-item-textarea-lable {
@@ -1235,6 +1240,10 @@ input#ss-message__content--user-checkbox--checkbox_img {
 
 .ss-user-setting-phone-number-hyphens>input {
   width: 28%;
+}
+
+.ss-user-setting-card-number-separate-type>input {
+  width: 24%;
 }
 
 .ss-user-setting-double-input {
@@ -1539,4 +1548,98 @@ input#ss-message__content--user-checkbox--checkbox_img {
 
 .sl-popup-create-scenario-btn-wrapper button {
   margin: 0;
+}
+
+.ss-checkbox-custom-style {
+  margin-top: 10px;
+}
+
+.ss-mg-top-5 {
+  margin-top: 5px;
+}
+
+.ss-mg-bottom-5 {
+  margin-bottom: 5px;
+}
+
+.ant-carousel .slick-dots-bottom {
+  bottom: -8px;
+}
+
+.ant-carousel .slick-dots li.slick-active button {
+  background-color: #000;
+}
+
+.ant-carousel .slick-dots li button {
+  height: 6px;
+  background-color: #000;
+}
+
+.ant-carousel .slick-dots li.slick-active {
+  width: 35px;
+}
+
+.ant-carousel .slick-dots li {
+  width: 25px;
+}
+
+.ss-message__content--user-checkbox-wrapper {
+  width: 92%;
+  margin-left: 4%;
+}
+
+.ss-user-setting-input-overview {
+  width: 100%;
+}
+
+.ant-checkbox-group span {
+  font-size: 14px;
+  color: #000;
+  font-weight: 400;
+}
+
+.ss-user-setting-item-product-purchase {
+  width: 90%;
+}
+
+.ss-user-setting-product-purchase-container {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.ss-user-setting-product-purchase-file-img {
+  display: flex;
+  align-items: center;
+  width: 97%;
+}
+
+.ss-user-setting-product-purchase-file-img i {
+  padding: 8px;
+  background-color: #327aed;
+  margin-left: -3px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.ss-user-setting-product-purchase-infor-product {
+  display: flex;
+  width: 94%;
+}
+
+.ss-user-setting-product-purchase-sub-infor {
+  display: flex;
+  width: 93%;
+}
+
+.ss-user-setting-input-limit-character {}
+
+.ss-user-setting-product-purchase-sub-infor {}
+
+.ss-user-setting-product-purchase-times-icons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
 }
