@@ -394,8 +394,14 @@ function Sidebar(props) {
                     </li>
                   </ul>
                 </li>
+                <li className={activeRoute('push-message') + (true ? " active-pro" : "")} key={'push-message'}>
+                  <NavLink to="/admin/push-message" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                    <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                    <p style={{ color: "black" }}>Push Message</p>
+                  </NavLink>
+                </li>
 
-                <li key={'ab-test'}>
+                {/* <li key={'ab-test'}>
                   <NavLink onClick={() => displayABSetting()} to="/admin/create-ab-test" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
                     <p style={{ color: "black" }}>AB Test</p>
@@ -414,7 +420,7 @@ function Sidebar(props) {
                       </NavLink>
                     </li>
                   </ul>
-                </li>
+                </li> */}
 
                 <li className={activeRoute('variable-management') + (true ? " active-pro" : "")} key={'variable-management'}>
                   <NavLink to="/admin/variable-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
@@ -470,6 +476,14 @@ function Sidebar(props) {
                   </NavLink>
                 </li>
 
+                {/* <li key={'advance-setting'}>
+                <li className={activeRoute('payment-management') + (true ? " active-pro" : "")} key={'payment'}>
+                  <NavLink to="/admin/payment-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                    <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                    <p style={{ color: "black" }}>Payment Management</p>
+                  </NavLink>
+                </li>
+
                 <li key={'advance-setting'}>
                   <NavLink onClick={() => displayAVSetting()} to="/admin/basic-info" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
@@ -507,7 +521,7 @@ function Sidebar(props) {
                       </NavLink>
                     </li>
                   </ul>
-                </li>
+                </li> */}
 
               </ul>
             </li>
