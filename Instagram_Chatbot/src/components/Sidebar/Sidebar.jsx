@@ -469,7 +469,22 @@ function Sidebar(props) {
                   </ul>
                 </li>
 
+                <li className={activeRoute('payment-management') + (true ? " active-pro" : "")} key={'payment'}>
+                  <NavLink to="/admin/payment-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                    <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                    <p style={{ color: "black" }}>Payment Management</p>
+                  </NavLink>
+                </li>
+
                 {/* <li key={'advance-setting'}>
+                <li className={activeRoute('payment-management') + (true ? " active-pro" : "")} key={'payment'}>
+                  <NavLink to="/admin/payment-management" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                    <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                    <p style={{ color: "black" }}>Payment Management</p>
+                  </NavLink>
+                </li>
+
+                <li key={'advance-setting'}>
                   <NavLink onClick={() => displayAVSetting()} to="/admin/basic-info" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
                     <p style={{ color: "black" }}>Advance Setting</p>

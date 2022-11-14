@@ -1,6 +1,5 @@
 import React from 'react'
 import './html.css'
-import * as utils from './htmlTest.js' ;
 import Iframe from 'react-iframe'
 
 var __html = require('./html.js');
