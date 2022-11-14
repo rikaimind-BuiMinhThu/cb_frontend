@@ -475,6 +475,18 @@ function Sidebar(props) {
                     <p style={{ color: "black" }}>Payment Management</p>
                   </NavLink>
                 </li>
+                <li className={activeRoute('payment-gateway') + (true ? " active-pro" : "")} key={'payment-gateway'}>
+                  <NavLink to="/admin/payment-gateway" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                    <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                    <p style={{ color: "black" }}>Payment Gateway</p>
+                  </NavLink>
+                </li>
+                <li className={activeRoute('payment') + (true ? " active-pro" : "")} key={'payment-s'}>
+                  <NavLink to="/admin/payment" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
+                    <i className="nc-icon nc-badge" style={{ color: "black" }} />
+                    <p style={{ color: "black" }}>Payment Service</p>
+                  </NavLink>
+                </li>
 
                 {/* <li key={'advance-setting'}>
                 <li className={activeRoute('payment-management') + (true ? " active-pro" : "")} key={'payment'}>

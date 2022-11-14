@@ -3,6 +3,7 @@ import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstr
 import '../../assets/css/bot/payment-mng.css'
 import DatePicker from 'react-datepicker';
 import { useEffect } from 'react';
+import Payment from './BotSetting/Payment/Payment';
 function PaymentManagement() {
 
     const [startDate, setStartDate] = useState(null);

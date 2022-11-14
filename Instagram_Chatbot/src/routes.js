@@ -66,6 +66,9 @@ import HtmlScreen from "views/HtmlScreen";
 import Report from "views/BotElement/BotSetting/Report/Report";
 import PushMessage from "views/BotElement/PushMessage";
 import PaymentManagement from "views/BotElement/PaymentManagement";
+import Payment from "views/BotElement/BotSetting/Payment/Payment";
+import PaymentGateway from "views/BotElement/BotSetting/Payment/PaymentGateway";
+import AddPaymentGateway from "views/BotElement/BotSetting/Payment/AddPaymentGateway";
 
 var routes = [
   {
@@ -387,6 +390,27 @@ var routes = [
     name: "Payment",
     // icon: "nc-icon nc-single-02",
     component: PaymentManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/payment-gateway",
+    name: "Payment Gateway",
+    // icon: "nc-icon nc-single-02",
+    component: PaymentGateway,
+    layout: "/admin",
+  },
+  {
+    path: "/add-payment-gateway",
+    name: "Add Payment Gateway",
+    // icon: "nc-icon nc-single-02",
+    component: AddPaymentGateway,
+    layout: "/admin",
+  },
+  {
+    path: "/payment",
+    name: "Payment-Service",
+    // icon: "nc-icon nc-single-02",
+    component: Payment,
     layout: "/admin",
   },
   {
