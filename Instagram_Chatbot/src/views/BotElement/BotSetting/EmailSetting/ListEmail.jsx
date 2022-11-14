@@ -37,7 +37,7 @@ function ListEmail() {
       .catch((err) => {
         console.log(err);
         if (err.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }, []);
@@ -57,7 +57,7 @@ function ListEmail() {
             .catch((err) => {
               console.log(err);
               if (err.response?.data.code === 0) {
-                tokenExpired()
+                tokenExpired();
               }
             });
         } else {
@@ -68,7 +68,7 @@ function ListEmail() {
       .catch((err) => {
         console.log(err);
         if (err.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }
@@ -85,7 +85,7 @@ function ListEmail() {
         if (res.data.code == 1) {
           setIsOpenDuplicate(false);
           setIsOpenNoti(true);
-          setMsgNoti(`Dulicate successfully!`);
+          setMsgNoti(`Duplicate successfully!`);
           reLoad();
           setTimeout(() => {
             setIsOpenNoti(false);
@@ -104,7 +104,7 @@ function ListEmail() {
       .catch((err) => {
         console.log(err);
         if (err.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }
@@ -140,7 +140,7 @@ function ListEmail() {
       .catch((err) => {
         console.log(err);
         if (err.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }
@@ -214,8 +214,12 @@ function ListEmail() {
                         <div className="mail-detail">
                           <div className="email-detail--subject" type="text">
                             <span>Subject: </span>
+                            {item.email_template_name}
+                            <br />
+                            <span>Template name: </span>
                             {item.subject}
                           </div>
+
                           <div className="mail-detail--text">
                             <span>Text: </span>
                             <p>{item.content}</p>
