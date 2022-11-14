@@ -8,12 +8,14 @@ import noImage from './../../../assets/img/no-image.jpg';
 import './../../../assets/css/file-mng.css';
 import api from '../../../api/api-management';
 import axios from 'axios';
-import ModalNoti from 'views/Popup/ModalNoti';
+import ModalDetail from 'views/Popup/Modal';
 import { tokenExpired } from 'api/tokenExpired';
+import ModalNoti from 'views/Popup/ModalNoti';
 
 function FileManagement() {
   const [files, setFiles] = useState([]);
   const [newFile, setNewFile] = useState(null);
+  const [typeFilePreview, setTypeFilePreview] = useState('');
   const [srcPreview, setSrcPreview] = useState('');
   const [isOpenPreview, setIsOpenPreview] = useState(false);
   const inputRef = useRef(null);
@@ -42,10 +44,28 @@ function FileManagement() {
     setNewFile(e.target.files[0]);
   }
 
+  //'jpeg', 'jpg', 'png': <=2mb
+  //pdf: <=3mb
+  //mp4: 15s
   function handleSave() {
+    console.log(newFile);
     const type = newFile.name.split('.')[1].toLowerCase();
-    const trueFile = ['jpeg', 'jpg', 'png'].includes(type);
+    const trueFile = ['jpeg', 'jpg', 'png', 'pdf', 'mp4'].includes(type);
     if (trueFile) {
+      if (type != 'pdf' && type != 'mp4' && newFile.size / 1024 / 1024 > 2) {
+        setFileError(`You need to enter file <=2MB.`);
+        return;
+      } else if (type === 'pdf' && newFile.size / 1024 / 1024 > 3) {
+        setFileError(`You need to enter file <=3MB.`);
+        return;
+      } else if (type === 'mp4') {
+        const vid = document.getElementById('preview-video');
+        console.log(vid.duration);
+        if (vid.duration > 15) {
+          setFileError(`You need to upload file <=15s.`);
+          return;
+        }
+      }
       const file = { user_file: { file_type: type } };
       api
         .post(`/api/v1/managements/file/upload`, file)
@@ -64,14 +84,13 @@ function FileManagement() {
             .catch((err) => {
               console.log(err);
               if (err.response?.data.code === 0) {
-                tokenExpired()
+                tokenExpired();
               }
             });
           api
             .post(`/api/v1/managements/file`, filePost)
             .then((res) => {
               if (res.data.code == 1) {
-                console.log(res);
                 reload();
                 setMsgNoti(`Add successfully!`);
                 setIsOpenNoti(true);
@@ -92,23 +111,24 @@ function FileManagement() {
             .catch((err) => {
               console.log(err);
               if (err.response?.data.code === 0) {
-                tokenExpired()
+                tokenExpired();
               }
             });
         })
         .catch((err) => {
           console.log(err);
           if (err.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     } else {
-      setFileError(`You need enter format file is jpeg/ jpg/ png.`);
+      setFileError(`You need enter format file is jpeg/ jpg/ png/ pdf/ mp4.`);
     }
   }
 
-  function handlePreview(file_url) {
-    setSrcPreview(`https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file_url}`);
+  function handlePreview(file) {
+    setSrcPreview(`https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file.file_url}`);
+    setTypeFilePreview(file.file_url.split('.')[1].toLowerCase());
     setIsOpenPreview(true);
   }
 
@@ -142,7 +162,7 @@ function FileManagement() {
       .catch((err) => {
         console.log(err);
         if (err.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }
@@ -185,7 +205,17 @@ function FileManagement() {
                         {['jpeg', 'jpg', 'png'].includes(newFile.name.split('.')[1]) ? (
                           <img src={URL.createObjectURL(newFile)} alt={newFile.name} />
                         ) : (
-                          <img src={noImage} alt="" />
+                          <>
+                            {newFile.name.split('.')[1] == 'mp4' ? (
+                              <div className="file-mng__preview-video">
+                                <video id="preview-video" controls>
+                                  <source src={URL.createObjectURL(newFile)} type="video/mp4" />
+                                </video>
+                              </div>
+                            ) : (
+                              <img src={noImage} alt="" />
+                            )}
+                          </>
                         )}
                         <p className="file-mng__preview-name">{newFile.name}</p>
                         <p className="file-mng__preview-type">{newFile.name.split('.')[1]}</p>
@@ -228,7 +258,7 @@ function FileManagement() {
                           <div className="file-mng__action-wrapper">
                             <button
                               className="file-mng__btn-edit"
-                              onClick={() => handlePreview(file.file_url)}
+                              onClick={() => handlePreview(file)}
                             >
                               Preview
                             </button>
@@ -260,12 +290,27 @@ function FileManagement() {
           </Col>
         </Row>
 
-        <ModalShort open={isOpenPreview} onClose={() => setIsOpenPreview(false)}>
+        <ModalDetail open={isOpenPreview} onClose={() => setIsOpenPreview(false)}>
           <div className="file-mng__preview_img">
-            <img src={srcPreview} alt="" />
+            {typeFilePreview == 'mp4' ? (
+              <video style={{ width: '100%' }} controls>
+                <source src="https://www.w3schools.com/tags/mov_bbb.mp4" type="video/mp4" />
+              </video>
+            ) : (
+              <>
+                {typeFilePreview == 'pdf' ? (
+                  <embed
+                    style={{ width: '100%', height: '90%' }}
+                    src="https://media.geeksforgeeks.org/wp-content/cdn-uploads/20210101201653/PDF.pdf"
+                  />
+                ) : (
+                  <img src={srcPreview} alt="" />
+                )}
+              </>
+            )}
             <Button onClick={() => setIsOpenPreview(false)}>Close</Button>
           </div>
-        </ModalShort>
+        </ModalDetail>
 
         <ModalShort open={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
