@@ -28,9 +28,15 @@
   justify-content: flex-start;
 }
 .report__item-2-head {
-  width: calc(50% - 10px);
+  width: calc(30% - 10px);
+}
+.report__item-2-head-main {
+  width: calc(70% - 10px);
 }
 .report__item-2-head:nth-child(2) {
+  text-align: center;
+}
+.report__item-2-head-main:nth-child(2) {
   text-align: center;
 }
 .report__item-2-head-calender {

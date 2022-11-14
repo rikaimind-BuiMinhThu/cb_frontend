@@ -64,6 +64,7 @@ import FileManagement from "views/BotElement/BotSetting/FileManagement";
 import AddSubUserMng from "views/BotElement/AddSubUserMng";
 import HtmlScreen from "views/HtmlScreen";
 import Report from "views/BotElement/BotSetting/Report/Report";
+import PushMessage from "views/BotElement/PushMessage";
 
 var routes = [
   {
@@ -204,6 +205,13 @@ var routes = [
     name: "Sub User Management",
     // icon: "nc-icon nc-single-02",
     component: SubUserManagement,
+    layout: "/admin",
+  },
+  {
+    path: "/push-message",
+    name: "Push Message",
+    // icon: "nc-icon nc-single-02",
+    component: PushMessage,
     layout: "/admin",
   },
   {
