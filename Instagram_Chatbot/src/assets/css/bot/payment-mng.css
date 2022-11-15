@@ -47,6 +47,27 @@
     color:white;
     padding:10px 10px
 }
+.payment-gateway-cnf-btn{
+    display: flex;
+    text-align: center;
+    margin: auto;
+}
+.payment-gateway-cnf-btn-detail-yes{
+    margin:auto;
+    border: none;
+    padding: 7.5px 35px;
+    border-radius: 5px;
+    background-color: #57c8f0;
+    font-weight: 500;
+}
+.payment-gateway-cnf-btn-detail-no{
+    margin:auto;
+    border: none;
+    padding: 7.5px 35px;
+    border-radius:5px;
+    font-weight: 500;
+}
+
 /* Add-Payment-Gateway-CSS */
 .add-payment-gateway-add-form{
     width: 80%;
