@@ -258,6 +258,18 @@ function BasicSetting() {
                       </select>
                     </div>
                   </div>
+                  <div className="bs-field-container">
+                    <span className="bs-field-lable">URLs</span>
+                    <div className="bs-field-input">
+                      <input
+                        id="url"
+                        type="text"
+                        placeholder="enter input ..."
+                        name="url"
+                        // defaultValue={userDetail.urls}
+                      ></input>
+                    </div>
+                  </div>
                 </form>
 
                 <div className="bs-field-btn">
