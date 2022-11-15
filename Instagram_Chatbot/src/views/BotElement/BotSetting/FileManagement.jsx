@@ -53,16 +53,16 @@ function FileManagement() {
     const trueFile = ['jpeg', 'jpg', 'png', 'pdf', 'mp4'].includes(type);
     if (trueFile) {
       if (type != 'pdf' && type != 'mp4' && newFile.size / 1024 / 1024 > 2) {
-        setFileError(`You need to enter file <=2MB.`);
+        setFileError(`You need to upload file which size under 2MB.`);
         return;
       } else if (type === 'pdf' && newFile.size / 1024 / 1024 > 3) {
-        setFileError(`You need to enter file <=3MB.`);
+        setFileError(`You need to upload file which size under 3MB.`);
         return;
       } else if (type === 'mp4') {
         const vid = document.getElementById('preview-video');
         console.log(vid.duration);
         if (vid.duration > 15) {
-          setFileError(`You need to upload file <=15s.`);
+          setFileError(`You need to upload video which duration under 15 seconds.`);
           return;
         }
       }
