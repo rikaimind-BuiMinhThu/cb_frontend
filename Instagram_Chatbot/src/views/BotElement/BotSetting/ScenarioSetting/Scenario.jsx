@@ -27,7 +27,7 @@ import {
   S3_UPLOAD_URL
 } from '../../../../variables/constants';
 import { tokenExpired } from 'api/tokenExpired';
-import { Carousel } from 'antd';
+import { Carousel, Checkbox, Radio } from 'antd';
 import CheckboxGroupCustom from './scenarioComon/CheckboxGroupCustom';
 import american_express from '../../../../assets/img/payment-method/american_express.png';
 import diner_club from '../../../../assets/img/payment-method/diner_club.png';
@@ -2018,6 +2018,37 @@ const Scenario = () => {
                 is_quantity_designation: false
               }
             ]
+          }
+        }
+      );
+    } else if (messageType === 'product_purchase_radio_button') {
+      dataMessages[indexMessageSelect].message_content.push(
+        {
+          id: idMax,
+          type: messageType,
+          [messageType]: {
+            title_require: false,
+            require: false,
+            type: 'text_with_thumbnail_image', //type: text_with_thumbnail_image, text_with_image, consume_api_respone,
+            initial_selection: [],
+            product_number_display: false,
+            price_display: false,
+            product_name_display: false,
+            products: [
+              {
+                id: 1
+              }
+            ]
+          }
+        }
+      );
+    } else if (messageType === 'AFTEE_payment_module') {
+      dataMessages[indexMessageSelect].message_content.push(
+        {
+          id: idMax,
+          type: messageType,
+          [messageType]: {            
+            type: 'aftee', //type: aftee, atone, paidy, zcom            
           }
         }
       );
@@ -4101,6 +4132,297 @@ const Scenario = () => {
                                                           </div>
                                                         )
                                                       }
+                                                      {/* type == 'capture' */}
+                                                      {
+                                                        content.type === 'capture' && (
+                                                          <div style={{ color: '#6989A6', fontSize: '14px' }}>capture</div>
+                                                        )
+                                                      }
+                                                      {/* type == 'product_purchase' */}
+                                                      {
+                                                        content.type === 'product_purchase' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {(productPurchase.title_require || productPurchase.require) &&
+                                                              <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+                                                                {productPurchase.title_require &&
+                                                                  <span className="ss-message__content--user-checkbox-title">
+                                                                    {productPurchase.title}
+                                                                  </span>
+                                                                }
+                                                                {productPurchase.require === true &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
+                                                            <div>
+                                                              {productPurchase.type === 'text_with_thumbnail_image' && (
+                                                                productPurchase.multiple_item_purchase ? (
+                                                                  <React.Fragment>
+                                                                    <Checkbox.Group
+                                                                      className="ss-user-overview-product-purchase-checkbox-group ss-user-overview-product-purchase-style-width"
+                                                                      style={{ width: "100%" }}
+                                                                      onChange={(value) => console.log(value)}
+                                                                      value={productPurchase.initial_selection}
+                                                                    >
+                                                                      {productPurchase.products.map((itemProduct, indexProduct) => {
+                                                                        return <Checkbox key={indexProduct} value={itemProduct.id}>
+                                                                          <div className="ss-user-overview-product-purchase-container" key={{ indexProduct }}>
+                                                                            <div className="ss-user-overview-product-purchase-img">
+                                                                              <img src={itemProduct.img_url} />
+                                                                            </div>
+                                                                            {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                                                              <div className="ss-user-overview-product-purchase-infor">
+                                                                                {productPurchase.product_name_display && itemProduct.title &&
+                                                                                  <div className="ss-user-overview-product-purchase-infor-title">
+                                                                                    {itemProduct.title}
+                                                                                  </div>
+                                                                                }
+                                                                                {productPurchase.product_number_display && itemProduct.item_number &&
+                                                                                  <div className="ss-user-overview-product-purchase-infor-item-number">
+                                                                                    Item number: {itemProduct.item_number}
+                                                                                  </div>
+                                                                                }
+                                                                                {itemProduct.price_display_custom ?
+                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                    {itemProduct.price_display_custom}
+                                                                                  </div> :
+                                                                                  productPurchase.price_display && itemProduct.item_price &&
+                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                    Price: {itemProduct.item_price} 円
+                                                                                  </div>
+                                                                                }
+                                                                                {productPurchase.multiple_item_purchase &&
+                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                    Multiple item purchase
+                                                                                  </div>
+                                                                                }
+                                                                              </div>
+                                                                            }
+                                                                          </div>
+                                                                        </Checkbox>
+                                                                      })}
+                                                                    </Checkbox.Group>
+                                                                  </React.Fragment>
+                                                                ) : (
+                                                                  <React.Fragment>
+                                                                    <Radio.Group
+                                                                      className="ss-user-overview-product-purchase-radio-group ss-user-overview-product-purchase-style-width"
+                                                                      style={{ width: "100%" }}
+                                                                      onChange={(value) => console.log(value)}
+                                                                      value={productPurchase.initial_selection[0]}
+                                                                    >
+                                                                      {productPurchase.products.map((itemProduct, indexProduct) => {
+                                                                        return <Radio value={itemProduct.id} key={{ indexProduct }}>
+                                                                          <div className="ss-user-overview-product-purchase-container" key={{ indexProduct }}>
+                                                                            <div className="ss-user-overview-product-purchase-img">
+                                                                              <img src={itemProduct.img_url} />
+                                                                            </div>
+                                                                            {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                                                              <div className="ss-user-overview-product-purchase-infor">
+                                                                                {productPurchase.product_name_display && itemProduct.title &&
+                                                                                  <div className="ss-user-overview-product-purchase-infor-title">
+                                                                                    {itemProduct.title}
+                                                                                  </div>
+                                                                                }
+                                                                                {productPurchase.product_number_display && itemProduct.item_number &&
+                                                                                  <div className="ss-user-overview-product-purchase-infor-item-number">
+                                                                                    Item number: {itemProduct.item_number}
+                                                                                  </div>
+                                                                                }
+                                                                                {itemProduct.price_display_custom ?
+                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                    {itemProduct.price_display_custom}
+                                                                                  </div> :
+                                                                                  productPurchase.price_display && itemProduct.item_price &&
+                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                    Price: {itemProduct.item_price} 円
+                                                                                  </div>
+                                                                                }
+                                                                                {productPurchase.multiple_item_purchase &&
+                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                    Multiple item purchase
+                                                                                  </div>
+                                                                                }
+                                                                              </div>
+                                                                            }
+                                                                          </div>
+                                                                        </Radio>
+                                                                      })}
+                                                                    </Radio.Group>
+                                                                  </React.Fragment>
+                                                                )
+                                                              )}
+                                                              {productPurchase.type === 'text_with_image' && (
+                                                                productPurchase.multiple_item_purchase ? (
+                                                                  <React.Fragment>
+                                                                    <Checkbox.Group
+                                                                      className="ss-user-overview-product-purchase-checkbox-group-type-text_image ss-user-overview-product-purchase-style-width"
+                                                                      style={{ width: "100%" }}
+                                                                      onChange={(value) => console.log(value)}
+                                                                      value={productPurchase.initial_selection}
+                                                                    >
+                                                                      {productPurchase.products.map((itemProduct, indexProduct) => {
+                                                                        return <Checkbox key={indexProduct} value={itemProduct.id}>
+                                                                          <div className="ss-user-overview-product-purchase-container-type-text_image" key={{ indexProduct }}>
+                                                                            <div className="ss-user-overview-product-purchase-img-type-text_image">
+                                                                              <img src={itemProduct.img_url} />
+                                                                            </div>
+                                                                            {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                                                              <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                                                                {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                                                                              </div>
+                                                                            }
+                                                                          </div>
+                                                                        </Checkbox>
+                                                                      })}
+                                                                    </Checkbox.Group>
+                                                                  </React.Fragment>
+                                                                ) : (
+                                                                  <React.Fragment>
+                                                                    <Radio.Group
+                                                                      className="ss-user-overview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width"
+                                                                      style={{ width: "100%" }}
+                                                                      onChange={(value) => console.log(value)}
+                                                                      value={productPurchase.initial_selection[0]}
+                                                                    >
+                                                                      {productPurchase.products.map((itemProduct, indexProduct) => {
+                                                                        return <Radio value={itemProduct.id} key={{ indexProduct }}>
+                                                                          <div className="ss-user-overview-product-purchase-container-type-text_image" key={{ indexProduct }}>
+                                                                            <div className="ss-user-overview-product-purchase-img-type-text_image">
+                                                                              <img src={itemProduct.img_url} />
+                                                                            </div>
+                                                                            {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                                                              <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                                                                {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                                                                              </div>
+                                                                            }
+                                                                          </div>
+                                                                        </Radio>
+                                                                      })}
+                                                                    </Radio.Group>
+                                                                  </React.Fragment>
+                                                                )
+                                                              )}
+                                                              {productPurchase.type === 'consume_api_response' && (
+                                                                <>
+                                                                </>
+                                                              )}
+                                                            </div>
+                                                          </div>
+                                                        )
+                                                      }
+                                                      {/* type == 'product_purchase_radio_button' */}
+                                                      {
+                                                        content.type === 'product_purchase_radio_button' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {(productPurchaseRadioButton.title_require || productPurchaseRadioButton.require) &&
+                                                              <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+                                                                {productPurchaseRadioButton.title_require &&
+                                                                  <span className="ss-message__content--user-checkbox-title">
+                                                                    {productPurchaseRadioButton.title}
+                                                                  </span>
+                                                                }
+                                                                {productPurchaseRadioButton.require === true &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
+                                                            <div>
+                                                              {productPurchaseRadioButton.type === 'text_with_thumbnail_image' && (
+                                                                <React.Fragment>
+                                                                  <Radio.Group
+                                                                    className="ss-user-overview-product-purchase-radio-group ss-user-overview-product-purchase-style-width"
+                                                                    style={{ width: "100%" }}
+                                                                    onChange={(value) => console.log(value)}
+                                                                  >
+                                                                    {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
+                                                                      return <Radio value={itemProduct.id} key={{ indexProduct }}>
+                                                                        <div className="ss-user-overview-product-purchase-container" key={{ indexProduct }}>
+                                                                          <div className="ss-user-overview-product-purchase-img">
+                                                                            <img src={itemProduct.img_url} />
+                                                                          </div>
+                                                                          {(productPurchaseRadioButton.product_name_display || productPurchaseRadioButton.price_display || productPurchaseRadioButton.product_number_display) &&
+                                                                            <div className="ss-user-overview-product-purchase-infor">
+                                                                              {productPurchaseRadioButton.product_name_display && itemProduct.title &&
+                                                                                <div className="ss-user-overview-product-purchase-infor-title">
+                                                                                  {itemProduct.title}
+                                                                                </div>
+                                                                              }
+                                                                              {productPurchaseRadioButton.product_number_display && itemProduct.item_number &&
+                                                                                <div className="ss-user-overview-product-purchase-infor-item-number">
+                                                                                  Item No.: {itemProduct.item_number}
+                                                                                </div>
+                                                                              }
+                                                                              {productPurchaseRadioButton.price_display && itemProduct.item_price &&
+                                                                                <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                  Price: {itemProduct.item_price} 円
+                                                                                </div>
+                                                                              }
+                                                                            </div>
+                                                                          }
+                                                                        </div>
+                                                                      </Radio>
+                                                                    })}
+                                                                  </Radio.Group>
+                                                                </React.Fragment>
+                                                              )}
+                                                              {productPurchaseRadioButton.type === 'text_with_image' && (
+                                                                <React.Fragment>
+                                                                  <Radio.Group
+                                                                    className="ss-user-overview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width"
+                                                                    style={{ width: "100%" }}
+                                                                    onChange={(value) => console.log(value)}
+                                                                  >
+                                                                    {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
+                                                                      return <Radio value={itemProduct.id} key={{ indexProduct }}>
+                                                                        <div className="ss-user-overview-product-purchase-container-type-text_image" key={{ indexProduct }}>
+                                                                          <div className="ss-user-overview-product-purchase-img-type-text_image">
+                                                                            <img src={itemProduct.img_url} />
+                                                                          </div>
+                                                                          {(productPurchaseRadioButton.product_name_display || productPurchaseRadioButton.price_display || productPurchaseRadioButton.product_number_display) &&
+                                                                            <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                                                              {productPurchaseRadioButton.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchaseRadioButton.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {productPurchaseRadioButton.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : ""}
+                                                                            </div>
+                                                                          }
+                                                                        </div>
+                                                                      </Radio>
+                                                                    })}
+                                                                  </Radio.Group>
+                                                                </React.Fragment>
+                                                              )}
+                                                              {productPurchaseRadioButton.type === 'consume_api_response' && (
+                                                                <>
+                                                                </>
+                                                              )}
+                                                            </div>
+                                                          </div>
+                                                        )
+                                                      }
+                                                      {/* type == 'sms_verify' */}
+                                                      {content.type === 'sms_verify' && (
+                                                        <div style={{ marginBottom: '10px' }}>
+                                                          {smsVerify.title_require &&
+                                                            <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+                                                              {smsVerify.title_require &&
+                                                                <span className="ss-message__content--user-checkbox-title">
+                                                                  {smsVerify.title}
+                                                                </span>
+                                                              }
+                                                            </div>
+                                                          }
+                                                        </div>
+                                                      )}
+                                                      {/* type == 'AFTEE_payment_module' */}
+                                                      {content.type === 'AFTEE_payment_module' && (
+                                                        afteePaymentModule.content &&
+                                                        <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '10px' }}>
+                                                          {afteePaymentModule.content}
+                                                        </div>
+                                                      )}
                                                     </React.Fragment>
                                                   )
                                                 })}
@@ -7153,7 +7475,7 @@ const Scenario = () => {
                                                               style={{ width: '100%' }}
                                                               value={capture.type}
                                                               data={[
-                                                                { key: 'numbers', value: 'Numbers' }, { key: 'alphanumeric', value: 'Alphanumeric' }, { key: 'alphabet_only', value: 'Alphabet only' }
+                                                                { key: '0123456789', value: 'Numbers' }, { key: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', value: 'Alphanumeric' }, { key: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', value: 'Alphabet only' }
                                                               ]}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
                                                             />
@@ -7175,14 +7497,16 @@ const Scenario = () => {
                                                               placeholder="colour"
                                                               style={{ width: '100%' }}
                                                               value={capture.colour}
-                                                              data={[{ key: 'can_be', value: 'Can be' }, { key: 'none', value: 'None' }]}
+                                                              data={[{ key: true, value: 'Can be' }, { key: false, value: 'None' }]}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'colour')}
                                                             />
                                                           </div>
                                                         </div>
                                                       </div>
                                                       <div className="ss-user-setting__item-bottom">
-
+                                                        <div style={{ width: '90%' }}>
+                                                          <img style={{ width: '35%' }} src={`https://svg-captcha.herokuapp.com/captchapreview?size=${capture.length}${capture.colour ? "&color=true" : ""}&charPreset=${capture.type}`} />
+                                                        </div>
                                                       </div>
                                                     </React.Fragment>
                                                   )}
@@ -7590,34 +7914,268 @@ const Scenario = () => {
                                                               </Droppable>
                                                             </DragDropContext>
                                                           </div>
+
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <div style={{ width: '90%' }}>
+                                                              <Button
+                                                                style={{ margin: '0px', backgroundColor: '#327AED', textTransform: 'lowercase' }}
+                                                                onClick={() => {
+                                                                  let arrMess = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].products];
+                                                                  let idMax;
+                                                                  if (arrMess.length !== 0) {
+                                                                    idMax = Math.max(...arrMess.map(item => item.id)) + 1;
+                                                                  } else {
+                                                                    idMax = 1;
+                                                                  }
+                                                                  dataMessages[indexMessageSelect].message_content[indexContent][content.type].products.push({
+                                                                    id: idMax,
+                                                                    is_quantity_designation: false
+                                                                  });
+                                                                  setDataMessages([...dataMessages]);
+                                                                }}
+                                                              >
+                                                                addition
+                                                              </Button>
+                                                            </div>
+                                                          </div>
                                                         </React.Fragment>
                                                       }
-
-                                                      <div className="ss-user-setting__item-bottom">
+                                                    </>
+                                                  )}
+                                                  {/* user: type = 'product_purchase_radio_button' */}
+                                                  {content.type === 'product_purchase_radio_button' && (
+                                                    <>
+                                                      <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px' }}>
                                                         <div style={{ width: '90%' }}>
-                                                          <Button
-                                                            style={{ margin: '0px', backgroundColor: '#327AED', textTransform: 'lowercase' }}
-                                                            onClick={() => {
-                                                              let arrMess = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].products];
-                                                              let idMax;
-                                                              if (arrMess.length !== 0) {
-                                                                idMax = Math.max(...arrMess.map(item => item.id)) + 1;
-                                                              } else {
-                                                                idMax = 1;
-                                                              }
-                                                              dataMessages[indexMessageSelect].message_content[indexContent][content.type].products.push({
-                                                                id: idMax,
-                                                                is_quantity_designation: false
-                                                              });
-                                                              setDataMessages([...dataMessages]);
-                                                            }}
-                                                          >
-                                                            addition
-                                                          </Button>
+                                                          <CheckboxCustom
+                                                            label="Required"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
+                                                            value={productPurchaseRadioButton.require}
+                                                          />
                                                         </div>
                                                       </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            id="title"
+                                                            style={{ width: '49%' }}
+                                                            value={productPurchaseRadioButton.title_require}
+                                                            data={dropDownTitle}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
+                                                            keyValue="key"
+                                                          />
+                                                          <SelectCustom
+                                                            id="type"
+                                                            style={{ width: '49%' }}
+                                                            value={productPurchaseRadioButton.type}
+                                                            data={[
+                                                              { key: 'text_with_thumbnail_image', value: 'Text with thumbnail image' },
+                                                              { key: 'text_with_image', value: 'Text with image' },
+                                                              { key: 'consume_api_respone', value: 'Consume API response' }
+                                                            ]}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
+                                                            keyValue="key"
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                      {/* productPurchaseRadioButton: withTitle = true */}
+                                                      {productPurchaseRadioButton?.title_require === true &&
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <InputCustom
+                                                            placeholder="title"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
+                                                            value={productPurchaseRadioButton.title}
+                                                          />
+                                                        </div>
+                                                      }
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <Row style={{ width: '90%' }}>
+                                                          <Col xl={4} style={{ display: "flex", justifyContent: 'flex-start' }}>
+                                                            <CheckboxCustom
+                                                              label="Product name display"
+                                                              value={productPurchaseRadioButton.product_name_display}
+                                                              onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'product_name_display')}
+                                                            />
+                                                          </Col>
+                                                          <Col xl={5} style={{ display: "flex", justifyContent: 'flex-start' }}>
+                                                            <CheckboxCustom
+                                                              label="Product Number Display"
+                                                              value={productPurchaseRadioButton.product_number_display}
+                                                              onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'product_number_display')}
+                                                            />
+                                                          </Col>
+                                                          <Col xl={3} style={{ display: "flex", justifyContent: 'flex-start' }}>
+                                                            <CheckboxCustom
+                                                              label="Price display"
+                                                              value={productPurchaseRadioButton.price_display}
+                                                              onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'price_display')}
+                                                            />
+                                                          </Col>
+                                                        </Row>
+                                                      </div>
+                                                      {productPurchaseRadioButton.type !== 'consume_api_respone' &&
+                                                        <React.Fragment>
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <DragDropContext onDragEnd={result => handleDragEndRadioCheckbox(result, content.id, content.type, 'products')}>
+                                                              <Droppable droppableId='product-purchase'>
+                                                                {(providedChild) => {
+                                                                  return <div className="ss-user-setting-item-product-purchase" {...providedChild.droppableProps} ref={providedChild.innerRef}>
+                                                                    {
+                                                                      Array.isArray(productPurchaseRadioButton?.products) && productPurchaseRadioButton?.products
+                                                                        .map((itemProduct, indexProduct, array) => {
+                                                                          return (
+                                                                            <Draggable draggable={true} key={itemProduct.id} draggableId={itemProduct.id + ''} index={indexProduct}>
+                                                                              {(providedChild) => (
+                                                                                <div {...providedChild.draggableProps} {...providedChild.dragHandleProps} ref={providedChild.innerRef} >
+                                                                                  <div className="ss-user-setting-product-purchase-container" style={array.length > 1 ? { marginBottom: '10px' } : {}}>
+                                                                                    <div className="ss-user-setting-product-purchase-file-img">
+                                                                                      <InputCustom
+                                                                                        className="ss-mg-bottom-5"
+                                                                                        value={itemProduct.img_url}
+                                                                                        onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'img_url')}
+                                                                                      />
+                                                                                      <MDBIcon
+                                                                                        className="ss-mg-bottom-5" fas icon="folder-open"
+                                                                                        onClick={() => {
+                                                                                          setIsOpenFileReference(true)
+                                                                                          setVarFileReference({ indexContent, contentType: content.type, subContentType: 'products', indexSubContent: indexProduct, img: 'img_url' })
+                                                                                        }}
+                                                                                      />
+                                                                                    </div>
+                                                                                    <div className="ss-user-setting-product-purchase-infor-product">
+                                                                                      <InputCustom
+                                                                                        placeholder="title"
+                                                                                        style={{ borderTopRightRadius: '0px', borderBottomRightRadius: '0px' }}
+                                                                                        className="ss-mg-bottom-5 ss-user-setting-product-purchase-input-left"
+                                                                                        value={itemProduct.title}
+                                                                                        onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'title')}
+                                                                                      />
+                                                                                      <InputCustom
+                                                                                        placeholder="item number"
+                                                                                        style={{ borderTopLeftRadius: '0px', borderBottomLeftRadius: '0px', borderTopRightRadius: '0px', borderBottomRightRadius: '0px', borderLeft: '0px', borderRight: '0px' }}
+                                                                                        className="ss-mg-bottom-5 ss-user-setting-product-purchase-input-middle"
+                                                                                        value={itemProduct.item_number}
+                                                                                        onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'item_number')}
+                                                                                      />
+                                                                                      <InputNum
+                                                                                        placeholder="price"
+                                                                                        className="ss-mg-bottom-5 ss-user-setting-input-limit-character"
+                                                                                        style={{ borderTopLeftRadius: '0px', borderBottomLeftRadius: '0px', marginLeft: '0px', width: '78%' }}
+                                                                                        value={itemProduct.item_price}
+                                                                                        onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'item_price')}
+                                                                                      />
+                                                                                    </div>
+                                                                                    {array.length > 1 &&
+                                                                                      <div className="ss-user-setting-product-purchase-times-icons">
+                                                                                        <MDBIcon fas icon="times-circle"
+                                                                                          onClick={() => {
+                                                                                            let arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].products];
+                                                                                            let startArr = arrMessage.slice(0, indexProduct);
+                                                                                            let lastArr = arrMessage.slice(indexProduct + 1, arrMessage.length);
+                                                                                            console.log(arrMessage, [...startArr, ...lastArr]);
+                                                                                            dataMessages[indexMessageSelect].message_content[indexContent][content.type].products = [...startArr, ...lastArr];
+                                                                                            dataMessages[indexMessageSelect].message_content[indexContent][content.type].initial_selection = dataMessages[indexMessageSelect].message_content[indexContent][content.type].initial_selection.filter(item => item !== itemProduct.id);
+                                                                                            setDataMessages([...dataMessages]);
+                                                                                          }} />
+                                                                                      </div>
+                                                                                    }
+                                                                                  </div>
+                                                                                </div>
+                                                                              )}
+                                                                            </Draggable>
+                                                                          )
+                                                                        })
+                                                                    }
+                                                                    {providedChild.placeholder}
+                                                                  </div>
+                                                                }}
+                                                              </Droppable>
+                                                            </DragDropContext>
+                                                          </div>
 
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <div style={{ width: '90%' }}>
+                                                              <Button
+                                                                style={{ margin: '0px', backgroundColor: '#327AED', textTransform: 'lowercase' }}
+                                                                onClick={() => {
+                                                                  let arrMess = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].products];
+                                                                  let idMax;
+                                                                  if (arrMess.length !== 0) {
+                                                                    idMax = Math.max(...arrMess.map(item => item.id)) + 1;
+                                                                  } else {
+                                                                    idMax = 1;
+                                                                  }
+                                                                  dataMessages[indexMessageSelect].message_content[indexContent][content.type].products.push({
+                                                                    id: idMax,
+                                                                    is_quantity_designation: false
+                                                                  });
+                                                                  setDataMessages([...dataMessages]);
+                                                                }}
+                                                              >
+                                                                addition
+                                                              </Button>
+                                                            </div>
+                                                          </div>
+                                                        </React.Fragment>
+                                                      }
                                                     </>
+                                                  )}
+                                                  {/* user: type = 'sms_verify' */}
+                                                  {content.type === 'sms_verify' && (
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            id="title"
+                                                            style={{ width: '49%' }}
+                                                            value={smsVerify.title_require}
+                                                            data={dropDownTitle}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
+                                                            keyValue="key"
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                      {/* smsVerify: withTitle = true */}
+                                                      {smsVerify?.title_require === true &&
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <InputCustom
+                                                            placeholder="title"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
+                                                            value={smsVerify.title}
+                                                          />
+                                                        </div>
+                                                      }
+                                                    </React.Fragment>
+                                                  )}
+                                                  {/* user: type = 'AFTEE_payment_module' */}
+                                                  {content.type === 'AFTEE_payment_module' && (
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            style={{ width: '49%' }}
+                                                            value={afteePaymentModule.type}
+                                                            data={[
+                                                              { key: 'aftee', value: 'Aftee' },
+                                                              { key: 'atone', value: 'Atone' },
+                                                              { key: 'paidy', value: 'Paidy' },
+                                                              { key: 'zcom', value: 'ZCom' }
+                                                            ]}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <textarea
+                                                          style={{ width: '90%' }}
+                                                          className="ss-user-setting-item-textarea-label ss-input-value"
+                                                          placeholder="text"
+                                                          rows="5"
+                                                          value={afteePaymentModule.content}
+                                                          onChange={e => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.value, 'content')}
+                                                        />
+                                                      </div>
+                                                    </React.Fragment>
                                                   )}
                                                 </div>
                                               </div>
