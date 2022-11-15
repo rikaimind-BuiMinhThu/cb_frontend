@@ -30,10 +30,10 @@ function PaymentManagement() {
     function selectDateStart(date) {
         setStartDate(date)
         var validate = document.getElementById(`payment_management_date_err`)
-        var endMonth = (startDate.getMonth()+1 <10) ? `0${endDate.getMonth()+1}` : `${endDate.getMonth()+1}`
-        var endDatee = (startDate.getDate() <10) ? `0${endDate.getDate()}` : `${endDate.getDate()}`
-        var dateMonth = (date.getMonth()+1 <10) ? `0${date.getMonth() +1}` :  `${date.getMonth() + 1}`
-        var dateDate = (date.getDate() <10) ? `0${date.getDate()}` :  `${date.getDate()}`
+        var endMonth = (startDate.getMonth() + 1 < 10) ? `0${endDate.getMonth() + 1}` : `${endDate.getMonth() + 1}`
+        var endDatee = (startDate.getDate() < 10) ? `0${endDate.getDate()}` : `${endDate.getDate()}`
+        var dateMonth = (date.getMonth() + 1 < 10) ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`
+        var dateDate = (date.getDate() < 10) ? `0${date.getDate()}` : `${date.getDate()}`
         if (parseInt(`${date.getFullYear()}${dateMonth}${dateDate}`)
             > parseInt(`${endDate.getFullYear()}${endMonth}${endDatee}`)) {
             validate.style.display = 'block';
@@ -49,9 +49,9 @@ function PaymentManagement() {
     function selectDateEnd(date) {
         setEndDate(date)
         var validate = document.getElementById(`payment_management_date_err`)
-        var startMonth = (startDate.getMonth()+1) ? `0${startDate.getMonth()+1}` : `${startDate.getMonth()+1}`
+        var startMonth = (startDate.getMonth() + 1) ? `0${startDate.getMonth() + 1}` : `${startDate.getMonth() + 1}`
         var startDatee = (startDate.getDate()) ? `0${startDate.getDate()}` : `${startDate.getDate()}`
-        var dateMonth = (date.getMonth()+1) ? `0${date.getMonth() +1}` : `${date.getMonth() + 1}`
+        var dateMonth = (date.getMonth() + 1) ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`
         var dateDate = (date.getDate()) ? `0${date.getDate()}` : `${date.getDate()}`
         if (parseInt(`${startDate.getFullYear()}${startMonth}${startDatee}`)
             > parseInt(`${date.getFullYear()}${dateMonth}${dateDate}`)) {
@@ -128,36 +128,36 @@ function PaymentManagement() {
                             </div>
                             <br /> <br />
                             <Table style={{ textAlign: 'center', tableLayout: 'fixed', overflow: 'hidden' }}>
-                  <thead className="text-primary">
-                    <tr>
-                      <th style={{width:"7.5%"}}>No</th>
-                      <th style={{width:"7.5%"}}>User ID</th>
-                      <th style={{width:"9%"}}>Order number</th>
-                      <th>Product name</th>
-                      <th style={{width:"7.5%"}}>Unit price</th>
-                      <th style={{width:"7.5%"}}>Quantity</th>
-                      <th style={{width:"7.5%"}}>Price</th>
-                      <th>Consumption tax</th>
-                      <th>Settlement fee (tax included)</th>
-                      <th>Shipping fee (tax included)</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                        <td style={{border:'1px solid #7186a1'}}>123</td>
-                        <td style={{border:'1px solid #7186a1'}}>123</td>
-                        <td style={{border:'1px solid #7186a1'}}>123</td>
-                        <td style={{border:'1px solid #7186a1'}}>123</td>
-                        <td style={{border:'1px solid #7186a1'}}>123</td>
-                        <td style={{border:'1px solid #7186a1'}}>123</td>
-                        <td style={{border:'1px solid #7186a1'}}>123</td>
-                        <td style={{border:'1px solid #7186a1'}}>123</td>
-                        <td style={{border:'1px solid #7186a1'}}>123</td>
-                        <td style={{border:'1px solid #7186a1'}}>123</td>
-                        
-                    </tr>
-                  </tbody>
-                  </Table>
+                                <thead className="text-primary">
+                                    <tr>
+                                        <th style={{ width: "7.5%" }}>No</th>
+                                        <th style={{ width: "7.5%" }}>User ID</th>
+                                        <th style={{ width: "9%" }}>Order number</th>
+                                        <th>Product name</th>
+                                        <th style={{ width: "7.5%" }}>Unit price</th>
+                                        <th style={{ width: "7.5%" }}>Quantity</th>
+                                        <th style={{ width: "7.5%" }}>Price</th>
+                                        <th>Consumption tax</th>
+                                        <th>Settlement fee (tax included)</th>
+                                        <th>Shipping fee (tax included)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+                                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+                                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+                                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+                                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+                                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+                                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+                                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+                                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+                                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+
+                                    </tr>
+                                </tbody>
+                            </Table>
                         </CardBody>
                     </Card>
                 </Col>
