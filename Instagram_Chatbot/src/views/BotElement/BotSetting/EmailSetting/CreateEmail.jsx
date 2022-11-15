@@ -87,7 +87,7 @@ function CreateEmail() {
         .catch((err) => {
           console.log(err);
           if (err.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     }
@@ -245,7 +245,7 @@ function CreateEmail() {
         .catch((err) => {
           console.log(err);
           if (err.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     }
@@ -302,7 +302,7 @@ function CreateEmail() {
         .catch((err) => {
           console.log(err);
           if (err.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     }
@@ -355,7 +355,7 @@ function CreateEmail() {
               <CardBody>
                 <form id="create-email-form">
                   <div className="field-container">
-                    <span className="field-lable">Emailtemplate name</span>
+                    <span className="field-lable">Email template name</span>
                     <div className="field-input">
                       <input
                         id="email_template_name"
