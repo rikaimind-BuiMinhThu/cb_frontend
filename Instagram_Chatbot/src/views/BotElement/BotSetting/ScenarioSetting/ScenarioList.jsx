@@ -89,8 +89,8 @@ function ScenarioList() {
     const getListScenario = (pgIndex) => {
         api.get(`/api/v1/managements/chatbots/${Cookies.get('bot_id')}/scenarios?page=${pgIndex}`).then((res) => {
             console.log(res.data);
-            let scenarios = [...res.data.data];
-            let totalPage = Math.ceil(res.data.total / 25);
+            let scenarios = [...res?.data?.data];
+            let totalPage = Math.ceil(res?.data?.total / 25);
             setTotalPage(totalPage);
             setScenarioSelected(res.data.scenario_selected);
             setScenarioSelectedClone(res.data.scenario_selected);
@@ -128,6 +128,10 @@ function ScenarioList() {
                 console.log(res);
                 if (res.data.code === 1) {
                     setMessageNoti('Add scenario successfully');
+                    Cookies.set('scenario_id', res.data.data.id)
+                    setTimeout(()=>{
+                        document.getElementById('to_scenario').click()
+                    },1500)
                 } else if (res.data.code === 2) {
                     setMessageNoti(res.data.message);
                 }
@@ -358,6 +362,9 @@ function ScenarioList() {
                 </div>
             </ModalNoti>
             <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioId={scenarioId}/>
+            <Link to={`/admin/scenario-setting`}>
+            <button id='to_scenario' style={{display:'none'}}>ScSetting</button>
+            </Link>
         </div>
     );
 }
