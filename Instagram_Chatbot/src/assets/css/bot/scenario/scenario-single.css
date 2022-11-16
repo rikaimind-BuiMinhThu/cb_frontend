@@ -1725,3 +1725,73 @@ input#ss-message__content--user-checkbox--checkbox_img {
   top: 8px;
   left: 16px;
 }
+
+.ant-slider-mark .ant-slider-mark-text:nth-child(1) {
+  width: 48%;
+  text-align: left;
+}
+
+.ant-slider-mark .ant-slider-mark-text:nth-child(2) {
+  right: 0;
+  left: auto !important;
+  text-align: right;
+}
+
+.ant-slider-mark-text {
+  transform: none !important;
+  width: 48%;
+}
+
+.ant-slider-mark {
+  width: 100%;
+}
+
+.ss-user-setting-item-payment-radio-drag {
+  width: 90%;
+}
+
+.ss-user-setting-payment-radio-container {
+  width: 100%;
+  padding: 5px;
+  position: relative;
+}
+
+.ss-user-setting-payment-radio-container-img {
+  display: flex;
+  width: 97%;
+  justify-content: space-between;
+}
+
+.ss-user-setting-payment-radio-container .ss-user-setting-double-input {
+  width: 100%;
+}
+
+.ss-user-setting-payment-radio-container .ss-user-setting__item-select-bottom-wrapper-flex {
+  width: 100%;
+}
+
+.ss-user-setting-plus-minus-icon {
+  /* position: absolute; */
+  top: 0px;
+  right: 5px;
+  padding: 2px;
+}
+
+.ss-user-setting-payment-radio-container-no-img {
+  background-color: rgb(248, 249, 250);
+  margin-bottom: 10px;
+}
+
+.ss-user-setting-plus-minus-icon div {
+  font-size: 30px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 30px;
+  cursor: pointer;
+}
+
+.ss-user-setting-payment-radio-times-icons {
+  position: absolute;
+  top: 5px;
+  right: -24px;
+}

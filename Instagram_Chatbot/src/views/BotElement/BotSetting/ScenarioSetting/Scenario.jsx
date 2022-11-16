@@ -27,7 +27,7 @@ import {
   S3_UPLOAD_URL
 } from '../../../../variables/constants';
 import { tokenExpired } from 'api/tokenExpired';
-import { Carousel, Checkbox, Radio } from 'antd';
+import { Carousel, Checkbox, Radio, Slider } from 'antd';
 import CheckboxGroupCustom from './scenarioComon/CheckboxGroupCustom';
 import american_express from '../../../../assets/img/payment-method/american_express.png';
 import diner_club from '../../../../assets/img/payment-method/diner_club.png';
@@ -140,6 +140,14 @@ for (let i = 1; i <= 12; i++) {
     key: i + '',
     value: i + ''
   });
+}
+
+let dataMaxRangSlider = [];
+for (let i = 2; i <= 10; i++) {
+  dataMaxRangSlider.push({
+    key: i + '',
+    value: i + ''
+  })
 }
 
 let dataDayFixed = [];
@@ -2047,8 +2055,53 @@ const Scenario = () => {
         {
           id: idMax,
           type: messageType,
-          [messageType]: {            
+          [messageType]: {
             type: 'aftee', //type: aftee, atone, paidy, zcom            
+          }
+        }
+      );
+    } else if (messageType === 'slider') {
+      dataMessages[indexMessageSelect].message_content.push(
+        {
+          id: idMax,
+          type: messageType,
+          [messageType]: {
+            save_input_content: false,
+            title_require: false,
+            require: false,
+            type: 'continuous_type', //type: continuous_type, discrete_type
+            max_value: '2',
+            min_value: '0'
+          }
+        }
+      );
+    } else if (messageType === 'card_payment_radio_button') {
+      dataMessages[indexMessageSelect].message_content.push(
+        {
+          id: idMax,
+          type: messageType,
+          [messageType]: {
+            is_save_input_content: false,
+            require: false,
+            type: 'default',
+            title_require: false,
+            is_hide_card_name: false,
+            is_hide_cvc: false,
+            separate_type: false,
+            validity_check: false,
+            type_date_of_expiry: 'YM',
+            payment_method: [],
+            radio_contents: [
+              { id: 1 }
+            ],
+            radio_contents_img: [
+              {
+                id: 1,
+                contents: [
+                  { id: 1 }
+                ]
+              }
+            ]
           }
         }
       );
@@ -2062,6 +2115,7 @@ const Scenario = () => {
           type: messageType,
           [messageType]: {
             title_require: false,
+            require: false,
             type: subType,
             [subType]: {
 
@@ -2256,26 +2310,30 @@ const Scenario = () => {
     }
   }
 
-  const onChangeValueMessageContent = (indexMessage, indexContent, type, value, name, subField, indexSubField, subName) => {
+  const onChangeValueMessageContent = (indexMessage, indexContent, type, value, name, subField, indexSubField, subName, variable) => {
     console.log(indexMessage, indexContent, type, name, subField, indexSubField, value);
-
-    if (subName) {
+    if (variable !== undefined) {
+      if (dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField][subName] === undefined) {
+        dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField][subName] = {};
+      }
+      dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField][subName][variable] = value;
+    } else if (subName !== undefined) {
       if (dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField] === undefined) {
         dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField] = {};
       }
       dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField][subName] = value;
-    } else if (indexSubField) {
+    } else if (indexSubField !== undefined) {
       if (dataMessages[indexMessage].message_content[indexContent][type][name][subField] === undefined) {
         dataMessages[indexMessage].message_content[indexContent][type][name][subField] = {};
       }
       dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField] = value;
-    } else if (subField) {
+    } else if (subField !== undefined) {
       if (dataMessages[indexMessage].message_content[indexContent][type][name] === undefined) {
         dataMessages[indexMessage].message_content[indexContent][type][name] = {};
       }
       console.log(dataMessages[indexMessage].message_content[indexContent])
       dataMessages[indexMessage].message_content[indexContent][type][name][subField] = value;
-    } else if (name) {
+    } else if (name !== undefined) {
       if (dataMessages[indexMessage].message_content[indexContent][type] === undefined) {
         dataMessages[indexMessage].message_content[indexContent][type] = {};
       }
@@ -2643,6 +2701,18 @@ const Scenario = () => {
         }}
         onClick={onClick} />
     )
+  }
+
+  function isColor(strColor) {
+    var s = new Option().style;
+    s.color = strColor;
+    var test1 = s.color == strColor;
+    var test2 = /^#[a-fA-F0-9]{3,6}$/i.test(strColor);
+    if (test1 == true || test2 == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   const SamplePrevArrow = props => {
@@ -4423,6 +4493,162 @@ const Scenario = () => {
                                                           {afteePaymentModule.content}
                                                         </div>
                                                       )}
+                                                      {/* type == 'slider' */}
+                                                      {
+                                                        content.type === 'slider' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {(slider.title_require || slider.require) &&
+                                                              <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+                                                                {slider.title_require &&
+                                                                  <span className="ss-message__content--user-checkbox-title">
+                                                                    {slider.title}
+                                                                  </span>
+                                                                }
+                                                                {slider.require === true &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
+                                                            <div>
+                                                              <Slider
+                                                                trackStyle={{ backgroundColor: slider.color || '#2C75F0' }}
+                                                                min={slider.type === 'discrete_type' ? parseInt(slider.min_value) : 0}
+                                                                max={slider.type === 'discrete_type' ? parseInt(slider.max_value) : 10}
+                                                                dots={slider.type === 'discrete_type'}
+                                                                marks={
+                                                                  slider.type === 'discrete_type' ?
+                                                                    {
+                                                                      [slider.min_value]: slider.min_label,
+                                                                      [slider.max_value]: slider.max_label
+                                                                    } :
+                                                                    {
+                                                                      0: slider.min_label,
+                                                                      10: slider.max_label
+                                                                    }
+                                                                }
+                                                              />
+                                                            </div>
+                                                          </div>
+                                                        )}
+                                                      {/* type == 'card_payment_radio_button' */}
+                                                      {
+                                                        content.type === 'card_payment_radio_button' && (
+                                                          <div style={{ marginBottom: '10px' }}>
+                                                            {cardPaymentRadioButton.type !== 'default' ?
+                                                              cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
+                                                                return <div key={indexPayment} style={{ backgroundColor: '#ECF5FA', color: '#6789A6' }}>
+                                                                  {itemPayment.text}
+                                                                </div>
+                                                              }) :
+                                                              cardPaymentRadioButton.radio_contents_img.map((itemPayment, indexPayment) => {
+                                                                return <div key={indexPayment} style={{ color: '#6789A6', display: 'flex'}}>
+                                                                  <Radio.Group
+                                                                    className="ss-user-overview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width"
+                                                                    style={{ width: "100%" }}
+                                                                    onChange={(value) => console.log(value)}
+                                                                  >
+                                                                  {itemPayment.contents.map((itemPaymentContent, indexContent) => {
+                                                                    <Radio value={cardPaymentRadioButton.initial_selection} key={{ indexContent }}>
+
+                                                                    </Radio>
+                                                                  })}
+                                                                  </Radio.Group>
+                                                                </div>
+                                                              })
+                                                            }
+                                                            {(cardPaymentRadioButton.title_require || cardPaymentRadioButton.require) &&
+                                                              <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
+                                                                {cardPaymentRadioButton.title_require &&
+                                                                  <span className="ss-message__content--user-text-input-title">
+                                                                    {cardPaymentRadioButton.title}
+                                                                  </span>
+                                                                }
+                                                                {cardPaymentRadioButton.require === true &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
+                                                            {cardPaymentRadioButton.separate_type === false ?
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <InputCustom
+                                                                  className="ss-user-setting-input-overview"
+                                                                  styleLabel={{ width: '100%' }}
+                                                                  label="Card number"
+                                                                  inline={false}
+                                                                  disabled={true}
+                                                                  placeholder={cardPaymentRadioButton.card_number_placeholder}
+                                                                />
+                                                              </div> :
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <div style={{ width: '100%' }}>Card number</div>
+                                                                <div style={{ width: '100%' }} className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type">
+                                                                  <InputCustom
+                                                                    disabled={true}
+                                                                    placeholder={cardPaymentRadioButton.card_number_placeholder1}
+                                                                  />
+                                                                  <InputCustom
+                                                                    disabled={true}
+                                                                    placeholder={cardPaymentRadioButton.card_number_placeholder2}
+                                                                  />
+                                                                  <InputCustom
+                                                                    disabled={true}
+                                                                    placeholder={cardPaymentRadioButton.card_number_placeholder3}
+                                                                  />
+                                                                  <InputCustom
+                                                                    disabled={true}
+                                                                    placeholder={cardPaymentRadioButton.card_number_placeholder4}
+                                                                  />
+                                                                </div>
+                                                              </div>
+                                                            }
+                                                            {cardPaymentRadioButton.is_hide_card_name === false &&
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <InputCustom
+                                                                  className="ss-user-setting-input-overview"
+                                                                  styleLabel={{ width: '100%' }}
+                                                                  label="Card holder"
+                                                                  inline={false}
+                                                                  disabled={true}
+                                                                  placeholder={cardPaymentRadioButton.card_number_placeholder}
+                                                                />
+                                                              </div>
+                                                            }
+                                                            <div className="ss-user-setting__item-bottom">
+                                                              <div style={{ width: '100%' }}>Date of expiry</div>
+                                                              <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                                                                <SelectCustom
+                                                                  placeholder="year"
+                                                                  style={{ width: '49%' }}
+                                                                  value={cardPaymentRadioButton.year_placeholder}
+                                                                  disabled={true}
+                                                                />
+                                                                <SelectCustom
+                                                                  placeholder="month"
+                                                                  style={{ width: '49%' }}
+                                                                  value={cardPaymentRadioButton.month_placeholder}
+                                                                  disabled={true}
+                                                                />
+                                                              </div>
+                                                            </div>
+                                                            {cardPaymentRadioButton.is_hide_cvc === false &&
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <InputCustom
+                                                                  className="ss-user-setting-input-overview"
+                                                                  styleLabel={{ width: '100%' }}
+                                                                  label="CVC"
+                                                                  inline={false}
+                                                                  disabled={true}
+                                                                  placeholder={cardPaymentRadioButton.cvc_placeholder}
+                                                                />
+                                                              </div>
+                                                            }
+                                                          </div>
+                                                        )
+                                                      }
                                                     </React.Fragment>
                                                   )
                                                 })}
@@ -8092,7 +8318,6 @@ const Scenario = () => {
                                                               </Droppable>
                                                             </DragDropContext>
                                                           </div>
-
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div style={{ width: '90%' }}>
                                                               <Button
@@ -8176,6 +8401,598 @@ const Scenario = () => {
                                                         />
                                                       </div>
                                                     </React.Fragment>
+                                                  )}
+                                                  {/* user: type = 'slider' */}
+                                                  {content.type === 'slider' && (
+                                                    <React.Fragment>
+                                                      <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px' }}>
+                                                        <div style={{ width: '90%' }}>
+                                                          <CheckboxCustom
+                                                            label="Save the input contents in a variable."
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                            value={slider.is_save_input_content}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                      {slider.is_save_input_content &&
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                            <SelectCustom
+                                                              style={{ width: '100%', marginRight: '10px' }}
+                                                              id="title"
+                                                              value={slider?.save_input_content}
+                                                              data={dataInputVar}
+                                                              keyValue="variable_name"
+                                                              nameValue="variable_name"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
+                                                            />
+                                                            <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                          </div>
+                                                        </div>
+                                                      }
+                                                      <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px' }}>
+                                                        <div style={{ width: '90%' }}>
+                                                          <CheckboxCustom
+                                                            label="Required"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
+                                                            value={slider.require}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                          <SelectCustom
+                                                            id="title"
+                                                            style={{ width: '49%' }}
+                                                            value={slider.title_require}
+                                                            data={dropDownTitle}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
+                                                          />
+                                                          <SelectCustom
+                                                            id="type"
+                                                            style={{ width: '49%' }}
+                                                            value={slider.type}
+                                                            data={[
+                                                              { key: 'continuous_type', value: 'Continuous type' },
+                                                              { key: 'discrete_type', value: 'Discrete type' }
+                                                            ]}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                      {/* slider: withTitle = true */}
+                                                      {slider?.title_require === true &&
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <InputCustom
+                                                            placeholder="title"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
+                                                            value={slider.title}
+                                                          />
+                                                        </div>
+                                                      }
+                                                      {slider.type === 'discrete_type' &&
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <div className="ss-user-setting__item-select-bottom-wrapper-flex" style={{ justifyContent: 'flex-start', alignItems: 'center' }}>
+                                                            <SelectCustom
+                                                              label="Minimum value"
+                                                              style={{ width: '15%', marginRight: '10px' }}
+                                                              value={slider.min_value}
+                                                              data={[
+                                                                { key: '0', value: '0' },
+                                                                { key: '1', value: '1' }
+                                                              ]}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'min_value')}
+                                                            />
+                                                            <SelectCustom
+                                                              label="Maximum value"
+                                                              style={{ width: '15%' }}
+                                                              value={slider.max_value}
+                                                              data={dataMaxRangSlider}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'max_value')}
+                                                            />
+                                                          </div>
+                                                        </div>
+                                                      }
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div style={{ width: '90%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                          <InputCustom
+                                                            label="Minimum label"
+                                                            placeholder=""
+                                                            style={{ width: '82%', borderColor: slider.min_label ? 'gray' : 'red' }}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'min_label')}
+                                                            value={slider.min_label}
+                                                          />
+                                                        </div>
+                                                        {!slider.min_label &&
+                                                          <div style={{ width: '90%', color: '#b94a48', marginLeft: '21%' }}>Must be specified</div>
+                                                        }
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div style={{ width: '90%', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                          <InputCustom
+                                                            label="Maximum label"
+                                                            style={{ width: '82%', borderColor: slider.max_label ? 'gray' : 'red' }}
+                                                            placeholder=""
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'max_label')}
+                                                            value={slider.max_label}
+                                                          />
+                                                        </div>
+                                                        {!slider.max_label &&
+                                                          <div style={{ width: '90%', color: '#b94a48', marginLeft: '21%' }}>Must be specified</div>
+                                                        }
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div style={{ width: '90%', display: 'flex', alignItems: 'center' }}>
+                                                          <InputCustom
+                                                            label="Color"
+                                                            style={{ width: '30%', marginLeft: '12%', borderColor: slider.color && (isColor(slider.color) ? 'gray' : 'red') }}
+                                                            placeholder="#2c75f0"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'color')}
+                                                            value={slider.color}
+                                                          />
+                                                          <div style={{ width: '95px', height: '36px', backgroundColor: slider.color || '#2C75F0', marginLeft: '13px' }}></div>
+                                                        </div>
+                                                        {(slider.color && !isColor(slider.color)) &&
+                                                          <div style={{ width: '90%', color: '#b94a48', marginLeft: '21%' }}>Specify a valid regular expression for color.</div>
+                                                        }
+                                                      </div>
+                                                    </React.Fragment>
+                                                  )}
+                                                  {/* user: type = 'card_payment_radio_button' */}
+                                                  {console.log(cardPaymentRadioButton, 'checkkkkkkkkkkkkk123')}
+                                                  {content.type === 'card_payment_radio_button' && (
+                                                    <>
+                                                      <div className="ss-user-setting__item-text_input-top">
+                                                        <div className="ss-user-setting__item-text_input-save-variable-wrapper">
+                                                          <CheckboxCustom
+                                                            label="Save the input contents in a variable."
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                            value={cardPaymentRadioButton.is_save_input_content}
+                                                          />
+                                                        </div>
+                                                        {cardPaymentRadioButton.is_save_input_content &&
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                              <SelectCustom
+                                                                style={{ width: '100%', marginRight: '10px' }}
+                                                                value={cardPaymentRadioButton?.save_input_content}
+                                                                data={dataInputVar}
+                                                                keyValue="variable_name"
+                                                                nameValue="variable_name"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
+                                                              />
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                            </div>
+                                                          </div>
+                                                        }
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <div style={{ width: '95%' }}>
+                                                            <span>card payment linked setting</span>
+                                                          </div>
+                                                        </div>
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <div style={{ width: '90%' }}>
+                                                            <CheckboxCustom
+                                                              label="Required"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
+                                                              value={cardPaymentRadioButton.require}
+                                                            />
+                                                          </div>
+                                                        </div>
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                            <SelectCustom
+                                                              style={{ width: '49%' }}
+                                                              value={cardPaymentRadioButton.title_require}
+                                                              data={dropDownTitle}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
+                                                            />
+                                                            <SelectCustom
+                                                              id="type"
+                                                              style={{ width: '49%' }}
+                                                              value={cardPaymentRadioButton.type}
+                                                              data={[
+                                                                { key: 'default', value: 'Default' },
+                                                                { key: 'customized_style', value: 'Customized style' },
+                                                                { key: 'picture_radio', value: 'Picture radio' }
+                                                              ]}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
+                                                            />
+                                                          </div>
+                                                        </div>
+                                                        {/* cardPaymentRadioButton: withTitle = true */}
+                                                        {cardPaymentRadioButton?.title_require === true &&
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <InputCustom
+                                                              placeholder="title"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
+                                                              value={cardPaymentRadioButton.title}
+                                                            />
+                                                          </div>
+                                                        }
+                                                        <div className="ss-user-setting__item-bottom" style={{ position: 'relative' }}>
+                                                          {cardPaymentRadioButton.type !== "picture_radio" ?
+                                                            <DragDropContext onDragEnd={result => handleDragEndRadioCheckbox(result, content.id, content.type, 'radio_contents')}>
+                                                              <Droppable droppableId='payment-radio'>
+                                                                {(providedChild) => {
+                                                                  return <div className="ss-user-setting-item-payment-radio-drag" {...providedChild.droppableProps} ref={providedChild.innerRef}>
+                                                                    {
+                                                                      Array.isArray(cardPaymentRadioButton.radio_contents) && cardPaymentRadioButton.radio_contents
+                                                                        .map((itemPaymentRadio, indexPaymentRadio, array) => {
+                                                                          return (
+                                                                            <Draggable draggable={true} key={itemPaymentRadio.id} draggableId={itemPaymentRadio.id + ''} index={indexPaymentRadio}>
+                                                                              {(providedChild) => (
+                                                                                <div
+                                                                                  key={itemPaymentRadio.id}
+                                                                                  {...providedChild.draggableProps}
+                                                                                  {...providedChild.dragHandleProps}
+                                                                                  ref={providedChild.innerRef}
+                                                                                >
+                                                                                  <div className="ss-user-setting-payment-radio-container ss-user-setting-payment-radio-container-no-img">
+                                                                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                                                                                      <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
+                                                                                      <InputDouble
+                                                                                        placeholder={["text", "value"]}
+                                                                                        valueLeft={itemPaymentRadio.text}
+                                                                                        valueRight={itemPaymentRadio.value}
+                                                                                        onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'radio_contents', indexPaymentRadio, name === 'left' ? 'text' : 'value')}
+                                                                                      />
+                                                                                    </div>
+                                                                                    <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                                                      <CheckboxCustom
+                                                                                        label="Initial selection setting"
+                                                                                        value={cardPaymentRadioButton.initial_selection === itemPaymentRadio.id}
+                                                                                        onChange={() => {
+                                                                                          if (cardPaymentRadioButton.initial_selection !== itemPaymentRadio.id) {
+                                                                                            onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.id, 'initial_selection');
+                                                                                          } else {
+                                                                                            onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection');
+                                                                                          }
+                                                                                        }}
+                                                                                      />
+                                                                                      <CheckboxCustom
+                                                                                        label="Card payment linked setting"
+                                                                                        value={cardPaymentRadioButton.card_linked_setting === itemPaymentRadio.id}
+                                                                                        onChange={() => {
+                                                                                          if (cardPaymentRadioButton.card_linked_setting !== itemPaymentRadio.id) {
+                                                                                            onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.id, 'card_linked_setting');
+                                                                                          } else {
+                                                                                            onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'card_linked_setting');
+                                                                                          }
+                                                                                        }}
+                                                                                      />
+                                                                                    </div>
+                                                                                    {array.length > 1 &&
+                                                                                      <div className="ss-user-setting-payment-radio-times-icons">
+                                                                                        <MDBIcon fas icon="times-circle"
+                                                                                          onClick={() => {
+                                                                                            let arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents];
+                                                                                            let startArr = arrMessage.slice(0, indexPaymentRadio);
+                                                                                            let lastArr = arrMessage.slice(indexPaymentRadio + 1, arrMessage.length);
+                                                                                            console.log(arrMessage, [...startArr, ...lastArr]);
+                                                                                            dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents = [...startArr, ...lastArr];
+                                                                                            setDataMessages([...dataMessages]);
+                                                                                          }} />
+                                                                                      </div>
+                                                                                    }
+                                                                                  </div>
+                                                                                </div>
+                                                                              )}
+                                                                            </Draggable>
+                                                                          )
+                                                                        })
+                                                                    }
+                                                                    {providedChild.placeholder}
+                                                                  </div>
+                                                                }}
+                                                              </Droppable>
+                                                            </DragDropContext> :
+                                                            <React.Fragment>
+                                                              <DragDropContext onDragEnd={result => handleDragEndRadioCheckbox(result, content.id, content.type, 'radio_contents_img')}>
+                                                                <Droppable droppableId='payment-radio-img'>
+                                                                  {(providedChild) => {
+                                                                    return <div className="ss-user-setting-item-payment-radio-drag" {...providedChild.droppableProps} ref={providedChild.innerRef}>
+                                                                      {
+                                                                        Array.isArray(cardPaymentRadioButton.radio_contents_img) && cardPaymentRadioButton.radio_contents_img
+                                                                          .map((itemPaymentRadioImg, indexPaymentRadioImg, array) => {
+                                                                            return (
+                                                                              <Draggable draggable={true} key={itemPaymentRadioImg.id} draggableId={itemPaymentRadioImg.id + ''} index={indexPaymentRadioImg}>
+                                                                                {(providedChild) => (
+                                                                                  <div
+                                                                                    key={itemPaymentRadioImg.id}
+                                                                                    {...providedChild.draggableProps}
+                                                                                    {...providedChild.dragHandleProps}
+                                                                                    ref={providedChild.innerRef}
+                                                                                  >
+                                                                                    <div style={{ display: 'flex', marginBottom: '10px', backgroundColor: 'rgb(248, 249, 250)', position: 'relative' }}>
+                                                                                      <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px', display: 'flex', alignItems: 'center', marginRight: '5px', marginLeft: '10px' }} />
+                                                                                      <div className="ss-user-setting-payment-radio-container ss-user-setting-payment-radio-container-img"
+                                                                                      >
+                                                                                        {itemPaymentRadioImg.contents.map((itemContentPayment, indexContentPayment, arrContent) => {
+                                                                                          return <React.Fragment>
+                                                                                            <div style={{ width: arrContent.length > 1 ? `${(100 / arrContent.length) - 1}%` : '100%', padding: '5px' }}>
+                                                                                              <div className="ss-user-setting__item-bottom" style={{ flexWrap: 'nowrap' }}>
+                                                                                                <InputCustom
+                                                                                                  style={{ width: '92%' }}
+                                                                                                  placeholder="File URL"
+                                                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'radio_contents_img', indexPaymentRadioImg, 'contents', indexContentPayment, 'file_url')}
+                                                                                                  value={itemContentPayment.file_url}
+                                                                                                />
+                                                                                                <MDBIcon onClick={() => {
+                                                                                                  setIsOpenFileReference(true)
+                                                                                                  setVarFileReference({ indexContent, contentType: content.type, subContentType: 'radio_contents_img', indexSubContentType: indexPaymentRadioImg, childSubContentType: 'contents', indexChildSubContentType: indexContentPayment, img: 'file_url' })
+                                                                                                }}
+                                                                                                  fas icon="paperclip"
+                                                                                                  style={{ marginLeft: '10px', backgroundColor: '#fff', borderRadius: '50%', padding: '6px' }}
+                                                                                                />
+                                                                                              </div>
+                                                                                              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                                                                                                <InputDouble
+                                                                                                  placeholder={["text", "value"]}
+                                                                                                  valueLeft={itemContentPayment.text}
+                                                                                                  valueRight={itemContentPayment.value}
+                                                                                                  onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'radio_contents_img', indexPaymentRadioImg, 'contents', indexContentPayment, name === 'left' ? 'text' : 'value')}
+                                                                                                />
+                                                                                              </div>
+                                                                                              <div className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                                                                <CheckboxCustom
+                                                                                                  label="Initial selection setting"
+                                                                                                  value={cardPaymentRadioButton.initial_selection === `${itemPaymentRadioImg.id}-${itemContentPayment.id}`}
+                                                                                                  onChange={() => {
+                                                                                                    if (cardPaymentRadioButton.initial_selection !== `${itemPaymentRadioImg.id}-${itemContentPayment.id}`) {
+                                                                                                      onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, `${itemPaymentRadioImg.id}-${itemContentPayment.id}`, 'initial_selection')
+                                                                                                    } else {
+                                                                                                      onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection')
+                                                                                                    }
+                                                                                                  }}
+                                                                                                />
+                                                                                                <CheckboxCustom
+                                                                                                  label="Card payment linked setting"
+                                                                                                  value={cardPaymentRadioButton.card_linked_setting === `${itemPaymentRadioImg.id}-${itemContentPayment.id}`}
+                                                                                                  onChange={() => {
+                                                                                                    if (cardPaymentRadioButton.card_linked_setting !== `${itemPaymentRadioImg.id}-${itemContentPayment.id}`) {
+                                                                                                      onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, `${itemPaymentRadioImg.id}-${itemContentPayment.id}`, 'card_linked_setting')
+                                                                                                    } else {
+                                                                                                      onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'card_linked_setting')
+                                                                                                    }
+                                                                                                  }}
+                                                                                                />
+                                                                                              </div>
+                                                                                            </div>
+                                                                                          </React.Fragment>
+                                                                                        })}
+                                                                                      </div>
+                                                                                      <div className="ss-user-setting-plus-minus-icon" style={{ display: 'flex', alignItems: 'center' }}>
+                                                                                        <div>
+                                                                                          {itemPaymentRadioImg.contents.length < 3 &&
+                                                                                            <div style={{ color: '#327AED' }}
+                                                                                              onClick={() => {
+                                                                                                let arrMess = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img[indexPaymentRadioImg].contents];
+                                                                                                let idMax;
+                                                                                                if (arrMess.length !== 0) {
+                                                                                                  idMax = Math.max(...arrMess.map(item => item.id)) + 1;
+                                                                                                } else {
+                                                                                                  idMax = 1;
+                                                                                                }
+                                                                                                dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img[indexPaymentRadioImg].contents.push({
+                                                                                                  id: idMax
+                                                                                                });
+                                                                                                setDataMessages([...dataMessages]);
+                                                                                              }}
+                                                                                            >+</div>}
+                                                                                          {itemPaymentRadioImg.contents.length > 1 &&
+                                                                                            <div style={{ color: '#FA8464' }}
+                                                                                              onClick={() => {
+                                                                                                dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img[indexPaymentRadioImg].contents.pop();
+                                                                                                setDataMessages([...dataMessages]);
+                                                                                              }}
+                                                                                            >-</div>}
+                                                                                        </div>
+                                                                                      </div>
+                                                                                      {array.length > 1 &&
+                                                                                        <div className="ss-user-setting-payment-radio-times-icons">
+                                                                                          <MDBIcon fas icon="times-circle"
+                                                                                            onClick={() => {
+                                                                                              let arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img];
+                                                                                              let startArr = arrMessage.slice(0, indexPaymentRadioImg);
+                                                                                              let lastArr = arrMessage.slice(indexPaymentRadioImg + 1, arrMessage.length);
+                                                                                              console.log(arrMessage, [...startArr, ...lastArr]);
+                                                                                              dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img = [...startArr, ...lastArr];
+                                                                                              setDataMessages([...dataMessages]);
+                                                                                            }} />
+                                                                                        </div>
+                                                                                      }
+                                                                                    </div>
+                                                                                  </div>
+                                                                                )}
+                                                                              </Draggable>
+                                                                            )
+                                                                          })
+                                                                      }
+                                                                      {providedChild.placeholder}
+                                                                    </div>
+                                                                  }}
+                                                                </Droppable>
+                                                              </DragDropContext>
+                                                            </React.Fragment>
+                                                          }
+                                                        </div>
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <div style={{ width: '90%' }}>
+                                                            <Button style={{ margin: '0px', padding: '9px 19px', backgroundColor: '#327AED' }}
+                                                              onClick={() => {
+                                                                if (cardPaymentRadioButton.type !== 'picture_radio') {
+                                                                  let arrMess = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents];
+                                                                  let idMax;
+                                                                  if (arrMess.length !== 0) {
+                                                                    idMax = Math.max(...arrMess.map(item => item.id)) + 1;
+                                                                  } else {
+                                                                    idMax = 1;
+                                                                  }
+                                                                  dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents.push({
+                                                                    id: idMax
+                                                                  });
+                                                                  setDataMessages([...dataMessages]);
+                                                                } else {
+                                                                  let arrMess = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img];
+                                                                  let idMax;
+                                                                  if (arrMess.length !== 0) {
+                                                                    idMax = Math.max(...arrMess.map(item => item.id)) + 1;
+                                                                  } else {
+                                                                    idMax = 1;
+                                                                  }
+                                                                  dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img.push({
+                                                                    id: idMax,
+                                                                    contents: [
+                                                                      { id: 1 }
+                                                                    ]
+                                                                  });
+                                                                  setDataMessages([...dataMessages]);
+                                                                }
+                                                              }}
+                                                            >addition</Button>
+                                                          </div>
+                                                        </div>
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <div style={{ width: '95%', height: '1px', backgroundColor: 'black' }}></div>
+                                                        </div>
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <div style={{ width: '95%' }}>
+                                                            <span>card payment linked setting</span>
+                                                          </div>
+                                                        </div>
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <div style={{ width: '90%', display: 'flex' }}>
+                                                            <div style={{ width: '28%' }}>
+                                                              <CheckboxCustom
+                                                                label="Hide CVC"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_hide_cvc')}
+                                                                value={cardPaymentRadioButton.is_hide_cvc}
+                                                              />
+                                                            </div>
+                                                            <div>
+                                                              <CheckboxCustom
+                                                                label="Hide card name"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_hide_card_name')}
+                                                                value={cardPaymentRadioButton.is_hide_card_name}
+                                                              />
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <div style={{ width: '90%', display: 'flex' }}>
+                                                            <div style={{ width: '20%', display: 'flex', alignItems: 'center' }}>
+                                                              <CheckboxCustom
+                                                                label="Separate type"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'separate_type')}
+                                                                value={cardPaymentRadioButton.separate_type}
+                                                              />
+                                                            </div>
+                                                            <div style={{ marginLeft: '47px', display: 'flex', alignItems: 'center' }}>
+                                                              <CheckboxCustom
+                                                                label="Perform a validity check"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'validity_check')}
+                                                                value={cardPaymentRadioButton.validity_check}
+                                                              />
+                                                            </div>
+                                                            <div style={{ width: '35%', marginLeft: '38px', display: 'flex', justifyContent: 'space-between' }}>
+                                                              <span style={{ paddingTop: '3px', fontWeight: '400' }}>date of expiry</span>
+                                                              <SelectCustom
+                                                                style={{ width: '53%' }}
+                                                                value={cardPaymentRadioButton.type_date_of_expiry}
+                                                                data={[{ key: 'ym', value: 'YM' }, { key: 'my', value: 'MY' }]}
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type_date_of_expiry')}
+                                                              />
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <CheckboxGroupCustom
+                                                          style={{ width: '90%' }}
+                                                          value={cardPaymentRadioButton.payment_method}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'payment_method')}
+                                                          data={dataPaymentMethod}
+                                                        />
+                                                      </div>
+                                                      {cardPaymentRadioButton.separate_type === false ?
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <InputCustom
+                                                            styleLabel={{ width: '90%' }}
+                                                            label="Card number"
+                                                            inline={false}
+                                                            placeholder="placeholder"
+                                                            value={cardPaymentRadioButton.card_number_placeholder}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder')}
+                                                          />
+                                                        </div> :
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <div style={{ width: '90%' }}>Card number</div>
+                                                          <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type">
+                                                            <InputCustom
+                                                              placeholder="placeholder"
+                                                              value={cardPaymentRadioButton.card_number_placeholder1}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder1')}
+                                                            />
+                                                            <InputCustom
+                                                              placeholder="placeholder"
+                                                              value={cardPaymentRadioButton.card_number_placeholder2}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder2')}
+                                                            />
+                                                            <InputCustom
+                                                              placeholder="placeholder"
+                                                              value={cardPaymentRadioButton.card_number_placeholder3}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder3')}
+                                                            />
+                                                            <InputCustom
+                                                              placeholder="placeholder"
+                                                              value={cardPaymentRadioButton.card_number_placeholder4}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder4')}
+                                                            />
+                                                          </div>
+                                                        </div>
+                                                      }
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <InputCustom
+                                                          styleLabel={{ width: '90%' }}
+                                                          label="Card holder"
+                                                          inline={false}
+                                                          placeholder="placeholder"
+                                                          value={cardPaymentRadioButton.card_holder_placeholder}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_holder_placeholder')}
+                                                        />
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <div style={{ width: '90%' }}>Date of expiry</div>
+                                                        <div style={{ display: 'flex', width: '90%' }}>
+                                                          <SelectCustom
+                                                            placeholder="year"
+                                                            style={{ width: '25%' }}
+                                                            value={cardPaymentRadioButton.year_placeholder}
+                                                            data={dataYearFixed.filter(item => item.key >= new Date().getFullYear() && item.key <= (new Date().getFullYear() + 10))}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'year_placeholder')}
+                                                          />
+                                                          <SelectCustom
+                                                            placeholder="month"
+                                                            style={{ width: '25%', marginLeft: '10px' }}
+                                                            value={cardPaymentRadioButton.month_placeholder}
+                                                            data={dataMonthFixed}
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'month_placeholder')}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom">
+                                                        <InputCustom
+                                                          styleLabel={{ width: '90%' }}
+                                                          label="CVC"
+                                                          inline={false}
+                                                          placeholder="placeholder"
+                                                          value={cardPaymentRadioButton.cvc_placeholder}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'cvc_placeholder')}
+                                                        />
+                                                      </div>
+                                                    </>
                                                   )}
                                                 </div>
                                               </div>
@@ -8381,7 +9198,10 @@ const Scenario = () => {
             onCancel={() => setIsOpenFileReference(false)}
             onReferFile={(file_url) => {
               if (dataMessages[indexMessageSelect].belong_to === 'user') {
-                if (varFileReference.childSubContentType) {
+                if (varFileReference.indexChildSubContentType !== undefined) {
+                  console.log(varFileReference, 'checkkkkk varFileReference.indexChildSubContentType')
+                  onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, file_url, varFileReference.subContentType, varFileReference.indexSubContentType, varFileReference.childSubContentType, varFileReference.indexChildSubContentType, varFileReference.img);
+                } else if (varFileReference.childSubContentType !== undefined) {
                   onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, file_url, varFileReference.subContentType, varFileReference.childSubContentType, varFileReference.indexSubContent, varFileReference.img);
                 } else {
                   onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, file_url, varFileReference.subContentType, varFileReference.indexSubContent, varFileReference.img);
