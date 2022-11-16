@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
 import './../../assets/css/bot/bot-list.css';
@@ -24,6 +24,7 @@ function BotManagement() {
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState('');
   const [statusSelected, setStatusSelected] = useState('');
+  const [search, setSearch] = useState('');
 
   // side effects
   useEffect(() => {
@@ -46,13 +47,13 @@ function BotManagement() {
   }, []);
 
   function reloadList(pgIndex) {
+    console.log(pgIndex);
     api
-      .get(`/api/v1/managements/chatbots?page=${pgIndex}`)
+      .get(`/api/v1/managements/chatbots?page=${pgIndex}&name=${search}`)
       .then((res) => {
         console.log('bot list get data: ', res.data);
         setBotList(res.data?.data);
         setTotalPage(Math.ceil(res.data?.total / 10));
-        console.log(Math.ceil(res.data?.total / 10));
       })
       .catch((error) => {
         console.log(error);
@@ -60,6 +61,10 @@ function BotManagement() {
           tokenExpired();
         }
       });
+  }
+
+  function handleSearch() {
+    reloadList();
   }
 
   // open bot settings
@@ -259,6 +264,16 @@ function BotManagement() {
             <Card>
               <CardHeader>
                 <div className="div-add-bot">
+                  <div className="div-add-bot--search">
+                    <input
+                      type="text"
+                      placeholder="search ..."
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                    <button className="btn-add-bot" onClick={() => handleSearch()}>
+                      Search
+                    </button>
+                  </div>
                   <Link to={'/admin/add-bot-management'}>
                     <button className="btn-add-bot">Add bot</button>
                   </Link>
