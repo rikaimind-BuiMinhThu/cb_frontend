@@ -14,6 +14,7 @@ function BotManagement() {
   // states
   const [botList, setBotList] = useState([]);
   const [page, setPage] = useState(1);
+  const [pageIndex, setPageIndex] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const [isOpenPopupConfirm, setIsOpenPopupConfirm] = useState(false);
   const [msgConfirm, setMsgConfirm] = useState('');
@@ -41,24 +42,29 @@ function BotManagement() {
   }, []);
 
   useEffect(() => {
+    reloadList(1);
+  }, []);
+
+  function reloadList(pgIndex) {
     api
-      .get(`/api/v1/managements/chatbots?pages=1`)
+      .get(`/api/v1/managements/chatbots?page=${pgIndex}`)
       .then((res) => {
         console.log('bot list get data: ', res.data);
         setBotList(res.data?.data);
         setTotalPage(Math.ceil(res.data?.total / 10));
+        console.log(Math.ceil(res.data?.total / 10));
       })
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
-  }, []);
+  }
 
   // open bot settings
   function openBotSetting(id) {
-    Cookies.remove('bot_id')
+    Cookies.remove('bot_id');
     Cookies.set('bot_type', 'bot');
     Cookies.set('bot_id', `${id}`);
     window.location.href = '/admin/scenario-list';
@@ -71,13 +77,13 @@ function BotManagement() {
         console.log('duplicate: ', res.data);
         if (res.data.code == 1) {
           setIsOpenNoti(true);
-          setMsgNoti("Duplicate bot successfully!");
+          setMsgNoti('Duplicate bot successfully!');
           setTimeout(() => {
             setIsOpenNoti(false);
             setMsgNoti('');
           }, 2000);
           api
-            .get(`/api/v1/managements/chatbots?pages=1`)
+            .get(`/api/v1/managements/chatbots?page=1`)
             .then((res) => {
               console.log('bot list get data: ', res.data);
               setBotList(res.data?.data);
@@ -86,7 +92,7 @@ function BotManagement() {
             .catch((error) => {
               console.log(error);
               if (error.response?.data.code === 0) {
-                tokenExpired()
+                tokenExpired();
               }
             });
         } else if (res.data.code == 2) {
@@ -101,28 +107,19 @@ function BotManagement() {
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }
 
   // handle change page
   const handleChangePage = (event, value) => {
-    setPage(parseInt(value));
-    api
-      .get(`/api/v1/managements/chatbots?pages=${value}`)
-      .then((res) => {
-        console.log('bot list get data: ', res.data);
-        setBotList(res.data?.data);
-        setTotalPage(Math.ceil(res.data?.total / 10));
-        document.querySelector('.main-panel').scrollTop = 0;
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
-      });
+    if (totalPage > 1) {
+      setPage(parseInt(value));
+      setPageIndex(value);
+      reloadList(value);
+      document.querySelector('.main-panel').scrollTop = 0;
+    }
   };
 
   // handle confirm action
@@ -147,7 +144,7 @@ function BotManagement() {
               setMsgNoti('');
             }, 2000);
             api
-              .get(`/api/v1/managements/chatbots?pages=${page}`)
+              .get(`/api/v1/managements/chatbots?page=${page}`)
               .then((res) => {
                 console.log('bot list get data: ', res.data);
                 setBotList(res.data?.data);
@@ -156,7 +153,7 @@ function BotManagement() {
               .catch((error) => {
                 console.log(error);
                 if (error.response?.data.code === 0) {
-                  tokenExpired()
+                  tokenExpired();
                 }
               });
           } else if (res.data?.code === 2) {
@@ -176,7 +173,7 @@ function BotManagement() {
         .catch((error) => {
           console.log(error);
           if (error.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     }
@@ -197,7 +194,7 @@ function BotManagement() {
               setMsgNoti('');
             }, 2000);
             api
-              .get(`/api/v1/managements/chatbots?pages=1`)
+              .get(`/api/v1/managements/chatbots?page=1`)
               .then((res) => {
                 console.log('bot list get data: ', res.data);
                 setBotList(res.data?.data);
@@ -206,7 +203,7 @@ function BotManagement() {
               .catch((error) => {
                 console.log(error);
                 if (error.response?.data.code === 0) {
-                  tokenExpired()
+                  tokenExpired();
                 }
               });
           } else if (res.data?.code === 2) {
@@ -225,7 +222,7 @@ function BotManagement() {
         .catch((error) => {
           console.log(error);
           if (error.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     }
@@ -292,7 +289,10 @@ function BotManagement() {
                             <button className="btn-edit-bot" onClick={() => openBotSetting(bot.id)}>
                               編集
                             </button>
-                            <button className="btn-duplicate-bot" onClick={() => duplicateBot(bot.id)}>
+                            <button
+                              className="btn-duplicate-bot"
+                              onClick={() => duplicateBot(bot.id)}
+                            >
                               複製
                             </button>
                             <Link to={`/admin/demo-bot/${bot?.id}`}>
