@@ -64,7 +64,7 @@ function BotManagement() {
   }
 
   function handleSearch() {
-    reloadList();
+    reloadList(pageIndex);
   }
 
   // open bot settings
