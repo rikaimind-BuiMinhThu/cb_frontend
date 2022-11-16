@@ -9,6 +9,7 @@ import ModalNoti from 'views/Popup/ModalNoti';
 import ModalShort from 'views/Popup/ModalShort';
 import { Button } from 'react-bootstrap';
 import { tokenExpired } from 'api/tokenExpired';
+import Pagination from '@material-ui/lab/Pagination';
 
 function VariableManagement() {
   const [customVariable, setCustomVariable] = useState([]);
@@ -20,6 +21,11 @@ function VariableManagement() {
   const [openVariable, setOpenVariable] = useState(true);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [idVariable, setIdVariable] = useState();
+
+  const [pageIndex, setPageIndex] = useState(1);
+  const [totalPage, setTotalPage] = useState();
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     var bot_id = Cookies.get('bot_id');
@@ -34,28 +40,44 @@ function VariableManagement() {
       .then((res) => {
         console.log(res.data.data);
         setListVariable(res.data.data);
+        setTotalPage(Math.ceil(res.data.total / 25));
       })
       .catch((err) => {
         console.log(err);
         if (err.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }, []);
 
-  function reloadListVariable() {
+  function reloadListVariable(pgIndex) {
+    console.log(pgIndex);
     api
-      .get(`/api/v1/managements/chatbots/${botId}/variables?page=1`)
+      .get(`/api/v1/managements/chatbots/${botId}/variables?page=${pgIndex}&name=${search}`)
       .then((res) => {
         console.log(res.data.data);
         setListVariable(res.data.data);
+        setTotalPage(Math.ceil(res.data.total / 25));
       })
       .catch((err) => {
         console.log(err);
         if (err.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
+  }
+
+  function handleChange(event, value) {
+    if (totalPage > 1) {
+      setPage(parseInt(value));
+      setPageIndex(value);
+      reloadListVariable(value);
+      document.querySelector('.main-panel').scrollTop = 0;
+    }
+  }
+
+  function handleSearch() {
+    reloadListVariable(pageIndex);
   }
 
   //add field to add new variable
@@ -81,7 +103,7 @@ function VariableManagement() {
         .then((res) => {
           if (res.data.code == 1) {
             console.log(res);
-            reloadListVariable();
+            reloadListVariable(pageIndex);
             setIsOpenNoti(true);
             setMsgNoti(`Save successfully!`);
             setTimeout(() => {
@@ -98,7 +120,7 @@ function VariableManagement() {
         .catch((err) => {
           console.log(err);
           if (err.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     }
@@ -119,15 +141,16 @@ function VariableManagement() {
     setIdVariable(id);
   }
   function deleteVariable() {
+    console.log(idVariable);
     api
       .delete(`/api/v1/managements/chatbots/${botId}/variables/${idVariable}`)
       .then((res) => {
         if (res.data.code == 1) {
           setIsOpenDelete(false);
-          reloadListVariable();
           setMsgNoti(`Delete successfully!`);
           setIsOpenNoti(true);
           setTimeout(() => {
+            reloadListVariable(pageIndex);
             setIsOpenNoti(false);
             setMsgNoti(``);
           }, 2000);
@@ -144,7 +167,7 @@ function VariableManagement() {
       .catch((err) => {
         console.log(err);
         if (err.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }
@@ -166,7 +189,7 @@ function VariableManagement() {
         .then((res) => {
           console.log(res);
           if (res.data.code == 1) {
-            reloadListVariable();
+            reloadListVariable(pageIndex);
             setIsOpenNoti(true);
             setMsgNoti(`Update successfully!`);
             setTimeout(() => {
@@ -178,7 +201,7 @@ function VariableManagement() {
         .catch((err) => {
           console.log(err);
           if (err.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     }
@@ -215,6 +238,18 @@ function VariableManagement() {
                 <button className="btn btn-primary" onClick={() => setOpenVariable(false)}>
                   SYSTEM VARIABLES
                 </button>
+                {openVariable ? (
+                  <div className="var-variable-search">
+                    <input
+                      type="text"
+                      placeholder="Search variable ..."
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                    <Button onClick={() => handleSearch()}>Search</Button>
+                  </div>
+                ) : (
+                  ''
+                )}
                 <p className="var-variable-note">
                   * A variable that stores the user's input contents. It can be assigned and
                   referenced in the scenario.
@@ -329,6 +364,12 @@ function VariableManagement() {
                         </button>
                       </div>
                     </div>
+                    <Pagination
+                      count={totalPage}
+                      variant="outlined"
+                      page={page}
+                      onChange={handleChange}
+                    />
                   </div>
                 ) : (
                   <div className="var_system-variable">
