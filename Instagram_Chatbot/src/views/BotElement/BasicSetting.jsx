@@ -266,7 +266,7 @@ function BasicSetting() {
                         type="text"
                         placeholder="enter input ..."
                         name="url"
-                        // defaultValue={userDetail.urls}
+                        defaultValue={userDetail.url}
                       ></input>
                     </div>
                   </div>
