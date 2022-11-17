@@ -24,11 +24,11 @@
 .var-form__variable-group {
   display: flex;
   align-items: flex-start;
-  margin-top: 10px;
 }
 .var-form__variable-name {
   width: 30%;
   margin-right: 1.5%;
+  margin-bottom: 10px;
 }
 .var-form__variable-name input {
   border: 1px solid #7186a0;

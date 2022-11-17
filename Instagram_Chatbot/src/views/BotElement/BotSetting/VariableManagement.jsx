@@ -22,9 +22,9 @@ function VariableManagement() {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [idVariable, setIdVariable] = useState();
 
-  const [pageIndex, setPageIndex] = useState(1);
-  const [totalPage, setTotalPage] = useState();
-  const [page, setPage] = useState(1);
+  let [totalPage, setTotalPage] = useState();
+  var [pageIndex, setPageIndex] = useState(1);
+  var [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -55,7 +55,7 @@ function VariableManagement() {
     api
       .get(`/api/v1/managements/chatbots/${botId}/variables?page=${pgIndex}&name=${search}`)
       .then((res) => {
-        console.log(res.data.data);
+        console.log(res);
         setListVariable(res.data.data);
         setTotalPage(Math.ceil(res.data.total / 25));
       })
@@ -147,10 +147,10 @@ function VariableManagement() {
       .then((res) => {
         if (res.data.code == 1) {
           setIsOpenDelete(false);
+          reloadListVariable(pageIndex);
           setMsgNoti(`Delete successfully!`);
           setIsOpenNoti(true);
           setTimeout(() => {
-            reloadListVariable(pageIndex);
             setIsOpenNoti(false);
             setMsgNoti(``);
           }, 2000);
@@ -268,7 +268,7 @@ function VariableManagement() {
                           <div className="var-form__variable-name">
                             <input
                               id={`up_variable_name_${i}`}
-                              defaultValue={item.variable_name}
+                              defaultValue={item.variable_name || ''}
                               placeholder="Please input Variable name"
                               onChange={() =>
                                 checkInput(
@@ -291,7 +291,7 @@ function VariableManagement() {
                           <div className="var-form__variable-name">
                             <input
                               id={`up_variable_value_${i}`}
-                              defaultValue={item.default_value}
+                              defaultValue={item.default_value || ''}
                               placeholder="Please input variable value"
                             />
                           </div>
