@@ -172,145 +172,167 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
           let renderMessage = [];
           let index;
           let delayRender;
-
+          let isPauseScroll = false;
           for (let i = 0; i < messageArr.length; i++) {
-            if (messageArr[i].conditions?.length > 0) {
-              var checked = true;
-              console.log(messageArr[i].conditions, 'check conditions')
-              for (let j = 0; j < messageArr[i].conditions.length; j++) {
-                let conditionItem = messageArr[i].conditions[j];
-                if (j === 0) {
-                  if (conditionItem.condition === 'include') {
-                    checked = objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
-                  } else if (conditionItem.condition === 'is') {
-                    checked = (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
-                  } else if (conditionItem.condition === 'not_include') {
-                    checked = (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
-                  } else if (conditionItem.condition === 'is_not') {
-                    checked = (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
-                  }
-                } else if (conditionItem?.linkCondition === 'and') {
-                  if (conditionItem.condition === 'include') {
-                    checked = checked && objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
-                  } else if (conditionItem.condition === 'is') {
-                    checked = checked && (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
-                  } else if (conditionItem.condition === 'not_include') {
-                    checked = checked && (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
-                  } else if (conditionItem.condition === 'is_not') {
-                    checked = checked && (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
-                  }
-                } else if (conditionItem?.linkCondition === 'or') {
-                  if (conditionItem.condition === 'include') {
-                    checked = checked || objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
-                  } else if (conditionItem.condition === 'is') {
-                    checked = checked || (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
-                  } else if (conditionItem.condition === 'not_include') {
-                    checked = checked || (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
-                  } else if (conditionItem.condition === 'is_not') {
-                    checked = checked || (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+            if (messageArr[i].hidden !== true) {
+              if (messageArr[i].conditions?.length > 0) {
+                var checked = true;
+                console.log(messageArr[i].conditions, 'check conditions')
+                for (let j = 0; j < messageArr[i].conditions.length; j++) {
+                  let conditionItem = messageArr[i].conditions[j];
+                  if (j === 0) {
+                    if (conditionItem.condition === 'include') {
+                      checked = objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                    } else if (conditionItem.condition === 'is') {
+                      checked = (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                    } else if (conditionItem.condition === 'not_include') {
+                      checked = (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                    } else if (conditionItem.condition === 'is_not') {
+                      checked = (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                    }
+                  } else if (conditionItem?.linkCondition === 'and') {
+                    if (conditionItem.condition === 'include') {
+                      checked = checked && objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                    } else if (conditionItem.condition === 'is') {
+                      checked = checked && (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                    } else if (conditionItem.condition === 'not_include') {
+                      checked = checked && (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                    } else if (conditionItem.condition === 'is_not') {
+                      checked = checked && (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                    }
+                  } else if (conditionItem?.linkCondition === 'or') {
+                    if (conditionItem.condition === 'include') {
+                      checked = checked || objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                    } else if (conditionItem.condition === 'is') {
+                      checked = checked || (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                    } else if (conditionItem.condition === 'not_include') {
+                      checked = checked || (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                    } else if (conditionItem.condition === 'is_not') {
+                      checked = checked || (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                    }
                   }
                 }
+                if (checked === false) {
+                  if (messageArr[i].belong_to === 'user') setIndexUser(prev => prev + 1);
+                  continue;
+                }
               }
-              if (checked === false) {
-                if (messageArr[i].belong_to === 'user') setIndexUser(prev => prev + 1);
-                continue;
-              }
-            }
-            if (messageArr[0].belong_to === 'bot') {
-              console.log(i, 'check index message')
+              if (messageArr[0].belong_to === 'bot' && messageArr[i].message_content.length > 0) {
+                console.log(i, 'check index message')
 
-              if (messageArr[i]?.message_content[0].type === 'delay') {
-                await new Promise((resolve) => {
-                  return delayRender = setTimeout(() => {
-                    resolve();
-                  }, messageArr[i]?.message_content[0]?.delay?.content * 1000);
-                });
-                index = i;
-                // promise.then(data => {
-                //   renderMessage.push(data);
-                //   setRenderMessageArr([
-                //     ...renderMessage
-                //   ]);
-                // })
-              } else if (messageArr[i].belong_to !== 'bot') {
-                await new Promise((resolve) => {
-                  return delayRender = setTimeout(() => {
-                    resolve({ ...messageArr[i] });
-                  }, 1000);
-                }).then(data => {
-                  renderMessage.push(data);
-                  setRenderMessageArr([
-                    ...renderMessage
-                  ]);
-                })
-                setIndexUser(prev => prev + 1);
-                index = i;
-                break;
-              } else {
-                console.log(i, 'checkkkkk')
-                await new Promise((resolve) => {
-                  return delayRender = setTimeout(() => {
-                    if (messageArr[i].message_content[0].type === 'text_input') {
-                      messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                        if (variables.length !== 0) {
+                if (messageArr[i]?.message_content[0]?.type === 'delay') {
+                  await new Promise((resolve) => {
+                    return delayRender = setTimeout(() => {
+                      resolve();
+                    }, messageArr[i]?.message_content[0]?.delay?.content * 1000);
+                  });
+                  index = i;
+                  // promise.then(data => {
+                  //   renderMessage.push(data);
+                  //   setRenderMessageArr([
+                  //     ...renderMessage
+                  //   ]);
+                  // })
+                } else if (messageArr[i].belong_to !== 'bot') {
+                  await new Promise((resolve) => {
+                    return delayRender = setTimeout(() => {
+                      resolve({ ...messageArr[i] });
+                    }, 1000);
+                  }).then(data => {
+                    renderMessage.push(data);
+                    console.log(data);
+                    setRenderMessageArr([
+                      ...renderMessage
+                    ]);
+                    if (isPauseScroll === false) {
+                      scrollToBottom();
+                    }
+                  })
+                  setIndexUser(prev => prev + 1);
+                  index = i;
+                  break;
+                } else {
+                  console.log(i, 'checkkkkk')
+                  await new Promise((resolve) => {
+                    return delayRender = setTimeout(() => {
+                      if (messageArr[i].message_content[0]?.type === 'text_input' && messageArr[i].message_content[0].text_input.content) {
+                        messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                          if (variables.length !== 0) {
+                            for (let j = 0; j < variables.length; j++) {
+                              if (variables[j].variable_name === variable) {
+                                return variables[j].default_value;
+                              } else {
+                                return "";
+                              }
+                            }
+                          } else {
+                            return "";
+                          }
+                        });
+                      }
+                      resolve({ ...messageArr[i] });
+                    }, 1000);
+                  }).then(data => {
+                    renderMessage.push(data);
+                    console.log(data);
+                    setRenderMessageArr([
+                      ...renderMessage
+                    ]);
+                    if (isPauseScroll === false) {
+                      scrollToBottom();
+                    }
+                    if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
+                      isPauseScroll = true;
+                    }
+                  })
+                  index = i;
+                }
+              } else if (messageArr[0].belong_to === 'user' && messageArr[i].message_content.length > 0) {
+                if (messageArr[i].belong_to !== 'user') {
+                  await new Promise((resolve) => {
+                    return delayRender = setTimeout(() => {
+                      if (messageArr[i].message_content[0]?.type === 'text_input') {
+                        messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
                           for (let j = 0; j < variables.length; j++) {
                             if (variables[j].variable_name === variable) {
                               return variables[j].default_value;
-                            } else {
-                              return "";
                             }
                           }
-                        } else {
-                          return "";
-                        }
-                      });
+                        });
+                      }
+                      resolve({ ...messageArr[i] });
+                    }, 1000);
+                  }).then(data => {
+                    renderMessage.push(data);
+                    setRenderMessageArr([
+                      ...renderMessage
+                    ]);
+                    if (isPauseScroll === false) {
+                      scrollToBottom();
                     }
-                    resolve({ ...messageArr[i] });
-                  }, 1000);
-                }).then(data => {
-                  renderMessage.push(data);
-                  setRenderMessageArr([
-                    ...renderMessage
-                  ]);
-                })
-                index = i;
-              }
-            } else if (messageArr[0].belong_to === 'user') {
-              if (messageArr[i].belong_to !== 'user') {
-                await new Promise((resolve) => {
-                  return delayRender = setTimeout(() => {
-                    if (messageArr[i].message_content[0].type === 'text_input') {
-                      messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                        for (let j = 0; j < variables.length; j++) {
-                          if (variables[j].variable_name === variable) {
-                            return variables[j].default_value;
-                          }
-                        }
-                      });
+                    if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
+                      isPauseScroll = true;
                     }
-                    resolve({ ...messageArr[i] });
-                  }, 1000);
-                }).then(data => {
-                  renderMessage.push(data);
-                  setRenderMessageArr([
-                    ...renderMessage
-                  ]);
-                })
-                index = i;
-              } else {
-                await new Promise((resolve) => {
-                  return delayRender = setTimeout(() => {
-                    resolve({ ...messageArr[i] });
-                  }, 1000);
-                }).then(data => {
-                  renderMessage.push(data);
-                  setRenderMessageArr([
-                    ...renderMessage
-                  ]);
-                })
-                setIndexUser(prev => prev + 1);
-                index = i;
-                break;
+                  })
+                  index = i;
+                } else {
+                  await new Promise((resolve) => {
+                    return delayRender = setTimeout(() => {
+                      resolve({ ...messageArr[i] });
+                    }, 1000);
+                  }).then(data => {
+                    renderMessage.push(data);
+                    setRenderMessageArr([
+                      ...renderMessage
+                    ]);
+                    if (isPauseScroll === false) {
+                      scrollToBottom();
+                    }
+                  })
+                  setIndexUser(prev => prev + 1);
+                  index = i;
+                  break;
+                }
               }
             }
           }
@@ -330,6 +352,13 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
 
   //   }
   // }, [indexMessageRender])
+
+  const scrollToBottom = () => {
+    document.getElementById('cp-body').scrollTo({
+      top: document.getElementById('cp-body').scrollHeight,
+      behavior: 'smooth'
+    });
+  }
 
   const stringNullOrEmpty = (string) => {
     if (string === undefined || string === null || (string && (string + "")?.trim() === "") || string === "") return true
@@ -523,7 +552,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
           isValid = false;
         }
       }
-      if (contentType[contentType.type].range && contentType[contentType.type].range !== 'no_input'
+      if (contentArr[i].type === 'text_input' && contentType[contentType.type].range && contentType[contentType.type].range !== 'no_input'
         && (!stringNullOrEmpty(contentType[contentType.type].value) || !stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))) {
         let REGEX_CHECK;
         let messageLog = '';
@@ -586,86 +615,108 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
     let renderMessage = [...renderMessageArr];
     let index;
     let delayRender;
+    let isPauseScroll = false;
     // let REGEX = /\{\{(.*?)\}\}/ig;
     setIndexUser(prev => prev + 1);
 
     if (!dataMessages[indexMessageRender + 1]) return;
     if (dataMessages[indexMessageRender + 1].belong_to === 'bot') {
       for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
-        if (dataMessages[i].conditions) {
-          var checked = true;
-          for (let j = 0; j < dataMessages[i].conditions.length; j++) {
-            let conditionItem = dataMessages[i].conditions[j];
-            if (j === 0) {
-              if (conditionItem.condition === 'include') {
-                checked = objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
-              } else if (conditionItem.condition === 'is') {
-                checked = (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
-              } else if (conditionItem.condition === 'not_include') {
-                checked = (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
-              } else if (conditionItem.condition === 'is_not') {
-                checked = (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
-              }
-            } else if (conditionItem?.linkCondition === 'and') {
-              if (conditionItem.condition === 'include') {
-                checked = checked && objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
-              } else if (conditionItem.condition === 'is') {
-                checked = checked && (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
-              } else if (conditionItem.condition === 'not_include') {
-                checked = checked && (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
-              } else if (conditionItem.condition === 'is_not') {
-                checked = checked && (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
-              }
-            } else if (conditionItem?.linkCondition === 'or') {
-              if (conditionItem.condition === 'include') {
-                checked = checked || objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
-              } else if (conditionItem.condition === 'is') {
-                checked = checked || (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
-              } else if (conditionItem.condition === 'not_include') {
-                checked = checked || (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
-              } else if (conditionItem.condition === 'is_not') {
-                checked = checked || (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+        if (dataMessages[i].hidden !== true) {
+          if (dataMessages[i].conditions) {
+            var checked = true;
+            for (let j = 0; j < dataMessages[i].conditions.length; j++) {
+              let conditionItem = dataMessages[i].conditions[j];
+              if (j === 0) {
+                if (conditionItem.condition === 'include') {
+                  checked = objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                } else if (conditionItem.condition === 'is') {
+                  checked = (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                } else if (conditionItem.condition === 'not_include') {
+                  checked = (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                } else if (conditionItem.condition === 'is_not') {
+                  checked = (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                }
+              } else if (conditionItem?.linkCondition === 'and') {
+                if (conditionItem.condition === 'include') {
+                  checked = checked && objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                } else if (conditionItem.condition === 'is') {
+                  checked = checked && (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                } else if (conditionItem.condition === 'not_include') {
+                  checked = checked && (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                } else if (conditionItem.condition === 'is_not') {
+                  checked = checked && (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                }
+              } else if (conditionItem?.linkCondition === 'or') {
+                if (conditionItem.condition === 'include') {
+                  checked = checked || objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                } else if (conditionItem.condition === 'is') {
+                  checked = checked || (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                } else if (conditionItem.condition === 'not_include') {
+                  checked = checked || (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                } else if (conditionItem.condition === 'is_not') {
+                  checked = checked || (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                }
               }
             }
+            if (checked === false) {
+              if (dataMessages[i].belong_to === 'user') setIndexUser(prev => prev + 1);
+              continue;
+            }
           }
-          if (checked === false) {
-            if (dataMessages[i].belong_to === 'user') setIndexUser(prev => prev + 1);
-            continue;
-          }
-        }
-        if (dataMessages[i].belong_to === 'bot') {
-          if (dataMessages[i]?.message_content[0].type === 'delay') {
-            await new Promise((resolve) => {
-              return delayRender = setTimeout(() => {
-                resolve();
-              }, (dataMessages[i]?.message_content[0].delay.content * 1000));
-            });
-            index = i;
-            // promise.then(data => {
-            //   renderMessage.push(data);
-            //   setRenderMessageArr([
-            //     ...renderMessage
-            //   ]);
-            // })
-          } else {
-            await new Promise((resolve) => {
-              return delayRender = setTimeout(() => {
-                if (dataMessages[i].message_content[0].type === 'text_input') {
-                  dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                    if (variables.length !== 0) {
-                      for (let j = 0; j < variables.length; j++) {
-                        if (variables[j].variable_name === variable) {
-                          return variables[j].default_value;
-                        } else {
-                          return "";
+          console.log(dataMessages[i])
+          if (dataMessages[i].belong_to === 'bot') {
+            if (dataMessages[i]?.message_content[0].type === 'delay') {
+              await new Promise((resolve) => {
+                return delayRender = setTimeout(() => {
+                  resolve();
+                }, (dataMessages[i]?.message_content[0].delay.content * 1000));
+              });
+              index = i;
+              // promise.then(data => {
+              //   renderMessage.push(data);
+              //   setRenderMessageArr([
+              //     ...renderMessage
+              //   ]);
+              // })
+            } else {
+              await new Promise((resolve) => {
+                return delayRender = setTimeout(() => {
+                  if (dataMessages[i].message_content[0].type === 'text_input') {
+                    dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                      if (variables.length !== 0) {
+                        for (let j = 0; j < variables.length; j++) {
+                          if (variables[j].variable_name === variable) {
+                            return variables[j].default_value;
+                          } else {
+                            return "";
+                          }
                         }
+                      } else {
+                        return "";
                       }
-                    } else {
-                      return "";
-                    }
-                  })
+                    })
+                  }
+                  resolve({ ...dataMessages[i] });
+                }, 1000);
+              }).then(data => {
+                renderMessage.push(data);
+                console.log(data)
+                setRenderMessageArr([
+                  ...renderMessage
+                ]);
+                if (isPauseScroll === false) {
+                  scrollToBottom();
                 }
-
+                if (data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
+                  isPauseScroll = true;
+                }
+              })
+              index = i;
+            }
+          } else if (dataMessages[i].belong_to === 'user' && dataMessages[i].message_content.length > 0) {
+            await new Promise((resolve) => {
+              return delayRender = setTimeout(() => {
                 resolve({ ...dataMessages[i] });
               }, 1000);
             }).then(data => {
@@ -673,22 +724,13 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
               setRenderMessageArr([
                 ...renderMessage
               ]);
+              if (isPauseScroll === false) {
+                scrollToBottom();
+              }
             })
             index = i;
+            break;
           }
-        } else if (dataMessages[i].belong_to === 'user' && dataMessages[i].message_content.length > 0) {
-          await new Promise((resolve) => {
-            return delayRender = setTimeout(() => {
-              resolve({ ...dataMessages[i] });
-            }, 1000);
-          }).then(data => {
-            renderMessage.push(data);
-            setRenderMessageArr([
-              ...renderMessage
-            ]);
-          })
-          index = i;
-          break;
         }
       }
       setIndexMessageRender(index);
@@ -696,21 +738,74 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
         ...renderMessage
       ]);
     } else {
-      if (dataMessages[indexMessageRender + 1].message_content.length > 0) {
-        setRenderMessageArr([
-          ...renderMessage,
-          dataMessages[indexMessageRender + 1]
-        ]);
+      if (dataMessages[indexMessageRender + 1].message_content.length > 0 && dataMessages[indexMessageRender + 1].hidden !== true) {
+        await new Promise((resolve) => {
+          return delayRender = setTimeout(() => {
+            resolve({ ...dataMessages[indexMessageRender + 1] });
+          }, 1000);
+        }).then(data => {
+          renderMessage.push(data);
+          console.log(data)
+          setRenderMessageArr([
+            ...renderMessage
+          ]);
+          if (isPauseScroll === false) {
+            scrollToBottom();
+          }
+        });
         index = indexMessageRender + 1;
       } else {
         for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
-          if (dataMessages[i].message_content.length > 0) {
-            setRenderMessageArr([
-              ...renderMessage,
-              dataMessages[i]
-            ]);
-            index = i;
-            break;
+          console.log(dataMessages[i], 'checkkkkk dataMessages[i]')
+          if (dataMessages[i].message_content.length > 0 && dataMessages[i].hidden !== true) {
+            if (dataMessages[i].belong_to === 'user') {
+              await new Promise((resolve) => {
+                return delayRender = setTimeout(() => {
+                  resolve({ ...dataMessages[i] });
+                }, 1000);
+              }).then(data => {
+                renderMessage.push(data);
+                console.log(data)
+                setRenderMessageArr([
+                  ...renderMessage
+                ]);
+                if (isPauseScroll === false) {
+                  scrollToBottom();
+                }
+              });
+              index = i;
+              break;
+            } else {
+              await new Promise((resolve) => {
+                return delayRender = setTimeout(() => {
+                  if (dataMessages[i].message_content[0].type === 'text_input') {
+                    dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                      if (variables.length !== 0) {
+                        for (let j = 0; j < variables.length; j++) {
+                          if (variables[j].variable_name === variable) {
+                            return variables[j].default_value;
+                          } else {
+                            return "";
+                          }
+                        }
+                      } else {
+                        return "";
+                      }
+                    })
+                  }
+                  resolve({ ...dataMessages[i] });
+                }, 1000);
+              }).then(data => {
+                renderMessage.push(data);
+                console.log(data)
+                setRenderMessageArr([
+                  ...renderMessage
+                ]);
+                if (isPauseScroll === false) {
+                  scrollToBottom();
+                }
+              });
+            }
           }
         }
       }
@@ -739,7 +834,13 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
     if (dataMessages[indexMessageRender].message_content[indexContent][contentType].is_save_input_content) {
       variables.forEach(item => {
         if (dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content === item.variable_name) {
-          item.default_value = value;
+          let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
+          if (contentType === 'zip_code_address') {
+            console.log(dataContentType, 'checkkkk value');
+            item.default_value = `〒 ${dataContentType?.value_post_code} ${dataContentType?.value_prefecture}${dataContentType?.value_municipality} ${dataContentType?.value_address}${dataContentType?.value_building_name}`;
+          } else {
+            item.default_value = value;
+          }
         }
       });
       objParam[dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content] = value;
@@ -980,6 +1081,17 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
         let attachingFile = content.attaching_file;
         let calendar = content.calendar;
         let agreeTerm = content.agree_term;
+        let carousel = content.carousel;
+        let creditCardPayment = content.credit_card_payment;
+        let capture = content.capture;
+        let productPurchase = content.product_purchase;
+        let productPurchaseRadioButton = content.product_purchase_radio_button;
+        let smsVerify = content.sms_verify;
+        let afteePaymentModule = content.AFTEE_payment_module;
+        let slider = content.slider;
+        let cardPaymentRadioButton = content.card_payment_radio_button;
+        let variableSet = content.variable_set;
+        let labelNoTransition = content.label_no_transition;
 
         return (
           <React.Fragment key={indexContent}>
@@ -1201,12 +1313,12 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {(textarea?.type === 'text_input' ||
                     textarea?.type === 'invalid_input') && (
                       <textarea
-                        disabled={disabled}
+                        disabled={disabled || textarea?.type === 'invalid_input'}
                         className="ss-message__content--user-textarea ss-input-value"
                         placeholder={textarea[textarea.type]?.content}
                         rows={3}
                         onChange={e => onChangeValue(indexContent, content.type, e.target.value, textarea?.type, 'value')}
-                        value={textarea[textarea.type]?.value}
+                        value={textarea?.type === 'invalid_input' ? textarea[textarea.type]?.content : textarea[textarea.type]?.value}
                       ></textarea>
                     )}
                   {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${textarea.type}`] &&
@@ -2124,6 +2236,34 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       />
                     </div>
                   )}
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                    <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                    </div>
+                  }
+                </div>
+              )
+            }
+            {/* type == 'carousel' */}
+            {
+              content.type === 'carousel' && (
+                <div style={{ marginBottom: '10px' }}>
+                  {(carousel.title_require || carousel.isCheckRequire) &&
+                    <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
+                      {carousel.title_require &&
+                        <span className="ss-message__content--user-pull_down-title">
+                          {carousel.title}
+                        </span>
+                      }
+                      {(carousel.isCheckRequire === 'all_items_require' ||
+                        carousel.isCheckRequire === 'require') &&
+                        <span className="ss-message__content--user-text-input-required">
+                          * required
+                        </span>
+                      }
+                    </div>
+                  }
+                  
                   {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
                       {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}

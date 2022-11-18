@@ -1288,9 +1288,15 @@ input#ss-message__content--user-checkbox--checkbox_img {
   width: 75%;
 }
 
+.ss-plus-circle-option-icon-times-custom {
+  width: 7%!important;
+  text-align: center;
+  font-size: 25px !important;
+}
+
 .ss-user-setting-checkbox-custom {
   margin-left: 1%;
-  margin-right: 13%;
+  margin-right: 9%;
 }
 
 .ss-user-setting__item-bottom-flex-start .react-datepicker-wrapper {
@@ -1354,7 +1360,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-custom-label-zip-code {
-  width: 15% !important;
+  width: 18% !important;
 }
 
 .fa-minus-circle {
@@ -1670,6 +1676,14 @@ input#ss-message__content--user-checkbox--checkbox_img {
   width: 4%;
 }
 
+.ss-user-overview-product-purchase-style-width .ant-checkbox-wrapper span:nth-child(2) {
+  width: 96%;
+}
+
+.ss-user-overview-product-purchase-style-width .ant-radio-wrapper span:nth-child(1) {
+  width: 17px;
+}
+
 .ss-user-overview-product-purchase-style-width .ant-radio-wrapper span:nth-child(2) {
   width: 96%;
 }
@@ -1707,6 +1721,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 
 .ss-user-overview-product-purchase-radio-group-type-text_image .ant-radio-wrapper {
   position: relative;
+  width: 100%;
 }
 
 .ss-user-overview-product-purchase-radio-group-type-text_image .ant-radio-wrapper .ant-radio {
