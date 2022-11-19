@@ -700,8 +700,8 @@ function PushMessage() {
           <div style={{width:"100%"}}>
             <h4>Do you want to delete this push message?</h4>
             <div style={{display:'flex', margin:"auto", width:"100%"}}>
-              <button style={{width:"30%", border:"none", margin:"auto"}} onClick={()=> deletePM()}>Yes</button>
-              <button style={{width:"30%", border:'none', margin:"auto"}} onClick={()=> setIsOpenDelete(false)}>No</button>
+              <button style={{width:"30%", border:"none", padding:"5px 15px", backgroundColor:"#52cbce", borderRadius:"5px", margin:"auto"}} onClick={()=> deletePM()}>Yes</button>
+              <button style={{width:"30%", border:'none', padding:"5px 15px", borderRadius:"5px", margin:"auto"}} onClick={()=> setIsOpenDelete(false)}>No</button>
             </div>
           </div>
         </ModalShort>
