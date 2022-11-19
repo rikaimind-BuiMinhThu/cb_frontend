@@ -398,7 +398,7 @@ function PushMessage() {
                     </thead>
                     <tbody>
                       {listPushMessage?.map((item, i) => (
-                        <tr>
+                        <tr key={i}>
                           <td style={{ width: "5%", border: '1px solid #7186a0' }}>{i}</td>
                           <td style={{ width: "25%", border: '1px solid #7186a0' }}>{item.title}</td>
                           <td style={{ width: "15%", border: '1px solid #7186a0' }}>{item.sending_method === 'email' ? 'Email' : 'SMS'}</td>
@@ -580,15 +580,15 @@ function PushMessage() {
                   <span style={{ display: 'flex', width: "80%" }}>
                     <select id='excluded_time_from' name='excluded_time_from'
                       className='push-message-input-form' style={{ width: "35%" }}>
-                      {listExcludedTimeAlt.map((item) => (
-                        <option value={item}>{item}</option>
+                      {listExcludedTimeAlt.map((item, i) => (
+                        <option key={i} value={item}>{item}</option>
                       ))}
                     </select>
                     &ensp;   <span>~</span> &ensp;
                     <select id='excluded_time_to' name='excluded_time_to'
                       className='push-message-input-form' style={{ width: "35%" }}>
-                      {listExcludedTimeAlt.map((item) => (
-                        <option value={item}>{item}</option>
+                      {listExcludedTimeAlt.map((item, i) => (
+                        <option key={i} value={item}>{item}</option>
                       ))}
                     </select>
                   </span>
@@ -602,8 +602,8 @@ function PushMessage() {
                   <span style={{ display: 'flex', width: "80%" }}>
                     <select id='alternate_send_time   ' name='alternate_send_time'
                       className='push-message-input-form' style={{ width: "35%" }}>
-                      {listExcludedTimeAlt.map((item) => (
-                        <option value={item}>{item}</option>
+                      {listExcludedTimeAlt.map((item, i) => (
+                        <option key={i} value={item}>{item}</option>
                       ))}
                     </select>
                   </span>
@@ -633,8 +633,8 @@ function PushMessage() {
                     <option value="of">Of</option>
                   </select>
                   <select name="last_message_datetime_since" id="last_message_datetime_since" style={{ width: "15%", margin: "1% 1%" }}>
-                    {alternateSendTime.map((time) => (
-                      <option value={time}>{time}</option>
+                    {alternateSendTime.map((time, i) => (
+                      <option key={i} value={time}>{time}</option>
                     ))}
                   </select>
                   <div style={{ width: "15%", margin: "1% 1.25%" }}></div>
@@ -676,8 +676,8 @@ function PushMessage() {
                       {/* <option value="contain">Contains</option> */}
                     </select>
                     <select name={`value${i}`} id={`value${i}`} style={{ width: "15%", margin: "1% 1%" }}>
-                      {alternateSendTime.map((time) => (
-                        <option value={time}>{time}</option>
+                      {alternateSendTime?.map((time, i) => (
+                        <option key={i} value={time}>{time}</option>
                       ))}
                     </select>
                     <button style={{ width: "15%", margin: "1% 1%" }} onClick={(e) => deleteCDiv(e, i)}>Delete</button>
