@@ -3,16 +3,16 @@ import { MDBIcon } from 'mdbreact';
 import CheckboxCustom from './CheckboxCustom';
 import Select from './SelectCustom';
 
-const InputCustom = ({ id, value, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false, style, classLabel, disabled = false }) => {
+const InputCustom = ({ id, value, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false, style, classLabel, disabled = false, styleLabel, inline = true }) => {
 
     return (
         <React.Fragment>
-            {label && <span className={classLabel} style={{ fontSize: '14px', fontWeight: '400', width: 'fit-content' }}>{label}</span>}
+            {label && <div className={classLabel} style={{ fontSize: '14px', fontWeight: '400', ...inline === false ? {width: '90%'}: {width: 'fit-content'}, ...styleLabel }}>{label}</div>}
             <input
                 id={id}
                 type="text"
                 name="ss-user-setting__item-text_input-use-api"
-                className={`ss-input-value ss-user-setting-item ${className}`}
+                className={`ss-input-value ss-user-setting-item ${className ? className : ''}`}
                 placeholder={placeholder}
                 disabled={disabled}
                 value={value}
