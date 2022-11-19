@@ -407,6 +407,13 @@ var routes = [
     layout: "/admin",
   },
   {
+    path: "/edit-payment-gateway/:id",
+    name: "Edit Payment Gateway",
+    // icon: "nc-icon nc-single-02",
+    component: AddPaymentGateway,
+    layout: "/admin",
+  },
+  {
     path: "/payment",
     name: "Payment-Service",
     // icon: "nc-icon nc-single-02",

@@ -6,14 +6,25 @@
   min-width: 250px;
 }
 .div-add-bot {
+  display: flex;
+  justify-content: space-between;
   width: 100%;
   padding-top: 20px;
-  padding-bottom: 50px;
+  padding-bottom: 20px;
+}
+.div-add-bot--search {
+  width: 30%;
+  display: flex;
+}
+.div-add-bot--search input {
+  margin-right: 10px;
+  padding: 5px 15px 5px 15px;
+
+  /* padding: ; */
 }
 .btn-add-bot {
-  float: right;
   border: none;
-  color:white;
+  color: white;
   font-weight: 600;
   background-color: #51cbce;
   padding: 5px 15px 5px 15px;
@@ -28,7 +39,7 @@
 }
 .btn-duplicate-bot {
   /* width: 25%; */
-  color: #FF9900;
+  color: #ff9900;
   font-weight: 700;
   border: none;
   background: #ffffff;

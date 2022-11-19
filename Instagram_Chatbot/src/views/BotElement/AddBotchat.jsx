@@ -8,6 +8,7 @@ import IconWomenDefault from '../../assets/img/bot-icon/women1_new.png';
 import ModalNoti from '../../views/Popup/ModalNoti';
 import { Link } from 'react-router-dom';
 import { tokenExpired } from 'api/tokenExpired';
+import Cookies from 'js-cookie';
 
 const colors = [
   {
@@ -152,11 +153,19 @@ function AddBotchat() {
       api
         .post(`api/v1/managements/chatbots`, bot)
         .then((res) => {
-          console.log(res);
+          
           if (res.data.code === 1 || res.data.code === '1') {
+            Cookies.set('bot_id', res.data.data.id)
             setMsgNoti('Add new bot chat successfully!');
             setIsOpenNoti(true);
-            window.location.href = '/admin/bot'
+            setTimeout(()=>{
+              setMsgNoti('');
+            setIsOpenNoti(false);
+            window.location.href = '/admin/scenario-list'
+            },1500)
+            
+            // console.log(res.data.data.id);
+            
           } else if (res.data?.code === 2 || res.data?.code === '2') {
             setMsgNoti(res.data.message);
             setIsOpenNoti(true);
@@ -388,6 +397,9 @@ function AddBotchat() {
             <span style={{ fontSize: '16px' }}>{msgNoti}</span>
           </div>
         </ModalNoti>
+        <Link to={'/admin/scenario-list'}>
+          <button style={{display:'none'}}>SCL</button>
+        </Link>
       </div>
     </>
   );
