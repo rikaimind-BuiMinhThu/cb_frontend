@@ -57,6 +57,10 @@ function VariableManagement() {
       .then((res) => {
         console.log(res);
         setListVariable(res.data.data);
+        for(var i=0; i<res.data.data.length; i++){
+          document.getElementById(`up_variable_name_${i}`).value = res?.data?.data[i].variable_name
+          document.getElementById(`up_variable_value_${i}`).value = res?.data?.data[i].default_value
+        }
         setTotalPage(Math.ceil(res.data.total / 25));
       })
       .catch((err) => {
@@ -263,12 +267,12 @@ function VariableManagement() {
                       <label>Default value</label>
                     </div>
                     <div className="var-form__variable">
-                      {listVariable.map((item, i) => (
+                      {listVariable?.map((item, i) => (
                         <div className="var-form__variable-group" id={`up_var_add_${i}`} key={i}>
                           <div className="var-form__variable-name">
                             <input
                               id={`up_variable_name_${i}`}
-                              defaultValue={item.variable_name || ''}
+                              defaultValue={item.variable_name == undefined ? '': item.variable_name}
                               placeholder="Please input Variable name"
                               onChange={() =>
                                 checkInput(
@@ -291,7 +295,7 @@ function VariableManagement() {
                           <div className="var-form__variable-name">
                             <input
                               id={`up_variable_value_${i}`}
-                              defaultValue={item.default_value || ''}
+                              defaultValue={item.default_value == undefined ? '': item.default_value}
                               placeholder="Please input variable value"
                             />
                           </div>
