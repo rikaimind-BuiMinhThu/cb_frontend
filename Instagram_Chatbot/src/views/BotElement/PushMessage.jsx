@@ -24,6 +24,9 @@ function PushMessage() {
   const [numHotTemp, setNumHotTemp] = useState(0);
   const [alternateSendTime, setAlternateSendTime] = useState([]);
   const [listExcludedTimeAlt, setListExcluedTimeAlt] = useState([]);
+  const [update, setUpdate] = useState(false);
+  const [itemUpdate, setItemUpdate] = useState()
+
   useEffect(() => {
     let listAlternateTime = [];
     for (var i = 1; i <= 36; i++) {
@@ -117,6 +120,15 @@ function PushMessage() {
             group.add(option);
           }
         }
+        // setEmailDetailId(res?.data?.data[0].id)
+        // set1stEmailDetailId()
+        // group.value = 
+        console.log('check status update', update);
+        if(update == true){
+          group.value = emailDetailId
+        }else{
+          group.value = res?.data?.data[0].id
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -196,6 +208,7 @@ function PushMessage() {
   }
 
   function closeAddPM() {
+    setUpdate(false)
     setCustomDiv([]);
     setIsOpenAddPM(false);
   }
@@ -207,40 +220,40 @@ function PushMessage() {
 
   function selectVariableVal(value, i) {
     console.log(value);
-    var selectobject = document.getElementById(`operator${i}`);
-    if (
-      value == 'current_url_param' ||
-      value == 'current_url' ||
-      value == 'current_url_title' ||
-      value == 'user_id' ||
-      value == 'bot_id' ||
-      value == 'preview_flg' ||
-      value == 'user_ip_address' ||
-      value == 'user_country' ||
-      value == 'user_device' ||
-      value == 'user_browser' ||
-      value == 'user_agent' ||
-      value == 'cv_datetime' ||
-      value == 'cv_flg' ||
-      value == 'start_datetime' ||
-      value == 'user_referer_firstopen' ||
-      value == 'user_referer_current'
-    ) {
-      for (var i = 0; i < selectobject.length; i++) {
-        if (selectobject.options[i].value == 'contain') selectobject.remove(i);
-      }
-    } else {
-      var opt = document.createElement('option');
-      opt.value = 'contain';
-      opt.innerHTML = 'Contains';
-      selectobject.appendChild(opt);
-    }
+    // var selectobject = document.getElementById(`operator${i}`);
+    // if (
+    //   value == 'current_url_param' ||
+    //   value == 'current_url' ||
+    //   value == 'current_url_title' ||
+    //   value == 'user_id' ||
+    //   value == 'bot_id' ||
+    //   value == 'preview_flg' ||
+    //   value == 'user_ip_address' ||
+    //   value == 'user_country' ||
+    //   value == 'user_device' ||
+    //   value == 'user_browser' ||
+    //   value == 'user_agent' ||
+    //   value == 'cv_datetime' ||
+    //   value == 'cv_flg' ||
+    //   value == 'start_datetime' ||
+    //   value == 'user_referer_firstopen' ||
+    //   value == 'user_referer_current'
+    // ) {
+    //   for (var i = 0; i < selectobject.length; i++) {
+    //     if (selectobject.options[i].value == 'contains') selectobject.remove(i);
+    //   }
+    // } else {
+    //   var opt = document.createElement('option');
+    //   opt.value = 'contains';
+    //   opt.innerHTML = 'Contains';
+    //   selectobject.appendChild(opt);
+    // }
   }
 
   function savePM() {
     var bot_id = Cookies.get('bot_id');
     const formAdd = document.getElementById('form_add_PM');
-    let user = {};
+    let push_message = {};
     let variableList = [];
     let sysVariableList = [];
     let operatorList = [];
@@ -265,13 +278,13 @@ function PushMessage() {
         !formAdd[i].name.includes('value')
       ) {
         if (formAdd[i].name.includes('has_timezone_exclusion')) {
-          if (formAdd[i].value == 'on') {
-            user[formAdd[i].name] = 'yes';
-          } else {
-            user[formAdd[i].name] = 'no';
+          if (document.getElementById('has_timezone_exclusion').checked == true) {
+            push_message[formAdd[i].name] = 'yes';
+          } else if (document.getElementById('has_timezone_exclusion').checked == false) {
+            push_message[formAdd[i].name] = 'no';
           }
         } else {
-          user[formAdd[i].name] = formAdd[i].value;
+          push_message[formAdd[i].name] = formAdd[i].value;
         }
       } else if (formAdd[i].name.includes('variable_id')) {
         if (
@@ -304,28 +317,32 @@ function PushMessage() {
         valueList.push(formAdd[i].value);
       }
       // if( formAdd[i].name == 'has_timezone_exclusion'){
-      //   if(formAdd[i].value == 'on'){
+      //   // console.log(document.getElementById('has_timezone_exclusion').checked)
+
+      //   // console.log(formAdd[i].value, 'value ne')
+      //   if(document.getElementById('has_timezone_exclusion').checked == true){
       //     variableList.push('yes')
-      //   }else{
+      //   }else if(document.getElementById('has_timezone_exclusion').checked == false){
       //     variableList.push('no')
       //   }
-      // }else{
       // }
     }
     let varList = [];
     for (var i = 0; i < variableList.length; i++) {
       varList.push({
-        variable: variableList[i],
+        variable_id: variableList[i],
         // variable_name: sysVariableList[i],
         operator: operatorList[i],
         value: valueList[i],
       });
     }
     if (checkedStartAt == true && checkedTitle == true) {
-      user.variables = varList;
-      console.log(user);
-      api
-        .post(`/api/v1/managements/push_messages?chatbot_id=${bot_id}`, user)
+      push_message.variables = varList;
+      // var pmAdd = {push_message: {user}}
+      console.log({ push_message });
+      if(update == false){
+        api
+        .post(`/api/v1/managements/push_messages?chatbot_id=${bot_id}`, {push_message})
         .then((res) => {
           if (res.data.code == 1) {
             setMsgNoti('Add Push Message successfully');
@@ -345,6 +362,28 @@ function PushMessage() {
             tokenExpired();
           }
         });
+      }else{
+        api.patch(`/api/v1/managements/push_messages/${idPMUpdate}`,{push_message}).then((res) => {
+          if (res.data.code == 1) {
+            setMsgNoti('Update Push Message successfully');
+            setIsOpenNoti(true);
+            setTimeout(() => {
+              setIsOpenNoti(false);
+              setMsgNoti('');
+              reloadListPM();
+            }, 1500);
+            setIsOpenAddPM(false);
+          } else if (res.data.code == 2) {
+            console.log(res.data.message);
+          }
+        })
+        .catch((error) => {
+          if (error?.response.data.code == 0) {
+            tokenExpired();
+          }
+        });
+      }
+      
     } else {
       console.log('empty');
     }
@@ -404,12 +443,36 @@ function PushMessage() {
     // /api/v1/managements/push_messages/id/unsubscribe
   }
 
+  const [emailDetailId, setEmailDetailId] = useState()
+  const [idPMUpdate, setIdPMUpdate] = useState()
   function editPushMessage(item) {
+    setUpdate(true)
+    setIdPMUpdate(item.id)
+    setEmailDetailId(item.email_id)
+    console.log('email detail id: ', item.email_id)
+    
     item.started_at = item.started_at.substring(0, 19).replaceAll('T', ' ');
     delete item.id;
     delete item.updated_at;
     delete item.created_at;
     console.log(item);
+    setItemUpdate(item)
+    let numDiv = []
+    for (var i = 0; i < item.variables.length; i++) {
+      numDiv.push(`newDiv${i}`)
+      // if(document.getElementById(`variable_id${i}`)!=null &&
+      // document.getElementById(`operator${i}`) != null &&
+      // document.getElementById(`value${i}`) != null){
+      //   //  document.getElementById(`variable_id${i}`).value = item.variables[i].variable_id
+      //   // document.getElementById(`operator${i}`).value = item.variables[i].operator
+      //   // document.getElementById(`value${i}`).value = item.variables[i].value
+      // }
+
+    }
+    setCustomDiv(numDiv)
+    setNumHotTemp(item.variables.length);
+    
+    setIsOpenAddPM(true)
   }
 
   function deletePMConf(id) {
@@ -440,6 +503,16 @@ function PushMessage() {
           tokenExpired();
         }
       });
+  }
+
+  function checkTZ(check){
+    console.log('checked: ',check)
+    if(check == 'yes'){
+      // document.getElementById('has_timezone_exclusion').checked = true
+    }else{
+      // document.getElementById('has_timezone_exclusion').checked = false
+    }
+    
   }
 
   return (
@@ -567,11 +640,11 @@ function PushMessage() {
                         onChange={(date) => selectDateEnd(date)}
                         dateFormat="yyyy-MM-dd"
                         value={endDate}
-                        // value={
-                        //   endDatePreview
-                        //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-                        //     : 'yyyy/mm/dd'
-                        // }
+                      // value={
+                      //   endDatePreview
+                      //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+                      //     : 'yyyy/mm/dd'
+                      // }
                       />
                     </div>
                     まで &emsp;<button className="push-message-btn-search">Search</button>
@@ -610,14 +683,14 @@ function PushMessage() {
           </Col>
         </Row>
         <ModalDetail open={isOpenAddPM} onClose={() => closeAddPM()}>
-          <div style={{ width: '100%', height: '630px', overflowY: 'auto' }}>
+          <div style={{ width: '100%', height: '630px', overflowY: 'auto' }} onLoad={getEmailList()}>
             <form id="form_add_PM">
               <div className="push-message-add-form">
                 <span className="push-message-span-form">
                   Push message name
                   <span style={{ color: 'red' }}>*</span>
                 </span>
-                <input id="title" name="title" className="push-message-input-form"></input>
+                <input id="title" name="title" defaultValue={update == true ? itemUpdate.title : ''} className="push-message-input-form"></input>
               </div>
               <div className="push-message-add-form">
                 <span className="push-message-span-form"></span>
@@ -670,7 +743,7 @@ function PushMessage() {
                     timeFormat="HH:mm"
                     timeIntervals={15}
                     timeCaption="time"
-                    dateFormat="yyyy-MM-dd h:mm:ss"
+                    dateFormat="yyyy-MM-dd HH:mm:ss"
                   />
                 </div>
                 {/* <input id='push_message_name' className='push-message-input-form'></input> */}
@@ -700,12 +773,13 @@ function PushMessage() {
                     name="has_timezone_exclusion"
                     onChange={(e) => selectTimezoneExclusion(e.target.checked)}
                     type="checkbox"
+                    checked={(update == true & itemUpdate?.has_timezone_exclusion == 'yes') ? true: false}
                     style={{ marginTop: '15px' }}
                   />
                 </span>
               </div>
               <br />
-              <div id="excludedTime" style={{ width: '100%', display: 'none' }}>
+              <div id="excludedTime" style={{ width: '100%', display: `${(update == true && itemUpdate.has_timezone_exclusion === 'yes') ? 'block' : 'none'}` }}>
                 <div className="push-message-add-form">
                   <span className="push-message-span-form">
                     Excluded time
@@ -715,6 +789,7 @@ function PushMessage() {
                     <select
                       id="excluded_time_from"
                       name="excluded_time_from"
+                      defaultValue={update == true ? itemUpdate.excluded_time_from : ''}
                       className="push-message-input-form"
                       style={{ width: '35%' }}
                     >
@@ -728,6 +803,7 @@ function PushMessage() {
                     <select
                       id="excluded_time_to"
                       name="excluded_time_to"
+                      defaultValue={update == true ? itemUpdate.excluded_time_to : ''}
                       className="push-message-input-form"
                       style={{ width: '35%' }}
                     >
@@ -749,6 +825,7 @@ function PushMessage() {
                     <select
                       id="alternate_send_time   "
                       name="alternate_send_time"
+                      defaultValue={update == true ? itemUpdate.alternate_send_time : ''}
                       className="push-message-input-form"
                       style={{ width: '35%' }}
                     >
@@ -834,7 +911,7 @@ function PushMessage() {
                     <select
                       name={`variable_id${i}`}
                       id={`variable_id${i}`}
-                      defaultValue={'current_url'}
+                      defaultValue={update == true ? itemUpdate?.variables[i]?.variable_id : ''}
                       style={{ width: '30%', margin: '1% 1%' }}
                       onChange={(e) => selectVariableVal(e.target.value, i)}
                     >
@@ -854,31 +931,32 @@ function PushMessage() {
                       <option value="start_datetime">cvstart_datetime_flg</option>
                       <option value="user_referer_firstopen">user_referer_firstopen</option>
                       <option value="user_referer_current">user_referer_current</option> */}
-                      {listVar?.map((item) => (
-                        <option value={`${item.id}`}>{item.variable_name}</option>
+                      {listVar?.map((item, i) => (
+                        <option value={`${item.id}`} key={i}>{item.variable_name}</option>
                       ))}
                     </select>
                     <select
                       name={`operator${i}`}
-                      defaultValue={'is'}
+                      defaultValue={update == true ? itemUpdate?.variables[i]?.operator : 'is'}
                       id={`operator${i}`}
                       style={{ width: '15%', margin: '1% 1%' }}
                     >
                       <option value="is">Is</option>
-                      <option value="isNot">Is not</option>
-                      {/* <option value="contain">Contains</option> */}
+                      <option value="is_not">Is not</option>
+                      <option value="contains">Contains</option>
                     </select>
-                    <select
+                    <input
                       name={`value${i}`}
                       id={`value${i}`}
+                      defaultValue={update == true ? itemUpdate?.variables[i]?.value : ''}
                       style={{ width: '15%', margin: '1% 1%' }}
-                    >
-                      {alternateSendTime?.map((time, i) => (
+                    />
+                    {/* {alternateSendTime?.map((time, i) => (
                         <option key={i} value={time}>
                           {time}
                         </option>
                       ))}
-                    </select>
+                    </select> */}
                     <button
                       style={{ width: '15%', margin: '1% 1%' }}
                       onClick={(e) => deleteCDiv(e, i)}
