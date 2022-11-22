@@ -407,12 +407,12 @@ function PushMessage() {
       api
         .patch(`/api/v1/managements/push_messages/${item?.id}/unsubscribe`)
         .then((res) => {
-          console.log(res);
           setIsOpenNoti(true);
           setMsgNoti(`Unsubscribe successfully!`);
+          reloadListPM()
           setTimeout(() => {
             setIsOpenNoti(false);
-            setMsgNoti(`Unsubscribe failed!`);
+            setMsgNoti(``);
           }, 2000);
         })
         .catch((err) => {
@@ -425,11 +425,11 @@ function PushMessage() {
       api
         .patch(`/api/v1/managements/push_messages/${item.id}/subscribe`)
         .then((res) => {
-          console.log(res);
           setMsgNoti(`Subscribe successfully!`);
+          reloadListPM();
           setTimeout(() => {
             setIsOpenNoti(false);
-            setMsgNoti(`Subscribe failed!`);
+            setMsgNoti(``);
           }, 2000);
         })
         .catch((err) => {
