@@ -3,6 +3,10 @@ import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstr
 import '../../assets/css/bot/payment-mng.css';
 import DatePicker from 'react-datepicker';
 import { useEffect } from 'react';
+import  api from 'api/api-management';
+import Cookies from 'js-cookie';
+import { tokenExpired } from 'api/tokenExpired';
+
 function PaymentManagement() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -11,7 +15,7 @@ function PaymentManagement() {
   const [noCan, setNoCan] = useState(true);
   const [noPaid, setNoPaid] = useState(true);
   const [noShip, setNoShip] = useState(true);
-
+  const [listvar, setListVar] = useState([])
   useEffect(() => {
     var date = new Date();
     if (date.getDate() != 1) {
@@ -19,6 +23,17 @@ function PaymentManagement() {
     }
     setStartDate(new Date(date.setDate(1)));
   }, []);
+  useEffect(()=>{
+    var botId = Cookies.get('bot_id')
+    api.get(`/api/v1/managements/chatbots/${botId}/variables?page=all`).then(res =>{
+      setListVar(res?.data?.data)
+    }).catch(err =>{
+      console.log(err)
+      if(err?.response?.data?.code ==0){
+        tokenExpired()
+      }
+    })
+  },[])
 
   function orderHisSelected() {
     setOpenHisOrder(true);
@@ -74,6 +89,24 @@ function PaymentManagement() {
     }
   }
 
+  function saveConsumptionTax(){
+    //consumption_tax
+    var obj={}
+    var elements = document.getElementById('included_tax').checked;
+    var elements0 = document.getElementById('outside_tax').checked;
+    var elements1= document.getElementById('sales_tax_rate').value;
+    var elements2 = document.getElementById('truncation').checked;
+    var elements3 = document.getElementById('rounded').checked;
+    
+    obj={
+      included_outside_tax:elements == true ? 'tax_included' : 'outside_tax',
+      sales_tax_rate: elements1,
+      truncation_rounded: (elements2 == false && elements3 == false) ? '' : elements2 == true ? 'truncation' : 'rounded'
+      
+    }
+      console.log(obj);
+  }
+
   return (
     // <div>
     <div className="content">
@@ -118,11 +151,11 @@ function PaymentManagement() {
                           onChange={(date) => selectDateStart(date)}
                           dateFormat="yyyy-MM-dd"
                           value={startDate}
-                          // value={
-                          //   startDatePreview
-                          //     ? startDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-                          //     : 'yyyy/mm/dd'
-                          // }
+                        // value={
+                        //   startDatePreview
+                        //     ? startDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+                        //     : 'yyyy/mm/dd'
+                        // }
                         />
                       </div>
                       <h4
@@ -140,11 +173,11 @@ function PaymentManagement() {
                           onChange={(date) => selectDateEnd(date)}
                           dateFormat="yyyy-MM-dd"
                           value={endDate}
-                          // value={
-                          //   endDatePreview
-                          //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-                          //     : 'yyyy/mm/dd'
-                          // }
+                        // value={
+                        //   endDatePreview
+                        //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+                        //     : 'yyyy/mm/dd'
+                        // }
                         />
                       </div>
                       まで &emsp;<button className="payment-management-btn-search">Search</button>
@@ -192,55 +225,47 @@ function PaymentManagement() {
                     <h6>consumption tax</h6>
                     <div className="payment_management_setting__body">
                       <div className="payment_management_setting__check">
-                        <form action="">
+                        <form id='consumption_tax'>
                           <input
                             type="radio"
-                            name="tax"
+                            name="included_outside_tax"
+                            id='included_tax'
                             checked={openTax}
+                            value={`tax_include`}
                             onChange={() => setOpenTax(true)}
                           />
                           <label> tax included</label>
-                          <input type="radio" name="tax" onChange={() => setOpenTax(false)} />
+                          <input type="radio" id='outside_tax' name="included_outside_tax" value={`outside`}
+                          onChange={() => setOpenTax(false)} />
                           <label>outside tax</label>
                           <br />
+                            <div className="payment_management_setting__check-out">
+                              <div style={{width:"100%", display:`${openTax == true ? 'none' : 'block'}`}}>
+                              <span style={{fontWeight:"500", color: '#767676'}}>sales tax rate(%) &emsp;
+                              <select id='sales_tax_rate' name='sales_tax_rate'>
+                                <option value="8">8</option>
+                                {/* <option value="9">9</option> */}
+                                <option value="10">10</option>
+                              </select></span>
+                              <br />
+                              <span style={{fontWeight:"500", color: '#767676'}}>Less than 1 yen &emsp;
+                              <input type="radio" name="truncation_rounded" id='truncation'value={`truncation`} />
+                              <label> truncation</label>
+                              <input type="radio" name="truncation_rounded" id='rounded' value={`rounded`} />
+                              <label>rounded up</label></span>
+                              </div>
+                              <br />
+                              <p>
+                                In the case of tax-inclusive, the product price subtotal will be used
+                                as the order price.
+                              </p>
+                              <p>
+                                In the case of tax-excluded, the order amount is calculated by adding
+                                the tax rate to the product price subtotal.
+                              </p>
+                            </div>
                         </form>
-                        {openTax ? (
-                          <div className="payment_management_setting__check-in">
-                            <p>
-                              In the case of tax-inclusive, the product price subtotal will be used
-                              as the order price.
-                            </p>
-                            <p>
-                              In the case of tax-excluded, the order amount is calculated by adding
-                              the tax rate to the product price subtotal.
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="payment_management_setting__check-out">
-                            <p>sales tax rate(%)</p>
-                            <select>
-                              <option value="8">8</option>
-                              <option value="9">9</option>
-                              <option value="10">10</option>
-                            </select>
-                            <br />
-                            <p>Less than 1 yen</p>
-                            <input type="radio" name="sale" />
-                            <label> truncation</label>
-                            <input type="radio" name="sale" />
-                            <label>rounded up</label>
-                            <br />
-                            <p>
-                              In the case of tax-inclusive, the product price subtotal will be used
-                              as the order price.
-                            </p>
-                            <p>
-                              In the case of tax-excluded, the order amount is calculated by adding
-                              the tax rate to the product price subtotal.
-                            </p>
-                          </div>
-                        )}
-                        <button className="btn btn-primary">Keep</button>
+                        <button className="btn btn-primary" onClick={()=>saveConsumptionTax()}>Keep</button>
                       </div>
                     </div>
                   </div>
@@ -260,15 +285,15 @@ function PaymentManagement() {
                           <input type="radio" name="tax" onChange={() => setNoCan(false)} />
                           <label>can be</label>
                           <br />
-                        </form>
-                        {noCan ? (
-                          ''
-                        ) : (
-                          <div className="payment_management_setting__can">
+                        
+  
+                          <div className="payment_management_setting__can"
+                          style={{display: `${noCan == true ? 'none' : 'block'}`}}>
                             <label>Payment method variable name</label>
-                            <select>
-                              <option value="current_url">current_url</option>
-                              <option value="current_url">current_url dddddddddddddd</option>
+                            <select name='payment_method_variable'>
+                              {listvar?.map((item, i)=>(
+                                <option key={i} value={item.id}>{item.variable_name}</option>
+                              ))}
                             </select>
                             <br />
                             <div>
@@ -292,10 +317,10 @@ function PaymentManagement() {
                               </form>
                             </div>
                             <button className="btn btn-outline-primary">
-                              <i class="fas fa-plus"></i>
+                              <i className="fas fa-plus"></i>
                             </button>
                           </div>
-                        )}
+                          </form>
                         <button className="btn btn-primary">Keep</button>
                       </div>
                     </div>
@@ -339,7 +364,7 @@ function PaymentManagement() {
                               </form>
                             </div>
                             <button className="btn btn-outline-primary">
-                              <i class="fas fa-plus"></i>
+                              <i className="fas fa-plus"></i>
                             </button>
                           </div>
                         )}
