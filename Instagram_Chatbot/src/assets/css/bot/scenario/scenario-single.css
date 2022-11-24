@@ -1716,7 +1716,8 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-overview-product-purchase-img-type-text_image img {
-  height: 200px;
+  height: auto;
+  width: 100%;
 }
 
 .ss-user-overview-product-purchase-radio-group-type-text_image .ant-radio-wrapper {
@@ -1809,4 +1810,9 @@ input#ss-message__content--user-checkbox--checkbox_img {
   position: absolute;
   top: 5px;
   right: -24px;
+}
+
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #0175FF;
+  border-color: #0175FF;
 }

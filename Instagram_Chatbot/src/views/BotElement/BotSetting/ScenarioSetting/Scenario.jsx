@@ -1578,7 +1578,6 @@ const Scenario = () => {
 
   const handleGetMessage = () => {
     api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`).then((res) => {
-      console.log(res.data.data);
       setDataMessages(res.data.data?.conversation?.messages || []);
       setScenarioName(res.data.data?.scenario_name || '');
 
@@ -1998,8 +1997,9 @@ const Scenario = () => {
           id: idMax,
           type: messageType,
           [messageType]: {
-            title_require: false, //yes-no
-            type: 'numbers', //type: numbers, alphanumeric, alphabet_only,
+            title_require: false,
+            require: true,
+            type: '0123456789', //type: numbers, alphanumeric, alphabet_only,
             length: 6,
             colour: 'can_be', //type: can_be, none
           }
@@ -2023,6 +2023,7 @@ const Scenario = () => {
             products: [
               {
                 id: 1,
+                quantity_select: 1,
                 is_quantity_designation: false
               }
             ]
@@ -2089,7 +2090,7 @@ const Scenario = () => {
             is_hide_cvc: false,
             separate_type: false,
             validity_check: false,
-            type_date_of_expiry: 'YM',
+            type_date_of_expiry: 'ym',
             payment_method: [],
             radio_contents: [
               { id: 1 }
@@ -2409,7 +2410,6 @@ const Scenario = () => {
       }
     });
   }
-  { console.log(dataCondition, 'chaschkashckjas') }
 
   const createVariable = () => {
     if (!variableName) {
@@ -2670,20 +2670,20 @@ const Scenario = () => {
   const handleOpenPreview = (isOpen) => {
     if (!isOpenPreview) return;
     if (isOpen) {
-      document.getElementById('cp-container').style.height = "610px";
-      document.getElementById('cp-header').style.position = "static";
-      document.getElementById('cp-header').style.borderBottomLeftRadius = "0px";
-      document.getElementById('cp-header').style.borderBottomRightRadius = "0px";
-      document.getElementById('cp-process-bar').style.display = "block";
-      document.getElementById('cp-body').style.display = "block";
+      document.getElementById('sp-container').style.height = "610px";
+      document.getElementById('sp-header').style.position = "static";
+      document.getElementById('sp-header').style.borderBottomLeftRadius = "0px";
+      document.getElementById('sp-header').style.borderBottomRightRadius = "0px";
+      document.getElementById('sp-process-bar').style.display = "block";
+      document.getElementById('sp-body').style.display = "block";
     } else {
-      document.getElementById('cp-container').style.height = "0px";
-      document.getElementById('cp-process-bar').style.display = "none";
-      document.getElementById('cp-body').style.display = "none";
-      document.getElementById('cp-header').style.borderBottomLeftRadius = "25px";
-      document.getElementById('cp-header').style.borderBottomRightRadius = "25px";
-      document.getElementById('cp-header').style.position = "absolute";
-      document.getElementById('cp-header').style.bottom = "13px";
+      document.getElementById('sp-container').style.height = "0px";
+      document.getElementById('sp-process-bar').style.display = "none";
+      document.getElementById('sp-body').style.display = "none";
+      document.getElementById('sp-header').style.borderBottomLeftRadius = "25px";
+      document.getElementById('sp-header').style.borderBottomRightRadius = "25px";
+      document.getElementById('sp-header').style.position = "absolute";
+      document.getElementById('sp-header').style.bottom = "13px";
     }
     setIsOpenPreview(!isOpenPreview);
   }
@@ -2792,7 +2792,6 @@ const Scenario = () => {
                             <div className="" {...provided.droppableProps} ref={provided.innerRef}>
                               {dataMessages && dataMessages.map((message, index, arr) => {
                                 let content;
-                                console.log(message, 'chekckekkkkkkk')
                                 if (message.belong_to === 'bot') content = message.message_content[0];
                                 return message.belong_to === 'bot' ? (
                                   <Draggable key={message.id} draggableId={message.id?.toString()} index={index}>
@@ -3116,7 +3115,6 @@ const Scenario = () => {
                                                   let cardPaymentRadioButton = content.card_payment_radio_button;
                                                   let variableSet = content.variable_set;
                                                   let labelNoTransition = content.label_no_transition;
-                                                  console.log(content, 'check content')
                                                   return (
                                                     <React.Fragment key={indexContent}>
                                                       {/* type == 'text_input' */}
@@ -4094,8 +4092,7 @@ const Scenario = () => {
                                                                 <Carousel arrows {...settingsCarousel} afterChange={(currentSlide) => setIndexCarouselSlide(currentSlide)}>
                                                                   {carousel[carousel?.type]?.contents &&
                                                                     carousel[carousel?.type]?.contents.map((itemCarousel, indexCarousel) => {
-                                                                      console.log(itemCarousel);
-                                                                      return <React.Fragment key={{ indexCarousel }}>
+                                                                      return <React.Fragment key={indexCarousel}>
                                                                         <div style={{ width: '100%', minHeight: '298px' }}>
                                                                           <img src={itemCarousel.fileUrl} />
                                                                           {itemCarousel.title && <div style={{ fontWeight: '800' }}>{itemCarousel.title}</div>}
@@ -4251,7 +4248,7 @@ const Scenario = () => {
                                                                     >
                                                                       {productPurchase.products.map((itemProduct, indexProduct) => {
                                                                         return <Checkbox key={indexProduct} value={itemProduct.id}>
-                                                                          <div className="ss-user-overview-product-purchase-container" key={{ indexProduct }}>
+                                                                          <div className="ss-user-overview-product-purchase-container">
                                                                             <div className="ss-user-overview-product-purchase-img">
                                                                               <img src={itemProduct.img_url} />
                                                                             </div>
@@ -4276,11 +4273,11 @@ const Scenario = () => {
                                                                                     Price: {itemProduct.item_price} 円
                                                                                   </div>
                                                                                 }
-                                                                                {productPurchase.multiple_item_purchase &&
+                                                                                {/* {productPurchase.multiple_item_purchase &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-price">
                                                                                     Multiple item purchase
                                                                                   </div>
-                                                                                }
+                                                                                } */}
                                                                               </div>
                                                                             }
                                                                           </div>
@@ -4297,8 +4294,8 @@ const Scenario = () => {
                                                                       value={productPurchase.initial_selection[0]}
                                                                     >
                                                                       {productPurchase.products.map((itemProduct, indexProduct) => {
-                                                                        return <Radio value={itemProduct.id} key={{ indexProduct }}>
-                                                                          <div className="ss-user-overview-product-purchase-container" key={{ indexProduct }}>
+                                                                        return <Radio value={itemProduct.id} key={indexProduct}>
+                                                                          <div className="ss-user-overview-product-purchase-container">
                                                                             <div className="ss-user-overview-product-purchase-img">
                                                                               <img src={itemProduct.img_url} />
                                                                             </div>
@@ -4323,11 +4320,11 @@ const Scenario = () => {
                                                                                     Price: {itemProduct.item_price} 円
                                                                                   </div>
                                                                                 }
-                                                                                {productPurchase.multiple_item_purchase &&
+                                                                                {/* {productPurchase.multiple_item_purchase &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-price">
                                                                                     Multiple item purchase
                                                                                   </div>
-                                                                                }
+                                                                                } */}
                                                                               </div>
                                                                             }
                                                                           </div>
@@ -4348,7 +4345,7 @@ const Scenario = () => {
                                                                     >
                                                                       {productPurchase.products.map((itemProduct, indexProduct) => {
                                                                         return <Checkbox key={indexProduct} value={itemProduct.id}>
-                                                                          <div className="ss-user-overview-product-purchase-container-type-text_image" key={{ indexProduct }}>
+                                                                          <div className="ss-user-overview-product-purchase-container-type-text_image">
                                                                             <div className="ss-user-overview-product-purchase-img-type-text_image">
                                                                               <img src={itemProduct.img_url} />
                                                                             </div>
@@ -4371,8 +4368,8 @@ const Scenario = () => {
                                                                       value={productPurchase.initial_selection[0]}
                                                                     >
                                                                       {productPurchase.products.map((itemProduct, indexProduct) => {
-                                                                        return <Radio value={itemProduct.id} key={{ indexProduct }}>
-                                                                          <div className="ss-user-overview-product-purchase-container-type-text_image" key={{ indexProduct }}>
+                                                                        return <Radio value={itemProduct.id} key={indexProduct}>
+                                                                          <div className="ss-user-overview-product-purchase-container-type-text_image">
                                                                             <div className="ss-user-overview-product-purchase-img-type-text_image">
                                                                               <img src={itemProduct.img_url} />
                                                                             </div>
@@ -4423,8 +4420,8 @@ const Scenario = () => {
                                                                     onChange={(value) => console.log(value)}
                                                                   >
                                                                     {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
-                                                                      return <Radio value={itemProduct.id} key={{ indexProduct }}>
-                                                                        <div className="ss-user-overview-product-purchase-container" key={{ indexProduct }}>
+                                                                      return <Radio value={itemProduct.id} key={indexProduct}>
+                                                                        <div className="ss-user-overview-product-purchase-container">
                                                                           <div className="ss-user-overview-product-purchase-img">
                                                                             <img src={itemProduct.img_url} />
                                                                           </div>
@@ -4461,8 +4458,8 @@ const Scenario = () => {
                                                                     onChange={(value) => console.log(value)}
                                                                   >
                                                                     {productPurchaseRadioButton.products && productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
-                                                                      return <Radio value={itemProduct.id} key={{ indexProduct }}>
-                                                                        <div className="ss-user-overview-product-purchase-container-type-text_image" key={{ indexProduct }}>
+                                                                      return <Radio value={itemProduct.id} key={indexProduct}>
+                                                                        <div className="ss-user-overview-product-purchase-container-type-text_image">
                                                                           <div className="ss-user-overview-product-purchase-img-type-text_image">
                                                                             <img src={itemProduct.img_url} />
                                                                           </div>
@@ -4544,11 +4541,26 @@ const Scenario = () => {
                                                               />
                                                             </div>
                                                           </div>
-                                                        )}
+                                                        )
+                                                      }
                                                       {/* type == 'card_payment_radio_button' */}
                                                       {
                                                         content.type === 'card_payment_radio_button' && (
                                                           <div style={{ marginBottom: '10px' }}>
+                                                            {(cardPaymentRadioButton.title_require || cardPaymentRadioButton.require) &&
+                                                              <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
+                                                                {cardPaymentRadioButton.title_require &&
+                                                                  <span className="ss-message__content--user-text-input-title">
+                                                                    {cardPaymentRadioButton.title}
+                                                                  </span>
+                                                                }
+                                                                {cardPaymentRadioButton.require === true &&
+                                                                  <span className="ss-message__content--user-text-input-required">
+                                                                    * required
+                                                                  </span>
+                                                                }
+                                                              </div>
+                                                            }
                                                             {console.log(cardPaymentRadioButton, 'checkkkkk')}
                                                             {cardPaymentRadioButton.type === 'default' &&
                                                               <Radio.Group
@@ -4586,31 +4598,19 @@ const Scenario = () => {
                                                                     style={{ width: "100%", fontSize: '14px', display: 'flex' }}
                                                                     className="ss-user-overview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width"
                                                                     onChange={(value) => console.log(value)}
-                                                                    value={cardPaymentRadioButton.initial_selection}
+                                                                    value={cardPaymentRadioButton.initial_selection_picture}
                                                                   >
                                                                     {itemPaymentImg.contents.map((itemPaymentContent, indexContent) => {
-                                                                      return <Radio value={`${itemPaymentImg.id}-${itemPaymentContent.id}`} key={{ indexContent }} style={{ marginRight: '0px' }}>
+                                                                      return <Radio value={`${itemPaymentImg.id}-${itemPaymentContent.id}`} key={indexContent} style={{ marginRight: '0px' }}>
                                                                         <img src={itemPaymentContent.file_url}></img>
                                                                         <div style={{ textAlign: 'center', fontSize: '14px', color: '#6789A6', fontWeight: '700' }}>{itemPaymentContent.text}</div>
                                                                       </Radio>
                                                                     })}
                                                                   </Radio.Group>
                                                                 </div>
-                                                              })}
-                                                            {(cardPaymentRadioButton.title_require || cardPaymentRadioButton.require) &&
-                                                              <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
-                                                                {cardPaymentRadioButton.title_require &&
-                                                                  <span className="ss-message__content--user-text-input-title">
-                                                                    {cardPaymentRadioButton.title}
-                                                                  </span>
-                                                                }
-                                                                {cardPaymentRadioButton.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
-                                                              </div>
+                                                              })
                                                             }
+
                                                             {cardPaymentRadioButton.separate_type === false ?
                                                               <div className="ss-user-setting__item-bottom">
                                                                 <InputCustom
@@ -4652,7 +4652,7 @@ const Scenario = () => {
                                                                   label="Card holder"
                                                                   inline={false}
                                                                   disabled={true}
-                                                                  placeholder={cardPaymentRadioButton.card_number_placeholder}
+                                                                  placeholder={cardPaymentRadioButton.card_holder_placeholder}
                                                                 />
                                                               </div>
                                                             }
@@ -7472,7 +7472,7 @@ const Scenario = () => {
                                                           <div style={{ width: '92%', marginLeft: '4%' }}>
                                                             <Carousel arrows {...settingsCarousel} afterChange={(currentSlide) => setIndexCarouselSlide(currentSlide)}>
                                                               {carousel[carousel.type]?.contents.map((itemCarousel, indexCarousel) => {
-                                                                return <React.Fragment key={{ indexCarousel }}>
+                                                                return <React.Fragment key={indexCarousel}>
                                                                   <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }} key={indexCarousel}>
                                                                     <InputCustom
                                                                       placeholder="title"
@@ -7483,6 +7483,7 @@ const Scenario = () => {
                                                                       className="ss-mg-top-5"
                                                                       placeholder="subtitle"
                                                                       value={itemCarousel.subtitle}
+                                                                      maxLength={90}
                                                                       onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, carousel.type, 'contents', indexCarousel, 'subtitle')}
                                                                     />
                                                                     <InputCustom
@@ -7507,7 +7508,7 @@ const Scenario = () => {
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-file-upload-wrapper" style={{ width: '90%' }}>
-                                                              <Button style={{ margin: '0px', marginRight: '15px'}} className="ss-bot-file-reference-btn" onClick={() => {
+                                                              <Button style={{ margin: '0px', marginRight: '15px' }} className="ss-bot-file-reference-btn" onClick={() => {
                                                                 setIsOpenFileReference(true)
                                                                 setVarFileReference({ indexContent, contentType: content.type, subContentType: carousel.type, childSubContentType: 'contents', indexSubContent: indexCarouselSlide, img: 'fileUrl' })
                                                               }}>
@@ -7928,21 +7929,23 @@ const Scenario = () => {
                                                                                     <div className="ss-user-setting-product-purchase-sub-infor">
                                                                                       <div style={{ width: '50%' }}>
                                                                                         <InputNum
-                                                                                          className="ss-user-setting-input-limit-character"
+                                                                                          className="ss-user-setting-input-limit-character ss-mg-bottom-5"
                                                                                           style={{ marginLeft: '0px', width: '50%' }}
                                                                                           label="Quantity limit"
                                                                                           value={itemProduct.quantity_limit}
                                                                                           onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'quantity_limit')}
                                                                                         />
                                                                                       </div>
-                                                                                      <div style={{ width: '50%' }}>
-                                                                                        <InputCustom
-                                                                                          className="ss-mg-bottom-5"
-                                                                                          label="Price display contents (customized)"
-                                                                                          value={itemProduct.price_display_custom}
-                                                                                          onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')}
-                                                                                        />
-                                                                                      </div>
+                                                                                      {productPurchase.price_display &&
+                                                                                        <div style={{ width: '50%' }}>
+                                                                                          <InputCustom
+                                                                                            className="ss-mg-bottom-5"
+                                                                                            label="Price display contents (customized)"
+                                                                                            value={itemProduct.price_display_custom}
+                                                                                            onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')}
+                                                                                          />
+                                                                                        </div>
+                                                                                      }
                                                                                     </div>
                                                                                     <div className="ss-user-setting-product-purchase-sub-infor">
                                                                                       <div style={{ width: '50%' }}>
@@ -8026,6 +8029,7 @@ const Scenario = () => {
                                                                   }
                                                                   dataMessages[indexMessageSelect].message_content[indexContent][content.type].products.push({
                                                                     id: idMax,
+                                                                    quantity_select: 1,
                                                                     is_quantity_designation: false
                                                                   });
                                                                   setDataMessages([...dataMessages]);
@@ -8607,23 +8611,23 @@ const Scenario = () => {
                                                                                               <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                                                                 <CheckboxCustom
                                                                                                   label="Initial selection setting"
-                                                                                                  value={cardPaymentRadioButton.initial_selection === `${itemPaymentRadioImg.id}-${itemContentPayment.id}`}
+                                                                                                  value={cardPaymentRadioButton.initial_selection_picture === `${itemPaymentRadioImg.id}-${itemContentPayment.id}`}
                                                                                                   onChange={() => {
-                                                                                                    if (cardPaymentRadioButton.initial_selection !== `${itemPaymentRadioImg.id}-${itemContentPayment.id}`) {
-                                                                                                      onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, `${itemPaymentRadioImg.id}-${itemContentPayment.id}`, 'initial_selection')
+                                                                                                    if (cardPaymentRadioButton.initial_selection_picture !== `${itemPaymentRadioImg.id}-${itemContentPayment.id}`) {
+                                                                                                      onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, `${itemPaymentRadioImg.id}-${itemContentPayment.id}`, 'initial_selection_picture')
                                                                                                     } else {
-                                                                                                      onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection')
+                                                                                                      onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection_picture')
                                                                                                     }
                                                                                                   }}
                                                                                                 />
                                                                                                 <CheckboxCustom
                                                                                                   label="Card payment linked setting"
-                                                                                                  value={cardPaymentRadioButton.card_linked_setting === `${itemPaymentRadioImg.id}-${itemContentPayment.id}`}
+                                                                                                  value={cardPaymentRadioButton.card_linked_setting_picture === `${itemPaymentRadioImg.id}-${itemContentPayment.id}`}
                                                                                                   onChange={() => {
-                                                                                                    if (cardPaymentRadioButton.card_linked_setting !== `${itemPaymentRadioImg.id}-${itemContentPayment.id}`) {
-                                                                                                      onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, `${itemPaymentRadioImg.id}-${itemContentPayment.id}`, 'card_linked_setting')
+                                                                                                    if (cardPaymentRadioButton.card_linked_setting_picture !== `${itemPaymentRadioImg.id}-${itemContentPayment.id}`) {
+                                                                                                      onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, `${itemPaymentRadioImg.id}-${itemContentPayment.id}`, 'card_linked_setting_picture')
                                                                                                     } else {
-                                                                                                      onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'card_linked_setting')
+                                                                                                      onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'card_linked_setting_picture')
                                                                                                     }
                                                                                                   }}
                                                                                                 />
