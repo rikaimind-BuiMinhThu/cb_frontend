@@ -425,6 +425,7 @@ function PushMessage() {
       api
         .patch(`/api/v1/managements/push_messages/${item.id}/subscribe`)
         .then((res) => {
+          setIsOpenNoti(true)
           setMsgNoti(`Subscribe successfully!`);
           reloadListPM();
           setTimeout(() => {
@@ -575,24 +576,27 @@ function PushMessage() {
                           <td style={{ width: '150px', border: '1px solid #7186a0' }}>
                             <div style={{ width: '100%', display: 'flex' }}>
                               <button
-                                style={{ width: '32.33%', margin: '0px 1%', borderRadius: '5px' }}
+                                style={{ width: '32.33%', margin: '0px 1%', borderRadius: '5px', 
+                                backgroundColor:`${item.subscribe_status === 'subscribe' ? '#F39C12' : '#9B59B6'}`, border:'none', color:"white" }}
                                 onClick={() => changeStatus(item)}
                               >
                                 {item.subscribe_status === 'subscribe'
-                                  ? 'Unsubscribe'
-                                  : 'To deliver'}
+                                  ? '配信停止'
+                                  : '配信する'}
                               </button>
                               <button
-                                style={{ width: '32.33%', margin: '0px 1%', borderRadius: '5px' }}
+                                style={{ width: '32.33%', margin: '0px 1%', borderRadius: '5px', 
+                                backgroundColor:'#1ABC9C', border:'none', color:"white" }}
                                 onClick={() => editPushMessage(item)}
                               >
-                                Edit
+                                編集
                               </button>
                               <button
-                                style={{ width: '32.33%', margin: '0px 1%', borderRadius: '5px' }}
+                                style={{ width: '32.33%', margin: '0px 1%', borderRadius: '5px', 
+                                backgroundColor:'#E74C3C', border:'none', color:"white" }}
                                 onClick={() => deletePMConf(item.id)}
                               >
-                                Delete
+                                削除
                               </button>
                             </div>
                           </td>
@@ -683,7 +687,7 @@ function PushMessage() {
           </Col>
         </Row>
         <ModalDetail open={isOpenAddPM} onClose={() => closeAddPM()}>
-          <div style={{ width: '100%', height: '630px', overflowY: 'auto' }} onLoad={getEmailList()}>
+          <div style={{ width: '100%', height: '97.5%', overflowY: 'auto' }} onLoad={getEmailList()}>
             <form id="form_add_PM">
               <div className="push-message-add-form">
                 <span className="push-message-span-form">
@@ -965,23 +969,30 @@ function PushMessage() {
                     </button>
                   </div>
                 ))}
-                <button style={{ float: 'right' }} onClick={(e) => newTemp(e)}>
+                <button style={{ float: 'right', width:"130px", padding:"7.5px 15px", textAlign:"center", borderRadius:"5px",
+              border:'none', backgroundColor:'#52cbce', color:"white" }}  onClick={(e) => newTemp(e)}>
                   Add condition
                 </button>
               </div>
             </form>
-            <div style={{ width: '95%', margin: '5% 2.5%' }}>
-              <button style={{ float: 'left' }} onClick={() => setIsOpenAddPM(false)}>
+            <div style={{ width: '95%', margin: '5% 2.5% 5% 2.5%', }}>
+              <button style={{ float: 'left', width:"110px", padding:"7.5px 35px", textAlign:"center", border:'none',borderRadius:"5px",
+              backgroundColor:'#66615b', color:'white' }} 
+              onClick={() => setIsOpenAddPM(false)}>
                 Cancel
               </button>
-              <button style={{ float: 'right' }} onClick={() => savePM()}>
+              <button style={{ float: 'right', width:"110px", padding:"7.5px 35px", textAlign:"center", borderRadius:"5px",
+              border:'none', backgroundColor:'#52cbce', color:"white" }} 
+              onClick={() => savePM()}>
                 Save
               </button>
             </div>
           </div>
         </ModalDetail>
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-          <h5>{msgNoti}</h5>
+          <div>
+          <h6>{msgNoti}</h6>
+          </div>
         </ModalNoti>
         <ModalShort
           open={isOpenDelete}
@@ -990,7 +1001,7 @@ function PushMessage() {
           }}
         >
           <div style={{ width: '100%' }}>
-            <h4>Do you want to delete this push message?</h4>
+            <h5>Do you want to delete this push message?</h5>
             <div style={{ display: 'flex', margin: 'auto', width: '100%' }}>
               <button
                 style={{

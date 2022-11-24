@@ -244,7 +244,7 @@ function FileManagement() {
                     <tr>
                       <th style={{ width: '10%' }}>ID</th>
                       <th style={{ width: '15%' }}>Type</th>
-                      <th style={{ width: '40%' }}>Url</th>
+                      <th style={{ width: '70%' }}>Url</th>
                       <th style={{ width: '250px', minWidth: '250px' }}>Action</th>
                     </tr>
                   </thead>

@@ -44,23 +44,35 @@
 }
 .file-mng__btn-edit {
   /* width: 25%; */
-  color: #327aed;
+  width: 85px;
+  background-color: #1ABC9C;
   font-weight: 700;
   border: none;
-  background: #ffffff;
+  margin: 5px 2.5px;
+  padding:7.5px 15px;
+  border-radius: 5px;
+  color: #ffffff;
 }
 
 .file-mng__btn-stop {
-  color: #7186a0;
-  font-weight: 500;
-  border: none;
-  background: #ffffff;
-}
-.file-mng__btn-delete {
-  color: #f46835;
+  width: 75px;
+  background-color: #5DADE2;
   font-weight: 700;
   border: none;
-  background: #ffffff;
+  margin: 5px 2.5px;
+  padding:7.5px 10px;
+  border-radius: 5px;
+  color: #ffffff;
+}
+.file-mng__btn-delete {
+  width: 75px;
+  background-color: #f46835;
+  font-weight: 700;
+  border: none;
+  margin: 5px 2.5px;
+  padding:7.5px 15px;
+  border-radius: 5px;
+  color: #ffffff;
 }
 .file-mng__preview_img {
   color: '#51cbce';
