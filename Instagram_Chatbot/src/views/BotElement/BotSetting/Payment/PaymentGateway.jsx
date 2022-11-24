@@ -6,15 +6,19 @@ import { tokenExpired } from 'api/tokenExpired';
 import { Link } from 'react-router-dom';
 import ModalNoti from 'views/Popup/ModalNoti';
 import ModalShort from 'views/Popup/ModalShort';
+import { Pagination } from '@material-ui/lab';
 function PaymentGateway() {
     const [gateway, setGateway] = useState([])
     const [msgNoti, setMsgNoti] = useState('')
     const [idDelete, setIdDelete] = useState('')
     const [isOpenNoti, setIsOpenNoti] = useState(false)
     const [isOpenDeletePW, setIsOpenDeletePW] = useState(false)
+    const [totalPage, setTotalPage] = useState(1);
+    const [page, setPage] = useState(1);
+    const [pageIndex, setPageIndex] = useState(1);
 
     useEffect(() => {
-        api.get(`/api/v1/payment_managements/payment_gateways`).then(res => {
+        api.get(`/api/v1/payment_managements/payment_gateways?page=all`).then(res => {
             console.log(res.data.data)
             setGateway(res.data.data)
         }).catch(error => {
@@ -25,10 +29,15 @@ function PaymentGateway() {
         })
     }, [])
 
-    function reloadListPMGW(){
-        api.get(`/api/v1/payment_managements/payment_gateways`).then(res => {
+    function reloadListPMGW(pgIndex){
+        console.log(pgIndex);
+        api.get(`/api/v1/payment_managements/payment_gateways?page=${pgIndex}`).then(res => {
             console.log(res.data.data)
-            setGateway(res.data.data)
+            if(res?.data?.code ==1){
+                setGateway(res.data.data)
+            setTotalPage(Math.ceil(res.data?.total / 25));
+            }
+            
         }).catch(error => {
             console.log(error);
             if (error.response?.data.code === 0) {
@@ -36,6 +45,15 @@ function PaymentGateway() {
             }
         })
     }
+
+    const handleChangePage = (event, value) => {
+        if (totalPage > 1) {
+          setPage(parseInt(value));
+          setPageIndex(value);
+          reloadListPMGW(value);
+          document.querySelector('.main-panel').scrollTop = 0;
+        }
+      };
 
     function cnfDeleteGW(id) {
         setIdDelete(id)
@@ -53,7 +71,7 @@ function PaymentGateway() {
                     setIsOpenNoti(false)
                     setMsgNoti("")
                 }, 1500)
-                reloadListPMGW()
+                reloadListPMGW(pageIndex)
             } else if (res.data.code === 2) {
                 console.log(res.data.message)
             }
@@ -111,6 +129,12 @@ function PaymentGateway() {
                                     </tbody>
 
                                 </Table>
+                                <Pagination
+                  count={totalPage}
+                  variant="outlined"
+                  page={page}
+                  onChange={handleChangePage}
+                />
                                 <div style={{ width: "100%", textAlign: "center" }}>
                                     <Link to={'/admin/add-payment-gateway'}>
                                         <button className='payment-gatway-btn-add-gateway'>Addition</button>
