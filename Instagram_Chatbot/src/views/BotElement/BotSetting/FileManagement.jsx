@@ -33,6 +33,7 @@ function FileManagement() {
   function reload() {
     api.get(`/api/v1//managements/file`).then((res) => {
       setFiles(res.data.data);
+      console.log(res.data.data)
     });
   }
 
@@ -51,6 +52,7 @@ function FileManagement() {
     console.log(newFile);
     const type = newFile.name.split('.')[1].toLowerCase();
     const trueFile = ['jpeg', 'jpg', 'png', 'pdf', 'mp4'].includes(type);
+    let file
     if (trueFile) {
       if (type != 'pdf' && type != 'mp4' && newFile.size / 1024 / 1024 > 2) {
         setFileError(`You need to upload file which size under 2MB.`);
@@ -65,29 +67,35 @@ function FileManagement() {
           setFileError(`You need to upload video which duration under 15 seconds.`);
           return;
         }
+        
       }
-      const file = { user_file: { file_type: type } };
+      const video = document.getElementById('preview-video');
+        file = { user_file: { file_type: type, size: newFile.size, timeplay: `${type == 'mp4' ? video.duration : ''}` } };
       api
         .post(`/api/v1/managements/file/upload`, file)
         .then((res) => {
+          console.log('res upload file type: ', res);
           const urlFile = res.data.data.url;
           let filePost = { user_file: { file_type: type, file_url: res.data.data.path } };
+          let typeUpload = ''
+          if(type == 'mp4'){
+            typeUpload = 'video/mp4'
+          }else if(type == 'pdf'){
+            typeUpload = 'application/pdf'
+          }else {
+            typeUpload = `image/${type}`
+          }
+
           axios
-            .put(urlFile, newFile, {
+            .put(urlFile, newFile
+              , {
               headers: {
-                'Content-Type': `image/${type}`,
+                'Content-Type': typeUpload
               },
             })
             .then((res) => {
               console.log('response`: ', res);
-            })
-            .catch((err) => {
-              console.log(err);
-              if (err.response?.data.code === 0) {
-                tokenExpired();
-              }
-            });
-          api
+              api
             .post(`/api/v1/managements/file`, filePost)
             .then((res) => {
               if (res.data.code == 1) {
@@ -114,6 +122,14 @@ function FileManagement() {
                 tokenExpired();
               }
             });
+            })
+            .catch((err) => {
+              console.log("err: ", err);
+              if (err.response?.data.code === 0) {
+                tokenExpired();
+              }
+            });
+          
         })
         .catch((err) => {
           console.log(err);
@@ -127,6 +143,7 @@ function FileManagement() {
   }
 
   function handlePreview(file) {
+    console.log(file)
     setSrcPreview(`https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file.file_url}`);
     setTypeFilePreview(file.file_url.split('.')[1].toLowerCase());
     setIsOpenPreview(true);
@@ -294,14 +311,14 @@ function FileManagement() {
           <div className="file-mng__preview_img">
             {typeFilePreview == 'mp4' ? (
               <video style={{ width: '100%' }} controls>
-                <source src="https://www.w3schools.com/tags/mov_bbb.mp4" type="video/mp4" />
+                <source src={srcPreview} type="video/mp4" />
               </video>
             ) : (
               <>
                 {typeFilePreview == 'pdf' ? (
                   <embed
                     style={{ width: '100%', height: '90%' }}
-                    src="https://media.geeksforgeeks.org/wp-content/cdn-uploads/20210101201653/PDF.pdf"
+                    src={srcPreview}
                   />
                 ) : (
                   <img src={srcPreview} alt="" />
