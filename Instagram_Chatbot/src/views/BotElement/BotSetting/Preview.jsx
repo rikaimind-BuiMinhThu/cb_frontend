@@ -10,7 +10,11 @@ import DatePicker from 'react-datepicker';
 import {
   Button
 } from 'reactstrap';
+import { Carousel, Checkbox, Radio, Slider } from 'antd';
+import cvcIcon from '../../../assets/img/cvc-icon.png';
 import $ from 'jquery';
+import InputNum from './ScenarioSetting/scenarioComon/InputNum';
+import { tokenExpired } from 'api/tokenExpired';
 
 let dataHourFixed = [];
 for (let i = 1; i <= 24; i++) {
@@ -77,7 +81,7 @@ let dataEveryMinute = [
 
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
-function Preview({ onOpenPreview, isOpen, scenarioId }) {
+function Preview({ onOpenPreview, isOpen, scenarioId, dataVariables }) {
 
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
   const [botInfor, setBotInfor] = useState();
@@ -88,6 +92,8 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
   const [messageUser, setMessageUser] = useState([]);
   const [errors, setErrors] = useState({});
   const [variables, setVariables] = useState([]);
+  const [isDisplayButtonNext, setIsDisplayButtonNext] = useState(false);
+  const [captcha, setCaptcha] = useState([]);
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
       current_url: window.location.href,
@@ -149,6 +155,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
   useEffect(() => {
     api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
       if (res.data.code == 1) {
+        console.log(res.data, 'cehckkkkkkkkkk')
         setBotInfor(res.data.data);
       }
     }).catch(err => console.log(err));
@@ -225,46 +232,94 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                     return delayRender = setTimeout(() => {
                       resolve();
                     }, messageArr[i]?.message_content[0]?.delay?.content * 1000);
-                  });
+                  }).then(() => {
+                    setIndexMessageRender(i);
+                  })
                   index = i;
-                  // promise.then(data => {
-                  //   renderMessage.push(data);
-                  //   setRenderMessageArr([
-                  //     ...renderMessage
-                  //   ]);
-                  // })
+                } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
+                  // console.log(dataVariables, 'checkkkk variables')                
+                  if (variables.length !== 0) {
+                    let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
+                    variables.forEach(item => {
+                      for (let z = 0; z < dataVarExist.length; z++) {
+                        if (item.variable_name === dataVarExist[z].key) {
+                          item.default_value = dataVarExist[z].value;
+                        }
+                      }
+                    });
+                    console.log(variables, 'checkkkk variables');
+                    setVariables([...variables]);
+                  }
+                  setIndexMessageRender(i);
+                  index = i;
+                } else if (messageArr[i]?.message_content[0]?.type === 'clear_variable') {
+                  // console.log(dataVariables, 'checkkkk variables')                
+                  if (variables.length !== 0) {
+                    let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
+                    variables.forEach(item => {
+                      for (let z = 0; z < dataVarExist.length; z++) {
+                        if (item.variable_name === dataVarExist[z]) {
+                          item.default_value = "";
+                        }
+                      }
+                    });
+                    console.log(variables, 'checkkkk variables');
+                    setVariables([...variables]);
+                  }
+                  setIndexMessageRender(i);
+                  index = i;
                 } else if (messageArr[i].belong_to !== 'bot') {
                   await new Promise((resolve) => {
                     return delayRender = setTimeout(() => {
+                      console.log(messageArr[i], 'cacjalkscjalksjlkduqioweu123123')
+                      for (let j = 0; j < messageArr[i].message_content.length; j++) {
+                        if (messageArr[i].message_content[j].type === 'capture') {
+                          api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
+                            console.log(res);
+                            captcha.push({
+                              index: i,
+                              indexContent: j,
+                              ...res.data
+                            })
+                            setCaptcha([...captcha]);
+                          })
+                          // break;
+                        }
+                      }
                       resolve({ ...messageArr[i] });
                     }, 1000);
                   }).then(data => {
                     renderMessage.push(data);
-                    console.log(data);
+                    console.log(renderMessage);
                     setRenderMessageArr([
                       ...renderMessage
                     ]);
+                    setIndexMessageRender(i);
                     if (isPauseScroll === false) {
                       scrollToBottom();
                     }
-                  })
+                  }).catch((error) => {
+                    console.log(error);
+                    if (error.response?.data.code === 0) {
+                      tokenExpired();
+                    }
+                  });
                   setIndexUser(prev => prev + 1);
                   index = i;
                   break;
                 } else {
-                  console.log(i, 'checkkkkk')
                   await new Promise((resolve) => {
                     return delayRender = setTimeout(() => {
                       if (messageArr[i].message_content[0]?.type === 'text_input' && messageArr[i].message_content[0].text_input.content) {
                         messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
                           if (variables.length !== 0) {
+                            let valueVar = "";
                             for (let j = 0; j < variables.length; j++) {
                               if (variables[j].variable_name === variable) {
-                                return variables[j].default_value;
-                              } else {
-                                return "";
+                                valueVar = variables[j].default_value;
                               }
                             }
+                            return valueVar;
                           } else {
                             return "";
                           }
@@ -278,6 +333,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                     setRenderMessageArr([
                       ...renderMessage
                     ]);
+                    setIndexMessageRender(i);
                     if (isPauseScroll === false) {
                       scrollToBottom();
                     }
@@ -288,55 +344,71 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                   index = i;
                 }
               } else if (messageArr[0].belong_to === 'user' && messageArr[i].message_content.length > 0) {
-                if (messageArr[i].belong_to !== 'user') {
-                  await new Promise((resolve) => {
-                    return delayRender = setTimeout(() => {
-                      if (messageArr[i].message_content[0]?.type === 'text_input') {
-                        messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                          for (let j = 0; j < variables.length; j++) {
-                            if (variables[j].variable_name === variable) {
-                              return variables[j].default_value;
-                            }
-                          }
-                        });
+                // if (messageArr[i].belong_to !== 'user') {
+                //   await new Promise((resolve) => {
+                //     return delayRender = setTimeout(() => {
+                //       if (messageArr[i].message_content[0]?.type === 'text_input') {
+                //         messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                //           for (let j = 0; j < variables.length; j++) {
+                //             if (variables[j].variable_name === variable) {
+                //               console.log(variables[j].variable_name, 'cehckkkkk')
+                //               return variables[j].default_value;
+                //             }
+                //           }
+                //         });
+                //       }
+                //       resolve({ ...messageArr[i] });
+                //     }, 1000);
+                //   }).then(data => {
+                //     renderMessage.push(data);
+                //     setRenderMessageArr([
+                //       ...renderMessage
+                //     ]);
+                //     setIndexMessageRender(i);
+                //     if (isPauseScroll === false) {
+                //       scrollToBottom();
+                //     }
+                //     if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
+                //       isPauseScroll = true;
+                //     }
+                //   })
+                //   index = i;
+                // } else {
+                await new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    for (let j = 0; j < messageArr[i].message_content.length; j++) {
+                      if (messageArr[i].message_content[j].type === 'capture') {
+                        api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
+                          console.log(res);
+                          captcha.push({
+                            index: i,
+                            indexContent: j,
+                            ...res.data
+                          })
+                          setCaptcha([...captcha]);
+                        })
                       }
-                      resolve({ ...messageArr[i] });
-                    }, 1000);
-                  }).then(data => {
-                    renderMessage.push(data);
-                    setRenderMessageArr([
-                      ...renderMessage
-                    ]);
-                    if (isPauseScroll === false) {
-                      scrollToBottom();
                     }
-                    if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
-                      isPauseScroll = true;
-                    }
-                  })
-                  index = i;
-                } else {
-                  await new Promise((resolve) => {
-                    return delayRender = setTimeout(() => {
-                      resolve({ ...messageArr[i] });
-                    }, 1000);
-                  }).then(data => {
-                    renderMessage.push(data);
-                    setRenderMessageArr([
-                      ...renderMessage
-                    ]);
-                    if (isPauseScroll === false) {
-                      scrollToBottom();
-                    }
-                  })
-                  setIndexUser(prev => prev + 1);
-                  index = i;
-                  break;
-                }
+                    resolve({ ...messageArr[i] });
+                  }, 1000);
+                }).then(data => {
+                  renderMessage.push(data);
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
+                  setIndexMessageRender(i);
+                  if (isPauseScroll === false) {
+                    scrollToBottom();
+                  }
+                })
+                setIndexUser(prev => prev + 1);
+                index = i;
+                break;
               }
+              // }
             }
           }
-          setIndexMessageRender(index);
+          // setIndexMessageRender(index);
           // setRenderMessageArr(renderMessage);
           return () => {
             clearTimeout(delayRender);
@@ -346,18 +418,13 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
     }
   }, [scenarioId])
 
-  // useEffect(() => {
-  //   console.log(indexMessageRender, 'chcek indexMessageRender', renderMessageArr)
-  //   if (indexMessageRender && indexMessageRender !== 0) {
-
-  //   }
-  // }, [indexMessageRender])
-
   const scrollToBottom = () => {
-    document.getElementById('cp-body').scrollTo({
-      top: document.getElementById('cp-body').scrollHeight,
-      behavior: 'smooth'
-    });
+    if (document.getElementById('sp-body')) {
+      document.getElementById('sp-body').scrollTo({
+        top: document.getElementById('sp-body').scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   }
 
   const stringNullOrEmpty = (string) => {
@@ -542,6 +609,58 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
             errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select from ${contentType.selection_limit_from} to ${contentType.selection_limit_to} for this item.`;
             isValid = false;
           }
+        } else if (contentArr[i].type === 'capture') {
+          console.log(contentArr[i].type, contentType, 'chechkkkkk');
+          if (stringNullOrEmpty(contentType.value)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          } else if (captcha.filter(item => item.index === indexMessageRender && item.indexContent === i)?.[0]?.text.toLowerCase() !== contentType.value.toLowerCase()) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Wrong authorization code";
+            isValid = false;
+          }
+        } else if (contentArr[i].type === 'credit_card_payment') {
+          if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
+            || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
+            || (contentType.separate_type === true && (stringNullOrEmpty(contentType.card_number1) || stringNullOrEmpty(contentType.card_number2) || stringNullOrEmpty(contentType.card_number3) || stringNullOrEmpty(contentType.card_number4)))
+            || (contentType.separate_type === false && stringNullOrEmpty(contentType.card_number))
+            || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
+            || (stringNullOrEmpty(contentType.year))
+            || (stringNullOrEmpty(contentType.month))
+          ) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          } else if ((contentType.card_number && (contentType.card_number + "").length !== 16) ||
+            ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
+              ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Credit card number is invalid.";
+            isValid = false;
+          }
+        } else if (contentArr[i].type === 'product_purchase') {
+          console.log(contentType.initial_selection)
+          if (contentType.initial_selection.length === 0) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === 'slider') {
+          if (stringNullOrEmpty(contentType.value)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === 'product_purchase_radio_button') {
+          console.log(contentType.initial_selection)
+          if (contentType.initial_selection.length === 0) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === 'card_payment_radio_button') {
+          console.log(contentType.initial_selection)
+          if (contentType.type !== 'picture_radio' && stringNullOrEmpty(contentType.initial_selection)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          } else if (contentType.type === 'picture_radio' && stringNullOrEmpty(contentType.initial_selection_picture)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
         } else if (contentType.type === 'invalid_input') {
 
         } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
@@ -679,19 +798,51 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
               //     ...renderMessage
               //   ]);
               // })
+            } else if (dataMessages[i]?.message_content[0]?.type === 'variable_set') {
+              // console.log(dataVariables, 'checkkkk variables')                
+              if (variables.length !== 0) {
+                let dataVarExist = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].variables;
+                variables.forEach(item => {
+                  for (let z = 0; z < dataVarExist.length; z++) {
+                    if (item.variable_name === dataVarExist[z].key) {
+                      item.default_value = dataVarExist[z].value;
+                    }
+                  }
+                });
+                console.log(variables, 'checkkkk variables');
+                setVariables([...variables]);
+              }
+              setIndexMessageRender(i);
+              index = i;
+            } else if (dataMessages[i]?.message_content[0]?.type === 'clear_variable') {
+              // console.log(dataVariables, 'checkkkk variables')                
+              if (variables.length !== 0) {
+                let dataVarExist = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].variables;
+                variables.forEach(item => {
+                  for (let z = 0; z < dataVarExist.length; z++) {
+                    if (item.variable_name === dataVarExist[z]) {
+                      item.default_value = "";
+                    }
+                  }
+                });
+                console.log(variables, 'checkkkk variables');
+                setVariables([...variables]);
+              }
+              setIndexMessageRender(i);
+              index = i;
             } else {
               await new Promise((resolve) => {
                 return delayRender = setTimeout(() => {
-                  if (dataMessages[i].message_content[0].type === 'text_input') {
+                  if (dataMessages[i].message_content[0].type === 'text_input' && dataMessages[i].message_content[0].text_input.content) {
                     dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
                       if (variables.length !== 0) {
+                        let valueVar = "";
                         for (let j = 0; j < variables.length; j++) {
                           if (variables[j].variable_name === variable) {
-                            return variables[j].default_value;
-                          } else {
-                            return "";
+                            valueVar = variables[j].default_value;
                           }
                         }
+                        return valueVar;
                       } else {
                         return "";
                       }
@@ -708,7 +859,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                 if (isPauseScroll === false) {
                   scrollToBottom();
                 }
-                if (data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
+                if (data.message_content[0][data.message_content[0]?.type]?.scroll_auto === true) {
                   isPauseScroll = true;
                 }
               })
@@ -717,6 +868,19 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
           } else if (dataMessages[i].belong_to === 'user' && dataMessages[i].message_content.length > 0) {
             await new Promise((resolve) => {
               return delayRender = setTimeout(() => {
+                for (let j = 0; j < dataMessages[i].message_content.length; j++) {
+                  if (dataMessages[i].message_content[j].type === 'capture') {
+                    api.get(`https://svg-captcha.herokuapp.com/captcha?size=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].length}${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].type}`).then(res => {
+                      console.log(res);
+                      captcha.push({
+                        index: i,
+                        indexContent: j,
+                        ...res.data
+                      })
+                      setCaptcha([...captcha]);
+                    })
+                  }
+                }
                 resolve({ ...dataMessages[i] });
               }, 1000);
             }).then(data => {
@@ -738,9 +902,24 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
         ...renderMessage
       ]);
     } else {
+      // handle check message_content for user 
+      //if message_content.length !== 0 => show message
       if (dataMessages[indexMessageRender + 1].message_content.length > 0 && dataMessages[indexMessageRender + 1].hidden !== true) {
         await new Promise((resolve) => {
           return delayRender = setTimeout(() => {
+            for (let j = 0; j < dataMessages[indexMessageRender + 1].message_content.length; j++) {
+              if (dataMessages[indexMessageRender + 1].message_content[j].type === 'capture') {
+                api.get(`https://svg-captcha.herokuapp.com/captcha?size=${dataMessages[indexMessageRender + 1].message_content[j][dataMessages[indexMessageRender + 1].message_content[j].type].length}${dataMessages[indexMessageRender + 1].message_content[j][dataMessages[indexMessageRender + 1].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[indexMessageRender + 1].message_content[j][dataMessages[indexMessageRender + 1].message_content[j].type].type}`).then(res => {
+                  console.log(res);
+                  captcha.push({
+                    index: indexMessageRender + 1,
+                    indexContent: j,
+                    ...res.data
+                  })
+                  setCaptcha([...captcha]);
+                })
+              }
+            }
             resolve({ ...dataMessages[indexMessageRender + 1] });
           }, 1000);
         }).then(data => {
@@ -754,13 +933,27 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
           }
         });
         index = indexMessageRender + 1;
-      } else {
+      }
+      //if message_content.length === 0 => loop until meet message have message_content.length !== 0 => show message
+      else {
         for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
-          console.log(dataMessages[i], 'checkkkkk dataMessages[i]')
           if (dataMessages[i].message_content.length > 0 && dataMessages[i].hidden !== true) {
             if (dataMessages[i].belong_to === 'user') {
               await new Promise((resolve) => {
                 return delayRender = setTimeout(() => {
+                  for (let j = 0; j < dataMessages[i].message_content.length; j++) {
+                    if (dataMessages[i].message_content[j].type === 'capture') {
+                      api.get(`https://svg-captcha.herokuapp.com/captcha?size=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].length}${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].type}`).then(res => {
+                        console.log(res);
+                        captcha.push({
+                          index: i,
+                          indexContent: j,
+                          ...res.data
+                        })
+                        setCaptcha([...captcha]);
+                      })
+                    }
+                  }
                   resolve({ ...dataMessages[i] });
                 }, 1000);
               }).then(data => {
@@ -776,35 +969,75 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
               index = i;
               break;
             } else {
-              await new Promise((resolve) => {
-                return delayRender = setTimeout(() => {
-                  if (dataMessages[i].message_content[0].type === 'text_input') {
-                    dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                      if (variables.length !== 0) {
-                        for (let j = 0; j < variables.length; j++) {
-                          if (variables[j].variable_name === variable) {
-                            return variables[j].default_value;
-                          } else {
-                            return "";
-                          }
-                        }
-                      } else {
-                        return "";
+              if (dataMessages[i]?.message_content[0].type === 'delay') {
+                await new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    resolve();
+                  }, (dataMessages[i]?.message_content[0].delay.content * 1000));
+                });
+                index = i;
+              } else if (dataMessages[i]?.message_content[0]?.type === 'variable_set') {
+                if (variables.length !== 0) {
+                  let dataVarExist = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].variables;
+                  variables.forEach(item => {
+                    for (let z = 0; z < dataVarExist.length; z++) {
+                      if (item.variable_name === dataVarExist[z].key) {
+                        item.default_value = dataVarExist[z].value;
                       }
-                    })
-                  }
-                  resolve({ ...dataMessages[i] });
-                }, 1000);
-              }).then(data => {
-                renderMessage.push(data);
-                console.log(data)
-                setRenderMessageArr([
-                  ...renderMessage
-                ]);
-                if (isPauseScroll === false) {
-                  scrollToBottom();
+                    }
+                  });
+                  console.log(variables, 'checkkkk variables');
+                  setVariables([...variables]);
                 }
-              });
+                setIndexMessageRender(i);
+                index = i;
+              } else if (dataMessages[i]?.message_content[0]?.type === 'clear_variable') {
+                // console.log(dataVariables, 'checkkkk variables')                
+                if (variables.length !== 0) {
+                  let dataVarExist = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].variables;
+                  variables.forEach(item => {
+                    for (let z = 0; z < dataVarExist.length; z++) {
+                      if (item.variable_name === dataVarExist[z]) {
+                        item.default_value = "";
+                      }
+                    }
+                  });
+                  console.log(variables, 'checkkkk variables');
+                  setVariables([...variables]);
+                }
+                setIndexMessageRender(i);
+                index = i;
+              } else {
+                await new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    if (dataMessages[i].message_content[0].type === 'text_input' && dataMessages[i].message_content[0].text_input.content) {
+                      dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                        if (variables.length !== 0) {
+                          let valueVar = "";
+                          for (let j = 0; j < variables.length; j++) {
+                            if (variables[j].variable_name === variable) {
+                              valueVar = variables[j].default_value;
+                            }
+                          }
+                          return valueVar;
+                        } else {
+                          return "";
+                        }
+                      })
+                    }
+                    resolve({ ...dataMessages[i] });
+                  }, 1000);
+                }).then(data => {
+                  renderMessage.push(data);
+                  console.log(data)
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
+                  if (isPauseScroll === false) {
+                    scrollToBottom();
+                  }
+                });
+              }
             }
           }
         }
@@ -818,8 +1051,14 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
     // renderMessageArr
   }
 
-  const onChangeValue = (indexContent, contentType, value, field, subFiled) => {
-    if (subFiled) {
+  const onChangeValue = (indexContent, contentType, value, field, subFiled, name) => {
+    console.log(dataMessages[indexMessageRender].message_content[indexContent], indexContent, contentType, value, field, subFiled, name);
+    if (name) {
+      if (dataMessages[indexMessageRender].message_content[indexContent][contentType][field][subFiled] === undefined) {
+        dataMessages[indexMessageRender].message_content[indexContent][contentType][field][subFiled] = {}
+      }
+      dataMessages[indexMessageRender].message_content[indexContent][contentType][field][subFiled][name] = value;
+    } else if (subFiled) {
       if (dataMessages[indexMessageRender].message_content[indexContent][contentType][field] === undefined) {
         dataMessages[indexMessageRender].message_content[indexContent][contentType][field] = {}
       }
@@ -852,29 +1091,29 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
   return (
     scenarioId &&
     <React.Fragment>
-      <div id="cp-container" className="cp-container">
-        <div id="cp-header" className="cp-header" onClick={() => onOpenPreview(!isOpen)}>
-          <div className="cp-header-left">
-            <div className="cp-header-left-avatar cp-avatar">
+      <div id="sp-container" className="sp-container">
+        <div id="sp-header" style={botInfor?.main_color && {backgroundColor: botInfor?.main_color}} className="sp-header" onClick={() => onOpenPreview(!isOpen)}>
+          <div className="sp-header-left">
+            <div className="sp-header-left-avatar sp-avatar">
               <img src={botInfor?.icon?.url && ("https://ec-chatbot-test1.com/" + botInfor?.icon?.url)} />
             </div>
-            <div className="cp-header-left-label">
-              <div className="cp-header-left-label-sub-title">{botInfor?.subtitle}</div>
-              <div className="cp-header-left-label-title">{botInfor?.title}</div>
+            <div className="sp-header-left-label">
+              <div className="sp-header-left-label-sub-title">{botInfor?.subtitle}</div>
+              <div className="sp-header-left-label-title">{botInfor?.title}</div>
             </div>
           </div>
-          <div className="cp-header-right">
-            <div className="cp-header-right-arrow">
+          <div className="sp-header-right">
+            <div className="sp-header-right-arrow">
               {isOpen ? <MDBIcon fas icon="chevron-down" /> : <MDBIcon fas icon="chevron-up" />}
             </div>
           </div>
         </div>
-        <div id="cp-process-bar" className="cp-process-bar">
-          <div className="cp-process-bar-color" style={{ width: `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` }}>
+        <div id="sp-process-bar" className="sp-process-bar">
+          <div className="sp-process-bar-color" style={{ width: `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` }}>
             {messageUser.length !== (indexUser - 1) ? `${messageUser.length - indexUser + 1} tasks rest` : "Completed!"}
           </div>
         </div>
-        <div id="cp-body" className="cp-body">
+        <div id="sp-body" className="sp-body">
           {
             renderMessageArr.map((message, indexMessage) => {
               return (
@@ -890,17 +1129,20 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                     })
                   }
                   {message.belong_to === 'user' &&
-                    <div className="cp-body-user-side">
-                      <div className="cp-body-user-side-messages">
+                    <div className="sp-body-user-side">
+                      <div className="sp-body-user-side-messages">
                         <UserMessage
+                          captcha={captcha}
                           messageContentProps={message.message_content}
                           disabled={message.disabled}
-                          onChangeValue={(indexContent, contentType, value, field, subFiled) => onChangeValue(indexContent, contentType, value, field, subFiled)}
+                          onChangeValue={(indexContent, contentType, value, field, subFiled, name) => onChangeValue(indexContent, contentType, value, field, subFiled, name)}
                           indexMessageRender={indexMessageRender}
+                          onClickNext={() => onClickNext(indexMessage)}
                           indexMessage={indexMessage}
                           errorsProps={errors}
+                          displayButtonNext={(value) => setIsDisplayButtonNext(value)}
                         />
-                        {message?.message_content.length !== 0 &&
+                        {(message?.message_content.length !== 1 || (message?.message_content[0].type !== 'card_payment_radio_button' && message?.message_content[0].type !== 'product_purchase_radio_button') || (message?.message_content[0]?.[message?.message_content[0].type].type !== "picture_radio" ? (message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting && message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting === message?.message_content[0]?.[message?.message_content[0].type]?.initial_selection) : (message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting_picture && message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting_picture === message?.message_content[0]?.[message?.message_content[0].type]?.initial_selection_picture))) &&
                           <div className="ss-user-message__action-wrapper">
                             <Button disabled={message.disabled} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
                               To the next
@@ -933,13 +1175,13 @@ const BotMessage = ({ content, index, botInfor }) => {
   }
 
   return (
-    <div key={index} className="cp-body-bot-side">
+    <div key={index} className="sp-body-bot-side">
       {(content.type === 'text_input' || content.type === 'file') && (
-        <div className="cp-body-bot-side-avatar cp-avatar">
+        <div className="sp-body-bot-side-avatar sp-avatar">
           <img src={"https://ec-chatbot-test1.com/" + botInfor?.icon?.url} />
         </div>
       )}
-      <div className="cp-body-bot-side-messages">
+      <div className="sp-body-bot-side-messages">
         {/* <img className="ss-bot-ava" src={icon} alt="" /> */}
         {content &&
           <React.Fragment>
@@ -948,7 +1190,7 @@ const BotMessage = ({ content, index, botInfor }) => {
               <textarea
                 className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                 value={content[content.type]?.content || ''}
-                // onChange={() => onChangeValueMessageContent(indexMessageSelect, index, content.type, value, 'content')}
+                // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
                 readOnly
               ></textarea>
             )}
@@ -979,7 +1221,7 @@ const BotMessage = ({ content, index, botInfor }) => {
   )
 }
 
-const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage }) => {
+const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
   const [dataCity, setDataCity] = useState([]);
@@ -987,8 +1229,14 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   const [startDate, setStartDate] = useState(new Date());
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
-
   const [checked, setChecked] = useState([]);
+
+  function loadCaptcha(indexContent) {
+    console.log('load captcha');
+    console.log(captcha, indexMessage, indexMessageRender, captcha.filter(item => item.index === indexMessage))
+    if (document.getElementById(`captcha-${indexMessage}-${indexContent}`) && captcha.length !== 0)
+      document.getElementById(`captcha-${indexMessage}-${indexContent}`).innerHTML = captcha.filter(item => item.index === indexMessage && item.indexContent === indexContent)?.[0]?.data || "";
+  }
 
   useEffect(() => {
     setErrors(errorsProps);
@@ -1189,6 +1437,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     <React.Fragment>
                       <InputCustom
                         disabled={disabled}
+                        type="password"
                         // className="ss-message__content--user-text-input ss-input-value"
                         style={{ marginBottom: '0px' }}
                         placeholder={textInput[textInput.type]?.password}
@@ -1212,24 +1461,12 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   }
                   {(textInput.type === 'email_confirmation') &&
                     (<>
-                      {/* <input
-                        className="ss-message__content--user-text-input ss-input-value"
-                        placeholder={textInput[textInput.type].cfEmlAdd_email}
-                        onChange={onChangeValue(indexContent, content.type, textInput.type, 'value')}
-                        value={textInput[textInput.type]?.value}
-                      ></input> */}
                       <InputCustom
                         disabled={disabled}
                         placeholder={textInput[textInput.type].cfEmlAdd_email}
                         onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
                         value={textInput[textInput.type]?.value}
                       />
-                      {/* <input
-                        className="ss-message__content--user-text-input ss-input-value"
-                        placeholder={textInput[textInput.type].cfEmlAdd_confirm_email}
-                        onChange={onChangeValue(indexContent, content.type, textInput.type, 'valueConfirm')}
-                        value={textInput[textInput.type]?.valueConfirm}
-                      ></input> */}
                       <InputCustom
                         disabled={disabled}
                         placeholder={textInput[textInput.type].cfEmlAdd_confirm_email}
@@ -2263,7 +2500,182 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                     </div>
                   }
-                  
+                  {/* carousel: type = 'default' */}
+                  {carousel.type === 'default' && (
+                    <div className="sp-carousel-container-preivew">
+                      {carousel[carousel.type].contents && carousel[carousel.type].contents.map((itemCarousel, indexCarousel) => {
+                        return <div className="sp-carousel-container-block-item" key={indexCarousel}>
+                          <div className="sp-carousel-container-block-item-infor">
+                            <div className="sp-carousel-preview-img">
+                              <img src={itemCarousel.fileUrl} style={{ width: '100%' }} />
+                            </div>
+                            <div className="sp-carousel-preview-title">
+                              {itemCarousel.title}
+                            </div>
+                            <div className="sp-carousel-preview-sub-title">
+                              {itemCarousel.subtitle}
+                            </div>
+                          </div>
+                          <a className="sp-carousel-preview-button" href={itemCarousel.urls} target="_blank">
+                            {itemCarousel.buttonTitle || "Select"}
+                          </a>
+                        </div>
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            }
+            {/* type == 'credit_card_payment' */}
+            {
+              content.type === 'credit_card_payment' && (
+                <div style={{ marginBottom: '10px' }}>
+                  {(creditCardPayment.title_require || creditCardPayment.require) &&
+                    <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
+                      {creditCardPayment.title_require &&
+                        <span className="ss-message__content--user-pull_down-title">
+                          {creditCardPayment.title}
+                        </span>
+                      }
+                      {(creditCardPayment.require) &&
+                        <span className="ss-message__content--user-text-input-required">
+                          * required
+                        </span>
+                      }
+                    </div>
+                  }
+                  {creditCardPayment.separate_type === false ?
+                    <div className="ss-user-setting__item-bottom">
+                      <InputNum
+                        styleLabel={{ width: '100%' }}
+                        className="ss-user-setting-input-limit-character"
+                        label="Card number"
+                        controls={false}
+                        max={9999999999999999}
+                        disabled={disabled}
+                        style={{ width: '100%', marginLeft: '0px' }}
+                        value={creditCardPayment.card_number}
+                        placeholder={creditCardPayment.card_number_placeholder}
+                        onChange={value => onChangeValue(indexContent, content.type, value, 'card_number')}
+                      />
+                    </div> :
+                    <div className="ss-user-setting__item-bottom">
+                      <div style={{ width: '100%' }}>Card number</div>
+                      <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type" style={{ width: '100%' }}>
+                        <InputNum
+                          max={9999}
+                          controls={false}
+                          style={{ marginLeft: '0px' }}
+                          disabled={disabled}
+                          className="ss-user-setting-input-limit-character"
+                          value={creditCardPayment.card_number1}
+                          placeholder={creditCardPayment.card_number_placeholder1}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'card_number1')}
+                        />
+                        <InputNum
+                          max={9999}
+                          controls={false}
+                          style={{ marginLeft: '7px' }}
+                          disabled={disabled}
+                          className="ss-user-setting-input-limit-character"
+                          value={creditCardPayment.card_number2}
+                          placeholder={creditCardPayment.card_number_placeholder2}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'card_number2')}
+                        />
+                        <InputNum
+                          max={9999}
+                          controls={false}
+                          style={{ marginLeft: '7px' }}
+                          disabled={disabled}
+                          className="ss-user-setting-input-limit-character"
+                          value={creditCardPayment.card_number3}
+                          placeholder={creditCardPayment.card_number_placeholder3}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'card_number3')}
+                        />
+                        <InputNum
+                          max={9999}
+                          controls={false}
+                          style={{ marginLeft: '7px' }}
+                          disabled={disabled}
+                          className="ss-user-setting-input-limit-character"
+                          value={creditCardPayment.card_number4}
+                          placeholder={creditCardPayment.card_number_placeholder4}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'card_number4')}
+                        />
+                      </div>
+                    </div>
+                  }
+                  {creditCardPayment.is_hide_card_name !== true &&
+                    <div className="ss-user-setting__item-bottom">
+                      <InputCustom
+                        styleLabel={{ width: '100%' }}
+                        label="Card holder"
+                        inline={false}
+                        disabled={disabled}
+                        value={creditCardPayment.card_holder}
+                        placeholder={creditCardPayment.card_holder_placeholder}
+                        onChange={value => onChangeValue(indexContent, content.type, value, 'card_holder')}
+                      />
+                    </div>
+                  }
+                  <div className="ss-user-setting__item-bottom">
+                    <div style={{ width: '100%' }}>Date of expiry</div>
+                    {creditCardPayment.type_date_of_expiry === 'ym' &&
+                      <div style={{ display: 'flex', width: '100%' }}>
+                        <SelectCustom
+                          style={{ width: '33%' }}
+                          value={creditCardPayment.year}
+                          disabled={disabled}
+                          placeholder={creditCardPayment.year_placeholder}
+                          data={dataYearFixed.filter(item => item.key >= new Date().getFullYear() && item.key <= (new Date().getFullYear() + 10))}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'year')}
+                        />
+                        <SelectCustom
+                          style={{ width: '33%', marginLeft: '10px' }}
+                          value={creditCardPayment.month}
+                          placeholder={creditCardPayment.month_placeholder}
+                          data={dataMonth}
+                          disabled={disabled}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'month')}
+                        />
+                      </div>
+                    }
+                    {creditCardPayment.type_date_of_expiry === 'my' &&
+                      <div style={{ display: 'flex', width: '100%' }}>
+                        <SelectCustom
+                          style={{ width: '33%' }}
+                          value={creditCardPayment.month}
+                          placeholder={creditCardPayment.month_placeholder}
+                          data={dataMonth}
+                          disabled={disabled}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'month')}
+                        />
+                        <SelectCustom
+                          style={{ width: '33%', marginLeft: '10px' }}
+                          value={creditCardPayment.year}
+                          disabled={disabled}
+                          placeholder={creditCardPayment.year_placeholder}
+                          data={dataYearFixed.filter(item => item.key >= new Date().getFullYear() && item.key <= (new Date().getFullYear() + 10))}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'year')}
+                        />
+                      </div>
+                    }
+                  </div>
+                  {creditCardPayment.is_hide_cvc !== true &&
+                    <div className="ss-user-setting__item-bottom" style={{ display: 'block' }}>
+                      <InputNum
+                        style={{ marginLeft: '0px', width: '33%' }}
+                        className="ss-user-setting-input-limit-character"
+                        max={9999}
+                        disabled={disabled}
+                        controls={false}
+                        label={<span style={{ fontWeight: '400' }}>CVC <img style={{ width: '8%' }} src={cvcIcon} /></span>}
+                        value={creditCardPayment.cvc}
+                        placeholder={creditCardPayment.cvc_placeholder}
+                        onChange={value => onChangeValue(indexContent, content.type, value, 'cvc')}
+                      />
+                    </div>
+                  }
                   {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
                       {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
@@ -2272,10 +2684,802 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                 </div>
               )
             }
+            {/* type == 'capture' */}
+            {
+              content.type === 'capture' && (
+                <div style={{ marginBottom: '10px' }}>
+                  <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '-5px' }}>
+                    {capture.title_require &&
+                      <span className="ss-message__content--user-pull_down-title">
+                        {capture.title}
+                      </span>
+                    }
+                    <span className="ss-message__content--user-text-input-required">
+                      * required
+                    </span>
+                  </div>
+                  <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px' }}>
+                    <InputCustom
+                      disabled={disabled}
+                      style={{ width: '50%' }}
+                      value={capture.value}
+                      onChange={value => onChangeValue(indexContent, content.type, value, 'value')}
+                    />
+                    {console.log(capture)}
+                    {new DOMParser().parseFromString(capture.img, "text/xml").innerHTML}
+                    <div id={`captcha-${indexMessage}-${indexContent}`} style={{ width: '50%' }} onLoad={loadCaptcha(indexContent)}></div>
+                  </div>
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                    <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                    </div>
+                  }
+                </div>
+              )
+            }
+            {/* type == 'product_purchase' */}
+            {
+              content.type === 'product_purchase' && (
+                <div style={{ marginBottom: '10px' }}>
+                  {(productPurchase.title_require || productPurchase.require) &&
+                    <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+                      {productPurchase.title_require &&
+                        <span className="ss-message__content--user-checkbox-title">
+                          {productPurchase.title}
+                        </span>
+                      }
+                      {productPurchase.require === true &&
+                        <span className="ss-message__content--user-text-input-required">
+                          * required
+                        </span>
+                      }
+                    </div>
+                  }
+                  <div>
+                    {productPurchase.type === 'text_with_thumbnail_image' && (
+                      productPurchase.multiple_item_purchase ? (
+                        <React.Fragment>
+                          <Checkbox.Group
+                            className="ss-user-preivew-product-purchase-checkbox-group ss-user-preivew-product-purchase-style-width"
+                            style={{ width: "100%" }}
+                            disabled={disabled}
+                            onChange={(value) => console.log(value)}
+                            value={productPurchase.initial_selection}
+                          >
+                            {productPurchase.products.map((itemProduct, indexProduct) => {
+                              return <React.Fragment key={indexProduct}>
+                                <Checkbox value={itemProduct.id}
+                                  onChange={() => {
+                                    let selectArr = [...productPurchase.initial_selection];
+                                    if (selectArr.includes(itemProduct.id)) {
+                                      selectArr = [...selectArr.filter(item => item !== itemProduct.id)];
+                                      console.log(selectArr, itemProduct.id, 'cehckkkkk');
+                                    } else {
+                                      selectArr.push(itemProduct.id);
+                                    }
+                                    onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                    // onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')
+                                  }}>
+                                  <div className="ss-user-overview-product-purchase-container">
+                                    <div className="ss-user-preivew-product-purchase-img">
+                                      <img src={itemProduct.img_url} />
+                                    </div>
+                                    {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                      <div className="ss-user-preivew-product-purchase-infor">
+                                        {productPurchase.product_name_display && itemProduct.title &&
+                                          <div className="ss-user-overview-product-purchase-infor-title">
+                                            {itemProduct.title}
+                                          </div>
+                                        }
+                                        {productPurchase.product_number_display && itemProduct.item_number &&
+                                          <div className="ss-user-overview-product-purchase-infor-item-number">
+                                            Item number: {itemProduct.item_number}
+                                          </div>
+                                        }
+                                        {itemProduct.price_display_custom ?
+                                          <div className="ss-user-overview-product-purchase-infor-price">
+                                            {itemProduct.price_display_custom}
+                                          </div> :
+                                          productPurchase.price_display && itemProduct.item_price &&
+                                          <div className="ss-user-overview-product-purchase-infor-price">
+                                            Price: {itemProduct.item_price} 円
+                                          </div>
+                                        }
+                                        {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
+                                          <InputNum
+                                            value={itemProduct.quantity_select}
+                                            onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
+                                            controls={false}
+                                            min={1}
+                                            max={itemProduct.quantity_limit}
+                                            addonAfter={<div
+                                              style={{ padding: '4px 11px' }}
+                                              onClick={() => {
+                                                if (itemProduct.quantity_select < itemProduct.quantity_limit) {
+                                                  onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                                }
+                                              }}
+                                            >+</div>}
+                                            addonBefore={<div
+                                              style={{ padding: '4px 11px' }}
+                                              onClick={() => {
+                                                if (itemProduct.quantity_select > 1) {
+                                                  onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                                }
+                                              }}
+                                            >-</div>}
+                                          />
+                                        }
+                                        {/* {productPurchase.multiple_item_purchase &&
+                                        <div className="ss-user-overview-product-purchase-infor-price">
+                                          Multiple item purchase
+                                        </div>
+                                      } */}
+                                      </div>
+                                    }
+                                  </div>
+                                </Checkbox>
+                              </React.Fragment>
+                            })}
+                          </Checkbox.Group>
+                        </React.Fragment>
+                      ) : (
+                        <React.Fragment>
+                          <Radio.Group
+                            className="ss-user-preivew-product-purchase-radio-group ss-user-preivew-product-purchase-style-width"
+                            style={{ width: "100%" }}
+                            disabled={disabled}
+                            onChange={(value) => console.log(value)}
+                            value={productPurchase.initial_selection[0]}
+                          >
+                            {productPurchase.products.map((itemProduct, indexProduct) => {
+                              return <Radio value={itemProduct.id} key={indexProduct}
+                                onChange={() => {
+                                  let selectArr = [...productPurchase.initial_selection];
+                                  let dataValue;
+                                  if (selectArr.includes(itemProduct.id)) {
+                                    dataValue = [];
+                                  } else {
+                                    dataValue = [itemProduct.id];
+                                  }
+                                  onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
+                                }}
+                              >
+                                <div className="ss-user-overview-product-purchase-container">
+                                  <div className="ss-user-preivew-product-purchase-img">
+                                    <img src={itemProduct.img_url} />
+                                  </div>
+                                  {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                    <div className="ss-user-preivew-product-purchase-infor">
+                                      {productPurchase.product_name_display && itemProduct.title &&
+                                        <div className="ss-user-overview-product-purchase-infor-title">
+                                          {itemProduct.title}
+                                        </div>
+                                      }
+                                      {productPurchase.product_number_display && itemProduct.item_number &&
+                                        <div className="ss-user-overview-product-purchase-infor-item-number">
+                                          Item number: {itemProduct.item_number}
+                                        </div>
+                                      }
+                                      {itemProduct.price_display_custom ?
+                                        <div className="ss-user-overview-product-purchase-infor-price">
+                                          {itemProduct.price_display_custom}
+                                        </div> :
+                                        productPurchase.price_display && itemProduct.item_price &&
+                                        <div className="ss-user-overview-product-purchase-infor-price">
+                                          Price: {itemProduct.item_price} 円
+                                        </div>
+                                      }
+                                      {/* {productPurchase.multiple_item_purchase &&
+                                        <div className="ss-user-overview-product-purchase-infor-price">
+                                          Multiple item purchase
+                                        </div>
+                                      } */}
+                                      {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
+                                        <InputNum
+                                          value={itemProduct.quantity_select}
+                                          onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
+                                          controls={false}
+                                          min={1}
+                                          max={itemProduct.quantity_limit}
+                                          addonAfter={<div
+                                            style={{ padding: '4px 11px' }}
+                                            onClick={() => {
+                                              if (itemProduct.quantity_select < itemProduct.quantity_limit) {
+                                                onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                              }
+                                            }}
+                                          >+</div>}
+                                          addonBefore={<div
+                                            style={{ padding: '4px 11px' }}
+                                            onClick={() => {
+                                              if (itemProduct.quantity_select > 1) {
+                                                onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                              }
+                                            }}
+                                          >-</div>}
+                                        />
+                                      }
+                                    </div>
+                                  }
+                                </div>
+                              </Radio>
+                            })}
+                          </Radio.Group>
+                        </React.Fragment>
+                      )
+                    )}
+                    {productPurchase.type === 'text_with_image' && (
+                      productPurchase.multiple_item_purchase ? (
+                        <React.Fragment>
+                          <Checkbox.Group
+                            className="ss-user-preview-product-purchase-checkbox-group-type-text_image ss-user-preivew-product-purchase-style-width"
+                            style={{ width: "100%" }}
+                            disabled={disabled}
+                            onChange={(value) => console.log(value)}
+                            value={productPurchase.initial_selection}
+                          >
+                            {productPurchase.products.map((itemProduct, indexProduct) => {
+                              return <Checkbox key={indexProduct} value={itemProduct.id}
+                                onChange={() => {
+                                  let selectArr = [...productPurchase.initial_selection];
+                                  if (selectArr.includes(itemProduct.id)) {
+                                    selectArr = [...selectArr.filter(item => item !== itemProduct.id)];
+                                    console.log(selectArr, itemProduct.id, 'cehckkkkk');
+                                  } else {
+                                    selectArr.push(itemProduct.id);
+                                  }
+                                  onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                  // onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')
+                                }}>
+                                <div className="ss-user-overview-product-purchase-container-type-text_image">
+                                  <div className="ss-user-overview-product-purchase-img-type-text_image">
+                                    <img src={itemProduct.img_url} />
+                                  </div>
+                                  {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                    <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                      {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                                    </div>
+                                  }
+                                  {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
+                                    <InputNum
+                                      value={itemProduct.quantity_select}
+                                      onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
+                                      controls={false}
+                                      min={1}
+                                      style={{ width: '50%' }}
+                                      max={itemProduct.quantity_limit}
+                                      addonAfter={<div
+                                        style={{ padding: '4px 11px' }}
+                                        onClick={() => {
+                                          if (itemProduct.quantity_select < itemProduct.quantity_limit) {
+                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                          }
+                                        }}
+                                      >+</div>}
+                                      addonBefore={<div
+                                        style={{ padding: '4px 11px' }}
+                                        onClick={() => {
+                                          if (itemProduct.quantity_select > 1) {
+                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                          }
+                                        }}
+                                      >-</div>}
+                                    />
+                                  }
+                                </div>
+                              </Checkbox>
+                            })}
+                          </Checkbox.Group>
+                        </React.Fragment>
+                      ) : (
+                        <React.Fragment>
+                          <Radio.Group
+                            className="ss-user-preview-product-purchase-radio-group-type-text_image ss-user-preivew-product-purchase-style-width"
+                            style={{ width: "100%" }}
+                            disabled={disabled}
+                            onChange={(e) => {
+                              let selectArr = [...productPurchase.initial_selection];
+                              let dataValue;
+                              console.log(selectArr, e.target.value, selectArr.includes(e.target.value))
+                              if (selectArr.includes(e.target.value)) {
+                                dataValue = [];
+                              } else {
+                                dataValue = [e.target.value];
+                              }
+                              onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
+                            }}
+                            value={productPurchase.initial_selection[0]}
+                          >
+                            {productPurchase.products.map((itemProduct, indexProduct) => {
+                              return <Radio value={itemProduct.id} key={indexProduct}>
+                                <div className="ss-user-overview-product-purchase-container-type-text_image">
+                                  <div className="ss-user-overview-product-purchase-img-type-text_image">
+                                    <img src={itemProduct.img_url} />
+                                  </div>
+                                  {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                    <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                      {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                                    </div>
+                                  }
+                                  {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
+                                    <InputNum
+                                      value={itemProduct.quantity_select}
+                                      onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
+                                      controls={false}
+                                      min={1}
+                                      style={{ width: '50%' }}
+                                      max={itemProduct.quantity_limit}
+                                      addonAfter={<div
+                                        style={{ padding: '4px 11px' }}
+                                        onClick={() => {
+                                          if (itemProduct.quantity_select < itemProduct.quantity_limit) {
+                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                          }
+                                        }}
+                                      >+</div>}
+                                      addonBefore={<div
+                                        style={{ padding: '4px 11px' }}
+                                        onClick={() => {
+                                          if (itemProduct.quantity_select > 1) {
+                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                          }
+                                        }}
+                                      >-</div>}
+                                    />
+                                  }
+                                </div>
+                              </Radio>
+                            })}
+                          </Radio.Group>
+                        </React.Fragment>
+                      )
+                    )}
+                    {productPurchase.type === 'consume_api_response' && (
+                      <>
+                      </>
+                    )}
+                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                      <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      </div>
+                    }
+                  </div>
+                </div>
+              )
+            }
+            {/* type == 'product_purchase_radio_button' */}
+            {
+              content.type === 'product_purchase_radio_button' && (
+                <div style={{ marginBottom: '10px' }}>
+                  {(productPurchaseRadioButton.title_require || productPurchaseRadioButton.require) &&
+                    <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+                      {productPurchaseRadioButton.title_require &&
+                        <span className="ss-message__content--user-checkbox-title">
+                          {productPurchaseRadioButton.title}
+                        </span>
+                      }
+                      {productPurchaseRadioButton.require === true &&
+                        <span className="ss-message__content--user-text-input-required">
+                          * required
+                        </span>
+                      }
+                    </div>
+                  }
+                  <div>
+                    {productPurchaseRadioButton.type === 'text_with_thumbnail_image' && (
+                      <React.Fragment>
+                        <Radio.Group
+                          className="ss-user-preivew-product-purchase-radio-group ss-user-preivew-product-purchase-style-width"
+                          style={{ width: "100%" }}
+                          disabled={disabled}
+                          onChange={(value) => console.log(value)}
+                          value={productPurchaseRadioButton.initial_selection[0]}
+                        >
+                          {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
+                            return <Radio value={itemProduct.id} key={indexProduct}
+                              onChange={() => {
+                                let selectArr = [...productPurchaseRadioButton.initial_selection];
+                                let dataValue;
+                                if (selectArr.includes(itemProduct.id)) {
+                                  dataValue = [];
+                                } else {
+                                  dataValue = [itemProduct.id];
+                                }
+                                onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
+                                onClickNext();
+                              }}
+                            >
+                              <div className="ss-user-overview-product-purchase-container">
+                                <div className="ss-user-preivew-product-purchase-img">
+                                  <img src={itemProduct.img_url} />
+                                </div>
+                                {(productPurchaseRadioButton.product_name_display || productPurchaseRadioButton.price_display || productPurchaseRadioButton.product_number_display) &&
+                                  <div className="ss-user-preivew-product-purchase-infor">
+                                    {productPurchaseRadioButton.product_name_display && itemProduct.title &&
+                                      <div className="ss-user-overview-product-purchase-infor-title">
+                                        {itemProduct.title}
+                                      </div>
+                                    }
+                                    {productPurchaseRadioButton.product_number_display && itemProduct.item_number &&
+                                      <div className="ss-user-overview-product-purchase-infor-item-number">
+                                        Item number: {itemProduct.item_number}
+                                      </div>
+                                    }
+                                    {itemProduct.price_display_custom ?
+                                      <div className="ss-user-overview-product-purchase-infor-price">
+                                        {itemProduct.price_display_custom}
+                                      </div> :
+                                      productPurchaseRadioButton.price_display && itemProduct.item_price &&
+                                      <div className="ss-user-overview-product-purchase-infor-price">
+                                        Price: {itemProduct.item_price} 円
+                                      </div>
+                                    }
+                                    {/* {productPurchaseRadioButton.multiple_item_purchase &&
+                                        <div className="ss-user-overview-product-purchase-infor-price">
+                                          Multiple item purchase
+                                        </div>
+                                      } */}
+                                  </div>
+                                }
+                              </div>
+                            </Radio>
+                          })}
+                        </Radio.Group>
+                      </React.Fragment>
+                    )}
+                    {productPurchaseRadioButton.type === 'text_with_image' && (
+                      <React.Fragment>
+                        <Radio.Group
+                          className="ss-user-preview-product-purchase-radio-group-type-text_image ss-user-preivew-product-purchase-style-width"
+                          style={{ width: "100%" }}
+                          disabled={disabled}
+                          value={productPurchaseRadioButton.initial_selection[0]}
+                        >
+                          {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
+                            return <Radio value={itemProduct.id} key={indexProduct}
+                              onChange={() => {
+                                let selectArr = [...productPurchaseRadioButton.initial_selection];
+                                let dataValue;
+                                if (selectArr.includes(itemProduct.id)) {
+                                  dataValue = [];
+                                } else {
+                                  dataValue = [itemProduct.id];
+                                }
+                                onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
+                                onClickNext();
+                              }}>
+                              <div className="ss-user-overview-product-purchase-container-type-text_image">
+                                <div className="ss-user-overview-product-purchase-img-type-text_image">
+                                  <img src={itemProduct.img_url} />
+                                </div>
+                                {(productPurchaseRadioButton.product_name_display || productPurchaseRadioButton.price_display || productPurchaseRadioButton.product_number_display) &&
+                                  <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                    {productPurchaseRadioButton.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchaseRadioButton.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchaseRadioButton.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                                  </div>
+                                }
+                              </div>
+                            </Radio>
+                          })}
+                        </Radio.Group>
+                      </React.Fragment>
+                    )}
+                    {productPurchaseRadioButton.type === 'consume_api_response' && (
+                      <>
+                      </>
+                    )}
+                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                      <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      </div>
+                    }
+                  </div>
+                </div>
+              )
+            }
+            {/* type == 'slider' */}
+            {
+              content.type === 'slider' && (
+                <div style={{ marginBottom: '10px' }}>
+                  {(slider.title_require || slider.require) &&
+                    <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+                      {slider.title_require &&
+                        <span className="ss-message__content--user-checkbox-title">
+                          {slider.title}
+                        </span>
+                      }
+                      {slider.require === true &&
+                        <span className="ss-message__content--user-text-input-required">
+                          * required
+                        </span>
+                      }
+                    </div>
+                  }
+                  <div>
+                    <Slider
+                      disabled={disabled}
+                      value={slider.value}
+                      onChange={value => onChangeValue(indexContent, content.type, value, 'value')}
+                      trackStyle={{ backgroundColor: slider.color || '#2C75F0' }}
+                      min={slider.type === 'discrete_type' ? parseInt(slider.min_value) : 0}
+                      max={slider.type === 'discrete_type' ? parseInt(slider.max_value) : 10}
+                      dots={slider.type === 'discrete_type'}
+                      marks={
+                        slider.type === 'discrete_type' ?
+                          {
+                            [slider.min_value]: slider.min_label,
+                            [slider.max_value]: slider.max_label
+                          } :
+                          {
+                            0: slider.min_label,
+                            10: slider.max_label
+                          }
+                      }
+                    />
+                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                      <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      </div>
+                    }
+                  </div>
+                </div>
+              )
+            }
+            {/* type == 'card_payment_radio_button' */}
+            {
+              content.type === 'card_payment_radio_button' && (
+                <div style={{ marginBottom: '10px' }}>
+                  {(cardPaymentRadioButton.title_require || cardPaymentRadioButton.require) &&
+                    <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
+                      {cardPaymentRadioButton.title_require &&
+                        <span className="ss-message__content--user-text-input-title">
+                          {cardPaymentRadioButton.title}
+                        </span>
+                      }
+                      {cardPaymentRadioButton.require === true &&
+                        <span className="ss-message__content--user-text-input-required">
+                          * required
+                        </span>
+                      }
+                    </div>
+                  }
+                  {console.log(cardPaymentRadioButton, 'checkkkkk')}
+                  {cardPaymentRadioButton.type === 'default' &&
+                    <Radio.Group
+                      style={{ width: "100%", fontSize: '14px' }}
+                      onChange={(value) => console.log(value)}
+                      disabled={disabled}
+                      value={cardPaymentRadioButton.initial_selection}
+                    >
+                      {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
+                        console.log(itemPayment)
+                        return <Radio value={itemPayment.id} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%' }}
+                          onChange={() => {
+                            let dataValue;
+                            if (cardPaymentRadioButton.initial_selection !== itemPayment.id) {
+                              dataValue = itemPayment.id;
+                            } else {
+                              dataValue = "";
+                            }
+                            console.log(cardPaymentRadioButton.card_linked_setting, itemPayment.id)
+                            onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
+
+                            if (cardPaymentRadioButton.card_linked_setting === dataValue) {
+                              onChangeValue(indexContent, content.type, true, 'is_display_card_payment');
+                              displayButtonNext(true);
+                            } else {
+                              displayButtonNext(false);
+                              onChangeValue(indexContent, content.type, false, 'is_display_card_payment');
+                              onClickNext();
+                            }
+                          }}>
+                          {itemPayment.text}
+                        </Radio>
+                      })}
+                    </Radio.Group>
+                  }
+                  {cardPaymentRadioButton.type === 'customized_style' &&
+                    <Radio.Group
+                      style={{ width: "100%", fontSize: '14px' }}
+                      onChange={(value) => console.log(value)}
+                      disabled={disabled}
+                      value={cardPaymentRadioButton.initial_selection}
+                      buttonStyle="solid"
+                    >
+                      {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
+                        console.log(itemPayment)
+                        return <Radio.Button value={itemPayment.id} key={indexPayment} style={{ marginBottom: '5px', padding: '5px', width: '100%', textAlign: 'center', lineHeight: '22px' }}
+                          onChange={() => {
+                            let dataValue;
+                            if (cardPaymentRadioButton.initial_selection !== itemPayment.id) {
+                              dataValue = itemPayment.id;
+                            } else {
+                              dataValue = "";
+                            }
+                            console.log(cardPaymentRadioButton.card_linked_setting, itemPayment.id)
+                            onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
+
+                            if (cardPaymentRadioButton.card_linked_setting !== dataValue) {
+                              onClickNext();
+                            }
+                          }}>
+                          {itemPayment.text}
+                        </Radio.Button>
+                      })}
+                    </Radio.Group>
+                  }
+                  {cardPaymentRadioButton.type === 'picture_radio' && cardPaymentRadioButton.radio_contents_img &&
+                    cardPaymentRadioButton.radio_contents_img.map((itemPaymentImg, indexPaymentImg) => {
+                      return <div key={indexPaymentImg} style={{ color: '#6789A6' }}>
+                        <Radio.Group
+                          disabled={disabled}
+                          style={{ width: "100%", fontSize: '14px', display: 'flex' }}
+                          className="ss-user-preview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width"
+                          onChange={(value) => console.log(value)}
+                          value={cardPaymentRadioButton.initial_selection_picture}
+                        >
+                          {itemPaymentImg.contents && itemPaymentImg.contents.map((itemPaymentContent, indexPaymentContent) => {
+                            return <Radio value={`${itemPaymentImg.id}-${itemPaymentContent.id}`} key={indexPaymentContent} style={{ marginRight: '0px' }}
+                              onChange={() => {
+                                let dataValue;
+                                if (cardPaymentRadioButton.initial_selection_picture !== `${itemPaymentImg.id}-${itemPaymentContent.id}`) {
+                                  dataValue = `${itemPaymentImg.id}-${itemPaymentContent.id}`;
+                                } else {
+                                  dataValue = "";
+                                }
+                                onChangeValue(indexContent, content.type, dataValue, 'initial_selection_picture');
+                                if (cardPaymentRadioButton.card_linked_setting_picture !== dataValue) {
+                                  console.log(cardPaymentRadioButton.card_linked_setting_picture !== dataValue, cardPaymentRadioButton.card_linked_setting_picture, dataValue)
+                                  onClickNext();
+                                }
+                              }}>
+                              <img src={itemPaymentContent.file_url}></img>
+                              <div style={{ textAlign: 'center', fontSize: '14px', color: '#6789A6', fontWeight: '700' }}>{itemPaymentContent.text}</div>
+                            </Radio>
+                          })}
+                        </Radio.Group>
+                      </div>
+                    })
+                  }
+                  {console.log(cardPaymentRadioButton.card_linked_setting, cardPaymentRadioButton.initial_selection, cardPaymentRadioButton.card_linked_setting_picture, cardPaymentRadioButton.initial_selection_picture)}
+                  {(cardPaymentRadioButton.type !== "picture_radio" ? (cardPaymentRadioButton.card_linked_setting && cardPaymentRadioButton.card_linked_setting === cardPaymentRadioButton.initial_selection) : (cardPaymentRadioButton.card_linked_setting_picture && cardPaymentRadioButton.card_linked_setting_picture === cardPaymentRadioButton.initial_selection_picture)) &&
+                    <React.Fragment>
+                      {cardPaymentRadioButton.separate_type === false ?
+                        <div className="ss-user-setting__item-bottom">
+                          <InputCustom
+                            className="ss-user-setting-input-overview"
+                            styleLabel={{ width: '100%' }}
+                            label="Card number"
+                            inline={false}
+                            value={cardPaymentRadioButton.card_number}
+                            onChange={value => onChangeValue(indexContent, content.type, value, 'card_number')}
+                            disabled={disabled}
+                            placeholder={cardPaymentRadioButton.card_number_placeholder}
+                          />
+                        </div> :
+                        <div className="ss-user-setting__item-bottom">
+                          <div style={{ width: '100%' }}>Card number</div>
+                          <div style={{ width: '100%' }} className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type">
+                            <InputCustom
+                              disabled={disabled}
+                              value={cardPaymentRadioButton.card_number1}
+                              onChange={value => onChangeValue(indexContent, content.type, value, 'card_number1')}
+                              placeholder={cardPaymentRadioButton.card_number_placeholder1}
+                            />
+                            <InputCustom
+                              value={cardPaymentRadioButton.card_number2}
+                              onChange={value => onChangeValue(indexContent, content.type, value, 'card_number2')}
+                              disabled={disabled}
+                              placeholder={cardPaymentRadioButton.card_number_placeholder2}
+                            />
+                            <InputCustom
+                              value={cardPaymentRadioButton.card_number3}
+                              onChange={value => onChangeValue(indexContent, content.type, value, 'card_number3')}
+                              disabled={disabled}
+                              placeholder={cardPaymentRadioButton.card_number_placeholder3}
+                            />
+                            <InputCustom
+                              value={cardPaymentRadioButton.card_number4}
+                              onChange={value => onChangeValue(indexContent, content.type, value, 'card_number4')}
+                              disabled={disabled}
+                              placeholder={cardPaymentRadioButton.card_number_placeholder4}
+                            />
+                          </div>
+                        </div>
+                      }
+                      {cardPaymentRadioButton.is_hide_card_name === false &&
+                        <div className="ss-user-setting__item-bottom">
+                          <InputCustom
+                            className="ss-user-setting-input-overview"
+                            styleLabel={{ width: '100%' }}
+                            label="Card holder"
+                            inline={false}
+                            disabled={disabled}
+                            value={cardPaymentRadioButton.card_holder}
+                            onChange={value => onChangeValue(indexContent, content.type, value, 'card_holder')}
+                            placeholder={cardPaymentRadioButton.card_holder_placeholder}
+                          />
+                        </div>
+                      }
+                      <div className="ss-user-setting__item-bottom">
+                        <div style={{ width: '100%' }}>Date of expiry</div>
+                        {cardPaymentRadioButton.type_date_of_expiry === 'ym' &&
+                          <div style={{ display: 'flex', width: '100%' }}>
+                            <SelectCustom
+                              style={{ width: '33%' }}
+                              value={cardPaymentRadioButton.year}
+                              disabled={disabled}
+                              placeholder={"year"}
+                              data={dataYearFixed.filter(item => item.key >= new Date().getFullYear() && item.key <= (new Date().getFullYear() + 10))}
+                              onChange={value => onChangeValue(indexContent, content.type, value, 'year')}
+                            />
+                            <SelectCustom
+                              style={{ width: '33%', marginLeft: '10px' }}
+                              value={cardPaymentRadioButton.month}
+                              placeholder={"month"}
+                              data={dataMonth}
+                              disabled={disabled}
+                              onChange={value => onChangeValue(indexContent, content.type, value, 'month')}
+                            />
+                          </div>
+                        }
+                        {cardPaymentRadioButton.type_date_of_expiry === 'my' &&
+                          <div style={{ display: 'flex', width: '100%' }}>
+                            <SelectCustom
+                              style={{ width: '33%' }}
+                              value={cardPaymentRadioButton.month}
+                              placeholder={"month"}
+                              data={dataMonth}
+                              disabled={disabled}
+                              onChange={value => onChangeValue(indexContent, content.type, value, 'month')}
+                            />
+                            <SelectCustom
+                              style={{ width: '33%', marginLeft: '10px' }}
+                              value={cardPaymentRadioButton.year}
+                              disabled={disabled}
+                              placeholder={"year"}
+                              data={dataYearFixed.filter(item => item.key >= new Date().getFullYear() && item.key <= (new Date().getFullYear() + 10))}
+                              onChange={value => onChangeValue(indexContent, content.type, value, 'year')}
+                            />
+                          </div>
+                        }
+                      </div>
+                      {cardPaymentRadioButton.is_hide_cvc === false &&
+                        <div className="ss-user-setting__item-bottom">
+                          <InputCustom
+                            className="ss-user-setting-input-overview"
+                            styleLabel={{ width: '100%' }}
+                            label="CVC"
+                            inline={false}
+                            disabled={disabled}
+                            value={cardPaymentRadioButton.cvc}
+                            onChange={value => onChangeValue(indexContent, content.type, value, 'cvc')}
+                            placeholder={cardPaymentRadioButton.cvc_placeholder}
+                          />
+                        </div>
+                      }
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                        <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                          {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                        </div>
+                      }
+                    </React.Fragment>
+                  }
+                </div>
+              )
+            }
+            {/* type == 'label_no_transition' */}
+            {
+              content.type === 'label_no_transition' && (
+                <div style={{ marginBottom: '10px' }}>
+                  {labelNoTransition.value}
+                </div>
+              )
+            }
           </React.Fragment>
         )
       })}
-    </div>
+    </div >
   )
 }
 
