@@ -81,7 +81,7 @@ let dataEveryMinute = [
 
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
-function Preview({ onOpenPreview, isOpen, scenarioId }) {
+function Preview({ onOpenPreview, isOpen, scenarioId, dataVariables }) {
 
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
   const [botInfor, setBotInfor] = useState();
@@ -155,6 +155,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
   useEffect(() => {
     api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
       if (res.data.code == 1) {
+        console.log(res.data, 'cehckkkkkkkkkk')
         setBotInfor(res.data.data);
       }
     }).catch(err => console.log(err));
@@ -236,13 +237,35 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                   })
                   index = i;
                 } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
-
-
-                  //handle next day
-
-
-
-                  console.log(messageArr[i]?.message_content[0]);
+                  // console.log(dataVariables, 'checkkkk variables')                
+                  if (variables.length !== 0) {
+                    let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
+                    variables.forEach(item => {
+                      for (let z = 0; z < dataVarExist.length; z++) {
+                        if (item.variable_name === dataVarExist[z].key) {
+                          item.default_value = dataVarExist[z].value;
+                        }
+                      }
+                    });
+                    console.log(variables, 'checkkkk variables');
+                    setVariables([...variables]);
+                  }
+                  setIndexMessageRender(i);
+                  index = i;
+                } else if (messageArr[i]?.message_content[0]?.type === 'clear_variable') {
+                  // console.log(dataVariables, 'checkkkk variables')                
+                  if (variables.length !== 0) {
+                    let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
+                    variables.forEach(item => {
+                      for (let z = 0; z < dataVarExist.length; z++) {
+                        if (item.variable_name === dataVarExist[z]) {
+                          item.default_value = "";
+                        }
+                      }
+                    });
+                    console.log(variables, 'checkkkk variables');
+                    setVariables([...variables]);
+                  }
                   setIndexMessageRender(i);
                   index = i;
                 } else if (messageArr[i].belong_to !== 'bot') {
@@ -290,13 +313,13 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                       if (messageArr[i].message_content[0]?.type === 'text_input' && messageArr[i].message_content[0].text_input.content) {
                         messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
                           if (variables.length !== 0) {
+                            let valueVar = "";
                             for (let j = 0; j < variables.length; j++) {
                               if (variables[j].variable_name === variable) {
-                                return variables[j].default_value;
-                              } else {
-                                return "";
+                                valueVar = variables[j].default_value;
                               }
                             }
+                            return valueVar;
                           } else {
                             return "";
                           }
@@ -321,67 +344,68 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
                   index = i;
                 }
               } else if (messageArr[0].belong_to === 'user' && messageArr[i].message_content.length > 0) {
-                if (messageArr[i].belong_to !== 'user') {
-                  await new Promise((resolve) => {
-                    return delayRender = setTimeout(() => {
-                      if (messageArr[i].message_content[0]?.type === 'text_input') {
-                        messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                          for (let j = 0; j < variables.length; j++) {
-                            if (variables[j].variable_name === variable) {
-                              return variables[j].default_value;
-                            }
-                          }
-                        });
-                      }
-                      resolve({ ...messageArr[i] });
-                    }, 1000);
-                  }).then(data => {
-                    renderMessage.push(data);
-                    setRenderMessageArr([
-                      ...renderMessage
-                    ]);
-                    setIndexMessageRender(i);
-                    if (isPauseScroll === false) {
-                      scrollToBottom();
-                    }
-                    if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
-                      isPauseScroll = true;
-                    }
-                  })
-                  index = i;
-                } else {
-                  await new Promise((resolve) => {
-                    return delayRender = setTimeout(() => {
-                      for (let j = 0; j < messageArr[i].message_content.length; j++) {
-                        if (messageArr[i].message_content[j].type === 'capture') {
-                          api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
-                            console.log(res);
-                            captcha.push({
-                              index: i,
-                              indexContent: j,
-                              ...res.data
-                            })
-                            setCaptcha([...captcha]);
+                // if (messageArr[i].belong_to !== 'user') {
+                //   await new Promise((resolve) => {
+                //     return delayRender = setTimeout(() => {
+                //       if (messageArr[i].message_content[0]?.type === 'text_input') {
+                //         messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                //           for (let j = 0; j < variables.length; j++) {
+                //             if (variables[j].variable_name === variable) {
+                //               console.log(variables[j].variable_name, 'cehckkkkk')
+                //               return variables[j].default_value;
+                //             }
+                //           }
+                //         });
+                //       }
+                //       resolve({ ...messageArr[i] });
+                //     }, 1000);
+                //   }).then(data => {
+                //     renderMessage.push(data);
+                //     setRenderMessageArr([
+                //       ...renderMessage
+                //     ]);
+                //     setIndexMessageRender(i);
+                //     if (isPauseScroll === false) {
+                //       scrollToBottom();
+                //     }
+                //     if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
+                //       isPauseScroll = true;
+                //     }
+                //   })
+                //   index = i;
+                // } else {
+                await new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    for (let j = 0; j < messageArr[i].message_content.length; j++) {
+                      if (messageArr[i].message_content[j].type === 'capture') {
+                        api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
+                          console.log(res);
+                          captcha.push({
+                            index: i,
+                            indexContent: j,
+                            ...res.data
                           })
-                        }
+                          setCaptcha([...captcha]);
+                        })
                       }
-                      resolve({ ...messageArr[i] });
-                    }, 1000);
-                  }).then(data => {
-                    renderMessage.push(data);
-                    setRenderMessageArr([
-                      ...renderMessage
-                    ]);
-                    setIndexMessageRender(i);
-                    if (isPauseScroll === false) {
-                      scrollToBottom();
                     }
-                  })
-                  setIndexUser(prev => prev + 1);
-                  index = i;
-                  break;
-                }
+                    resolve({ ...messageArr[i] });
+                  }, 1000);
+                }).then(data => {
+                  renderMessage.push(data);
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
+                  setIndexMessageRender(i);
+                  if (isPauseScroll === false) {
+                    scrollToBottom();
+                  }
+                })
+                setIndexUser(prev => prev + 1);
+                index = i;
+                break;
               }
+              // }
             }
           }
           // setIndexMessageRender(index);
@@ -394,34 +418,6 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
     }
   }, [scenarioId])
 
-  // useEffect(() => {
-  //   if (document.getElementById('captcha') && indexMessageRender && dataMessages) {
-  //     console.log('akjdlkajdlkaj1231231231231231')
-  //     for (let i = 0; i < dataMessages[indexMessageRender].length; i++) {
-  //       if (dataMessages[indexMessageRender].message_content[i].type === 'captcha') {
-  //         api.get(`https://svg-captcha.herokuapp.com/captcha?size=${dataMessages[indexMessageRender].message_content[i][dataMessages[indexMessageRender].message_content[i].type].length}${dataMessages[indexMessageRender].message_content[i][dataMessages[indexMessageRender].message_content[i].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[indexMessageRender].message_content[i][dataMessages[indexMessageRender].message_content[i].type].type}`).then(res => {
-  //           console.log(res);
-  //           // document.getElementById('captcha').innerHTML = res.data.data;
-  //           setCaptcha(res.data.data);
-  //         }).catch((error) => {
-  //           console.log(error);
-  //           if (error.response?.data.code === 0) {
-  //             tokenExpired();
-  //           }
-  //         });
-
-  //       }
-  //     }
-  //   }
-  // }, [])
-
-
-  // useEffect(() => {
-  //   console.log(indexMessageRender, 'chcek indexMessageRender', renderMessageArr)
-  //   if (indexMessageRender && indexMessageRender !== 0) {
-
-  //   }
-  // }, [indexMessageRender])
   const scrollToBottom = () => {
     if (document.getElementById('sp-body')) {
       document.getElementById('sp-body').scrollTo({
@@ -802,19 +798,51 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
               //     ...renderMessage
               //   ]);
               // })
+            } else if (dataMessages[i]?.message_content[0]?.type === 'variable_set') {
+              // console.log(dataVariables, 'checkkkk variables')                
+              if (variables.length !== 0) {
+                let dataVarExist = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].variables;
+                variables.forEach(item => {
+                  for (let z = 0; z < dataVarExist.length; z++) {
+                    if (item.variable_name === dataVarExist[z].key) {
+                      item.default_value = dataVarExist[z].value;
+                    }
+                  }
+                });
+                console.log(variables, 'checkkkk variables');
+                setVariables([...variables]);
+              }
+              setIndexMessageRender(i);
+              index = i;
+            } else if (dataMessages[i]?.message_content[0]?.type === 'clear_variable') {
+              // console.log(dataVariables, 'checkkkk variables')                
+              if (variables.length !== 0) {
+                let dataVarExist = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].variables;
+                variables.forEach(item => {
+                  for (let z = 0; z < dataVarExist.length; z++) {
+                    if (item.variable_name === dataVarExist[z]) {
+                      item.default_value = "";
+                    }
+                  }
+                });
+                console.log(variables, 'checkkkk variables');
+                setVariables([...variables]);
+              }
+              setIndexMessageRender(i);
+              index = i;
             } else {
               await new Promise((resolve) => {
                 return delayRender = setTimeout(() => {
-                  if (dataMessages[i].message_content[0].type === 'text_input') {
+                  if (dataMessages[i].message_content[0].type === 'text_input' && dataMessages[i].message_content[0].text_input.content) {
                     dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
                       if (variables.length !== 0) {
+                        let valueVar = "";
                         for (let j = 0; j < variables.length; j++) {
                           if (variables[j].variable_name === variable) {
-                            return variables[j].default_value;
-                          } else {
-                            return "";
+                            valueVar = variables[j].default_value;
                           }
                         }
+                        return valueVar;
                       } else {
                         return "";
                       }
@@ -874,6 +902,8 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
         ...renderMessage
       ]);
     } else {
+      // handle check message_content for user 
+      //if message_content.length !== 0 => show message
       if (dataMessages[indexMessageRender + 1].message_content.length > 0 && dataMessages[indexMessageRender + 1].hidden !== true) {
         await new Promise((resolve) => {
           return delayRender = setTimeout(() => {
@@ -903,9 +933,10 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
           }
         });
         index = indexMessageRender + 1;
-      } else {
+      }
+      //if message_content.length === 0 => loop until meet message have message_content.length !== 0 => show message
+      else {
         for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
-          console.log(dataMessages[i], 'checkkkkk dataMessages[i]')
           if (dataMessages[i].message_content.length > 0 && dataMessages[i].hidden !== true) {
             if (dataMessages[i].belong_to === 'user') {
               await new Promise((resolve) => {
@@ -938,35 +969,75 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
               index = i;
               break;
             } else {
-              await new Promise((resolve) => {
-                return delayRender = setTimeout(() => {
-                  if (dataMessages[i].message_content[0].type === 'text_input') {
-                    dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                      if (variables.length !== 0) {
-                        for (let j = 0; j < variables.length; j++) {
-                          if (variables[j].variable_name === variable) {
-                            return variables[j].default_value;
-                          } else {
-                            return "";
-                          }
-                        }
-                      } else {
-                        return "";
+              if (dataMessages[i]?.message_content[0].type === 'delay') {
+                await new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    resolve();
+                  }, (dataMessages[i]?.message_content[0].delay.content * 1000));
+                });
+                index = i;
+              } else if (dataMessages[i]?.message_content[0]?.type === 'variable_set') {
+                if (variables.length !== 0) {
+                  let dataVarExist = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].variables;
+                  variables.forEach(item => {
+                    for (let z = 0; z < dataVarExist.length; z++) {
+                      if (item.variable_name === dataVarExist[z].key) {
+                        item.default_value = dataVarExist[z].value;
                       }
-                    })
-                  }
-                  resolve({ ...dataMessages[i] });
-                }, 1000);
-              }).then(data => {
-                renderMessage.push(data);
-                console.log(data)
-                setRenderMessageArr([
-                  ...renderMessage
-                ]);
-                if (isPauseScroll === false) {
-                  scrollToBottom();
+                    }
+                  });
+                  console.log(variables, 'checkkkk variables');
+                  setVariables([...variables]);
                 }
-              });
+                setIndexMessageRender(i);
+                index = i;
+              } else if (dataMessages[i]?.message_content[0]?.type === 'clear_variable') {
+                // console.log(dataVariables, 'checkkkk variables')                
+                if (variables.length !== 0) {
+                  let dataVarExist = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].variables;
+                  variables.forEach(item => {
+                    for (let z = 0; z < dataVarExist.length; z++) {
+                      if (item.variable_name === dataVarExist[z]) {
+                        item.default_value = "";
+                      }
+                    }
+                  });
+                  console.log(variables, 'checkkkk variables');
+                  setVariables([...variables]);
+                }
+                setIndexMessageRender(i);
+                index = i;
+              } else {
+                await new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    if (dataMessages[i].message_content[0].type === 'text_input' && dataMessages[i].message_content[0].text_input.content) {
+                      dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                        if (variables.length !== 0) {
+                          let valueVar = "";
+                          for (let j = 0; j < variables.length; j++) {
+                            if (variables[j].variable_name === variable) {
+                              valueVar = variables[j].default_value;
+                            }
+                          }
+                          return valueVar;
+                        } else {
+                          return "";
+                        }
+                      })
+                    }
+                    resolve({ ...dataMessages[i] });
+                  }, 1000);
+                }).then(data => {
+                  renderMessage.push(data);
+                  console.log(data)
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
+                  if (isPauseScroll === false) {
+                    scrollToBottom();
+                  }
+                });
+              }
             }
           }
         }
@@ -1021,7 +1092,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId }) {
     scenarioId &&
     <React.Fragment>
       <div id="sp-container" className="sp-container">
-        <div id="sp-header" className="sp-header" onClick={() => onOpenPreview(!isOpen)}>
+        <div id="sp-header" style={botInfor?.main_color && {backgroundColor: botInfor?.main_color}} className="sp-header" onClick={() => onOpenPreview(!isOpen)}>
           <div className="sp-header-left">
             <div className="sp-header-left-avatar sp-avatar">
               <img src={botInfor?.icon?.url && ("https://ec-chatbot-test1.com/" + botInfor?.icon?.url)} />
@@ -1158,7 +1229,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   const [startDate, setStartDate] = useState(new Date());
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
-
   const [checked, setChecked] = useState([]);
 
   function loadCaptcha(indexContent) {
@@ -1367,6 +1437,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     <React.Fragment>
                       <InputCustom
                         disabled={disabled}
+                        type="password"
                         // className="ss-message__content--user-text-input ss-input-value"
                         style={{ marginBottom: '0px' }}
                         placeholder={textInput[textInput.type]?.password}
@@ -1390,24 +1461,12 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   }
                   {(textInput.type === 'email_confirmation') &&
                     (<>
-                      {/* <input
-                        className="ss-message__content--user-text-input ss-input-value"
-                        placeholder={textInput[textInput.type].cfEmlAdd_email}
-                        onChange={onChangeValue(indexContent, content.type, textInput.type, 'value')}
-                        value={textInput[textInput.type]?.value}
-                      ></input> */}
                       <InputCustom
                         disabled={disabled}
                         placeholder={textInput[textInput.type].cfEmlAdd_email}
                         onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
                         value={textInput[textInput.type]?.value}
                       />
-                      {/* <input
-                        className="ss-message__content--user-text-input ss-input-value"
-                        placeholder={textInput[textInput.type].cfEmlAdd_confirm_email}
-                        onChange={onChangeValue(indexContent, content.type, textInput.type, 'valueConfirm')}
-                        value={textInput[textInput.type]?.valueConfirm}
-                      ></input> */}
                       <InputCustom
                         disabled={disabled}
                         placeholder={textInput[textInput.type].cfEmlAdd_confirm_email}

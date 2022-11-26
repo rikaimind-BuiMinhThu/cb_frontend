@@ -2540,12 +2540,12 @@ const Scenario = () => {
               delay: {},
               api_link_age: {},
               clear_variable: {
-                variables: [dataInputVar[0].variable_name]
+                variables: [dataInputVar[0]?.variable_name]
               },
               variable_set: {
                 variables: [
                   {
-                    key: dataInputVar[0].variable_name,
+                    key: dataInputVar[0]?.variable_name,
                     value: ''
                   }
                 ]
@@ -2582,12 +2582,12 @@ const Scenario = () => {
               delay: {},
               api_link_age: {},
               clear_variable: {
-                variables: [dataInputVar[0].variable_name]
+                variables: [dataInputVar[0]?.variable_name]
               },
               variable_set: {
                 variables: [
                   {
-                    key: dataInputVar[0].variable_name,
+                    key: dataInputVar[0]?.variable_name,
                     value: ''
                   }
                 ]
@@ -2925,7 +2925,8 @@ const Scenario = () => {
                                                   <div style={{ backgroundColor: 'white', ...message.hidden === true ? { opacity: '0.4' } : {} }} className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                                                   >
                                                     <ul>
-                                                      {content[content.type]?.variables.map((item, index) => {
+                                                      {console.log(content[content.type]?.variables)}
+                                                      {content[content.type]?.variables.length !== 0 && content[content.type]?.variables.map((item, index) => {
                                                         return <li key={index}>
                                                           {item}
                                                         </li>
@@ -2939,7 +2940,8 @@ const Scenario = () => {
                                                   <div style={{ backgroundColor: 'white', ...message.hidden === true ? { opacity: '0.4' } : {} }}
                                                     className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}>
                                                     <ul>
-                                                      {content[content.type]?.variables.map((item, index) => {
+                                                      {console.log(content[content.type]?.variables)}
+                                                      {content[content.type]?.variables.length !== 0 && content[content.type]?.variables.map((item, index) => {
                                                         return <li key={index}>
                                                           {item.key} : {item.value}
                                                         </li>
@@ -3431,68 +3433,68 @@ const Scenario = () => {
                                                                 }
                                                               </div>
                                                             }
-                                                            <div className="ss-message__content--user-checkbox-wrapper">
-                                                              {checkbox.type === 'default' && (
-                                                                checkbox[checkbox.type].map((item, index) => {
-                                                                  return <div key={index} className="ss-message__content--user-checkbox">
-                                                                    <input
-                                                                      type="checkbox"
-                                                                      name="ss-message__content--user-checkbox"
-                                                                      id="ss-message__content--user-checkbox"
-                                                                      disabled
-                                                                      checked={checkbox.all_item_checked}
-                                                                    />
-                                                                    <label htmlFor="ss-message__content--user-checkbox">
-                                                                      {item.text}
-                                                                    </label>
-                                                                  </div>
-                                                                })
-                                                              )}
-                                                              {checkbox.type === 'checkbox_img' && (
-                                                                checkbox[checkbox.type].map((item, index) => {
-                                                                  return <div key={index} className="ss-message__content--user-checkbox--checkbox_img" style={{ marginBottom: '10px' }}>
-                                                                    <input
-                                                                      type="checkbox"
-                                                                      name="ss-message__content--user-checkbox--checkbox_img"
-                                                                      id="ss-message__content--user-checkbox--checkbox_img"
-                                                                      disabled
-                                                                      checked={checkbox.all_item_checked}
-                                                                    />
-                                                                    <img
-                                                                      src={item.img}
-                                                                      alt=""
-                                                                    />
-                                                                    <div style={{ textAlign: 'center' }}>{item.text}</div>
-                                                                  </div>
-                                                                })
-                                                              )}
-                                                              {checkbox.type === 'consume_api_response' && (
-                                                                <>
-                                                                  <div className="ss-message__content--user-checkbox">
-                                                                    <input
-                                                                      type="checkbox"
-                                                                      name="ss-message__content--user-checkbox"
-                                                                      id="ss-message__content--user-checkbox"
-                                                                      disabled
-                                                                    />
-                                                                    <label htmlFor="ss-message__content--user-checkbox">
-                                                                      label
-                                                                    </label>
-                                                                  </div>
-                                                                  <div className="ss-message__content--user-checkbox">
-                                                                    <input
-                                                                      type="checkbox"
-                                                                      name="ss-message__content--user-checkbox"
-                                                                      id="ss-message__content--user-checkbox"
-                                                                      disabled
-                                                                    />
-                                                                    <label htmlFor="ss-message__content--user-checkbox">
-                                                                      label
-                                                                    </label>
-                                                                  </div>
-                                                                </>
-                                                              )}
-                                                            </div>
+                                                            {/* <div className="ss-message__content--user-checkbox-wrapper"> */}
+                                                            {checkbox.type === 'default' && (
+                                                              checkbox[checkbox.type].map((item, index) => {
+                                                                return <div key={index} className="ss-message__content--user-checkbox">
+                                                                  <input
+                                                                    type="checkbox"
+                                                                    name="ss-message__content--user-checkbox"
+                                                                    id="ss-message__content--user-checkbox"
+                                                                    disabled
+                                                                    checked={checkbox.all_item_checked}
+                                                                  />
+                                                                  <label htmlFor="ss-message__content--user-checkbox">
+                                                                    {item.text}
+                                                                  </label>
+                                                                </div>
+                                                              })
+                                                            )}
+                                                            {checkbox.type === 'checkbox_img' && (
+                                                              checkbox[checkbox.type].map((item, index) => {
+                                                                return <div key={index} className="ss-message__content--user-checkbox--checkbox_img" style={{ marginBottom: '10px' }}>
+                                                                  <input
+                                                                    type="checkbox"
+                                                                    name="ss-message__content--user-checkbox--checkbox_img"
+                                                                    id="ss-message__content--user-checkbox--checkbox_img"
+                                                                    disabled
+                                                                    checked={checkbox.all_item_checked}
+                                                                  />
+                                                                  <img
+                                                                    src={item.img}
+                                                                    alt=""
+                                                                  />
+                                                                  <div style={{ textAlign: 'center' }}>{item.text}</div>
+                                                                </div>
+                                                              })
+                                                            )}
+                                                            {checkbox.type === 'consume_api_response' && (
+                                                              <>
+                                                                <div className="ss-message__content--user-checkbox">
+                                                                  <input
+                                                                    type="checkbox"
+                                                                    name="ss-message__content--user-checkbox"
+                                                                    id="ss-message__content--user-checkbox"
+                                                                    disabled
+                                                                  />
+                                                                  <label htmlFor="ss-message__content--user-checkbox">
+                                                                    label
+                                                                  </label>
+                                                                </div>
+                                                                <div className="ss-message__content--user-checkbox">
+                                                                  <input
+                                                                    type="checkbox"
+                                                                    name="ss-message__content--user-checkbox"
+                                                                    id="ss-message__content--user-checkbox"
+                                                                    disabled
+                                                                  />
+                                                                  <label htmlFor="ss-message__content--user-checkbox">
+                                                                    label
+                                                                  </label>
+                                                                </div>
+                                                              </>
+                                                            )}
+                                                            {/* </div> */}
                                                           </div>
                                                         )
                                                       }
@@ -5032,7 +5034,7 @@ const Scenario = () => {
                                       })
                                   }
                                   <Button onClick={() => {
-                                    dataMessages[indexMessageSelect].message_content[0][messageType]?.variables.push(dataInputVar[0].variable_name);
+                                    dataMessages[indexMessageSelect].message_content[0][messageType]?.variables.push(dataInputVar[0]?.variable_name);
                                     setDataMessages([...dataMessages]);
                                   }}>addition</Button>
                                 </div>
@@ -5075,7 +5077,7 @@ const Scenario = () => {
                                       })
                                   }
                                   <Button onClick={() => {
-                                    dataMessages[indexMessageSelect].message_content[0][messageType]?.variables.push({ key: dataInputVar[0].variable_name, value: '' });
+                                    dataMessages[indexMessageSelect].message_content[0][messageType]?.variables.push({ key: dataInputVar[0]?.variable_name, value: '' });
                                     setDataMessages([...dataMessages]);
                                   }}>addition</Button>
                                 </div>
@@ -5738,7 +5740,13 @@ const Scenario = () => {
                                                                                         />
                                                                                         <CheckboxCustom
                                                                                           label="Initial selection setting"
-                                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.id, 'initial_selection')}
+                                                                                          onChange={() => {
+                                                                                            if (radioButton.initial_selection !== itemRadio.id) {
+                                                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.id, 'initial_selection');
+                                                                                            } else {
+                                                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection');
+                                                                                            }
+                                                                                          }}
                                                                                           value={radioButton.initial_selection === itemRadio.id}
                                                                                           isOnChange={false}
                                                                                         />
@@ -5761,7 +5769,13 @@ const Scenario = () => {
                                                                                         </div>
                                                                                         <CheckboxCustom
                                                                                           label="Initial selection setting"
-                                                                                          onChange={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.id, 'initial_selection')}
+                                                                                          onChange={() => {
+                                                                                            if (radioButton.initial_selection !== itemRadio.id) {
+                                                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.id, 'initial_selection');
+                                                                                            } else {
+                                                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection');
+                                                                                            }
+                                                                                          }}
                                                                                           value={radioButton.initial_selection === itemRadio.id}
                                                                                           isOnChange={false}
                                                                                         />
@@ -5851,34 +5865,38 @@ const Scenario = () => {
                                                           />
                                                         </div>
                                                       }
-                                                      <div className="ss-user-setting__item-text_input-top">
-                                                        <CheckboxCustom
-                                                          label="All items checked"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'all_item_checked')}
-                                                          value={checkbox.all_item_checked}
-                                                        />
-                                                      </div>
-                                                      <div className="ss-user-setting__item-bottom-flex-start">
-                                                        <span className="ss-user-setting-label">Selection limit</span>
-                                                        <InputNum
-                                                          placeholder="0000"
-                                                          className="ss-user-setting-input-limit-character"
-                                                          max={checkbox.selection_limit_to}
-                                                          min={0}
-                                                          disabled={!checkbox.require}
-                                                          value={checkbox.selection_limit_from}
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'selection_limit_from')}
-                                                        />
-                                                        <span style={{ fontSize: '30px', marginLeft: '10px', opacity: '0.4' }}>~</span>
-                                                        <InputNum
-                                                          placeholder="0000"
-                                                          className="ss-user-setting-input-limit-character"
-                                                          min={checkbox.selection_limit_from || 0}
-                                                          max={checkbox?.[checkbox.type].length}
-                                                          value={checkbox.selection_limit_to}
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'selection_limit_to')}
-                                                        />
-                                                      </div>
+                                                      {(checkbox.type !== 'consume_api_response') && (
+                                                        <React.Fragment>
+                                                          <div className="ss-user-setting__item-text_input-top">
+                                                            <CheckboxCustom
+                                                              label="All items checked"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'all_item_checked')}
+                                                              value={checkbox.all_item_checked}
+                                                            />
+                                                          </div>
+                                                          <div className="ss-user-setting__item-bottom-flex-start">
+                                                            <span className="ss-user-setting-label">Selection limit</span>
+                                                            <InputNum
+                                                              placeholder="0000"
+                                                              className="ss-user-setting-input-limit-character"
+                                                              max={checkbox.selection_limit_to}
+                                                              min={0}
+                                                              disabled={!checkbox.require}
+                                                              value={checkbox.selection_limit_from}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'selection_limit_from')}
+                                                            />
+                                                            <span style={{ fontSize: '30px', marginLeft: '10px', opacity: '0.4' }}>~</span>
+                                                            <InputNum
+                                                              placeholder="0000"
+                                                              className="ss-user-setting-input-limit-character"
+                                                              min={checkbox.selection_limit_from || 0}
+                                                              max={checkbox?.[checkbox.type].length}
+                                                              value={checkbox.selection_limit_to}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'selection_limit_to')}
+                                                            />
+                                                          </div>
+                                                        </React.Fragment>
+                                                      )}
                                                       {/* checkbox: type = consume_api_response */}
                                                       {(checkbox.type === 'consume_api_response') && (
                                                         <div className="ss-user-setting__item-bottom">
@@ -9109,7 +9127,7 @@ const Scenario = () => {
           />
         </div>
       </ModalShort>
-      {isOpenPreview && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioId={scenarioId} />}
+      {isOpenPreview && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioId={scenarioId} dataVariables={dataInputVar} />}
     </div >
   );
 };
