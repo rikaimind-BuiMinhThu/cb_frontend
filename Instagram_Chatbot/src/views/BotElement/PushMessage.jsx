@@ -26,6 +26,7 @@ function PushMessage() {
   const [listExcludedTimeAlt, setListExcluedTimeAlt] = useState([]);
   const [update, setUpdate] = useState(false);
   const [itemUpdate, setItemUpdate] = useState()
+  const [isChecked, setIsChecked] = useState(false)
 
   useEffect(() => {
     let listAlternateTime = [];
@@ -105,6 +106,7 @@ function PushMessage() {
     setNumHotTemp(numHotTemp + 1);
   }
   function getEmailList() {
+    
     var bot_id = Cookies.get('bot_id');
     api
       .get(`/api/v1/managements/emails?page=all&chatbot_id=${bot_id}`)
@@ -117,7 +119,7 @@ function PushMessage() {
             let option = document.createElement('option');
             option.value = res.data.data[i].id;
             option.text = res.data.data[i].email_template_name;
-            group.add(option);
+            group?.add(option);
           }
         }
         // setEmailDetailId(res?.data?.data[0].id)
@@ -125,8 +127,10 @@ function PushMessage() {
         // group.value = 
         console.log('check status update', update);
         if(update == true){
+          if(group)
           group.value = emailDetailId
         }else{
+          if(group)
           group.value = res?.data?.data[0].id
         }
       })
@@ -391,15 +395,18 @@ function PushMessage() {
     // console.log(varList)
   }
 
-  function selectTimezoneExclusion(value) {
+  function selectTimezoneExclusion(value, check) {
     console.log(value);
     if (value == true) {
       document.getElementById('excludedTime').style.display = 'block';
+      setIsChecked(true)
       // document.getElementById('alternateTime').style.display= 'block'
     } else {
       document.getElementById('excludedTime').style.display = 'none';
+      setIsChecked(false)
       // document.getElementById('alternateTime').style.display= 'none'
     }
+   
   }
 
   function changeStatus(item) {
@@ -450,6 +457,12 @@ function PushMessage() {
     setUpdate(true)
     setIdPMUpdate(item.id)
     setEmailDetailId(item.email_id)
+    if(item.has_timezone_exclusion == 'yes'){
+       setIsChecked(true)
+    }else{
+      setIsChecked(false)
+    }
+   
     console.log('email detail id: ', item.email_id)
     
     item.started_at = item.started_at.substring(0, 19).replaceAll('T', ' ');
@@ -507,11 +520,11 @@ function PushMessage() {
   }
 
   function checkTZ(check){
-    console.log('checked: ',check)
+    // console.log('checked: ',check)
     if(check == 'yes'){
-      // document.getElementById('has_timezone_exclusion').checked = true
+      setIsChecked(true)
     }else{
-      // document.getElementById('has_timezone_exclusion').checked = false
+      setIsChecked(false)
     }
     
   }
@@ -775,15 +788,17 @@ function PushMessage() {
                   <input
                     id="has_timezone_exclusion"
                     name="has_timezone_exclusion"
-                    onChange={(e) => selectTimezoneExclusion(e.target.checked)}
+                    onChange={(e) => selectTimezoneExclusion(e.target.checked,itemUpdate?.has_timezone_exclusion)}
                     type="checkbox"
-                    checked={(update == true & itemUpdate?.has_timezone_exclusion == 'yes') ? true: false}
+                    checked={isChecked}
                     style={{ marginTop: '15px' }}
+                    // onLoad={()=>checkTZ(itemUpdate?.has_timezone_exclusion)}
                   />
                 </span>
               </div>
               <br />
-              <div id="excludedTime" style={{ width: '100%', display: `${(update == true && itemUpdate.has_timezone_exclusion === 'yes') ? 'block' : 'none'}` }}>
+              <div id="excludedTime" 
+              style={{ width: '100%', display: `${(update == true && itemUpdate.has_timezone_exclusion === 'yes') ? 'block' : 'none'}` }}>
                 <div className="push-message-add-form">
                   <span className="push-message-span-form">
                     Excluded time
