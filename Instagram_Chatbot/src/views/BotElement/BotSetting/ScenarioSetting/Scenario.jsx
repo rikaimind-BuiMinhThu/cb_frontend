@@ -5,7 +5,6 @@ import {
 } from 'reactstrap';
 import icon from '../../../../assets/img/bot-icon/man1_new.png';
 import { MDBIcon } from 'mdbreact';
-import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Link } from 'react-router-dom';
 import SelectCustom from './scenarioComon/SelectCustom';
@@ -22,12 +21,13 @@ import ModalShort from '../../../Popup/ModalShort';
 import Preview from '../Preview';
 import FileReferencePopup from './FileReferencePopup';
 import axios from 'axios';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons'
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import {
   S3_UPLOAD_URL
 } from '../../../../variables/constants';
 import { tokenExpired } from 'api/tokenExpired';
-import { Carousel, Checkbox, Radio, Slider } from 'antd';
+import DatePickerCustom from './scenarioComon/DatePickerCustom';
+import { Carousel, Checkbox, Radio, Slider, Calendar } from 'antd';
 import CheckboxGroupCustom from './scenarioComon/CheckboxGroupCustom';
 import american_express from '../../../../assets/img/payment-method/american_express.png';
 import diner_club from '../../../../assets/img/payment-method/diner_club.png';
@@ -1473,7 +1473,6 @@ const Scenario = () => {
   const [indexMessageSelect, setIndexMessageSelect] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [indexMessageContentSelect, setIndexMessageContentSelect] = useState('');
-  const [dataSelecteFixed, setDataSelecteFixed] = useState(new Date());
   const [dataInputVar, setDataInputVar] = useState([]);
   const [isOpenPreview, setIsOpenPreview] = useState(false);
 
@@ -2730,6 +2729,94 @@ const Scenario = () => {
     )
   }
 
+  const handleDisableDateCalendar = (current, calendar) => {
+    console.log(calendar.start_date, calendar.end_date, calendar.aggregation_target_period_from, calendar.aggregation_target_period_to)
+    if (calendar.end_date || calendar.start_date
+      || calendar.fixed_date || calendar.non_select_date_time
+      || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to) {
+      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD')
+        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
+        || moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_select, 'YYYY/MM/DD')
+        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
+        || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current, 'YYYY/MM/DD') < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_test, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current, 'YYYY/MM/DD') > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_test, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || calendar.non_select_date_time?.find(type => {
+          if (type === 'today') {
+            return (moment().format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD"));
+          } else if (type === 'tomorrow') {
+            return moment().add(1, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+          } else if (type === 'day_after_tomorrow') {
+            return moment().add(2, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+          } else if (type === 'past') {
+            return moment(current).format("YYYY/MM/DD") < moment().format("YYYY/MM/DD");
+          } else if (type === 'future') {
+            return moment(current).format("YYYY/MM/DD") > moment().format("YYYY/MM/DD");
+          } else if (type === 'moon') {
+            return moment(current).day() === 1;
+          } else if (type === 'fire') {
+            return moment(current).day() === 2;
+          } else if (type === 'water') {
+            return moment(current).day() === 3;
+          } else if (type === 'wood') {
+            return moment(current).day() === 4;
+          } else if (type === 'money') {
+            return moment(current).day() === 5;
+          } else if (type === 'soil') {
+            return moment(current).day() === 6;
+          } else if (type === 'day') {
+            return moment(current).day() === 0;
+          }
+        }))
+    }
+  }
+
+  const handleDisableEndDateCalendar = (current, calendar) => {
+    console.log(calendar.start_date_test, calendar[calendar.type].specified_period_from, calendar[calendar.type].specified_period_to)
+    if (calendar.end_date || calendar.start_date
+      || calendar.fixed_date || calendar.non_select_date_time
+      || calendar.start_date_test || calendar.specified_period_from
+      || calendar.specified_period_to || calendar.aggregation_target_period_from
+      || calendar.aggregation_target_period_to) {
+      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD')
+        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
+        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date_test, 'YYYY/MM/DD')
+        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
+        || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current, 'YYYY/MM/DD') < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_test, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current, 'YYYY/MM/DD') > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_test, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || calendar.non_select_date_time?.find(type => {
+          if (type === 'today') {
+            return (moment().format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD"));
+          } else if (type === 'tomorrow') {
+            return moment().add(1, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+          } else if (type === 'day_after_tomorrow') {
+            return moment().add(2, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+          } else if (type === 'past') {
+            return moment(current).format("YYYY/MM/DD") < moment().format("YYYY/MM/DD");
+          } else if (type === 'future') {
+            return moment(current).format("YYYY/MM/DD") > moment().format("YYYY/MM/DD");
+          } else if (type === 'moon') {
+            return moment(current).day() === 1;
+          } else if (type === 'fire') {
+            return moment(current).day() === 2;
+          } else if (type === 'water') {
+            return moment(current).day() === 3;
+          } else if (type === 'wood') {
+            return moment(current).day() === 4;
+          } else if (type === 'money') {
+            return moment(current).day() === 5;
+          } else if (type === 'soil') {
+            return moment(current).day() === 6;
+          } else if (type === 'day') {
+            return moment(current).day() === 0;
+          }
+        }))
+    }
+  }
+
   const settingsCarousel = {
     nextArrow: <SampleNextArrow />,
     prevArrow: <SamplePrevArrow />
@@ -3968,25 +4055,25 @@ const Scenario = () => {
                                                             {/* calendar: type = 'date_selection' */}
                                                             {calendar.type === 'date_selection' && (
                                                               <React.Fragment>
-                                                                <div className="ss-message__content--user-calender-date_selection" style={{ backgroundColor: '#FAFAFA', height: '36px', border: '1px solid gray' }}>
-                                                                  {/* <MDBIcon
-                                                        fas
-                                                        icon="calendar"
-                                                      /> */}
-                                                                  <MDBIcon far icon="calendar-alt"
-                                                                    className="ss-message__content--user-calender-icon-date_selection"
-                                                                  />
-                                                                </div>
+                                                                <DatePickerCustom
+                                                                  style={{ width: '99%', marginTop: '5px'}}
+                                                                  value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
+                                                                  onChange={(date, dateString) => console.log(dateString)}
+                                                                  disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
+                                                                />
                                                               </React.Fragment>
                                                             )}
                                                             {/* calendar: type = 'embedded' */}
                                                             {calendar.type === 'embedded' && (
                                                               <React.Fragment>
-                                                                <div className="ss-message__content--user-calender-embedded">
-                                                                  <DatePicker
-                                                                    selected={startDate}
-                                                                    onChange={(date) => setStartDate(date)}
-                                                                    inline
+                                                                <div className="ss-message__content--user-calender-embedded" style={{ marginTop: '5px' }}>
+                                                                  <Calendar
+                                                                    className="ss-custom-calendar"
+                                                                    fullscreen={false}
+                                                                    onPanelChange={(value, mode) => console.log(value)}
+                                                                    style={{ top: '20px', width: '300px', border: '1px solid grey' }}
+                                                                    onChange={value => console.log(value.format("DD/MM/YYYY"))}
+                                                                    disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                                                                   />
                                                                 </div>
                                                               </React.Fragment>
@@ -3994,24 +4081,18 @@ const Scenario = () => {
                                                             {/* calendar: type = 'start_end_date' */}
                                                             {calendar.type === 'start_end_date' && (
                                                               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                <div className="ss-message__content--user-calender-date_selection" style={{ width: '49%', backgroundColor: '#FAFAFA', height: '36px', border: '1px solid gray' }}>
-                                                                  {/* <MDBIcon
-                                                        fas
-                                                        icon="calendar"
-                                                      /> */}
-                                                                  <MDBIcon far icon="calendar-alt"
-                                                                    className="ss-message__content--user-calender-icon-date_selection"
-                                                                  />
-                                                                </div>
-                                                                <div className="ss-message__content--user-calender-date_selection" style={{ width: '49%', backgroundColor: '#FAFAFA', height: '36px', border: '1px solid gray' }}>
-                                                                  {/* <MDBIcon
-                                                        fas
-                                                        icon="calendar"
-                                                      /> */}
-                                                                  <MDBIcon far icon="calendar-alt"
-                                                                    className="ss-message__content--user-calender-icon-date_selection"
-                                                                  />
-                                                                </div>
+                                                                <DatePickerCustom
+                                                                  style={{ width: '49%', marginTop: '5px' }}
+                                                                  disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
+                                                                  value={calendar.start_date_test ? moment(calendar.start_date_test) : null}
+                                                                  onChange={(date, dateString) => console.log(dateString)}
+                                                                />
+                                                                <DatePickerCustom
+                                                                  style={{ width: '49%', marginTop: '5px' }}
+                                                                  disabledDate={(current) => handleDisableEndDateCalendar(current, calendar)}
+                                                                  value={calendar.end_date_test ? moment(calendar.end_date_test) : null}
+                                                                  onChange={(date, dateString) => console.log(dateString)}
+                                                                />
                                                               </div>
                                                             )}
                                                           </div>
@@ -4703,7 +4784,7 @@ const Scenario = () => {
                                               {message?.message_content.length !== 0 &&
                                                 <div className="ss-user-message__action-wrapper">
                                                   <Button className="ss-user-message__action-btn">
-                                                    To the next
+                                                    {message.buttonName || "To the next"}
                                                   </Button>
                                                 </div>
                                               }
@@ -6338,39 +6419,34 @@ const Scenario = () => {
                                                           </div>
                                                         }
                                                         <div className="ss-user-setting__item-bottom-flex-start">
-                                                          <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>start date</span>
-                                                          <DatePicker
-                                                            selected={calendar.start_date}
-                                                            onChange={(date) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, date, 'start_date')}
-                                                            className="ss-input-value"
+                                                          <span className="ss-user-setting-label" style={{ marginRight: '12px' }}>start date</span>
+                                                          <DatePickerCustom
+                                                            style={{ width: '39%' }}
+                                                            value={calendar.start_date ? moment(calendar.start_date) : null}
+                                                            onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'start_date')}
                                                           />
                                                           <span style={{ fontSize: '30px', marginLeft: '10px', opacity: '0.4', marginRight: '10px' }}>~</span>
-                                                          <DatePicker
-                                                            selected={calendar.end_date}
-                                                            onChange={(date) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, date, 'end_date')}
-                                                            className="ss-input-value"
+                                                          <DatePickerCustom
+                                                            style={{ width: '39%' }}
+                                                            value={calendar.end_date ? moment(calendar.end_date) : null}
+                                                            onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'end_date')}
                                                           />
                                                         </div>
-                                                        <div className="ss-user-setting__item-text_input-use-api-wrapper">
-                                                          <div>
-                                                            <CheckboxCustom
-                                                              label="Use APIs to validate input values"
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_api_input_value')}
-                                                              value={calendar.use_api_input_value}
-                                                            />
-                                                          </div>
-                                                          <div className="ss-user-setting__item-text_input-use-api-required">
-                                                            <CheckboxCustom
-                                                              label="Initial selection (shortest date from today)"
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'initial_selection')}
-                                                              value={calendar.initial_selection}
-                                                            />
-                                                          </div>
-                                                        </div>
+                                                        <CheckboxCustom
+                                                          label="Use APIs to validate input values"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_api_input_value')}
+                                                          value={calendar.use_api_input_value}
+                                                        />
+                                                        <CheckboxCustom
+                                                          label="Initial selection (shortest date from today)"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'initial_selection')}
+                                                          value={calendar.initial_selection}
+                                                        />
                                                         <div className="ss-user-setting__item-bottom">
                                                           <SelectCustom
                                                             label="Non-selectable date and time:"
                                                             mode="multiple"
+                                                            styleLabel={{ fontWeight: '700' }}
                                                             style={{ width: '66%' }}
                                                             data={dataSelectDateTime}
                                                             onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'non_select_date_time')}
@@ -6379,11 +6455,11 @@ const Scenario = () => {
                                                         </div>
                                                         <div className="ss-user-setting__item-bottom-flex-start ss-user-setting__item-custom">
                                                           <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>fixed date</span>
-                                                          <DatePicker
-                                                            selected={calendar.select_fixed_date}
-                                                            onChange={(date) => onChangeFixedDate(indexMessageSelect, indexContent, content.type, date, 'fixed_date')}
-                                                            className="ss-input-value ss-date-picker-custom"
-                                                            style={{ width: '100%' }}
+                                                          <DatePickerCustom
+                                                            value={calendar.select_fixed_date ? moment(calendar.select_fixed_date) : null}
+                                                            onChange={(date, dateString) => onChangeFixedDate(indexMessageSelect, indexContent, content.type, dateString, 'fixed_date')}
+                                                            style={{ width: '88%' }}
+                                                            allowClear={false}
                                                           />
                                                         </div>
                                                         <div className="ss-user-setting__item-bottom">
@@ -6397,7 +6473,7 @@ const Scenario = () => {
                                                           />
                                                         </div>
                                                         <div className="ss-user-setting__item-bottom-flex-start" style={{ display: 'block' }}>
-                                                          <div><span className="ss-user-setting-label" style={{ marginRight: '10px' }}>Selectable dates (ranges based on "today")</span></div>
+                                                          <div><span className="ss-user-setting-label" style={{ marginRight: '10px', fontWeight: '700', fontSize: '14px' }}>Selectable dates (ranges based on "today")</span></div>
                                                           <div><span className="ss-user-setting-label" style={{ marginRight: '10px' }}>*Both positive and negative numbers can be specified.</span></div>
                                                         </div>
                                                         <div className="ss-user-setting__item-bottom-flex-start">
@@ -6405,8 +6481,8 @@ const Scenario = () => {
                                                           <InputNum
                                                             placeholder="0000"
                                                             className="ss-user-setting-input-limit-character"
-                                                            min={1}
-                                                            max={999}
+                                                            min={Number.MIN_SAFE_INTEGER}
+                                                            max={calendar.aggregation_target_period_to}
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'aggregation_target_period_from')}
                                                             value={calendar.aggregation_target_period_from}
                                                           />
@@ -6414,31 +6490,33 @@ const Scenario = () => {
                                                           <InputNum
                                                             placeholder="0000"
                                                             className="ss-user-setting-input-limit-character"
-                                                            min={1}
-                                                            max={999}
+                                                            min={calendar.aggregation_target_period_from}
+                                                            max={Number.MAX_SAFE_INTEGER}
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'aggregation_target_period_to')}
                                                             value={calendar.aggregation_target_period_to}
                                                           />
                                                         </div>
                                                         {/* calendar: type = date_selection */}
                                                         {calendar.type === 'date_selection' &&
-                                                          <div className="ss-user-setting__item-bottom-flex-start">
-                                                            <DatePicker
-                                                              selected={dataSelecteFixed}
-                                                              className="ss-input-value ss-date-picker-custom"
-                                                              onChange={(date) => setDataSelecteFixed(date)}
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <DatePickerCustom
+                                                              style={{ width: '99%' }}
+                                                              value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
+                                                              onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'date_selection_test')}
+                                                              disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                                                             />
-                                                            <MDBIcon style={{ color: 'grey', marginLeft: '10px', fontSize: '21px' }} far icon="calendar-alt" />
                                                           </div>
                                                         }
                                                         {/* calendar: type = embedded */}
                                                         {calendar.type === 'embedded' &&
-                                                          <div className="ss-user-setting__item-bottom-flex-start" style={{ height: '280px' }}>
-                                                            <DatePicker
-                                                              // selected={calendar.select_fixed_date}
-                                                              className="ss-input-value ss-date-picker-custom"
-                                                              // style={{ width: '100%' }}
-                                                              inline
+                                                          <div className="ss-user-setting__item-bottom-flex-start" style={{ height: '380px' }}>
+                                                            <Calendar
+                                                              className="ss-custom-calendar"
+                                                              fullscreen={false}
+                                                              onPanelChange={(value, mode) => console.log(value)}
+                                                              style={{ top: '20px', width: '300px', border: '1px solid grey' }}
+                                                              onChange={value => console.log(value.format("DD/MM/YYYY"))}
+                                                              disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                                                             />
                                                           </div>
                                                         }
@@ -6450,43 +6528,39 @@ const Scenario = () => {
                                                               <InputNum
                                                                 placeholder="0000"
                                                                 className="ss-user-setting-input-limit-character"
+                                                                style={{ width: '16%' }}
                                                                 min={1}
-                                                                max={999}
+                                                                max={calendar[calendar.type].specified_period_to}
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, calendar.type, 'specified_period_from')}
-                                                                value={calendar.specified_period_from}
+                                                                value={calendar[calendar.type].specified_period_from}
                                                               />
                                                               <span style={{ fontSize: '30px', marginLeft: '10px', opacity: '0.4' }}>~</span>
                                                               <InputNum
                                                                 placeholder="0000"
                                                                 className="ss-user-setting-input-limit-character"
-                                                                min={1}
-                                                                max={999}
+                                                                style={{ width: '16%' }}
+                                                                min={calendar[calendar.type].specified_period_from}
+                                                                max={9999}
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, calendar.type, 'specified_period_to')}
-                                                                value={calendar.specified_period_to}
+                                                                value={calendar[calendar.type].specified_period_to}
                                                               />
                                                             </div>
                                                             <div className="ss-user-setting__item-bottom-flex-start" style={{ display: 'block', height: '15px' }}>
-                                                              <div><span className="ss-user-setting-label" style={{ marginRight: '10px', color: '#ccc' }}>*Both positive and negative numbers can be specified.</span></div>
+                                                              <div><span className="ss-user-setting-label" style={{ marginRight: '10px', color: '#ccc' }}>*The end date is linked to the specified period of N days from the start date.</span></div>
                                                             </div>
-                                                            <div className="ss-user-setting__item-bottom-flex-start ss-user-setting-flex-date">
-                                                              <DatePicker
-                                                                selected={startDateClone}
-                                                                onChange={(date) => setStartDateClone(date)}
-                                                                selectsStart
-                                                                startDate={startDateClone}
-                                                                endDate={endDate}
-                                                                className="ss-input-value ss-date-picker-custom"
+                                                            <div className="ss-user-setting__item-bottom" style={{ justifyContent: 'space-around' }}>
+                                                              <DatePickerCustom
+                                                                style={{ width: '49%' }}
+                                                                disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
+                                                                value={calendar.start_date_test ? moment(calendar.start_date_test) : null}
+                                                                onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'start_date_test')}
                                                               />
-                                                              <DatePicker
-                                                                selected={endDate}
-                                                                onChange={(date) => setEndDate(date)}
-                                                                selectsEnd
-                                                                startDate={startDateClone}
-                                                                endDate={endDate}
-                                                                minDate={startDateClone}
-                                                                className="ss-input-value ss-date-picker-custom"
+                                                              <DatePickerCustom
+                                                                style={{ width: '49%' }}
+                                                                disabledDate={(current) => handleDisableEndDateCalendar(current, calendar)}
+                                                                value={calendar.end_date_test ? moment(calendar.end_date_test) : null}
+                                                                onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'end_date_test')}
                                                               />
-                                                              <MDBIcon style={{ color: 'grey', marginLeft: '10px', fontSize: '21px' }} far icon="calendar-alt" />
                                                             </div>
                                                           </React.Fragment>
                                                         }
@@ -7776,8 +7850,8 @@ const Scenario = () => {
                                                             <InputNum
                                                               className="ss-user-setting-input-limit-character"
                                                               style={{ width: '100%', marginLeft: '0px' }}
-                                                              min={6}
-                                                              max={15}
+                                                              min={1}
+                                                              max={9999}
                                                               value={capture.length}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'length')}
                                                             />
@@ -9028,9 +9102,10 @@ const Scenario = () => {
                                   <InputCustom
                                     style={{ height: '38.2px', margin: '10px', width: '22%' }}
                                     label="Registration button name"
-                                    value={dataMessages[indexMessageSelect].buttonNameCondition}
+                                    value={dataMessages[indexMessageSelect].buttonName}
+                                    maxLength={30}
                                     onChange={(value) => {
-                                      dataMessages[indexMessageSelect].buttonNameCondition = value;
+                                      dataMessages[indexMessageSelect].buttonName = value;
                                       setDataMessages([...dataMessages]);
                                     }}
                                   />
@@ -9127,7 +9202,7 @@ const Scenario = () => {
           />
         </div>
       </ModalShort>
-      {isOpenPreview && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioId={scenarioId} dataVariables={dataInputVar} />}
+      {isOpenPreview && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} />}
     </div >
   );
 };

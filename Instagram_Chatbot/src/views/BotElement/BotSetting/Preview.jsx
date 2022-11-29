@@ -10,9 +10,11 @@ import DatePicker from 'react-datepicker';
 import {
   Button
 } from 'reactstrap';
-import { Carousel, Checkbox, Radio, Slider } from 'antd';
+import { Checkbox, Radio, Slider, Calendar } from 'antd';
+import moment from 'moment';
 import cvcIcon from '../../../assets/img/cvc-icon.png';
 import $ from 'jquery';
+import DatePickerCustom from './ScenarioSetting/scenarioComon/DatePickerCustom';
 import InputNum from './ScenarioSetting/scenarioComon/InputNum';
 import { tokenExpired } from 'api/tokenExpired';
 
@@ -81,9 +83,10 @@ let dataEveryMinute = [
 
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
-function Preview({ onOpenPreview, isOpen, scenarioId, dataVariables }) {
+function Preview({ onOpenPreview, isOpen }) {
 
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
+  const [scenarioId, setScenarioId] = useState(Cookies.get('scenario_id'));
   const [botInfor, setBotInfor] = useState();
   const [dataMessages, setDataMessages] = useState([]);
   const [indexMessageRender, setIndexMessageRender] = useState(0);
@@ -152,14 +155,13 @@ function Preview({ onOpenPreview, isOpen, scenarioId, dataVariables }) {
     return obj;
   }
 
-  useEffect(() => {
-    api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
-      if (res.data.code == 1) {
-        console.log(res.data, 'cehckkkkkkkkkk')
-        setBotInfor(res.data.data);
-      }
-    }).catch(err => console.log(err));
-  }, [])
+  // useEffect(() => {
+  //   api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
+  //     if (res.data.code == 1) {
+  //       setBotInfor(res.data.data);
+  //     }
+  //   }).catch(err => console.log(err));
+  // }, [])
 
   useEffect(() => {
     if (scenarioId) {
@@ -168,6 +170,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId, dataVariables }) {
           let messageArr = [...res.data.data?.conversation?.messages];
           setDataMessages(messageArr);
           setVariables([...res.data.variables]);
+          setBotInfor(res.data.chatbot);
           res.data.variables.forEach(item => {
             objParam[item.variable_name] = item.default_value;
           });
@@ -439,10 +442,12 @@ function Preview({ onOpenPreview, isOpen, scenarioId, dataVariables }) {
 
     let messageError = "These are required fields."
     for (let i = 0; i < contentArr.length; i++) {
+
       let contentType = contentArr[i][contentArr[i].type];
+      let limitFrom = contentType[contentType.type]?.character_limit_from;
+      let limitTo = contentType[contentType.type]?.character_limit_to;
       if (contentType.require) {
-        let limitFrom = contentType[contentType.type]?.character_limit_from;
-        let limitTo = contentType[contentType.type]?.character_limit_to;
+        console.log(contentType.type, contentType.date_select)
         if (contentType.type === 'text' || contentType.type === 'password') {
           if (contentType[contentType.type].isSplitInput) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
@@ -591,6 +596,17 @@ function Preview({ onOpenPreview, isOpen, scenarioId, dataVariables }) {
             errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
+        } else if (contentType.type === 'date_selection' || contentType.type === 'embedded') {
+          if (stringNullOrEmpty(contentType.date_select)) {
+            console.log(contentType.date_select, 'checckkkk')
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'start_end_date') {
+          if (stringNullOrEmpty(contentType.start_date_select) || stringNullOrEmpty(contentType.end_date_select)) {
+            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
         } else if (contentArr[i].type === 'agree_term') {
           if (stringNullOrEmpty(contentType.isAgree) || contentType.isAgree === false) {
             errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
@@ -667,6 +683,18 @@ function Preview({ onOpenPreview, isOpen, scenarioId, dataVariables }) {
           errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
           isValid = false;
         } else if ((limitFrom || limitTo) && (contentType[contentType.type]?.value?.length < limitFrom || contentType[contentType.type]?.value?.length > limitTo)) {
+          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+          isValid = false;
+        }
+      }
+      if (contentType.type === 'text' || contentType.type === 'password') {
+        if (contentType[contentType.type].isSplitInput
+          && (!stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))
+          && (contentType[contentType.type].valueLeft.length > limitTo || contentType[contentType.type].valueRight.length > limitTo)) {
+          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value)
+          && contentType[contentType.type].value.length > limitTo) {
           errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
           isValid = false;
         }
@@ -1077,6 +1105,8 @@ function Preview({ onOpenPreview, isOpen, scenarioId, dataVariables }) {
           if (contentType === 'zip_code_address') {
             console.log(dataContentType, 'checkkkk value');
             item.default_value = `〒 ${dataContentType?.value_post_code} ${dataContentType?.value_prefecture}${dataContentType?.value_municipality} ${dataContentType?.value_address}${dataContentType?.value_building_name}`;
+          } else if (field === 'start_date_select' || field === 'end_date_select') {
+            item.default_value = `${dataContentType?.start_date_select || "start date"} ~ ${dataContentType?.end_date_select || "end date"}`;
           } else {
             item.default_value = value;
           }
@@ -1092,7 +1122,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId, dataVariables }) {
     scenarioId &&
     <React.Fragment>
       <div id="sp-container" className="sp-container">
-        <div id="sp-header" style={botInfor?.main_color && {backgroundColor: botInfor?.main_color}} className="sp-header" onClick={() => onOpenPreview(!isOpen)}>
+        <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header" onClick={() => onOpenPreview(!isOpen)}>
           <div className="sp-header-left">
             <div className="sp-header-left-avatar sp-avatar">
               <img src={botInfor?.icon?.url && ("https://ec-chatbot-test1.com/" + botInfor?.icon?.url)} />
@@ -1145,7 +1175,7 @@ function Preview({ onOpenPreview, isOpen, scenarioId, dataVariables }) {
                         {(message?.message_content.length !== 1 || (message?.message_content[0].type !== 'card_payment_radio_button' && message?.message_content[0].type !== 'product_purchase_radio_button') || (message?.message_content[0]?.[message?.message_content[0].type].type !== "picture_radio" ? (message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting && message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting === message?.message_content[0]?.[message?.message_content[0].type]?.initial_selection) : (message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting_picture && message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting_picture === message?.message_content[0]?.[message?.message_content[0].type]?.initial_selection_picture))) &&
                           <div className="ss-user-message__action-wrapper">
                             <Button disabled={message.disabled} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
-                              To the next
+                              {message.buttonName || "To the next"}
                             </Button>
                           </div>
                         }
@@ -1314,6 +1344,92 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
 
     // };
     // reader.readAsDataURL(file);
+  }
+
+  const handleDisableDateCalendar = (current, calendar) => {
+    console.log(calendar.start_date, calendar.end_date, calendar.aggregation_target_period_from, calendar.aggregation_target_period_to)
+    if (calendar.end_date || calendar.start_date
+      || calendar.fixed_date || calendar.non_select_date_time
+      || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to) {
+      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD')
+        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
+        || moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_select, 'YYYY/MM/DD')
+        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
+        || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || calendar.non_select_date_time?.find(type => {
+          if (type === 'today') {
+            return (moment().format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD"));
+          } else if (type === 'tomorrow') {
+            return moment().add(1, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+          } else if (type === 'day_after_tomorrow') {
+            return moment().add(2, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+          } else if (type === 'past') {
+            return moment(current).format("YYYY/MM/DD") < moment().format("YYYY/MM/DD");
+          } else if (type === 'future') {
+            return moment(current).format("YYYY/MM/DD") > moment().format("YYYY/MM/DD");
+          } else if (type === 'moon') {
+            return moment(current).day() === 1;
+          } else if (type === 'fire') {
+            return moment(current).day() === 2;
+          } else if (type === 'water') {
+            return moment(current).day() === 3;
+          } else if (type === 'wood') {
+            return moment(current).day() === 4;
+          } else if (type === 'money') {
+            return moment(current).day() === 5;
+          } else if (type === 'soil') {
+            return moment(current).day() === 6;
+          } else if (type === 'day') {
+            return moment(current).day() === 0;
+          }
+        }))
+    }
+  }
+
+  const handleDisableEndDateCalendar = (current, calendar) => {
+    console.log(calendar.start_date, calendar[calendar.type].specified_period_from, calendar[calendar.type].specified_period_to)
+    if (calendar.end_date || calendar.start_date
+      || calendar.fixed_date || calendar.non_select_date_time
+      || calendar.start_date_select || calendar.specified_period_from
+      || calendar.specified_period_to || calendar.aggregation_target_period_from
+      || calendar.aggregation_target_period_to) {
+      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD')
+        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
+        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date_select, 'YYYY/MM/DD')
+        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
+        || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current, 'YYYY/MM/DD') < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_select, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current, 'YYYY/MM/DD') > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_select, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || calendar.non_select_date_time?.find(type => {
+          if (type === 'today') {
+            return (moment().format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD"));
+          } else if (type === 'tomorrow') {
+            return moment().add(1, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+          } else if (type === 'day_after_tomorrow') {
+            return moment().add(2, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+          } else if (type === 'past') {
+            return moment(current).format("YYYY/MM/DD") < moment().format("YYYY/MM/DD");
+          } else if (type === 'future') {
+            return moment(current).format("YYYY/MM/DD") > moment().format("YYYY/MM/DD");
+          } else if (type === 'moon') {
+            return moment(current).day() === 1;
+          } else if (type === 'fire') {
+            return moment(current).day() === 2;
+          } else if (type === 'water') {
+            return moment(current).day() === 3;
+          } else if (type === 'wood') {
+            return moment(current).day() === 4;
+          } else if (type === 'money') {
+            return moment(current).day() === 5;
+          } else if (type === 'soil') {
+            return moment(current).day() === 6;
+          } else if (type === 'day') {
+            return moment(current).day() === 0;
+          }
+        }))
+    }
   }
 
   return (
@@ -2364,25 +2480,28 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {/* calendar: type = 'date_selection' */}
                   {calendar.type === 'date_selection' && (
                     <React.Fragment>
-                      <div className="ss-message__content--user-calender-date_selection" style={{ backgroundColor: '#FAFAFA', height: '36px', border: '1px solid gray' }}>
-                        {/* <MDBIcon
-                                                        fas
-                                                        icon="calendar"
-                                                      /> */}
-                        <MDBIcon far icon="calendar-alt"
-                          className="ss-message__content--user-calender-icon-date_selection"
-                        />
-                      </div>
+                      <DatePickerCustom
+                        disabled={disabled}
+                        style={{ width: '99%', marginTop: '5px' }}
+                        value={calendar.date_select ? moment(calendar.date_select) : null}
+                        onChange={(date, dateString) => onChangeValue(indexContent, content.type, dateString, 'date_select')}
+                        disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
+                      />
                     </React.Fragment>
                   )}
                   {/* calendar: type = 'embedded' */}
                   {calendar.type === 'embedded' && (
                     <React.Fragment>
-                      <div className="ss-message__content--user-calender-embedded">
-                        <DatePicker
-                          selected={startDate}
-                          onChange={(date) => setStartDate(date)}
-                          inline
+                      <div className="ss-message__content--user-calender-embedded" style={{ marginTop: '5px' }}>
+                        <Calendar
+                          disabled={disabled}
+                          className="ss-custom-calendar"
+                          fullscreen={false}
+                          onPanelChange={(value, mode) => console.log(value)}
+                          style={{ top: '20px', width: '300px', border: '1px solid grey' }}
+                          value={calendar.date_select ? moment(calendar.date_select, "DD/MM/YYYY") : null}
+                          onChange={value => onChangeValue(indexContent, content.type, value.format("DD/MM/YYYY"), 'date_select')}
+                          disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                         />
                       </div>
                     </React.Fragment>
@@ -2390,29 +2509,25 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {/* calendar: type = 'start_end_date' */}
                   {calendar.type === 'start_end_date' && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <div className="ss-message__content--user-calender-date_selection" style={{ width: '49%', backgroundColor: '#FAFAFA', height: '36px', border: '1px solid gray' }}>
-                        {/* <MDBIcon
-                                                        fas
-                                                        icon="calendar"
-                                                      /> */}
-                        <MDBIcon far icon="calendar-alt"
-                          className="ss-message__content--user-calender-icon-date_selection"
-                        />
-                      </div>
-                      <div className="ss-message__content--user-calender-date_selection" style={{ width: '49%', backgroundColor: '#FAFAFA', height: '36px', border: '1px solid gray' }}>
-                        {/* <MDBIcon
-                                                        fas
-                                                        icon="calendar"
-                                                      /> */}
-                        <MDBIcon far icon="calendar-alt"
-                          className="ss-message__content--user-calender-icon-date_selection"
-                        />
-                      </div>
+                      <DatePickerCustom
+                        disabled={disabled}
+                        style={{ width: '49%', marginTop: '5px' }}
+                        disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
+                        value={calendar.start_date_select ? moment(calendar.start_date_select) : null}
+                        onChange={(date, dateString) => onChangeValue(indexContent, content.type, dateString, 'start_date_select')}
+                      />
+                      <DatePickerCustom
+                        disabled={disabled}
+                        style={{ width: '49%', marginTop: '5px' }}
+                        disabledDate={(current) => handleDisableEndDateCalendar(current, calendar)}
+                        value={calendar.end_date_select ? moment(calendar.end_date_select) : null}
+                        onChange={(date, dateString) => onChangeValue(indexContent, content.type, dateString, 'end_date_select')}
+                      />
                     </div>
                   )}
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${calendar.type}`] &&
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${calendar.type}`]}
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>

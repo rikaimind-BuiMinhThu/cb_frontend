@@ -1816,3 +1816,23 @@ input#ss-message__content--user-checkbox--checkbox_img {
   background-color: #0175FF;
   border-color: #0175FF;
 }
+
+.ant-picker-focused {
+  box-shadow: none;
+}
+
+.ant-picker:hover, .ant-picker-focused {
+  border-color: grey;
+}
+
+.ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  box-shadow: none;
+}
+
+.ss-custom-calendar .ant-select-selector {
+  min-height: 24px!important;
+}
+
+.ss-custom-calendar .ant-radio-button-wrapper {
+  font-size: 14px;
+}

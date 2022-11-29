@@ -4,10 +4,10 @@ import 'antd/dist/antd.css';
 
 const { Option } = Select;
 
-const SelectCustom = ({ id, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label, disabled = false }) => {
+const SelectCustom = ({ id, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label, disabled = false, styleLabel }) => {
   return (
     <React.Fragment>
-      {label && <span style={{ marginRight: '2%', fontSize: '14px', fontWeight: '400' }}>{label}</span>}
+      {label && <span style={{ marginRight: '2%', fontSize: '14px', fontWeight: '400', ...styleLabel }}>{label}</span>}
       <Select
         allowClear
         style={style || { width: '90%' }}

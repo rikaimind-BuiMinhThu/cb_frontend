@@ -272,10 +272,10 @@
 
 .sp-body-user-side-messages .ant-radio-group-solid .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
     color: #fff;
-    background-color: #000!important;
+    background-color: #000 !important;
 }
 
-.ss-user-preview-product-purchase-radio-group-type-text_image span.ant-radio + * {
+.ss-user-preview-product-purchase-radio-group-type-text_image span.ant-radio+* {
     padding-right: 3px;
     padding-left: 3px;
 }
@@ -284,4 +284,12 @@
     position: absolute;
     top: 8px;
     left: 5px;
-  }
+}
+
+.sp-body-user-side .ss-custom-calendar .ant-radio-button-wrapper {
+    font-size: 11px;
+}
+
+.sp-body-user-side .ant-picker-calendar-header .ant-picker-calendar-year-select {
+    min-width: 73px;
+}
