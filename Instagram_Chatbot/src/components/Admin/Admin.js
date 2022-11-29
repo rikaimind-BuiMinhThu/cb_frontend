@@ -10,6 +10,7 @@ import Security from 'views/Public/Security';
 import Agreement from 'views/Public/Agreement';
 import Company from 'views/Public/Company';
 import Contact from 'views/Public/Contact';
+import ShortUrl from 'views/Public/ShortUrl';
 class App extends Component {
   render() {
     return (
@@ -35,7 +36,8 @@ class App extends Component {
             <Route exact path="/" component={Login} />
             <Route path="/sign-in" component={Login} />
             <Route path="/admin" render={(props) => <Admin {...props} />} />
-            <Redirect to="/admin/dashboard" />
+            <Route component={ShortUrl}></Route>
+            {/* <Redirect to="/admin/dashboard" /> */}
           </Switch>
         </div>
       </BrowserRouter>
