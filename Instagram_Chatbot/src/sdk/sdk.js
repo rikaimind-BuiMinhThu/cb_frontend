@@ -1,23 +1,23 @@
-
-function displayPopup(){
+function displayPopup() {
     var body = document.getElementsByTagName("BODY")[0]
-var popup_chat = document.createElement('div')
-popup_chat.style.height = "620px"
-popup_chat.style.width = "380px"
-// popup_chat.style.float = "right"
-popup_chat.style.position = "absolute"
-popup_chat.style.bottom = "0"
-popup_chat.style.right = "0"
-popup_chat.style.backgroundColor = "aqua"
-body.appendChild(popup_chat)
+    var popup_chat = document.createElement('div')
+    popup_chat.style.height = "620px"
+    popup_chat.style.width = "380px"
+    // popup_chat.style.float = "right"
+    popup_chat.style.position = "absolute"
+    popup_chat.style.bottom = "0"
+    popup_chat.style.right = "0"
+    popup_chat.style.backgroundColor = "aqua"
+    body.appendChild(popup_chat)
 
-// var html = '<html><head></head><body>Foo</body></html>';
-var iframe = document.createElement('iframe');
-iframe.width  = '380px';
-iframe.height = '620px';
-document.cookie='bot_id = 6; expires=86400 ; path=/'
-document.cookie='scenario_id = 62; expires=86400 ; path=/'
-iframe.src = 'https://localhost:3000/preview-customer';
-popup_chat.appendChild(iframe)
+    // var html = '<html><head></head><body>Foo</body></html>';
+    var iframe = document.createElement('iframe');
+    iframe.width = '380px';
+    iframe.height = '620px';
+    document.cookie = 'bot_id = 6; expires=86400 ; path=/'
+    document.cookie = 'scenario_id = 62; expires=86400 ; path=/'
+    iframe.src = 'https://localhost:3000/preview-customer';
+    popup_chat.appendChild(iframe)
 }
+
 displayPopup()
