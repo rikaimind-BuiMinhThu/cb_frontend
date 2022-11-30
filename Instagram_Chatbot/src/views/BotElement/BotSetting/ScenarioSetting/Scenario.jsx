@@ -1488,7 +1488,8 @@ const Scenario = () => {
 
   const [isClickPlus, setIsClickPlus] = useState(false);
 
-  const [startDateClone, setStartDateClone] = useState(new Date());
+  const [fileError, setFileError] = useState('');
+  const [fileErrorCarousel, setFileErrorCarousel] = useState('');
   const [endDate, setEndDate] = useState(new Date());
 
   // user setting values
@@ -1600,64 +1601,109 @@ const Scenario = () => {
     var fileInput = document.querySelector('input[type=file]')['files'][0];
     const type = fileInput.name.slice(fileInput.name.lastIndexOf('.') + 1);
     console.log(fileInput, type)
-    const trueFile = ['jpeg', 'jpg', 'png'].includes(type);
+    let trueFile;
+    if (dataMessages[indexMessageSelect].belong_to === 'user') {
+      trueFile = ['jpeg', 'jpg', 'png'].includes(type);
+    } else {
+      trueFile = ['jpeg', 'jpg', 'png', 'pdf', 'mp4'].includes(type);
+    }
+    let file
     if (trueFile) {
-      const file = { user_file: { file_type: type } };
+      if (type != 'pdf' && type != 'mp4' && fileInput.size / 1024 / 1024 > 2) {
+        setFileError(`You need to upload file which size under 2MB.`);
+        return;
+      } else if (type === 'pdf' && fileInput.size / 1024 / 1024 > 3) {
+        setFileError(`You need to upload file which size under 3MB.`);
+        return;
+      } else if (type === 'mp4') {
+        const vid = document.getElementById('preview-video');
+        console.log(vid.duration);
+        if (vid.duration > 15) {
+          setFileError(`You need to upload video which duration under 15 seconds.`);
+          return;
+        }
+
+      }
+      setFileError('');
+      const video = document.getElementById('preview-video');
+      file = { user_file: { file_type: type, size: fileInput.size, timeplay: `${type == 'mp4' ? video.duration : ''}` } };
       api
         .post(`/api/v1/managements/file/upload`, file)
         .then((res) => {
+          console.log('res upload file type: ', res);
           const urlFile = res.data.data.url;
           let filePost = { user_file: { file_type: type, file_url: res.data.data.path } };
+          let typeUpload = ''
+          if (type == 'mp4') {
+            typeUpload = 'video/mp4'
+          } else if (type == 'pdf') {
+            typeUpload = 'application/pdf'
+          } else {
+            typeUpload = `image/${type}`
+          }
+
           axios
-            .put(urlFile, fileInput, {
-              headers: {
-                'Content-Type': `image/${type}`,
-              },
-            })
+            .put(urlFile, fileInput
+              , {
+                headers: {
+                  'Content-Type': typeUpload
+                },
+              })
             .then((res) => {
               console.log('response`: ', res);
+              api
+                .post(`/api/v1/managements/file`, filePost)
+                .then((res) => {
+                  if (res.data.code == 1) {
+                    if (dataMessages[indexMessageSelect].belong_to === 'user') {
+                      dataMessages[indexMessageSelect].message_content[indexContent].carousel.default.contents[indexCarouselSlide].fileUrl = S3_UPLOAD_URL + res.data.data.file_url;
+                    } else {
+                      dataMessages[indexMessageSelect].message_content[0].file.content = S3_UPLOAD_URL + res.data.data.file_url;
+                    }
+                    setDataMessages([...dataMessages]);
+                    setMessageNoti(`Add successfully!`);
+                    setIsOpenNoti(true);
+                    setTimeout(() => {
+                      setIsOpenNoti(false);
+                      setMessageNoti(``);
+                    }, 2000);
+                  } else {
+                    setMessageNoti(`Add failed!`);
+                    setIsOpenNoti(true);
+                    setTimeout(() => {
+                      setIsOpenNoti(false);
+                      setMessageNoti(``);
+                    }, 2000);
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                  if (err.response?.data.code === 0) {
+                    tokenExpired();
+                  }
+                });
             })
-            .catch((error) => {
-              console.log(error);
-              if (error.response?.data.code === 0) {
-                tokenExpired()
+            .catch((err) => {
+              console.log("err: ", err);
+              if (err.response?.data.code === 0) {
+                tokenExpired();
               }
             });
-          api
-            .post(`/api/v1/managements/file`, filePost)
-            .then((res) => {
-              if (res.data.code == 1) {
-                console.log(res);
-                if (dataMessages[indexMessageSelect].belong_to === 'user') {
-                  dataMessages[indexMessageSelect].message_content[indexContent].carousel.default.contents[indexCarouselSlide].fileUrl = S3_UPLOAD_URL + res.data.data.file_url;
-                } else {
-                  dataMessages[indexMessageSelect].message_content[0].file.content = S3_UPLOAD_URL + res.data.data.file_url;
-                }
-                setDataMessages([...dataMessages]);
-              } else {
-                // setMsgNoti(`Add failed!`);
-                // setIsOpenNoti(true);
-                setTimeout(() => {
-                  // setIsOpenNoti(false);
-                  // setMsgNoti(``);
-                }, 2000);
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-              if (error.response?.data.code === 0) {
-                tokenExpired()
-              }
-            });
+
         })
-        .catch((error) => {
-          console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
+        .catch((err) => {
+          console.log(err);
+          if (err.response?.data.code === 0) {
+            tokenExpired();
           }
         });
+    } else if (dataMessages[indexMessageSelect].belong_to !== 'user') {
+      setFileError(`You need enter format file is jpeg/ jpg/ png/ pdf/ mp4.`);
     } else {
-      alert(`You need enter format file is jpeg/ jpg/ png.`);
+      setFileErrorCarousel('Please specify jpeg, jpg, png type files for the file.');
+      setTimeout(() => {
+        setFileErrorCarousel('');
+      }, 4000)
     }
     // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
     // var reader = new FileReader();
@@ -2536,7 +2582,9 @@ const Scenario = () => {
               email: {},
               file: {},
               script: {},
-              delay: {},
+              delay: {
+                typing_on: false,
+              },
               api_link_age: {},
               clear_variable: {
                 variables: [dataInputVar[0]?.variable_name]
@@ -2825,7 +2873,7 @@ const Scenario = () => {
   return (
     <div className="content">
       <div className="ss-actions">
-        <Button onClick={() => onClickSaveScenario()}>Save</Button>
+        <Button onClick={() => onClickSaveScenario()}>Keep</Button>
         <Button onClick={() => onClickSavePreview()}>Save and preview</Button>
       </div>
       <Row>
@@ -2879,7 +2927,14 @@ const Scenario = () => {
                             <div className="" {...provided.droppableProps} ref={provided.innerRef}>
                               {dataMessages && dataMessages.map((message, index, arr) => {
                                 let content;
-                                if (message.belong_to === 'bot') content = message.message_content[0];
+                                let type;
+                                if (message.belong_to === 'bot') {
+                                  content = message.message_content[0];
+                                  if (content.type === 'file') {
+                                    type = content[content.type]?.content.slice(content[content.type]?.content.lastIndexOf('.') + 1);
+                                    console.log(type, 'checkkk type');
+                                  }
+                                }
                                 return message.belong_to === 'bot' ? (
                                   <Draggable key={message.id} draggableId={message.id?.toString()} index={index}>
                                     {(provided) => (
@@ -2887,7 +2942,6 @@ const Scenario = () => {
                                         <div
                                           className={`ss-bot-chat ss-message ss-message-${index}`}
                                         >
-                                          {content.type !== 'text_input' && <span style={{ marginLeft: '49px' }}>{content.type}</span>}
                                           <div
                                             className="ss-bot-chat-detail ss-message__detail"
                                             onClick={() =>
@@ -2897,146 +2951,133 @@ const Scenario = () => {
                                             <img className="ss-bot-ava" src={icon} alt="" />
                                             {content ?
                                               <React.Fragment>
-                                                {/* bot: type == 'text_input' */}
-                                                {content.type === 'text_input' && (
-                                                  <textarea
-                                                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                    value={content[content.type]?.content || ''}
-                                                    style={message.hidden === true ? { opacity: '0.4' } : {}}
-                                                    // onChange={() => onChangeValueMessageContent(indexMessageSelect, index, content.type, value, 'content')}
-                                                    readOnly
-                                                  ></textarea>
-                                                )}
-                                                {/* bot: type == 'file' */}
-                                                {/* file type: jpeg, jpg, png */}
-                                                {/* {content.type === 'file' && (
-                                      <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-img">
-                                        <img
-                                          src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/63354faaba626.jpg"
-                                          alt=""
-                                        />
-                                      </div>
-                                    )} */}
+                                                <div style={{ width: '65%' }}>
+                                                  <div style={{ display: 'flex', paddingLeft: '10px' }}>
+                                                    {content.type !== 'text_input' && <div className="ss-sub-title-message">{content.type}</div>}
+                                                    {message.message_name && <div className="ss-sub-title-message ss-truncation-text" style={{ backgroundColor: '#fff', maxWidth: '60%' }}>{message.message_name}</div>}
+                                                  </div>
+                                                  {/* bot: type == 'text_input' */}
+                                                  {content.type === 'text_input' && (
+                                                    <textarea
+                                                      className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                      value={content[content.type]?.content || ''}
+                                                      style={message.hidden === true ? { opacity: '0.4' } : {}}
+                                                      readOnly
+                                                    ></textarea>
+                                                  )}
+                                                  {/* bot: type == 'file' */}
+                                                  {content.type === 'file' && (
+                                                    content[content.type]?.content ? (
+                                                      <React.Fragment>
+                                                        {(type === 'mp4') &&
+                                                          <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-video">
+                                                            <video
+                                                              src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/633551125f613.mp4"
+                                                              controls="controls"
+                                                            ></video>
+                                                          </div>
+                                                        }
+                                                        {(type === 'jpeg' || type === 'png' || type === 'jpg') &&
+                                                          <img
+                                                            className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content`}
+                                                            src={content[content.type]?.content}
+                                                            alt=""
+                                                            style={{ width: '27%', border: 'none', height: 'auto', ...message.hidden === true ? { opacity: '0.4' } : {} }}
+                                                          />
+                                                        }
+                                                        {/* // <span
+                                                          //   style={{ color: '#089BE5', fontSize: '17px' }}
+                                                          //   onClick={() => handleDownloadFile(content[content.type]?.content)}
+                                                          // // className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                          // >Download this file</span> */}
+                                                        {(type === 'pdf') &&
+                                                          <textarea
+                                                            className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                            style={message.hidden === true ? { opacity: '0.4' } : {}}
+                                                            value={content[content.type]?.content}
+                                                            readOnly
+                                                          ></textarea>
+                                                        }
+                                                      </React.Fragment>
+                                                    ) :
+                                                      <textarea
+                                                        className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                        style={message.hidden === true ? { opacity: '0.4' } : {}}
+                                                        value={''}
+                                                        readOnly
+                                                      ></textarea>
+                                                  )}
 
-                                                {/* file type: gif, mp4 */}
-                                                {/* {content.type === 'file' && (
-                                      <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-video">
-                                        <video
-                                          src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/633551125f613.mp4"
-                                          controls="controls"
-                                        ></video>
-                                      </div>
-                                    )} */}
-
-                                                {/* file type: pdf */}
-                                                {content.type === 'file' && (
-                                                  // <textarea
-                                                  //   className="ss-bot-chat-detail-content ss-message__content--bot-file-pdf ss-input-value"
-                                                  //   value={
-                                                  //     'https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/6335523536dd4.pdf'
-                                                  //   }
-                                                  //   readOnly
-                                                  // ></textarea>
-                                                  content[content.type]?.content ? (
-                                                    <React.Fragment>
-                                                      {(content[content.type]?.content.includes('jpeg') || content[content.type]?.content.includes('png') || content[content.type]?.content.includes('jpg')) ?
-                                                        <img
-                                                          className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content`}
-                                                          src={content[content.type]?.content}
-                                                          alt=""
-                                                          style={{ width: '27%', border: 'none', height: 'auto', ...message.hidden === true ? { opacity: '0.4' } : {} }}
-                                                        /> :
-                                                        // <span
-                                                        //   style={{ color: '#089BE5', fontSize: '17px' }}
-                                                        //   onClick={() => handleDownloadFile(content[content.type]?.content)}
-                                                        // // className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                        // >Download this file</span>
-                                                        <textarea
-                                                          className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                          style={message.hidden === true ? { opacity: '0.4' } : {}}
-                                                          value={content[content.type]?.content}
-                                                          readOnly
-                                                        ></textarea>
-                                                      }
-                                                    </React.Fragment>
-                                                  ) :
+                                                  {/* bot: type == 'email' */}
+                                                  {content.type === 'email' && (
                                                     <textarea
                                                       className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                                                       style={message.hidden === true ? { opacity: '0.4' } : {}}
-                                                      value={''}
+                                                      value={content[content.type]?.content || ''}
                                                       readOnly
                                                     ></textarea>
-                                                )}
+                                                  )}
 
-                                                {/* bot: type == 'email' */}
-                                                {content.type === 'email' && (
-                                                  <textarea
-                                                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                    style={message.hidden === true ? { opacity: '0.4' } : {}}
-                                                    value={content[content.type]?.content || ''}
-                                                    readOnly
-                                                  ></textarea>
-                                                )}
+                                                  {/* bot: type == 'api_linkage' || 'pause' */}
+                                                  {(content.type === 'api_linkage' || content.type === 'pause') && (
+                                                    <textareag bhh
+                                                      className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                      style={message.hidden === true ? { opacity: '0.4' } : {}}
+                                                      // value={content[content.type]?.content || ''}
+                                                      readOnly
+                                                    ></textareag>
+                                                  )}
 
-                                                {/* bot: type == 'api_linkage' || 'pause' */}
-                                                {(content.type === 'api_linkage' || content.type === 'pause') && (
-                                                  <textareag bhh
-                                                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                    style={message.hidden === true ? { opacity: '0.4' } : {}}
-                                                    // value={content[content.type]?.content || ''}
-                                                    readOnly
-                                                  ></textareag>
-                                                )}
+                                                  {/* bot: type == 'script' */}
+                                                  {content.type === 'script' && (
+                                                    <textarea
+                                                      className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                      style={message.hidden === true ? { opacity: '0.4' } : {}}
+                                                      value={content[content.type]?.content || ''}
+                                                      readOnly
+                                                    ></textarea>
+                                                  )}
+                                                  {/* bot: type == 'delay' */}
+                                                  {content.type === 'delay' && (
+                                                    <textarea
+                                                      className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                      style={message.hidden === true ? { opacity: '0.4' } : {}}
+                                                      value={`${content[content.type]?.content || 0} 秒`}
+                                                      readOnly
+                                                    ></textarea>
+                                                  )}
 
-                                                {/* bot: type == 'script' */}
-                                                {content.type === 'script' && (
-                                                  <textarea
-                                                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                    style={message.hidden === true ? { opacity: '0.4' } : {}}
-                                                    value={content[content.type]?.content || ''}
-                                                    readOnly
-                                                  ></textarea>
-                                                )}
-                                                {/* bot: type == 'delay' */}
-                                                {content.type === 'delay' && (
-                                                  <textarea
-                                                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                    style={message.hidden === true ? { opacity: '0.4' } : {}}
-                                                    value={`${content[content.type]?.content || 0} 秒`}
-                                                    readOnly
-                                                  ></textarea>
-                                                )}
+                                                  {/* bot: type == 'clear_variable' */}
+                                                  {content.type === 'clear_variable' && (
+                                                    <div style={{ backgroundColor: 'white', ...message.hidden === true ? { opacity: '0.4' } : {} }} className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                    >
+                                                      <ul>
+                                                        {console.log(content[content.type]?.variables)}
+                                                        {content[content.type]?.variables.length !== 0 && content[content.type]?.variables.map((item, index) => {
+                                                          return <li key={index}>
+                                                            {item}
+                                                          </li>
+                                                        })}
+                                                      </ul>
+                                                    </div>
+                                                  )}
 
-                                                {/* bot: type == 'clear_variable' */}
-                                                {content.type === 'clear_variable' && (
-                                                  <div style={{ backgroundColor: 'white', ...message.hidden === true ? { opacity: '0.4' } : {} }} className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                  >
-                                                    <ul>
-                                                      {console.log(content[content.type]?.variables)}
-                                                      {content[content.type]?.variables.length !== 0 && content[content.type]?.variables.map((item, index) => {
-                                                        return <li key={index}>
-                                                          {item}
-                                                        </li>
-                                                      })}
-                                                    </ul>
-                                                  </div>
-                                                )}
-
-                                                {/* bot: type == 'variable_set' */}
-                                                {content.type === 'variable_set' && (
-                                                  <div style={{ backgroundColor: 'white', ...message.hidden === true ? { opacity: '0.4' } : {} }}
-                                                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}>
-                                                    <ul>
-                                                      {console.log(content[content.type]?.variables)}
-                                                      {content[content.type]?.variables.length !== 0 && content[content.type]?.variables.map((item, index) => {
-                                                        return <li key={index}>
-                                                          {item.key} : {item.value}
-                                                        </li>
-                                                      })}
-                                                    </ul>
-                                                  </div>
-                                                )}
-                                                <div className="ss-chat-option">
+                                                  {/* bot: type == 'variable_set' */}
+                                                  {content.type === 'variable_set' && (
+                                                    <div style={{ backgroundColor: 'white', ...message.hidden === true ? { opacity: '0.4' } : {} }}
+                                                      className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}>
+                                                      <ul>
+                                                        {console.log(content[content.type]?.variables)}
+                                                        {content[content.type]?.variables.length !== 0 && content[content.type]?.variables.map((item, index) => {
+                                                          return <li key={index}>
+                                                            {item.key} : {item.value}
+                                                          </li>
+                                                        })}
+                                                      </ul>
+                                                    </div>
+                                                  )}
+                                                </div>
+                                                <div className="ss-chat-option" style={{ marginTop: '25px' }}>
                                                   <MDBIcon
                                                     fas
                                                     icon="pencil-alt"
@@ -3089,7 +3130,8 @@ const Scenario = () => {
                                                     </div>
                                                   </div>
                                                 </div>
-                                              </React.Fragment> :
+                                              </React.Fragment>
+                                              :
                                               <React.Fragment>
                                                 <textarea
                                                   className="ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value"
@@ -4056,7 +4098,7 @@ const Scenario = () => {
                                                             {calendar.type === 'date_selection' && (
                                                               <React.Fragment>
                                                                 <DatePickerCustom
-                                                                  style={{ width: '99%', marginTop: '5px'}}
+                                                                  style={{ width: '99%', marginTop: '5px' }}
                                                                   value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
                                                                   onChange={(date, dateString) => console.log(dateString)}
                                                                   disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
@@ -4889,11 +4931,25 @@ const Scenario = () => {
                           <div id="bot-statement" className="ss-bot-statement-detail-setting">
                             {/* Bot setting detail below */}
                             <div style={{ padding: '10px' }}>
-                              <label htmlFor="ss-bot-statement-title">Type</label>
+                              <div className="ss-user-setting__top">
+                                <div className="ss-user-setting__name-wrapper" style={{ marginBottom: '10px' }}>
+                                  <div>
+                                    <span>Name</span>
+                                    <span className="ss-user-setting__name-error" style={{ marginLeft: '5px', marginTop: '0px' }}>* required</span>
+                                  </div>
+                                  <InputCustom
+                                    placeholder="name"
+                                    style={{ width: '100%' }}
+                                    onChange={value => onChangeValueNameMessage(indexMessageSelect, 'message_name', value)}
+                                    value={dataMessages[indexMessageSelect].message_name}
+                                  />
+                                </div>
+                              </div>
+                              <label htmlFor="ss-bot-statement-title" style={{ marginBottom: '1px' }}>Type</label>
                               <select
                                 name="bot_statement_type"
                                 id="ss-bot-statement-type"
-                                className="ss-bot-statement-type ss-input-value"
+                                className="ss-input-value"
                                 value={messageType}
                                 onChange={e => handleChangeBotStatementType(e.target.value)}
                               >
@@ -4965,6 +5021,11 @@ const Scenario = () => {
                                       hidden
                                       onChange={(e) => getBaseUrl(e)}
                                     />
+                                    {fileError &&
+                                      <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                                        {fileError}
+                                      </div>
+                                    }
                                     <CheckboxCustom
                                       label={<span>do not scroll automatically<MDBIcon fas icon="question-circle" style={{ color: '#347AED', marginLeft: '5px', fontSize: '13px' }} /></span>}
                                       value={dataMessages[indexMessageSelect].message_content[0][messageType]?.scroll_auto || false}
@@ -5235,11 +5296,11 @@ const Scenario = () => {
                                   </Button>
                                 </div>
                               }
-                              <div className="ss-bot-setting-condition-bottom-button">
+                              {/* <div className="ss-bot-setting-condition-bottom-button">
                                 <Button className="ss-bot-setting-condition-keep-button">
                                   keep
                                 </Button>
-                              </div>
+                              </div> */}
                             </div>
                           </div>
                         </div>
@@ -5255,8 +5316,8 @@ const Scenario = () => {
                               </div>
                               <InputCustom
                                 placeholder="Enter chat name"
-                                onChange={value => onChangeValueNameMessage(indexMessageSelect, 'name', value)}
-                                value={dataMessages[indexMessageSelect].name}
+                                onChange={value => onChangeValueNameMessage(indexMessageSelect, 'message_name', value)}
+                                value={dataMessages[indexMessageSelect].message_name}
                               />
                             </div>
                           </div>
@@ -7618,6 +7679,12 @@ const Scenario = () => {
                                                               </Button>
                                                             </div>
                                                           </div>
+                                                          {fileErrorCarousel && <div className="ss-user-setting__item-bottom">
+                                                            <div style={{ color: '#FF7E00', fontSize: '12px', width: '90%' }}>
+                                                              {fileErrorCarousel}
+                                                            </div>
+                                                          </div>
+                                                          }
                                                           <div className="ss-user-setting__item-bottom" style={{ width: '90%', height: '1px', marginLeft: '5%', backgroundColor: 'gray' }}></div>
                                                           <div className="ss-user-setting__item-bottom">
                                                             <InputCustom
@@ -9109,9 +9176,9 @@ const Scenario = () => {
                                       setDataMessages([...dataMessages]);
                                     }}
                                   />
-                                  <Button className="ss-bot-setting-condition-keep-button">
+                                  {/* <Button className="ss-bot-setting-condition-keep-button">
                                     keep
-                                  </Button>
+                                  </Button> */}
                                 </div>
                               </div>
                             </div>

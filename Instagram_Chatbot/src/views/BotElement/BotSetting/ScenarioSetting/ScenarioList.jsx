@@ -61,7 +61,7 @@ function ScenarioList() {
     }, []);
 
     const handleOpenPreview = (isOpen) => {
-        if(isOpen) {
+        if (isOpen) {
             document.getElementById('sp-container').style.height = "610px";
             document.getElementById('sp-header').style.position = "static";
             document.getElementById('sp-header').style.borderBottomLeftRadius = "0px";
@@ -76,12 +76,12 @@ function ScenarioList() {
             document.getElementById('sp-header').style.borderBottomRightRadius = "25px";
             document.getElementById('sp-header').style.position = "absolute";
             document.getElementById('sp-header').style.bottom = "13px";
-
         }
         setIsOpenPreview(!isOpenPreview);
     }
 
     const onClickPreview = (scenarioId) => {
+        Cookies.set('scenario_id', scenarioId);
         setScenarioId(scenarioId);
         setIsOpenPreview(true);
     }
@@ -129,9 +129,9 @@ function ScenarioList() {
                 if (res.data.code === 1) {
                     setMessageNoti('Add scenario successfully');
                     Cookies.set('scenario_id', res.data.data.id)
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         document.getElementById('to_scenario').click()
-                    },1500)
+                    }, 1500)
                 } else if (res.data.code === 2) {
                     setMessageNoti(res.data.message);
                 }
@@ -226,7 +226,7 @@ function ScenarioList() {
 
     const onclickEditScenario = (id) => {
         Cookies.set('scenario_id', id);
-    }   
+    }
 
     return (
         <div className="content">
@@ -361,9 +361,9 @@ function ScenarioList() {
                     <span style={{ fontSize: '16px' }}>{messageNoti}</span>
                 </div>
             </ModalNoti>
-            <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioId={scenarioId}/>
+            {scenarioId && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} />}
             <Link to={`/admin/scenario-setting`}>
-            <button id='to_scenario' style={{display:'none'}}>ScSetting</button>
+                <button id='to_scenario' style={{ display: 'none' }}>ScSetting</button>
             </Link>
         </div>
     );

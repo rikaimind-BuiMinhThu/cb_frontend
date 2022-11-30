@@ -13,6 +13,7 @@ import {
 import { Checkbox, Radio, Slider, Calendar } from 'antd';
 import moment from 'moment';
 import cvcIcon from '../../../assets/img/cvc-icon.png';
+import messageTypingGif from '../../../assets/img/icons8-dots-loading.gif';
 import $ from 'jquery';
 import DatePickerCustom from './ScenarioSetting/scenarioComon/DatePickerCustom';
 import InputNum from './ScenarioSetting/scenarioComon/InputNum';
@@ -229,15 +230,36 @@ function Preview({ onOpenPreview, isOpen }) {
               }
               if (messageArr[0].belong_to === 'bot' && messageArr[i].message_content.length > 0) {
                 console.log(i, 'check index message')
-
                 if (messageArr[i]?.message_content[0]?.type === 'delay') {
-                  await new Promise((resolve) => {
-                    return delayRender = setTimeout(() => {
+                  if (messageArr[i]?.message_content[0]?.delay.typing_on) {
+                    await new Promise((resolve) => {
+                      renderMessage.push({ ...messageArr[i] });
+                      setRenderMessageArr([
+                        ...renderMessage
+                      ]);
                       resolve();
-                    }, messageArr[i]?.message_content[0]?.delay?.content * 1000);
-                  }).then(() => {
-                    setIndexMessageRender(i);
-                  })
+                    }).then(async () => {
+                      await new Promise((resolve) => {
+                        delayRender = setTimeout(() => {
+                          resolve();
+                        }, (messageArr[i]?.message_content[0].delay.content * 1000));
+                      });
+                    }).then(() => {
+                      setIndexMessageRender(i);
+                      renderMessage.pop();
+                      setRenderMessageArr([
+                        ...renderMessage
+                      ]);
+                    });
+                  } else {
+                    await new Promise((resolve) => {
+                      return delayRender = setTimeout(() => {
+                        resolve();
+                      }, messageArr[i]?.message_content[0]?.delay?.content * 1000);
+                    }).then(() => {
+                      setIndexMessageRender(i);
+                    })
+                  }
                   index = i;
                 } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
                   // console.log(dataVariables, 'checkkkk variables')                
@@ -274,7 +296,6 @@ function Preview({ onOpenPreview, isOpen }) {
                 } else if (messageArr[i].belong_to !== 'bot') {
                   await new Promise((resolve) => {
                     return delayRender = setTimeout(() => {
-                      console.log(messageArr[i], 'cacjalkscjalksjlkduqioweu123123')
                       for (let j = 0; j < messageArr[i].message_content.length; j++) {
                         if (messageArr[i].message_content[j].type === 'capture') {
                           api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
@@ -438,7 +459,7 @@ function Preview({ onOpenPreview, isOpen }) {
   const handleValidateField = () => {
     let contentArr = [...dataMessages[indexMessageRender].message_content];
     let isValid = true;
-    let errors = {};
+    let errorsMess = {};
 
     let messageError = "These are required fields."
     for (let i = 0; i < contentArr.length; i++) {
@@ -451,77 +472,77 @@ function Preview({ onOpenPreview, isOpen }) {
         if (contentType.type === 'text' || contentType.type === 'password') {
           if (contentType[contentType.type].isSplitInput) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
-              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
             } else if (contentType[contentType.type].valueLeft.length < limitFrom
               || contentType[contentType.type].valueLeft.length > limitTo
               || contentType[contentType.type].valueRight.length < limitFrom
               || contentType[contentType.type].valueRight.length > limitTo) {
-              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           } else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
             isValid = false;
           }
         } else if (contentType.type === 'phone_number') {
           if (contentType[contentType.type].withHyphen) {
             if (stringNullOrEmpty(contentType[contentType.type].value1) || stringNullOrEmpty(contentType[contentType.type].value2)) {
-              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'email_confirmation' || contentType.type === 'password_confirmation') {
           let limitFrom = contentType[contentType.type]?.character_limit_from;
           let limitTo = contentType[contentType.type]?.character_limit_to;
           if (stringNullOrEmpty(contentType[contentType.type].value) || stringNullOrEmpty(contentType[contentType.type].valueConfirm)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           } else if (contentType.type === 'password_confirmation' &&
             (contentType[contentType.type].value.length < limitFrom
               || contentType[contentType.type].value.length > limitTo
               || contentType[contentType.type].valueConfirm.length < limitFrom
               || contentType[contentType.type].valueConfirm.length > limitTo)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
             isValid = false;
           }
         } else if (contentType.type === 'customization') {
           if (contentType[contentType.type].is_comment) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
-              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'time_hm') {
           if (stringNullOrEmpty(contentType[contentType.type].valueHour) || stringNullOrEmpty(contentType[contentType.type].valueMinute)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_ymd'
           || contentType.type === 'dob_ymd') {
           if (stringNullOrEmpty(contentType[contentType.type].valueYear) || stringNullOrEmpty(contentType[contentType.type].valueMonth)
             || stringNullOrEmpty(contentType[contentType.type].valueDay)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_md') {
           if (stringNullOrEmpty(contentType[contentType.type].valueMonth) || stringNullOrEmpty(contentType[contentType.type].valueDay)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_ym'
           || contentType.type === 'dob_ym') {
           if (stringNullOrEmpty(contentType[contentType.type].valueYear) || stringNullOrEmpty(contentType[contentType.type].valueMonth)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_ymd_hm') {
@@ -530,7 +551,7 @@ function Preview({ onOpenPreview, isOpen }) {
             || stringNullOrEmpty(contentType[contentType.type].valueDay)
             || stringNullOrEmpty(contentType[contentType.type].valueHour)
             || stringNullOrEmpty(contentType[contentType.type].valueMinutes)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'timezone_from_to') {
@@ -538,7 +559,7 @@ function Preview({ onOpenPreview, isOpen }) {
             || stringNullOrEmpty(contentType[contentType.type].valueMinutes1)
             || stringNullOrEmpty(contentType[contentType.type].valueHour2)
             || stringNullOrEmpty(contentType[contentType.type].valueMinutes2)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'period_from_to') {
@@ -548,13 +569,13 @@ function Preview({ onOpenPreview, isOpen }) {
             || stringNullOrEmpty(contentType[contentType.type].valueYear2)
             || stringNullOrEmpty(contentType[contentType.type].valueMonth2)
             || stringNullOrEmpty(contentType[contentType.type].valueDay2)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'up_to_municipality') {
           if (stringNullOrEmpty(contentType[contentType.type].prefecture)
             || stringNullOrEmpty(contentType[contentType.type].city)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'zip_code_address') {
@@ -562,76 +583,76 @@ function Preview({ onOpenPreview, isOpen }) {
             if (contentType.split_postal_code) {
               if (stringNullOrEmpty(contentType.value_post_code_left)
                 || stringNullOrEmpty(contentType.value_post_code_right)) {
-                errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+                errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
                 isValid = false;
               }
             } else if (stringNullOrEmpty(contentType.value_post_code)) {
-              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
             }
           }
           if (contentType.prefecture && stringNullOrEmpty(contentType.value_prefecture)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
           if (contentType.municipality && stringNullOrEmpty(contentType.value_municipality)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
           if (contentType.address && stringNullOrEmpty(contentType.value_address)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
           if (contentType.building_name && stringNullOrEmpty(contentType.value_building_name)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
           if (isValid === false) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = true;
             isValid = false;
           }
         } else if (contentArr[i].type === 'attaching_file') {
           if (stringNullOrEmpty(contentType.content)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_selection' || contentType.type === 'embedded') {
           if (stringNullOrEmpty(contentType.date_select)) {
             console.log(contentType.date_select, 'checckkkk')
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'start_end_date') {
           if (stringNullOrEmpty(contentType.start_date_select) || stringNullOrEmpty(contentType.end_date_select)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'agree_term') {
           if (stringNullOrEmpty(contentType.isAgree) || contentType.isAgree === false) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'radio_button') {
           if (stringNullOrEmpty(contentType.initial_selection)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'checkbox') {
           if (contentType.checkedValue && contentType.checkedValue.length === 0) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           } else if ((contentType.selection_limit_from || contentType.selection_limit_to) && (contentType.checkedValue.length < parseInt(contentType.selection_limit_from) || contentType.checkedValue.length > parseInt(contentType.selection_limit_to))) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select from ${contentType.selection_limit_from} to ${contentType.selection_limit_to} for this item.`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select from ${contentType.selection_limit_from} to ${contentType.selection_limit_to} for this item.`;
             isValid = false;
           }
         } else if (contentArr[i].type === 'capture') {
           console.log(contentArr[i].type, contentType, 'chechkkkkk');
           if (stringNullOrEmpty(contentType.value)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           } else if (captcha.filter(item => item.index === indexMessageRender && item.indexContent === i)?.[0]?.text.toLowerCase() !== contentType.value.toLowerCase()) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Wrong authorization code";
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Wrong authorization code";
             isValid = false;
           }
         } else if (contentArr[i].type === 'credit_card_payment') {
@@ -643,47 +664,47 @@ function Preview({ onOpenPreview, isOpen }) {
             || (stringNullOrEmpty(contentType.year))
             || (stringNullOrEmpty(contentType.month))
           ) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           } else if ((contentType.card_number && (contentType.card_number + "").length !== 16) ||
             ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
               ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Credit card number is invalid.";
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Credit card number is invalid.";
             isValid = false;
           }
         } else if (contentArr[i].type === 'product_purchase') {
           console.log(contentType.initial_selection)
           if (contentType.initial_selection.length === 0) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'slider') {
           if (stringNullOrEmpty(contentType.value)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'product_purchase_radio_button') {
           console.log(contentType.initial_selection)
           if (contentType.initial_selection.length === 0) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'card_payment_radio_button') {
           console.log(contentType.initial_selection)
           if (contentType.type !== 'picture_radio' && stringNullOrEmpty(contentType.initial_selection)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           } else if (contentType.type === 'picture_radio' && stringNullOrEmpty(contentType.initial_selection_picture)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'invalid_input') {
 
         } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
-          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
           isValid = false;
         } else if ((limitFrom || limitTo) && (contentType[contentType.type]?.value?.length < limitFrom || contentType[contentType.type]?.value?.length > limitTo)) {
-          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
           isValid = false;
         }
       }
@@ -691,13 +712,16 @@ function Preview({ onOpenPreview, isOpen }) {
         if (contentType[contentType.type].isSplitInput
           && (!stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))
           && (contentType[contentType.type].valueLeft.length > limitTo || contentType[contentType.type].valueRight.length > limitTo)) {
-          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
           isValid = false;
         } else if (!stringNullOrEmpty(contentType[contentType.type].value)
           && contentType[contentType.type].value.length > limitTo) {
-          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
           isValid = false;
         }
+      }
+      if (contentArr[i].type === 'attaching_file' && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
+        isValid = false;
       }
       if (contentArr[i].type === 'text_input' && contentType[contentType.type].range && contentType[contentType.type].range !== 'no_input'
         && (!stringNullOrEmpty(contentType[contentType.type].value) || !stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))) {
@@ -728,20 +752,24 @@ function Preview({ onOpenPreview, isOpen }) {
           || REGEX_CHECK.test(contentType[contentType.type].valueRight)
           || REGEX_CHECK.test(contentType[contentType.type].value))) {
           isValid = false;
-          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
         } else if ((contentType[contentType.type].range === 'double_byte'
           || contentType[contentType.type].range === 'full_width_katakana'
           || contentType[contentType.type].range === 'double_byte_hiragana')
           && ucs2ToBinaryString(contentType[contentType.type].value).length === contentType[contentType.type].value.length * 3) {
           isValid = false;
-          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
         }
       }
     }
+
     if (isValid) {
-      errors = {};
+      errorsMess = {};
     }
-    setErrors(errors);
+    setErrors({
+      ...errors,
+      ...errorsMess
+    });
     return isValid;
   }
 
@@ -761,9 +789,8 @@ function Preview({ onOpenPreview, isOpen }) {
     renderMessageArr[indexMessage].disabled = true;
     let renderMessage = [...renderMessageArr];
     let index;
-    let delayRender;
     let isPauseScroll = false;
-    // let REGEX = /\{\{(.*?)\}\}/ig;
+    let delayRender;
     setIndexUser(prev => prev + 1);
 
     if (!dataMessages[indexMessageRender + 1]) return;
@@ -814,11 +841,32 @@ function Preview({ onOpenPreview, isOpen }) {
           console.log(dataMessages[i])
           if (dataMessages[i].belong_to === 'bot') {
             if (dataMessages[i]?.message_content[0].type === 'delay') {
-              await new Promise((resolve) => {
-                return delayRender = setTimeout(() => {
+              if (dataMessages[i]?.message_content[0]?.delay.typing_on) {
+                await new Promise((resolve) => {
+                  renderMessage.push({ ...dataMessages[i] });
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
                   resolve();
-                }, (dataMessages[i]?.message_content[0].delay.content * 1000));
-              });
+                }).then(async () => {
+                  await new Promise((resolve) => {
+                    delayRender = setTimeout(() => {
+                      resolve();
+                    }, (dataMessages[i]?.message_content[0].delay.content * 1000));
+                  });
+                }).then(() => {
+                  renderMessage.pop();
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
+                });
+              } else {
+                await new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    resolve();
+                  }, dataMessages[i]?.message_content[0]?.delay?.content * 1000);
+                })
+              }
               index = i;
               // promise.then(data => {
               //   renderMessage.push(data);
@@ -998,11 +1046,32 @@ function Preview({ onOpenPreview, isOpen }) {
               break;
             } else {
               if (dataMessages[i]?.message_content[0].type === 'delay') {
-                await new Promise((resolve) => {
-                  return delayRender = setTimeout(() => {
+                if (dataMessages[i]?.message_content[0]?.delay.typing_on) {
+                  await new Promise((resolve) => {
+                    renderMessage.push({ ...dataMessages[i] });
+                    setRenderMessageArr([
+                      ...renderMessage
+                    ]);
                     resolve();
-                  }, (dataMessages[i]?.message_content[0].delay.content * 1000));
-                });
+                  }).then(async () => {
+                    await new Promise((resolve) => {
+                      delayRender = setTimeout(() => {
+                        resolve();
+                      }, (dataMessages[i]?.message_content[0].delay.content * 1000));
+                    });
+                  }).then(() => {
+                    renderMessage.pop();
+                    setRenderMessageArr([
+                      ...renderMessage
+                    ]);
+                  });
+                } else {
+                  await new Promise((resolve) => {
+                    return delayRender = setTimeout(() => {
+                      resolve();
+                    }, dataMessages[i]?.message_content[0]?.delay?.content * 1000);
+                  })
+                }
                 index = i;
               } else if (dataMessages[i]?.message_content[0]?.type === 'variable_set') {
                 if (variables.length !== 0) {
@@ -1119,7 +1188,7 @@ function Preview({ onOpenPreview, isOpen }) {
   }
 
   return (
-    scenarioId &&
+    scenarioId ?
     <React.Fragment>
       <div id="sp-container" className="sp-container">
         <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header" onClick={() => onOpenPreview(!isOpen)}>
@@ -1189,15 +1258,18 @@ function Preview({ onOpenPreview, isOpen }) {
           }
         </div>
       </div>
-    </React.Fragment>
+    </React.Fragment> : 
+    <React.Fragment/>
   )
 }
 
 const BotMessage = ({ content, index, botInfor }) => {
+
   const handleDownloadFile = (file) => {
     let link = document.createElement('a');
     link.href = file;
     link.download = "file";
+    link.target = "_blank"
     document.body.appendChild(link);
 
     link.click();
@@ -1206,7 +1278,7 @@ const BotMessage = ({ content, index, botInfor }) => {
 
   return (
     <div key={index} className="sp-body-bot-side">
-      {(content.type === 'text_input' || content.type === 'file') && (
+      {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay') && (
         <div className="sp-body-bot-side-avatar sp-avatar">
           <img src={"https://ec-chatbot-test1.com/" + botInfor?.icon?.url} />
         </div>
@@ -1224,7 +1296,6 @@ const BotMessage = ({ content, index, botInfor }) => {
                 readOnly
               ></textarea>
             )}
-
             {content.type === 'file' && (
               content[content.type]?.content ? (
                 <React.Fragment>
@@ -1234,7 +1305,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                       alt=""
                       style={{ width: '50%', marginLeft: '8px' }} /> :
                     <span
-                      style={{ color: '#089BE5', fontSize: '17px' }}
+                      style={{ color: '#089BE5', fontSize: '17px', display: 'block', height: '50px', cursor: 'pointer' }}
                       onClick={() => handleDownloadFile(content[content.type]?.content)}
                     >Download this file</span>}
                 </React.Fragment>
@@ -1244,6 +1315,9 @@ const BotMessage = ({ content, index, botInfor }) => {
                   value={''}
                   readOnly
                 ></textarea>
+            )}
+            {content.type === 'delay' && (
+              <img src={messageTypingGif} style={{ backgroundColor: '#EBF7FF', height: '40px' }} />
             )}
           </React.Fragment>}
       </div>
@@ -1307,10 +1381,11 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
     const type = file.name.slice(file.name.lastIndexOf('.') + 1);
     if (!messageContent[indexContent].attaching_file.file_type.includes(type)) {
       errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = `Please specify a ${messageContent[indexContent].attaching_file.file_type.join(", ")} type file for the file.`;
-      setErrors({ ...errors })
+      setErrors({ ...errors });
       return;
     } else {
-      errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = ""
+      errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = "";
+      setErrors({ ...errors });
     }
     // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
     // var reader = new FileReader(file);
