@@ -82,7 +82,7 @@
   padding: 10px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 41%;
+  padding-right: 42%;
 }
 
 .ss-message-wrapper {
@@ -104,6 +104,7 @@
 }
 
 .ss-bot-ava {
+  margin-top: 25px;
   width: 30px;
   height: 30px;
   border-radius: 15px;
@@ -111,8 +112,8 @@
 }
 
 .ss-bot-chat-detail-content {
-  margin-left: 8px;
-  width: 65%;
+  /* margin-left: 8px; */
+  /* width: 65%; */
   border-radius: 5px;
   border: 1px solid gray;
   height: 85px;
@@ -1289,7 +1290,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-plus-circle-option-icon-times-custom {
-  width: 7%!important;
+  width: 7% !important;
   text-align: center;
   font-size: 25px !important;
 }
@@ -1821,7 +1822,8 @@ input#ss-message__content--user-checkbox--checkbox_img {
   box-shadow: none;
 }
 
-.ant-picker:hover, .ant-picker-focused {
+.ant-picker:hover,
+.ant-picker-focused {
   border-color: grey;
 }
 
@@ -1830,9 +1832,27 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-custom-calendar .ant-select-selector {
-  min-height: 24px!important;
+  min-height: 24px !important;
 }
 
 .ss-custom-calendar .ant-radio-button-wrapper {
   font-size: 14px;
+}
+
+.ss-sub-title-message {
+  background-color: #F1F2F6;
+  border-radius: 3px;
+  border: 1px solid gray;
+  border-bottom: 0px;
+  padding: 0px 8px;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  font-weight: 600;
+  color: #767676;
+}
+
+.ss-truncation-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

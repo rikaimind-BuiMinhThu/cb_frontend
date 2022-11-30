@@ -4,6 +4,7 @@ let dataClone = {
     {
       id: '1',
       hidden: true,
+      message_name: '',
       belong_to: 'user',
       conditions: [
         {
@@ -35,8 +36,8 @@ let dataClone = {
             year_placeholder: '',
             cvc_placeholder: '',
             initial_selection: '',
-            // initial_selection_radio_img: '',
             card_linked_setting: '',
+            // initial_selection_radio_img: '',
             radio_contents: [
               {
                 text: '',
@@ -453,6 +454,7 @@ let dataClone = {
       id: '2',
       hidden: true,
       belong_to: 'bot',
+      message_name: '',
       message_content: [
         {
           type: 'text',
