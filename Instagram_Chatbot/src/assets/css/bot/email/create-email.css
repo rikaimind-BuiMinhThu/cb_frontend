@@ -17,7 +17,7 @@
   position: relative;
 }
 
-input {
+input.ce_input {
   display: block;
   outline: 0;
   border: 1px solid #7186a0;
@@ -39,7 +39,7 @@ input {
   padding: 0;
   margin-top: 5px;
 }
-textarea {
+textarea.ce_textArea {
   width: 100%;
   outline: 0;
   border: 1px solid #7186a0;

@@ -358,6 +358,7 @@ function CreateEmail() {
                     <span className="field-lable">Email template name</span>
                     <div className="field-input">
                       <input
+                        className="ce_input"
                         id="email_template_name"
                         defaultValue={
                           mailAction == false ? detailEmail?.email.email_template_name : ''
@@ -380,6 +381,7 @@ function CreateEmail() {
                     <span className="field-lable">Sender name</span>
                     <div className="field-input">
                       <input
+                        className="ce_input"
                         id="sender_name"
                         type="text"
                         defaultValue={mailAction == false ? detailEmail?.email.sender_name : ''}
@@ -394,6 +396,7 @@ function CreateEmail() {
                     <span className="field-lable">To</span>
                     <div className="field-input">
                       <input
+                        className="ce_input"
                         id="to"
                         type="text"
                         defaultValue={mailAction == false ? detailEmail?.email.to : ''}
@@ -411,6 +414,7 @@ function CreateEmail() {
                     <div className="field-input-cc">
                       <div id="list-cc"></div>
                       <input
+                        className="ce_input"
                         id="cc"
                         type="text"
                         placeholder="no-reply@botchan.chat"
@@ -426,6 +430,7 @@ function CreateEmail() {
                     <div className="field-input-cc">
                       <div id="list-bcc"></div>
                       <input
+                        className="ce_input"
                         id="bcc"
                         type="text"
                         placeholder="no-reply@botchan.chat"
@@ -440,6 +445,7 @@ function CreateEmail() {
                     <span className="field-lable">Reply-To</span>
                     <div className="field-input">
                       <input
+                        className="ce_input"
                         type="text"
                         defaultValue={mailAction == false ? detailEmail?.email.reply_to : ''}
                         placeholder="no-reply@botchan.chat"
@@ -452,6 +458,7 @@ function CreateEmail() {
                     <span className="field-lable">Subject</span>
                     <div className="field-input">
                       <input
+                        className="ce_input"
                         id="subject"
                         type="text"
                         defaultValue={mailAction == false ? detailEmail?.email.subject : ''}
@@ -468,6 +475,7 @@ function CreateEmail() {
                     <span className="field-lable">Text</span>
                     <div className="field-input">
                       <textarea
+                        className="ce_textArea"
                         id="text"
                         cols="10"
                         rows="7"

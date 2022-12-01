@@ -103,6 +103,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">Full name</span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="fullname"
                         type="text"
                         placeholder="enter input ..."
@@ -118,6 +119,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">Business category</span>
                     <div className="bs-field-input">
                       <select
+                        className="bs-field-input-select"
                         name="business_division"
                         value={division}
                         onChange={(e) => setDivision(e.target.value)}
@@ -132,6 +134,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">Company name</span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="companyName"
                         type="text"
                         placeholder="enter input ..."
@@ -149,6 +152,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">Department</span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="department"
                         type="text"
                         placeholder="enter input ..."
@@ -166,6 +170,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">Position</span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="job_title"
                         type="text"
                         placeholder="enter input ..."
@@ -183,6 +188,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">Email address</span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="emailAddress"
                         type="text"
                         placeholder="enter input ..."
@@ -204,6 +210,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">Phone number</span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="phone_number"
                         type="number"
                         placeholder="enter input ..."
@@ -219,6 +226,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">Post code</span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="post_code"
                         type="number"
                         placeholder="enter input ..."
@@ -233,6 +241,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">Address</span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="address"
                         type="text"
                         placeholder="enter input ..."
@@ -247,6 +256,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">Language</span>
                     <div className="bs-field-input">
                       <select
+                        className="bs-field-input-select"
                         name="language"
                         value={language}
                         onChange={(e) => setLanguage(e.target.value)}
@@ -262,6 +272,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">URLs</span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="url"
                         type="text"
                         placeholder="enter input ..."
