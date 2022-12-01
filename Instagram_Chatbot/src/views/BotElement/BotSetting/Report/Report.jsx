@@ -13,14 +13,15 @@ function Report() {
   const [endDate, setEndDate] = useState(new Date());
   const [dateState, setDateState] = useState(new Date());
   const [barChart, setBarChart] = useState({
-
-    series: [{
-      data: [70, 95]
-    }],
+    series: [
+      {
+        data: [70, 95],
+      },
+    ],
     options: {
       chart: {
         type: 'bar',
-        height: 380
+        height: 380,
       },
       plotOptions: {
         bar: {
@@ -28,43 +29,41 @@ function Report() {
           distributed: true,
           horizontal: true,
           dataLabels: {
-            position: 'bottom'
+            position: 'bottom',
           },
-        }
+        },
       },
-      colors: ['#33b2df', '#546E7A'
-      ],
+      colors: ['#33b2df', '#546E7A'],
       dataLabels: {
         enabled: true,
         textAnchor: 'start',
         style: {
-          colors: ['#fff']
+          colors: ['#fff'],
         },
         formatter: function (val, opt) {
-          return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
+          return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
         },
         offsetX: 0,
         dropShadow: {
-          enabled: true
-        }
+          enabled: true,
+        },
       },
       stroke: {
         width: 1,
-        colors: ['#fff']
+        colors: ['#fff'],
       },
       xaxis: {
-        categories: ['South Korea', 'Canada'
-        ],
+        categories: ['South Korea', 'Canada'],
       },
       yaxis: {
         labels: {
-          show: false
-        }
+          show: false,
+        },
       },
       title: {
         text: 'Custom DataLabels',
         align: 'center',
-        floating: true
+        floating: true,
       },
       subtitle: {
         text: 'Category Names as DataLabels inside bars',
@@ -73,50 +72,65 @@ function Report() {
       tooltip: {
         theme: 'dark',
         x: {
-          show: false
+          show: false,
         },
         y: {
           title: {
             formatter: function () {
-              return ''
-            }
-          }
-        }
-      }
-    }
-  })
+              return '';
+            },
+          },
+        },
+      },
+    },
+  });
 
   const [lineChart, setLineChart] = useState({
-    series: [{
-      name: 'TEAM A',
-      type: 'area',
-      data: [44, 55, 31, 47, 31, 43, 26, 41, 31, 47, 33]
-    }, {
-      name: 'TEAM B',
-      type: 'line',
-      data: [55, 69, 45, 61, 43, 54, 37, 52, 44, 61, 43]
-    },
-    {
-      name: 'TEAM C',
-      type: 'line',
-      data: [65, 29, 35, 61, 73, 44, 87, 42, 34, 91, 23]
-    }],
+    series: [
+      {
+        name: 'TEAM A',
+        type: 'area',
+        data: [44, 55, 31, 47, 31, 43, 26, 41, 31, 47, 33],
+      },
+      {
+        name: 'TEAM B',
+        type: 'line',
+        data: [55, 69, 45, 61, 43, 54, 37, 52, 44, 61, 43],
+      },
+      {
+        name: 'TEAM C',
+        type: 'line',
+        data: [65, 29, 35, 61, 73, 44, 87, 42, 34, 91, 23],
+      },
+    ],
     options: {
       chart: {
         height: 350,
-        width: "100%",
+        width: '100%',
         type: 'line',
       },
       stroke: {
-        curve: 'smooth'
+        curve: 'smooth',
       },
       fill: {
         type: 'solid',
         opacity: [0.35, 1],
       },
-      labels: ['Dec 01', 'Dec 02', 'Dec 03', 'Dec 04', 'Dec 05', 'Dec 06', 'Dec 07', 'Dec 08', 'Dec 09 ', 'Dec 10', 'Dec 11'],
+      labels: [
+        'Dec 01',
+        'Dec 02',
+        'Dec 03',
+        'Dec 04',
+        'Dec 05',
+        'Dec 06',
+        'Dec 07',
+        'Dec 08',
+        'Dec 09 ',
+        'Dec 10',
+        'Dec 11',
+      ],
       markers: {
-        size: 0
+        size: 0,
       },
       yaxis: [
         {
@@ -136,49 +150,61 @@ function Report() {
         intersect: false,
         y: {
           formatter: function (y) {
-            if (typeof y !== "undefined") {
-              return y.toFixed(0) + " points";
+            if (typeof y !== 'undefined') {
+              return y.toFixed(0) + ' points';
             }
             return y;
-          }
-        }
-
-      }
-    }
-
-  }
-  )
-  const [lineChartScenario, setLineChartScenario] = useState({
-    series: [{
-      name: 'TEAM A',
-      type: 'area',
-      data: [44, 55, 31, 47, 31, 43, 26, 41, 31, 47, 33]
-    }, {
-      name: 'TEAM B',
-      type: 'line',
-      data: [55, 69, 45, 61, 43, 54, 37, 52, 44, 61, 43]
+          },
+        },
+      },
     },
-    {
-      name: 'TEAM C',
-      type: 'line',
-      data: [65, 29, 35, 61, 73, 44, 87, 42, 34, 91, 23]
-    }],
+  });
+  const [lineChartScenario, setLineChartScenario] = useState({
+    series: [
+      {
+        name: 'TEAM A',
+        type: 'area',
+        data: [44, 55, 31, 47, 31, 43, 26, 41, 31, 47, 33],
+      },
+      {
+        name: 'TEAM B',
+        type: 'line',
+        data: [55, 69, 45, 61, 43, 54, 37, 52, 44, 61, 43],
+      },
+      {
+        name: 'TEAM C',
+        type: 'line',
+        data: [65, 29, 35, 61, 73, 44, 87, 42, 34, 91, 23],
+      },
+    ],
     options: {
       chart: {
         height: 350,
-        width: "100%",
+        width: '100%',
         type: 'line',
       },
       stroke: {
-        curve: 'smooth'
+        curve: 'smooth',
       },
       fill: {
-        type:'solid',
+        type: 'solid',
         opacity: [0.35, 1],
       },
-      labels: ['Dec 01', 'Dec 02','Dec 03','Dec 04','Dec 05','Dec 06','Dec 07','Dec 08','Dec 09 ','Dec 10','Dec 11'],
+      labels: [
+        'Dec 01',
+        'Dec 02',
+        'Dec 03',
+        'Dec 04',
+        'Dec 05',
+        'Dec 06',
+        'Dec 07',
+        'Dec 08',
+        'Dec 09 ',
+        'Dec 10',
+        'Dec 11',
+      ],
       markers: {
-        size: 0
+        size: 0,
       },
       yaxis: [
         {
@@ -198,18 +224,15 @@ function Report() {
         intersect: false,
         y: {
           formatter: function (y) {
-            if(typeof y !== "undefined") {
-              return  y.toFixed(0) + " points";
+            if (typeof y !== 'undefined') {
+              return y.toFixed(0) + ' points';
             }
             return y;
-          }
-        }
-      
-    }
-    }
-  
-  }
-  )
+          },
+        },
+      },
+    },
+  });
 
   function validDateRange(start, end) {
     const errDate = document.getElementById('errDate');
@@ -248,161 +271,155 @@ function Report() {
   function changeConversionRate() {
     // document.getElementById('conversion_rate').style.display = 'block'
     // document.getElementById('click_through_rate').style.display = 'none'
-    setBarChart(
-      {
-
-        series: [{
-          data: [70, 95]
-        }],
-        options: {
-          chart: {
-            type: 'bar',
-            height: 380
+    setBarChart({
+      series: [
+        {
+          data: [70, 95],
+        },
+      ],
+      options: {
+        chart: {
+          type: 'bar',
+          height: 380,
+        },
+        plotOptions: {
+          bar: {
+            barHeight: '100%',
+            distributed: true,
+            horizontal: true,
+            dataLabels: {
+              position: 'bottom',
+            },
           },
-          plotOptions: {
-            bar: {
-              barHeight: '100%',
-              distributed: true,
-              horizontal: true,
-              dataLabels: {
-                position: 'bottom'
-              },
-            }
+        },
+        colors: ['#33b2df', '#546E7A'],
+        dataLabels: {
+          enabled: true,
+          textAnchor: 'start',
+          style: {
+            colors: ['#fff'],
           },
-          colors: ['#33b2df', '#546E7A'
-          ],
-          dataLabels: {
+          formatter: function (val, opt) {
+            return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
+          },
+          offsetX: 0,
+          dropShadow: {
             enabled: true,
-            textAnchor: 'start',
-            style: {
-              colors: ['#fff']
+          },
+        },
+        stroke: {
+          width: 1,
+          colors: ['#fff'],
+        },
+        xaxis: {
+          categories: ['South Korea', 'Canada'],
+        },
+        yaxis: {
+          labels: {
+            show: false,
+          },
+        },
+        title: {
+          text: 'Conversion rate',
+          align: 'center',
+          floating: true,
+        },
+        // subtitle: {
+        //   text: 'Category Names as DataLabels inside bars',
+        //   align: 'center',
+        // },
+        tooltip: {
+          theme: 'dark',
+          x: {
+            show: false,
+          },
+          y: {
+            title: {
+              formatter: function () {
+                return '';
+              },
             },
-            formatter: function (val, opt) {
-              return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
-            },
-            offsetX: 0,
-            dropShadow: {
-              enabled: true
-            }
           },
-          stroke: {
-            width: 1,
-            colors: ['#fff']
-          },
-          xaxis: {
-            categories: ['South Korea', 'Canada'
-            ],
-          },
-          yaxis: {
-            labels: {
-              show: false
-            }
-          },
-          title: {
-            text: 'Conversion rate',
-            align: 'center',
-            floating: true
-          },
-          // subtitle: {
-          //   text: 'Category Names as DataLabels inside bars',
-          //   align: 'center',
-          // },
-          tooltip: {
-            theme: 'dark',
-            x: {
-              show: false
-            },
-            y: {
-              title: {
-                formatter: function () {
-                  return ''
-                }
-              }
-            }
-          }
-        }
-      }
-    )
+        },
+      },
+    });
   }
 
   function changeClickConversionRate() {
     // document.getElementById('conversion_rate').style.display = 'none'
     // document.getElementById('click_through_rate').style.display = 'block'
-    setBarChart(
-      {
-
-        series: [{
-          data: [20, 85]
-        }],
-        options: {
-          chart: {
-            type: 'bar',
-            height: 380
+    setBarChart({
+      series: [
+        {
+          data: [20, 85],
+        },
+      ],
+      options: {
+        chart: {
+          type: 'bar',
+          height: 380,
+        },
+        plotOptions: {
+          bar: {
+            barHeight: '100%',
+            distributed: true,
+            horizontal: true,
+            dataLabels: {
+              position: 'bottom',
+            },
           },
-          plotOptions: {
-            bar: {
-              barHeight: '100%',
-              distributed: true,
-              horizontal: true,
-              dataLabels: {
-                position: 'bottom'
-              },
-            }
+        },
+        colors: ['#33b2df', '#546E7A'],
+        dataLabels: {
+          enabled: true,
+          textAnchor: 'start',
+          style: {
+            colors: ['#fff'],
           },
-          colors: ['#33b2df', '#546E7A'
-          ],
-          dataLabels: {
+          formatter: function (val, opt) {
+            return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
+          },
+          offsetX: 0,
+          dropShadow: {
             enabled: true,
-            textAnchor: 'start',
-            style: {
-              colors: ['#fff']
+          },
+        },
+        stroke: {
+          width: 1,
+          colors: ['#fff'],
+        },
+        xaxis: {
+          categories: ['Hien dang', 'no 50k'],
+        },
+        yaxis: {
+          labels: {
+            show: false,
+          },
+        },
+        title: {
+          text: 'Click Through Rate',
+          align: 'center',
+          floating: true,
+        },
+        // subtitle: {
+        //   text: 'Category Names as DataLabels inside bars',
+        //   align: 'center',
+        // },
+        tooltip: {
+          theme: 'dark',
+          x: {
+            show: false,
+          },
+          y: {
+            title: {
+              formatter: function () {
+                return '';
+              },
             },
-            formatter: function (val, opt) {
-              return opt.w.globals.labels[opt.dataPointIndex] + ":  " + val
-            },
-            offsetX: 0,
-            dropShadow: {
-              enabled: true
-            }
           },
-          stroke: {
-            width: 1,
-            colors: ['#fff']
-          },
-          xaxis: {
-            categories: ['Hien dang', 'no 50k'
-            ],
-          },
-          yaxis: {
-            labels: {
-              show: false
-            }
-          },
-          title: {
-            text: 'Click Through Rate',
-            align: 'center',
-            floating: true
-          },
-          // subtitle: {
-          //   text: 'Category Names as DataLabels inside bars',
-          //   align: 'center',
-          // },
-          tooltip: {
-            theme: 'dark',
-            x: {
-              show: false
-            },
-            y: {
-              title: {
-                formatter: function () {
-                  return ''
-                }
-              }
-            }
-          }
-        }
-      }
-    )
+        },
+      },
+    });
   }
 
   return (
@@ -416,7 +433,7 @@ function Report() {
                   <form id="formSearch" className="report__info">
                     <p className="report__group">Aggregation period:</p>
                     <div className="report__group">
-                      <select name="" id="">
+                      <select className="report__group-select" name="" id="">
                         <option value="qqq">Aggregation period</option>
                         <option value="">The day before</option>
                         <option value="">Last 7 days</option>
@@ -425,6 +442,7 @@ function Report() {
                     </div>
                     <div className="report__group report-date">
                       <DatePicker
+                        className="report__group-input"
                         id="startDate"
                         selected={startDate}
                         onChange={(date) => selectStartDate(date)}
@@ -433,6 +451,7 @@ function Report() {
                     </div>
                     <div className="report__group report-date">
                       <DatePicker
+                        className="report__group-input"
                         id="endDate"
                         selected={endDate}
                         onChange={(date) => selectEndDate(date)}
@@ -441,7 +460,7 @@ function Report() {
                     </div>
                     <p className="report__group">device</p>
                     <div className="report__group">
-                      <select name="" id="">
+                      <select className="report__group-select" name="" id="">
                         <option value="qqqwe">All</option>
                         <option value="">computer</option>
                         <option value="">Tablet</option>
@@ -450,7 +469,7 @@ function Report() {
                     </div>
                     <p className="report__group">scenario</p>
                     <div className="report__group">
-                      <select name="" id="">
+                      <select className="report__group-select" name="" id="">
                         <option value="dddd">BOB scenario</option>
                         <option value="">Test1</option>
                         <option value="">Test2</option>
@@ -479,17 +498,28 @@ function Report() {
                       </a>
                     </div>
                     <div className="report__item-btn">
-                      <button className="btn btn-success"
-                        id='btn_conversion_rate'
-                        onClick={() => changeConversionRate()}>
-                        Conversion rate (CVR)</button>
-                      <button className="btn btn-success"
-                        id='btn_click_through_conversion_rate'
-                        onClick={() => changeClickConversionRate()}>Click-through rate (CTR)</button>
+                      <button
+                        className="btn btn-success"
+                        id="btn_conversion_rate"
+                        onClick={() => changeConversionRate()}
+                      >
+                        Conversion rate (CVR)
+                      </button>
+                      <button
+                        className="btn btn-success"
+                        id="btn_click_through_conversion_rate"
+                        onClick={() => changeClickConversionRate()}
+                      >
+                        Click-through rate (CTR)
+                      </button>
                     </div>
-                    <div id='conversion_rate' className="report__item-chart">
-                      <ReactApexChart options={barChart.options} series={barChart.series} type="bar" height={350} />
-
+                    <div id="conversion_rate" className="report__item-chart">
+                      <ReactApexChart
+                        options={barChart.options}
+                        series={barChart.series}
+                        type="bar"
+                        height={350}
+                      />
                     </div>
                     {/* <div id='click_through_rate' className="report__item-chart" style={{ display: 'none' }}>
                       <ReactApexChart options={barChart.options} series={barChart.series} type="bar" height={350} />
@@ -503,7 +533,12 @@ function Report() {
                       <a href="">
                         <i class="far fa-question-circle"></i>
                       </a>
-                      <ReactApexChart options={lineChart.options} series={lineChart.series} type="line" height={350} />
+                      <ReactApexChart
+                        options={lineChart.options}
+                        series={lineChart.series}
+                        type="line"
+                        height={350}
+                      />
                     </div>
                     <div className="report__item-head report__item-2-head">
                       CHANGE IN MONTHLY CONVERSIONS
@@ -531,7 +566,12 @@ function Report() {
                         <button className="btn btn-success">Scenario trends for each item</button>
                       </div>
                       <div className="report__item-content">
-                        <ReactApexChart options={lineChartScenario.options} series={lineChart.series} type="line" height={350} />
+                        <ReactApexChart
+                          options={lineChartScenario.options}
+                          series={lineChart.series}
+                          type="line"
+                          height={350}
+                        />
                       </div>
                     </div>
                   </div>
@@ -576,39 +616,33 @@ function Report() {
                       </div>
                     </div>
                     <div className="report__item-head report__item-2-head">
-                    <div className="report__item-head report__item-2-head">
-                      DEVICE
-                      <a href="">
-                        <i class="far fa-question-circle"></i>
-                      </a>
-                      <div>
-                        There's no data.
+                      <div className="report__item-head report__item-2-head">
+                        DEVICE
+                        <a href="">
+                          <i class="far fa-question-circle"></i>
+                        </a>
+                        <div>There's no data.</div>
                       </div>
-                    </div>
-                    <div className="report__item-head report__item-2-head">
-                      DEVICE
-                      <a href="">
-                        <i class="far fa-question-circle"></i>
-                      </a>
-                      <div>
-                        There's no data.
+                      <div className="report__item-head report__item-2-head">
+                        DEVICE
+                        <a href="">
+                          <i class="far fa-question-circle"></i>
+                        </a>
+                        <div>There's no data.</div>
                       </div>
-                    </div>
-                    <div className="report__item-head report__item-2-head">
-                      DEVICE
-                      <a href="">
-                        <i class="far fa-question-circle"></i>
-                      </a>
-                      <div>
-                        There's no data.
+                      <div className="report__item-head report__item-2-head">
+                        DEVICE
+                        <a href="">
+                          <i class="far fa-question-circle"></i>
+                        </a>
+                        <div>There's no data.</div>
                       </div>
-                    </div>
                     </div>
                   </div>
 
                   <div className="report__item">
-                    <div style={{textAlign: 'center'}} className="report__item-head">
-                    SHORTENED LINK CLICKS
+                    <div style={{ textAlign: 'center' }} className="report__item-head">
+                      SHORTENED LINK CLICKS
                       {/* <a href="">
                         <i class="far fa-question-circle"></i>
                       </a> */}
@@ -616,7 +650,8 @@ function Report() {
                         <button className="btn btn-success">start page</button>
                         <button className="btn btn-success">CV page</button>
                       </div> */}
-                      <br /><br />
+                      <br />
+                      <br />
                       <div className="report__item-content">
                         <Table>
                           <thead className="text-primary">
@@ -634,13 +669,11 @@ function Report() {
                       </div>
                     </div>
                   </div>
-
                 </div>
               </CardBody>
             </Card>
           </Col>
         </Row>
-        
       </div>
     </>
   );
