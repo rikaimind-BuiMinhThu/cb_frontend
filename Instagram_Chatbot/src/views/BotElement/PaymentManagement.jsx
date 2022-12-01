@@ -463,7 +463,6 @@ function PaymentManagement() {
         };
       }
     }
-    console.log(res);
     if (res != null || res != undefined) {
       api
         .patch(
@@ -500,6 +499,7 @@ function PaymentManagement() {
   }
 
   function savePrefecturesTax() {
+    let checkAmount = false;
     let formAdd = document.getElementById('shipping_fee_tax');
     let payment_method_variable = document.getElementById('shipping_fee_address_variable')?.value;
     let shipping_tax_free = document.getElementById('shipping_tax_free')?.checked;
@@ -510,11 +510,22 @@ function PaymentManagement() {
     // for (let i = 0; i < formAdd.length; i++) {
     //   pm[formAdd[i].name] = formAdd[i].value;
     // }
-    for (var i = 0; i < formAdd.length; i++) {
+    for (let i = 0; i < formAdd.length; i++) {
       pm.push({
         prefecture_id: formAdd[i].name,
         amount: formAdd[i].value,
       });
+    }
+    for (let i = 0; i < formAdd.length; i++) {
+      if (formAdd[i].value == '') {
+        checkAmount = true;
+        if (document.getElementById(`err_amount_of_money_${i}`))
+          document.getElementById(`err_amount_of_money_${i}`).innerHTML =
+            'Please input amount of money';
+      } else {
+        if (document.getElementById(`err_amount_of_money_${i}`))
+          document.getElementById(`err_amount_of_money_${i}`).innerHTML = '';
+      }
     }
     let res;
     if (shipping_tax_free) {
@@ -534,8 +545,7 @@ function PaymentManagement() {
         },
       };
     }
-    console.log(res);
-    if (res != null || res != undefined) {
+    if ((res != null || res != undefined) && checkAmount == false) {
       api
         .patch(`/api/v1/payment_managements/payment_managements/${botId}/update_shipping_fee`, res)
         .then((respon) => {
@@ -574,6 +584,24 @@ function PaymentManagement() {
     let np_maximum_amount = document.getElementById('np_maximum_amount')?.value;
     let formAdd = document.getElementById('customNP');
     let pm = [];
+    let pmFreeValue = [];
+    let pmMaxValue = [];
+    let pmMinValue = [];
+    let checkMaxAmount = false;
+    let checkFreeValue = false;
+    let checkMaxValue = false;
+    let checkMinValue = false;
+
+    for (var i = 0; i < formAdd.length; i++) {
+      if (formAdd[i].name.includes('np_settlement_fee_value')) {
+        pmFreeValue.push(formAdd[i].value);
+      } else if (formAdd[i].name.includes('np_settlement_max_value')) {
+        pmMaxValue.push(formAdd[i].value);
+      } else {
+        pmMinValue.push(formAdd[i].value);
+      }
+    }
+
     for (var i = 0; i < formAdd.length; i += 3) {
       pm.push({
         np_settlement_fee_value: formAdd[i].value,
@@ -581,7 +609,54 @@ function PaymentManagement() {
         np_settlement_min_value: formAdd[i + 2].value,
       });
     }
-    console.log(np_maximum_amount);
+
+    if (np_maximum_amount === '') {
+      checkMaxAmount = true;
+      if (document.getElementById(`err_np_maximum_amount`))
+        document.getElementById(`err_np_maximum_amount`).innerHTML = 'Please input maximum amount ';
+    } else {
+      if (document.getElementById(`err_np_maximum_amount`))
+        document.getElementById(`err_np_maximum_amount`).innerHTML = '';
+    }
+    for (var i = 0; i < pmFreeValue.length; i++) {
+      if (pmFreeValue[i] == '') {
+        checkFreeValue = true;
+        if (document.getElementById(`err_np_settlement_fee_value_${i}`)) {
+          document.getElementById(`err_np_settlement_fee_value_${i}`).innerHTML =
+            'Please input np settlement fee value';
+        }
+      } else {
+        if (document.getElementById(`err_np_settlement_fee_value_${i}`))
+          document.getElementById(`err_np_settlement_fee_value_${i}`).innerHTML = '';
+      }
+      if (pmMaxValue[i] == '') {
+        checkMaxValue = true;
+        if (document.getElementById(`err_np_settlement_max_value_${i}`))
+          document.getElementById(`err_np_settlement_max_value_${i}`).innerHTML =
+            'Please input np settlement max value';
+      } else {
+        if (document.getElementById(`err_np_settlement_max_value_${i}`))
+          document.getElementById(`err_np_settlement_max_value_${i}`).innerHTML = '';
+      }
+      if (pmMinValue[i] == '') {
+        checkMinValue = true;
+        if (document.getElementById(`err_np_settlement_min_value_${i}`))
+          document.getElementById(`err_np_settlement_min_value_${i}`).innerHTML =
+            'Please input np settlement min value';
+      } else {
+        if (document.getElementById(`err_np_settlement_min_value_${i}`))
+          document.getElementById(`err_np_settlement_min_value_${i}`).innerHTML = '';
+      }
+    }
+
+    if (
+      checkMaxAmount == false &&
+      checkFreeValue == false &&
+      checkMaxValue == false &&
+      checkMinValue == false
+    ) {
+      console.log(pm);
+    }
   }
 
   function deleteCdivSpecifyPGW(id) {
@@ -713,6 +788,7 @@ function PaymentManagement() {
                 </>
               ) : (
                 <div>
+                  {/* 1.CONSUMPTION TAX */}
                   <div className="payment_management_setting__item">
                     <h6>consumption tax</h6>
                     <div className="payment_management_setting__body">
@@ -800,6 +876,7 @@ function PaymentManagement() {
                     </div>
                   </div>
 
+                  {/* 2.SPECIFY PAYMENT GATEWAY */}
                   <div className="payment_management_setting__item">
                     <h6>Specify payment gateway</h6>
                     <div className="payment_management_setting__body">
@@ -954,6 +1031,7 @@ function PaymentManagement() {
                     </div>
                   </div>
 
+                  {/* 3.SETTLEMENT FEE (TAX INCLUDED) */}
                   <div className="payment_management_setting__item">
                     <h6>Settlement fee (tax included)</h6>
                     <div className="payment_management_setting__body">
@@ -1085,6 +1163,7 @@ function PaymentManagement() {
                     </div>
                   </div>
 
+                  {/* 4.SHIPPING FEE (TAX INCLUDED) */}
                   <div className="payment_management_setting__item">
                     <h6>Shipping fee (tax included)</h6>
                     <div className="payment_management_setting__body">
@@ -1157,12 +1236,22 @@ function PaymentManagement() {
                                   <span style={{ width: '35%', padding: '2%', color: '#767676' }}>
                                     {item.prefectureName}
                                   </span>
-                                  <input
-                                    type="number"
-                                    name={payment?.shipping_fee_variables[i]?.prefecture_id}
-                                    style={{ width: '40%', color: '#767676' }}
-                                    defaultValue={payment?.shipping_fee_variables[i]?.value}
-                                  />
+                                  <span style={{ width: '40%', display: 'inline-block' }}>
+                                    <input
+                                      type="number"
+                                      name={payment?.shipping_fee_variables[i]?.prefecture_id}
+                                      style={{ width: '100%', color: '#767676' }}
+                                      defaultValue={
+                                        payment?.shipping_fee_variables[i]?.value
+                                          ? payment?.shipping_fee_variables[i]?.value
+                                          : 0
+                                      }
+                                    />
+                                    <label
+                                      style={{ color: 'red' }}
+                                      id={`err_amount_of_money_${i}`}
+                                    ></label>
+                                  </span>
                                   <span style={{ width: '25%', padding: '2%', color: '#767676' }}>
                                     Yen (tax included)
                                   </span>
@@ -1178,6 +1267,7 @@ function PaymentManagement() {
                     </div>
                   </div>
 
+                  {/* 5.NP DEFERRED PAYMENT */}
                   <div className="payment_management_setting__item">
                     <h6>NP deferred payment</h6>
                     <div className="payment_management_setting__body">
@@ -1230,61 +1320,88 @@ function PaymentManagement() {
                             <span style={{ fontWeight: '400', color: '#767676' }}>
                               * A separate contract with Yamato Credit Finance is required.
                             </span>
-                            <br />
+                          </div>
+                          <div style={{ display: 'flex' }}>
                             <label style={{ marginRight: '20px' }}>
                               Maximum amount <span style={{ color: 'red' }}>*</span>
                             </label>
-                            <input
-                              type="number"
-                              placeholder="0"
-                              id="np_maximum_amount"
-                              defaultValue={payment.np_maximum_amount}
-                            />
+                            <span style={{ display: 'inline-block' }}>
+                              <input
+                                type="number"
+                                placeholder="0"
+                                id="np_maximum_amount"
+                                defaultValue={payment.np_maximum_amount}
+                              />
+                              <br />
+                              <label style={{ color: 'red' }} id={`err_np_maximum_amount`}></label>
+                            </span>
                             Circle
-                            <br />
-                            <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                              <label style={{ marginRight: '20px' }}>
-                                Settlement fee <span style={{ color: 'red' }}>*</span>
-                              </label>
-                              <form id="customNP">
-                                {customDivSettlementFee.map((cdiv, i) => (
-                                  <div
-                                    style={{ marginBottom: '10px' }}
-                                    key={cdiv}
-                                    id={`settlementFee${i}`}
-                                  >
+                          </div>
+                          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                            <label style={{ marginRight: '20px' }}>
+                              Settlement fee <span style={{ color: 'red' }}>*</span>
+                            </label>
+                            <form id="customNP">
+                              {customDivSettlementFee.map((cdiv, i) => (
+                                <div
+                                  style={{ display: 'flex' }}
+                                  key={cdiv}
+                                  id={`settlementFee${i}`}
+                                >
+                                  <div style={{ display: 'inline-block' }}>
                                     <input
                                       style={{ marginLeft: '20px' }}
                                       type="number"
                                       placeholder="0"
-                                      name=""
+                                      name="np_settlement_fee_value"
                                     />
-                                    ~
-                                    <input
-                                      style={{ marginLeft: '20px' }}
-                                      type="number"
-                                      placeholder="0"
-                                    />
-                                    Circle
-                                    <input
-                                      style={{ marginLeft: '20px' }}
-                                      type="number"
-                                      placeholder="0"
-                                    />
-                                    Circle
-                                    <span
-                                      style={{
-                                        color: 'red',
-                                        display: `${i == 0 ? 'none' : 'inline-block'}`,
-                                      }}
-                                      onClick={() => deleteCdivSettlementFee(i)}
-                                    >
-                                      &emsp;X
-                                    </span>
+                                    ~<br />
+                                    <label
+                                      style={{ color: 'red', margin: '0 0 0 20px' }}
+                                      id={`err_np_settlement_fee_value_${i}`}
+                                    ></label>
                                   </div>
-                                ))}
-                              </form>
-                            </div>
+                                  <div style={{ display: 'inline-block' }}>
+                                    <input
+                                      style={{ marginLeft: '20px' }}
+                                      type="number"
+                                      placeholder="0"
+                                      name="np_settlement_max_value"
+                                    />
+                                    Circle
+                                    <br />
+                                    <label
+                                      style={{ color: 'red', margin: '0 0 0 20px' }}
+                                      id={`err_np_settlement_max_value_${i}`}
+                                    ></label>
+                                  </div>
+                                  <div style={{ display: 'inline-block' }}>
+                                    <input
+                                      style={{ marginLeft: '20px' }}
+                                      type="number"
+                                      placeholder="0"
+                                      name="np_settlement_min_value"
+                                    />
+                                    Circle
+                                    <br />
+                                    <label
+                                      style={{ color: 'red', margin: '0 0 0 20px' }}
+                                      id={`err_np_settlement_min_value_${i}`}
+                                    ></label>
+                                  </div>
+                                  <span
+                                    style={{
+                                      color: 'red',
+                                      display: `${i == 0 ? 'none' : 'inline-block'}`,
+                                      marginTop: '10px',
+                                    }}
+                                    onClick={() => deleteCdivSettlementFee(i)}
+                                  >
+                                    &emsp;X
+                                  </span>
+                                </div>
+                              ))}
+                            </form>
                           </div>
                           <button
                             className="btn btn-outline-primary"
