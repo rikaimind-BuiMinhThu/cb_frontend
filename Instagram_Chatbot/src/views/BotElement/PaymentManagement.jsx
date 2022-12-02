@@ -578,7 +578,7 @@ function PaymentManagement() {
   }
 
   function saveNPDeferredPayment() {
-    let np_deferred_no = document.getElementById('np_deferred_no');
+    let np_deferred_no = document.getElementById('np_deferred_no').checked;
     let not_included = document.getElementById('not_included')?.checked;
     let enclosed = document.getElementById('enclosed')?.checked;
     let np_maximum_amount = document.getElementById('np_maximum_amount')?.value;
@@ -591,6 +591,7 @@ function PaymentManagement() {
     let checkFreeValue = false;
     let checkMaxValue = false;
     let checkMinValue = false;
+    let res;
 
     for (var i = 0; i < formAdd.length; i++) {
       if (formAdd[i].name.includes('np_settlement_fee_value')) {
@@ -634,6 +635,11 @@ function PaymentManagement() {
         if (document.getElementById(`err_np_settlement_max_value_${i}`))
           document.getElementById(`err_np_settlement_max_value_${i}`).innerHTML =
             'Please input np settlement max value';
+      } else if (pmMaxValue[i] < pmMinValue[i]) {
+        checkMaxValue = true;
+        if (document.getElementById(`err_np_settlement_max_value_${i}`))
+          document.getElementById(`err_np_settlement_max_value_${i}`).innerHTML =
+            'Np settlement max value must be greater than min value';
       } else {
         if (document.getElementById(`err_np_settlement_max_value_${i}`))
           document.getElementById(`err_np_settlement_max_value_${i}`).innerHTML = '';
@@ -649,13 +655,66 @@ function PaymentManagement() {
       }
     }
 
-    if (
-      checkMaxAmount == false &&
-      checkFreeValue == false &&
-      checkMaxValue == false &&
-      checkMinValue == false
-    ) {
-      console.log(pm);
+    if (np_deferred_no) {
+      res = {
+        np_deferred_payment: {
+          need_np_deferred_payment: 'no', // {free: false, paid: true}
+          np_invoice_included: payment?.np_invoice_included, // {not_include: 0, enclosed: 1}
+          np_maximum_amount: payment?.np_maximum_amount,
+          np_value_settlements_attributes: payment?.settlement_fee_variable,
+        },
+      };
+    } else {
+      if (
+        checkMaxAmount == false &&
+        checkFreeValue == false &&
+        checkMaxValue == false &&
+        checkMinValue == false
+      ) {
+        res = {
+          np_deferred_payment: {
+            need_np_deferred_payment: 'yes',
+            np_invoice_included: not_included ? 'not_include' : enclosed,
+            np_maximum_amount: np_maximum_amount,
+            np_value_settlements_attributes: pm,
+          },
+        };
+      }
+    }
+
+    if (res != null || res != undefined) {
+      console.log(res);
+      api
+        .patch(
+          `/api/v1/payment_managements/payment_managements/${botId}/update_np_deferred_payment`,
+          res
+        )
+        .then((respon) => {
+          console.log(respon);
+          if (respon.data.code == 1) {
+            setMsgNoti(`Update successfully!`);
+            setIsOpenNoti(true);
+            reload();
+            setTimeout(() => {
+              setMsgNoti('');
+              setIsOpenNoti(false);
+            }, 2000);
+          }
+          if (respon.data.code == 2) {
+            setMsgNoti(respon.data.message);
+            setIsOpenNoti(true);
+            setTimeout(() => {
+              setMsgNoti('');
+              setIsOpenNoti(false);
+            }, 2000);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err.response?.data.code === 0) {
+            tokenExpired();
+          }
+        });
     }
   }
 
@@ -1353,7 +1412,13 @@ function PaymentManagement() {
                                       style={{ marginLeft: '20px' }}
                                       type="number"
                                       placeholder="0"
-                                      name="np_settlement_fee_value"
+                                      name={`np_settlement_fee_value${i}`}
+                                      defaultValue={
+                                        payment?.np_value_settlements.length > 0
+                                          ? payment?.np_value_settlements[i]
+                                              ?.np_settlement_fee_value
+                                          : null
+                                      }
                                     />
                                     ~<br />
                                     <label
@@ -1366,7 +1431,13 @@ function PaymentManagement() {
                                       style={{ marginLeft: '20px' }}
                                       type="number"
                                       placeholder="0"
-                                      name="np_settlement_max_value"
+                                      name={`np_settlement_max_value${i}`}
+                                      defaultValue={
+                                        payment?.np_value_settlements.length > 0
+                                          ? payment?.np_value_settlements[i]
+                                              ?.np_settlement_max_value
+                                          : null
+                                      }
                                     />
                                     Circle
                                     <br />
@@ -1380,7 +1451,13 @@ function PaymentManagement() {
                                       style={{ marginLeft: '20px' }}
                                       type="number"
                                       placeholder="0"
-                                      name="np_settlement_min_value"
+                                      name={`np_settlement_min_value${i}`}
+                                      defaultValue={
+                                        payment?.np_value_settlements.length > 0
+                                          ? payment?.np_value_settlements[i]
+                                              ?.np_settlement_min_value
+                                          : null
+                                      }
                                     />
                                     Circle
                                     <br />
