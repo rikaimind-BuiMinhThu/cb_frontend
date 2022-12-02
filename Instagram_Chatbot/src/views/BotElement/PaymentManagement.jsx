@@ -141,6 +141,15 @@ function PaymentManagement() {
         else setNoShip(false);
         if (res.data?.data?.need_np_deferred_payment === 'no') setNoNP(true);
         else setNoNP(false);
+        if (res.data?.data?.specify_payment_variables[0].id !== null) {
+          setCustomDivSpecifyPaymentGW(res.data?.data?.specify_payment_variables);
+        }
+        if (res.data?.data?.settlement_fee_variables[0].id !== null) {
+          setCustomDivSettlementPaymentGW(res.data?.data?.settlement_fee_variables);
+        }
+        if (res.data?.data?.np_value_settlements[0].id !== null) {
+          setCustomDivSettlementFee(res.data?.data?.np_value_settlements);
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -996,7 +1005,7 @@ function PaymentManagement() {
                                 </select>
                               </div> */}
                               {customDivSpecifyPaymentGW?.map((cdiv, i) => (
-                                <div key={cdiv} id={`specifyPGW${i}`}>
+                                <div key={i} id={`specifyPGW${i}`}>
                                   <div style={{ display: 'flex' }}>
                                     <label style={{ width: '10%' }}>
                                       variable value <span style={{ color: 'red' }}>*</span>
@@ -1148,7 +1157,7 @@ function PaymentManagement() {
 
                             </div> */}
                             {customDivSettlementPaymentGW?.map((cdiv, i) => (
-                              <div key={cdiv} id={`settlementPGW${i}`}>
+                              <div key={i} id={`settlementPGW${i}`}>
                                 <div style={{ display: 'flex' }}>
                                   <label style={{ width: '10%' }}>
                                     variable value <span style={{ color: 'red' }}>*</span>
@@ -1402,11 +1411,7 @@ function PaymentManagement() {
                             </label>
                             <form id="customNP">
                               {customDivSettlementFee.map((cdiv, i) => (
-                                <div
-                                  style={{ display: 'flex' }}
-                                  key={cdiv}
-                                  id={`settlementFee${i}`}
-                                >
+                                <div style={{ display: 'flex' }} key={i} id={`settlementFee${i}`}>
                                   <div style={{ display: 'inline-block' }}>
                                     <input
                                       style={{ marginLeft: '20px' }}
