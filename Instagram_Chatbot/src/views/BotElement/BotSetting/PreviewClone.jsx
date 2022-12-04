@@ -7,7 +7,7 @@ import SelectCustom from './ScenarioSetting/scenarioComon/SelectCustom';
 import CheckboxCustom from './ScenarioSetting/scenarioComon/CheckboxCustom';
 import InputCustom from './ScenarioSetting/scenarioComon/InputCustom';
 import DatePicker from 'react-datepicker';
-import {Button} from 'reactstrap';
+import { Button } from 'reactstrap';
 import { Checkbox, Radio, Slider, Calendar } from 'antd';
 import moment from 'moment';
 import cvcIcon from '../../../assets/img/cvc-icon.png';
@@ -83,9 +83,11 @@ let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
 function PreviewClone() {
 
-  const [isOpen, setIsOpen] = useState(true)
-  const [botId, setBotId] = useState(Cookies.get('bot_id'));
-  const [scenarioId, setScenarioId] = useState(Cookies.get('scenario_id'));
+  const [isOpen, setIsOpen] = useState(false)
+  const [urlSend, setUrlSend] = useState()
+  const [urlReceive, setUrlReceive] = useState()
+  const [botId, setBotId] = useState();
+  const [scenarioId, setScenarioId] = useState();
   const [botInfor, setBotInfor] = useState();
   const [dataMessages, setDataMessages] = useState([]);
   const [indexMessageRender, setIndexMessageRender] = useState(0);
@@ -116,6 +118,10 @@ function PreviewClone() {
     });
     return dataObj;
   });
+
+  // useEffect(() => {
+
+  // }, [])
 
   function getAllUrlParams(url) {
     var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
@@ -154,25 +160,36 @@ function PreviewClone() {
     return obj;
   }
 
-  function onOpenPreview(){
-      if(isOpen) {
-          document.getElementById('sp-container').style.height = "610px";
-          document.getElementById('sp-header').style.position = "static";
-          document.getElementById('sp-header').style.borderBottomLeftRadius = "0px";
-          document.getElementById('sp-header').style.borderBottomRightRadius = "0px";
-          document.getElementById('sp-process-bar').style.display = "block";
-          document.getElementById('sp-body').style.display = "block";
-      } else {
-          document.getElementById('sp-container').style.height = "0px";
-          document.getElementById('sp-process-bar').style.display = "none";
-          document.getElementById('sp-body').style.display = "none";
-          document.getElementById('sp-header').style.borderBottomLeftRadius = "25px";
-          document.getElementById('sp-header').style.borderBottomRightRadius = "25px";
-          document.getElementById('sp-header').style.position = "absolute";
-          document.getElementById('sp-header').style.bottom = "13px";
-
+  function onOpenPreview() {
+    if (isOpen) {
+      Cookies.set('openPre', true)
+      if (window && window.parent) {
+        window.parent.postMessage(true, urlReceive);
       }
-      setIsOpen(!isOpen);
+      
+      // body.postMessage(message, domain);
+      document.getElementById('sp-container').style.height = "610px";
+      document.getElementById('sp-header').style.position = "static";
+      document.getElementById('sp-header').style.borderBottomLeftRadius = "0px";
+      document.getElementById('sp-header').style.borderBottomRightRadius = "0px";
+      document.getElementById('sp-process-bar').style.display = "block";
+      document.getElementById('sp-body').style.display = "block";
+    }
+    else {
+      Cookies.set('openPre', false)
+      if (window && window.parent) {
+        window.parent.postMessage(false, urlReceive);
+      }
+      document.getElementById('sp-container').style.height = "0px";
+      document.getElementById('sp-process-bar').style.display = "none";
+      document.getElementById('sp-body').style.display = "none";
+      document.getElementById('sp-header').style.borderBottomLeftRadius = "25px";
+      document.getElementById('sp-header').style.borderBottomRightRadius = "25px";
+      document.getElementById('sp-header').style.position = "absolute";
+      document.getElementById('sp-header').style.bottom = "13px";
+
+    }
+    setIsOpen(!isOpen);
   }
 
   // useEffect(() => {
@@ -184,221 +201,130 @@ function PreviewClone() {
   // }, [])
 
   useEffect(() => {
-    if (scenarioId) {
-      api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/preview`).then(async res => {
-        if (res.data.code == 1) {
-          let messageArr = [...res.data.data?.conversation?.messages];
-          setDataMessages(messageArr);
-          setVariables([...res.data.variables]);
-          setBotInfor(res.data.chatbot);
-          res.data.variables.forEach(item => {
-            objParam[item.variable_name] = item.default_value;
-          });
-          setObjParam({ ...objParam });
-          console.log(objParam, 'ceghckkkkkkkkkkkkkkk objParam')
-          let variables = [...res.data.variables];
-          let messageUserVar = messageArr.filter(item => item.belong_to === 'user' && item.message_content.length > 0);
-          setMessageUser([...messageUserVar]);
-          let renderMessage = [];
-          let index;
-          let delayRender;
-          let isPauseScroll = false;
-          for (let i = 0; i < messageArr.length; i++) {
-            if (messageArr[i].hidden !== true) {
-              if (messageArr[i].conditions?.length > 0) {
-                var checked = true;
-                console.log(messageArr[i].conditions, 'check conditions')
-                for (let j = 0; j < messageArr[i].conditions.length; j++) {
-                  let conditionItem = messageArr[i].conditions[j];
-                  if (j === 0) {
-                    if (conditionItem.condition === 'include') {
-                      checked = objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
-                    } else if (conditionItem.condition === 'is') {
-                      checked = (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
-                    } else if (conditionItem.condition === 'not_include') {
-                      checked = (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
-                    } else if (conditionItem.condition === 'is_not') {
-                      checked = (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
-                    }
-                  } else if (conditionItem?.linkCondition === 'and') {
-                    if (conditionItem.condition === 'include') {
-                      checked = checked && objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
-                    } else if (conditionItem.condition === 'is') {
-                      checked = checked && (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
-                    } else if (conditionItem.condition === 'not_include') {
-                      checked = checked && (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
-                    } else if (conditionItem.condition === 'is_not') {
-                      checked = checked && (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
-                    }
-                  } else if (conditionItem?.linkCondition === 'or') {
-                    if (conditionItem.condition === 'include') {
-                      checked = checked || objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
-                    } else if (conditionItem.condition === 'is') {
-                      checked = checked || (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
-                    } else if (conditionItem.condition === 'not_include') {
-                      checked = checked || (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
-                    } else if (conditionItem.condition === 'is_not') {
-                      checked = checked || (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
-                    }
+    var url = new URL(window.location.href)
+    console.log(url)
+    let params = new URLSearchParams(url.search);
+    let botIdGet = params.get('bot_id') // 'chrome-instant'
+    let urlRe = params.get('urlReceive') // 'chrome-instant'
+    let scenarioIdGet = params.get('scenario_id') // 'mdn query string'
+    console.log('url ne: ', urlRe)
+    setUrlSend(url.href)
+    setUrlReceive(urlRe)
+    console.log('botIdGet: ', botIdGet)
+    console.log('scenarioIdGet: ', scenarioIdGet)
+    setBotId(botIdGet)
+    setScenarioId(scenarioIdGet)
+    api.get(`/api/v1/managements/chatbots/${botIdGet}/scenarios/${scenarioIdGet}/preview`).then(async res => {
+      if (res.data.code == 1) {
+        let messageArr = [...res.data.data?.conversation?.messages];
+        setDataMessages(messageArr);
+        setVariables([...res.data.variables]);
+        setBotInfor(res.data.chatbot);
+        res.data.variables.forEach(item => {
+          objParam[item.variable_name] = item.default_value;
+        });
+        console.log(res.data.chatbot);
+        setObjParam({ ...objParam });
+        console.log(objParam, 'ceghckkkkkkkkkkkkkkk objParam')
+        let variables = [...res.data.variables];
+        let messageUserVar = messageArr.filter(item => item.belong_to === 'user' && item.message_content.length > 0);
+        setMessageUser([...messageUserVar]);
+        let renderMessage = [];
+        let index;
+        let delayRender;
+        let isPauseScroll = false;
+        for (let i = 0; i < messageArr.length; i++) {
+          if (messageArr[i].hidden !== true) {
+            if (messageArr[i].conditions?.length > 0) {
+              var checked = true;
+              console.log(messageArr[i].conditions, 'check conditions')
+              for (let j = 0; j < messageArr[i].conditions.length; j++) {
+                let conditionItem = messageArr[i].conditions[j];
+                if (j === 0) {
+                  if (conditionItem.condition === 'include') {
+                    checked = objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                  } else if (conditionItem.condition === 'is') {
+                    checked = (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                  } else if (conditionItem.condition === 'not_include') {
+                    checked = (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                  } else if (conditionItem.condition === 'is_not') {
+                    checked = (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
                   }
-                }
-                if (checked === false) {
-                  if (messageArr[i].belong_to === 'user') setIndexUser(prev => prev + 1);
-                  continue;
+                } else if (conditionItem?.linkCondition === 'and') {
+                  if (conditionItem.condition === 'include') {
+                    checked = checked && objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                  } else if (conditionItem.condition === 'is') {
+                    checked = checked && (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                  } else if (conditionItem.condition === 'not_include') {
+                    checked = checked && (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                  } else if (conditionItem.condition === 'is_not') {
+                    checked = checked && (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                  }
+                } else if (conditionItem?.linkCondition === 'or') {
+                  if (conditionItem.condition === 'include') {
+                    checked = checked || objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                  } else if (conditionItem.condition === 'is') {
+                    checked = checked || (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                  } else if (conditionItem.condition === 'not_include') {
+                    checked = checked || (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                  } else if (conditionItem.condition === 'is_not') {
+                    checked = checked || (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                  }
                 }
               }
-              if (messageArr[0].belong_to === 'bot' && messageArr[i].message_content.length > 0) {
-                console.log(i, 'check index message')
+              if (checked === false) {
+                if (messageArr[i].belong_to === 'user') setIndexUser(prev => prev + 1);
+                continue;
+              }
+            }
+            if (messageArr[0].belong_to === 'bot' && messageArr[i].message_content.length > 0) {
+              console.log(i, 'check index message')
 
-                if (messageArr[i]?.message_content[0]?.type === 'delay') {
-                  await new Promise((resolve) => {
-                    return delayRender = setTimeout(() => {
-                      resolve();
-                    }, messageArr[i]?.message_content[0]?.delay?.content * 1000);
-                  }).then(() => {
-                    setIndexMessageRender(i);
-                  })
-                  index = i;
-                } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
-                  // console.log(dataVariables, 'checkkkk variables')                
-                  if (variables.length !== 0) {
-                    let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
-                    variables.forEach(item => {
-                      for (let z = 0; z < dataVarExist.length; z++) {
-                        if (item.variable_name === dataVarExist[z].key) {
-                          item.default_value = dataVarExist[z].value;
-                        }
-                      }
-                    });
-                    console.log(variables, 'checkkkk variables');
-                    setVariables([...variables]);
-                  }
-                  setIndexMessageRender(i);
-                  index = i;
-                } else if (messageArr[i]?.message_content[0]?.type === 'clear_variable') {
-                  // console.log(dataVariables, 'checkkkk variables')                
-                  if (variables.length !== 0) {
-                    let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
-                    variables.forEach(item => {
-                      for (let z = 0; z < dataVarExist.length; z++) {
-                        if (item.variable_name === dataVarExist[z]) {
-                          item.default_value = "";
-                        }
-                      }
-                    });
-                    console.log(variables, 'checkkkk variables');
-                    setVariables([...variables]);
-                  }
-                  setIndexMessageRender(i);
-                  index = i;
-                } else if (messageArr[i].belong_to !== 'bot') {
-                  await new Promise((resolve) => {
-                    return delayRender = setTimeout(() => {
-                      console.log(messageArr[i], 'cacjalkscjalksjlkduqioweu123123')
-                      for (let j = 0; j < messageArr[i].message_content.length; j++) {
-                        if (messageArr[i].message_content[j].type === 'capture') {
-                          api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
-                            console.log(res);
-                            captcha.push({
-                              index: i,
-                              indexContent: j,
-                              ...res.data
-                            })
-                            setCaptcha([...captcha]);
-                          })
-                          // break;
-                        }
-                      }
-                      resolve({ ...messageArr[i] });
-                    }, 1000);
-                  }).then(data => {
-                    renderMessage.push(data);
-                    console.log(renderMessage);
-                    setRenderMessageArr([
-                      ...renderMessage
-                    ]);
-                    setIndexMessageRender(i);
-                    if (isPauseScroll === false) {
-                      scrollToBottom();
-                    }
-                  }).catch((error) => {
-                    console.log(error);
-                    if (error.response?.data.code === 0) {
-                      tokenExpired();
-                    }
-                  });
-                  setIndexUser(prev => prev + 1);
-                  index = i;
-                  break;
-                } else {
-                  await new Promise((resolve) => {
-                    return delayRender = setTimeout(() => {
-                      if (messageArr[i].message_content[0]?.type === 'text_input' && messageArr[i].message_content[0].text_input.content) {
-                        messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                          if (variables.length !== 0) {
-                            let valueVar = "";
-                            for (let j = 0; j < variables.length; j++) {
-                              if (variables[j].variable_name === variable) {
-                                valueVar = variables[j].default_value;
-                              }
-                            }
-                            return valueVar;
-                          } else {
-                            return "";
-                          }
-                        });
-                      }
-                      resolve({ ...messageArr[i] });
-                    }, 1000);
-                  }).then(data => {
-                    renderMessage.push(data);
-                    console.log(data);
-                    setRenderMessageArr([
-                      ...renderMessage
-                    ]);
-                    setIndexMessageRender(i);
-                    if (isPauseScroll === false) {
-                      scrollToBottom();
-                    }
-                    if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
-                      isPauseScroll = true;
-                    }
-                  })
-                  index = i;
-                }
-              } else if (messageArr[0].belong_to === 'user' && messageArr[i].message_content.length > 0) {
-                // if (messageArr[i].belong_to !== 'user') {
-                //   await new Promise((resolve) => {
-                //     return delayRender = setTimeout(() => {
-                //       if (messageArr[i].message_content[0]?.type === 'text_input') {
-                //         messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                //           for (let j = 0; j < variables.length; j++) {
-                //             if (variables[j].variable_name === variable) {
-                //               console.log(variables[j].variable_name, 'cehckkkkk')
-                //               return variables[j].default_value;
-                //             }
-                //           }
-                //         });
-                //       }
-                //       resolve({ ...messageArr[i] });
-                //     }, 1000);
-                //   }).then(data => {
-                //     renderMessage.push(data);
-                //     setRenderMessageArr([
-                //       ...renderMessage
-                //     ]);
-                //     setIndexMessageRender(i);
-                //     if (isPauseScroll === false) {
-                //       scrollToBottom();
-                //     }
-                //     if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
-                //       isPauseScroll = true;
-                //     }
-                //   })
-                //   index = i;
-                // } else {
+              if (messageArr[i]?.message_content[0]?.type === 'delay') {
                 await new Promise((resolve) => {
                   return delayRender = setTimeout(() => {
+                    resolve();
+                  }, messageArr[i]?.message_content[0]?.delay?.content * 1000);
+                }).then(() => {
+                  setIndexMessageRender(i);
+                })
+                index = i;
+              } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
+                // console.log(dataVariables, 'checkkkk variables')                
+                if (variables.length !== 0) {
+                  let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
+                  variables.forEach(item => {
+                    for (let z = 0; z < dataVarExist.length; z++) {
+                      if (item.variable_name === dataVarExist[z].key) {
+                        item.default_value = dataVarExist[z].value;
+                      }
+                    }
+                  });
+                  console.log(variables, 'checkkkk variables');
+                  setVariables([...variables]);
+                }
+                setIndexMessageRender(i);
+                index = i;
+              } else if (messageArr[i]?.message_content[0]?.type === 'clear_variable') {
+                // console.log(dataVariables, 'checkkkk variables')                
+                if (variables.length !== 0) {
+                  let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
+                  variables.forEach(item => {
+                    for (let z = 0; z < dataVarExist.length; z++) {
+                      if (item.variable_name === dataVarExist[z]) {
+                        item.default_value = "";
+                      }
+                    }
+                  });
+                  console.log(variables, 'checkkkk variables');
+                  setVariables([...variables]);
+                }
+                setIndexMessageRender(i);
+                index = i;
+              } else if (messageArr[i].belong_to !== 'bot') {
+                await new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    console.log(messageArr[i], 'cacjalkscjalksjlkduqioweu123123')
                     for (let j = 0; j < messageArr[i].message_content.length; j++) {
                       if (messageArr[i].message_content[j].type === 'capture') {
                         api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
@@ -410,12 +336,14 @@ function PreviewClone() {
                           })
                           setCaptcha([...captcha]);
                         })
+                        // break;
                       }
                     }
                     resolve({ ...messageArr[i] });
                   }, 1000);
                 }).then(data => {
                   renderMessage.push(data);
+                  console.log(renderMessage);
                   setRenderMessageArr([
                     ...renderMessage
                   ]);
@@ -423,23 +351,125 @@ function PreviewClone() {
                   if (isPauseScroll === false) {
                     scrollToBottom();
                   }
-                })
+                }).catch((error) => {
+                  console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired();
+                  }
+                });
                 setIndexUser(prev => prev + 1);
                 index = i;
                 break;
+              } else {
+                await new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    if (messageArr[i].message_content[0]?.type === 'text_input' && messageArr[i].message_content[0].text_input.content) {
+                      messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                        if (variables.length !== 0) {
+                          let valueVar = "";
+                          for (let j = 0; j < variables.length; j++) {
+                            if (variables[j].variable_name === variable) {
+                              valueVar = variables[j].default_value;
+                            }
+                          }
+                          return valueVar;
+                        } else {
+                          return "";
+                        }
+                      });
+                    }
+                    resolve({ ...messageArr[i] });
+                  }, 1000);
+                }).then(data => {
+                  renderMessage.push(data);
+                  console.log(data);
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
+                  setIndexMessageRender(i);
+                  if (isPauseScroll === false) {
+                    scrollToBottom();
+                  }
+                  if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
+                    isPauseScroll = true;
+                  }
+                })
+                index = i;
               }
-              // }
+            } else if (messageArr[0].belong_to === 'user' && messageArr[i].message_content.length > 0) {
+              // if (messageArr[i].belong_to !== 'user') {
+              //   await new Promise((resolve) => {
+              //     return delayRender = setTimeout(() => {
+              //       if (messageArr[i].message_content[0]?.type === 'text_input') {
+              //         messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+              //           for (let j = 0; j < variables.length; j++) {
+              //             if (variables[j].variable_name === variable) {
+              //               console.log(variables[j].variable_name, 'cehckkkkk')
+              //               return variables[j].default_value;
+              //             }
+              //           }
+              //         });
+              //       }
+              //       resolve({ ...messageArr[i] });
+              //     }, 1000);
+              //   }).then(data => {
+              //     renderMessage.push(data);
+              //     setRenderMessageArr([
+              //       ...renderMessage
+              //     ]);
+              //     setIndexMessageRender(i);
+              //     if (isPauseScroll === false) {
+              //       scrollToBottom();
+              //     }
+              //     if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
+              //       isPauseScroll = true;
+              //     }
+              //   })
+              //   index = i;
+              // } else {
+              await new Promise((resolve) => {
+                return delayRender = setTimeout(() => {
+                  for (let j = 0; j < messageArr[i].message_content.length; j++) {
+                    if (messageArr[i].message_content[j].type === 'capture') {
+                      api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
+                        console.log(res);
+                        captcha.push({
+                          index: i,
+                          indexContent: j,
+                          ...res.data
+                        })
+                        setCaptcha([...captcha]);
+                      })
+                    }
+                  }
+                  resolve({ ...messageArr[i] });
+                }, 1000);
+              }).then(data => {
+                renderMessage.push(data);
+                setRenderMessageArr([
+                  ...renderMessage
+                ]);
+                setIndexMessageRender(i);
+                if (isPauseScroll === false) {
+                  scrollToBottom();
+                }
+              })
+              setIndexUser(prev => prev + 1);
+              index = i;
+              break;
             }
-          }
-          // setIndexMessageRender(index);
-          // setRenderMessageArr(renderMessage);
-          return () => {
-            clearTimeout(delayRender);
+            // }
           }
         }
-      }).catch(err => console.log(err));
-    }
-  }, [scenarioId])
+        // setIndexMessageRender(index);
+        // setRenderMessageArr(renderMessage);
+        return () => {
+          clearTimeout(delayRender);
+        }
+      }
+    }).catch(err => console.log(err));
+
+  }, [])
 
   const scrollToBottom = () => {
     if (document.getElementById('sp-body')) {
@@ -1139,9 +1169,11 @@ function PreviewClone() {
   }
 
   return (
-    <React.Fragment>
+    <div id='jjhs'>
       <div id="sp-container" className="sp-container">
-        <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header" onClick={() => onOpenPreview()}>
+        <div id="sp-header"
+          style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }}
+          className="sp-header" onClick={() => onOpenPreview()}>
           <div className="sp-header-left">
             <div className="sp-header-left-avatar sp-avatar">
               <img src={botInfor?.icon?.url && ("https://ec-chatbot-test1.com/" + botInfor?.icon?.url)} />
@@ -1208,7 +1240,7 @@ function PreviewClone() {
           }
         </div>
       </div>
-    </React.Fragment>
+    </div>
   )
 }
 

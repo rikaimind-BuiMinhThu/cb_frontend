@@ -8002,8 +8002,8 @@ function Chatbot() {
               </div>
               <label id="registrationTitleErr" style={{ display: 'none', color: "red" }}></label>
             </label><br /> */}
-            <div style={{ height: "325px", overflowY: "scroll" }}>
-              {hotTem.map((item, i) => (
+            <div style={{ height: "325px", overflowY: "scroll", display:`${hotTem.length != 0 ?'block': 'none'}` }}>
+              {hotTem?.map((item, i) => (
                 <div key={item.id}>
                   <br />
                   <label style={{ width: "100%" }}>
