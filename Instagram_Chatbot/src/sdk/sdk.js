@@ -1,29 +1,8 @@
-var botId = 6
-var scenarioId = 101
-var url = `https://ec-chatbot-test1.com/api/v1/analytics/chatbot_counts/${botId}`;
-/* Adding the script tag to the head as suggested before */
-
-var head = document.getElementsByTagName('head')[0];
-var script = document.createElement('script');
-script.type = 'text/javascript';
-script.src = "https://code.jquery.com/jquery-3.6.0.min.js";
-
-// Then bind the event to the callback function.
-// There are several events for cross browser compatibility.
-script.onreadystatechange = handler;
-script.onload = handler;
-
-// Fire the loading
-head.appendChild(script);
-
-function handler(){
-   console.log('jquery added :)');
-}
-// const full = window.location.protocol + '//' + window.location.host;
+var botId = sessionStorage.getItem('bot_id'); var scenarioId = sessionStorage.getItem('scenario_id'); var url = `https://ec-chatbot-test1.com/api/v1/analytics/chatbot_counts/${botId}`;
+var head = document.getElementsByTagName('head')[0]; var script = document.createElement('script'); script.type = 'text/javascript';
+script.src = "https://code.jquery.com/jquery-3.6.0.min.js"; head.appendChild(script);
 function displayPopup() {
-
-    var body = document.getElementsByTagName("BODY")[0]
-    var iframe = document.createElement('iframe');
+    var body = document.getElementsByTagName("BODY")[0]; var iframe = document.createElement('iframe');
     iframe.id = 'previewSdk'; iframe.style.position = "fixed"; iframe.style.bottom = "0"; iframe.style.right = "0"
     iframe.style.border = 'none'; iframe.style.padding = '0'; iframe.style.margin = '0'; iframe.style.borderRadius = '30px'
     iframe.src = `https://localhost:3000/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}`;
@@ -40,27 +19,27 @@ function displayPopup() {
     }, false);
     let device = (mobileAndTabletcheck() == false && mobileCheck() == false) ? 'pc' : ((mobileAndTabletcheck() == true && mobileCheck() == false) ? 'tablet' : 'sp')
     // console.log('device: ', device)
-    setTimeout(()=>{
+    setTimeout(() => {
         let checkDevice = { chatbot_data: device }
         submitForm(url, checkDevice)
-    },1000)
+    }, 1000)
 
 }
 async function submitForm(url, data) {
     $.ajax({
         url: url,
         data: {
-           data 
+            data
         },
-        error: function(e) {
-           console.log('error roi ', e);
+        error: function (e) {
+            console.log('error roi ', e);
         },
         dataType: 'data',
-        success: function(data) {
-           console.log('oke roi nhe');
+        success: function (data) {
+            console.log('oke roi nhe');
         },
         type: 'PATCH'
-     });
+    });
 }
 
 
