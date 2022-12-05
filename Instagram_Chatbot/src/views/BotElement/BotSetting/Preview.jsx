@@ -18,6 +18,12 @@ import $ from 'jquery';
 import DatePickerCustom from './ScenarioSetting/scenarioComon/DatePickerCustom';
 import InputNum from './ScenarioSetting/scenarioComon/InputNum';
 import { tokenExpired } from 'api/tokenExpired';
+import american_express from '../../../assets/img/payment-method/american_express.png';
+import diner_club from '../../../assets/img/payment-method/diner_club.png';
+import discover from '../../../assets/img/payment-method/discover.png';
+import jcb from '../../../assets/img/payment-method/jcb.png';
+import master_card from '../../../assets/img/payment-method/master_card.png';
+import visa from '../../../assets/img/payment-method/visa.png';
 
 const _ = require('lodash');
 
@@ -83,6 +89,33 @@ let dataEveryMinute = [
     value: '30'
   },
 ];
+
+let dataPaymentMethod = [
+  {
+    key: 'visa',
+    value: <img src={visa} />
+  },
+  {
+    key: 'jcb',
+    value: <img src={jcb} />
+  },
+  {
+    key: 'master_card',
+    value: <img src={master_card} />
+  },
+  {
+    key: 'american_express',
+    value: <img src={american_express} />
+  },
+  {
+    key: 'diner_club',
+    value: <img src={diner_club} />
+  },
+  {
+    key: 'discover',
+    value: <img src={discover} />
+  }
+]
 
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
@@ -2961,6 +2994,13 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                     </div>
                   }
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    {creditCardPayment.payment_method.map((itemPayment, index, array) => {
+                      return <div key={index} style={{width: `${100/array.length - 3}%`}} className="ss-img-list-bank">
+                        {dataPaymentMethod.find(item => item.key === itemPayment).value}
+                      </div>
+                    })}
+                  </div>
                   {creditCardPayment.separate_type === false ?
                     <div className="ss-user-setting__item-bottom">
                       <InputNum

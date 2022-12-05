@@ -2031,7 +2031,7 @@ const Scenario = () => {
             is_hide_cvc: false,
             separate_type: false,
             validity_check: false,
-            type_date_of_expiry: 'YM',
+            type_date_of_expiry: 'ym',
             payment_method: []
           }
         }
