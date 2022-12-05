@@ -293,3 +293,7 @@
 .sp-body-user-side .ant-picker-calendar-header .ant-picker-calendar-year-select {
     min-width: 73px;
 }
+
+.ss-img-list-bank img {
+    width: 100%;
+}

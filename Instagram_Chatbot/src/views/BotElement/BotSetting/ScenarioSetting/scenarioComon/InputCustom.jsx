@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MDBIcon } from 'mdbreact';
 import CheckboxCustom from './CheckboxCustom';
-import Select from './SelectCustom';
 
 const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false, style, classLabel, disabled = false, styleLabel, inline = true }) => {
 
