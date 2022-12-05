@@ -8,6 +8,23 @@ function WithdrawalPrevention() {
   const [valueWP, setValueWP] = useState('');
   const [chooseImage, setChooseImage] = useState(false);
 
+  function handleKeep() {
+    let invalid = document.getElementById('invalid');
+    let standard = document.getElementById('standard_exit_popup');
+    let image = document.getElementById('image_popup');
+    let image_URL = document.getElementById('image_URL');
+    let link_URL = document.getElementById('link_URL');
+    let res;
+    if (invalid.checked) {
+      res = invalid.value;
+    } else if (standard.checked) {
+      res = standard.value;
+    } else {
+      res = [image_URL.value, link_URL.value];
+    }
+    console.log(res);
+  }
+
   return (
     <>
       <div className="content">
@@ -22,7 +39,7 @@ function WithdrawalPrevention() {
                     type="radio"
                     id="invalid"
                     name="withdrawal-prevention"
-                    value="invalid"
+                    defaultValue={0}
                     onClick={() => setChooseImage(false)}
                   />
                   <label className="wp-lable" for="invalid">
@@ -31,9 +48,10 @@ function WithdrawalPrevention() {
                   <input
                     className="wp-input-radio"
                     type="radio"
+                    defaultChecked
                     id="standard_exit_popup"
                     name="withdrawal-prevention"
-                    value="standard_exit_popup"
+                    defaultValue={1}
                     onClick={() => setChooseImage(false)}
                   />
                   <label className="wp-lable" for="standard_exit_popup">
@@ -56,16 +74,14 @@ function WithdrawalPrevention() {
                     <label className="wp-image-label">
                       image URL <span style={{ color: 'red' }}>*</span>
                     </label>
-                    <input className="wp-image-input" type="text" defaultValue="" />
+                    <input id="image_URL" className="wp-image-input" type="text" defaultValue={1} />
                   </div>
                   <div className="wp-image-item">
-                    <label className="wp-image-label">
-                      Link URL <span style={{ color: 'red' }}>*</span>
-                    </label>
-                    <input className="wp-image-input" type="text" defaultValue="" />
+                    <label className="wp-image-label">Link URL</label>
+                    <input id="link_URL" className="wp-image-input" type="text" defaultValue={2} />
                   </div>
                 </div>
-                <Button>Keep</Button>
+                <Button onClick={() => handleKeep()}>Keep</Button>
               </CardBody>
             </Card>
           </Col>
