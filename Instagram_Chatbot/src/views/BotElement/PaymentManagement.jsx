@@ -729,17 +729,20 @@ function PaymentManagement() {
 
   function deleteCdivSpecifyPGW(id) {
     var ele = document.getElementById(`specifyPGW${id}`);
-    ele.remove();
+    document.getElementById(`customSPGW`).removeChild(ele)
+    // ele.remove();
   }
 
   function deleteCdivSettlementPGW(id) {
     var ele = document.getElementById(`settlementPGW${id}`);
-    ele.remove();
+    document.getElementById(`settlement_PMGW`).removeChild(ele)
+    // ele.remove();
   }
 
   function deleteCdivSettlementFee(id) {
     var ele = document.getElementById(`settlementFee${id}`);
-    ele.remove();
+    document.getElementById(`customNP`).removeChild(ele)
+    // ele.remove();
   }
 
   return (
