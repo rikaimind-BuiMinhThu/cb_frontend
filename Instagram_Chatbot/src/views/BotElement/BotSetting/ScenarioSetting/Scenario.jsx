@@ -111,7 +111,7 @@ let dataProductPurchase = [
 
 
 let dataHourFixed = [];
-for (let i = 1; i <= 24; i++) {
+for (let i = 0; i <= 23; i++) {
   dataHourFixed.push({
     key: i + '',
     value: i + ''
@@ -119,7 +119,7 @@ for (let i = 1; i <= 24; i++) {
 }
 
 let dataMinutesFixed = [];
-for (let i = 1; i <= 59; i++) {
+for (let i = 0; i <= 59; i++) {
   dataMinutesFixed.push({
     key: i + '',
     value: i + ''
@@ -1941,7 +1941,7 @@ const Scenario = () => {
             timezone_from_to: {},
             period_from_to: {},
             up_to_municipality: {},
-
+            prefectures: {}
           }
         }
       );
@@ -2778,13 +2778,15 @@ const Scenario = () => {
   }
 
   const handleDisableDateCalendar = (current, calendar) => {
-    console.log(calendar.start_date, calendar.end_date, calendar.aggregation_target_period_from, calendar.aggregation_target_period_to)
+    console.log(calendar.start_date, calendar.end_date, calendar.fixed_date, calendar.non_select_date_time, calendar.aggregation_target_period_from, calendar.aggregation_target_period_to)
     if (calendar.end_date || calendar.start_date
-      || calendar.fixed_date || calendar.non_select_date_time
-      || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to) {
+      || calendar.fixed_date.length !== 0 || calendar.non_select_date_time
+      || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to
+      || calendar.end_date_test || calendar[calendar.type].specified_period_from
+      || calendar[calendar.type].specified_period_to) {
       return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD')
         || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
-        || moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_select, 'YYYY/MM/DD')
+        || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_test, 'YYYY/MM/DD'))
         || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
         || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
@@ -2829,7 +2831,7 @@ const Scenario = () => {
       || calendar.aggregation_target_period_to) {
       return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD')
         || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
-        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date_test, 'YYYY/MM/DD')
+        || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') < moment(calendar.start_date_test, 'YYYY/MM/DD'))
         || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
         || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
@@ -3077,7 +3079,7 @@ const Scenario = () => {
                                                     </div>
                                                   )}
                                                 </div>
-                                                <div className="ss-chat-option" style={{ marginTop: '25px' }}>
+                                                <div className="ss-chat-option" style={message.message_name ? { marginTop: '25px' }: {}}>
                                                   <MDBIcon
                                                     fas
                                                     icon="pencil-alt"
@@ -3221,513 +3223,539 @@ const Scenario = () => {
                                               handleSelectMessage(index, message.belong_to, message.message_content[message.message_content.length - 1])
                                             }
                                           >
-                                            <div className={`ss-user-chat-detail-content ss-user-chat-detail-content-${index}`}
-                                              style={message.hidden === true ? { opacity: '0.4' } : {}}>
-                                              <div className="ss-user-message__content-wrapper">
-                                                {message?.message_content.map((content, indexContent) => {
-                                                  let textInput = content.text_input;
-                                                  let label = content.label;
-                                                  let textarea = content.textarea;
-                                                  let radioButton = content.radio_button;
-                                                  let checkbox = content.checkbox;
-                                                  let pullDown = content.pull_down;
-                                                  let zipCodeAddress = content.zip_code_address;
-                                                  let attachingFile = content.attaching_file;
-                                                  let calendar = content.calendar;
-                                                  let agreeTerm = content.agree_term;
-                                                  let carousel = content.carousel;
-                                                  let creditCardPayment = content.credit_card_payment;
-                                                  let capture = content.capture;
-                                                  let productPurchase = content.product_purchase;
-                                                  let productPurchaseRadioButton = content.product_purchase_radio_button;
-                                                  let smsVerify = content.sms_verify;
-                                                  let afteePaymentModule = content.AFTEE_payment_module;
-                                                  let slider = content.slider;
-                                                  let cardPaymentRadioButton = content.card_payment_radio_button;
-                                                  let variableSet = content.variable_set;
-                                                  let labelNoTransition = content.label_no_transition;
-                                                  return (
-                                                    <React.Fragment key={indexContent}>
-                                                      {/* type == 'text_input' */}
-                                                      {
-                                                        content.type === 'text_input' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {(textInput.title_require || textInput.require) &&
-                                                              <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
-                                                                {textInput.title_require &&
-                                                                  <span className="ss-message__content--user-text-input-title">
-                                                                    {textInput.title}
-                                                                  </span>
-                                                                }
-                                                                {textInput.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
-                                                              </div>
-                                                            }
-                                                            {(textInput.type === 'text') &&
-                                                              (textInput.text.isSplitInput ?
-                                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                  <input
-                                                                    className="ss-message__content--user-text-input ss-input-value"
-                                                                    readOnly
-                                                                    placeholder={textInput.text?.placeholderLeft}
-                                                                    style={{ width: '49%', marginBottom: '0px' }}
-                                                                    disabled
-                                                                  ></input>
-                                                                  <input
-                                                                    className="ss-message__content--user-text-input ss-input-value"
-                                                                    readOnly
-                                                                    placeholder={textInput.text?.placeholderRight}
-                                                                    style={{ width: '49%' }}
-                                                                    disabled
-                                                                  ></input>
-                                                                </div> :
+                                            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                              {message.message_name && <div className="ss-sub-title-message ss-truncation-text" style={{ backgroundColor: '#fff', maxWidth: '60%', marginRight: '10px' }}>{message.message_name}</div>}
+                                              <div className={`ss-user-chat-detail-content ss-user-chat-detail-content-${index} ${message.hidden === true ? "ss-message-hidden-style" : ""}`}
+                                                style={message.message_name ? {} : { borderColor: 'red' }}>
+                                                <div className="ss-user-message__content-wrapper">
+                                                  {message?.message_content.map((content, indexContent) => {
+                                                    let textInput = content.text_input;
+                                                    let label = content.label;
+                                                    let textarea = content.textarea;
+                                                    let radioButton = content.radio_button;
+                                                    let checkbox = content.checkbox;
+                                                    let pullDown = content.pull_down;
+                                                    let zipCodeAddress = content.zip_code_address;
+                                                    let attachingFile = content.attaching_file;
+                                                    let calendar = content.calendar;
+                                                    let agreeTerm = content.agree_term;
+                                                    let carousel = content.carousel;
+                                                    let creditCardPayment = content.credit_card_payment;
+                                                    let capture = content.capture;
+                                                    let productPurchase = content.product_purchase;
+                                                    let productPurchaseRadioButton = content.product_purchase_radio_button;
+                                                    let smsVerify = content.sms_verify;
+                                                    let afteePaymentModule = content.AFTEE_payment_module;
+                                                    let slider = content.slider;
+                                                    let cardPaymentRadioButton = content.card_payment_radio_button;
+                                                    let variableSet = content.variable_set;
+                                                    let labelNoTransition = content.label_no_transition;
+                                                    return (
+                                                      <React.Fragment key={indexContent}>
+                                                        {/* type == 'text_input' */}
+                                                        {
+                                                          content.type === 'text_input' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(textInput.title_require || textInput.require) &&
+                                                                <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
+                                                                  {textInput.title_require &&
+                                                                    <span className="ss-message__content--user-text-input-title">
+                                                                      {textInput.title}
+                                                                    </span>
+                                                                  }
+                                                                  {textInput.require === true &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              {(textInput.type === 'text') &&
+                                                                (textInput.text.isSplitInput ?
+                                                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                    <input
+                                                                      className="ss-message__content--user-text-input ss-input-value"
+                                                                      readOnly
+                                                                      placeholder={textInput.text?.placeholderLeft}
+                                                                      style={{ width: '49%', marginBottom: '0px' }}
+                                                                      disabled
+                                                                    ></input>
+                                                                    <input
+                                                                      className="ss-message__content--user-text-input ss-input-value"
+                                                                      readOnly
+                                                                      placeholder={textInput.text?.placeholderRight}
+                                                                      style={{ width: '49%' }}
+                                                                      disabled
+                                                                    ></input>
+                                                                  </div> :
+                                                                  <React.Fragment>
+                                                                    <input
+                                                                      className="ss-message__content--user-text-input ss-input-value"
+                                                                      readOnly
+                                                                      style={{ marginBottom: '0px' }}
+                                                                      placeholder={textInput[textInput.type]?.placeholderLeft}
+                                                                      disabled
+                                                                    ></input>
+                                                                    {textInput.text?.placeholderRight &&
+                                                                      <span style={{ fontWeight: '400', color: 'black', fontSize: '12px', marginLeft: '18px' }}>{textInput.text?.placeholderRight}</span>
+                                                                    }
+                                                                  </React.Fragment>
+                                                                )
+                                                              }
+                                                              {(textInput.type === 'phone_number') &&
+                                                                <React.Fragment>
+                                                                  {textInput.phone_number.withHyphen === false ?
+                                                                    <input
+                                                                      className="ss-message__content--user-text-input ss-input-value"
+                                                                      readOnly
+                                                                      style={{ marginBottom: '0px' }}
+                                                                      placeholder={textInput[textInput.type]?.number}
+                                                                      disabled
+                                                                    ></input> :
+                                                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                      <input
+                                                                        className="ss-message__content--user-text-input ss-input-value"
+                                                                        readOnly
+                                                                        style={{ marginBottom: '0px', width: '32%' }}
+                                                                        placeholder={textInput[textInput.type]?.number1}
+                                                                        disabled
+                                                                      ></input>
+                                                                      <input
+                                                                        className="ss-message__content--user-text-input ss-input-value"
+                                                                        readOnly
+                                                                        style={{ marginBottom: '0px', width: '32%' }}
+                                                                        placeholder={textInput[textInput.type]?.number2}
+                                                                        disabled
+                                                                      ></input>
+                                                                      <input
+                                                                        className="ss-message__content--user-text-input ss-input-value"
+                                                                        readOnly
+                                                                        style={{ marginBottom: '0px', width: '32%' }}
+                                                                        placeholder={textInput[textInput.type]?.number3}
+                                                                        disabled
+                                                                      ></input>
+                                                                    </div>
+                                                                  }
+                                                                </React.Fragment>
+                                                              }
+                                                              {(textInput.type === 'password') &&
                                                                 <React.Fragment>
                                                                   <input
                                                                     className="ss-message__content--user-text-input ss-input-value"
                                                                     readOnly
                                                                     style={{ marginBottom: '0px' }}
-                                                                    placeholder={textInput[textInput.type]?.placeholderLeft}
+                                                                    placeholder={textInput[textInput.type]?.password}
                                                                     disabled
                                                                   ></input>
-                                                                  {textInput.text?.placeholderRight &&
-                                                                    <span style={{ fontWeight: '400', color: 'black', fontSize: '12px', marginLeft: '18px' }}>{textInput.text?.placeholderRight}</span>
-                                                                  }
                                                                 </React.Fragment>
-                                                              )
-                                                            }
-                                                            {(textInput.type === 'phone_number') &&
-                                                              <React.Fragment>
-                                                                {textInput.phone_number.withHyphen === false ?
+                                                              }
+                                                              {(textInput.type === 'urls' ||
+                                                                textInput.type === 'email_address') &&
+                                                                <React.Fragment>
                                                                   <input
                                                                     className="ss-message__content--user-text-input ss-input-value"
                                                                     readOnly
                                                                     style={{ marginBottom: '0px' }}
-                                                                    placeholder={textInput[textInput.type]?.number}
+                                                                    placeholder={textInput[textInput.type].placeholder}
                                                                     disabled
-                                                                  ></input> :
-                                                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                    <input
-                                                                      className="ss-message__content--user-text-input ss-input-value"
-                                                                      readOnly
-                                                                      style={{ marginBottom: '0px', width: '32%' }}
-                                                                      placeholder={textInput[textInput.type]?.number1}
-                                                                      disabled
-                                                                    ></input>
-                                                                    <input
-                                                                      className="ss-message__content--user-text-input ss-input-value"
-                                                                      readOnly
-                                                                      style={{ marginBottom: '0px', width: '32%' }}
-                                                                      placeholder={textInput[textInput.type]?.number2}
-                                                                      disabled
-                                                                    ></input>
-                                                                    <input
-                                                                      className="ss-message__content--user-text-input ss-input-value"
-                                                                      readOnly
-                                                                      style={{ marginBottom: '0px', width: '32%' }}
-                                                                      placeholder={textInput[textInput.type]?.number3}
-                                                                      disabled
-                                                                    ></input>
-                                                                  </div>
-                                                                }
-                                                              </React.Fragment>
-                                                            }
-                                                            {(textInput.type === 'password') &&
-                                                              <React.Fragment>
-                                                                <input
-                                                                  className="ss-message__content--user-text-input ss-input-value"
-                                                                  readOnly
-                                                                  style={{ marginBottom: '0px' }}
-                                                                  placeholder={textInput[textInput.type]?.password}
-                                                                  disabled
-                                                                ></input>
-                                                              </React.Fragment>
-                                                            }
-                                                            {(textInput.type === 'urls' ||
-                                                              textInput.type === 'email_address') &&
-                                                              <React.Fragment>
-                                                                <input
-                                                                  className="ss-message__content--user-text-input ss-input-value"
-                                                                  readOnly
-                                                                  style={{ marginBottom: '0px' }}
-                                                                  placeholder={textInput[textInput.type].placeholder}
-                                                                  disabled
-                                                                ></input>
-                                                              </React.Fragment>
-                                                            }
-                                                            {(textInput.type === 'email_confirmation') &&
-                                                              (<>
-                                                                <input
-                                                                  className="ss-message__content--user-text-input ss-input-value"
-                                                                  readOnly
-                                                                  disabled
-                                                                  placeholder={textInput[textInput.type].cfEmlAdd_email}
-                                                                ></input>
-                                                                <input
-                                                                  className="ss-message__content--user-text-input ss-input-value"
-                                                                  readOnly
-                                                                  placeholder={textInput[textInput.type].cfEmlAdd_confirm_email}
-                                                                  disabled
-                                                                ></input>
-                                                              </>
-                                                              )}
-                                                            {(textInput.type === 'password_confirmation') &&
-                                                              (<>
-                                                                <input
-                                                                  className="ss-message__content--user-text-input ss-input-value"
-                                                                  readOnly
-                                                                  disabled
-                                                                  placeholder={textInput[textInput.type].password}
-                                                                ></input>
-                                                                <input
-                                                                  className="ss-message__content--user-text-input ss-input-value"
-                                                                  readOnly
-                                                                  placeholder={textInput[textInput.type].confirm_password}
-                                                                  disabled
-                                                                ></input>
-                                                              </>
-                                                              )}
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'label' */}
-                                                      {
-                                                        (content.type === 'label' && label.lbl_content) && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            <div className="ss-message__content--user-label-top">
-                                                              <span className="ss-message__content--user-label-title">
-                                                                {label.lbl_content}
-                                                              </span>
-                                                              {label?.require === true &&
-                                                                <span className="ss-message__content--user-required">
-                                                                  * required
-                                                                </span>
+                                                                  ></input>
+                                                                </React.Fragment>
                                                               }
+                                                              {(textInput.type === 'email_confirmation') &&
+                                                                (<>
+                                                                  <input
+                                                                    className="ss-message__content--user-text-input ss-input-value"
+                                                                    readOnly
+                                                                    disabled
+                                                                    placeholder={textInput[textInput.type].cfEmlAdd_email}
+                                                                  ></input>
+                                                                  <input
+                                                                    className="ss-message__content--user-text-input ss-input-value"
+                                                                    readOnly
+                                                                    placeholder={textInput[textInput.type].cfEmlAdd_confirm_email}
+                                                                    disabled
+                                                                  ></input>
+                                                                </>
+                                                                )}
+                                                              {(textInput.type === 'password_confirmation') &&
+                                                                (<>
+                                                                  <input
+                                                                    className="ss-message__content--user-text-input ss-input-value"
+                                                                    readOnly
+                                                                    disabled
+                                                                    placeholder={textInput[textInput.type].password}
+                                                                  ></input>
+                                                                  <input
+                                                                    className="ss-message__content--user-text-input ss-input-value"
+                                                                    readOnly
+                                                                    placeholder={textInput[textInput.type].confirm_password}
+                                                                    disabled
+                                                                  ></input>
+                                                                </>
+                                                                )}
                                                             </div>
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'textarea' */}
-                                                      {
-                                                        content.type === 'textarea' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {(textarea.title_require || textarea.require) &&
-                                                              <div className="ss-message__content--user-textarea-top" style={{ marginBottom: '0px' }}>
-                                                                {textarea.title_require &&
-                                                                  <span className="ss-message__content--user-textarea-title">
-                                                                    {textarea.title}
-                                                                  </span>
-                                                                }
-                                                                {textarea.require === true && textarea?.type === 'text_input' &&
-                                                                  <span className="ss-message__content--user-text-input-required">
+                                                          )
+                                                        }
+                                                        {/* type == 'label' */}
+                                                        {
+                                                          (content.type === 'label' && label.lbl_content) && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              <div className="ss-message__content--user-label-top">
+                                                                <span className="ss-message__content--user-label-title">
+                                                                  {label.lbl_content}
+                                                                </span>
+                                                                {label?.require === true &&
+                                                                  <span className="ss-message__content--user-required">
                                                                     * required
                                                                   </span>
                                                                 }
                                                               </div>
-                                                            }
-                                                            {(textarea?.type === 'text_input' ||
-                                                              textarea?.type === 'invalid_input') && (
+                                                            </div>
+                                                          )
+                                                        }
+                                                        {/* type == 'textarea' */}
+                                                        {
+                                                          content.type === 'textarea' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(textarea.title_require || textarea.require) &&
+                                                                <div className="ss-message__content--user-textarea-top" style={{ marginBottom: '0px' }}>
+                                                                  {textarea.title_require &&
+                                                                    <span className="ss-message__content--user-textarea-title">
+                                                                      {textarea.title}
+                                                                    </span>
+                                                                  }
+                                                                  {textarea.require === true && textarea?.type === 'text_input' &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              {(textarea?.type === 'text_input' ||
+                                                                textarea?.type === 'invalid_input') && (
+                                                                  <textarea
+                                                                    className="ss-message__content--user-textarea ss-input-value"
+                                                                    readOnly
+                                                                    placeholder={textarea[textarea.type]?.content}
+                                                                    rows={3}
+                                                                    value={textarea?.type === 'invalid_input' ? textarea[textarea.type]?.content : ''}
+                                                                  ></textarea>
+                                                                )}
+                                                              {textarea?.type === 'consume_api_response' && (
                                                                 <textarea
                                                                   className="ss-message__content--user-textarea ss-input-value"
                                                                   readOnly
-                                                                  placeholder={textarea[textarea.type]?.content}
+                                                                  value={'入力値の検証にAPIを利用する'}
                                                                   rows={3}
-                                                                  value={textarea?.type === 'invalid_input' ? textarea[textarea.type]?.content : ''}
                                                                 ></textarea>
                                                               )}
-                                                            {textarea?.type === 'consume_api_response' && (
-                                                              <textarea
-                                                                className="ss-message__content--user-textarea ss-input-value"
-                                                                readOnly
-                                                                value={'入力値の検証にAPIを利用する'}
-                                                                rows={3}
-                                                              ></textarea>
-                                                            )}
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'radio_button' */}
-                                                      {
-                                                        content.type === 'radio_button' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {(radioButton.title_require || radioButton.require) &&
-                                                              <div className="ss-message__content--user-radio_button-top" style={{ marginBottom: '0px' }}>
-                                                                {radioButton.title_require &&
-                                                                  <span className="ss-message__content--user-radio_button-title">
-                                                                    {radioButton.title}
-                                                                  </span>
-                                                                }
-                                                                {radioButton.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
-                                                              </div>
-                                                            }
-                                                            <div className="ss-message__content--user-radio_button-wrapper">
-                                                              {radioButton.type === 'default' && (
-                                                                radioButton[radioButton.type].map((item, index) => {
-                                                                  return <div key={index} className="ss-message__content--user-radio_button">
-                                                                    <input
-                                                                      type="radio"
-                                                                      name="ss-message__content--user-radio_button"
-                                                                      id="ss-message__content--user-radio_button"
-                                                                      disabled
-                                                                      checked={radioButton.initial_selection === item.id}
-                                                                    />
-                                                                    {item.text &&
+                                                            </div>
+                                                          )
+                                                        }
+                                                        {/* type == 'radio_button' */}
+                                                        {
+                                                          content.type === 'radio_button' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(radioButton.title_require || radioButton.require) &&
+                                                                <div className="ss-message__content--user-radio_button-top" style={{ marginBottom: '0px' }}>
+                                                                  {radioButton.title_require &&
+                                                                    <span className="ss-message__content--user-radio_button-title">
+                                                                      {radioButton.title}
+                                                                    </span>
+                                                                  }
+                                                                  {radioButton.require === true &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              <div className="ss-message__content--user-radio_button-wrapper">
+                                                                {radioButton.type === 'default' && (
+                                                                  radioButton[radioButton.type].map((item, index) => {
+                                                                    return <div key={index} className="ss-message__content--user-radio_button">
+                                                                      <input
+                                                                        type="radio"
+                                                                        name="ss-message__content--user-radio_button"
+                                                                        id="ss-message__content--user-radio_button"
+                                                                        disabled
+                                                                        checked={radioButton.initial_selection === item.id}
+                                                                      />
+                                                                      {item.text &&
+                                                                        <label htmlFor="ss-message__content--user-radio_button">
+                                                                          {item.text}
+                                                                        </label>
+                                                                      }
+                                                                    </div>
+                                                                  })
+                                                                )}
+                                                                {radioButton.type === 'radio_button_img' && (
+                                                                  radioButton[radioButton.type].map((item, index) => {
+                                                                    return <div key={index} className="ss-message__content--user-radio_button--radio_button_img">
+                                                                      <input
+                                                                        type="radio"
+                                                                        name="ss-message__content--user-radio_button--radio_button_img"
+                                                                        id="ss-message__content--user-radio_button--radio_button_img"
+                                                                        disabled
+                                                                        checked={radioButton.initial_selection === item.id}
+                                                                      />
+                                                                      <img
+                                                                        src={item.img}
+                                                                        alt=""
+                                                                      />
+                                                                      {item.text &&
+                                                                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                                          {item.text}
+                                                                        </div>
+                                                                      }
+                                                                    </div>
+                                                                  })
+                                                                )}
+                                                                {radioButton.type === 'consume_api_response' && (
+                                                                  <>
+                                                                    <div className="ss-message__content--user-radio_button">
+                                                                      <input
+                                                                        type="radio"
+                                                                        name="ss-message__content--user-radio_button"
+                                                                        id="ss-message__content--user-radio_button"
+                                                                        disabled
+                                                                      />
                                                                       <label htmlFor="ss-message__content--user-radio_button">
-                                                                        {item.text}
+                                                                        label
                                                                       </label>
-                                                                    }
+                                                                    </div>
+                                                                    <div className="ss-message__content--user-radio_button">
+                                                                      <input
+                                                                        type="radio"
+                                                                        name="ss-message__content--user-radio_button"
+                                                                        id="ss-message__content--user-radio_button"
+                                                                        disabled
+                                                                      />
+                                                                      <label htmlFor="ss-message__content--user-radio_button">
+                                                                        label
+                                                                      </label>
+                                                                    </div>
+                                                                  </>
+                                                                )}
+                                                                {radioButton.type === 'block_style' && (
+                                                                  radioButton[radioButton.type].map((item, index) => {
+                                                                    return item.text && <div style={{ marginBottom: '10px' }} key={index} className="ss-message__content--user-radio_button--block_style">
+                                                                      <span>{item.text}</span>
+                                                                    </div>
+                                                                  })
+                                                                )}
+                                                              </div>
+                                                            </div>
+                                                          )
+                                                        }
+                                                        {/* type == 'checkbox' */}
+                                                        {
+                                                          content.type === 'checkbox' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(checkbox.title_require || checkbox.require) &&
+                                                                <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+                                                                  {checkbox.title_require &&
+                                                                    <span className="ss-message__content--user-checkbox-title">
+                                                                      {checkbox.title}
+                                                                    </span>
+                                                                  }
+                                                                  {checkbox.require === true &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              {/* <div className="ss-message__content--user-checkbox-wrapper"> */}
+                                                              {checkbox.type === 'default' && (
+                                                                checkbox[checkbox.type].map((item, index) => {
+                                                                  return <div key={index} className="ss-message__content--user-checkbox">
+                                                                    <input
+                                                                      type="checkbox"
+                                                                      name="ss-message__content--user-checkbox"
+                                                                      id="ss-message__content--user-checkbox"
+                                                                      disabled
+                                                                      checked={checkbox.all_item_checked}
+                                                                    />
+                                                                    <label htmlFor="ss-message__content--user-checkbox">
+                                                                      {item.text}
+                                                                    </label>
                                                                   </div>
                                                                 })
                                                               )}
-                                                              {radioButton.type === 'radio_button_img' && (
-                                                                radioButton[radioButton.type].map((item, index) => {
-                                                                  return <div key={index} className="ss-message__content--user-radio_button--radio_button_img">
+                                                              {checkbox.type === 'checkbox_img' && (
+                                                                checkbox[checkbox.type].map((item, index) => {
+                                                                  return <div key={index} className="ss-message__content--user-checkbox--checkbox_img" style={{ marginBottom: '10px' }}>
                                                                     <input
-                                                                      type="radio"
-                                                                      name="ss-message__content--user-radio_button--radio_button_img"
-                                                                      id="ss-message__content--user-radio_button--radio_button_img"
+                                                                      type="checkbox"
+                                                                      name="ss-message__content--user-checkbox--checkbox_img"
+                                                                      id="ss-message__content--user-checkbox--checkbox_img"
                                                                       disabled
-                                                                      checked={radioButton.initial_selection === item.id}
+                                                                      checked={checkbox.all_item_checked}
                                                                     />
                                                                     <img
                                                                       src={item.img}
                                                                       alt=""
                                                                     />
-                                                                    {item.text &&
-                                                                      <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                                                        {item.text}
-                                                                      </div>
-                                                                    }
+                                                                    <div style={{ textAlign: 'center' }}>{item.text}</div>
                                                                   </div>
                                                                 })
                                                               )}
-                                                              {radioButton.type === 'consume_api_response' && (
+                                                              {checkbox.type === 'consume_api_response' && (
                                                                 <>
-                                                                  <div className="ss-message__content--user-radio_button">
+                                                                  <div className="ss-message__content--user-checkbox">
                                                                     <input
-                                                                      type="radio"
-                                                                      name="ss-message__content--user-radio_button"
-                                                                      id="ss-message__content--user-radio_button"
+                                                                      type="checkbox"
+                                                                      name="ss-message__content--user-checkbox"
+                                                                      id="ss-message__content--user-checkbox"
                                                                       disabled
                                                                     />
-                                                                    <label htmlFor="ss-message__content--user-radio_button">
+                                                                    <label htmlFor="ss-message__content--user-checkbox">
                                                                       label
                                                                     </label>
                                                                   </div>
-                                                                  <div className="ss-message__content--user-radio_button">
+                                                                  <div className="ss-message__content--user-checkbox">
                                                                     <input
-                                                                      type="radio"
-                                                                      name="ss-message__content--user-radio_button"
-                                                                      id="ss-message__content--user-radio_button"
+                                                                      type="checkbox"
+                                                                      name="ss-message__content--user-checkbox"
+                                                                      id="ss-message__content--user-checkbox"
                                                                       disabled
                                                                     />
-                                                                    <label htmlFor="ss-message__content--user-radio_button">
+                                                                    <label htmlFor="ss-message__content--user-checkbox">
                                                                       label
                                                                     </label>
                                                                   </div>
                                                                 </>
                                                               )}
-                                                              {radioButton.type === 'block_style' && (
-                                                                radioButton[radioButton.type].map((item, index) => {
-                                                                  return item.text && <div style={{ marginBottom: '10px' }} key={index} className="ss-message__content--user-radio_button--block_style">
-                                                                    <span>{item.text}</span>
-                                                                  </div>
-                                                                })
-                                                              )}
+                                                              {/* </div> */}
                                                             </div>
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'checkbox' */}
-                                                      {
-                                                        content.type === 'checkbox' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {(checkbox.title_require || checkbox.require) &&
-                                                              <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
-                                                                {checkbox.title_require &&
-                                                                  <span className="ss-message__content--user-checkbox-title">
-                                                                    {checkbox.title}
-                                                                  </span>
-                                                                }
-                                                                {checkbox.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
-                                                              </div>
-                                                            }
-                                                            {/* <div className="ss-message__content--user-checkbox-wrapper"> */}
-                                                            {checkbox.type === 'default' && (
-                                                              checkbox[checkbox.type].map((item, index) => {
-                                                                return <div key={index} className="ss-message__content--user-checkbox">
-                                                                  <input
-                                                                    type="checkbox"
-                                                                    name="ss-message__content--user-checkbox"
-                                                                    id="ss-message__content--user-checkbox"
-                                                                    disabled
-                                                                    checked={checkbox.all_item_checked}
-                                                                  />
-                                                                  <label htmlFor="ss-message__content--user-checkbox">
-                                                                    {item.text}
-                                                                  </label>
+                                                          )
+                                                        }
+                                                        {/* type == 'pull_down' */}
+                                                        {
+                                                          content.type === 'pull_down' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(pullDown.title_require || pullDown.require) &&
+                                                                <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
+                                                                  {pullDown.title_require &&
+                                                                    <span className="ss-message__content--user-pull_down-title">
+                                                                      {pullDown.title}
+                                                                    </span>
+                                                                  }
+                                                                  {pullDown.require === true &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
                                                                 </div>
-                                                              })
-                                                            )}
-                                                            {checkbox.type === 'checkbox_img' && (
-                                                              checkbox[checkbox.type].map((item, index) => {
-                                                                return <div key={index} className="ss-message__content--user-checkbox--checkbox_img" style={{ marginBottom: '10px' }}>
-                                                                  <input
-                                                                    type="checkbox"
-                                                                    name="ss-message__content--user-checkbox--checkbox_img"
-                                                                    id="ss-message__content--user-checkbox--checkbox_img"
-                                                                    disabled
-                                                                    checked={checkbox.all_item_checked}
-                                                                  />
-                                                                  <img
-                                                                    src={item.img}
-                                                                    alt=""
-                                                                  />
-                                                                  <div style={{ textAlign: 'center' }}>{item.text}</div>
-                                                                </div>
-                                                              })
-                                                            )}
-                                                            {checkbox.type === 'consume_api_response' && (
-                                                              <>
-                                                                <div className="ss-message__content--user-checkbox">
-                                                                  <input
-                                                                    type="checkbox"
-                                                                    name="ss-message__content--user-checkbox"
-                                                                    id="ss-message__content--user-checkbox"
-                                                                    disabled
-                                                                  />
-                                                                  <label htmlFor="ss-message__content--user-checkbox">
-                                                                    label
-                                                                  </label>
-                                                                </div>
-                                                                <div className="ss-message__content--user-checkbox">
-                                                                  <input
-                                                                    type="checkbox"
-                                                                    name="ss-message__content--user-checkbox"
-                                                                    id="ss-message__content--user-checkbox"
-                                                                    disabled
-                                                                  />
-                                                                  <label htmlFor="ss-message__content--user-checkbox">
-                                                                    label
-                                                                  </label>
-                                                                </div>
-                                                              </>
-                                                            )}
-                                                            {/* </div> */}
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'pull_down' */}
-                                                      {
-                                                        content.type === 'pull_down' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {(pullDown.title_require || pullDown.require) &&
-                                                              <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
-                                                                {pullDown.title_require &&
-                                                                  <span className="ss-message__content--user-pull_down-title">
-                                                                    {pullDown.title}
-                                                                  </span>
-                                                                }
-                                                                {pullDown.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
-                                                              </div>
-                                                            }
-                                                            <div className="ss-message__content--user-pull_down-wrapper">
-                                                              {pullDown.type === 'customization' && (
-                                                                <>
-                                                                  <div className="ss-message__content--user-pull_down--customization">
-                                                                    <div
-                                                                      className="ss-message__content--user-pull_down-comment"
-                                                                      style={{ marginBottom: '4px' }}
-                                                                    >
-                                                                      <span>{pullDown[pullDown.type].title_comment}</span>
-                                                                    </div>
-                                                                    <div className="">
-                                                                      {
-                                                                        pullDown[pullDown.type].is_comment === false ?
-                                                                          <div className="ss-message__content--user-pull_down-col col-12" style={{ padding: '0' }}>
-                                                                            <SelectCustom
-                                                                              data={pullDown[pullDown.type].options_without_comment}
-                                                                              keyValue="value"
-                                                                              style={{ width: '100%' }}
-                                                                              placeholder={pullDown[pullDown.type].display_unselected}
-                                                                              nameValue="text"
-                                                                            />
-                                                                          </div> :
-                                                                          <div className="ss-message__content--user-pull_down-col col-12" style={{ display: 'flex', justifyContent: 'space-between', padding: '0' }}>
-                                                                            <SelectCustom
-                                                                              data={pullDown[pullDown.type].options_with_comment}
-                                                                              keyValue="value"
-                                                                              style={{ width: '49%' }}
-                                                                              placeholder={pullDown[pullDown.type].display_unselected}
-                                                                              nameValue="text"
-                                                                            />
-                                                                            <SelectCustom
-                                                                              data={pullDown[pullDown.type].options_with_comment}
-                                                                              keyValue="value2"
-                                                                              style={{ width: '49%' }}
-                                                                              placeholder={pullDown[pullDown.type].display_unselected}
-                                                                              nameValue="text2"
-                                                                            />
-                                                                          </div>
-                                                                      }
-                                                                    </div>
-                                                                    <div
-                                                                      className="ss-message__content--user-pull_down-comment"
-                                                                      style={{ marginTop: '4px' }}
-                                                                    >
-                                                                      <span>{pullDown[pullDown.type].comment}</span>
-                                                                    </div>
-                                                                  </div>
-                                                                </>
-                                                              )}
-                                                              {(pullDown.type === 'time_hm') && (
-                                                                <React.Fragment>
-                                                                  <div className="ss-message__content--user-pull_down--time_hm">
-                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                      <SelectCustom
-                                                                        data={dataHour}
-                                                                        placeholder="Time"
-                                                                        style={{ width: '32%' }}
-                                                                      />
-                                                                      <SelectCustom
-                                                                        data={dataMinutes}
-                                                                        placeholder="Minutes"
-                                                                        style={{ width: '32%' }}
-                                                                      />
+                                                              }
+                                                              <div className="ss-message__content--user-pull_down-wrapper">
+                                                                {pullDown.type === 'customization' && (
+                                                                  <>
+                                                                    <div className="ss-message__content--user-pull_down--customization">
                                                                       <div
                                                                         className="ss-message__content--user-pull_down-comment"
-                                                                        style={{ marginTop: '4px', width: '32%' }}
+                                                                        style={{ marginBottom: '4px' }}
+                                                                      >
+                                                                        <span>{pullDown[pullDown.type].title_comment}</span>
+                                                                      </div>
+                                                                      <div className="">
+                                                                        {
+                                                                          pullDown[pullDown.type].is_comment === false ?
+                                                                            <div className="ss-message__content--user-pull_down-col col-12" style={{ padding: '0' }}>
+                                                                              <SelectCustom
+                                                                                data={pullDown[pullDown.type].options_without_comment}
+                                                                                keyValue="value"
+                                                                                style={{ width: '100%' }}
+                                                                                placeholder={pullDown[pullDown.type].display_unselected}
+                                                                                nameValue="text"
+                                                                              />
+                                                                            </div> :
+                                                                            <div className="ss-message__content--user-pull_down-col col-12" style={{ display: 'flex', justifyContent: 'space-between', padding: '0' }}>
+                                                                              <SelectCustom
+                                                                                data={pullDown[pullDown.type].options_with_comment}
+                                                                                keyValue="value"
+                                                                                style={{ width: '49%' }}
+                                                                                placeholder={pullDown[pullDown.type].display_unselected}
+                                                                                nameValue="text"
+                                                                              />
+                                                                              <SelectCustom
+                                                                                data={pullDown[pullDown.type].options_with_comment}
+                                                                                keyValue="value2"
+                                                                                style={{ width: '49%' }}
+                                                                                placeholder={pullDown[pullDown.type].display_unselected}
+                                                                                nameValue="text2"
+                                                                              />
+                                                                            </div>
+                                                                        }
+                                                                      </div>
+                                                                      <div
+                                                                        className="ss-message__content--user-pull_down-comment"
+                                                                        style={{ marginTop: '4px' }}
                                                                       >
                                                                         <span>{pullDown[pullDown.type].comment}</span>
                                                                       </div>
                                                                     </div>
-                                                                  </div>
-                                                                </React.Fragment>
-                                                              )}
-                                                              {(pullDown.type === 'date_ymd' ||
-                                                                pullDown.type === 'dob_ymd') && (
+                                                                  </>
+                                                                )}
+                                                                {(pullDown.type === 'time_hm') && (
                                                                   <React.Fragment>
                                                                     <div className="ss-message__content--user-pull_down--time_hm">
-                                                                      <div className="" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                                                                      <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                                         <SelectCustom
-                                                                          data={dataYear}
-                                                                          placeholder="Year"
+                                                                          data={dataHour}
+                                                                          placeholder="Time"
                                                                           style={{ width: '32%' }}
                                                                         />
+                                                                        <SelectCustom
+                                                                          data={dataMinutes}
+                                                                          placeholder="Minutes"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                        <div
+                                                                          className="ss-message__content--user-pull_down-comment"
+                                                                          style={{ marginTop: '4px', width: '32%' }}
+                                                                        >
+                                                                          <span>{pullDown[pullDown.type].comment}</span>
+                                                                        </div>
+                                                                      </div>
+                                                                    </div>
+                                                                  </React.Fragment>
+                                                                )}
+                                                                {(pullDown.type === 'date_ymd' ||
+                                                                  pullDown.type === 'dob_ymd') && (
+                                                                    <React.Fragment>
+                                                                      <div className="ss-message__content--user-pull_down--time_hm">
+                                                                        <div className="" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                                                                          <SelectCustom
+                                                                            data={dataYear}
+                                                                            placeholder="Year"
+                                                                            style={{ width: '32%' }}
+                                                                          />
+                                                                          <SelectCustom
+                                                                            data={dataMonth}
+                                                                            placeholder="Month"
+                                                                            style={{ width: '32%' }}
+                                                                          />
+                                                                          <SelectCustom
+                                                                            data={dataDay}
+                                                                            placeholder="Day"
+                                                                            style={{ width: '32%' }}
+                                                                          />
+                                                                          <div
+                                                                            className="ss-message__content--user-pull_down-comment"
+                                                                            style={{ marginTop: '4px', width: '32%' }}
+                                                                          >
+                                                                            <span>{pullDown[pullDown.type].comment}</span>
+                                                                          </div>
+                                                                        </div>
+                                                                      </div>
+                                                                    </React.Fragment>
+                                                                  )}
+                                                                {(pullDown.type === 'date_md') && (
+                                                                  <React.Fragment>
+                                                                    <div className="ss-message__content--user-pull_down--time_hm">
+                                                                      <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                                                                         <SelectCustom
                                                                           data={dataMonth}
                                                                           placeholder="Month"
@@ -3748,20 +3776,98 @@ const Scenario = () => {
                                                                     </div>
                                                                   </React.Fragment>
                                                                 )}
-                                                              {(pullDown.type === 'date_md') && (
-                                                                <React.Fragment>
-                                                                  <div className="ss-message__content--user-pull_down--time_hm">
-                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                      <SelectCustom
-                                                                        data={dataMonth}
-                                                                        placeholder="Month"
-                                                                        style={{ width: '32%' }}
-                                                                      />
-                                                                      <SelectCustom
-                                                                        data={dataDay}
-                                                                        placeholder="Day"
-                                                                        style={{ width: '32%' }}
-                                                                      />
+                                                                {(pullDown.type === 'date_ym' ||
+                                                                  pullDown.type === 'dob_ym') && (
+                                                                    <React.Fragment>
+                                                                      <div className="ss-message__content--user-pull_down--time_hm">
+                                                                        <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                          <SelectCustom
+                                                                            data={dataYear}
+                                                                            placeholder="Year"
+                                                                            style={{ width: '32%' }}
+                                                                          />
+                                                                          <SelectCustom
+                                                                            data={dataMonth}
+                                                                            placeholder="Month"
+                                                                            style={{ width: '32%' }}
+                                                                          />
+                                                                          <div
+                                                                            className="ss-message__content--user-pull_down-comment"
+                                                                            style={{ marginTop: '4px', width: '32%' }}
+                                                                          >
+                                                                            <span>{pullDown[pullDown.type].comment}</span>
+                                                                          </div>
+                                                                        </div>
+                                                                      </div>
+                                                                    </React.Fragment>
+                                                                  )}
+                                                                {(pullDown.type === 'date_ymd_hm') && (
+                                                                  <React.Fragment>
+                                                                    <div className="ss-message__content--user-pull_down--time_hm">
+                                                                      <div className="" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                                                                        <SelectCustom
+                                                                          data={dataYear}
+                                                                          placeholder="Year"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                        <SelectCustom
+                                                                          data={dataMonth}
+                                                                          placeholder="Month"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                        <SelectCustom
+                                                                          data={dataDay}
+                                                                          placeholder="Day"
+                                                                          style={{ width: '32%', marginBottom: '10px' }}
+                                                                        />
+                                                                        <SelectCustom
+                                                                          data={dataHour}
+                                                                          placeholder="Time"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                        <SelectCustom
+                                                                          data={dataMinutes}
+                                                                          placeholder="Minutes"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                        <div
+                                                                          className="ss-message__content--user-pull_down-comment"
+                                                                          style={{ marginTop: '4px', width: '32%' }}
+                                                                        >
+                                                                          <span>{pullDown[pullDown.type].comment}</span>
+                                                                        </div>
+                                                                      </div>
+                                                                    </div>
+                                                                  </React.Fragment>
+                                                                )}
+                                                                {pullDown.type === 'timezone_from_to' && (
+                                                                  <React.Fragment>
+                                                                    <div className="ss-message__content--user-pull_down--time_hm">
+                                                                      <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                        <SelectCustom
+                                                                          data={dataHour}
+                                                                          placeholder="Time"
+                                                                          style={{ width: '49%' }}
+                                                                        />
+                                                                        <SelectCustom
+                                                                          data={dataMinutes}
+                                                                          placeholder="Minutes"
+                                                                          style={{ width: '49%' }}
+                                                                        />
+                                                                      </div>
+                                                                      <div style={{ textAlign: 'center' }}>~</div>
+                                                                      <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                        <SelectCustom
+                                                                          data={dataHour}
+                                                                          placeholder="Time"
+                                                                          style={{ width: '49%' }}
+                                                                        />
+                                                                        <SelectCustom
+                                                                          data={dataMinutes}
+                                                                          placeholder="Minutes"
+                                                                          style={{ width: '49%' }}
+                                                                        />
+                                                                      </div>
                                                                       <div
                                                                         className="ss-message__content--user-pull_down-comment"
                                                                         style={{ marginTop: '4px', width: '32%' }}
@@ -3769,11 +3875,9 @@ const Scenario = () => {
                                                                         <span>{pullDown[pullDown.type].comment}</span>
                                                                       </div>
                                                                     </div>
-                                                                  </div>
-                                                                </React.Fragment>
-                                                              )}
-                                                              {(pullDown.type === 'date_ym' ||
-                                                                pullDown.type === 'dob_ym') && (
+                                                                  </React.Fragment>
+                                                                )}
+                                                                {pullDown.type === 'period_from_to' && (
                                                                   <React.Fragment>
                                                                     <div className="ss-message__content--user-pull_down--time_hm">
                                                                       <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -3787,45 +3891,30 @@ const Scenario = () => {
                                                                           placeholder="Month"
                                                                           style={{ width: '32%' }}
                                                                         />
-                                                                        <div
-                                                                          className="ss-message__content--user-pull_down-comment"
-                                                                          style={{ marginTop: '4px', width: '32%' }}
-                                                                        >
-                                                                          <span>{pullDown[pullDown.type].comment}</span>
-                                                                        </div>
+                                                                        <SelectCustom
+                                                                          data={dataDay}
+                                                                          placeholder="Day"
+                                                                          style={{ width: '32%' }}
+                                                                        />
                                                                       </div>
-                                                                    </div>
-                                                                  </React.Fragment>
-                                                                )}
-                                                              {(pullDown.type === 'date_ymd_hm') && (
-                                                                <React.Fragment>
-                                                                  <div className="ss-message__content--user-pull_down--time_hm">
-                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                                                                      <SelectCustom
-                                                                        data={dataYear}
-                                                                        placeholder="Year"
-                                                                        style={{ width: '32%' }}
-                                                                      />
-                                                                      <SelectCustom
-                                                                        data={dataMonth}
-                                                                        placeholder="Month"
-                                                                        style={{ width: '32%' }}
-                                                                      />
-                                                                      <SelectCustom
-                                                                        data={dataDay}
-                                                                        placeholder="Day"
-                                                                        style={{ width: '32%', marginBottom: '10px' }}
-                                                                      />
-                                                                      <SelectCustom
-                                                                        data={dataHour}
-                                                                        placeholder="Time"
-                                                                        style={{ width: '32%' }}
-                                                                      />
-                                                                      <SelectCustom
-                                                                        data={dataMinutes}
-                                                                        placeholder="Minutes"
-                                                                        style={{ width: '32%' }}
-                                                                      />
+                                                                      <div style={{ textAlign: 'center' }}>~</div>
+                                                                      <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                        <SelectCustom
+                                                                          data={dataYear}
+                                                                          placeholder="Year"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                        <SelectCustom
+                                                                          data={dataMonth}
+                                                                          placeholder="Month"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                        <SelectCustom
+                                                                          data={dataDay}
+                                                                          placeholder="Day"
+                                                                          style={{ width: '32%' }}
+                                                                        />
+                                                                      </div>
                                                                       <div
                                                                         className="ss-message__content--user-pull_down-comment"
                                                                         style={{ marginTop: '4px', width: '32%' }}
@@ -3833,623 +3922,656 @@ const Scenario = () => {
                                                                         <span>{pullDown[pullDown.type].comment}</span>
                                                                       </div>
                                                                     </div>
-                                                                  </div>
-                                                                </React.Fragment>
-                                                              )}
-                                                              {pullDown.type === 'timezone_from_to' && (
-                                                                <React.Fragment>
-                                                                  <div className="ss-message__content--user-pull_down--time_hm">
-                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                      <SelectCustom
-                                                                        data={dataHour}
-                                                                        placeholder="Time"
-                                                                        style={{ width: '49%' }}
-                                                                      />
-                                                                      <SelectCustom
-                                                                        data={dataMinutes}
-                                                                        placeholder="Minutes"
-                                                                        style={{ width: '49%' }}
-                                                                      />
-                                                                    </div>
-                                                                    <div style={{ textAlign: 'center' }}>~</div>
-                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                      <SelectCustom
-                                                                        data={dataHour}
-                                                                        placeholder="Time"
-                                                                        style={{ width: '49%' }}
-                                                                      />
-                                                                      <SelectCustom
-                                                                        data={dataMinutes}
-                                                                        placeholder="Minutes"
-                                                                        style={{ width: '49%' }}
-                                                                      />
-                                                                    </div>
-                                                                    <div
-                                                                      className="ss-message__content--user-pull_down-comment"
-                                                                      style={{ marginTop: '4px', width: '32%' }}
-                                                                    >
-                                                                      <span>{pullDown[pullDown.type].comment}</span>
-                                                                    </div>
-                                                                  </div>
-                                                                </React.Fragment>
-                                                              )}
-                                                              {pullDown.type === 'period_from_to' && (
-                                                                <React.Fragment>
-                                                                  <div className="ss-message__content--user-pull_down--time_hm">
-                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                      <SelectCustom
-                                                                        data={dataYear}
-                                                                        placeholder="Year"
-                                                                        style={{ width: '32%' }}
-                                                                      />
-                                                                      <SelectCustom
-                                                                        data={dataMonth}
-                                                                        placeholder="Month"
-                                                                        style={{ width: '32%' }}
-                                                                      />
-                                                                      <SelectCustom
-                                                                        data={dataDay}
-                                                                        placeholder="Day"
-                                                                        style={{ width: '32%' }}
-                                                                      />
-                                                                    </div>
-                                                                    <div style={{ textAlign: 'center' }}>~</div>
-                                                                    <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                      <SelectCustom
-                                                                        data={dataYear}
-                                                                        placeholder="Year"
-                                                                        style={{ width: '32%' }}
-                                                                      />
-                                                                      <SelectCustom
-                                                                        data={dataMonth}
-                                                                        placeholder="Month"
-                                                                        style={{ width: '32%' }}
-                                                                      />
-                                                                      <SelectCustom
-                                                                        data={dataDay}
-                                                                        placeholder="Day"
-                                                                        style={{ width: '32%' }}
-                                                                      />
-                                                                    </div>
-                                                                    <div
-                                                                      className="ss-message__content--user-pull_down-comment"
-                                                                      style={{ marginTop: '4px', width: '32%' }}
-                                                                    >
-                                                                      <span>{pullDown[pullDown.type].comment}</span>
-                                                                    </div>
-                                                                  </div>
-                                                                </React.Fragment>
-                                                              )}
-                                                              {pullDown.type === 'prefectures' && (
-                                                                <React.Fragment>
-                                                                  <SelectCustom
-                                                                    data={dataPrefectures}
-                                                                    placeholder="Please select"
-                                                                    style={{ width: '100%' }}
-                                                                    keyValue="id"
-                                                                    nameValue="name"
-                                                                  />
-                                                                </React.Fragment>
-                                                              )}
-                                                              {pullDown.type === 'up_to_municipality' && (
-                                                                <div>
-                                                                  <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].prefecture_comment}</div>
-                                                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                  </React.Fragment>
+                                                                )}
+                                                                {pullDown.type === 'prefectures' && (
+                                                                  <React.Fragment>
                                                                     <SelectCustom
                                                                       data={dataPrefectures}
-                                                                      placeholder="Select prefecture"
-                                                                      style={{ width: '45%' }}
+                                                                      placeholder="Please select"
+                                                                      style={{ width: '100%' }}
                                                                       keyValue="id"
                                                                       nameValue="name"
                                                                     />
-                                                                    <span>~</span>
-                                                                    <SelectCustom
-                                                                      data={dataCity}
-                                                                      placeholder="Select city"
-                                                                      style={{ width: '45%' }}
-                                                                      keyValue="id"
-                                                                      nameValue="name"
+                                                                  </React.Fragment>
+                                                                )}
+                                                                {pullDown.type === 'up_to_municipality' && (
+                                                                  <div>
+                                                                    <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].prefecture_comment}</div>
+                                                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                      <SelectCustom
+                                                                        data={dataPrefectures}
+                                                                        placeholder="Select prefecture"
+                                                                        style={{ width: '45%' }}
+                                                                        keyValue="id"
+                                                                        nameValue="name"
+                                                                      />
+                                                                      <span>~</span>
+                                                                      <SelectCustom
+                                                                        data={dataCity}
+                                                                        placeholder="Select city"
+                                                                        style={{ width: '45%' }}
+                                                                        keyValue="id"
+                                                                        nameValue="name"
+                                                                      />
+                                                                    </div>
+                                                                    <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].city_comment}</div>
+                                                                  </div>
+                                                                )}
+                                                              </div>
+                                                            </div>
+                                                          )
+                                                        }
+                                                        {/* type == 'zip_code_address' */}
+                                                        {
+                                                          content.type === 'zip_code_address' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire) &&
+                                                                <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
+                                                                  {zipCodeAddress.title_require &&
+                                                                    <span className="ss-message__content--user-pull_down-title">
+                                                                      {zipCodeAddress.title}
+                                                                    </span>
+                                                                  }
+                                                                  {(zipCodeAddress.isCheckRequire === 'all_items_require' ||
+                                                                    zipCodeAddress.isCheckRequire === 'require') &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              {zipCodeAddress.post_code !== undefined && (
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '5px' }}>
+                                                                    Post code
+                                                                  </div>
+                                                                  {zipCodeAddress.split_postal_code !== true ?
+                                                                    <InputCustom
+                                                                      placeholder={zipCodeAddress.post_code}
+                                                                      disabled={true}
+                                                                      style={{ width: '100%' }}
+                                                                    /> :
+                                                                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                                                      <InputCustom
+                                                                        placeholder={zipCodeAddress.post_code_left}
+                                                                        disabled={true}
+                                                                        style={{ width: '49%' }}
+                                                                      />
+                                                                      <InputCustom
+                                                                        placeholder={zipCodeAddress.post_code_right}
+                                                                        disabled={true}
+                                                                        style={{ width: '49%' }}
+                                                                      />
+                                                                    </div>
+                                                                  }
+                                                                </div>
+                                                              )}
+                                                              {zipCodeAddress.prefecture !== undefined &&
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                    Prefectures
+                                                                  </div>
+                                                                  <InputCustom
+                                                                    placeholder={zipCodeAddress.prefecture}
+                                                                    disabled={true}
+                                                                    style={{ width: '100%' }}
+                                                                  />
+                                                                </div>
+                                                              }
+                                                              {zipCodeAddress.municipality !== undefined &&
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                    Municipalities
+                                                                  </div>
+                                                                  <InputCustom
+                                                                    placeholder={zipCodeAddress.municipality}
+                                                                    disabled={true}
+                                                                    style={{ width: '100%' }}
+                                                                  />
+                                                                </div>
+                                                              }
+                                                              {zipCodeAddress.address !== undefined &&
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                    Address
+                                                                  </div>
+                                                                  <InputCustom
+                                                                    placeholder={zipCodeAddress.address}
+                                                                    disabled={true}
+                                                                    style={{ width: '100%' }}
+                                                                  />
+                                                                </div>
+                                                              }
+                                                              {zipCodeAddress.building_name !== undefined &&
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                    Building name
+                                                                  </div>
+                                                                  <InputCustom
+                                                                    placeholder={zipCodeAddress.building_name}
+                                                                    disabled={true}
+                                                                    style={{ width: '100%' }}
+                                                                  />
+                                                                </div>
+                                                              }
+                                                            </div>
+                                                          )
+                                                        }
+                                                        {/* type == 'attaching_file' */}
+                                                        {
+                                                          content.type === 'attaching_file' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(attachingFile.require) &&
+                                                                <div className="ss-message__content--user-attaching_file-top">
+                                                                  {attachingFile.require === true &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              {!attachingFile.file_content && <span style={{ fontWeight: '400', fontSize: '12px' }}>Not selected</span>}
+                                                              <div className="ss-message__content--user-attaching_file">
+                                                                <Button className="ss-message__content--user-attaching_file-btn" style={{ backgroundColor: '#A3B1BF', marginTop: '0px' }}>
+                                                                  Select file
+                                                                </Button>
+                                                              </div>
+                                                            </div>
+                                                          )
+                                                        }
+                                                        {/* type == 'calendar' */}
+                                                        {
+                                                          content.type === 'calendar' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(calendar.title_require || calendar.require) &&
+                                                                <div className="ss-message__content--user-calender-top" style={{ marginBottom: '0px' }}>
+                                                                  {calendar.title_require &&
+                                                                    <span className="ss-message__content--user-calender-title">
+                                                                      {calendar.title}
+                                                                    </span>
+                                                                  }
+                                                                  {calendar.require === true &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              {/* calendar: type = 'date_selection' */}
+                                                              {calendar.type === 'date_selection' && (
+                                                                <React.Fragment>
+                                                                  <DatePickerCustom
+                                                                    style={{ width: '99%', marginTop: '5px' }}
+                                                                    value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
+                                                                    onChange={(date, dateString) => console.log(dateString)}
+                                                                    disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
+                                                                  />
+                                                                </React.Fragment>
+                                                              )}
+                                                              {/* calendar: type = 'embedded' */}
+                                                              {calendar.type === 'embedded' && (
+                                                                <React.Fragment>
+                                                                  <div className="ss-message__content--user-calender-embedded" style={{ marginTop: '5px' }}>
+                                                                    <Calendar
+                                                                      className="ss-custom-calendar"
+                                                                      fullscreen={false}
+                                                                      onPanelChange={(value, mode) => console.log(value)}
+                                                                      style={{ top: '20px', width: '300px', border: '1px solid grey' }}
+                                                                      value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
+                                                                      onChange={value => console.log(value.format("DD/MM/YYYY"))}
+                                                                      disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                                                                     />
                                                                   </div>
-                                                                  <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].city_comment}</div>
+                                                                </React.Fragment>
+                                                              )}
+                                                              {/* calendar: type = 'start_end_date' */}
+                                                              {calendar.type === 'start_end_date' && (
+                                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                                                  <DatePickerCustom
+                                                                    style={{ width: '49%', marginTop: '5px' }}
+                                                                    disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
+                                                                    value={calendar.start_date_test ? moment(calendar.start_date_test) : null}
+                                                                    onChange={(date, dateString) => console.log(dateString)}
+                                                                  />
+                                                                  <DatePickerCustom
+                                                                    style={{ width: '49%', marginTop: '5px' }}
+                                                                    disabledDate={(current) => handleDisableEndDateCalendar(current, calendar)}
+                                                                    value={calendar.end_date_test ? moment(calendar.end_date_test) : null}
+                                                                    onChange={(date, dateString) => console.log(dateString)}
+                                                                  />
                                                                 </div>
                                                               )}
                                                             </div>
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'zip_code_address' */}
-                                                      {
-                                                        content.type === 'zip_code_address' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire) &&
-                                                              <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
-                                                                {zipCodeAddress.title_require &&
-                                                                  <span className="ss-message__content--user-pull_down-title">
-                                                                    {zipCodeAddress.title}
+                                                          )
+                                                        }
+                                                        {/* type == 'agree_term' */}
+                                                        {
+                                                          content.type === 'agree_term' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {/* {(agreeTerm.title_require || agreeTerm.require) && */}
+                                                              <div className="ss-message__content--user-agree_to_term-top" style={{ marginBottom: '0px' }}>
+                                                                {agreeTerm.title_require &&
+                                                                  <span className="ss-message__content--user-agree_to_term-title">
+                                                                    {agreeTerm.title}
                                                                   </span>
                                                                 }
-                                                                {(zipCodeAddress.isCheckRequire === 'all_items_require' ||
-                                                                  zipCodeAddress.isCheckRequire === 'require') &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
+                                                                <span className="ss-message__content--user-text-input-required">
+                                                                  * required
+                                                                </span>
                                                               </div>
-                                                            }
-                                                            {zipCodeAddress.post_code !== undefined && (
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '5px' }}>
-                                                                  Post code
-                                                                </div>
-                                                                {zipCodeAddress.split_postal_code !== true ?
-                                                                  <InputCustom
-                                                                    placeholder={zipCodeAddress.post_code}
-                                                                    disabled={true}
-                                                                    style={{ width: '100%' }}
-                                                                  /> :
-                                                                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                                                    <InputCustom
-                                                                      placeholder={zipCodeAddress.post_code_left}
-                                                                      disabled={true}
-                                                                      style={{ width: '49%' }}
-                                                                    />
-                                                                    <InputCustom
-                                                                      placeholder={zipCodeAddress.post_code_right}
-                                                                      disabled={true}
-                                                                      style={{ width: '49%' }}
+                                                              {/* } */}
+                                                              {/* agreeTerm: type = 'detail_content' */}
+                                                              {agreeTerm.type === 'detail_content' && (
+                                                                <React.Fragment>
+                                                                  <div className="ss-message__content--user-agree_to_term-detail_content">
+                                                                    <textarea
+                                                                      name="ss-message__content--user-agree_to_term-detail_content"
+                                                                      id=""
+                                                                      rows="5"
+                                                                      value={agreeTerm[agreeTerm.type].content}
+                                                                      className="ss-input-value"
+                                                                      readOnly
+                                                                    ></textarea>
+                                                                    <CheckboxCustom
+                                                                      onChange={value => console.log(value)}
+                                                                      label={agreeTerm.term}
                                                                     />
                                                                   </div>
-                                                                }
-                                                              </div>
-                                                            )}
-                                                            {zipCodeAddress.prefecture !== undefined &&
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                                  Prefectures
-                                                                </div>
-                                                                <InputCustom
-                                                                  placeholder={zipCodeAddress.prefecture}
-                                                                  disabled={true}
-                                                                  style={{ width: '100%' }}
-                                                                />
-                                                              </div>
-                                                            }
-                                                            {zipCodeAddress.municipality !== undefined &&
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                                  Municipalities
-                                                                </div>
-                                                                <InputCustom
-                                                                  placeholder={zipCodeAddress.municipality}
-                                                                  disabled={true}
-                                                                  style={{ width: '100%' }}
-                                                                />
-                                                              </div>
-                                                            }
-                                                            {zipCodeAddress.address !== undefined &&
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                                  Address
-                                                                </div>
-                                                                <InputCustom
-                                                                  placeholder={zipCodeAddress.address}
-                                                                  disabled={true}
-                                                                  style={{ width: '100%' }}
-                                                                />
-                                                              </div>
-                                                            }
-                                                            {zipCodeAddress.building_name !== undefined &&
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                                  Building name
-                                                                </div>
-                                                                <InputCustom
-                                                                  placeholder={zipCodeAddress.building_name}
-                                                                  disabled={true}
-                                                                  style={{ width: '100%' }}
-                                                                />
-                                                              </div>
-                                                            }
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'attaching_file' */}
-                                                      {
-                                                        content.type === 'attaching_file' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {(attachingFile.require) &&
-                                                              <div className="ss-message__content--user-attaching_file-top">
-                                                                {attachingFile.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
-                                                              </div>
-                                                            }
-                                                            {!attachingFile.file_content && <span style={{ fontWeight: '400', fontSize: '12px' }}>Not selected</span>}
-                                                            <div className="ss-message__content--user-attaching_file">
-                                                              <Button className="ss-message__content--user-attaching_file-btn" style={{ backgroundColor: '#A3B1BF', marginTop: '0px' }}>
-                                                                Select file
-                                                              </Button>
-                                                            </div>
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'calendar' */}
-                                                      {
-                                                        content.type === 'calendar' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {(calendar.title_require || calendar.require) &&
-                                                              <div className="ss-message__content--user-calender-top" style={{ marginBottom: '0px' }}>
-                                                                {calendar.title_require &&
-                                                                  <span className="ss-message__content--user-calender-title">
-                                                                    {calendar.title}
-                                                                  </span>
-                                                                }
-                                                                {calendar.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
-                                                              </div>
-                                                            }
-                                                            {/* calendar: type = 'date_selection' */}
-                                                            {calendar.type === 'date_selection' && (
-                                                              <React.Fragment>
-                                                                <DatePickerCustom
-                                                                  style={{ width: '99%', marginTop: '5px' }}
-                                                                  value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
-                                                                  onChange={(date, dateString) => console.log(dateString)}
-                                                                  disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
-                                                                />
-                                                              </React.Fragment>
-                                                            )}
-                                                            {/* calendar: type = 'embedded' */}
-                                                            {calendar.type === 'embedded' && (
-                                                              <React.Fragment>
-                                                                <div className="ss-message__content--user-calender-embedded" style={{ marginTop: '5px' }}>
-                                                                  <Calendar
-                                                                    className="ss-custom-calendar"
-                                                                    fullscreen={false}
-                                                                    onPanelChange={(value, mode) => console.log(value)}
-                                                                    style={{ top: '20px', width: '300px', border: '1px solid grey' }}
-                                                                    onChange={value => console.log(value.format("DD/MM/YYYY"))}
-                                                                    disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
-                                                                  />
-                                                                </div>
-                                                              </React.Fragment>
-                                                            )}
-                                                            {/* calendar: type = 'start_end_date' */}
-                                                            {calendar.type === 'start_end_date' && (
-                                                              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                                <DatePickerCustom
-                                                                  style={{ width: '49%', marginTop: '5px' }}
-                                                                  disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
-                                                                  value={calendar.start_date_test ? moment(calendar.start_date_test) : null}
-                                                                  onChange={(date, dateString) => console.log(dateString)}
-                                                                />
-                                                                <DatePickerCustom
-                                                                  style={{ width: '49%', marginTop: '5px' }}
-                                                                  disabledDate={(current) => handleDisableEndDateCalendar(current, calendar)}
-                                                                  value={calendar.end_date_test ? moment(calendar.end_date_test) : null}
-                                                                  onChange={(date, dateString) => console.log(dateString)}
-                                                                />
-                                                              </div>
-                                                            )}
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'agree_term' */}
-                                                      {
-                                                        content.type === 'agree_term' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {/* {(agreeTerm.title_require || agreeTerm.require) && */}
-                                                            <div className="ss-message__content--user-agree_to_term-top" style={{ marginBottom: '0px' }}>
-                                                              {agreeTerm.title_require &&
-                                                                <span className="ss-message__content--user-agree_to_term-title">
-                                                                  {agreeTerm.title}
-                                                                </span>
-                                                              }
-                                                              <span className="ss-message__content--user-text-input-required">
-                                                                * required
-                                                              </span>
-                                                            </div>
-                                                            {/* } */}
-                                                            {/* agreeTerm: type = 'detail_content' */}
-                                                            {agreeTerm.type === 'detail_content' && (
-                                                              <React.Fragment>
-                                                                <div className="ss-message__content--user-agree_to_term-detail_content">
-                                                                  <textarea
-                                                                    name="ss-message__content--user-agree_to_term-detail_content"
-                                                                    id=""
-                                                                    rows="5"
-                                                                    value={agreeTerm[agreeTerm.type].content}
-                                                                    className="ss-input-value"
-                                                                    readOnly
-                                                                  ></textarea>
+                                                                </React.Fragment>
+                                                              )}
+                                                              {/* agreeTerm: type = 'post_link_only' */}
+                                                              {agreeTerm.type === 'post_link_only' && (
+                                                                <div>
+                                                                  {agreeTerm[agreeTerm.type].map((item, index) => {
+                                                                    return <div key={index} className="ss-message__content--user-agree_to_term-post_link_only">
+                                                                      <span style={{ marginRight: '8px' }}>{item.title_comment}</span>
+                                                                      <a href={item.urls} target="_blank">{item.title}</a>
+                                                                      <span style={{ marginLeft: '8px' }}>{item.url_comment}</span>
+                                                                    </div>
+                                                                  })}
                                                                   <CheckboxCustom
                                                                     onChange={value => console.log(value)}
                                                                     label={agreeTerm.term}
                                                                   />
                                                                 </div>
-                                                              </React.Fragment>
-                                                            )}
-                                                            {/* agreeTerm: type = 'post_link_only' */}
-                                                            {agreeTerm.type === 'post_link_only' && (
-                                                              <div>
-                                                                {agreeTerm[agreeTerm.type].map((item, index) => {
-                                                                  return <div key={index} className="ss-message__content--user-agree_to_term-post_link_only">
-                                                                    <span style={{ marginRight: '8px' }}>{item.title_comment}</span>
-                                                                    <a href={item.urls} target="_blank">{item.title}</a>
-                                                                    <span style={{ marginLeft: '8px' }}>{item.url_comment}</span>
-                                                                  </div>
-                                                                })}
-                                                                <CheckboxCustom
-                                                                  onChange={value => console.log(value)}
-                                                                  label={agreeTerm.term}
-                                                                />
-                                                              </div>
-                                                            )}
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'carousel' */}
-                                                      {
-                                                        content.type === 'carousel' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {(carousel.title_require || carousel.require) &&
-                                                              <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
-                                                                {carousel.title_require &&
-                                                                  <span className="ss-message__content--user-checkbox-title">
-                                                                    {carousel.title}
-                                                                  </span>
-                                                                }
-                                                                {carousel.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
-                                                              </div>
-                                                            }
-                                                            <div className="ss-message__content--user-checkbox-wrapper">
-                                                              {carousel.type === 'default' && (
-                                                                <Carousel arrows {...settingsCarousel} afterChange={(currentSlide) => setIndexCarouselSlide(currentSlide)}>
-                                                                  {carousel[carousel?.type]?.contents &&
-                                                                    carousel[carousel?.type]?.contents.map((itemCarousel, indexCarousel) => {
-                                                                      return <React.Fragment key={indexCarousel}>
-                                                                        <div style={{ width: '100%', minHeight: '298px' }}>
-                                                                          <img src={itemCarousel.fileUrl} />
-                                                                          {itemCarousel.title && <div style={{ fontWeight: '800' }}>{itemCarousel.title}</div>}
-                                                                          {itemCarousel.subtitle && <div>{itemCarousel.subtitle}</div>}
-                                                                        </div>
-                                                                        {itemCarousel.buttonTitle &&
-                                                                          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
-                                                                            <span style={{ minWidth: '10%', height: '10%', backgroundColor: '#088C43', padding: '7px', color: 'white', fontWeight: '400', borderRadius: '5px' }}>
-                                                                              {itemCarousel.buttonTitle}
-                                                                            </span>
-                                                                          </div>
-                                                                        }
-                                                                      </React.Fragment>
-                                                                    })}
-                                                                </Carousel>
-                                                              )}
-                                                              {carousel.type === 'consume_api_response' && (
-                                                                <>
-                                                                </>
                                                               )}
                                                             </div>
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'credit_card_payment' */}
-                                                      {
-                                                        content.type === 'credit_card_payment' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {(creditCardPayment.title_require || creditCardPayment.require) &&
-                                                              <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
-                                                                {creditCardPayment.title_require &&
-                                                                  <span className="ss-message__content--user-text-input-title">
-                                                                    {creditCardPayment.title}
-                                                                  </span>
-                                                                }
-                                                                {creditCardPayment.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
+                                                          )
+                                                        }
+                                                        {/* type == 'carousel' */}
+                                                        {
+                                                          content.type === 'carousel' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(carousel.title_require || carousel.require) &&
+                                                                <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+                                                                  {carousel.title_require &&
+                                                                    <span className="ss-message__content--user-checkbox-title">
+                                                                      {carousel.title}
+                                                                    </span>
+                                                                  }
+                                                                  {carousel.require === true &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              <div className="ss-message__content--user-checkbox-wrapper">
+                                                                {carousel.type === 'default' && (
+                                                                  <Carousel arrows {...settingsCarousel} afterChange={(currentSlide) => setIndexCarouselSlide(currentSlide)}>
+                                                                    {carousel[carousel?.type]?.contents &&
+                                                                      carousel[carousel?.type]?.contents.map((itemCarousel, indexCarousel) => {
+                                                                        return <React.Fragment key={indexCarousel}>
+                                                                          <div style={{ width: '100%', minHeight: '298px' }}>
+                                                                            <img src={itemCarousel.fileUrl} />
+                                                                            {itemCarousel.title && <div style={{ fontWeight: '800' }}>{itemCarousel.title}</div>}
+                                                                            {itemCarousel.subtitle && <div>{itemCarousel.subtitle}</div>}
+                                                                          </div>
+                                                                          {itemCarousel.buttonTitle &&
+                                                                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '30px' }}>
+                                                                              <span style={{ minWidth: '10%', height: '10%', backgroundColor: '#088C43', padding: '7px', color: 'white', fontWeight: '400', borderRadius: '5px' }}>
+                                                                                {itemCarousel.buttonTitle}
+                                                                              </span>
+                                                                            </div>
+                                                                          }
+                                                                        </React.Fragment>
+                                                                      })}
+                                                                  </Carousel>
+                                                                )}
+                                                                {carousel.type === 'consume_api_response' && (
+                                                                  <>
+                                                                  </>
+                                                                )}
                                                               </div>
-                                                            }
-                                                            {creditCardPayment.separate_type === false ?
+                                                            </div>
+                                                          )
+                                                        }
+                                                        {/* type == 'credit_card_payment' */}
+                                                        {
+                                                          content.type === 'credit_card_payment' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(creditCardPayment.title_require || creditCardPayment.require) &&
+                                                                <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
+                                                                  {creditCardPayment.title_require &&
+                                                                    <span className="ss-message__content--user-text-input-title">
+                                                                      {creditCardPayment.title}
+                                                                    </span>
+                                                                  }
+                                                                  {creditCardPayment.require === true &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              {creditCardPayment.separate_type === false ?
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <InputCustom
+                                                                    className="ss-user-setting-input-overview"
+                                                                    styleLabel={{ width: '100%' }}
+                                                                    label="Card number"
+                                                                    inline={false}
+                                                                    disabled={true}
+                                                                    placeholder={creditCardPayment.card_number_placeholder}
+                                                                  />
+                                                                </div> :
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <div style={{ width: '100%' }}>Card number</div>
+                                                                  <div style={{ width: '100%' }} className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type">
+                                                                    <InputCustom
+                                                                      disabled={true}
+                                                                      placeholder={creditCardPayment.card_number_placeholder1}
+                                                                    />
+                                                                    <InputCustom
+                                                                      disabled={true}
+                                                                      placeholder={creditCardPayment.card_number_placeholder2}
+                                                                    />
+                                                                    <InputCustom
+                                                                      disabled={true}
+                                                                      placeholder={creditCardPayment.card_number_placeholder3}
+                                                                    />
+                                                                    <InputCustom
+                                                                      disabled={true}
+                                                                      placeholder={creditCardPayment.card_number_placeholder4}
+                                                                    />
+                                                                  </div>
+                                                                </div>
+                                                              }
+                                                              {creditCardPayment.is_hide_card_name === false &&
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <InputCustom
+                                                                    className="ss-user-setting-input-overview"
+                                                                    styleLabel={{ width: '100%' }}
+                                                                    label="Card holder"
+                                                                    inline={false}
+                                                                    disabled={true}
+                                                                    placeholder={creditCardPayment.card_number_placeholder}
+                                                                  />
+                                                                </div>
+                                                              }
                                                               <div className="ss-user-setting__item-bottom">
-                                                                <InputCustom
-                                                                  className="ss-user-setting-input-overview"
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  label="Card number"
-                                                                  inline={false}
-                                                                  disabled={true}
-                                                                  placeholder={creditCardPayment.card_number_placeholder}
-                                                                />
-                                                              </div> :
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <div style={{ width: '100%' }}>Card number</div>
-                                                                <div style={{ width: '100%' }} className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type">
-                                                                  <InputCustom
+                                                                <div style={{ width: '100%' }}>Date of expiry</div>
+                                                                <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                                                                  <SelectCustom
+                                                                    placeholder="year"
+                                                                    style={{ width: '49%' }}
+                                                                    value={creditCardPayment.year_placeholder}
                                                                     disabled={true}
-                                                                    placeholder={creditCardPayment.card_number_placeholder1}
                                                                   />
-                                                                  <InputCustom
+                                                                  <SelectCustom
+                                                                    placeholder="month"
+                                                                    style={{ width: '49%' }}
+                                                                    value={creditCardPayment.month_placeholder}
                                                                     disabled={true}
-                                                                    placeholder={creditCardPayment.card_number_placeholder2}
-                                                                  />
-                                                                  <InputCustom
-                                                                    disabled={true}
-                                                                    placeholder={creditCardPayment.card_number_placeholder3}
-                                                                  />
-                                                                  <InputCustom
-                                                                    disabled={true}
-                                                                    placeholder={creditCardPayment.card_number_placeholder4}
                                                                   />
                                                                 </div>
                                                               </div>
-                                                            }
-                                                            {creditCardPayment.is_hide_card_name === false &&
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <InputCustom
-                                                                  className="ss-user-setting-input-overview"
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  label="Card holder"
-                                                                  inline={false}
-                                                                  disabled={true}
-                                                                  placeholder={creditCardPayment.card_number_placeholder}
-                                                                />
-                                                              </div>
-                                                            }
-                                                            <div className="ss-user-setting__item-bottom">
-                                                              <div style={{ width: '100%' }}>Date of expiry</div>
-                                                              <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
-                                                                <SelectCustom
-                                                                  placeholder="year"
-                                                                  style={{ width: '49%' }}
-                                                                  value={creditCardPayment.year_placeholder}
-                                                                  disabled={true}
-                                                                />
-                                                                <SelectCustom
-                                                                  placeholder="month"
-                                                                  style={{ width: '49%' }}
-                                                                  value={creditCardPayment.month_placeholder}
-                                                                  disabled={true}
-                                                                />
-                                                              </div>
+                                                              {creditCardPayment.is_hide_cvc === false &&
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <InputCustom
+                                                                    className="ss-user-setting-input-overview"
+                                                                    styleLabel={{ width: '100%' }}
+                                                                    label="CVC"
+                                                                    inline={false}
+                                                                    disabled={true}
+                                                                    placeholder={creditCardPayment.cvc_placeholder}
+                                                                  />
+                                                                </div>
+                                                              }
                                                             </div>
-                                                            {creditCardPayment.is_hide_cvc === false &&
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <InputCustom
-                                                                  className="ss-user-setting-input-overview"
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  label="CVC"
-                                                                  inline={false}
-                                                                  disabled={true}
-                                                                  placeholder={creditCardPayment.cvc_placeholder}
-                                                                />
-                                                              </div>
-                                                            }
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'capture' */}
-                                                      {
-                                                        content.type === 'capture' && (
-                                                          <div style={{ color: '#6989A6', fontSize: '14px' }}>capture</div>
-                                                        )
-                                                      }
-                                                      {/* type == 'product_purchase' */}
-                                                      {
-                                                        content.type === 'product_purchase' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {(productPurchase.title_require || productPurchase.require) &&
-                                                              <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
-                                                                {productPurchase.title_require &&
-                                                                  <span className="ss-message__content--user-checkbox-title">
-                                                                    {productPurchase.title}
-                                                                  </span>
-                                                                }
-                                                                {productPurchase.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
-                                                              </div>
-                                                            }
-                                                            <div>
-                                                              {productPurchase.type === 'text_with_thumbnail_image' && (
-                                                                productPurchase.multiple_item_purchase ? (
-                                                                  <React.Fragment>
-                                                                    <Checkbox.Group
-                                                                      className="ss-user-overview-product-purchase-checkbox-group ss-user-overview-product-purchase-style-width"
-                                                                      style={{ width: "100%" }}
-                                                                      onChange={(value) => console.log(value)}
-                                                                      value={productPurchase.initial_selection}
-                                                                    >
-                                                                      {productPurchase.products.map((itemProduct, indexProduct) => {
-                                                                        return <Checkbox key={indexProduct} value={itemProduct.id}>
-                                                                          <div className="ss-user-overview-product-purchase-container">
-                                                                            <div className="ss-user-overview-product-purchase-img">
-                                                                              <img src={itemProduct.img_url} />
-                                                                            </div>
-                                                                            {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
-                                                                              <div className="ss-user-overview-product-purchase-infor">
-                                                                                {productPurchase.product_name_display && itemProduct.title &&
-                                                                                  <div className="ss-user-overview-product-purchase-infor-title">
-                                                                                    {itemProduct.title}
-                                                                                  </div>
-                                                                                }
-                                                                                {productPurchase.product_number_display && itemProduct.item_number &&
-                                                                                  <div className="ss-user-overview-product-purchase-infor-item-number">
-                                                                                    Item number: {itemProduct.item_number}
-                                                                                  </div>
-                                                                                }
-                                                                                {itemProduct.price_display_custom ?
-                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                    {itemProduct.price_display_custom}
-                                                                                  </div> :
-                                                                                  productPurchase.price_display && itemProduct.item_price &&
-                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                    Price: {itemProduct.item_price} 円
-                                                                                  </div>
-                                                                                }
-                                                                                {/* {productPurchase.multiple_item_purchase &&
+                                                          )
+                                                        }
+                                                        {/* type == 'capture' */}
+                                                        {
+                                                          content.type === 'capture' && (
+                                                            <div style={{ color: '#6989A6', fontSize: '14px' }}>capture</div>
+                                                          )
+                                                        }
+                                                        {/* type == 'product_purchase' */}
+                                                        {
+                                                          content.type === 'product_purchase' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(productPurchase.title_require || productPurchase.require) &&
+                                                                <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+                                                                  {productPurchase.title_require &&
+                                                                    <span className="ss-message__content--user-checkbox-title">
+                                                                      {productPurchase.title}
+                                                                    </span>
+                                                                  }
+                                                                  {productPurchase.require === true &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              <div>
+                                                                {productPurchase.type === 'text_with_thumbnail_image' && (
+                                                                  productPurchase.multiple_item_purchase ? (
+                                                                    <React.Fragment>
+                                                                      <Checkbox.Group
+                                                                        className="ss-user-overview-product-purchase-checkbox-group ss-user-overview-product-purchase-style-width"
+                                                                        style={{ width: "100%" }}
+                                                                        onChange={(value) => console.log(value)}
+                                                                        value={productPurchase.initial_selection}
+                                                                      >
+                                                                        {productPurchase.products.map((itemProduct, indexProduct) => {
+                                                                          return <Checkbox key={indexProduct} value={itemProduct.id}>
+                                                                            <div className="ss-user-overview-product-purchase-container">
+                                                                              <div className="ss-user-overview-product-purchase-img">
+                                                                                <img src={itemProduct.img_url} />
+                                                                              </div>
+                                                                              {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                                                                <div className="ss-user-overview-product-purchase-infor">
+                                                                                  {productPurchase.product_name_display && itemProduct.title &&
+                                                                                    <div className="ss-user-overview-product-purchase-infor-title">
+                                                                                      {itemProduct.title}
+                                                                                    </div>
+                                                                                  }
+                                                                                  {productPurchase.product_number_display && itemProduct.item_number &&
+                                                                                    <div className="ss-user-overview-product-purchase-infor-item-number">
+                                                                                      Item number: {itemProduct.item_number}
+                                                                                    </div>
+                                                                                  }
+                                                                                  {itemProduct.price_display_custom ?
+                                                                                    <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                      {itemProduct.price_display_custom}
+                                                                                    </div> :
+                                                                                    productPurchase.price_display && itemProduct.item_price &&
+                                                                                    <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                      Price: {itemProduct.item_price} 円
+                                                                                    </div>
+                                                                                  }
+                                                                                  {/* {productPurchase.multiple_item_purchase &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-price">
                                                                                     Multiple item purchase
                                                                                   </div>
                                                                                 } */}
+                                                                                </div>
+                                                                              }
+                                                                            </div>
+                                                                          </Checkbox>
+                                                                        })}
+                                                                      </Checkbox.Group>
+                                                                    </React.Fragment>
+                                                                  ) : (
+                                                                    <React.Fragment>
+                                                                      <Radio.Group
+                                                                        className="ss-user-overview-product-purchase-radio-group ss-user-overview-product-purchase-style-width"
+                                                                        style={{ width: "100%" }}
+                                                                        onChange={(value) => console.log(value)}
+                                                                        value={productPurchase.initial_selection[0]}
+                                                                      >
+                                                                        {productPurchase.products.map((itemProduct, indexProduct) => {
+                                                                          return <Radio value={itemProduct.id} key={indexProduct}>
+                                                                            <div className="ss-user-overview-product-purchase-container">
+                                                                              <div className="ss-user-overview-product-purchase-img">
+                                                                                <img src={itemProduct.img_url} />
                                                                               </div>
-                                                                            }
-                                                                          </div>
-                                                                        </Checkbox>
-                                                                      })}
-                                                                    </Checkbox.Group>
-                                                                  </React.Fragment>
-                                                                ) : (
+                                                                              {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                                                                <div className="ss-user-overview-product-purchase-infor">
+                                                                                  {productPurchase.product_name_display && itemProduct.title &&
+                                                                                    <div className="ss-user-overview-product-purchase-infor-title">
+                                                                                      {itemProduct.title}
+                                                                                    </div>
+                                                                                  }
+                                                                                  {productPurchase.product_number_display && itemProduct.item_number &&
+                                                                                    <div className="ss-user-overview-product-purchase-infor-item-number">
+                                                                                      Item number: {itemProduct.item_number}
+                                                                                    </div>
+                                                                                  }
+                                                                                  {itemProduct.price_display_custom ?
+                                                                                    <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                      {itemProduct.price_display_custom}
+                                                                                    </div> :
+                                                                                    productPurchase.price_display && itemProduct.item_price &&
+                                                                                    <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                      Price: {itemProduct.item_price} 円
+                                                                                    </div>
+                                                                                  }
+                                                                                  {/* {productPurchase.multiple_item_purchase &&
+                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                    Multiple item purchase
+                                                                                  </div>
+                                                                                } */}
+                                                                                </div>
+                                                                              }
+                                                                            </div>
+                                                                          </Radio>
+                                                                        })}
+                                                                      </Radio.Group>
+                                                                    </React.Fragment>
+                                                                  )
+                                                                )}
+                                                                {productPurchase.type === 'text_with_image' && (
+                                                                  productPurchase.multiple_item_purchase ? (
+                                                                    <React.Fragment>
+                                                                      <Checkbox.Group
+                                                                        className="ss-user-overview-product-purchase-checkbox-group-type-text_image ss-user-overview-product-purchase-style-width"
+                                                                        style={{ width: "100%" }}
+                                                                        onChange={(value) => console.log(value)}
+                                                                        value={productPurchase.initial_selection}
+                                                                      >
+                                                                        {productPurchase.products.map((itemProduct, indexProduct) => {
+                                                                          return <Checkbox key={indexProduct} value={itemProduct.id}>
+                                                                            <div className="ss-user-overview-product-purchase-container-type-text_image">
+                                                                              <div className="ss-user-overview-product-purchase-img-type-text_image">
+                                                                                <img src={itemProduct.img_url} />
+                                                                              </div>
+                                                                              {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                                                                <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                                                                  {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                                                                                </div>
+                                                                              }
+                                                                            </div>
+                                                                          </Checkbox>
+                                                                        })}
+                                                                      </Checkbox.Group>
+                                                                    </React.Fragment>
+                                                                  ) : (
+                                                                    <React.Fragment>
+                                                                      <Radio.Group
+                                                                        className="ss-user-overview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width"
+                                                                        style={{ width: "100%" }}
+                                                                        onChange={(value) => console.log(value)}
+                                                                        value={productPurchase.initial_selection[0]}
+                                                                      >
+                                                                        {productPurchase.products.map((itemProduct, indexProduct) => {
+                                                                          return <Radio value={itemProduct.id} key={indexProduct}>
+                                                                            <div className="ss-user-overview-product-purchase-container-type-text_image">
+                                                                              <div className="ss-user-overview-product-purchase-img-type-text_image">
+                                                                                <img src={itemProduct.img_url} />
+                                                                              </div>
+                                                                              {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                                                                <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                                                                  {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                                                                                </div>
+                                                                              }
+                                                                            </div>
+                                                                          </Radio>
+                                                                        })}
+                                                                      </Radio.Group>
+                                                                    </React.Fragment>
+                                                                  )
+                                                                )}
+                                                                {productPurchase.type === 'consume_api_response' && (
+                                                                  <>
+                                                                  </>
+                                                                )}
+                                                              </div>
+                                                            </div>
+                                                          )
+                                                        }
+                                                        {/* type == 'product_purchase_radio_button' */}
+                                                        {
+                                                          content.type === 'product_purchase_radio_button' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(productPurchaseRadioButton.title_require || productPurchaseRadioButton.require) &&
+                                                                <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+                                                                  {productPurchaseRadioButton.title_require &&
+                                                                    <span className="ss-message__content--user-checkbox-title">
+                                                                      {productPurchaseRadioButton.title}
+                                                                    </span>
+                                                                  }
+                                                                  {productPurchaseRadioButton.require === true &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              <div>
+                                                                {productPurchaseRadioButton.type === 'text_with_thumbnail_image' && (
                                                                   <React.Fragment>
                                                                     <Radio.Group
                                                                       className="ss-user-overview-product-purchase-radio-group ss-user-overview-product-purchase-style-width"
                                                                       style={{ width: "100%" }}
                                                                       onChange={(value) => console.log(value)}
-                                                                      value={productPurchase.initial_selection[0]}
                                                                     >
-                                                                      {productPurchase.products.map((itemProduct, indexProduct) => {
+                                                                      {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
                                                                         return <Radio value={itemProduct.id} key={indexProduct}>
                                                                           <div className="ss-user-overview-product-purchase-container">
                                                                             <div className="ss-user-overview-product-purchase-img">
                                                                               <img src={itemProduct.img_url} />
                                                                             </div>
-                                                                            {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                                                            {(productPurchaseRadioButton.product_name_display || productPurchaseRadioButton.price_display || productPurchaseRadioButton.product_number_display) &&
                                                                               <div className="ss-user-overview-product-purchase-infor">
-                                                                                {productPurchase.product_name_display && itemProduct.title &&
+                                                                                {productPurchaseRadioButton.product_name_display && itemProduct.title &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-title">
                                                                                     {itemProduct.title}
                                                                                   </div>
                                                                                 }
-                                                                                {productPurchase.product_number_display && itemProduct.item_number &&
+                                                                                {productPurchaseRadioButton.product_number_display && itemProduct.item_number &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-item-number">
-                                                                                    Item number: {itemProduct.item_number}
+                                                                                    Item No.: {itemProduct.item_number}
                                                                                   </div>
                                                                                 }
-                                                                                {itemProduct.price_display_custom ?
-                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                    {itemProduct.price_display_custom}
-                                                                                  </div> :
-                                                                                  productPurchase.price_display && itemProduct.item_price &&
+                                                                                {productPurchaseRadioButton.price_display && itemProduct.item_price &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-price">
                                                                                     Price: {itemProduct.item_price} 円
                                                                                   </div>
                                                                                 }
-                                                                                {/* {productPurchase.multiple_item_purchase &&
-                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                    Multiple item purchase
-                                                                                  </div>
-                                                                                } */}
                                                                               </div>
                                                                             }
                                                                           </div>
@@ -4457,50 +4579,23 @@ const Scenario = () => {
                                                                       })}
                                                                     </Radio.Group>
                                                                   </React.Fragment>
-                                                                )
-                                                              )}
-                                                              {productPurchase.type === 'text_with_image' && (
-                                                                productPurchase.multiple_item_purchase ? (
-                                                                  <React.Fragment>
-                                                                    <Checkbox.Group
-                                                                      className="ss-user-overview-product-purchase-checkbox-group-type-text_image ss-user-overview-product-purchase-style-width"
-                                                                      style={{ width: "100%" }}
-                                                                      onChange={(value) => console.log(value)}
-                                                                      value={productPurchase.initial_selection}
-                                                                    >
-                                                                      {productPurchase.products.map((itemProduct, indexProduct) => {
-                                                                        return <Checkbox key={indexProduct} value={itemProduct.id}>
-                                                                          <div className="ss-user-overview-product-purchase-container-type-text_image">
-                                                                            <div className="ss-user-overview-product-purchase-img-type-text_image">
-                                                                              <img src={itemProduct.img_url} />
-                                                                            </div>
-                                                                            {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
-                                                                              <div className="ss-user-overview-product-purchase-infor-type-text_image">
-                                                                                {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
-                                                                              </div>
-                                                                            }
-                                                                          </div>
-                                                                        </Checkbox>
-                                                                      })}
-                                                                    </Checkbox.Group>
-                                                                  </React.Fragment>
-                                                                ) : (
+                                                                )}
+                                                                {productPurchaseRadioButton.type === 'text_with_image' && (
                                                                   <React.Fragment>
                                                                     <Radio.Group
                                                                       className="ss-user-overview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width"
                                                                       style={{ width: "100%" }}
                                                                       onChange={(value) => console.log(value)}
-                                                                      value={productPurchase.initial_selection[0]}
                                                                     >
-                                                                      {productPurchase.products.map((itemProduct, indexProduct) => {
+                                                                      {productPurchaseRadioButton.products && productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
                                                                         return <Radio value={itemProduct.id} key={indexProduct}>
                                                                           <div className="ss-user-overview-product-purchase-container-type-text_image">
                                                                             <div className="ss-user-overview-product-purchase-img-type-text_image">
                                                                               <img src={itemProduct.img_url} />
                                                                             </div>
-                                                                            {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                                                            {(productPurchaseRadioButton.product_name_display || productPurchaseRadioButton.price_display || productPurchaseRadioButton.product_number_display) &&
                                                                               <div className="ss-user-overview-product-purchase-infor-type-text_image">
-                                                                                {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                                                                                {productPurchaseRadioButton.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchaseRadioButton.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {productPurchaseRadioButton.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : ""}
                                                                               </div>
                                                                             }
                                                                           </div>
@@ -4508,331 +4603,242 @@ const Scenario = () => {
                                                                       })}
                                                                     </Radio.Group>
                                                                   </React.Fragment>
-                                                                )
-                                                              )}
-                                                              {productPurchase.type === 'consume_api_response' && (
-                                                                <>
-                                                                </>
-                                                              )}
+                                                                )}
+                                                                {productPurchaseRadioButton.type === 'consume_api_response' && (
+                                                                  <>
+                                                                  </>
+                                                                )}
+                                                              </div>
                                                             </div>
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'product_purchase_radio_button' */}
-                                                      {
-                                                        content.type === 'product_purchase_radio_button' && (
+                                                          )
+                                                        }
+                                                        {/* type == 'sms_verify' */}
+                                                        {content.type === 'sms_verify' && (
                                                           <div style={{ marginBottom: '10px' }}>
-                                                            {(productPurchaseRadioButton.title_require || productPurchaseRadioButton.require) &&
+                                                            {smsVerify.title_require &&
                                                               <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
-                                                                {productPurchaseRadioButton.title_require &&
+                                                                {smsVerify.title_require &&
                                                                   <span className="ss-message__content--user-checkbox-title">
-                                                                    {productPurchaseRadioButton.title}
-                                                                  </span>
-                                                                }
-                                                                {productPurchaseRadioButton.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
+                                                                    {smsVerify.title}
                                                                   </span>
                                                                 }
                                                               </div>
                                                             }
-                                                            <div>
-                                                              {productPurchaseRadioButton.type === 'text_with_thumbnail_image' && (
-                                                                <React.Fragment>
-                                                                  <Radio.Group
-                                                                    className="ss-user-overview-product-purchase-radio-group ss-user-overview-product-purchase-style-width"
-                                                                    style={{ width: "100%" }}
-                                                                    onChange={(value) => console.log(value)}
-                                                                  >
-                                                                    {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
-                                                                      return <Radio value={itemProduct.id} key={indexProduct}>
-                                                                        <div className="ss-user-overview-product-purchase-container">
-                                                                          <div className="ss-user-overview-product-purchase-img">
-                                                                            <img src={itemProduct.img_url} />
-                                                                          </div>
-                                                                          {(productPurchaseRadioButton.product_name_display || productPurchaseRadioButton.price_display || productPurchaseRadioButton.product_number_display) &&
-                                                                            <div className="ss-user-overview-product-purchase-infor">
-                                                                              {productPurchaseRadioButton.product_name_display && itemProduct.title &&
-                                                                                <div className="ss-user-overview-product-purchase-infor-title">
-                                                                                  {itemProduct.title}
-                                                                                </div>
-                                                                              }
-                                                                              {productPurchaseRadioButton.product_number_display && itemProduct.item_number &&
-                                                                                <div className="ss-user-overview-product-purchase-infor-item-number">
-                                                                                  Item No.: {itemProduct.item_number}
-                                                                                </div>
-                                                                              }
-                                                                              {productPurchaseRadioButton.price_display && itemProduct.item_price &&
-                                                                                <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                  Price: {itemProduct.item_price} 円
-                                                                                </div>
-                                                                              }
-                                                                            </div>
-                                                                          }
-                                                                        </div>
-                                                                      </Radio>
-                                                                    })}
-                                                                  </Radio.Group>
-                                                                </React.Fragment>
-                                                              )}
-                                                              {productPurchaseRadioButton.type === 'text_with_image' && (
-                                                                <React.Fragment>
-                                                                  <Radio.Group
-                                                                    className="ss-user-overview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width"
-                                                                    style={{ width: "100%" }}
-                                                                    onChange={(value) => console.log(value)}
-                                                                  >
-                                                                    {productPurchaseRadioButton.products && productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
-                                                                      return <Radio value={itemProduct.id} key={indexProduct}>
-                                                                        <div className="ss-user-overview-product-purchase-container-type-text_image">
-                                                                          <div className="ss-user-overview-product-purchase-img-type-text_image">
-                                                                            <img src={itemProduct.img_url} />
-                                                                          </div>
-                                                                          {(productPurchaseRadioButton.product_name_display || productPurchaseRadioButton.price_display || productPurchaseRadioButton.product_number_display) &&
-                                                                            <div className="ss-user-overview-product-purchase-infor-type-text_image">
-                                                                              {productPurchaseRadioButton.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchaseRadioButton.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {productPurchaseRadioButton.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : ""}
-                                                                            </div>
-                                                                          }
-                                                                        </div>
-                                                                      </Radio>
-                                                                    })}
-                                                                  </Radio.Group>
-                                                                </React.Fragment>
-                                                              )}
-                                                              {productPurchaseRadioButton.type === 'consume_api_response' && (
-                                                                <>
-                                                                </>
-                                                              )}
-                                                            </div>
                                                           </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'sms_verify' */}
-                                                      {content.type === 'sms_verify' && (
-                                                        <div style={{ marginBottom: '10px' }}>
-                                                          {smsVerify.title_require &&
-                                                            <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
-                                                              {smsVerify.title_require &&
-                                                                <span className="ss-message__content--user-checkbox-title">
-                                                                  {smsVerify.title}
-                                                                </span>
+                                                        )}
+                                                        {/* type == 'AFTEE_payment_module' */}
+                                                        {content.type === 'AFTEE_payment_module' && (
+                                                          afteePaymentModule.content &&
+                                                          <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '10px' }}>
+                                                            {afteePaymentModule.content}
+                                                          </div>
+                                                        )}
+                                                        {/* type == 'slider' */}
+                                                        {
+                                                          content.type === 'slider' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(slider.title_require || slider.require) &&
+                                                                <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
+                                                                  {slider.title_require &&
+                                                                    <span className="ss-message__content--user-checkbox-title">
+                                                                      {slider.title}
+                                                                    </span>
+                                                                  }
+                                                                  {slider.require === true &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              <div>
+                                                                <Slider
+                                                                  trackStyle={{ backgroundColor: slider.color || '#2C75F0' }}
+                                                                  min={slider.type === 'discrete_type' ? parseInt(slider.min_value) : 0}
+                                                                  max={slider.type === 'discrete_type' ? parseInt(slider.max_value) : 10}
+                                                                  dots={slider.type === 'discrete_type'}
+                                                                  marks={
+                                                                    slider.type === 'discrete_type' ?
+                                                                      {
+                                                                        [slider.min_value]: slider.min_label,
+                                                                        [slider.max_value]: slider.max_label
+                                                                      } :
+                                                                      {
+                                                                        0: slider.min_label,
+                                                                        10: slider.max_label
+                                                                      }
+                                                                  }
+                                                                />
+                                                              </div>
+                                                            </div>
+                                                          )
+                                                        }
+                                                        {/* type == 'card_payment_radio_button' */}
+                                                        {
+                                                          content.type === 'card_payment_radio_button' && (
+                                                            <div style={{ marginBottom: '10px' }}>
+                                                              {(cardPaymentRadioButton.title_require || cardPaymentRadioButton.require) &&
+                                                                <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
+                                                                  {cardPaymentRadioButton.title_require &&
+                                                                    <span className="ss-message__content--user-text-input-title">
+                                                                      {cardPaymentRadioButton.title}
+                                                                    </span>
+                                                                  }
+                                                                  {cardPaymentRadioButton.require === true &&
+                                                                    <span className="ss-message__content--user-text-input-required">
+                                                                      * required
+                                                                    </span>
+                                                                  }
+                                                                </div>
+                                                              }
+                                                              {console.log(cardPaymentRadioButton, 'checkkkkk')}
+                                                              {cardPaymentRadioButton.type === 'default' &&
+                                                                <Radio.Group
+                                                                  style={{ width: "100%", fontSize: '14px' }}
+                                                                  onChange={(value) => console.log(value)}
+                                                                  value={cardPaymentRadioButton.initial_selection}
+                                                                >
+                                                                  {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
+                                                                    console.log(itemPayment)
+                                                                    return <Radio value={itemPayment.id} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%' }}>
+                                                                      {itemPayment.text}
+                                                                    </Radio>
+                                                                  })}
+                                                                </Radio.Group>
+                                                              }
+                                                              {cardPaymentRadioButton.type === 'customized_style' &&
+                                                                <Radio.Group
+                                                                  style={{ width: "100%", fontSize: '14px' }}
+                                                                  onChange={(value) => console.log(value)}
+                                                                  value={cardPaymentRadioButton.initial_selection}
+                                                                  buttonStyle="solid"
+                                                                >
+                                                                  {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
+                                                                    console.log(itemPayment)
+                                                                    return <Radio.Button value={itemPayment.id} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%', textAlign: 'center', lineHeight: '22px' }}>
+                                                                      {itemPayment.text}
+                                                                    </Radio.Button>
+                                                                  })}
+                                                                </Radio.Group>
+                                                              }
+                                                              {cardPaymentRadioButton.type === 'picture_radio' && cardPaymentRadioButton.radio_contents_img &&
+                                                                cardPaymentRadioButton.radio_contents_img.map((itemPaymentImg, indexPaymentImg) => {
+                                                                  return <div key={indexPaymentImg} style={{ color: '#6789A6' }}>
+                                                                    <Radio.Group
+                                                                      style={{ width: "100%", fontSize: '14px', display: 'flex' }}
+                                                                      className="ss-user-overview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width"
+                                                                      onChange={(value) => console.log(value)}
+                                                                      value={cardPaymentRadioButton.initial_selection_picture}
+                                                                    >
+                                                                      {itemPaymentImg.contents.map((itemPaymentContent, indexContent) => {
+                                                                        return <Radio value={`${itemPaymentImg.id}-${itemPaymentContent.id}`} key={indexContent} style={{ marginRight: '0px' }}>
+                                                                          <img src={itemPaymentContent.file_url}></img>
+                                                                          <div style={{ textAlign: 'center', fontSize: '14px', color: '#6789A6', fontWeight: '700' }}>{itemPaymentContent.text}</div>
+                                                                        </Radio>
+                                                                      })}
+                                                                    </Radio.Group>
+                                                                  </div>
+                                                                })
+                                                              }
+
+                                                              {cardPaymentRadioButton.separate_type === false ?
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <InputCustom
+                                                                    className="ss-user-setting-input-overview"
+                                                                    styleLabel={{ width: '100%' }}
+                                                                    label="Card number"
+                                                                    inline={false}
+                                                                    disabled={true}
+                                                                    placeholder={cardPaymentRadioButton.card_number_placeholder}
+                                                                  />
+                                                                </div> :
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <div style={{ width: '100%' }}>Card number</div>
+                                                                  <div style={{ width: '100%' }} className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type">
+                                                                    <InputCustom
+                                                                      disabled={true}
+                                                                      placeholder={cardPaymentRadioButton.card_number_placeholder1}
+                                                                    />
+                                                                    <InputCustom
+                                                                      disabled={true}
+                                                                      placeholder={cardPaymentRadioButton.card_number_placeholder2}
+                                                                    />
+                                                                    <InputCustom
+                                                                      disabled={true}
+                                                                      placeholder={cardPaymentRadioButton.card_number_placeholder3}
+                                                                    />
+                                                                    <InputCustom
+                                                                      disabled={true}
+                                                                      placeholder={cardPaymentRadioButton.card_number_placeholder4}
+                                                                    />
+                                                                  </div>
+                                                                </div>
+                                                              }
+                                                              {cardPaymentRadioButton.is_hide_card_name === false &&
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <InputCustom
+                                                                    className="ss-user-setting-input-overview"
+                                                                    styleLabel={{ width: '100%' }}
+                                                                    label="Card holder"
+                                                                    inline={false}
+                                                                    disabled={true}
+                                                                    placeholder={cardPaymentRadioButton.card_holder_placeholder}
+                                                                  />
+                                                                </div>
+                                                              }
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <div style={{ width: '100%' }}>Date of expiry</div>
+                                                                <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
+                                                                  <SelectCustom
+                                                                    placeholder="year"
+                                                                    style={{ width: '49%' }}
+                                                                    value={cardPaymentRadioButton.year_placeholder}
+                                                                    disabled={true}
+                                                                  />
+                                                                  <SelectCustom
+                                                                    placeholder="month"
+                                                                    style={{ width: '49%' }}
+                                                                    value={cardPaymentRadioButton.month_placeholder}
+                                                                    disabled={true}
+                                                                  />
+                                                                </div>
+                                                              </div>
+                                                              {cardPaymentRadioButton.is_hide_cvc === false &&
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <InputCustom
+                                                                    className="ss-user-setting-input-overview"
+                                                                    styleLabel={{ width: '100%' }}
+                                                                    label="CVC"
+                                                                    inline={false}
+                                                                    disabled={true}
+                                                                    placeholder={cardPaymentRadioButton.cvc_placeholder}
+                                                                  />
+                                                                </div>
                                                               }
                                                             </div>
-                                                          }
-                                                        </div>
-                                                      )}
-                                                      {/* type == 'AFTEE_payment_module' */}
-                                                      {content.type === 'AFTEE_payment_module' && (
-                                                        afteePaymentModule.content &&
-                                                        <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '10px' }}>
-                                                          {afteePaymentModule.content}
-                                                        </div>
-                                                      )}
-                                                      {/* type == 'slider' */}
-                                                      {
-                                                        content.type === 'slider' && (
+                                                          )
+                                                        }
+                                                        {/* type == 'label_no_transition' */}
+                                                        {content.type === 'label_no_transition' && (
                                                           <div style={{ marginBottom: '10px' }}>
-                                                            {(slider.title_require || slider.require) &&
-                                                              <div className="ss-message__content--user-checkbox-top" style={{ marginBottom: '0px' }}>
-                                                                {slider.title_require &&
-                                                                  <span className="ss-message__content--user-checkbox-title">
-                                                                    {slider.title}
-                                                                  </span>
-                                                                }
-                                                                {slider.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
-                                                              </div>
-                                                            }
-                                                            <div>
-                                                              <Slider
-                                                                trackStyle={{ backgroundColor: slider.color || '#2C75F0' }}
-                                                                min={slider.type === 'discrete_type' ? parseInt(slider.min_value) : 0}
-                                                                max={slider.type === 'discrete_type' ? parseInt(slider.max_value) : 10}
-                                                                dots={slider.type === 'discrete_type'}
-                                                                marks={
-                                                                  slider.type === 'discrete_type' ?
-                                                                    {
-                                                                      [slider.min_value]: slider.min_label,
-                                                                      [slider.max_value]: slider.max_label
-                                                                    } :
-                                                                    {
-                                                                      0: slider.min_label,
-                                                                      10: slider.max_label
-                                                                    }
-                                                                }
-                                                              />
-                                                            </div>
+                                                            {labelNoTransition.value}
                                                           </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'card_payment_radio_button' */}
-                                                      {
-                                                        content.type === 'card_payment_radio_button' && (
-                                                          <div style={{ marginBottom: '10px' }}>
-                                                            {(cardPaymentRadioButton.title_require || cardPaymentRadioButton.require) &&
-                                                              <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
-                                                                {cardPaymentRadioButton.title_require &&
-                                                                  <span className="ss-message__content--user-text-input-title">
-                                                                    {cardPaymentRadioButton.title}
-                                                                  </span>
-                                                                }
-                                                                {cardPaymentRadioButton.require === true &&
-                                                                  <span className="ss-message__content--user-text-input-required">
-                                                                    * required
-                                                                  </span>
-                                                                }
-                                                              </div>
-                                                            }
-                                                            {console.log(cardPaymentRadioButton, 'checkkkkk')}
-                                                            {cardPaymentRadioButton.type === 'default' &&
-                                                              <Radio.Group
-                                                                style={{ width: "100%", fontSize: '14px' }}
-                                                                onChange={(value) => console.log(value)}
-                                                                value={cardPaymentRadioButton.initial_selection}
-                                                              >
-                                                                {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
-                                                                  console.log(itemPayment)
-                                                                  return <Radio value={itemPayment.id} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%' }}>
-                                                                    {itemPayment.text}
-                                                                  </Radio>
-                                                                })}
-                                                              </Radio.Group>
-                                                            }
-                                                            {cardPaymentRadioButton.type === 'customized_style' &&
-                                                              <Radio.Group
-                                                                style={{ width: "100%", fontSize: '14px' }}
-                                                                onChange={(value) => console.log(value)}
-                                                                value={cardPaymentRadioButton.initial_selection}
-                                                                buttonStyle="solid"
-                                                              >
-                                                                {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
-                                                                  console.log(itemPayment)
-                                                                  return <Radio.Button value={itemPayment.id} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%', textAlign: 'center', lineHeight: '22px' }}>
-                                                                    {itemPayment.text}
-                                                                  </Radio.Button>
-                                                                })}
-                                                              </Radio.Group>
-                                                            }
-                                                            {cardPaymentRadioButton.type === 'picture_radio' && cardPaymentRadioButton.radio_contents_img &&
-                                                              cardPaymentRadioButton.radio_contents_img.map((itemPaymentImg, indexPaymentImg) => {
-                                                                return <div key={indexPaymentImg} style={{ color: '#6789A6' }}>
-                                                                  <Radio.Group
-                                                                    style={{ width: "100%", fontSize: '14px', display: 'flex' }}
-                                                                    className="ss-user-overview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width"
-                                                                    onChange={(value) => console.log(value)}
-                                                                    value={cardPaymentRadioButton.initial_selection_picture}
-                                                                  >
-                                                                    {itemPaymentImg.contents.map((itemPaymentContent, indexContent) => {
-                                                                      return <Radio value={`${itemPaymentImg.id}-${itemPaymentContent.id}`} key={indexContent} style={{ marginRight: '0px' }}>
-                                                                        <img src={itemPaymentContent.file_url}></img>
-                                                                        <div style={{ textAlign: 'center', fontSize: '14px', color: '#6789A6', fontWeight: '700' }}>{itemPaymentContent.text}</div>
-                                                                      </Radio>
-                                                                    })}
-                                                                  </Radio.Group>
-                                                                </div>
-                                                              })
-                                                            }
-
-                                                            {cardPaymentRadioButton.separate_type === false ?
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <InputCustom
-                                                                  className="ss-user-setting-input-overview"
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  label="Card number"
-                                                                  inline={false}
-                                                                  disabled={true}
-                                                                  placeholder={cardPaymentRadioButton.card_number_placeholder}
-                                                                />
-                                                              </div> :
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <div style={{ width: '100%' }}>Card number</div>
-                                                                <div style={{ width: '100%' }} className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type">
-                                                                  <InputCustom
-                                                                    disabled={true}
-                                                                    placeholder={cardPaymentRadioButton.card_number_placeholder1}
-                                                                  />
-                                                                  <InputCustom
-                                                                    disabled={true}
-                                                                    placeholder={cardPaymentRadioButton.card_number_placeholder2}
-                                                                  />
-                                                                  <InputCustom
-                                                                    disabled={true}
-                                                                    placeholder={cardPaymentRadioButton.card_number_placeholder3}
-                                                                  />
-                                                                  <InputCustom
-                                                                    disabled={true}
-                                                                    placeholder={cardPaymentRadioButton.card_number_placeholder4}
-                                                                  />
-                                                                </div>
-                                                              </div>
-                                                            }
-                                                            {cardPaymentRadioButton.is_hide_card_name === false &&
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <InputCustom
-                                                                  className="ss-user-setting-input-overview"
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  label="Card holder"
-                                                                  inline={false}
-                                                                  disabled={true}
-                                                                  placeholder={cardPaymentRadioButton.card_holder_placeholder}
-                                                                />
-                                                              </div>
-                                                            }
-                                                            <div className="ss-user-setting__item-bottom">
-                                                              <div style={{ width: '100%' }}>Date of expiry</div>
-                                                              <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between' }}>
-                                                                <SelectCustom
-                                                                  placeholder="year"
-                                                                  style={{ width: '49%' }}
-                                                                  value={cardPaymentRadioButton.year_placeholder}
-                                                                  disabled={true}
-                                                                />
-                                                                <SelectCustom
-                                                                  placeholder="month"
-                                                                  style={{ width: '49%' }}
-                                                                  value={cardPaymentRadioButton.month_placeholder}
-                                                                  disabled={true}
-                                                                />
-                                                              </div>
-                                                            </div>
-                                                            {cardPaymentRadioButton.is_hide_cvc === false &&
-                                                              <div className="ss-user-setting__item-bottom">
-                                                                <InputCustom
-                                                                  className="ss-user-setting-input-overview"
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  label="CVC"
-                                                                  inline={false}
-                                                                  disabled={true}
-                                                                  placeholder={cardPaymentRadioButton.cvc_placeholder}
-                                                                />
-                                                              </div>
-                                                            }
-                                                          </div>
-                                                        )
-                                                      }
-                                                      {/* type == 'label_no_transition' */}
-                                                      {content.type === 'label_no_transition' && (
-                                                        <div style={{ marginBottom: '10px' }}>
-                                                          {labelNoTransition.value}
-                                                        </div>
-                                                      )}
-                                                    </React.Fragment>
-                                                  )
-                                                })}
-                                              </div>
-                                              {message?.message_content.length !== 0 &&
-                                                <div className="ss-user-message__action-wrapper">
-                                                  <Button className="ss-user-message__action-btn">
-                                                    {message.buttonName || "To the next"}
-                                                  </Button>
+                                                        )}
+                                                      </React.Fragment>
+                                                    )
+                                                  })}
                                                 </div>
-                                              }
+                                                {message?.message_content.length !== 0 &&
+                                                  <div className="ss-user-message__action-wrapper">
+                                                    <Button className="ss-user-message__action-btn">
+                                                      {message.buttonName || "To the next"}
+                                                    </Button>
+                                                  </div>
+                                                }
+                                              </div>
                                             </div>
 
-                                            <div className="ss-chat-option">
+                                            <div className="ss-chat-option" style={message.message_name ? { marginTop: '25px' } : {}}>
                                               <MDBIcon
                                                 fas
                                                 icon="pencil-alt"
@@ -5316,9 +5322,13 @@ const Scenario = () => {
                               </div>
                               <InputCustom
                                 placeholder="Enter chat name"
+                                style={dataMessages[indexMessageSelect].message_name ? {} : { borderColor: 'red' }}
                                 onChange={value => onChangeValueNameMessage(indexMessageSelect, 'message_name', value)}
                                 value={dataMessages[indexMessageSelect].message_name}
                               />
+                              {!dataMessages[indexMessageSelect].message_name && <div style={{ color: 'rgb(185, 74, 72)' }}>
+                                Must be specified.
+                              </div>}
                             </div>
                           </div>
                           <DragDropContext onDragEnd={handleDragEnd}>
@@ -6500,7 +6510,24 @@ const Scenario = () => {
                                                         />
                                                         <CheckboxCustom
                                                           label="Initial selection (shortest date from today)"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'initial_selection')}
+                                                          onChange={value => {
+                                                            if (value === true) {
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY/MM/DD"), 'date_selection_test');
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY/MM/DD"), 'date_select');
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY/MM/DD"), 'start_date_select');
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY/MM/DD"), 'end_date_select');
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY/MM/DD"), 'start_date_test');
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY/MM/DD"), 'end_date_test');
+                                                            } else {
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, null, 'date_selection_test');
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, null, 'date_select');
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, null, 'start_date_select');
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, null, 'end_date_select');
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, null, 'start_date_test');
+                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, null, 'end_date_test');
+                                                            }
+                                                            onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'initial_selection');
+                                                          }}
                                                           value={calendar.initial_selection}
                                                         />
                                                         <div className="ss-user-setting__item-bottom">
@@ -6564,7 +6591,7 @@ const Scenario = () => {
                                                               style={{ width: '99%' }}
                                                               value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
                                                               onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'date_selection_test')}
-                                                              disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
+                                                              disabledDate={(current) =>  handleDisableDateCalendar(current, calendar)}
                                                             />
                                                           </div>
                                                         }
@@ -6576,7 +6603,8 @@ const Scenario = () => {
                                                               fullscreen={false}
                                                               onPanelChange={(value, mode) => console.log(value)}
                                                               style={{ top: '20px', width: '300px', border: '1px solid grey' }}
-                                                              onChange={value => console.log(value.format("DD/MM/YYYY"))}
+                                                              value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value.format("DD/MM/YYYY"), 'date_selection_test')}
                                                               disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                                                             />
                                                           </div>

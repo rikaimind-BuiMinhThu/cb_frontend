@@ -9,6 +9,7 @@ const SelectCustom = ({ id, data, value, onChange, keyValue = "key", style, plac
     <React.Fragment>
       {label && <span style={{ marginRight: '2%', fontSize: '14px', fontWeight: '400', ...styleLabel }}>{label}</span>}
       <Select
+        showSearch
         allowClear
         style={style || { width: '90%' }}
         placeholder={placeholder}
@@ -16,9 +17,16 @@ const SelectCustom = ({ id, data, value, onChange, keyValue = "key", style, plac
         onChange={onChange}
         value={value}
         disabled={disabled}
+        filterOption={(input, option) =>
+          option.children ?
+            option.children?.toLowerCase().includes(input.toLowerCase())
+            :
+            option.value.toLowerCase().includes(input.toLowerCase())
+        }
+        optionFilterProp="children"
       >
         {
-          data && data.map((item, index) => {            
+          data && data.map((item, index) => {
             return (item[keyValue] || item[nameValue]) && <Option key={index} value={item[keyValue]}>{item[nameValue]}</Option>
           })
         }

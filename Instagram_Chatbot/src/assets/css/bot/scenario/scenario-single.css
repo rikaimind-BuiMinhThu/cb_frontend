@@ -1856,3 +1856,11 @@ input#ss-message__content--user-checkbox--checkbox_img {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.ss-message-hidden-style {
+  opacity: 0.4;
+}
+
+.ss-message-custom-icon-times {
+  color: #2C75F0 !important;
+}
