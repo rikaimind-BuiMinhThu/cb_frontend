@@ -328,6 +328,11 @@ function Preview({ onOpenPreview, isOpen }) {
                   }
                   setIndexMessageRender(i);
                   index = i;
+                } else if (messageArr[i]?.message_content[0]?.type === 'pause') {
+                  // console.log(dataVariables, 'checkkkk variables')                
+                  setIndexMessageRender(i);
+                  index = i;
+                  break;
                 } else if (messageArr[i].belong_to !== 'bot') {
                   await new Promise((resolve) => {
                     return delayRender = setTimeout(() => {
@@ -1071,6 +1076,11 @@ function Preview({ onOpenPreview, isOpen }) {
               }
               setIndexMessageRender(i);
               index = i;
+            } else if (dataMessages[i]?.message_content[0]?.type === 'pause') {
+              // console.log(dataVariables, 'checkkkk variables')                
+              setIndexMessageRender(i);
+              index = i;
+              break;
             } else {
               await new Promise((resolve) => {
                 return delayRender = setTimeout(() => {
@@ -1269,6 +1279,11 @@ function Preview({ onOpenPreview, isOpen }) {
                 }
                 setIndexMessageRender(i);
                 index = i;
+              } else if (dataMessages[i]?.message_content[0]?.type === 'pause') {
+                // console.log(dataVariables, 'checkkkk variables')                
+                setIndexMessageRender(i);
+                index = i;
+                break;
               } else {
                 await new Promise((resolve) => {
                   return delayRender = setTimeout(() => {
@@ -1489,7 +1504,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                 ></textarea>
             )}
             {content.type === 'delay' && (
-              <img src={messageTypingGif} style={{ backgroundColor: '#EBF7FF', height: '40px' }} />
+              <img src={messageTypingGif} style={{ backgroundColor: '#EBF7FF', height: '40px', borderRadius: '10px'}} />
             )}
           </React.Fragment>}
       </div>
@@ -2994,9 +3009,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                     </div>
                   }
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-start', margin: '5px 0px' }}>
                     {creditCardPayment.payment_method.map((itemPayment, index, array) => {
-                      return <div key={index} style={{width: `${100/array.length - 3}%`}} className="ss-img-list-bank">
+                      return <div key={index} style={{width: `${15.6667}%`, marginRight: '1%'}} className="ss-img-list-bank">
                         {dataPaymentMethod.find(item => item.key === itemPayment).value}
                       </div>
                     })}

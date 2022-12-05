@@ -35,6 +35,7 @@ import discover from '../../../../assets/img/payment-method/discover.png';
 import jcb from '../../../../assets/img/payment-method/jcb.png';
 import master_card from '../../../../assets/img/payment-method/master_card.png';
 import visa from '../../../../assets/img/payment-method/visa.png';
+import nanoMetadata from 'nano-metadata';
 
 const _ = require('lodash');
 
@@ -1465,6 +1466,7 @@ let dataApiLinkage = [
 
 const Scenario = () => {
   // states
+  const [fileVideo, setFileVideo] = useState('');
   const [scenarioName, setScenarioName] = useState('');
   const [errorScenarioName, setErrorScenarioName] = useState('');
 
@@ -1597,17 +1599,17 @@ const Scenario = () => {
     document.getElementById('ss-carouse-file-upload').click();
   }
 
-  function getBaseUrl(event, indexContent) {
+  const getBaseUrl = async (event, indexContent) => {
     var fileInput = document.querySelector('input[type=file]')['files'][0];
     const type = fileInput.name.slice(fileInput.name.lastIndexOf('.') + 1);
-    console.log(fileInput, type)
+
     let trueFile;
     if (dataMessages[indexMessageSelect].belong_to === 'user') {
       trueFile = ['jpeg', 'jpg', 'png'].includes(type);
     } else {
       trueFile = ['jpeg', 'jpg', 'png', 'pdf', 'mp4'].includes(type);
     }
-    let file
+    let file;
     if (trueFile) {
       if (type != 'pdf' && type != 'mp4' && fileInput.size / 1024 / 1024 > 2) {
         setFileError(`You need to upload file which size under 2MB.`);
@@ -1616,9 +1618,10 @@ const Scenario = () => {
         setFileError(`You need to upload file which size under 3MB.`);
         return;
       } else if (type === 'mp4') {
-        const vid = document.getElementById('preview-video');
-        console.log(vid.duration);
-        if (vid.duration > 15) {
+        const vid = document?.getElementById('preview-video');
+        let duration = await nanoMetadata.video.duration(fileInput);
+        console.log(duration);
+        if (duration > 15) {
           setFileError(`You need to upload video which duration under 15 seconds.`);
           return;
         }
@@ -1626,7 +1629,7 @@ const Scenario = () => {
       }
       setFileError('');
       const video = document.getElementById('preview-video');
-      file = { user_file: { file_type: type, size: fileInput.size, timeplay: `${type == 'mp4' ? video.duration : ''}` } };
+      file = { user_file: { file_type: type, size: fileInput.size, timeplay: `${type == 'mp4' ? video?.duration : ''}` } };
       api
         .post(`/api/v1/managements/file/upload`, file)
         .then((res) => {
@@ -1705,37 +1708,6 @@ const Scenario = () => {
         setFileErrorCarousel('');
       }, 4000)
     }
-    // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
-    // var reader = new FileReader();
-    // var baseString;
-    // var imgUrl = URL.createObjectURL(event.target.files[0]);
-    // if (
-    //   file?.type === 'image/png' ||
-    //   file?.type === 'image/jpeg' ||
-    //   file?.type === 'image/jpg' ||
-    //   file?.type === 'image/gif' ||
-    //   file?.type === 'image/img'
-    // ) {
-    //   document.getElementById(`bot-file-upload-img`).style.display = 'block';
-    //   document.getElementById(`bot-file-upload-img`).src = imgUrl;
-    // } else {
-    //   document.getElementById(`bot-file-upload-img`).style.display = 'none';
-    //   document.getElementById(`bot-file-upload-img`).src = '';
-    // }
-
-    // reader.onloadend = function () {
-    //   baseString = reader.result;
-    //   // setInputImage(baseString);
-    //   // document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
-    //   if (baseString !== undefined || baseString !== '') {
-    //     // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
-    //     console.log(baseString)
-    //     dataMessages[indexMessageSelect].message_content[0].file.content = baseString;
-    //     setDataMessages([...dataMessages]);
-    //   }
-
-    // };
-    // reader.readAsDataURL(file);
   }
 
   // handle select message
@@ -2933,7 +2905,7 @@ const Scenario = () => {
                                 if (message.belong_to === 'bot') {
                                   content = message.message_content[0];
                                   if (content.type === 'file') {
-                                    type = content[content.type]?.content.slice(content[content.type]?.content.lastIndexOf('.') + 1);
+                                    type = content[content.type]?.content?.slice(content[content.type]?.content.lastIndexOf('.') + 1) || "";
                                     console.log(type, 'checkkk type');
                                   }
                                 }
@@ -2971,14 +2943,15 @@ const Scenario = () => {
                                                   {content.type === 'file' && (
                                                     content[content.type]?.content ? (
                                                       <React.Fragment>
-                                                        {(type === 'mp4') &&
-                                                          <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-video">
-                                                            <video
-                                                              src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/633551125f613.mp4"
-                                                              controls="controls"
-                                                            ></video>
-                                                          </div>
-                                                        }
+                                                        {/* {(type === 'mp4') && */}
+                                                        <div style={type !== 'mp4' ? { display: 'none' } : {}} className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-video">
+                                                          <video
+                                                            id="preview-video"
+                                                            src={content[content.type]?.content}
+                                                            controls
+                                                          ></video>
+                                                        </div>
+                                                        {/* } */}
                                                         {(type === 'jpeg' || type === 'png' || type === 'jpg') &&
                                                           <img
                                                             className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content`}
@@ -2987,11 +2960,6 @@ const Scenario = () => {
                                                             style={{ width: '27%', border: 'none', height: 'auto', ...message.hidden === true ? { opacity: '0.4' } : {} }}
                                                           />
                                                         }
-                                                        {/* // <span
-                                                          //   style={{ color: '#089BE5', fontSize: '17px' }}
-                                                          //   onClick={() => handleDownloadFile(content[content.type]?.content)}
-                                                          // // className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                          // >Download this file</span> */}
                                                         {(type === 'pdf') &&
                                                           <textarea
                                                             className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
@@ -3022,14 +2990,13 @@ const Scenario = () => {
 
                                                   {/* bot: type == 'api_linkage' || 'pause' */}
                                                   {(content.type === 'api_linkage' || content.type === 'pause') && (
-                                                    <textareag bhh
+                                                    <textarea
                                                       className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                                                       style={message.hidden === true ? { opacity: '0.4' } : {}}
-                                                      // value={content[content.type]?.content || ''}
+                                                      value={''}
                                                       readOnly
-                                                    ></textareag>
+                                                    ></textarea>
                                                   )}
-
                                                   {/* bot: type == 'script' */}
                                                   {content.type === 'script' && (
                                                     <textarea
@@ -3079,7 +3046,7 @@ const Scenario = () => {
                                                     </div>
                                                   )}
                                                 </div>
-                                                <div className="ss-chat-option" style={message.message_name ? { marginTop: '25px' }: {}}>
+                                                <div className="ss-chat-option" style={content.type !== "text_input" ? { marginTop: '25px' } : {}}>
                                                   <MDBIcon
                                                     fas
                                                     icon="pencil-alt"
@@ -5005,12 +4972,6 @@ const Scenario = () => {
                                     id="ss-bot-statement-type-file"
                                     className="ss-bot-statement-type-file ss-bot-statement-type"
                                   >
-                                    {/* <img
-                                src=""
-                                id="bot-file-upload-img"
-                                className="ss-bot-file-upload-img"
-                                alt=""
-                              /> */}
                                     <textarea
                                       name="bot-statement-type-file-content"
                                       id="ss-bot-statement-type-file-content"
@@ -6591,7 +6552,7 @@ const Scenario = () => {
                                                               style={{ width: '99%' }}
                                                               value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
                                                               onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'date_selection_test')}
-                                                              disabledDate={(current) =>  handleDisableDateCalendar(current, calendar)}
+                                                              disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                                                             />
                                                           </div>
                                                         }
@@ -8352,6 +8313,18 @@ const Scenario = () => {
                                                                                         value={itemProduct.item_price}
                                                                                         onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'item_price')}
                                                                                       />
+                                                                                    </div>
+                                                                                    <div className="ss-user-setting-product-purchase-sub-infor">
+                                                                                      {productPurchaseRadioButton.price_display &&
+                                                                                        <div style={{ width: '50%' }}>
+                                                                                          <InputCustom
+                                                                                            className="ss-mg-bottom-5"
+                                                                                            label="Price display contents (customized)"
+                                                                                            value={itemProduct.price_display_custom}
+                                                                                            onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')}
+                                                                                          />
+                                                                                        </div>
+                                                                                      }
                                                                                     </div>
                                                                                     {array.length > 1 &&
                                                                                       <div className="ss-user-setting-product-purchase-times-icons">
