@@ -57,9 +57,10 @@ function VariableManagement() {
       .then((res) => {
         console.log(res);
         setListVariable(res.data.data);
-        for(var i=0; i<res.data.data.length; i++){
-          document.getElementById(`up_variable_name_${i}`).value = res?.data?.data[i].variable_name
-          document.getElementById(`up_variable_value_${i}`).value = res?.data?.data[i].default_value
+        for (var i = 0; i < res.data.data.length; i++) {
+          document.getElementById(`up_variable_name_${i}`).value = res?.data?.data[i].variable_name;
+          document.getElementById(`up_variable_value_${i}`).value =
+            res?.data?.data[i].default_value;
         }
         setTotalPage(Math.ceil(res.data.total / 25));
       })
@@ -245,6 +246,7 @@ function VariableManagement() {
                 {openVariable ? (
                   <div className="var-variable-search">
                     <input
+                      className="var-form-input"
                       type="text"
                       placeholder="Search variable ..."
                       onChange={(e) => setSearch(e.target.value)}
@@ -271,8 +273,11 @@ function VariableManagement() {
                         <div className="var-form__variable-group" id={`up_var_add_${i}`} key={i}>
                           <div className="var-form__variable-name">
                             <input
+                              className="var-form-input"
                               id={`up_variable_name_${i}`}
-                              defaultValue={item.variable_name == undefined ? '': item.variable_name}
+                              defaultValue={
+                                item.variable_name == undefined ? '' : item.variable_name
+                              }
                               placeholder="Please input Variable name"
                               onChange={() =>
                                 checkInput(
@@ -294,8 +299,11 @@ function VariableManagement() {
 
                           <div className="var-form__variable-name">
                             <input
+                              className="var-form-input"
                               id={`up_variable_value_${i}`}
-                              defaultValue={item.default_value == undefined ? '': item.default_value}
+                              defaultValue={
+                                item.default_value == undefined ? '' : item.default_value
+                              }
                               placeholder="Please input variable value"
                             />
                           </div>
@@ -322,6 +330,7 @@ function VariableManagement() {
                         <div className="var-form__variable-group" id={`new_var_add_${i}`} key={i}>
                           <div className="var-form__variable-name">
                             <input
+                              className="var-form-input"
                               id={`variable_name_${i}`}
                               placeholder="Please input Variable name"
                               onChange={() =>
@@ -335,6 +344,7 @@ function VariableManagement() {
                           </div>
                           <div className="var-form__variable-name">
                             <input
+                              className="var-form-input"
                               id={`variable_value_${i}`}
                               placeholder="Please input variable value"
                             />
@@ -384,7 +394,12 @@ function VariableManagement() {
                     <div className="var-form__variable">
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="current_url" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="current_url"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           URL of the page that opened the bot
@@ -392,7 +407,12 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="current_url_param" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="current_url_param"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           Parameters in the URL of the page that opened the bot (character string
@@ -401,7 +421,12 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="current_url_title" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="current_url_title"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           The title of the webpage that opened the bot
@@ -409,7 +434,7 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="user_id" />
+                          <input className="var-form-input" type="text" disabled value="user_id" />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           A unique ID automatically assigned to each user using the bot
@@ -417,13 +442,18 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="bot_id" />
+                          <input className="var-form-input" type="text" disabled value="bot_id" />
                         </div>
                         <div className="var-form__variable-value var-none-border">the bot's ID</div>
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="preview_flg" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="preview_flg"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           Flag for users using preview features (empty for normal users)
@@ -431,7 +461,12 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="user_ip_address" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_ip_address"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           IP address of the accessing user
@@ -439,7 +474,12 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="user_country" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_country"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           Country name calculated from IP address
@@ -447,7 +487,12 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="user_city" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_city"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           Municipality calculated from the IP address
@@ -455,7 +500,12 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="user_device" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_device"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           The type of device the user is using (PC, smartphone, tablet)
@@ -463,7 +513,12 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="user_browser" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_browser"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           the type of browser the user is using
@@ -471,7 +526,12 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="user_agent" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_agent"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           User's browser information and OS information (each type, version, etc.)
@@ -479,7 +539,12 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="cv_datetime" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="cv_datetime"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           The date and time when the user reached the end of the scenario
@@ -487,7 +552,7 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="cv_flg" />
+                          <input className="var-form-input" type="text" disabled value="cv_flg" />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           Flag when the user has reached the end of the scenario (returns a value of
@@ -497,7 +562,12 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="start_datetime" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="start_datetime"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           The date and time when you opened the chatbot and had your first
@@ -506,7 +576,12 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="user_referer_firstopen" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_referer_firstopen"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           User's referral when first opened (the URL of the page they were on before
@@ -515,7 +590,12 @@ function VariableManagement() {
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
-                          <input type="text" disabled value="user_referer_current" />
+                          <input
+                            className="var-form-input"
+                            type="text"
+                            disabled
+                            value="user_referer_current"
+                          />
                         </div>
                         <div className="var-form__variable-value var-none-border">
                           User's last referral (the URL of the page they were on before visiting

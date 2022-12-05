@@ -25,8 +25,8 @@ input::-webkit-inner-spin-button {
   position: relative;
 }
 
-input,
-select {
+.bs-field-input-item,
+.bs-field-input-select {
   display: block;
   outline: 0;
   border: 1px solid #7186a0;
