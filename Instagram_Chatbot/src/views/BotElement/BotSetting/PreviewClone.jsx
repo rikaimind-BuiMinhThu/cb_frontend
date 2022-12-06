@@ -7,17 +7,28 @@ import SelectCustom from './ScenarioSetting/scenarioComon/SelectCustom';
 import CheckboxCustom from './ScenarioSetting/scenarioComon/CheckboxCustom';
 import InputCustom from './ScenarioSetting/scenarioComon/InputCustom';
 import DatePicker from 'react-datepicker';
-import { Button } from 'reactstrap';
+import {
+  Button
+} from 'reactstrap';
 import { Checkbox, Radio, Slider, Calendar } from 'antd';
 import moment from 'moment';
 import cvcIcon from '../../../assets/img/cvc-icon.png';
+import messageTypingGif from '../../../assets/img/icons8-dots-loading.gif';
 import $ from 'jquery';
 import DatePickerCustom from './ScenarioSetting/scenarioComon/DatePickerCustom';
 import InputNum from './ScenarioSetting/scenarioComon/InputNum';
 import { tokenExpired } from 'api/tokenExpired';
+import american_express from '../../../assets/img/payment-method/american_express.png';
+import diner_club from '../../../assets/img/payment-method/diner_club.png';
+import discover from '../../../assets/img/payment-method/discover.png';
+import jcb from '../../../assets/img/payment-method/jcb.png';
+import master_card from '../../../assets/img/payment-method/master_card.png';
+import visa from '../../../assets/img/payment-method/visa.png';
+
+const _ = require('lodash');
 
 let dataHourFixed = [];
-for (let i = 1; i <= 24; i++) {
+for (let i = 0; i <= 23; i++) {
   dataHourFixed.push({
     key: i + '',
     value: i + ''
@@ -25,7 +36,7 @@ for (let i = 1; i <= 24; i++) {
 }
 
 let dataMinutes = [];
-for (let i = 1; i <= 59; i++) {
+for (let i = 0; i <= 59; i++) {
   dataMinutes.push({
     key: i + '',
     value: i + ''
@@ -79,15 +90,42 @@ let dataEveryMinute = [
   },
 ];
 
+let dataPaymentMethod = [
+  {
+    key: 'visa',
+    value: <img src={visa} />
+  },
+  {
+    key: 'jcb',
+    value: <img src={jcb} />
+  },
+  {
+    key: 'master_card',
+    value: <img src={master_card} />
+  },
+  {
+    key: 'american_express',
+    value: <img src={american_express} />
+  },
+  {
+    key: 'diner_club',
+    value: <img src={diner_club} />
+  },
+  {
+    key: 'discover',
+    value: <img src={discover} />
+  }
+]
+
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
-function PreviewClone() {
+function Preview() {
 
   const [isOpen, setIsOpen] = useState(false)
   const [urlSend, setUrlSend] = useState()
   const [urlReceive, setUrlReceive] = useState()
-  const [botId, setBotId] = useState();
-  const [scenarioId, setScenarioId] = useState();
+  const [botId, setBotId] = useState(Cookies.get('bot_id'));
+  const [scenarioId, setScenarioId] = useState(Cookies.get('scenario_id'));
   const [botInfor, setBotInfor] = useState();
   const [dataMessages, setDataMessages] = useState([]);
   const [indexMessageRender, setIndexMessageRender] = useState(0);
@@ -118,10 +156,6 @@ function PreviewClone() {
     });
     return dataObj;
   });
-
-  // useEffect(() => {
-
-  // }, [])
 
   function getAllUrlParams(url) {
     var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
@@ -191,7 +225,6 @@ function PreviewClone() {
     }
     setIsOpen(!isOpen);
   }
-
   // useEffect(() => {
   //   api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
   //     if (res.data.code == 1) {
@@ -214,117 +247,245 @@ function PreviewClone() {
     console.log('scenarioIdGet: ', scenarioIdGet)
     setBotId(botIdGet)
     setScenarioId(scenarioIdGet)
-    api.get(`/api/v1/managements/chatbots/${botIdGet}/scenarios/${scenarioIdGet}/preview`).then(async res => {
-      if (res.data.code == 1) {
-        let messageArr = [...res.data.data?.conversation?.messages];
-        setDataMessages(messageArr);
-        setVariables([...res.data.variables]);
-        setBotInfor(res.data.chatbot);
-        res.data.variables.forEach(item => {
-          objParam[item.variable_name] = item.default_value;
-        });
-        console.log(res.data.chatbot);
-        setObjParam({ ...objParam });
-        console.log(objParam, 'ceghckkkkkkkkkkkkkkk objParam')
-        let variables = [...res.data.variables];
-        let messageUserVar = messageArr.filter(item => item.belong_to === 'user' && item.message_content.length > 0);
-        setMessageUser([...messageUserVar]);
-        let renderMessage = [];
-        let index;
-        let delayRender;
-        let isPauseScroll = false;
-        for (let i = 0; i < messageArr.length; i++) {
-          if (messageArr[i].hidden !== true) {
-            if (messageArr[i].conditions?.length > 0) {
-              var checked = true;
-              console.log(messageArr[i].conditions, 'check conditions')
-              for (let j = 0; j < messageArr[i].conditions.length; j++) {
-                let conditionItem = messageArr[i].conditions[j];
-                if (j === 0) {
-                  if (conditionItem.condition === 'include') {
-                    checked = objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
-                  } else if (conditionItem.condition === 'is') {
-                    checked = (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
-                  } else if (conditionItem.condition === 'not_include') {
-                    checked = (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
-                  } else if (conditionItem.condition === 'is_not') {
-                    checked = (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
-                  }
-                } else if (conditionItem?.linkCondition === 'and') {
-                  if (conditionItem.condition === 'include') {
-                    checked = checked && objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
-                  } else if (conditionItem.condition === 'is') {
-                    checked = checked && (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
-                  } else if (conditionItem.condition === 'not_include') {
-                    checked = checked && (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
-                  } else if (conditionItem.condition === 'is_not') {
-                    checked = checked && (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
-                  }
-                } else if (conditionItem?.linkCondition === 'or') {
-                  if (conditionItem.condition === 'include') {
-                    checked = checked || objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
-                  } else if (conditionItem.condition === 'is') {
-                    checked = checked || (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
-                  } else if (conditionItem.condition === 'not_include') {
-                    checked = checked || (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
-                  } else if (conditionItem.condition === 'is_not') {
-                    checked = checked || (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+      api.get(`/api/v1/managements/chatbots/${botIdGet}/scenarios/${scenarioIdGet}/preview`).then(async res => {
+        if (res.data.code == 1) {
+          let messageArr = [...res.data.data?.conversation?.messages];
+          setDataMessages(messageArr);
+          setVariables([...res.data.variables]);
+          setBotInfor(res.data.chatbot);
+          res.data.variables.forEach(item => {
+            objParam[item.variable_name] = item.default_value;
+          });
+          setObjParam({ ...objParam });
+          console.log(objParam, 'ceghckkkkkkkkkkkkkkk objParam')
+          let variables = [...res.data.variables];
+          let messageUserVar = messageArr.filter(item => item.belong_to === 'user' && item.message_content.length > 0);
+          setMessageUser([...messageUserVar]);
+          let renderMessage = [];
+          let index;
+          let delayRender;
+          let isPauseScroll = false;
+          for (let i = 0; i < messageArr.length; i++) {
+            if (messageArr[i].hidden !== true) {
+              if (messageArr[i].conditions?.length > 0) {
+                var checked = true;
+                console.log(messageArr[i].conditions, 'check conditions')
+                for (let j = 0; j < messageArr[i].conditions.length; j++) {
+                  let conditionItem = messageArr[i].conditions[j];
+                  if (j === 0) {
+                    if (conditionItem.condition === 'include') {
+                      checked = objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                    } else if (conditionItem.condition === 'is') {
+                      checked = (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                    } else if (conditionItem.condition === 'not_include') {
+                      checked = (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                    } else if (conditionItem.condition === 'is_not') {
+                      checked = (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                    }
+                  } else if (conditionItem?.linkCondition === 'and') {
+                    if (conditionItem.condition === 'include') {
+                      checked = checked && objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                    } else if (conditionItem.condition === 'is') {
+                      checked = checked && (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                    } else if (conditionItem.condition === 'not_include') {
+                      checked = checked && (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                    } else if (conditionItem.condition === 'is_not') {
+                      checked = checked && (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                    }
+                  } else if (conditionItem?.linkCondition === 'or') {
+                    if (conditionItem.condition === 'include') {
+                      checked = checked || objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition);
+                    } else if (conditionItem.condition === 'is') {
+                      checked = checked || (objParam[conditionItem.nameCondition] == conditionItem.inputCondition);
+                    } else if (conditionItem.condition === 'not_include') {
+                      checked = checked || (!objParam[conditionItem.nameCondition].includes(conditionItem.inputCondition));
+                    } else if (conditionItem.condition === 'is_not') {
+                      checked = checked || (objParam[conditionItem.nameCondition] != conditionItem.inputCondition);
+                    }
                   }
                 }
+                if (checked === false) {
+                  if (messageArr[i].belong_to === 'user') setIndexUser(prev => prev + 1);
+                  continue;
+                }
               }
-              if (checked === false) {
-                if (messageArr[i].belong_to === 'user') setIndexUser(prev => prev + 1);
-                continue;
-              }
-            }
-            if (messageArr[0].belong_to === 'bot' && messageArr[i].message_content.length > 0) {
-              console.log(i, 'check index message')
-
-              if (messageArr[i]?.message_content[0]?.type === 'delay') {
-                await new Promise((resolve) => {
-                  return delayRender = setTimeout(() => {
-                    resolve();
-                  }, messageArr[i]?.message_content[0]?.delay?.content * 1000);
-                }).then(() => {
+              if (messageArr[0].belong_to === 'bot' && messageArr[i].message_content.length > 0) {
+                console.log(i, 'check index message')
+                if (messageArr[i]?.message_content[0]?.type === 'delay') {
+                  if (messageArr[i]?.message_content[0]?.delay.typing_on) {
+                    await new Promise((resolve) => {
+                      renderMessage.push({ ...messageArr[i] });
+                      setRenderMessageArr([
+                        ...renderMessage
+                      ]);
+                      resolve();
+                    }).then(async () => {
+                      await new Promise((resolve) => {
+                        delayRender = setTimeout(() => {
+                          resolve();
+                        }, (messageArr[i]?.message_content[0].delay.content * 1000));
+                      });
+                    }).then(() => {
+                      setIndexMessageRender(i);
+                      renderMessage.pop();
+                      setRenderMessageArr([
+                        ...renderMessage
+                      ]);
+                    });
+                  } else {
+                    await new Promise((resolve) => {
+                      return delayRender = setTimeout(() => {
+                        resolve();
+                      }, messageArr[i]?.message_content[0]?.delay?.content * 1000);
+                    }).then(() => {
+                      setIndexMessageRender(i);
+                    })
+                  }
+                  index = i;
+                } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
+                  // console.log(dataVariables, 'checkkkk variables')                
+                  if (variables.length !== 0) {
+                    let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
+                    variables.forEach(item => {
+                      for (let z = 0; z < dataVarExist.length; z++) {
+                        if (item.variable_name === dataVarExist[z].key) {
+                          item.default_value = dataVarExist[z].value;
+                        }
+                      }
+                    });
+                    console.log(variables, 'checkkkk variables');
+                    setVariables([...variables]);
+                  }
                   setIndexMessageRender(i);
-                })
-                index = i;
-              } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
-                // console.log(dataVariables, 'checkkkk variables')                
-                if (variables.length !== 0) {
-                  let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
-                  variables.forEach(item => {
-                    for (let z = 0; z < dataVarExist.length; z++) {
-                      if (item.variable_name === dataVarExist[z].key) {
-                        item.default_value = dataVarExist[z].value;
+                  index = i;
+                } else if (messageArr[i]?.message_content[0]?.type === 'clear_variable') {
+                  // console.log(dataVariables, 'checkkkk variables')                
+                  if (variables.length !== 0) {
+                    let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
+                    variables.forEach(item => {
+                      for (let z = 0; z < dataVarExist.length; z++) {
+                        if (item.variable_name === dataVarExist[z]) {
+                          item.default_value = "";
+                        }
                       }
+                    });
+                    console.log(variables, 'checkkkk variables');
+                    setVariables([...variables]);
+                  }
+                  setIndexMessageRender(i);
+                  index = i;
+                } else if (messageArr[i]?.message_content[0]?.type === 'pause') {
+                  // console.log(dataVariables, 'checkkkk variables')                
+                  setIndexMessageRender(i);
+                  index = i;
+                  break;
+                } else if (messageArr[i].belong_to !== 'bot') {
+                  await new Promise((resolve) => {
+                    return delayRender = setTimeout(() => {
+                      for (let j = 0; j < messageArr[i].message_content.length; j++) {
+                        if (messageArr[i].message_content[j].type === 'capture') {
+                          api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
+                            console.log(res);
+                            captcha.push({
+                              index: i,
+                              indexContent: j,
+                              ...res.data
+                            })
+                            setCaptcha([...captcha]);
+                          })
+                          // break;
+                        }
+                      }
+                      resolve({ ...messageArr[i] });
+                    }, 1000);
+                  }).then(data => {
+                    renderMessage.push(data);
+                    console.log(renderMessage);
+                    setRenderMessageArr([
+                      ...renderMessage
+                    ]);
+                    setIndexMessageRender(i);
+                    if (isPauseScroll === false) {
+                      scrollToBottom();
+                    }
+                  }).catch((error) => {
+                    console.log(error);
+                    if (error.response?.data.code === 0) {
+                      tokenExpired();
                     }
                   });
-                  console.log(variables, 'checkkkk variables');
-                  setVariables([...variables]);
-                }
-                setIndexMessageRender(i);
-                index = i;
-              } else if (messageArr[i]?.message_content[0]?.type === 'clear_variable') {
-                // console.log(dataVariables, 'checkkkk variables')                
-                if (variables.length !== 0) {
-                  let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
-                  variables.forEach(item => {
-                    for (let z = 0; z < dataVarExist.length; z++) {
-                      if (item.variable_name === dataVarExist[z]) {
-                        item.default_value = "";
+                  setIndexUser(prev => prev + 1);
+                  index = i;
+                  break;
+                } else {
+                  await new Promise((resolve) => {
+                    return delayRender = setTimeout(() => {
+                      if (messageArr[i].message_content[0]?.type === 'text_input' && messageArr[i].message_content[0].text_input.content) {
+                        messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                          if (variables.length !== 0) {
+                            let valueVar = "";
+                            for (let j = 0; j < variables.length; j++) {
+                              if (variables[j].variable_name === variable) {
+                                valueVar = variables[j].default_value;
+                              }
+                            }
+                            return valueVar;
+                          } else {
+                            return "";
+                          }
+                        });
                       }
+                      resolve({ ...messageArr[i] });
+                    }, 1000);
+                  }).then(data => {
+                    renderMessage.push(data);
+                    console.log(data);
+                    setRenderMessageArr([
+                      ...renderMessage
+                    ]);
+                    setIndexMessageRender(i);
+                    if (isPauseScroll === false) {
+                      scrollToBottom();
                     }
-                  });
-                  console.log(variables, 'checkkkk variables');
-                  setVariables([...variables]);
+                    if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
+                      isPauseScroll = true;
+                    }
+                  })
+                  index = i;
                 }
-                setIndexMessageRender(i);
-                index = i;
-              } else if (messageArr[i].belong_to !== 'bot') {
+              } else if (messageArr[0].belong_to === 'user' && messageArr[i].message_content.length > 0) {
+                // if (messageArr[i].belong_to !== 'user') {
+                //   await new Promise((resolve) => {
+                //     return delayRender = setTimeout(() => {
+                //       if (messageArr[i].message_content[0]?.type === 'text_input') {
+                //         messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
+                //           for (let j = 0; j < variables.length; j++) {
+                //             if (variables[j].variable_name === variable) {
+                //               console.log(variables[j].variable_name, 'cehckkkkk')
+                //               return variables[j].default_value;
+                //             }
+                //           }
+                //         });
+                //       }
+                //       resolve({ ...messageArr[i] });
+                //     }, 1000);
+                //   }).then(data => {
+                //     renderMessage.push(data);
+                //     setRenderMessageArr([
+                //       ...renderMessage
+                //     ]);
+                //     setIndexMessageRender(i);
+                //     if (isPauseScroll === false) {
+                //       scrollToBottom();
+                //     }
+                //     if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
+                //       isPauseScroll = true;
+                //     }
+                //   })
+                //   index = i;
+                // } else {
                 await new Promise((resolve) => {
                   return delayRender = setTimeout(() => {
-                    console.log(messageArr[i], 'cacjalkscjalksjlkduqioweu123123')
                     for (let j = 0; j < messageArr[i].message_content.length; j++) {
                       if (messageArr[i].message_content[j].type === 'capture') {
                         api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
@@ -336,14 +497,12 @@ function PreviewClone() {
                           })
                           setCaptcha([...captcha]);
                         })
-                        // break;
                       }
                     }
                     resolve({ ...messageArr[i] });
                   }, 1000);
                 }).then(data => {
                   renderMessage.push(data);
-                  console.log(renderMessage);
                   setRenderMessageArr([
                     ...renderMessage
                   ]);
@@ -351,125 +510,23 @@ function PreviewClone() {
                   if (isPauseScroll === false) {
                     scrollToBottom();
                   }
-                }).catch((error) => {
-                  console.log(error);
-                  if (error.response?.data.code === 0) {
-                    tokenExpired();
-                  }
-                });
+                })
                 setIndexUser(prev => prev + 1);
                 index = i;
                 break;
-              } else {
-                await new Promise((resolve) => {
-                  return delayRender = setTimeout(() => {
-                    if (messageArr[i].message_content[0]?.type === 'text_input' && messageArr[i].message_content[0].text_input.content) {
-                      messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-                        if (variables.length !== 0) {
-                          let valueVar = "";
-                          for (let j = 0; j < variables.length; j++) {
-                            if (variables[j].variable_name === variable) {
-                              valueVar = variables[j].default_value;
-                            }
-                          }
-                          return valueVar;
-                        } else {
-                          return "";
-                        }
-                      });
-                    }
-                    resolve({ ...messageArr[i] });
-                  }, 1000);
-                }).then(data => {
-                  renderMessage.push(data);
-                  console.log(data);
-                  setRenderMessageArr([
-                    ...renderMessage
-                  ]);
-                  setIndexMessageRender(i);
-                  if (isPauseScroll === false) {
-                    scrollToBottom();
-                  }
-                  if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
-                    isPauseScroll = true;
-                  }
-                })
-                index = i;
               }
-            } else if (messageArr[0].belong_to === 'user' && messageArr[i].message_content.length > 0) {
-              // if (messageArr[i].belong_to !== 'user') {
-              //   await new Promise((resolve) => {
-              //     return delayRender = setTimeout(() => {
-              //       if (messageArr[i].message_content[0]?.type === 'text_input') {
-              //         messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-              //           for (let j = 0; j < variables.length; j++) {
-              //             if (variables[j].variable_name === variable) {
-              //               console.log(variables[j].variable_name, 'cehckkkkk')
-              //               return variables[j].default_value;
-              //             }
-              //           }
-              //         });
-              //       }
-              //       resolve({ ...messageArr[i] });
-              //     }, 1000);
-              //   }).then(data => {
-              //     renderMessage.push(data);
-              //     setRenderMessageArr([
-              //       ...renderMessage
-              //     ]);
-              //     setIndexMessageRender(i);
-              //     if (isPauseScroll === false) {
-              //       scrollToBottom();
-              //     }
-              //     if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
-              //       isPauseScroll = true;
-              //     }
-              //   })
-              //   index = i;
-              // } else {
-              await new Promise((resolve) => {
-                return delayRender = setTimeout(() => {
-                  for (let j = 0; j < messageArr[i].message_content.length; j++) {
-                    if (messageArr[i].message_content[j].type === 'capture') {
-                      api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
-                        console.log(res);
-                        captcha.push({
-                          index: i,
-                          indexContent: j,
-                          ...res.data
-                        })
-                        setCaptcha([...captcha]);
-                      })
-                    }
-                  }
-                  resolve({ ...messageArr[i] });
-                }, 1000);
-              }).then(data => {
-                renderMessage.push(data);
-                setRenderMessageArr([
-                  ...renderMessage
-                ]);
-                setIndexMessageRender(i);
-                if (isPauseScroll === false) {
-                  scrollToBottom();
-                }
-              })
-              setIndexUser(prev => prev + 1);
-              index = i;
-              break;
+              // }
             }
-            // }
+          }
+          // setIndexMessageRender(index);
+          // setRenderMessageArr(renderMessage);
+          return () => {
+            clearTimeout(delayRender);
           }
         }
-        // setIndexMessageRender(index);
-        // setRenderMessageArr(renderMessage);
-        return () => {
-          clearTimeout(delayRender);
-        }
-      }
-    }).catch(err => console.log(err));
-
-  }, [])
+      }).catch(err => console.log(err));
+    
+  },[])
 
   const scrollToBottom = () => {
     if (document.getElementById('sp-body')) {
@@ -488,90 +545,90 @@ function PreviewClone() {
   const handleValidateField = () => {
     let contentArr = [...dataMessages[indexMessageRender].message_content];
     let isValid = true;
-    let errors = {};
+    let errorsMess = {};
 
     let messageError = "These are required fields."
     for (let i = 0; i < contentArr.length; i++) {
 
       let contentType = contentArr[i][contentArr[i].type];
       let limitFrom = contentType[contentType.type]?.character_limit_from;
-      let limitTo = contentType[contentType.type]?.character_limit_to;
+      let limitTo = contentType[contentType.type]?.character_limit_to || Number.MAX_SAFE_INTEGER;
       if (contentType.require) {
         console.log(contentType.type, contentType.date_select)
         if (contentType.type === 'text' || contentType.type === 'password') {
           if (contentType[contentType.type].isSplitInput) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
-              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
             } else if (contentType[contentType.type].valueLeft.length < limitFrom
               || contentType[contentType.type].valueLeft.length > limitTo
               || contentType[contentType.type].valueRight.length < limitFrom
               || contentType[contentType.type].valueRight.length > limitTo) {
-              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           } else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
             isValid = false;
           }
         } else if (contentType.type === 'phone_number') {
           if (contentType[contentType.type].withHyphen) {
             if (stringNullOrEmpty(contentType[contentType.type].value1) || stringNullOrEmpty(contentType[contentType.type].value2)) {
-              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'email_confirmation' || contentType.type === 'password_confirmation') {
           let limitFrom = contentType[contentType.type]?.character_limit_from;
           let limitTo = contentType[contentType.type]?.character_limit_to;
           if (stringNullOrEmpty(contentType[contentType.type].value) || stringNullOrEmpty(contentType[contentType.type].valueConfirm)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           } else if (contentType.type === 'password_confirmation' &&
             (contentType[contentType.type].value.length < limitFrom
               || contentType[contentType.type].value.length > limitTo
               || contentType[contentType.type].valueConfirm.length < limitFrom
               || contentType[contentType.type].valueConfirm.length > limitTo)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
             isValid = false;
           }
         } else if (contentType.type === 'customization') {
           if (contentType[contentType.type].is_comment) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
-              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'time_hm') {
           if (stringNullOrEmpty(contentType[contentType.type].valueHour) || stringNullOrEmpty(contentType[contentType.type].valueMinute)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_ymd'
           || contentType.type === 'dob_ymd') {
           if (stringNullOrEmpty(contentType[contentType.type].valueYear) || stringNullOrEmpty(contentType[contentType.type].valueMonth)
             || stringNullOrEmpty(contentType[contentType.type].valueDay)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_md') {
           if (stringNullOrEmpty(contentType[contentType.type].valueMonth) || stringNullOrEmpty(contentType[contentType.type].valueDay)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_ym'
           || contentType.type === 'dob_ym') {
           if (stringNullOrEmpty(contentType[contentType.type].valueYear) || stringNullOrEmpty(contentType[contentType.type].valueMonth)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_ymd_hm') {
@@ -580,7 +637,7 @@ function PreviewClone() {
             || stringNullOrEmpty(contentType[contentType.type].valueDay)
             || stringNullOrEmpty(contentType[contentType.type].valueHour)
             || stringNullOrEmpty(contentType[contentType.type].valueMinutes)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'timezone_from_to') {
@@ -588,7 +645,7 @@ function PreviewClone() {
             || stringNullOrEmpty(contentType[contentType.type].valueMinutes1)
             || stringNullOrEmpty(contentType[contentType.type].valueHour2)
             || stringNullOrEmpty(contentType[contentType.type].valueMinutes2)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'period_from_to') {
@@ -598,90 +655,56 @@ function PreviewClone() {
             || stringNullOrEmpty(contentType[contentType.type].valueYear2)
             || stringNullOrEmpty(contentType[contentType.type].valueMonth2)
             || stringNullOrEmpty(contentType[contentType.type].valueDay2)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'up_to_municipality') {
           if (stringNullOrEmpty(contentType[contentType.type].prefecture)
             || stringNullOrEmpty(contentType[contentType.type].city)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === 'zip_code_address') {
-          if (contentType.post_code) {
-            if (contentType.split_postal_code) {
-              if (stringNullOrEmpty(contentType.value_post_code_left)
-                || stringNullOrEmpty(contentType.value_post_code_right)) {
-                errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
-                isValid = false;
-              }
-            } else if (stringNullOrEmpty(contentType.value_post_code)) {
-              errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
-              isValid = false;
-            }
-          }
-          if (contentType.prefecture && stringNullOrEmpty(contentType.value_prefecture)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
-            isValid = false;
-          }
-          if (contentType.municipality && stringNullOrEmpty(contentType.value_municipality)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
-            isValid = false;
-          }
-          if (contentType.address && stringNullOrEmpty(contentType.value_address)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
-            isValid = false;
-          }
-          if (contentType.building_name && stringNullOrEmpty(contentType.value_building_name)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
-            isValid = false;
-          }
-          if (isValid === false) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
-            isValid = true;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'attaching_file') {
           if (stringNullOrEmpty(contentType.content)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'date_selection' || contentType.type === 'embedded') {
           if (stringNullOrEmpty(contentType.date_select)) {
             console.log(contentType.date_select, 'checckkkk')
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'start_end_date') {
           if (stringNullOrEmpty(contentType.start_date_select) || stringNullOrEmpty(contentType.end_date_select)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'agree_term') {
           if (stringNullOrEmpty(contentType.isAgree) || contentType.isAgree === false) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'radio_button') {
           if (stringNullOrEmpty(contentType.initial_selection)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'checkbox') {
           if (contentType.checkedValue && contentType.checkedValue.length === 0) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
-          } else if ((contentType.selection_limit_from || contentType.selection_limit_to) && (contentType.checkedValue.length < parseInt(contentType.selection_limit_from) || contentType.checkedValue.length > parseInt(contentType.selection_limit_to))) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select from ${contentType.selection_limit_from} to ${contentType.selection_limit_to} for this item.`;
+          } else if ((contentType.selection_limit_from || contentType.selection_limit_to) && (contentType.checkedValue.length < parseInt(contentType.selection_limit_from || 0) || contentType.checkedValue.length > parseInt(contentType.selection_limit_to))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select from ${contentType.selection_limit_from || 0} to ${contentType.selection_limit_to} for this item.`;
             isValid = false;
           }
         } else if (contentArr[i].type === 'capture') {
           console.log(contentArr[i].type, contentType, 'chechkkkkk');
           if (stringNullOrEmpty(contentType.value)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           } else if (captcha.filter(item => item.index === indexMessageRender && item.indexContent === i)?.[0]?.text.toLowerCase() !== contentType.value.toLowerCase()) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Wrong authorization code";
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Wrong authorization code";
             isValid = false;
           }
         } else if (contentArr[i].type === 'credit_card_payment') {
@@ -693,61 +716,170 @@ function PreviewClone() {
             || (stringNullOrEmpty(contentType.year))
             || (stringNullOrEmpty(contentType.month))
           ) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           } else if ((contentType.card_number && (contentType.card_number + "").length !== 16) ||
             ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
               ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Credit card number is invalid.";
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Credit card number is invalid.";
             isValid = false;
           }
         } else if (contentArr[i].type === 'product_purchase') {
           console.log(contentType.initial_selection)
           if (contentType.initial_selection.length === 0) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'slider') {
           if (stringNullOrEmpty(contentType.value)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'product_purchase_radio_button') {
           console.log(contentType.initial_selection)
           if (contentType.initial_selection.length === 0) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'card_payment_radio_button') {
           console.log(contentType.initial_selection)
           if (contentType.type !== 'picture_radio' && stringNullOrEmpty(contentType.initial_selection)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           } else if (contentType.type === 'picture_radio' && stringNullOrEmpty(contentType.initial_selection_picture)) {
-            errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'invalid_input') {
 
         } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
-          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
           isValid = false;
         } else if ((limitFrom || limitTo) && (contentType[contentType.type]?.value?.length < limitFrom || contentType[contentType.type]?.value?.length > limitTo)) {
-          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+          isValid = false;
+        }
+      } else {
+        if (contentType.type === 'text' || contentType.type === 'password') {
+          if (contentType[contentType.type].isSplitInput
+            && (!stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))
+            && (contentType[contentType.type].valueLeft.length >= limitTo || contentType[contentType.type].valueRight.length >= limitTo)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+            isValid = false;
+          } else if (!stringNullOrEmpty(contentType[contentType.type].value)
+            && contentType[contentType.type].value.length >= limitTo) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+            isValid = false;
+          }
+        }
+        if (contentArr[i].type === 'checkbox') {
+          if (contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select not over ${contentType.selection_limit_to} items.`;
+            isValid = false;
+          }
+        }
+      }
+      if (contentArr[i].type === 'zip_code_address') {
+        if (contentType.isCheckRequire === "require") {
+          if (contentType.post_code !== undefined) {
+            if (contentType.split_postal_code) {
+              if (stringNullOrEmpty(contentType.value_post_code_left)
+                || stringNullOrEmpty(contentType.value_post_code_right)) {
+                isValid = false;
+              }
+            } else if (stringNullOrEmpty(contentType.value_post_code)) {
+              isValid = false;
+            }
+          }
+        } else if (contentType.isCheckRequire === "all_items_require") {
+          if (contentType.post_code !== undefined) {
+            if (contentType.split_postal_code) {
+              if (stringNullOrEmpty(contentType.value_post_code_left)
+                || stringNullOrEmpty(contentType.value_post_code_right)) {
+                isValid = false;
+              }
+            } else if (stringNullOrEmpty(contentType.value_post_code)) {
+              isValid = false;
+            }
+          }
+          if (contentType.prefecture !== undefined && stringNullOrEmpty(contentType.value_prefecture)) {
+            isValid = false;
+          }
+          if (contentType.municipality !== undefined && stringNullOrEmpty(contentType.value_municipality)) {
+            isValid = false;
+          }
+          if (contentType.address !== undefined && stringNullOrEmpty(contentType.value_address)) {
+            isValid = false;
+          }
+        }
+        if (isValid === false) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+        }
+      }
+
+      if (contentType.type === 'phone_number') {
+        let REGEX_PHONE = /^\d{10}$|^\d{11}$/;
+        if (contentType[contentType.type].withHyphen) {
+          if (!stringNullOrEmpty(contentType[contentType.type].value1)
+            && !stringNullOrEmpty(contentType[contentType.type].value2)
+            && !stringNullOrEmpty(contentType[contentType.type].value3)
+            && (!REGEX_PHONE.test(`${contentType[contentType.type].value1}${contentType[contentType.type].value2}${contentType[contentType.type].value3}`))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Incorrect format.";
+            isValid = false;
+          }
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PHONE.test(contentType[contentType.type].value)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Incorrect format.";
           isValid = false;
         }
       }
-      if (contentType.type === 'text' || contentType.type === 'password') {
-        if (contentType[contentType.type].isSplitInput
-          && (!stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))
-          && (contentType[contentType.type].valueLeft.length > limitTo || contentType[contentType.type].valueRight.length > limitTo)) {
-          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
-          isValid = false;
-        } else if (!stringNullOrEmpty(contentType[contentType.type].value)
-          && contentType[contentType.type].value.length > limitTo) {
-          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+      if (contentType.type === 'urls' && !stringNullOrEmpty(contentType[contentType.type].value)) {
+        let REGEX_URLS = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
+        console.log(REGEX_URLS.test(contentType[contentType.type].value));
+        if (!REGEX_URLS.test(contentType[contentType.type].value)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Please specify in valid URL format.`;
           isValid = false;
         }
+      }
+      let REGEX_EMAIL = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+      if (contentType.type === 'email_address' && !stringNullOrEmpty(contentType[contentType.type].value)) {
+        console.log(REGEX_EMAIL.test(contentType[contentType.type].value));
+        if (!REGEX_EMAIL.test(contentType[contentType.type].value)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Please specify in the format a valid email address.`;
+          isValid = false;
+        }
+      }
+      let REGEX_PASSWORD = /[A-Za-z0-9 ]+/;
+      if (contentType.type === 'password' && !stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
+        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.`;
+        isValid = false;
+      }
+      if (contentType.type === 'password_confirmation') {
+        if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].valueConfirm) && !REGEX_PASSWORD.test(contentType[contentType.type].valueConfirm)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !stringNullOrEmpty(contentType[contentType.type].valueConfirm) && contentType[contentType.type].value !== contentType[contentType.type].valueConfirm) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Your password and password confirmation do not match.";
+          isValid = false;
+        }
+      }
+      if (contentType.type === 'email_confirmation') {
+        if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_EMAIL.test(contentType[contentType.type].value)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Please specify in the format a valid email address.`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].valueConfirm) && !REGEX_EMAIL.test(contentType[contentType.type].valueConfirm)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Please specify in the format a valid email address.`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !stringNullOrEmpty(contentType[contentType.type].valueConfirm) && contentType[contentType.type].value !== contentType[contentType.type].valueConfirm) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Your email address and email address confirmation do not match.`;
+          isValid = false;
+        }
+      }
+      if (contentArr[i].type === 'attaching_file' && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
+        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`];
+        isValid = false;
       }
       if (contentArr[i].type === 'text_input' && contentType[contentType.type].range && contentType[contentType.type].range !== 'no_input'
         && (!stringNullOrEmpty(contentType[contentType.type].value) || !stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))) {
@@ -770,29 +902,91 @@ function PreviewClone() {
             REGEX_CHECK = /[^A-Za-z0-9 ]+/;
             messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.";
             break;
+          // case 'double_byte_hiragana':
+          //   REGEX_CHECK = /[\u3040-\u309F]+/;
+          //   messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.";
+          //   break;
+          // case 'full_width_katakana':
+          //   REGEX_CHECK = /[\u30A0-\u30FF]+/;
+          //   messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.";
+          //   break;
+          // case 'double_byte':
+          //   REGEX_CHECK = /%{2}/;
+          //   messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.";
+          //   break;         
           default:
             REGEX_CHECK = "";
             break;
         }
-        if (REGEX_CHECK !== "" && (REGEX_CHECK.test(contentType[contentType.type].valueLeft)
-          || REGEX_CHECK.test(contentType[contentType.type].valueRight)
-          || REGEX_CHECK.test(contentType[contentType.type].value))) {
-          isValid = false;
-          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
-        } else if ((contentType[contentType.type].range === 'double_byte'
-          || contentType[contentType.type].range === 'full_width_katakana'
-          || contentType[contentType.type].range === 'double_byte_hiragana')
-          && ucs2ToBinaryString(contentType[contentType.type].value).length === contentType[contentType.type].value.length * 3) {
-          isValid = false;
-          errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
+        console.log(contentType[contentType.type].range, REGEX_CHECK);
+        if (REGEX_CHECK !== "") {
+          if (contentType[contentType.type].isSplitInput && (REGEX_CHECK.test(contentType[contentType.type].valueLeft)
+            || REGEX_CHECK.test(contentType[contentType.type].valueRight))) {
+            isValid = false;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
+          } else if (REGEX_CHECK.test(contentType[contentType.type].value)) {
+            console.log(REGEX_CHECK)
+            isValid = false;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
+          }
+        } else if (REGEX_CHECK === "" && !contentType[contentType.type].isSplitInput) {
+          if (contentType[contentType.type].range === 'double_byte' && !isDoubleByte(contentType[contentType.type].value)) {
+            isValid = false;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
+          } else if (contentType[contentType.type].range === 'full_width_katakana' && mbStrWidth(contentType[contentType.type].value) === 2) {
+            isValid = false;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in full-width katakana characters.";
+          } else if (contentType[contentType.type].range === 'double_byte_hiragana' && !isDoubleByte(contentType[contentType.type].value)) {
+            isValid = false;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte hiragana characters.";
+          }
+        } else if (REGEX_CHECK === "" && contentType[contentType.type].isSplitInput) {
+          if (contentType[contentType.type].range === 'double_byte'
+            && (!isDoubleByte(contentType[contentType.type].valueLeft) || !isDoubleByte(contentType[contentType.type].valueRight))) {
+            isValid = false;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
+          } else if (contentType[contentType.type].range === 'full_width_katakana' &&
+            (mbStrWidth(contentType[contentType.type].valueLeft) === 2 || mbStrWidth(contentType[contentType.type].valueRight) === 2)) {
+            isValid = false;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please input katakana type.";
+          } else if (contentType[contentType.type].range === 'double_byte_hiragana' &&
+            (!isDoubleByte(contentType[contentType.type].valueLeft) || !isDoubleByte(contentType[contentType.type].valueRight))) {
+            isValid = false;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please input hiragana type.";
+          }
         }
       }
     }
+
     if (isValid) {
-      errors = {};
+      errorsMess = {};
     }
-    setErrors(errors);
+    setErrors({
+      ...errorsMess
+    });
     return isValid;
+  }
+
+  function mbStrWidth(input) {
+    let len = 0;
+    for (let i = 0; i < input.length; i++) {
+      let code = input.charCodeAt(i);
+      if ((code >= 0x0020 && code <= 0x1FFF) || (code >= 0xFF61 && code <= 0xFF9F)) {
+        len += 1;
+      } else if ((code >= 0x2000 && code <= 0xFF60) || (code >= 0xFFA0)) {
+        len += 2;
+      } else {
+        len += 0;
+      }
+    }
+    return len;
+  }
+
+  function isDoubleByte(str) {
+    for (var i = 0, n = str.length; i < n; i++) {
+      if (str.charCodeAt(i) > 255) { return true; }
+    }
+    return false;
   }
 
   function ucs2ToBinaryString(str) {
@@ -811,9 +1005,8 @@ function PreviewClone() {
     renderMessageArr[indexMessage].disabled = true;
     let renderMessage = [...renderMessageArr];
     let index;
-    let delayRender;
     let isPauseScroll = false;
-    // let REGEX = /\{\{(.*?)\}\}/ig;
+    let delayRender;
     setIndexUser(prev => prev + 1);
 
     if (!dataMessages[indexMessageRender + 1]) return;
@@ -864,11 +1057,32 @@ function PreviewClone() {
           console.log(dataMessages[i])
           if (dataMessages[i].belong_to === 'bot') {
             if (dataMessages[i]?.message_content[0].type === 'delay') {
-              await new Promise((resolve) => {
-                return delayRender = setTimeout(() => {
+              if (dataMessages[i]?.message_content[0]?.delay.typing_on) {
+                await new Promise((resolve) => {
+                  renderMessage.push({ ...dataMessages[i] });
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
                   resolve();
-                }, (dataMessages[i]?.message_content[0].delay.content * 1000));
-              });
+                }).then(async () => {
+                  await new Promise((resolve) => {
+                    delayRender = setTimeout(() => {
+                      resolve();
+                    }, (dataMessages[i]?.message_content[0].delay.content * 1000));
+                  });
+                }).then(() => {
+                  renderMessage.pop();
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
+                });
+              } else {
+                await new Promise((resolve) => {
+                  return delayRender = setTimeout(() => {
+                    resolve();
+                  }, dataMessages[i]?.message_content[0]?.delay?.content * 1000);
+                })
+              }
               index = i;
               // promise.then(data => {
               //   renderMessage.push(data);
@@ -908,6 +1122,11 @@ function PreviewClone() {
               }
               setIndexMessageRender(i);
               index = i;
+            } else if (dataMessages[i]?.message_content[0]?.type === 'pause') {
+              // console.log(dataVariables, 'checkkkk variables')                
+              setIndexMessageRender(i);
+              index = i;
+              break;
             } else {
               await new Promise((resolve) => {
                 return delayRender = setTimeout(() => {
@@ -1048,11 +1267,32 @@ function PreviewClone() {
               break;
             } else {
               if (dataMessages[i]?.message_content[0].type === 'delay') {
-                await new Promise((resolve) => {
-                  return delayRender = setTimeout(() => {
+                if (dataMessages[i]?.message_content[0]?.delay.typing_on) {
+                  await new Promise((resolve) => {
+                    renderMessage.push({ ...dataMessages[i] });
+                    setRenderMessageArr([
+                      ...renderMessage
+                    ]);
                     resolve();
-                  }, (dataMessages[i]?.message_content[0].delay.content * 1000));
-                });
+                  }).then(async () => {
+                    await new Promise((resolve) => {
+                      delayRender = setTimeout(() => {
+                        resolve();
+                      }, (dataMessages[i]?.message_content[0].delay.content * 1000));
+                    });
+                  }).then(() => {
+                    renderMessage.pop();
+                    setRenderMessageArr([
+                      ...renderMessage
+                    ]);
+                  });
+                } else {
+                  await new Promise((resolve) => {
+                    return delayRender = setTimeout(() => {
+                      resolve();
+                    }, dataMessages[i]?.message_content[0]?.delay?.content * 1000);
+                  })
+                }
                 index = i;
               } else if (dataMessages[i]?.message_content[0]?.type === 'variable_set') {
                 if (variables.length !== 0) {
@@ -1085,6 +1325,11 @@ function PreviewClone() {
                 }
                 setIndexMessageRender(i);
                 index = i;
+              } else if (dataMessages[i]?.message_content[0]?.type === 'pause') {
+                // console.log(dataVariables, 'checkkkk variables')                
+                setIndexMessageRender(i);
+                index = i;
+                break;
               } else {
                 await new Promise((resolve) => {
                   return delayRender = setTimeout(() => {
@@ -1157,6 +1402,13 @@ function PreviewClone() {
             item.default_value = `〒 ${dataContentType?.value_post_code} ${dataContentType?.value_prefecture}${dataContentType?.value_municipality} ${dataContentType?.value_address}${dataContentType?.value_building_name}`;
           } else if (field === 'start_date_select' || field === 'end_date_select') {
             item.default_value = `${dataContentType?.start_date_select || "start date"} ~ ${dataContentType?.end_date_select || "end date"}`;
+          } else if (contentType === 'radio_button') {
+            item.default_value = dataContentType[dataContentType.type].find(item => item.id === value).text || item.default_value;
+          } else if (contentType === 'checkbox') {
+            let dataTextChecked = dataContentType.checkedValue.map(itemChecked => {
+              return dataContentType[dataContentType.type].find(item => itemChecked === item.id).text;
+            })
+            item.default_value = dataTextChecked.join(',') || item.default_value;
           } else {
             item.default_value = value;
           }
@@ -1169,86 +1421,86 @@ function PreviewClone() {
   }
 
   return (
-    <div id='jjhs'>
-      <div id="sp-container" className="sp-container">
-        <div id="sp-header"
-          style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }}
-          className="sp-header" onClick={() => onOpenPreview()}>
-          <div className="sp-header-left">
-            <div className="sp-header-left-avatar sp-avatar">
-              <img src={botInfor?.icon?.url && ("https://ec-chatbot-test1.com/" + botInfor?.icon?.url)} />
+      <React.Fragment>
+        <div id="sp-container" className="sp-container">
+          <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header" onClick={() => onOpenPreview(!isOpen)}>
+            <div className="sp-header-left">
+              <div className="sp-header-left-avatar sp-avatar">
+                <img src={botInfor?.icon?.url && ("https://ec-chatbot-test1.com/" + botInfor?.icon?.url)} />
+              </div>
+              <div className="sp-header-left-label">
+                <div className="sp-header-left-label-sub-title">{botInfor?.subtitle}</div>
+                <div className="sp-header-left-label-title">{botInfor?.title}</div>
+              </div>
             </div>
-            <div className="sp-header-left-label">
-              <div className="sp-header-left-label-sub-title">{botInfor?.subtitle}</div>
-              <div className="sp-header-left-label-title">{botInfor?.title}</div>
+            <div className="sp-header-right">
+              <div className="sp-header-right-arrow">
+                {isOpen ? <MDBIcon fas icon="chevron-down" /> : <MDBIcon fas icon="chevron-up" />}
+              </div>
             </div>
           </div>
-          <div className="sp-header-right">
-            <div className="sp-header-right-arrow">
-              {isOpen ? <MDBIcon fas icon="chevron-down" /> : <MDBIcon fas icon="chevron-up" />}
+          <div id="sp-process-bar" className="sp-process-bar">
+            <div className="sp-process-bar-color" style={{ width: `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` }}>
+              {messageUser.length !== (indexUser - 1) ? `${messageUser.length - indexUser + 1} tasks rest` : "Completed!"}
             </div>
           </div>
-        </div>
-        <div id="sp-process-bar" className="sp-process-bar">
-          <div className="sp-process-bar-color" style={{ width: `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` }}>
-            {messageUser.length !== (indexUser - 1) ? `${messageUser.length - indexUser + 1} tasks rest` : "Completed!"}
-          </div>
-        </div>
-        <div id="sp-body" className="sp-body">
-          {
-            renderMessageArr.map((message, indexMessage) => {
-              return (
-                <React.Fragment key={indexMessage}>
-                  {message.belong_to === 'bot' &&
-                    message?.message_content.map((content, index) => {
-                      return <BotMessage
-                        key={index}
-                        content={content}
-                        index={index}
-                        botInfor={botInfor}
-                      />
-                    })
-                  }
-                  {message.belong_to === 'user' &&
-                    <div className="sp-body-user-side">
-                      <div className="sp-body-user-side-messages">
-                        <UserMessage
-                          captcha={captcha}
-                          messageContentProps={message.message_content}
-                          disabled={message.disabled}
-                          onChangeValue={(indexContent, contentType, value, field, subFiled, name) => onChangeValue(indexContent, contentType, value, field, subFiled, name)}
-                          indexMessageRender={indexMessageRender}
-                          onClickNext={() => onClickNext(indexMessage)}
-                          indexMessage={indexMessage}
-                          errorsProps={errors}
-                          displayButtonNext={(value) => setIsDisplayButtonNext(value)}
+          <div id="sp-body" className="sp-body">
+            {
+              renderMessageArr.map((message, indexMessage) => {
+                return (
+                  <React.Fragment key={indexMessage}>
+                    {message.belong_to === 'bot' &&
+                      message?.message_content.map((content, index) => {
+                        return <BotMessage
+                          key={index}
+                          content={content}
+                          index={index}
+                          botInfor={botInfor}
                         />
-                        {(message?.message_content.length !== 1 || (message?.message_content[0].type !== 'card_payment_radio_button' && message?.message_content[0].type !== 'product_purchase_radio_button') || (message?.message_content[0]?.[message?.message_content[0].type].type !== "picture_radio" ? (message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting && message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting === message?.message_content[0]?.[message?.message_content[0].type]?.initial_selection) : (message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting_picture && message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting_picture === message?.message_content[0]?.[message?.message_content[0].type]?.initial_selection_picture))) &&
-                          <div className="ss-user-message__action-wrapper">
-                            <Button disabled={message.disabled} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
-                              {message.buttonName || "To the next"}
-                            </Button>
-                          </div>
-                        }
+                      })
+                    }
+                    {message.belong_to === 'user' &&
+                      <div className="sp-body-user-side">
+                        <div className="sp-body-user-side-messages">
+                          <UserMessage
+                            captcha={captcha}
+                            messageContentProps={message.message_content}
+                            disabled={message.disabled}
+                            onChangeValue={(indexContent, contentType, value, field, subFiled, name) => onChangeValue(indexContent, contentType, value, field, subFiled, name)}
+                            indexMessageRender={indexMessageRender}
+                            onClickNext={() => onClickNext(indexMessage)}
+                            indexMessage={indexMessage}
+                            errorsProps={errors}
+                            displayButtonNext={(value) => setIsDisplayButtonNext(value)}
+                          />
+                          {(message?.message_content.length !== 1 || (message?.message_content[0].type !== 'card_payment_radio_button' && message?.message_content[0].type !== 'product_purchase_radio_button') || (message?.message_content[0]?.[message?.message_content[0].type].type !== "picture_radio" ? (message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting && message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting === message?.message_content[0]?.[message?.message_content[0].type]?.initial_selection) : (message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting_picture && message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting_picture === message?.message_content[0]?.[message?.message_content[0].type]?.initial_selection_picture))) &&
+                            <div className="ss-user-message__action-wrapper">
+                              <Button disabled={message.disabled} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
+                                {message.buttonName || "To the next"}
+                              </Button>
+                            </div>
+                          }
+                        </div>
                       </div>
-                    </div>
-                  }
-                </React.Fragment>
-              )
+                    }
+                  </React.Fragment>
+                )
 
-            })
-          }
+              })
+            }
+          </div>
         </div>
-      </div>
-    </div>
+      </React.Fragment>
   )
 }
 
 const BotMessage = ({ content, index, botInfor }) => {
+
   const handleDownloadFile = (file) => {
     let link = document.createElement('a');
     link.href = file;
     link.download = "file";
+    link.target = "_blank"
     document.body.appendChild(link);
 
     link.click();
@@ -1257,7 +1509,7 @@ const BotMessage = ({ content, index, botInfor }) => {
 
   return (
     <div key={index} className="sp-body-bot-side">
-      {(content.type === 'text_input' || content.type === 'file') && (
+      {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay') && (
         <div className="sp-body-bot-side-avatar sp-avatar">
           <img src={"https://ec-chatbot-test1.com/" + botInfor?.icon?.url} />
         </div>
@@ -1275,7 +1527,6 @@ const BotMessage = ({ content, index, botInfor }) => {
                 readOnly
               ></textarea>
             )}
-
             {content.type === 'file' && (
               content[content.type]?.content ? (
                 <React.Fragment>
@@ -1285,7 +1536,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                       alt=""
                       style={{ width: '50%', marginLeft: '8px' }} /> :
                     <span
-                      style={{ color: '#089BE5', fontSize: '17px' }}
+                      style={{ color: '#089BE5', fontSize: '17px', display: 'block', height: '50px', cursor: 'pointer' }}
                       onClick={() => handleDownloadFile(content[content.type]?.content)}
                     >Download this file</span>}
                 </React.Fragment>
@@ -1295,6 +1546,9 @@ const BotMessage = ({ content, index, botInfor }) => {
                   value={''}
                   readOnly
                 ></textarea>
+            )}
+            {content.type === 'delay' && (
+              <img src={messageTypingGif} style={{ backgroundColor: '#EBF7FF', height: '40px', borderRadius: '10px'}} />
             )}
           </React.Fragment>}
       </div>
@@ -1333,20 +1587,93 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
     }).catch((error) => { console.error(error) });
   }, [])
 
-  const onChangeValueCheckbox = (indexContent, contentType, value, field) => {
+  useEffect(() => {
 
-    setChecked(prev => {
-      const isChecked = checked.includes(value);
-      if (isChecked) {
-        messageContent[indexContent][contentType][field] = [...checked.filter(item => item !== value)];
-        setMessageContent([...messageContent])
-        return checked.filter(item => item !== value);
-      } else {
-        messageContent[indexContent][contentType][field] = [...prev, value];
-        setMessageContent([...messageContent])
-        return [...prev, value];
+  }, [])
+
+  useEffect(() => {
+    messageContent.forEach((content, indexContent) => {
+      console.log(content)
+      if (content.type === "calendar") {
+        let calendar = content.calendar;
+        if (calendar.initial_selection && calendar.type !== "start_end_date") {
+          let i = 0;
+          let date_select = "";
+          console.log(handleDisableDateCalendar(moment().add(1, 'days'), calendar));
+          while (handleDisableDateCalendar(moment().add(i, 'days'), calendar)) {
+            date_select = moment().add(i + 1, 'days').format("YYYY/MM/DD");
+            console.log(handleDisableDateCalendar(moment().add(i, 'days'), calendar));
+            i++;
+          }
+          calendar.date_select = date_select;
+        } else if (calendar.initial_selection && calendar.type === "start_end_date") {
+          let i = 0;
+          console.log(handleDisableDateCalendar(moment().add(1, 'days'), calendar));
+          while (handleDisableDateCalendar(moment().add(i, 'days'), calendar)) {
+            calendar.start_date_select = moment().add(i + 1, 'days');
+            calendar.end_date_select = moment().add(i + 1, 'days');
+            console.log(handleDisableDateCalendar(moment().add(i, 'days'), calendar));
+            i++;
+          }
+        }
+      } else if (content.type === "checkbox") {
+        let checkbox = content.checkbox;
+        if (checkbox.all_item_checked) {
+          checkbox[checkbox.type].forEach(item => {
+            checkbox.checkedValue.push(item.id);
+          })
+          onChangeValue(indexContent, content.type, checkbox.checkedValue, 'checkedValue');
+          console.log(checkbox.checkedValue)
+        }
       }
     })
+  }, [])
+
+  const onChangeValueCheckbox = (checkbox, indexContent, contentType, value, field) => {
+    // setChecked(prev => {
+    //   const isChecked = checked.includes(value);
+    //   console.log(checked);
+    //   if (isChecked) {
+    //     onChangeValue(indexContent, contentType, [...checked.filter(item => item !== value)], field);
+    //     // messageContent[indexContent][contentType][field] = [...checked.filter(item => item !== value)];
+    //     // setMessageContent([...messageContent])
+    //     return checked.filter(item => item !== value);
+    //   } else {
+    //     onChangeValue(indexContent, contentType, [...prev, value], field);
+    //     // messageContent[indexContent][contentType][field] = [...prev, value];
+    //     // setMessageContent([...messageContent])
+    //     return [...prev, value];
+    //   }
+    // })
+
+    setMessageContent(prev => {
+      let checkedArray = [...messageContent[indexContent][contentType].checkedValue];
+      const isChecked = checkedArray.includes(value);
+      if (isChecked) {
+        checkedArray = checkedArray.filter(item => item !== value);
+        console.log(checkedArray);
+        prev[indexContent][contentType].checkedValue = checkedArray;
+        return prev;
+      } else {
+        checkedArray.push(value);
+        prev[indexContent][contentType].checkedValue = checkedArray;
+        return prev;
+      }
+    })
+
+
+    // console.log(checkbox, indexContent, contentType, value, field);
+    // let checkboxClone = _.cloneDeep(checkbox);
+    // const isChecked = checkboxClone.checkedValue.includes(value);
+    // console.log(isChecked);
+    // if (isChecked) {
+    //   checkboxClone.checkedValue = checkboxClone.checkedValue.filter(item => item !== value);
+    //   console.log(checkboxClone.checkedValue)
+    //   onChangeValue(indexContent, contentType, checkboxClone.checkedValue, field);
+    // } else {
+    //   checkboxClone.checkedValue.push(value);
+    //   onChangeValue(indexContent, contentType, checkboxClone.checkedValue, field);
+    // }
   }
 
   function botUploadFile() {
@@ -1356,18 +1683,19 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   function getBaseUrl(event, indexContent) {
     var file = document.querySelector('input[type=file]')['files'][0];
     const type = file.name.slice(file.name.lastIndexOf('.') + 1);
-    if (!messageContent[indexContent].attaching_file.file_type.includes(type)) {
+    if (messageContent[indexContent].attaching_file.file_type.length > 0 && !messageContent[indexContent].attaching_file.file_type.includes(type)) {
       errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = `Please specify a ${messageContent[indexContent].attaching_file.file_type.join(", ")} type file for the file.`;
-      setErrors({ ...errors })
+      setErrors({ ...errors });
       return;
     } else {
-      errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = ""
+      errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = "";
+      setErrors({ ...errors });
     }
     // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
     // var reader = new FileReader(file);
 
-    messageContent[indexContent].attaching_file.content = file.name;
-    setMessageContent([...messageContent]);
+    // messageContent[indexContent].attaching_file.value = file.name;
+    onChangeValue(indexContent, 'attaching_file', file.name, "value");
     // var baseString;
     // var imgUrl = URL.createObjectURL(event.target.files[0]);
     // if (
@@ -1398,13 +1726,14 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   }
 
   const handleDisableDateCalendar = (current, calendar) => {
-    console.log(calendar.start_date, calendar.end_date, calendar.aggregation_target_period_from, calendar.aggregation_target_period_to)
+    console.log(calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD")))
     if (calendar.end_date || calendar.start_date
-      || calendar.fixed_date || calendar.non_select_date_time
-      || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to) {
+      || calendar?.fixed_date?.length !== 0 || calendar?.non_select_date_time?.length !== 0
+      || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to
+      || calendar.end_date_select) {
       return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD')
         || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
-        || moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_select, 'YYYY/MM/DD')
+        || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_select, 'YYYY/MM/DD'))
         || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
         || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
@@ -1441,13 +1770,13 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   const handleDisableEndDateCalendar = (current, calendar) => {
     console.log(calendar.start_date, calendar[calendar.type].specified_period_from, calendar[calendar.type].specified_period_to)
     if (calendar.end_date || calendar.start_date
-      || calendar.fixed_date || calendar.non_select_date_time
+      || calendar?.fixed_date?.length !== 0 || calendar?.non_select_date_time?.length !== 0
       || calendar.start_date_select || calendar.specified_period_from
       || calendar.specified_period_to || calendar.aggregation_target_period_from
       || calendar.aggregation_target_period_to) {
       return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD')
         || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
-        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date_select, 'YYYY/MM/DD')
+        || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') < moment(calendar.start_date_select, 'YYYY/MM/DD'))
         || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
         || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
@@ -1575,24 +1904,41 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <InputCustom
                             disabled={disabled}
                             className="ss-message__content--user-text-input ss-input-value"
+                            maxLength={3}
                             style={{ marginBottom: '0px', width: '32%' }}
                             placeholder={textInput[textInput.type]?.number1}
-                            onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value1')}
+                            onChange={value => {
+                              if (value.length === 3) {
+                                document.getElementById('ss-user-message-phone_number_2').focus();
+                                document.getElementById('ss-user-message-phone_number_2').select();
+                              }
+                              onChangeValue(indexContent, content.type, value, textInput.type, 'value1')
+                            }}
                             value={textInput[textInput.type]?.value1}
                           ></InputCustom>
                           <InputCustom
+                            id="ss-user-message-phone_number_2"
                             disabled={disabled}
                             className="ss-message__content--user-text-input ss-input-value"
                             style={{ marginBottom: '0px', width: '32%' }}
+                            maxLength={4}
                             placeholder={textInput[textInput.type]?.number2}
-                            onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value2')}
+                            onChange={value => {
+                              if (value.length === 4) {
+                                document.getElementById('ss-user-message-phone_number_3').focus();
+                                document.getElementById('ss-user-message-phone_number_3').select();
+                              }
+                              onChangeValue(indexContent, content.type, value, textInput.type, 'value2')
+                            }}
                             value={textInput[textInput.type]?.value2}
                           ></InputCustom>
                           <InputCustom
+                            id="ss-user-message-phone_number_3"
                             disabled={disabled}
                             // className="ss-message__content--user-text-input ss-input-value"
                             style={{ marginBottom: '0px', width: '32%' }}
                             placeholder={textInput[textInput.type]?.number3}
+                            maxLength={4}
                             onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value3')}
                             value={textInput[textInput.type]?.value3}
                           ></InputCustom>
@@ -1629,6 +1975,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {(textInput.type === 'email_confirmation') &&
                     (<>
                       <InputCustom
+                        style={{ marginBottom: '5px' }}
                         disabled={disabled}
                         placeholder={textInput[textInput.type].cfEmlAdd_email}
                         onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
@@ -1644,27 +1991,17 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     )}
                   {(textInput.type === 'password_confirmation') &&
                     (<>
-                      {/* <input
-                        className="ss-message__content--user-text-input ss-input-value"
-                        placeholder={textInput[textInput.type].password}
-                        onChange={onChangeValue(indexContent, content.type, textInput.type, 'value')}
-                        value={textInput[textInput.type]?.value}
-                      ></input> */}
-                      {/* <input
-                        className="ss-message__content--user-text-input ss-input-value"
-                        placeholder={textInput[textInput.type].confirm_password}
-                        onChange={onChangeValue(indexContent, content.type, textInput.type, 'valueConfirm')}
-                        value={textInput[textInput.type]?.valueConfirm}
-                      ></input> */}
                       <InputCustom
                         style={{ marginBottom: '5px' }}
                         disabled={disabled}
+                        type="password"
                         placeholder={textInput[textInput.type].password}
                         onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'value')}
                         value={textInput[textInput.type]?.value}
                       />
                       <InputCustom
                         disabled={disabled}
+                        type="password"
                         placeholder={textInput[textInput.type].confirm_password}
                         onChange={value => onChangeValue(indexContent, content.type, value, textInput.type, 'valueConfirm')}
                         value={textInput[textInput.type]?.valueConfirm}
@@ -1830,9 +2167,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       })
                     )}
                   </div>
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${radioButton.type}`] &&
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${radioButton.type}`]}
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -1858,27 +2195,25 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   }
                   <div className="ss-message__content--user-checkbox-wrapper">
                     {checkbox.type === 'default' && (
-                      checkbox[checkbox.type].map((item, index) => {
-                        return <div key={index} className="ss-message__content--user-checkbox">
-                          {/* <input
-                            disabled={disabled}
-                            type="checkbox"
-                            name="ss-message__content--user-checkbox"
-                            id="ss-message__content--user-checkbox"
-                          // onChange={() => onChangeValueCheckbox(indexContent, content.type, item.id, 'value')}
-                          // value={checkbox.checkedValue.includes(item.id)}
-                          /> */}
-                          <CheckboxCustom
-                            disabled={disabled}
-                            onChange={() => onChangeValueCheckbox(indexContent, content.type, item.id, 'checkedValue')}
-                            value={checkbox.checkedValue.includes(item.id)}
-                            isOnChange={false}
-                          />
-                          <label htmlFor="ss-message__content--user-checkbox">
-                            {item.text}
-                          </label>
-                        </div>
-                      })
+                      <Checkbox.Group
+                        style={{ width: "100%" }}
+                        disabled={disabled}
+                        onChange={(value) => onChangeValue(indexContent, content.type, value, 'checkedValue')}
+                        value={checkbox.checkedValue}
+                      >
+                        {checkbox[checkbox.type].map((item, index) => {
+                          console.log(checkbox.checkedValue, 'checkkkk box')
+                          return <div key={index} className="ss-message__content--user-checkbox">
+                            <Checkbox
+                              value={item.id}
+                            >
+                              <label htmlFor="ss-message__content--user-checkbox">
+                                {item.text}
+                              </label>
+                            </Checkbox>
+                          </div>
+                        })}
+                      </Checkbox.Group>
                     )}
                     {checkbox.type === 'checkbox_img' && (
                       checkbox[checkbox.type].map((item, index) => {
@@ -2008,11 +2343,12 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     )}
                     {(pullDown.type === 'time_hm') && (
                       <React.Fragment>
+                        {console.log(dataHour, pullDown[pullDown.type].start_at, pullDown[pullDown.type].end_at)}
                         <div className="ss-message__content--user-pull_down--time_hm">
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
                               disabled={disabled}
-                              data={dataHour.filter(item => item.value >= (pullDown[pullDown.type].start_at || "1") && item.value <= (pullDown[pullDown.type].end_at || "24"))}
+                              data={dataHour.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_at) || "0") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_at) || "23"))}
                               placeholder="Time"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour')}
@@ -2043,7 +2379,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <div className="" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                               <SelectCustom
                                 disabled={disabled}
-                                data={dataYear.filter(item => item.value >= (pullDown[pullDown.type].start_year || "1935") && item.value <= (pullDown[pullDown.type].end_year || "2072"))}
+                                data={dataYear.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_year) || "1935") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_year) || "2072"))}
                                 placeholder="Year"
                                 style={{ width: '32%' }}
                                 onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear')}
@@ -2112,7 +2448,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <SelectCustom
                                 disabled={disabled}
-                                data={dataYear.filter(item => item.value >= (pullDown[pullDown.type].start_year || "1935") && item.value <= (pullDown[pullDown.type].end_year || "2072"))}
+                                data={dataYear.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_year) || "1935") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_year) || "2072"))}
                                 placeholder="Year"
                                 style={{ width: '32%' }}
                                 onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear')}
@@ -2142,7 +2478,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                             <SelectCustom
                               disabled={disabled}
-                              data={dataYear.filter(item => item.value >= (pullDown[pullDown.type].start_year || "1935") && item.value <= (pullDown[pullDown.type].end_year || "2072"))}
+                              data={dataYear.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_year) || "1935") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_year) || "2072"))}
                               placeholder="Year"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear')}
@@ -2166,7 +2502,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             />
                             <SelectCustom
                               disabled={disabled}
-                              data={dataHour.filter(item => item.value >= (pullDown[pullDown.type].start_at || "1") && item.value <= (pullDown[pullDown.type].end_at || "24"))}
+                              data={dataHour.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_at) || "0") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_at) || "23"))}
                               placeholder="Time"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour')}
@@ -2196,7 +2532,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
                               disabled={disabled}
-                              data={dataHour.filter(item => item.value >= (pullDown[pullDown.type].start_at || "1") && item.value <= (pullDown[pullDown.type].end_at || "24"))}
+                              data={dataHour.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_at) || "0") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_at) || "23"))}
                               placeholder="Time"
                               style={{ width: '49%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour1')}
@@ -2215,7 +2551,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
                               disabled={disabled}
-                              data={dataHour.filter(item => item.value >= (pullDown[pullDown.type].start_at || "1") && item.value <= (pullDown[pullDown.type].end_at || "24"))}
+                              data={dataHour.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_at) || "0") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_at) || "23"))}
                               placeholder="Time"
                               style={{ width: '49%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour2')}
@@ -2245,7 +2581,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
                               disabled={disabled}
-                              data={dataYear.filter(item => item.value >= (pullDown[pullDown.type].start_year || "1935") && item.value <= (pullDown[pullDown.type].end_year || "2072"))}
+                              data={dataYear.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_year) || "1935") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_year) || "2072"))}
                               placeholder="Year"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear1')}
@@ -2272,7 +2608,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
                               disabled={disabled}
-                              data={dataYear.filter(item => item.value >= pullDown[pullDown.type].start_year && item.value <= pullDown[pullDown.type].end_year)}
+                              data={dataYear.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_year) || "1935") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_year) || "2072"))}
                               placeholder="Year"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear2')}
@@ -2311,10 +2647,10 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           data={dataPrefectures}
                           placeholder="Please select"
                           style={{ width: '100%' }}
-                          keyValue="id"
+                          keyValue="name"
                           nameValue="name"
                           onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'value')}
-                          value={pullDown[pullDown.type].value}
+                          value={pullDown[pullDown.type]?.value}
                         />
                       </React.Fragment>
                     )}
@@ -2485,10 +2821,16 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     </div>
                   }
                   <div className="ss-message__content--user-attaching_file">
-                    <InputCustom
-                      value={attachingFile.content}
-                      disabled={disabled}
-                    />
+                    <div style={{ position: 'relative' }}>
+                      <InputCustom
+                        value={attachingFile.value}
+                        disabled={true}
+                      />
+                      <MDBIcon fas icon="times-circle"
+                        className="ss-message-custom-icon-times"
+                        style={{ position: 'absolute', top: '23%', right: '2%', fontSize: '20px', cursor: 'pointer' }}
+                        onClick={() => onChangeValue(indexContent, content.type, "", 'value')} />
+                    </div>
                     <input
                       type="file"
                       id="ss-bot-file-upload"
@@ -2543,6 +2885,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {/* calendar: type = 'embedded' */}
                   {calendar.type === 'embedded' && (
                     <React.Fragment>
+                      {console.log(calendar.date_select)}
                       <div className="ss-message__content--user-calender-embedded" style={{ marginTop: '5px' }}>
                         <Calendar
                           disabled={disabled}
@@ -2550,8 +2893,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           fullscreen={false}
                           onPanelChange={(value, mode) => console.log(value)}
                           style={{ top: '20px', width: '300px', border: '1px solid grey' }}
-                          value={calendar.date_select ? moment(calendar.date_select, "DD/MM/YYYY") : null}
-                          onChange={value => onChangeValue(indexContent, content.type, value.format("DD/MM/YYYY"), 'date_select')}
+                          value={calendar.date_select ? moment(calendar.date_select, "YYYY/MM/DD") : null}
+                          onChange={value => onChangeValue(indexContent, content.type, value.format("YYYY/MM/DD"), 'date_select')}
                           disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                         />
                       </div>
@@ -2710,6 +3053,13 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                     </div>
                   }
+                  <div style={{ display: 'flex', justifyContent: 'flex-start', margin: '5px 0px' }}>
+                    {creditCardPayment.payment_method.map((itemPayment, index, array) => {
+                      return <div key={index} style={{width: `${15.6667}%`, marginRight: '1%'}} className="ss-img-list-bank">
+                        {dataPaymentMethod.find(item => item.key === itemPayment).value}
+                      </div>
+                    })}
+                  </div>
                   {creditCardPayment.separate_type === false ?
                     <div className="ss-user-setting__item-bottom">
                       <InputNum
@@ -3649,4 +3999,5 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   )
 }
 
-export default PreviewClone
+export default Preview
+
