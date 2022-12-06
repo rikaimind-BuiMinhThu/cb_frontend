@@ -16,24 +16,57 @@ function WithdrawalPrevention() {
   const [withDrawal, setWithDrawal] = useState({});
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState();
+  const [checkedChoose, setCheckedChoose] = useState({
+    invalid: false,
+    standard: false,
+    image: false
+  })
+  // useEffect(() => {
+  //   const bot_id = Cookies.get('bot_id');
+  //   setBotId(bot_id);
+  // }, []);
 
   useEffect(() => {
-    const bot_id = Cookies.get('bot_id');
-    setBotId(bot_id);
-  }, []);
-
-  useEffect(() => {
-    reload();
-  }, [botId]);
+    api
+      .get(`/api/v1/chatbot_settings/withdrawal_preventions/${botId}`)
+      .then((res) => {
+        console.log(res.data);
+        if (res.data.code == 1) {
+          // if(res.data.data.withdrawal_prevention_status == 'invalid'){
+          //   setCheckedChoose({invalid: true,standard: false,image: false})
+          // }else if(res.data.data.withdrawal_prevention_status == 'image_popup'){
+          //   setCheckedChoose({invalid: false,standard: false,image: true})
+          // }else{
+          //   setCheckedChoose({invalid: false,standard: true,image: false})
+          // }
+          setWithDrawal(res.data.data);
+        }
+        
+        
+      })
+      .catch((err) => {
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  },[]);
 
   function reload() {
     api
       .get(`/api/v1/chatbot_settings/withdrawal_preventions/${botId}`)
       .then((res) => {
-        console.log(res.data.data);
+        console.log(res.data);
         if (res.data.code == 1) {
           setWithDrawal(res.data.data);
         }
+        if(res.data.data.withdrawal_prevention_status == 'invalid'){
+          setCheckedChoose({invalid: true,standard: false,image: false})
+        }else if(res.data.data.withdrawal_prevention_status == 'image_popup'){
+          setCheckedChoose({invalid: false,standard: false,image: true})
+        }else{
+          setCheckedChoose({invalid: false,standard: true,image: false})
+        }
+        
       })
       .catch((err) => {
         if (err.response?.data.code === 0) {
@@ -78,7 +111,6 @@ function WithdrawalPrevention() {
         utils.checkRequired('image_URL', 'errImageURL', 'image URL');
       }
     }
-    console.log(resWith);
     if (resWith) {
       api
         .patch(`/api/v1/chatbot_settings/withdrawal_preventions/${botId}`, resWith)
@@ -102,6 +134,34 @@ function WithdrawalPrevention() {
     }
   }
 
+  function checkRadioChecked(){
+    if(withDrawal.withdrawal_prevention_status == 'invalid'){
+      document.getElementById('invalid').checked = true
+      document.getElementById('standard_exit_popup').checked = false
+      document.getElementById('image_popup').checked = false
+    }else if(withDrawal.withdrawal_prevention_status == 'standard_exit_popup'){
+      document.getElementById('invalid').checked = false
+      document.getElementById('standard_exit_popup').checked = true
+      document.getElementById('image_popup').checked = false
+    }else if(withDrawal.withdrawal_prevention_status == 'image_popup'){
+      document.getElementById('invalid').checked = false
+      document.getElementById('standard_exit_popup').checked = false
+      document.getElementById('image_popup').checked = true
+    }
+  }
+
+  function setInvalid(){
+    document.getElementById('display_img_url').style.display = 'none'
+    document.getElementById('invalid').checked = true
+  }
+  function setStandard(){
+    document.getElementById('display_img_url').style.display = 'none'
+    document.getElementById('standard_exit_popup').checked = true
+  }
+  function setImage(){
+    document.getElementById('display_img_url').style.display = 'block'
+    document.getElementById('image_popup').checked = true
+  }
   return (
     <>
       <div className="content">
@@ -110,19 +170,18 @@ function WithdrawalPrevention() {
             <Card>
               <CardHeader>Withdrawal Prevention</CardHeader>
               <CardBody>
-                <div>
+                <div onLoad={checkRadioChecked()}>
                   <input
                     className="wp-input-radio"
                     type="radio"
                     id="invalid"
                     name="withdrawal-prevention"
                     defaultValue={`invalid`}
-                    defaultChecked={
-                      withDrawal.withdrawal_prevention_status === 'invalid' ? true : false
-                    }
-                    onClick={() => setChooseImage(false)}
+                    // defaultChecked={checkedChoose.invalid}
+                    onClick={() =>setInvalid()}
+                    
                   />
-                  <label className="wp-lable" for="invalid">
+                  <label className="wp-lable" htmlFor="invalid">
                     invalid
                   </label>
                   <input
@@ -131,14 +190,10 @@ function WithdrawalPrevention() {
                     id="standard_exit_popup"
                     name="withdrawal-prevention"
                     defaultValue={`standard_exit_popup`}
-                    defaultChecked={
-                      withDrawal.withdrawal_prevention_status == 'standard_exit_popup'
-                        ? true
-                        : false
-                    }
-                    onClick={() => setChooseImage(false)}
+                    // defaultChecked={checkedChoose.standard}
+                    onClick={() => setStandard()}
                   />
-                  <label className="wp-lable" for="standard_exit_popup">
+                  <label className="wp-lable" htmlFor="standard_exit_popup">
                     Standard exit popup
                   </label>
                   <input
@@ -146,17 +201,15 @@ function WithdrawalPrevention() {
                     type="radio"
                     id="image_popup"
                     name="withdrawal-prevention"
-                    value="image_popup"
-                    defaultChecked={
-                      withDrawal.withdrawal_prevention_status == 'image_popup' ? true : false
-                    }
-                    onClick={() => setChooseImage(true)}
+                    // defaultChecked={checkedChoose.image}
+                    defaultValue={'image_popup'}
+                    onClick={() => setImage()}
                   />
-                  <label className="wp-lable" for="image_popup">
+                  <label className="wp-lable" htmlFor="image_popup">
                     image popup
                   </label>
                 </div>
-                <div style={{ display: chooseImage ? 'block' : 'none' }}>
+                <div id='display_img_url' style={{ display: withDrawal.withdrawal_prevention_status == 'image_popup' ? 'block' : 'none' }}>
                   <div className="wp-image-item">
                     <label className="wp-image-label">
                       image URL <span style={{ color: 'red' }}>*</span>
@@ -166,8 +219,8 @@ function WithdrawalPrevention() {
                       className="wp-image-input"
                       type="text"
                       defaultValue={
-                        withDrawal.withdrawal_prevention_image_url
-                          ? withDrawal.withdrawal_prevention_image_url
+                        withDrawal?.withdrawal_prevention_image_url
+                          ? withDrawal?.withdrawal_prevention_image_url
                           : null
                       }
                       onChange={() => utils.checkRequired('image_URL', 'errImageURL', 'image URL')}
@@ -181,8 +234,8 @@ function WithdrawalPrevention() {
                       className="wp-image-input"
                       type="text"
                       defaultValue={
-                        withDrawal.withdrawal_prevention_link_url
-                          ? withDrawal.withdrawal_prevention_link_url
+                        withDrawal?.withdrawal_prevention_link_url
+                          ? withDrawal?.withdrawal_prevention_link_url
                           : null
                       }
                     />
