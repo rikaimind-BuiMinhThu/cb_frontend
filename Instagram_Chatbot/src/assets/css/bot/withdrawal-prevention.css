@@ -16,3 +16,9 @@
 .wp-image-label {
   width: 100px;
 }
+.wp-image-err {
+  display: block;
+  color: red;
+  font-weight: 400;
+  margin-left: 100px;
+}
