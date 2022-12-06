@@ -27,6 +27,9 @@
   display: flex;
   justify-content: flex-start;
 }
+.report__item-pie {
+  width: 70%;
+}
 .report__item-2-head {
   width: calc(30% - 10px);
 }
@@ -48,6 +51,24 @@
 }
 .report__item-chart {
   height: 400px;
+}
+.report__item-content {
+  max-height: 200px;
+  overflow-y: auto;
+}
+.report__item-content--fix-table {
+  width: 100%;
+  display: table;
+  border-spacing: 0;
+  border-collapse: separate;
+}
+.report__item-content--fix-table thead > tr > th {
+  top: 0;
+  left: 0;
+  z-index: 2;
+  position: sticky;
+  top: 0;
+  background-color: #fff;
 }
 .err-date {
   color: red;

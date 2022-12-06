@@ -7,8 +7,13 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { format } from 'date-fns';
 import ReactApexChart from 'react-apexcharts';
+import { useEffect } from 'react';
+import api from './../../../../api/api-management';
+import Cookies from 'js-cookie';
+import { tokenExpired } from 'api/tokenExpired';
 
 function Report() {
+  // const [botId, setBotId]=useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [dateState, setDateState] = useState(new Date());
@@ -84,7 +89,6 @@ function Report() {
       },
     },
   });
-
   const [lineChart, setLineChart] = useState({
     series: [
       {
@@ -233,6 +237,49 @@ function Report() {
       },
     },
   });
+  const [pieChart, setPieChart] = useState({
+    series: [44, 55, 31],
+    options: {
+      chart: {
+        width: 380,
+        type: 'pie',
+      },
+      labels: ['Dec 01', 'Dec 02', 'Dec 03'],
+    },
+    responsive: [
+      {
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200,
+          },
+          legend: {
+            position: 'bottom',
+          },
+        },
+      },
+    ],
+  });
+  const [shortenedList, setShortenedList] = useState([]);
+
+  // useEffect(() => {
+  //   setBotId(Cookies.get('bot_id'));
+  // }, []);
+
+  useEffect(() => {
+    let botId = Cookies.get('bot_id');
+    api
+      .get(`/api/v1/managements/history_click_urls?chatbot_id=${botId}`)
+      .then((res) => {
+        console.log(res);
+        setShortenedList(res.data.data);
+      })
+      .catch((err) => {
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  }, []);
 
   function validDateRange(start, end) {
     const errDate = document.getElementById('errDate');
@@ -477,7 +524,7 @@ function Report() {
                     </div>
                     <div className="report__group">
                       <button className="btn btn-primary" onClick={(e) => handleSearch(e)}>
-                        <i class="fa fa-search" aria-hidden="true"></i>
+                        <i className="fa fa-search" aria-hidden="true"></i>
                       </button>
                     </div>
                     <span id="errDate" className="err-date"></span>
@@ -494,7 +541,7 @@ function Report() {
                     <div className="report__item-head">
                       CONVERSION RATE (CVR) / CLICK-THROUGH RATE (CTR
                       <a href="">
-                        <i class="far fa-question-circle"></i>
+                        <i className="far fa-question-circle"></i>
                       </a>
                     </div>
                     <div className="report__item-btn">
@@ -531,7 +578,7 @@ function Report() {
                     <div className="report__item-head report__item-2-head-main">
                       NUMBER OF CONVERSIONS / NUMBER OF BOT STARTS
                       <a href="">
-                        <i class="far fa-question-circle"></i>
+                        <i className="far fa-question-circle"></i>
                       </a>
                       <ReactApexChart
                         options={lineChart.options}
@@ -543,7 +590,7 @@ function Report() {
                     <div className="report__item-head report__item-2-head">
                       CHANGE IN MONTHLY CONVERSIONS
                       <a href="">
-                        <i class="far fa-question-circle"></i>
+                        <i className="far fa-question-circle"></i>
                       </a>
                       <Calendar
                         className="report__item-2-head-calender"
@@ -559,7 +606,7 @@ function Report() {
                     <div className="report__item-head">
                       SCENARIO TRANSITION
                       <a href="">
-                        <i class="far fa-question-circle"></i>
+                        <i className="far fa-question-circle"></i>
                       </a>
                       <div className="report__item-btn">
                         <button className="btn btn-success">Overall Scenario Transition</button>
@@ -576,11 +623,11 @@ function Report() {
                     </div>
                   </div>
 
-                  <div className="report__item">
+                  {/* <div className="report__item">
                     <div className="report__item-head">
                       CONTENT
                       <a href="">
-                        <i class="far fa-question-circle"></i>
+                        <i className="far fa-question-circle"></i>
                       </a>
                       <div className="report__item-btn">
                         <button className="btn btn-success">start page</button>
@@ -602,38 +649,46 @@ function Report() {
                         </Table>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="report__item report__item-2">
                     <div className="report__item-head report__item-2-head-main">
                       AREA
                       <a href="">
-                        <i class="far fa-question-circle"></i>
+                        <i className="far fa-question-circle"></i>
                       </a>
-                      <div className="report__item-btn">
+                      {/* <div className="report__item-btn">
                         <button className="btn btn-success">number of bot starts</button>
                         <button className="btn btn-success">Conversions (CV)</button>
+                      </div> */}
+                      <div className="report__item-pie">
+                        <ReactApexChart
+                          options={pieChart.options}
+                          series={pieChart.series}
+                          type="pie"
+                          height={350}
+                        />
                       </div>
                     </div>
                     <div className="report__item-head report__item-2-head">
                       <div className="report__item-head report__item-2-head">
                         DEVICE
                         <a href="">
-                          <i class="far fa-question-circle"></i>
+                          <i className="far fa-question-circle"></i>
                         </a>
                         <div>There's no data.</div>
                       </div>
                       <div className="report__item-head report__item-2-head">
                         DEVICE
                         <a href="">
-                          <i class="far fa-question-circle"></i>
+                          <i className="far fa-question-circle"></i>
                         </a>
                         <div>There's no data.</div>
                       </div>
                       <div className="report__item-head report__item-2-head">
                         DEVICE
                         <a href="">
-                          <i class="far fa-question-circle"></i>
+                          <i className="far fa-question-circle"></i>
                         </a>
                         <div>There's no data.</div>
                       </div>
@@ -643,17 +698,17 @@ function Report() {
                   <div className="report__item">
                     <div style={{ textAlign: 'center' }} className="report__item-head">
                       SHORTENED LINK CLICKS
-                      {/* <a href="">
-                        <i class="far fa-question-circle"></i>
-                      </a> */}
-                      {/* <div className="report__item-btn">
+                      <a href="">
+                        <i className="far fa-question-circle"></i>
+                      </a>
+                      <div className="report__item-btn">
                         <button className="btn btn-success">start page</button>
                         <button className="btn btn-success">CV page</button>
-                      </div> */}
+                      </div>
                       <br />
                       <br />
                       <div className="report__item-content">
-                        <Table>
+                        <Table height="200" bordered className="report__item-content--fix-table">
                           <thead className="text-primary">
                             <tr>
                               <th style={{ width: '5%' }}>No</th>
@@ -663,7 +718,81 @@ function Report() {
                             </tr>
                           </thead>
                           <tbody>
-                            <tr>sdsssd</tr>
+                            <tr>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                            </tr>
+                            <tr>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                            </tr>
+                            <tr>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                            </tr>
+                            <tr>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                            </tr>
+                            <tr>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                            </tr>
+                            <tr>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                            </tr>
+                            <tr>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                            </tr>
+                            <tr>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                            </tr>
+                            <tr>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                            </tr>
+                            <tr>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                            </tr>
+
+                            <tr>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                              <td>ss</td>
+                            </tr>
+                            {/* {shortenedList?.map((item, index) => (
+                              <tr key={index}>
+                                <th scope="row">{item.id}</th>
+                                <td>{item.num_of_click}</td>
+                                <td>{item.origin_url}</td>
+                                <td>{item.shorten_code}</td>
+                              </tr>
+                            ))} */}
                           </tbody>
                         </Table>
                       </div>
