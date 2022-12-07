@@ -82,7 +82,11 @@ function ScenarioList() {
 
     const onClickPreview = (scenarioId) => {
         Cookies.set('scenario_id', scenarioId);
-        setScenarioId(scenarioId);
+        setScenarioId("");
+        setTimeout(() => {
+            setScenarioId(scenarioId);
+        }, [100])
+        // handleOpenPreview(true);
         setIsOpenPreview(true);
     }
 
@@ -370,3 +374,5 @@ function ScenarioList() {
 }
 
 export default ScenarioList;
+
+

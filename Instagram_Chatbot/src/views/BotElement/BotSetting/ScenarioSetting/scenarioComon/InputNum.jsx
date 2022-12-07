@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { InputNumber } from 'antd';
 
-const InputNum = ({ id, addonAfter, addonBefore, label, value, onChange, placeholder, max = 9999999, min = 0, className, disabled = false, style, styleLabel, controls }) => {
+const InputNum = ({ id, addonAfter, maxLength, addonBefore, label, value, onChange, placeholder, max = 9999999, min = 0, className, disabled = false, style, styleLabel, controls }) => {
 
     return (
         <React.Fragment>
@@ -11,6 +11,7 @@ const InputNum = ({ id, addonAfter, addonBefore, label, value, onChange, placeho
                 id={id}
                 max={max}
                 min={min}
+                maxLength={maxLength}
                 addonAfter={addonAfter}
                 addonBefore={addonBefore}
                 controls={controls}
@@ -26,3 +27,4 @@ const InputNum = ({ id, addonAfter, addonBefore, label, value, onChange, placeho
 
 
 export default InputNum;
+
