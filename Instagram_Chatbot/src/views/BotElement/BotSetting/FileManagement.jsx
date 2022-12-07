@@ -34,6 +34,11 @@ function FileManagement() {
     api.get(`/api/v1//managements/file`).then((res) => {
       setFiles(res.data.data);
       console.log(res.data.data)
+    }).catch((err) => {
+      console.log(err);
+      if (err.response?.data.code === 0) {
+        tokenExpired();
+      }
     });
   }
 

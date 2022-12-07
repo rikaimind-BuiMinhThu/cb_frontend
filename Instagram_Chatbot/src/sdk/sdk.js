@@ -1,12 +1,13 @@
 var botId = sessionStorage.getItem('bot_id'); var scenarioId = sessionStorage.getItem('scenario_id'); var url = `https://ec-chatbot-test1.com/api/v1/analytics/chatbot_counts/${botId}`;
 var head = document.getElementsByTagName('head')[0]; var script = document.createElement('script'); script.type = 'text/javascript';
+
 script.src = "https://code.jquery.com/jquery-3.6.0.min.js"; head.appendChild(script);
 function displayPopup() {
     var body = document.getElementsByTagName("BODY")[0]; var iframe = document.createElement('iframe');
     iframe.id = 'previewSdk'; iframe.style.position = "fixed"; iframe.style.bottom = "0"; iframe.style.right = "0";
     iframe.width = '400px'; iframe.height = '620px';
     iframe.style.border = 'none'; iframe.style.padding = '0'; iframe.style.margin = '0'; iframe.style.borderRadius = '30px'
-    iframe.src = `https://localhost:3000/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}`;
+    iframe.src = `https://ec-chatbot1.com/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}`;
     body.appendChild(iframe)
     window.addEventListener('message', function (e) {
         let firstOpen = false
