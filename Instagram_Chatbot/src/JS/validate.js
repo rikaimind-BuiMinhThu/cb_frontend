@@ -12,6 +12,19 @@ export function checkEmail(inputId, errId, label) {
     return true;
   }
 }
+export function checkUrl(inputId, errId, label) {
+  var regex =
+    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
+  if (!regex.test(field(inputId).value) && field(inputId).value != '') {
+    field(errId).style.display = 'block';
+    field(errId).innerHTML = `${label} incorrect format.`;
+    return false;
+  } else {
+    field(errId).style.display = 'none';
+    field(errId).innerHTML = ``;
+    return true;
+  }
+}
 
 export function checkMaxLength(inputId, errId, label, length) {
   if (field(inputId).value.length > length && field(inputId).value != '') {

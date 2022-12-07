@@ -9,6 +9,7 @@ input::-webkit-inner-spin-button {
   align-items: flex-start;
 }
 .bs-field-lable {
+  display: inline-block;
   width: 20%;
   color: #000;
   font-size: 13px;
