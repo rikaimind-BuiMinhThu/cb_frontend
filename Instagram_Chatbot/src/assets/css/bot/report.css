@@ -53,23 +53,25 @@
   height: 400px;
 }
 .report__item-content {
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: auto;
 }
+
 .report__item-content--fix-table {
   width: 100%;
   display: table;
   border-spacing: 0;
   border-collapse: separate;
+  overflow: visible;
 }
-.report__item-content--fix-table thead > tr > th {
+.report__item-content-title {
   top: 0;
   left: 0;
   z-index: 2;
   position: sticky;
-  top: 0;
   background-color: #fff;
 }
+
 .err-date {
   color: red;
   display: block;

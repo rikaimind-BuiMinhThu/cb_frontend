@@ -13,7 +13,8 @@ import Cookies from 'js-cookie';
 import { tokenExpired } from 'api/tokenExpired';
 
 function Report() {
-  // const [botId, setBotId]=useState('');
+  // states
+  const [botId, setBotId] = useState(Cookies.get('bot_id'));
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [dateState, setDateState] = useState(new Date());
@@ -237,14 +238,17 @@ function Report() {
       },
     },
   });
-  const [pieChart, setPieChart] = useState({
-    series: [44, 55, 31],
+  const [devicePieChartSeries, setDevicePieChartSeries] = useState([]);
+
+  // chart
+  let devicePieChartConfig = {
+    series: devicePieChartSeries,
     options: {
       chart: {
         width: 380,
         type: 'pie',
       },
-      labels: ['Dec 01', 'Dec 02', 'Dec 03'],
+      labels: ['PC', 'SP', 'Tablet'],
     },
     responsive: [
       {
@@ -259,19 +263,20 @@ function Report() {
         },
       },
     ],
-  });
+  };
   const [shortenedList, setShortenedList] = useState([]);
 
-  // useEffect(() => {
-  //   setBotId(Cookies.get('bot_id'));
-  // }, []);
+  useEffect(() => {
+    setBotId(Cookies.get('bot_id'));
+  }, []);
 
+  //get data SHORTENED
   useEffect(() => {
     let botId = Cookies.get('bot_id');
     api
       .get(`/api/v1/managements/history_click_urls?chatbot_id=${botId}`)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         setShortenedList(res.data.data);
       })
       .catch((err) => {
@@ -280,6 +285,27 @@ function Report() {
         }
       });
   }, []);
+
+  //get data device pie chart
+  useEffect(() => {
+    api
+      .get(`/api/v1/analytics/chatbot_counts/${botId}`)
+      .then((res) => {
+        console.log(res?.data?.data?.chatbot);
+        let chatbotData = res?.data?.data?.chatbot;
+        let chatbotValue = [
+          chatbotData.num_of_pc_count,
+          chatbotData.num_of_sp_count,
+          chatbotData.num_of_tablet_count,
+        ];
+        setDevicePieChartSeries(chatbotValue);
+      })
+      .catch((err) => {
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  }, [botId]);
 
   function validDateRange(start, end) {
     const errDate = document.getElementById('errDate');
@@ -481,10 +507,10 @@ function Report() {
                     <p className="report__group">Aggregation period:</p>
                     <div className="report__group">
                       <select className="report__group-select" name="" id="">
-                        <option value="qqq">Aggregation period</option>
-                        <option value="">The day before</option>
-                        <option value="">Last 7 days</option>
-                        <option value="">last 30 days</option>
+                        <option value="aggregation_period">Aggregation period</option>
+                        <option value="the_day_before">The day before</option>
+                        <option value="last_7_days">Last 7 days</option>
+                        <option value="last_30_days">last 30 days</option>
                       </select>
                     </div>
                     <div className="report__group report-date">
@@ -508,18 +534,18 @@ function Report() {
                     <p className="report__group">device</p>
                     <div className="report__group">
                       <select className="report__group-select" name="" id="">
-                        <option value="qqqwe">All</option>
-                        <option value="">computer</option>
-                        <option value="">Tablet</option>
-                        <option value="">Smart phone</option>
+                        <option value="all">All</option>
+                        <option value="computer">computer</option>
+                        <option value="tablet">Tablet</option>
+                        <option value="smartphone">Smart phone</option>
                       </select>
                     </div>
                     <p className="report__group">scenario</p>
                     <div className="report__group">
                       <select className="report__group-select" name="" id="">
-                        <option value="dddd">BOB scenario</option>
-                        <option value="">Test1</option>
-                        <option value="">Test2</option>
+                        <option value="BOB">BOB scenario</option>
+                        <option value="Test1">Test1</option>
+                        <option value="Test2">Test2</option>
                       </select>
                     </div>
                     <div className="report__group">
@@ -653,7 +679,7 @@ function Report() {
 
                   <div className="report__item report__item-2">
                     <div className="report__item-head report__item-2-head-main">
-                      AREA
+                      DEVICE
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
@@ -663,8 +689,8 @@ function Report() {
                       </div> */}
                       <div className="report__item-pie">
                         <ReactApexChart
-                          options={pieChart.options}
-                          series={pieChart.series}
+                          options={devicePieChartConfig.options}
+                          series={devicePieChartConfig.series}
                           type="pie"
                           height={350}
                         />
@@ -672,25 +698,37 @@ function Report() {
                     </div>
                     <div className="report__item-head report__item-2-head">
                       <div className="report__item-head report__item-2-head">
-                        DEVICE
+                        PC
                         <a href="">
                           <i className="far fa-question-circle"></i>
                         </a>
-                        <div>There's no data.</div>
+                        {devicePieChartSeries[0] > 0 ? (
+                          <div>{devicePieChartSeries[0]}</div>
+                        ) : (
+                          <div>There's no data.</div>
+                        )}
                       </div>
                       <div className="report__item-head report__item-2-head">
-                        DEVICE
+                        Smartphone
                         <a href="">
                           <i className="far fa-question-circle"></i>
                         </a>
-                        <div>There's no data.</div>
+                        {devicePieChartSeries[1] > 0 ? (
+                          <div>{devicePieChartSeries[1]}</div>
+                        ) : (
+                          <div>There's no data.</div>
+                        )}
                       </div>
                       <div className="report__item-head report__item-2-head">
-                        DEVICE
+                        Tablet
                         <a href="">
                           <i className="far fa-question-circle"></i>
                         </a>
-                        <div>There's no data.</div>
+                        {devicePieChartSeries[2] > 0 ? (
+                          <div>{devicePieChartSeries[2]}</div>
+                        ) : (
+                          <div>There's no data.</div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -708,13 +746,21 @@ function Report() {
                       <br />
                       <br />
                       <div className="report__item-content">
-                        <Table height="200" bordered className="report__item-content--fix-table">
+                        <Table bordered height="200" className="report__item-content--fix-table">
                           <thead className="text-primary">
                             <tr>
-                              <th style={{ width: '5%' }}>No</th>
-                              <th style={{ width: '15%' }}>Number of click</th>
-                              <th style={{ width: '60%' }}>Original URL</th>
-                              <th style={{ width: '20%' }}>Url Shortening</th>
+                              <th className="report__item-content-title" style={{ width: '5%' }}>
+                                No
+                              </th>
+                              <th className="report__item-content-title" style={{ width: '15%' }}>
+                                Number of click
+                              </th>
+                              <th className="report__item-content-title" style={{ width: '60%' }}>
+                                Original URL
+                              </th>
+                              <th className="report__item-content-title" style={{ width: '20%' }}>
+                                Url Shortening
+                              </th>
                             </tr>
                           </thead>
                           <tbody>
