@@ -46,6 +46,7 @@ function BasicSetting() {
     utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'The Mail address');
     utils.checkTel('phone_number', 'errPhone', 'The Tel');
     utils.checkInput('address', 'errAddress', 'The Address');
+    utils.checkUrl('url', 'errUrl', 'The Url');
     if (
       utils.checkInput('fullname', 'errFullname', 'The name') &&
       utils.checkInput('companyName', 'errCompanyname', 'Company name') &&
@@ -53,7 +54,8 @@ function BasicSetting() {
       utils.checkMaxLength('job_title', 'errPosition', 'Position', 50) &&
       utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'The Mail address') &&
       utils.checkTel('phone_number', 'errPhone', 'The Tel') &&
-      utils.checkInput('address', 'errAddress', 'The Address')
+      utils.checkInput('address', 'errAddress', 'The Address') &&
+      utils.checkUrl('url', 'errUrl', 'The Url')
     ) {
       const form = document.getElementById('form-basic-setting');
       const obj = {};
@@ -100,7 +102,9 @@ function BasicSetting() {
               <CardBody>
                 <form id="form-basic-setting">
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">Full name</span>
+                    <span className="bs-field-lable">
+                      Full name <span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="bs-field-input">
                       <input
                         className="bs-field-input-item"
@@ -131,7 +135,9 @@ function BasicSetting() {
                   </div>
 
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">Company name</span>
+                    <span className="bs-field-lable">
+                      Company name <span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="bs-field-input">
                       <input
                         className="bs-field-input-item"
@@ -185,7 +191,9 @@ function BasicSetting() {
                   </div>
 
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">Email address</span>
+                    <span className="bs-field-lable">
+                      Email address<span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="bs-field-input">
                       <input
                         className="bs-field-input-item"
@@ -207,7 +215,9 @@ function BasicSetting() {
                   </div>
 
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">Phone number</span>
+                    <span className="bs-field-lable">
+                      Phone number<span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="bs-field-input">
                       <input
                         className="bs-field-input-item"
@@ -238,7 +248,9 @@ function BasicSetting() {
                   </div>
 
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">Address</span>
+                    <span className="bs-field-lable">
+                      Address<span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="bs-field-input">
                       <input
                         className="bs-field-input-item"
@@ -269,7 +281,7 @@ function BasicSetting() {
                     </div>
                   </div>
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">URLs</span>
+                    <span className="bs-field-lable">URL</span>
                     <div className="bs-field-input">
                       <input
                         className="bs-field-input-item"
@@ -278,7 +290,9 @@ function BasicSetting() {
                         placeholder="enter input ..."
                         name="url"
                         defaultValue={userDetail.url}
+                        onChange={() => utils.checkUrl('url', 'errUrl', 'The Url')}
                       ></input>
+                      <span id="errUrl" className="bs-err-format"></span>
                     </div>
                   </div>
                 </form>
