@@ -4,7 +4,7 @@ import { Checkbox, Row, Col } from 'antd';
 const CheckboxGroupCustom = ({ id, value = [], onChange, className, disabled = false, data, style, styleCol, direct = "horizontal" }) => {
     return (
         <div style={{ ...style }}>
-            <Checkbox.Group style={{ width: "100%" }} onChange={onChange}>
+            <Checkbox.Group style={{ width: "100%" }} onChange={onChange} value={value}>
                 {direct === "horizontal" ?
                     <Row>
                         {data.map((item, index) => {

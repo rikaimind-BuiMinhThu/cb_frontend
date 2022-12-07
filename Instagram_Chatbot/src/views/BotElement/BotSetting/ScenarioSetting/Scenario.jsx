@@ -35,6 +35,7 @@ import discover from '../../../../assets/img/payment-method/discover.png';
 import jcb from '../../../../assets/img/payment-method/jcb.png';
 import master_card from '../../../../assets/img/payment-method/master_card.png';
 import visa from '../../../../assets/img/payment-method/visa.png';
+import nanoMetadata from 'nano-metadata';
 
 const _ = require('lodash');
 
@@ -884,8 +885,8 @@ let agreeTermType = [
 
 let dataTypeFile = [
   {
-    key: 'jpegs',
-    value: 'jpegs',
+    key: 'jpeg',
+    value: 'jpeg',
   },
   {
     key: 'jpg',
@@ -1465,6 +1466,7 @@ let dataApiLinkage = [
 
 const Scenario = () => {
   // states
+  const [fileVideo, setFileVideo] = useState('');
   const [scenarioName, setScenarioName] = useState('');
   const [errorScenarioName, setErrorScenarioName] = useState('');
 
@@ -1510,6 +1512,8 @@ const Scenario = () => {
 
   const [variableName, setVariableName] = useState('');
   const [defaultValue, setDefaultValue] = useState('');
+
+  const [acceptFile, setAcceptFile] = useState();
 
   //state data pull_down
   const [dataHour, setDataHour] = useState(dataHourFixed);
@@ -1597,17 +1601,17 @@ const Scenario = () => {
     document.getElementById('ss-carouse-file-upload').click();
   }
 
-  function getBaseUrl(event, indexContent) {
-    var fileInput = document.querySelector('input[type=file]')['files'][0];
+  const getBaseUrl = async (event, indexContent) => {
+    var fileInput = event.target.files[0];
     const type = fileInput.name.slice(fileInput.name.lastIndexOf('.') + 1);
-    console.log(fileInput, type)
+
     let trueFile;
     if (dataMessages[indexMessageSelect].belong_to === 'user') {
       trueFile = ['jpeg', 'jpg', 'png'].includes(type);
     } else {
       trueFile = ['jpeg', 'jpg', 'png', 'pdf', 'mp4'].includes(type);
     }
-    let file
+    let file;
     if (trueFile) {
       if (type != 'pdf' && type != 'mp4' && fileInput.size / 1024 / 1024 > 2) {
         setFileError(`You need to upload file which size under 2MB.`);
@@ -1616,9 +1620,24 @@ const Scenario = () => {
         setFileError(`You need to upload file which size under 3MB.`);
         return;
       } else if (type === 'mp4') {
-        const vid = document.getElementById('preview-video');
-        console.log(vid.duration);
-        if (vid.duration > 15) {
+        if (fileInput.size / 1024 / 1024 > 50) {
+          setFileError(`You need to upload file which size under 50MB.`);
+          return;
+        }
+        // const video = document?.createElement('video');
+        // video.setAttribute('id', 'checkDurationVid');
+        // const source = document?.createElement('source');
+
+        // source.src = URL.createObjectURL(fileInput);
+        // source.type = "video/mp4";
+        // video.appendChild(source);
+        // document.getElementById("check-append-vid").appendChild(video);
+        // var dura = document.getElementById('checkDurationVid')
+        // console.log('duration: ', video.duration);
+        // console.log(fileInput);
+        let duration = await nanoMetadata.video.duration(fileInput);
+        console.log(duration);
+        if (duration > 15) {
           setFileError(`You need to upload video which duration under 15 seconds.`);
           return;
         }
@@ -1626,7 +1645,7 @@ const Scenario = () => {
       }
       setFileError('');
       const video = document.getElementById('preview-video');
-      file = { user_file: { file_type: type, size: fileInput.size, timeplay: `${type == 'mp4' ? video.duration : ''}` } };
+      file = { user_file: { file_type: type, size: fileInput.size, timeplay: `${type == 'mp4' ? video?.duration : ''}` } };
       api
         .post(`/api/v1/managements/file/upload`, file)
         .then((res) => {
@@ -1705,37 +1724,6 @@ const Scenario = () => {
         setFileErrorCarousel('');
       }, 4000)
     }
-    // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
-    // var reader = new FileReader();
-    // var baseString;
-    // var imgUrl = URL.createObjectURL(event.target.files[0]);
-    // if (
-    //   file?.type === 'image/png' ||
-    //   file?.type === 'image/jpeg' ||
-    //   file?.type === 'image/jpg' ||
-    //   file?.type === 'image/gif' ||
-    //   file?.type === 'image/img'
-    // ) {
-    //   document.getElementById(`bot-file-upload-img`).style.display = 'block';
-    //   document.getElementById(`bot-file-upload-img`).src = imgUrl;
-    // } else {
-    //   document.getElementById(`bot-file-upload-img`).style.display = 'none';
-    //   document.getElementById(`bot-file-upload-img`).src = '';
-    // }
-
-    // reader.onloadend = function () {
-    //   baseString = reader.result;
-    //   // setInputImage(baseString);
-    //   // document.getElementById('ss-bot-file-upload-name').innerHTML = event.target.files[0].name;
-    //   if (baseString !== undefined || baseString !== '') {
-    //     // document.getElementById('newClientImgLogoErrMsg').style.display = 'none';
-    //     console.log(baseString)
-    //     dataMessages[indexMessageSelect].message_content[0].file.content = baseString;
-    //     setDataMessages([...dataMessages]);
-    //   }
-
-    // };
-    // reader.readAsDataURL(file);
   }
 
   // handle select message
@@ -1912,7 +1900,12 @@ const Scenario = () => {
             title_require: false,
             type: 'default',
             default: [{ id: 1 }],
-            checkbox_img: [{ id: 1 }],
+            checkbox_img: [{
+              id: 1,
+              contents: [
+                { id: 1 }
+              ]
+            }],
             checkedValue: []
           }
         }
@@ -2008,6 +2001,7 @@ const Scenario = () => {
             type: 'default',
             default: {
               contents: [{
+                id: 1,
                 title: '',
                 subtitle: '',
                 urls: '',
@@ -2234,7 +2228,10 @@ const Scenario = () => {
       });
     } else {
       arr.push({
-        id: idMax
+        id: idMax,
+        contents: [
+          { id: 1 }
+        ]
       });
     }
     setDataMessages([...dataMessages]);
@@ -2392,9 +2389,10 @@ const Scenario = () => {
   }
 
   const onChangeFixedDate = (indexMessage, indexContent, type, value, name) => {
-
-    dataMessages[indexMessage].message_content[indexContent][type][name].push(moment(value).format('YYYY/MM/DD'));
-    console.log(dataMessages[indexMessage].message_content[indexContent][type][name])
+    console.log(value);
+    if (value) {
+      dataMessages[indexMessage].message_content[indexContent][type][name].push(moment(value).format('YYYY/MM/DD'));
+    }
     dataMessages[indexMessage].message_content[indexContent][type].select_fixed_date = value;
     setDataMessages([...dataMessages]);
   }
@@ -2608,6 +2606,7 @@ const Scenario = () => {
           hidden: false,
           belong_to: belongTo,
           conditions: [],
+          is_display_button_next: true,
           message_content: []
         }
       ];
@@ -2651,6 +2650,7 @@ const Scenario = () => {
           hidden: false,
           belong_to: belongTo,
           conditions: [],
+          is_display_button_next: true,
           message_content: []
         }
       )
@@ -2784,11 +2784,11 @@ const Scenario = () => {
       || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to
       || calendar.end_date_test || calendar[calendar.type].specified_period_from
       || calendar[calendar.type].specified_period_to) {
-      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD')
+      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD').add(1, 'days')
         || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
         || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_test, 'YYYY/MM/DD'))
         || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
-        || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current, 'YYYY/MM/DD') < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_test, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current, 'YYYY/MM/DD') > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_test, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
@@ -2829,11 +2829,11 @@ const Scenario = () => {
       || calendar.start_date_test || calendar.specified_period_from
       || calendar.specified_period_to || calendar.aggregation_target_period_from
       || calendar.aggregation_target_period_to) {
-      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD')
+      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD').add(1, 'days')
         || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
         || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') < moment(calendar.start_date_test, 'YYYY/MM/DD'))
         || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
-        || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current, 'YYYY/MM/DD') < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_test, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current, 'YYYY/MM/DD') > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_test, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
@@ -2933,7 +2933,7 @@ const Scenario = () => {
                                 if (message.belong_to === 'bot') {
                                   content = message.message_content[0];
                                   if (content.type === 'file') {
-                                    type = content[content.type]?.content.slice(content[content.type]?.content.lastIndexOf('.') + 1);
+                                    type = content[content.type]?.content?.slice(content[content.type]?.content.lastIndexOf('.') + 1) || "";
                                     console.log(type, 'checkkk type');
                                   }
                                 }
@@ -2971,14 +2971,15 @@ const Scenario = () => {
                                                   {content.type === 'file' && (
                                                     content[content.type]?.content ? (
                                                       <React.Fragment>
-                                                        {(type === 'mp4') &&
-                                                          <div className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-video">
-                                                            <video
-                                                              src="https://botchan.blob.core.windows.net/production/uploads/633180955bab416b487596eb/633551125f613.mp4"
-                                                              controls="controls"
-                                                            ></video>
-                                                          </div>
-                                                        }
+                                                        {/* {(type === 'mp4') && */}
+                                                        <div id='check-append-vid' style={type !== 'mp4' ? { display: 'none' } : {}} className="ss-bot-chat-detail-content ss-message__content ss-message__content--bot-file-video">
+                                                          <video
+                                                            // id="preview-video"
+                                                            src={content[content.type]?.content}
+                                                            controls
+                                                          ></video>
+                                                        </div>
+                                                        {/* } */}
                                                         {(type === 'jpeg' || type === 'png' || type === 'jpg') &&
                                                           <img
                                                             className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content`}
@@ -2987,11 +2988,6 @@ const Scenario = () => {
                                                             style={{ width: '27%', border: 'none', height: 'auto', ...message.hidden === true ? { opacity: '0.4' } : {} }}
                                                           />
                                                         }
-                                                        {/* // <span
-                                                          //   style={{ color: '#089BE5', fontSize: '17px' }}
-                                                          //   onClick={() => handleDownloadFile(content[content.type]?.content)}
-                                                          // // className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                          // >Download this file</span> */}
                                                         {(type === 'pdf') &&
                                                           <textarea
                                                             className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
@@ -3022,14 +3018,13 @@ const Scenario = () => {
 
                                                   {/* bot: type == 'api_linkage' || 'pause' */}
                                                   {(content.type === 'api_linkage' || content.type === 'pause') && (
-                                                    <textareag bhh
+                                                    <textarea
                                                       className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                                                       style={message.hidden === true ? { opacity: '0.4' } : {}}
-                                                      // value={content[content.type]?.content || ''}
+                                                      value={''}
                                                       readOnly
-                                                    ></textareag>
+                                                    ></textarea>
                                                   )}
-
                                                   {/* bot: type == 'script' */}
                                                   {content.type === 'script' && (
                                                     <textarea
@@ -3079,7 +3074,7 @@ const Scenario = () => {
                                                     </div>
                                                   )}
                                                 </div>
-                                                <div className="ss-chat-option" style={message.message_name ? { marginTop: '25px' }: {}}>
+                                                <div className="ss-chat-option" style={content.type !== "text_input" ? { marginTop: '25px' } : {}}>
                                                   <MDBIcon
                                                     fas
                                                     icon="pencil-alt"
@@ -3583,9 +3578,9 @@ const Scenario = () => {
                                                                   </div>
                                                                 })
                                                               )}
-                                                              {checkbox.type === 'checkbox_img' && (
-                                                                checkbox[checkbox.type].map((item, index) => {
-                                                                  return <div key={index} className="ss-message__content--user-checkbox--checkbox_img" style={{ marginBottom: '10px' }}>
+                                                              {/* {checkbox.type === 'checkbox_img' && (
+                                                                checkbox[checkbox.type].map((itemCheckboxImg, indexCheckboxImg) => {
+                                                                  return <div key={indexCheckboxImg} className="ss-message__content--user-checkbox--checkbox_img" style={{ marginBottom: '10px' }}>
                                                                     <input
                                                                       type="checkbox"
                                                                       name="ss-message__content--user-checkbox--checkbox_img"
@@ -3600,7 +3595,26 @@ const Scenario = () => {
                                                                     <div style={{ textAlign: 'center' }}>{item.text}</div>
                                                                   </div>
                                                                 })
-                                                              )}
+                                                              )} */}
+                                                              {checkbox.type === 'checkbox_img' && checkbox.checkbox_img &&
+                                                                checkbox[checkbox.type].map((itemCheckboxImg, indexCheckboxImg) => {
+                                                                  return <div key={indexCheckboxImg} className="ss-message__content--user-checkbox--checkbox_img" style={{ color: '#6789A6', marginBottom: '10px' }}>
+                                                                    <Checkbox.Group
+                                                                      style={{ width: "100%", fontSize: '14px', display: 'flex' }}
+                                                                      className="ss-user-overview-product-purchase-checkbox-group-type-text_image ss-user-overview-product-purchase-style-width"
+                                                                      onChange={(value) => console.log(value)}
+                                                                      value={checkbox.initial_selection_picture}
+                                                                    >
+                                                                      {itemCheckboxImg.contents && itemCheckboxImg.contents.map((itemCheckboxContent, indexContent) => {
+                                                                        return <Checkbox value={`${itemCheckboxImg.id}-${itemCheckboxContent.id}`} key={indexContent} style={{ marginRight: '0px' }}>
+                                                                          <img src={itemCheckboxContent.file_url}></img>
+                                                                          <div style={{ textAlign: 'center', fontSize: '14px', color: '#6789A6', fontWeight: '700' }}>{itemCheckboxContent.text}</div>
+                                                                        </Checkbox>
+                                                                      })}
+                                                                    </Checkbox.Group>
+                                                                  </div>
+                                                                })
+                                                              }
                                                               {checkbox.type === 'consume_api_response' && (
                                                                 <>
                                                                   <div className="ss-message__content--user-checkbox">
@@ -5005,12 +5019,6 @@ const Scenario = () => {
                                     id="ss-bot-statement-type-file"
                                     className="ss-bot-statement-type-file ss-bot-statement-type"
                                   >
-                                    {/* <img
-                                src=""
-                                id="bot-file-upload-img"
-                                className="ss-bot-file-upload-img"
-                                alt=""
-                              /> */}
                                     <textarea
                                       name="bot-statement-type-file-content"
                                       id="ss-bot-statement-type-file-content"
@@ -5873,8 +5881,9 @@ const Scenario = () => {
                                                                                             value={itemRadio.img}
                                                                                           />
                                                                                           <MDBIcon onClick={() => {
-                                                                                            setIsOpenFileReference(true)
-                                                                                            setVarFileReference({ indexContent, contentType: content.type, subContentType: radioButton.type, indexSubContent: indexRadio, img: 'img' })
+                                                                                            setIsOpenFileReference(true);
+                                                                                            setVarFileReference({ indexContent, contentType: content.type, subContentType: radioButton.type, indexSubContent: indexRadio, img: 'img' });
+                                                                                            setAcceptFile(['image']);
                                                                                           }}
                                                                                             fas icon="paperclip"
                                                                                             style={{ marginLeft: '10px', backgroundColor: '#fff', borderRadius: '50%', padding: '6px' }}
@@ -6072,7 +6081,6 @@ const Scenario = () => {
                                                                   // if(radioButton.type === 'default') {
                                                                   //   arrMap
                                                                   // }
-
                                                                   return <div className="ss-user-setting-item-checkbox-button-drag" {...providedChild.droppableProps} ref={providedChild.innerRef}>
                                                                     {
                                                                       Array.isArray(checkbox?.[checkbox.type]) && checkbox?.[checkbox.type]
@@ -6081,44 +6089,74 @@ const Scenario = () => {
                                                                             <Draggable draggable={true} key={itemCheckbox.id} draggableId={itemCheckbox.id + ''} index={indexCheckbox}>
                                                                               {(providedChild) => (
                                                                                 <div {...providedChild.draggableProps} {...providedChild.dragHandleProps} ref={providedChild.innerRef} >
-                                                                                  <div style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px' }}>
+                                                                                  {/* <div style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px' }}>
                                                                                     {checkbox.type === 'checkbox_img' &&
-                                                                                      <React.Fragment>
-                                                                                        <div className="ss-user-setting__item-bottom" style={{ display: 'flex', alignItems: 'center' }}>
-                                                                                          <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
-                                                                                          <InputCustom
-                                                                                            style={{ width: '86%' }}
-                                                                                            placeholder="File URL"
-                                                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, 'img')}
-                                                                                            value={checkbox[checkbox.type][indexCheckbox].img}
-                                                                                          />
-                                                                                          <MDBIcon onClick={() => {
-                                                                                            setIsOpenFileReference(true)
-                                                                                            setVarFileReference({ indexContent, contentType: content.type, subContentType: checkbox.type, indexSubContent: indexCheckbox, img: 'img' })
-                                                                                          }}
-                                                                                            fas icon="paperclip"
-                                                                                            style={{ marginLeft: '10px', backgroundColor: '#fff', borderRadius: '50%', padding: '6px' }}
+                                                                                      <div style={{ position: 'relative', display: 'flex' }}>
+                                                                                        <div style={{ width: '96%', padding: '0px 5px' }}>
+                                                                                          <div className="ss-user-setting__item-bottom" style={{ display: 'flex', alignItems: 'center' }}>
+                                                                                            <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
+                                                                                            <InputCustom
+                                                                                              style={{ width: '86%' }}
+                                                                                              placeholder="File URL"
+                                                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, 'img')}
+                                                                                              value={checkbox[checkbox.type][indexCheckbox].img}
+                                                                                            />
+                                                                                            <MDBIcon onClick={() => {
+                                                                                              setIsOpenFileReference(true);
+                                                                                              setVarFileReference({ indexContent, contentType: content.type, subContentType: checkbox.type, indexSubContent: indexCheckbox, img: 'img' });
+                                                                                              setAcceptFile(['image']);
+                                                                                            }}
+                                                                                              fas icon="paperclip"
+                                                                                              style={{ marginLeft: '10px', backgroundColor: '#fff', borderRadius: '50%', padding: '6px' }}
+                                                                                            />
+                                                                                          </div>
+                                                                                          <InputDouble
+                                                                                            classCustom="ss-user-radio-custom-class"
+                                                                                            onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'text' : 'value')}
+                                                                                            valueLeft={checkbox[checkbox.type][indexCheckbox].text}
+                                                                                            valueRight={checkbox[checkbox.type][indexCheckbox].value}
+                                                                                            placeholder={['title', 'value']}
                                                                                           />
                                                                                         </div>
-                                                                                        <InputDouble
-                                                                                          classCustom="ss-user-radio-custom-class"
-                                                                                          onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'text' : 'value')}
-                                                                                          onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
-                                                                                          valueLeft={checkbox[checkbox.type][indexCheckbox].text}
-                                                                                          valueRight={checkbox[checkbox.type][indexCheckbox].value}
-                                                                                          icon={array.length >= 2 ? "times-circle" : ""}
-                                                                                          placeholder={['title', 'value']}
-                                                                                          classIcon="ss-plus-circle-option-icon-times"
-                                                                                        />
-                                                                                        {/* <CheckboxCustom
-                                                                                        label="Initial selection setting"
-                                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, 'initial_selection')}
-                                                                                        value={checkbox[checkbox.type][indexCheckbox].initial_selection}
-                                                                                      /> */}
-                                                                                      </React.Fragment>
+                                                                                        {array.length > 1 &&
+                                                                                          <div className="ss-user-setting-checkbox-time-icons">
+                                                                                            <MDBIcon fas icon="times-circle"
+                                                                                              onClick={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)} />
+                                                                                          </div>
+                                                                                        }
+                                                                                        <div className="ss-user-setting-plus-minus-icon" style={{ display: 'flex', alignItems: 'center' }}>
+                                                                                          <div>
+                                                                                            {console.log(itemCheckbox)}
+                                                                                            {itemCheckbox.contents.length < 3 &&
+                                                                                              <div style={{ color: '#327AED' }}
+                                                                                                onClick={() => {
+                                                                                                  let arrMess = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].checkbox_img[indexCheckbox].contents];
+                                                                                                  let idMax;
+                                                                                                  if (arrMess.length !== 0) {
+                                                                                                    idMax = Math.max(...arrMess.map(item => item.id)) + 1;
+                                                                                                  } else {
+                                                                                                    idMax = 1;
+                                                                                                  }
+                                                                                                  dataMessages[indexMessageSelect].message_content[indexContent][content.type].checkbox_img[indexCheckbox].contents.push({
+                                                                                                    id: idMax
+                                                                                                  });
+                                                                                                  setDataMessages([...dataMessages]);
+                                                                                                }}
+                                                                                              >+</div>}
+                                                                                            {itemCheckbox.contents.length > 1 &&
+                                                                                              <div style={{ color: '#FA8464' }}
+                                                                                                onClick={() => {
+                                                                                                  dataMessages[indexMessageSelect].message_content[indexContent][content.type].checkbox_img[indexCheckbox].contents.pop();
+                                                                                                  setDataMessages([...dataMessages]);
+                                                                                                }}
+                                                                                              >-</div>}
+                                                                                          </div>
+                                                                                        </div>
+                                                                                      </div>
                                                                                     }
-                                                                                    {(checkbox.type === 'default') &&
-                                                                                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                                                  </div> */}
+                                                                                  {(checkbox.type === 'default') &&
+                                                                                      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px' }}>
                                                                                         <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
                                                                                         <InputDouble
                                                                                           classCustom="ss-user-radio-custom-class"
@@ -6130,14 +6168,82 @@ const Scenario = () => {
                                                                                           classIcon="ss-plus-circle-option-icon-times"
                                                                                           onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
                                                                                         />
-                                                                                        {/* <CheckboxCustom
-                                                                                        label="Initial selection setting"
-                                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, 'initial_selection')}
-                                                                                        value={checkbox[checkbox.type][indexCheckbox].initial_selection}
-                                                                                      /> */}
                                                                                       </div>
-                                                                                    }
-                                                                                  </div>
+                                                                                  }
+                                                                                  {checkbox.type === 'checkbox_img' &&
+                                                                                    <div style={{ display: 'flex', marginBottom: '10px', backgroundColor: 'rgb(248, 249, 250)', position: 'relative' }}>
+                                                                                      <React.Fragment>
+                                                                                        <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px', display: 'flex', alignItems: 'center', marginRight: '5px', marginLeft: '10px' }} />
+                                                                                        <div className="ss-user-setting-payment-radio-container ss-user-setting-payment-radio-container-img"
+                                                                                        >
+                                                                                          {itemCheckbox.contents.map((itemContentCheckbox, indexContentCheckbox, arrContent) => {
+                                                                                            return <React.Fragment key={indexContentCheckbox}>
+                                                                                              <div style={{ width: arrContent.length > 1 ? `${(100 / arrContent.length) - 1}%` : '100%', padding: '5px' }}>
+                                                                                                <div className="ss-user-setting__item-bottom" style={{ flexWrap: 'nowrap' }}>
+                                                                                                  <InputCustom
+                                                                                                    style={{ width: '92%' }}
+                                                                                                    placeholder="File URL"
+                                                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'checkbox_img', indexCheckbox, 'contents', indexContentCheckbox, 'file_url')}
+                                                                                                    value={itemContentCheckbox.file_url}
+                                                                                                  />
+                                                                                                  <MDBIcon onClick={() => {
+                                                                                                    setIsOpenFileReference(true)
+                                                                                                    setVarFileReference({ indexContent, contentType: content.type, subContentType: 'checkbox_img', indexSubContentType: indexCheckbox, childSubContentType: 'contents', indexChildSubContentType: indexContentCheckbox, img: 'file_url' })
+                                                                                                  }}
+                                                                                                    fas icon="paperclip"
+                                                                                                    style={{ marginLeft: '10px', backgroundColor: '#fff', borderRadius: '50%', padding: '6px' }}
+                                                                                                  />
+                                                                                                </div>
+                                                                                                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                                                                                                  <InputDouble
+                                                                                                    placeholder={["text", "value"]}
+                                                                                                    valueLeft={itemContentCheckbox.text}
+                                                                                                    valueRight={itemContentCheckbox.value}
+                                                                                                    onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'checkbox_img', indexCheckbox, 'contents', indexContentCheckbox, name === 'left' ? 'text' : 'value')}
+                                                                                                  />
+                                                                                                </div>
+                                                                                              </div>
+                                                                                            </React.Fragment>
+                                                                                          })}
+                                                                                        </div>
+                                                                                        <div className="ss-user-setting-plus-minus-icon" style={{ display: 'flex', alignItems: 'center' }}>
+                                                                                          <div>
+                                                                                            {itemCheckbox.contents.length < 3 &&
+                                                                                              <div style={{ color: '#327AED' }}
+                                                                                                onClick={() => {
+                                                                                                  let arrMess = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].checkbox_img[indexCheckbox].contents];
+                                                                                                  let idMax;
+                                                                                                  if (arrMess.length !== 0) {
+                                                                                                    idMax = Math.max(...arrMess.map(item => item.id)) + 1;
+                                                                                                  } else {
+                                                                                                    idMax = 1;
+                                                                                                  }
+                                                                                                  dataMessages[indexMessageSelect].message_content[indexContent][content.type].checkbox_img[indexCheckbox].contents.push({
+                                                                                                    id: idMax
+                                                                                                  });
+                                                                                                  setDataMessages([...dataMessages]);
+                                                                                                }}
+                                                                                              >+</div>
+                                                                                            }
+                                                                                            {itemCheckbox.contents.length > 1 &&
+                                                                                              <div style={{ color: '#FA8464' }}
+                                                                                                onClick={() => {
+                                                                                                  dataMessages[indexMessageSelect].message_content[indexContent][content.type].checkbox_img[indexCheckbox].contents.pop();
+                                                                                                  setDataMessages([...dataMessages]);
+                                                                                                }}
+                                                                                              >-</div>
+                                                                                            }
+                                                                                          </div>
+                                                                                        </div>
+                                                                                        {array.length > 1 &&
+                                                                                          <div className="ss-user-setting-payment-radio-times-icons">
+                                                                                            <MDBIcon fas icon="times-circle"
+                                                                                              onClick={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)} />
+                                                                                          </div>
+                                                                                        }
+                                                                                      </React.Fragment>
+                                                                                    </div>
+                                                                                  }
                                                                                 </div>
                                                                               )}
                                                                             </Draggable>
@@ -6407,13 +6513,13 @@ const Scenario = () => {
                                                               value={attachingFile.require}
                                                             />
                                                           </div>
-                                                          <div className="ss-user-setting__item-text_input-use-api-required">
+                                                          {/* <div className="ss-user-setting__item-text_input-use-api-required">
                                                             <CheckboxCustom
                                                               label="Multiple file upload"
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'multifile_upload')}
                                                               value={attachingFile.multifile_upload}
                                                             />
-                                                          </div>
+                                                          </div> */}
                                                         </div>
                                                         <div className="ss-user-setting__item-bottom">
                                                           <SelectCustom
@@ -6547,7 +6653,7 @@ const Scenario = () => {
                                                             value={calendar.select_fixed_date ? moment(calendar.select_fixed_date) : null}
                                                             onChange={(date, dateString) => onChangeFixedDate(indexMessageSelect, indexContent, content.type, dateString, 'fixed_date')}
                                                             style={{ width: '88%' }}
-                                                            allowClear={false}
+                                                            allowClear={true}
                                                           />
                                                         </div>
                                                         <div className="ss-user-setting__item-bottom">
@@ -6591,7 +6697,7 @@ const Scenario = () => {
                                                               style={{ width: '99%' }}
                                                               value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
                                                               onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'date_selection_test')}
-                                                              disabledDate={(current) =>  handleDisableDateCalendar(current, calendar)}
+                                                              disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                                                             />
                                                           </div>
                                                         }
@@ -7501,20 +7607,20 @@ const Scenario = () => {
                                                           <div className="ss-user-setting__item-bottom">
                                                             <SelectCustom
                                                               style={{ width: '42%' }}
-                                                              value={pullDown?.[pullDown.type]?.prefecture}
+                                                              value={pullDown?.[pullDown.type]?.prefecture_test}
                                                               placeholder="Select prefecture"
                                                               data={dataPrefectures}
-                                                              keyValue="id"
+                                                              keyValue="name"
                                                               nameValue="name"
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'prefecture')}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'prefecture_test')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
                                                             <SelectCustom
                                                               style={{ width: '42%' }}
                                                               placeholder="Select city"
-                                                              value={pullDown?.[pullDown.type]?.city}
+                                                              value={pullDown?.[pullDown.type]?.city_test}
                                                               data={[]}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'city')}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'city_test')}
                                                             />
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom">
@@ -7624,7 +7730,15 @@ const Scenario = () => {
                                                           <div className="ss-user-setting__item-bottom" style={carousel[carousel.type]?.contents.length > 1 ? { marginBottom: '0px' } : {}}>
                                                             <div style={{ width: '90%' }}>
                                                               <Button style={{ margin: '0px', backgroundColor: '#327AED' }} onClick={() => {
+                                                                let arrCarousel = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type][carousel.type].contents];
+                                                                let idMax;
+                                                                if (arrCarousel.length !== 0) {
+                                                                  idMax = Math.max(...arrCarousel.map(item => item.id)) + 1;
+                                                                } else {
+                                                                  idMax = 1;
+                                                                }
                                                                 dataMessages[indexMessageSelect].message_content[indexContent][content.type][carousel.type].contents.push({
+                                                                  id: idMax,
                                                                   title: '',
                                                                   subtitle: '',
                                                                   urls: '',
@@ -8352,6 +8466,18 @@ const Scenario = () => {
                                                                                         value={itemProduct.item_price}
                                                                                         onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'item_price')}
                                                                                       />
+                                                                                    </div>
+                                                                                    <div className="ss-user-setting-product-purchase-sub-infor">
+                                                                                      {productPurchaseRadioButton.price_display &&
+                                                                                        <div style={{ width: '50%' }}>
+                                                                                          <InputCustom
+                                                                                            className="ss-mg-bottom-5"
+                                                                                            label="Price display contents (customized)"
+                                                                                            value={itemProduct.price_display_custom}
+                                                                                            onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')}
+                                                                                          />
+                                                                                        </div>
+                                                                                      }
                                                                                     </div>
                                                                                     {array.length > 1 &&
                                                                                       <div className="ss-user-setting-product-purchase-times-icons">
@@ -9278,11 +9404,14 @@ const Scenario = () => {
       <ModalShort open={isOpenFileReference} onClose={() => setIsOpenFileReference(false)}>
         <div className="ss-popup-file-reference-scenario">
           <FileReferencePopup
-            onCancel={() => setIsOpenFileReference(false)}
+            onCancel={() => {
+              setIsOpenFileReference(false)
+              setAcceptFile();
+            }}
+            acceptFile={acceptFile}
             onReferFile={(file_url) => {
               if (dataMessages[indexMessageSelect].belong_to === 'user') {
                 if (varFileReference.indexChildSubContentType !== undefined) {
-                  console.log(varFileReference, 'checkkkkk varFileReference.indexChildSubContentType')
                   onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, file_url, varFileReference.subContentType, varFileReference.indexSubContentType, varFileReference.childSubContentType, varFileReference.indexChildSubContentType, varFileReference.img);
                 } else if (varFileReference.childSubContentType !== undefined) {
                   onChangeValueMessageContent(indexMessageSelect, varFileReference.indexContent, varFileReference.contentType, file_url, varFileReference.subContentType, varFileReference.childSubContentType, varFileReference.indexSubContent, varFileReference.img);
@@ -9303,3 +9432,4 @@ const Scenario = () => {
 };
 
 export default Scenario;
+

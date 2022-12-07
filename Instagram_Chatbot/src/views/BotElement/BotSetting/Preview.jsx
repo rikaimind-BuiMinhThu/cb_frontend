@@ -6,10 +6,10 @@ import { MDBIcon } from 'mdbreact';
 import SelectCustom from './ScenarioSetting/scenarioComon/SelectCustom';
 import CheckboxCustom from './ScenarioSetting/scenarioComon/CheckboxCustom';
 import InputCustom from './ScenarioSetting/scenarioComon/InputCustom';
-import DatePicker from 'react-datepicker';
 import {
   Button
 } from 'reactstrap';
+import ModalNoti from '../../../views/Popup/ModalNoti';
 import { Checkbox, Radio, Slider, Calendar } from 'antd';
 import moment from 'moment';
 import cvcIcon from '../../../assets/img/cvc-icon.png';
@@ -24,23 +24,40 @@ import discover from '../../../assets/img/payment-method/discover.png';
 import jcb from '../../../assets/img/payment-method/jcb.png';
 import master_card from '../../../assets/img/payment-method/master_card.png';
 import visa from '../../../assets/img/payment-method/visa.png';
+import {
+  SHORTEN_URL
+} from '../../../variables/constants';
 
 const _ = require('lodash');
 
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
-  dataHourFixed.push({
-    key: i + '',
-    value: i + ''
-  });
+  if (i < 10) {
+    dataHourFixed.push({
+      key: `0${i}` + '',
+      value: `0${i}` + ''
+    });
+  } else {
+    dataHourFixed.push({
+      key: i + '',
+      value: i + ''
+    });
+  }
 }
 
 let dataMinutes = [];
 for (let i = 0; i <= 59; i++) {
-  dataMinutes.push({
-    key: i + '',
-    value: i + ''
-  });
+  if (i < 10) {
+    dataMinutes.push({
+      key: `0${i}` + '',
+      value: `0${i}` + ''
+    });
+  } else {
+    dataMinutes.push({
+      key: i + '',
+      value: i + ''
+    });
+  }
 }
 
 let dataYearFixed = [];
@@ -53,18 +70,32 @@ for (let i = 1935; i <= 2072; i++) {
 
 let dataMonth = [];
 for (let i = 1; i <= 12; i++) {
-  dataMonth.push({
-    key: i + '',
-    value: i + ''
-  });
+  if (i < 10) {
+    dataMonth.push({
+      key: `0${i}` + '',
+      value: `0${i}` + ''
+    });
+  } else {
+    dataMonth.push({
+      key: i + '',
+      value: i + ''
+    });
+  }
 }
 
 let dataDay = [];
 for (let i = 1; i <= 31; i++) {
-  dataDay.push({
-    key: i + '',
-    value: i + ''
-  });
+  if (i < 10) {
+    dataDay.push({
+      key: `0${i}` + '',
+      value: `0${i}` + ''
+    });
+  } else {
+    dataDay.push({
+      key: i + '',
+      value: i + ''
+    });
+  }
 }
 
 let dataEveryMinute = [
@@ -328,6 +359,11 @@ function Preview({ onOpenPreview, isOpen }) {
                   }
                   setIndexMessageRender(i);
                   index = i;
+                } else if (messageArr[i]?.message_content[0]?.type === 'pause') {
+                  // console.log(dataVariables, 'checkkkk variables')                
+                  setIndexMessageRender(i);
+                  index = i;
+                  break;
                 } else if (messageArr[i].belong_to !== 'bot') {
                   await new Promise((resolve) => {
                     return delayRender = setTimeout(() => {
@@ -585,15 +621,15 @@ function Preview({ onOpenPreview, isOpen }) {
             || stringNullOrEmpty(contentType[contentType.type].valueMonth)
             || stringNullOrEmpty(contentType[contentType.type].valueDay)
             || stringNullOrEmpty(contentType[contentType.type].valueHour)
-            || stringNullOrEmpty(contentType[contentType.type].valueMinutes)) {
+            || stringNullOrEmpty(contentType[contentType.type].valueMinute)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'timezone_from_to') {
           if (stringNullOrEmpty(contentType[contentType.type].valueHour1)
-            || stringNullOrEmpty(contentType[contentType.type].valueMinutes1)
+            || stringNullOrEmpty(contentType[contentType.type].valueMinute1)
             || stringNullOrEmpty(contentType[contentType.type].valueHour2)
-            || stringNullOrEmpty(contentType[contentType.type].valueMinutes2)) {
+            || stringNullOrEmpty(contentType[contentType.type].valueMinute2)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
@@ -614,7 +650,7 @@ function Preview({ onOpenPreview, isOpen }) {
             isValid = false;
           }
         } else if (contentArr[i].type === 'attaching_file') {
-          if (stringNullOrEmpty(contentType.content)) {
+          if (stringNullOrEmpty(contentType.value)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
@@ -647,6 +683,11 @@ function Preview({ onOpenPreview, isOpen }) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select from ${contentType.selection_limit_from || 0} to ${contentType.selection_limit_to} for this item.`;
             isValid = false;
           }
+        } else if (contentArr[i].type === 'carousel') {
+          if (stringNullOrEmpty(contentType.initial_selection)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
         } else if (contentArr[i].type === 'capture') {
           console.log(contentArr[i].type, contentType, 'chechkkkkk');
           if (stringNullOrEmpty(contentType.value)) {
@@ -654,23 +695,6 @@ function Preview({ onOpenPreview, isOpen }) {
             isValid = false;
           } else if (captcha.filter(item => item.index === indexMessageRender && item.indexContent === i)?.[0]?.text.toLowerCase() !== contentType.value.toLowerCase()) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Wrong authorization code";
-            isValid = false;
-          }
-        } else if (contentArr[i].type === 'credit_card_payment') {
-          if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
-            || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
-            || (contentType.separate_type === true && (stringNullOrEmpty(contentType.card_number1) || stringNullOrEmpty(contentType.card_number2) || stringNullOrEmpty(contentType.card_number3) || stringNullOrEmpty(contentType.card_number4)))
-            || (contentType.separate_type === false && stringNullOrEmpty(contentType.card_number))
-            || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
-            || (stringNullOrEmpty(contentType.year))
-            || (stringNullOrEmpty(contentType.month))
-          ) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
-            isValid = false;
-          } else if ((contentType.card_number && (contentType.card_number + "").length !== 16) ||
-            ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
-              ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Credit card number is invalid.";
             isValid = false;
           }
         } else if (contentArr[i].type === 'product_purchase') {
@@ -720,10 +744,116 @@ function Preview({ onOpenPreview, isOpen }) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
             isValid = false;
           }
-        }
-        if (contentArr[i].type === 'checkbox') {
+        } else if (contentArr[i].type === 'credit_card_payment') {
+          if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
+            || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
+            || (contentType.separate_type === true && (stringNullOrEmpty(contentType.card_number1) || stringNullOrEmpty(contentType.card_number2) || stringNullOrEmpty(contentType.card_number3) || stringNullOrEmpty(contentType.card_number4)))
+            || (contentType.separate_type === false && stringNullOrEmpty(contentType.card_number))
+            || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
+            || (stringNullOrEmpty(contentType.year))
+            || (stringNullOrEmpty(contentType.month))
+          ) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          } else if ((contentType.card_number && (contentType.card_number + "").length !== 16) ||
+            ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
+              ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Credit card number is invalid.";
+            isValid = false;
+          }
+        } else if (contentArr[i].type === 'checkbox') {
           if (contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select not over ${contentType.selection_limit_to} items.`;
+            isValid = false;
+          }
+        } else if (contentType.type === 'customization') {
+          if (contentType[contentType.type].is_comment) {
+            if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+              isValid = false;
+            }
+          } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'time_hm') {
+          if ((!stringNullOrEmpty(contentType[contentType.type].valueHour) || !stringNullOrEmpty(contentType[contentType.type].valueMinute))
+            && (stringNullOrEmpty(contentType[contentType.type].valueMinute) || stringNullOrEmpty(contentType[contentType.type].valueHour))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'date_ymd'
+          || contentType.type === 'dob_ymd') {
+          if ((!stringNullOrEmpty(contentType[contentType.type].valueYear)
+            || !stringNullOrEmpty(contentType[contentType.type].valueMonth)
+            || !stringNullOrEmpty(contentType[contentType.type].valueDay))
+            && (stringNullOrEmpty(contentType[contentType.type].valueYear)
+              || stringNullOrEmpty(contentType[contentType.type].valueMonth)
+              || stringNullOrEmpty(contentType[contentType.type].valueDay))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'date_md') {
+          if ((!stringNullOrEmpty(contentType[contentType.type].valueMonth) || !stringNullOrEmpty(contentType[contentType.type].valueDay))
+            && (stringNullOrEmpty(contentType[contentType.type].valueMonth) || stringNullOrEmpty(contentType[contentType.type].valueDay))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'date_ym'
+          || contentType.type === 'dob_ym') {
+          if ((!stringNullOrEmpty(contentType[contentType.type].valueYear) || !stringNullOrEmpty(contentType[contentType.type].valueMonth))
+            && (stringNullOrEmpty(contentType[contentType.type].valueYear) || stringNullOrEmpty(contentType[contentType.type].valueMonth))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'date_ymd_hm') {
+          if ((!stringNullOrEmpty(contentType[contentType.type].valueYear)
+            || !stringNullOrEmpty(contentType[contentType.type].valueMonth)
+            || !stringNullOrEmpty(contentType[contentType.type].valueDay)
+            || !stringNullOrEmpty(contentType[contentType.type].valueHour)
+            || !stringNullOrEmpty(contentType[contentType.type].valueMinute))
+            && (stringNullOrEmpty(contentType[contentType.type].valueYear)
+              || stringNullOrEmpty(contentType[contentType.type].valueMonth)
+              || stringNullOrEmpty(contentType[contentType.type].valueDay)
+              || stringNullOrEmpty(contentType[contentType.type].valueHour)
+              || stringNullOrEmpty(contentType[contentType.type].valueMinute))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'timezone_from_to') {
+          if ((!stringNullOrEmpty(contentType[contentType.type].valueHour1)
+            || !stringNullOrEmpty(contentType[contentType.type].valueMinute1)
+            || !stringNullOrEmpty(contentType[contentType.type].valueHour2)
+            || !stringNullOrEmpty(contentType[contentType.type].valueMinute2))
+            && (stringNullOrEmpty(contentType[contentType.type].valueHour1)
+              || stringNullOrEmpty(contentType[contentType.type].valueMinute1)
+              || stringNullOrEmpty(contentType[contentType.type].valueHour2)
+              || stringNullOrEmpty(contentType[contentType.type].valueMinute2))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'period_from_to') {
+          if ((!stringNullOrEmpty(contentType[contentType.type].valueYear1)
+            || !stringNullOrEmpty(contentType[contentType.type].valueMonth1)
+            || !stringNullOrEmpty(contentType[contentType.type].valueDay1)
+            || !stringNullOrEmpty(contentType[contentType.type].valueYear2)
+            || !stringNullOrEmpty(contentType[contentType.type].valueMonth2)
+            || !stringNullOrEmpty(contentType[contentType.type].valueDay2))
+            && (stringNullOrEmpty(contentType[contentType.type].valueYear1)
+              || stringNullOrEmpty(contentType[contentType.type].valueMonth1)
+              || stringNullOrEmpty(contentType[contentType.type].valueDay1)
+              || stringNullOrEmpty(contentType[contentType.type].valueYear2)
+              || stringNullOrEmpty(contentType[contentType.type].valueMonth2)
+              || stringNullOrEmpty(contentType[contentType.type].valueDay2))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === 'up_to_municipality') {
+          if ((!stringNullOrEmpty(contentType[contentType.type].prefecture)
+            || !stringNullOrEmpty(contentType[contentType.type].city))
+            && (stringNullOrEmpty(contentType[contentType.type].prefecture)
+              || stringNullOrEmpty(contentType[contentType.type].city))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         }
@@ -797,7 +927,7 @@ function Preview({ onOpenPreview, isOpen }) {
           isValid = false;
         }
       }
-      let REGEX_PASSWORD = /[A-Za-z0-9 ]+/;
+      let REGEX_PASSWORD = /^[A-Za-z0-9 ]+$/;
       if (contentType.type === 'password' && !stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
         errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.`;
         isValid = false;
@@ -1071,6 +1201,11 @@ function Preview({ onOpenPreview, isOpen }) {
               }
               setIndexMessageRender(i);
               index = i;
+            } else if (dataMessages[i]?.message_content[0]?.type === 'pause') {
+              // console.log(dataVariables, 'checkkkk variables')                
+              setIndexMessageRender(i);
+              index = i;
+              break;
             } else {
               await new Promise((resolve) => {
                 return delayRender = setTimeout(() => {
@@ -1269,6 +1404,11 @@ function Preview({ onOpenPreview, isOpen }) {
                 }
                 setIndexMessageRender(i);
                 index = i;
+              } else if (dataMessages[i]?.message_content[0]?.type === 'pause') {
+                // console.log(dataVariables, 'checkkkk variables')                
+                setIndexMessageRender(i);
+                index = i;
+                break;
               } else {
                 await new Promise((resolve) => {
                   return delayRender = setTimeout(() => {
@@ -1348,6 +1488,14 @@ function Preview({ onOpenPreview, isOpen }) {
               return dataContentType[dataContentType.type].find(item => itemChecked === item.id).text;
             })
             item.default_value = dataTextChecked.join(',') || item.default_value;
+          } else if (contentType === 'pull_down') {
+            if (field === 'customization' || field === 'prefectures') {
+              item.default_value = value;
+            } else if (field === 'up_to_municipality') {
+              item.default_value = `${dataContentType[field].prefecture}${dataContentType[field].city}`
+            } else {
+              item.default_value = `${(dataContentType[field]?.valueYear || dataContentType[field]?.valueMonth || dataContentType[field]?.valueDay) ? `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}-${dataContentType[field]?.valueDay}` : ""} ${(dataContentType[field]?.valueHour || dataContentType[field]?.valueMinute) ? `${dataContentType[field]?.valueHour}:${dataContentType[field]?.valueMinute}` : ""}`;
+            }
           } else {
             item.default_value = value;
           }
@@ -1411,10 +1559,13 @@ function Preview({ onOpenPreview, isOpen }) {
                             onClickNext={() => onClickNext(indexMessage)}
                             indexMessage={indexMessage}
                             errorsProps={errors}
-                            displayButtonNext={(value) => setIsDisplayButtonNext(value)}
+                            displayButtonNext={(value) => {
+                              dataMessages[indexMessage].is_display_button_next = value;
+                              setDataMessages([...dataMessages]);
+                            }}
                           />
-                          {(message?.message_content.length !== 1 || (message?.message_content[0].type !== 'card_payment_radio_button' && message?.message_content[0].type !== 'product_purchase_radio_button') || (message?.message_content[0]?.[message?.message_content[0].type].type !== "picture_radio" ? (message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting && message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting === message?.message_content[0]?.[message?.message_content[0].type]?.initial_selection) : (message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting_picture && message?.message_content[0]?.[message?.message_content[0].type]?.card_linked_setting_picture === message?.message_content[0]?.[message?.message_content[0].type]?.initial_selection_picture))) &&
-                            <div className="ss-user-message__action-wrapper">
+                          {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
+                            && <div className="ss-user-message__action-wrapper">
                               <Button disabled={message.disabled} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
                                 {message.buttonName || "To the next"}
                               </Button>
@@ -1461,25 +1612,40 @@ const BotMessage = ({ content, index, botInfor }) => {
           <React.Fragment>
             {/* bot: type == 'text_input' */}
             {content.type === 'text_input' && (
-              <textarea
+              <div
                 className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                value={content[content.type]?.content || ''}
-                // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
-                readOnly
-              ></textarea>
+                style={{ overflowWrap: 'break-word', backgroundColor: 'white', height: 'auto', overflowY: 'hidden' }}
+              // value={content[content.type]?.content || ''}
+              // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
+              >
+                {content[content.type]?.content || ''}
+              </div>
             )}
             {content.type === 'file' && (
               content[content.type]?.content ? (
                 <React.Fragment>
-                  {(content[content.type]?.content.includes('jpeg') || content[content.type]?.content.includes('png') || content[content.type]?.content.includes('jpg')) ?
+                  {(content[content.type]?.content.includes('jpeg') || content[content.type]?.content.includes('png') || content[content.type]?.content.includes('jpg')) &&
                     <img
                       src={content[content.type]?.content}
                       alt=""
-                      style={{ width: '50%', marginLeft: '8px' }} /> :
+                      style={{ width: '50%', marginLeft: '8px' }} />
+                  }
+                  {content[content.type]?.content.includes('pdf') &&
                     <span
                       style={{ color: '#089BE5', fontSize: '17px', display: 'block', height: '50px', cursor: 'pointer' }}
                       onClick={() => handleDownloadFile(content[content.type]?.content)}
-                    >Download this file</span>}
+                    >Download this file</span>
+                  }
+                  {content[content.type]?.content.includes('mp4') &&
+                    <div>
+                      <video
+                        style={{ width: '100%', height: '100%', borderRadius: '5px' }}
+                        src={content[content.type]?.content}
+                        autoPlay
+                        controls
+                      />
+                    </div>
+                  }
                 </React.Fragment>
               ) :
                 <textarea
@@ -1489,7 +1655,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                 ></textarea>
             )}
             {content.type === 'delay' && (
-              <img src={messageTypingGif} style={{ backgroundColor: '#EBF7FF', height: '40px' }} />
+              <img src={messageTypingGif} style={{ backgroundColor: '#EBF7FF', height: '40px', borderRadius: '10px' }} />
             )}
           </React.Fragment>}
       </div>
@@ -1506,6 +1672,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
   const [checked, setChecked] = useState([]);
+  const [bot_id, setBotId] = useState(Cookies.get('bot_id'));
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [messageNoti, setMessageNoti] = useState('');
 
   function loadCaptcha(indexContent) {
     console.log('load captcha');
@@ -1513,6 +1682,23 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
     if (document.getElementById(`captcha-${indexMessage}-${indexContent}`) && captcha.length !== 0)
       document.getElementById(`captcha-${indexMessage}-${indexContent}`).innerHTML = captcha.filter(item => item.index === indexMessage && item.indexContent === indexContent)?.[0]?.data || "";
   }
+
+  useEffect(() => {
+    if (messageContent.length === 1) {
+      let message = messageContent[0];
+      if (message.type === 'card_payment_radio_button'
+        || message.type === 'product_purchase_radio_button'
+        || (message?.[message.type].type === "picture_radio" ? (message?.[message.type]?.card_linked_setting || message?.[message.type]?.card_linked_setting === message?.[message.type]?.initial_selection)
+          : (message?.[message.type]?.card_linked_setting_picture && message?.[message.type]?.card_linked_setting_picture === message?.[message.type]?.initial_selection_picture))
+        || (message.type === 'carousel' && message?.[message.type].require)) {
+        displayButtonNext(false);
+      } else {
+        displayButtonNext(true);
+      }
+    } else {
+      displayButtonNext(true);
+    }
+  }, [])
 
   useEffect(() => {
     setErrors(errorsProps);
@@ -1526,10 +1712,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
     api.get(`/api/v1/prefectures`).then((res) => {
       setDataPrefectures(res.data.data);
     }).catch((error) => { console.error(error) });
-  }, [])
-
-  useEffect(() => {
-
   }, [])
 
   useEffect(() => {
@@ -1618,14 +1800,18 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   }
 
   function botUploadFile() {
-    document.getElementById('ss-bot-file-upload').click();
+    document.getElementById('ss-bot-file-upload-preview').click();
   }
 
   function getBaseUrl(event, indexContent) {
-    var file = document.querySelector('input[type=file]')['files'][0];
+    var file = event.target.files[0];
     const type = file.name.slice(file.name.lastIndexOf('.') + 1);
     if (messageContent[indexContent].attaching_file.file_type.length > 0 && !messageContent[indexContent].attaching_file.file_type.includes(type)) {
       errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = `Please specify a ${messageContent[indexContent].attaching_file.file_type.join(", ")} type file for the file.`;
+      setErrors({ ...errors });
+      return;
+    } else if (file.size / 1024 / 1024 > 2) {
+      errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = "You need to upload file which size under 2MB.";
       setErrors({ ...errors });
       return;
     } else {
@@ -1636,7 +1822,10 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
     // var reader = new FileReader(file);
 
     // messageContent[indexContent].attaching_file.value = file.name;
+    let urlFile = URL.createObjectURL(file);
+    console.log(urlFile, 'checkkkk');
     onChangeValue(indexContent, 'attaching_file', file.name, "value");
+    onChangeValue(indexContent, 'attaching_file', urlFile, "linkFile");
     // var baseString;
     // var imgUrl = URL.createObjectURL(event.target.files[0]);
     // if (
@@ -1672,7 +1861,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
       || calendar?.fixed_date?.length !== 0 || calendar?.non_select_date_time?.length !== 0
       || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to
       || calendar.end_date_select) {
-      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD')
+      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD').add(1, 'days')
         || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
         || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_select, 'YYYY/MM/DD'))
         || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
@@ -1715,7 +1904,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
       || calendar.start_date_select || calendar.specified_period_from
       || calendar.specified_period_to || calendar.aggregation_target_period_from
       || calendar.aggregation_target_period_to) {
-      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD')
+      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD').add(1, 'days')
         || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
         || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') < moment(calendar.start_date_select, 'YYYY/MM/DD'))
         || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
@@ -1751,6 +1940,36 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
           }
         }))
     }
+  }
+
+  const handleClickCarousel = (urls, use_shortened_urls) => {
+    let data = {
+      history_click_url: {
+        origin_url: urls
+      }
+    }
+    api.post(`/api/v1/managements/history_click_urls?chatbot_id=${bot_id}`, data).then((response) => {
+      console.log(response);
+      if (response.data.code === 1) {
+        let message = response.data.message;
+        let link = document.createElement('a');
+        link.href = use_shortened_urls ? (SHORTEN_URL + message.shorten_code) : message.origin_url;
+        link.target = "_blank";
+        link.click();
+      } else if (response.data.code === 2) {
+        setMessageNoti(response.data.message[0]);
+        setIsOpenNoti(true);
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMessageNoti(``);
+        }, 2000);
+      }
+    }).catch((error) => {
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired();
+      }
+    })
   }
 
   return (
@@ -2454,8 +2673,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               data={dataMinutes}
                               placeholder="Minutes"
                               style={{ width: '32%' }}
-                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinutes')}
-                              value={pullDown[pullDown.type].valueMinutes}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinute')}
+                              value={pullDown[pullDown.type].valueMinute}
                             />
                             <div
                               className="ss-message__content--user-pull_down-comment"
@@ -2484,8 +2703,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               data={dataMinutes}
                               placeholder="Minutes"
                               style={{ width: '49%' }}
-                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinutes1')}
-                              value={pullDown[pullDown.type].valueMinutes1}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinute1')}
+                              value={pullDown[pullDown.type].valueMinute1}
                             />
                           </div>
                           <div style={{ textAlign: 'center' }}>~</div>
@@ -2503,8 +2722,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               data={dataMinutes}
                               placeholder="Minutes"
                               style={{ width: '49%' }}
-                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinutes2')}
-                              value={pullDown[pullDown.type].valueMinutes2}
+                              onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinute2')}
+                              value={pullDown[pullDown.type].valueMinute2}
                             />
                           </div>
                           <div
@@ -2604,7 +2823,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             data={dataPrefectures}
                             placeholder="Select prefecture"
                             style={{ width: '45%' }}
-                            keyValue="id"
+                            keyValue="name"
                             nameValue="name"
                             onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'prefecture')}
                             value={pullDown[pullDown.type].prefecture}
@@ -2615,7 +2834,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             data={dataCity}
                             placeholder="Select city"
                             style={{ width: '45%' }}
-                            keyValue="id"
+                            keyValue="name"
                             nameValue="name"
                             onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'city')}
                             value={pullDown[pullDown.type].city}
@@ -2764,17 +2983,20 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   <div className="ss-message__content--user-attaching_file">
                     <div style={{ position: 'relative' }}>
                       <InputCustom
-                        value={attachingFile.value}
+                        value={attachingFile.value || "Not selected"}
                         disabled={true}
                       />
                       <MDBIcon fas icon="times-circle"
-                        className="ss-message-custom-icon-times"
-                        style={{ position: 'absolute', top: '23%', right: '2%', fontSize: '20px', cursor: 'pointer' }}
-                        onClick={() => onChangeValue(indexContent, content.type, "", 'value')} />
+                        className={`ss-message-custom-icon-times ${disabled && "ss-message-custom-icon-times-disabled"}`}
+                        onClick={() => {
+                          if (!disabled) {
+                            onChangeValue(indexContent, content.type, "", 'value');
+                          }
+                        }} />
                     </div>
                     <input
                       type="file"
-                      id="ss-bot-file-upload"
+                      id="ss-bot-file-upload-preview"
                       name="bot-file-upload"
                       hidden
                       onChange={(e) => getBaseUrl(e, indexContent)}
@@ -2935,15 +3157,14 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
             {
               content.type === 'carousel' && (
                 <div style={{ marginBottom: '10px' }}>
-                  {(carousel.title_require || carousel.isCheckRequire) &&
+                  {(carousel.title_require || carousel.require) &&
                     <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
                       {carousel.title_require &&
                         <span className="ss-message__content--user-pull_down-title">
                           {carousel.title}
                         </span>
                       }
-                      {(carousel.isCheckRequire === 'all_items_require' ||
-                        carousel.isCheckRequire === 'require') &&
+                      {carousel.require &&
                         <span className="ss-message__content--user-text-input-required">
                           * required
                         </span>
@@ -2954,8 +3175,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {carousel.type === 'default' && (
                     <div className="sp-carousel-container-preivew">
                       {carousel[carousel.type].contents && carousel[carousel.type].contents.map((itemCarousel, indexCarousel) => {
+                        console.log(itemCarousel);
                         return <div className="sp-carousel-container-block-item" key={indexCarousel}>
-                          <div className="sp-carousel-container-block-item-infor">
+                          <div className="sp-carousel-container-block-item-infor" onClick={() => handleClickCarousel(itemCarousel.urls, carousel.use_shortened_urls)}>
                             <div className="sp-carousel-preview-img">
                               <img src={itemCarousel.fileUrl} style={{ width: '100%' }} />
                             </div>
@@ -2966,13 +3188,25 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               {itemCarousel.subtitle}
                             </div>
                           </div>
-                          <a className="sp-carousel-preview-button" href={itemCarousel.urls} target="_blank">
+                          <div className="sp-carousel-preview-button" style={carousel.initial_selection === itemCarousel.id ? { backgroundColor: 'white' } : (disabled ? { backgroundColor: '#B2B0AE' } : {})} onClick={() => {
+                            if (carousel.initial_selection !== itemCarousel.id && !disabled) {
+                              onChangeValue(indexContent, content.type, itemCarousel.id, 'initial_selection');
+                              if (carousel.require) {
+                                onClickNext();
+                              }
+                            }
+                          }}>
                             {itemCarousel.buttonTitle || "Select"}
-                          </a>
+                          </div>
                         </div>
                       })}
                     </div>
                   )}
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                    <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                    </div>
+                  }
                 </div>
               )
             }
@@ -2994,13 +3228,15 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                     </div>
                   }
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    {creditCardPayment.payment_method.map((itemPayment, index, array) => {
-                      return <div key={index} style={{width: `${100/array.length - 3}%`}} className="ss-img-list-bank">
-                        {dataPaymentMethod.find(item => item.key === itemPayment).value}
-                      </div>
-                    })}
-                  </div>
+                  {creditCardPayment.payment_method.length > 0 &&
+                    <div style={{ display: 'flex', justifyContent: 'flex-start', margin: '5px 0px' }}>
+                      {creditCardPayment.payment_method.map((itemPayment, index) => {
+                        return <div key={index} style={{ width: `${15.6667}%`, marginRight: '1%' }} className="ss-img-list-bank">
+                          {dataPaymentMethod.find(item => item.key === itemPayment).value}
+                        </div>
+                      })}
+                    </div>
+                  }
                   {creditCardPayment.separate_type === false ?
                     <div className="ss-user-setting__item-bottom">
                       <InputNum
@@ -3008,7 +3244,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         className="ss-user-setting-input-limit-character"
                         label="Card number"
                         controls={false}
-                        max={9999999999999999}
+                        max={Number.MAX_SAFE_INTEGER}
+                        maxLength={16}
                         disabled={disabled}
                         style={{ width: '100%', marginLeft: '0px' }}
                         value={creditCardPayment.card_number}
@@ -3024,36 +3261,61 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           controls={false}
                           style={{ marginLeft: '0px' }}
                           disabled={disabled}
+                          maxLength={4}
                           className="ss-user-setting-input-limit-character"
                           value={creditCardPayment.card_number1}
                           placeholder={creditCardPayment.card_number_placeholder1}
-                          onChange={value => onChangeValue(indexContent, content.type, value, 'card_number1')}
+                          onChange={value => {
+                            if ((value + "").length === 4) {
+                              document.getElementById('ss-user-card-number-radio-input2').focus();
+                              document.getElementById('ss-user-card-number-radio-input2').select();
+                            }
+                            onChangeValue(indexContent, content.type, value, 'card_number1')
+                          }}
                         />
                         <InputNum
                           max={9999}
+                          id="ss-user-card-number-radio-input2"
                           controls={false}
                           style={{ marginLeft: '7px' }}
                           disabled={disabled}
+                          maxLength={4}
                           className="ss-user-setting-input-limit-character"
                           value={creditCardPayment.card_number2}
                           placeholder={creditCardPayment.card_number_placeholder2}
-                          onChange={value => onChangeValue(indexContent, content.type, value, 'card_number2')}
+                          onChange={value => {
+                            if ((value + "").length === 4) {
+                              document.getElementById('ss-user-card-number-radio-input3').focus();
+                              document.getElementById('ss-user-card-number-radio-input3').select();
+                            }
+                            onChangeValue(indexContent, content.type, value, 'card_number2')
+                          }}
                         />
                         <InputNum
+                          id="ss-user-card-number-radio-input3"
                           max={9999}
                           controls={false}
                           style={{ marginLeft: '7px' }}
                           disabled={disabled}
+                          maxLength={4}
                           className="ss-user-setting-input-limit-character"
                           value={creditCardPayment.card_number3}
                           placeholder={creditCardPayment.card_number_placeholder3}
-                          onChange={value => onChangeValue(indexContent, content.type, value, 'card_number3')}
+                          onChange={value => {
+                            if ((value + "").length === 4) {
+                              document.getElementById('ss-user-card-number-radio-input4').focus();
+                              document.getElementById('ss-user-card-number-radio-input4').select();
+                            }
+                            onChangeValue(indexContent, content.type, value, 'card_number3')
+                          }}
                         />
                         <InputNum
+                          id="ss-user-card-number-radio-input4"
                           max={9999}
                           controls={false}
                           style={{ marginLeft: '7px' }}
                           disabled={disabled}
+                          maxLength={4}
                           className="ss-user-setting-input-limit-character"
                           value={creditCardPayment.card_number4}
                           placeholder={creditCardPayment.card_number_placeholder4}
@@ -3124,6 +3386,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         style={{ marginLeft: '0px', width: '33%' }}
                         className="ss-user-setting-input-limit-character"
                         max={9999}
+                        maxLength={4}
                         disabled={disabled}
                         controls={false}
                         label={<span style={{ fontWeight: '400' }}>CVC <img style={{ width: '8%' }} src={cvcIcon} /></span>}
@@ -3801,45 +4064,98 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {console.log(cardPaymentRadioButton.card_linked_setting, cardPaymentRadioButton.initial_selection, cardPaymentRadioButton.card_linked_setting_picture, cardPaymentRadioButton.initial_selection_picture)}
                   {(cardPaymentRadioButton.type !== "picture_radio" ? (cardPaymentRadioButton.card_linked_setting && cardPaymentRadioButton.card_linked_setting === cardPaymentRadioButton.initial_selection) : (cardPaymentRadioButton.card_linked_setting_picture && cardPaymentRadioButton.card_linked_setting_picture === cardPaymentRadioButton.initial_selection_picture)) &&
                     <React.Fragment>
+                      {cardPaymentRadioButton.payment_method.length !== 0 &&
+                        <div style={{ display: 'flex', justifyContent: 'flex-start', margin: '5px 0px' }}>
+                          {cardPaymentRadioButton.payment_method.map((itemPayment, index) => {
+                            return <div key={index} style={{ width: `${15.6667}%`, marginRight: '1%' }} className="ss-img-list-bank">
+                              {dataPaymentMethod.find(item => item.key === itemPayment).value}
+                            </div>
+                          })}
+                        </div>
+                      }
                       {cardPaymentRadioButton.separate_type === false ?
                         <div className="ss-user-setting__item-bottom">
-                          <InputCustom
-                            className="ss-user-setting-input-overview"
+                          <InputNum
                             styleLabel={{ width: '100%' }}
+                            className="ss-user-setting-input-limit-character"
                             label="Card number"
-                            inline={false}
-                            value={cardPaymentRadioButton.card_number}
-                            onChange={value => onChangeValue(indexContent, content.type, value, 'card_number')}
+                            controls={false}
+                            max={Number.MAX_SAFE_INTEGER}
+                            maxLength={16}
                             disabled={disabled}
+                            style={{ width: '100%', marginLeft: '0px' }}
+                            value={cardPaymentRadioButton.card_number}
                             placeholder={cardPaymentRadioButton.card_number_placeholder}
+                            onChange={value => onChangeValue(indexContent, content.type, value, 'card_number')}
                           />
                         </div> :
                         <div className="ss-user-setting__item-bottom">
                           <div style={{ width: '100%' }}>Card number</div>
                           <div style={{ width: '100%' }} className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type">
-                            <InputCustom
+                            <InputNum
+                              max={9999}
+                              controls={false}
+                              style={{ marginLeft: '0px' }}
                               disabled={disabled}
+                              maxLength={4}
+                              className="ss-user-setting-input-limit-character"
                               value={cardPaymentRadioButton.card_number1}
-                              onChange={value => onChangeValue(indexContent, content.type, value, 'card_number1')}
                               placeholder={cardPaymentRadioButton.card_number_placeholder1}
+                              onChange={value => {
+                                if ((value + "").length === 4) {
+                                  document.getElementById('ss-user-card-number-radio-input2').focus();
+                                  document.getElementById('ss-user-card-number-radio-input2').select();
+                                }
+                                onChangeValue(indexContent, content.type, value, 'card_number1')
+                              }}
                             />
-                            <InputCustom
+                            <InputNum
+                              max={9999}
+                              id="ss-user-card-number-radio-input2"
+                              controls={false}
+                              style={{ marginLeft: '7px' }}
+                              disabled={disabled}
+                              maxLength={4}
+                              className="ss-user-setting-input-limit-character"
                               value={cardPaymentRadioButton.card_number2}
-                              onChange={value => onChangeValue(indexContent, content.type, value, 'card_number2')}
-                              disabled={disabled}
                               placeholder={cardPaymentRadioButton.card_number_placeholder2}
+                              onChange={value => {
+                                if ((value + "").length === 4) {
+                                  document.getElementById('ss-user-card-number-radio-input3').focus();
+                                  document.getElementById('ss-user-card-number-radio-input3').select();
+                                }
+                                onChangeValue(indexContent, content.type, value, 'card_number2')
+                              }}
                             />
-                            <InputCustom
+                            <InputNum
+                              id="ss-user-card-number-radio-input3"
+                              max={9999}
+                              controls={false}
+                              style={{ marginLeft: '7px' }}
+                              disabled={disabled}
+                              maxLength={4}
+                              className="ss-user-setting-input-limit-character"
                               value={cardPaymentRadioButton.card_number3}
-                              onChange={value => onChangeValue(indexContent, content.type, value, 'card_number3')}
-                              disabled={disabled}
                               placeholder={cardPaymentRadioButton.card_number_placeholder3}
+                              onChange={value => {
+                                if ((value + "").length === 4) {
+                                  document.getElementById('ss-user-card-number-radio-input4').focus();
+                                  document.getElementById('ss-user-card-number-radio-input4').select();
+                                }
+                                onChangeValue(indexContent, content.type, value, 'card_number3')
+                              }}
                             />
-                            <InputCustom
-                              value={cardPaymentRadioButton.card_number4}
-                              onChange={value => onChangeValue(indexContent, content.type, value, 'card_number4')}
+                            <InputNum
+                              id="ss-user-card-number-radio-input4"
+                              max={9999}
+                              controls={false}
+                              style={{ marginLeft: '7px' }}
                               disabled={disabled}
+                              maxLength={4}
+                              className="ss-user-setting-input-limit-character"
+                              value={cardPaymentRadioButton.card_number4}
                               placeholder={cardPaymentRadioButton.card_number_placeholder4}
+                              onChange={value => onChangeValue(indexContent, content.type, value, 'card_number4')}
                             />
                           </div>
                         </div>
@@ -3936,8 +4252,14 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
           </React.Fragment>
         )
       })}
+      <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+        <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+          <span style={{ fontSize: '16px' }}>{messageNoti}</span>
+        </div>
+      </ModalNoti>
     </div >
   )
 }
 
 export default Preview
+

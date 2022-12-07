@@ -198,6 +198,7 @@
     bottom: 0;
     cursor: pointer;
     width: 100%;
+    border-top: 1px solid rgb(44, 117, 240);
 }
 
 .ss-user-preivew-product-purchase-style-width .ant-checkbox-wrapper span:nth-child(1) {
@@ -297,3 +298,12 @@
 .ss-img-list-bank img {
     width: 100%;
 }
+
+.ss-message-custom-icon-times {
+    position: absolute;
+    top: 23%;
+    right: 2%;
+    font-size: 20px;
+    cursor: pointer
+}
+

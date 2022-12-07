@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 const CheckboxCustom = ({ id, label, value = false, onChange, className, styleSpan, disabled = false, style }) => {
     return (
         <React.Fragment>
-            <div style={style} onClick={() => { onChange(!value) }} className={`ss-user-setting__item-text_input-save-variable-wrapper ${className ? className : ''}`}>
+            <div style={{...style, width: 'fit-content'}} onClick={() => { onChange(!value) }} className={`ss-user-setting__item-text_input-save-variable-wrapper ${className ? className : ''}`}>
                 <input
                     disabled={disabled}
                     id={id}
@@ -20,3 +20,5 @@ const CheckboxCustom = ({ id, label, value = false, onChange, className, styleSp
 }
 
 export default CheckboxCustom;
+
+
