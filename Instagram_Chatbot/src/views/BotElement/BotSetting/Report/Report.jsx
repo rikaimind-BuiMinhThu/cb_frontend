@@ -18,6 +18,7 @@ function Report() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [dateState, setDateState] = useState(new Date());
+  const [allScenarios, setAllScenarios] = useState([]);
   const [barChart, setBarChart] = useState({
     series: [
       {
@@ -276,7 +277,6 @@ function Report() {
     api
       .get(`/api/v1/managements/history_click_urls?chatbot_id=${botId}`)
       .then((res) => {
-        // console.log(res);
         setShortenedList(res.data.data);
       })
       .catch((err) => {
@@ -299,6 +299,22 @@ function Report() {
           chatbotData.num_of_tablet_count,
         ];
         setDevicePieChartSeries(chatbotValue);
+      })
+      .catch((err) => {
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  }, [botId]);
+
+  //get All Scenarios
+  useEffect(() => {
+    api
+      .get(`/api/v1/managements/chatbots/${botId}/all_scenarios`)
+      .then((res) => {
+        if (res.data.code === 1) {
+          setAllScenarios(res.data.data);
+        }
       })
       .catch((err) => {
         if (err.response?.data.code === 0) {
@@ -543,9 +559,11 @@ function Report() {
                     <p className="report__group">scenario</p>
                     <div className="report__group">
                       <select className="report__group-select" name="" id="">
-                        <option value="BOB">BOB scenario</option>
-                        <option value="Test1">Test1</option>
-                        <option value="Test2">Test2</option>
+                        {allScenarios.map((scenario, index) => (
+                          <option key={index} value={scenario.id}>
+                            {scenario.name}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div className="report__group">
