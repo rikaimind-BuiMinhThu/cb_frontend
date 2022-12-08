@@ -54,18 +54,22 @@ function AddPaymentGateway() {
         let check_sp = false
         let check_terminal = false
         if (gw_agency == 'gmo') {
-            if (gw_name == '') {
+            if (gw_name == '' || gw_name == ' ') {
                 document.getElementById('pm_gw_name_err').style.display = 'block'
+                document.getElementById('pm_gw_name_err').innerHTML = 'Please input payment gateway'
                 checked_name = false
             } else {
                 document.getElementById('pm_gw_name_err').style.display = 'none'
+                document.getElementById('pm_gw_name_err').innerHTML = ''
                 checked_name = true
             }
-            if (gw_shop_id == '') {
+            if (gw_shop_id == '' || gw_shop_id == ' ') {
                 document.getElementById('shop_id_err').style.display = 'block'
+                document.getElementById('shop_id_err').innerHTML = 'Please input shop Id'
                 checked_shop = false
             } else {
                 document.getElementById('shop_id_err').style.display = 'none'
+                document.getElementById('shop_id_err').innerHTML = ''
                 checked_shop = true
             }
         } else if (gw_agency == 'np_payment') {
@@ -173,6 +177,33 @@ function AddPaymentGateway() {
         }
     }
 
+    function checkPmGWName(name){
+        document.getElementById('pm_gw_name').value = name.replace(/ +(?= )/g,'')
+        if(name.length>50){
+            document.getElementById('pm_gw_name_err').innerHTML = 'Payment gateway name maximun 50 characters'
+            document.getElementById('pm_gw_name_err').style.display = 'block'
+        }else{
+            document.getElementById('pm_gw_name_err').innerHTML = ''
+            document.getElementById('pm_gw_name_err').style.display = 'none'
+        }
+    }
+
+    function checkPMGWShopId(shopId){
+        document.getElementById('pm_gw_shop_id').value = shopId.replace(/ +(?= )/g,'')
+        if(shopId.length>25){
+            document.getElementById('shop_id_err').innerHTML = 'Payment gateway shop id maximun 25 characters'
+            document.getElementById('shop_id_err').style.display = 'block'
+        }else{
+            document.getElementById('shop_id_err').innerHTML = ''
+            document.getElementById('shop_id_err').style.display = 'none'
+        }
+    }
+
+    function checkShopPassword(pass){
+        document.getElementById('pm_gw_shop_pass').value = pass.replace( /\s/g, '')
+
+    }
+
     return (
         <>
             <div className="content">
@@ -188,7 +219,7 @@ function AddPaymentGateway() {
                                         <span style={{ color: "red" }}>*</span>
                                     </span>
 
-                                    <input id='pm_gw_name' className='add-payment-gateway-input-form'
+                                    <input id='pm_gw_name' className='add-payment-gateway-input-form' onChange={(e)=>checkPmGWName(e.target.value)}
                                         defaultValue={`${detailGw == undefined ? '' : detailGw.gateway_name}`}></input>
                                 </div>
                                 <div className='add-payment-gateway-add-form' style={{ padding: "0", marginTop: "-1.75%" }}>
@@ -225,7 +256,7 @@ function AddPaymentGateway() {
                                             Shop ID
                                             <span style={{ color: "red" }}>*</span>
                                         </span>
-                                        <input id='pm_gw_shop_id' defaultValue={`${detailGw == undefined ? '' : detailGw.shop_id}`}
+                                        <input id='pm_gw_shop_id'onChange={(e)=>checkPMGWShopId(e.target.value)} defaultValue={`${detailGw == undefined ? '' : detailGw.shop_id}`}
                                             className='add-payment-gateway-input-form'></input>
                                     </div>
                                     <div className='add-payment-gateway-add-form'
@@ -235,7 +266,7 @@ function AddPaymentGateway() {
                                     </div>
                                     <div className='add-payment-gateway-add-form'>
                                         <span className='add-payment-gateway-span-form'>shop password</span>
-                                        <input id='pm_gw_shop_pass'
+                                        <input id='pm_gw_shop_pass' style={{border:"1px solid gray", borderRadius:"2.5px"}}  type={'password'} onChange={(e)=>checkShopPassword(e.target.value)}
                                             className='add-payment-gateway-input-form'></input>
                                     </div>
                                 </div>

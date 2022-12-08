@@ -6,7 +6,7 @@ import api from '../../../api/api-management'
 import { tokenExpired } from 'api/tokenExpired';
 function InstallationTag() {
 
-  const [urlDemo, setUrlDemo] = useState()
+  const [urlDemo, setUrlDemo] = useState('')
   const [botId, setBotId] = useState(Cookies.get('bot_id'))
   const [scenarioIdSelected, setScenarioSelected] = useState()
 
