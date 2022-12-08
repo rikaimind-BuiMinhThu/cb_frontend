@@ -16,6 +16,7 @@ import $ from 'jquery';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { tokenExpired } from 'api/tokenExpired';
+import {EC_CHATBOT_URL} from '../variables/constants'
 
 function ClientManagement() {
   var [dataList, setDataList] = useState([]);
@@ -329,7 +330,7 @@ function ClientManagement() {
         setTitle(data.title);
         setManager(data.responsible_person);
         setManagerKata(data.responsible_person_katakana);
-        setUrlLogo(`https://ec-chatbot-test1.com/${data.logo_url.url}`);
+        setUrlLogo(`${EC_CHATBOT_URL}/${data.logo_url.url}`);
         setUrl(data.url);
         setZipCode(data.zip_code);
         // console.log('prefecture: ' ,data.prefecture)
@@ -415,7 +416,7 @@ function ClientManagement() {
         setTitle(data.title);
         setManager(data.responsible_person);
         setManagerKata(data.responsible_person_katakana);
-        setUrlLogo(`https://ec-chatbot-test1.com/${data.logo_url.url}`);
+        setUrlLogo(`${EC_CHATBOT_URL}/${data.logo_url.url}`);
         setUrl(data.url);
         setZipCode(data.zip_code);
         // if (data.prefecture === null) {
@@ -1442,7 +1443,7 @@ function ClientManagement() {
                           <td>{item.id}</td>
                           <td style={{ margin: '0', padding: '0' }}>
                             <img
-                              src={`https://ec-chatbot-test1.com${item.logo_url.url}`}
+                              src={`${EC_CHATBOT_URL}${item.logo_url.url}`}
                               style={{ height: '60px', width: '60px', objectFit: 'cover' }}
                               alt=""
                             />
