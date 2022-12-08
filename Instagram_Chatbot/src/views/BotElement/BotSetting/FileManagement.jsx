@@ -11,8 +11,10 @@ import axios from 'axios';
 import ModalDetail from 'views/Popup/Modal';
 import { tokenExpired } from 'api/tokenExpired';
 import ModalNoti from 'views/Popup/ModalNoti';
+import { Pagination } from '@material-ui/lab';
 
 function FileManagement() {
+  // states
   const [files, setFiles] = useState([]);
   const [newFile, setNewFile] = useState(null);
   const [typeFilePreview, setTypeFilePreview] = useState('');
@@ -24,27 +26,57 @@ function FileManagement() {
   const [msgNoti, setMsgNoti] = useState();
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [idFile, setIdFile] = useState();
+  const [pageIndex, setPageIndex] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
+  const [page, setPage] = useState(1);
+
+  // side effects
+  useEffect(() => {
+    api
+      .get(`/api/v1/managements/file?page=1`)
+      .then((res) => {
+        console.log('file management: ', res.data);
+        setFiles(res.data?.data);
+        setTotalPage(Math.ceil(res.data?.total / 25));
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  }, []);
 
   function handleUpload() {
     inputRef.current.click();
     setFileError('');
   }
 
-  function reload() {
-    api.get(`/api/v1//managements/file`).then((res) => {
-      setFiles(res.data.data);
-      console.log(res.data.data)
-    }).catch((err) => {
-      console.log(err);
-      if (err.response?.data.code === 0) {
-        tokenExpired();
-      }
-    });
+  function reload(pageIndex) {
+    api
+      .get(`/api/v1/managements/file?page=${pageIndex}`)
+      .then((res) => {
+        console.log('file management: ', res.data);
+        setFiles(res.data?.data);
+        setTotalPage(Math.ceil(res.data?.total / 25));
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
   }
 
-  useEffect(() => {
-    reload();
-  }, []);
+  // handle change page
+  const handleChangePage = (event, value) => {
+    if (totalPage > 1) {
+      setPage(parseInt(value));
+      setPageIndex(value);
+      reload(value);
+      document.querySelector('.main-panel').scrollTop = 0;
+    }
+  };
 
   function handleChangeFile(e) {
     setNewFile(e.target.files[0]);
@@ -57,7 +89,7 @@ function FileManagement() {
     console.log(newFile);
     const type = newFile.name.split('.')[1].toLowerCase();
     const trueFile = ['jpeg', 'jpg', 'png', 'pdf', 'mp4'].includes(type);
-    let file
+    let file;
     if (trueFile) {
       if (type != 'pdf' && type != 'mp4' && newFile.size / 1024 / 1024 > 2) {
         setFileError(`You need to upload file which size under 2MB.`);
@@ -72,69 +104,72 @@ function FileManagement() {
           setFileError(`You need to upload video which duration under 15 seconds.`);
           return;
         }
-        
       }
       const video = document.getElementById('preview-video');
-        file = { user_file: { file_type: type, size: newFile.size, timeplay: `${type == 'mp4' ? video.duration : ''}` } };
+      file = {
+        user_file: {
+          file_type: type,
+          size: newFile.size,
+          timeplay: `${type == 'mp4' ? video.duration : ''}`,
+        },
+      };
       api
         .post(`/api/v1/managements/file/upload`, file)
         .then((res) => {
           console.log('res upload file type: ', res);
           const urlFile = res.data.data.url;
           let filePost = { user_file: { file_type: type, file_url: res.data.data.path } };
-          let typeUpload = ''
-          if(type == 'mp4'){
-            typeUpload = 'video/mp4'
-          }else if(type == 'pdf'){
-            typeUpload = 'application/pdf'
-          }else {
-            typeUpload = `image/${type}`
+          let typeUpload = '';
+          if (type == 'mp4') {
+            typeUpload = 'video/mp4';
+          } else if (type == 'pdf') {
+            typeUpload = 'application/pdf';
+          } else {
+            typeUpload = `image/${type}`;
           }
 
           axios
-            .put(urlFile, newFile
-              , {
+            .put(urlFile, newFile, {
               headers: {
-                'Content-Type': typeUpload
+                'Content-Type': typeUpload,
               },
             })
             .then((res) => {
               console.log('response`: ', res);
               api
-            .post(`/api/v1/managements/file`, filePost)
-            .then((res) => {
-              if (res.data.code == 1) {
-                reload();
-                setMsgNoti(`Add successfully!`);
-                setIsOpenNoti(true);
-                setNewFile(null);
-                setTimeout(() => {
-                  setIsOpenNoti(false);
-                  setMsgNoti(``);
-                }, 2000);
-              } else {
-                setMsgNoti(`Add failed!`);
-                setIsOpenNoti(true);
-                setTimeout(() => {
-                  setIsOpenNoti(false);
-                  setMsgNoti(``);
-                }, 2000);
-              }
+                .post(`/api/v1/managements/file`, filePost)
+                .then((res) => {
+                  if (res.data.code == 1) {
+                    reload();
+                    setMsgNoti(`Add successfully!`);
+                    setIsOpenNoti(true);
+                    setNewFile(null);
+                    setTimeout(() => {
+                      setIsOpenNoti(false);
+                      setMsgNoti(``);
+                    }, 2000);
+                  } else {
+                    setMsgNoti(`Add failed!`);
+                    setIsOpenNoti(true);
+                    setTimeout(() => {
+                      setIsOpenNoti(false);
+                      setMsgNoti(``);
+                    }, 2000);
+                  }
+                })
+                .catch((err) => {
+                  console.log(err);
+                  if (err.response?.data.code === 0) {
+                    tokenExpired();
+                  }
+                });
             })
             .catch((err) => {
-              console.log(err);
+              console.log('err: ', err);
               if (err.response?.data.code === 0) {
                 tokenExpired();
               }
             });
-            })
-            .catch((err) => {
-              console.log("err: ", err);
-              if (err.response?.data.code === 0) {
-                tokenExpired();
-              }
-            });
-          
         })
         .catch((err) => {
           console.log(err);
@@ -148,7 +183,7 @@ function FileManagement() {
   }
 
   function handlePreview(file) {
-    console.log(file)
+    console.log(file);
     setSrcPreview(`https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file.file_url}`);
     setTypeFilePreview(file.file_url.split('.')[1].toLowerCase());
     setIsOpenPreview(true);
@@ -264,7 +299,7 @@ function FileManagement() {
                 <Table>
                   <thead className="text-primary">
                     <tr>
-                      <th style={{ width: '10%' }}>ID</th>
+                      <th style={{ width: '10%' }}>STT</th>
                       <th style={{ width: '15%' }}>Type</th>
                       <th style={{ width: '70%' }}>Url</th>
                       <th style={{ width: '250px', minWidth: '250px' }}>Action</th>
@@ -273,7 +308,7 @@ function FileManagement() {
                   <tbody>
                     {files.map((file, i) => (
                       <tr key={i}>
-                        <td className="file-mng__border-table">{file.id}</td>
+                        <td className="file-mng__border-table">{i + 1 + 25 * (pageIndex - 1)}</td>
                         <td className="file-mng__border-table">{file.file_type}</td>
                         <td className="file-mng__border-table">{`https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file.file_url}`}</td>
                         <td className="file-mng__border-table file-mng__action-table">
@@ -305,8 +340,13 @@ function FileManagement() {
                       </tr>
                     ))}
                   </tbody>
-                  <tbody></tbody>
                 </Table>
+                <Pagination
+                  count={totalPage}
+                  variant="outlined"
+                  page={page}
+                  onChange={handleChangePage}
+                />
               </CardBody>
             </Card>
           </Col>
@@ -321,10 +361,7 @@ function FileManagement() {
             ) : (
               <>
                 {typeFilePreview == 'pdf' ? (
-                  <embed
-                    style={{ width: '100%', height: '90%' }}
-                    src={srcPreview}
-                  />
+                  <embed style={{ width: '100%', height: '90%' }} src={srcPreview} />
                 ) : (
                   <img src={srcPreview} alt="" />
                 )}

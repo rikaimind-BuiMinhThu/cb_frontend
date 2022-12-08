@@ -23,13 +23,12 @@
   flex-direction: column;
   padding: 10px;
 }
-.field-container {
+.add-bot_field-container {
   display: flex;
   align-items: center;
 }
 .label-field {
   width: 30%;
-  top: 50%;
 }
 .input-field {
   flex: 1;
@@ -127,9 +126,11 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  flex: 1;
 }
 .icons .icon {
   margin-right: 14px;
+  margin-bottom: 14px;
 }
 .icons .icon img {
   display: block;
@@ -145,7 +146,7 @@
   width: 54px;
   height: 54px;
   border-radius: 50%;
-  background-color: #ccc;
+  background-color: #ddd;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -153,9 +154,9 @@
   position: relative;
 }
 .add-icon:hover {
-  background-color: #ddd;
+  background-color: #ccc;
 }
-.add-icon span {
+.add-icon > span {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -165,6 +166,7 @@
   background-color: #fff;
   font-size: 44px;
   color: #ccc;
+  cursor: pointer;
 }
 
 /* image show */
@@ -172,6 +174,10 @@
   display: flex;
   justify-content: center;
   max-height: 200px;
+}
+
+.image-show img {
+  object-fit: contain;
 }
 
 /* error message */
@@ -191,6 +197,7 @@
   right: 0;
   bottom: 0;
   width: 100%;
+  height: 100%;
   opacity: 0;
   cursor: pointer;
 }

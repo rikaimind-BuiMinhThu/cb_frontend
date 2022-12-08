@@ -5,58 +5,56 @@ import api from '../../api/api-management';
 // icons
 import IconManDefault from '../../assets/img/bot-icon/man1_new.png';
 import IconWomenDefault from '../../assets/img/bot-icon/women1_new.png';
+import IconWomen4 from '../../assets/img/bot-icon/women4_new.png';
+import IconWomen5 from '../../assets/img/bot-icon/women5_new.png';
+import IconWomen6 from '../../assets/img/bot-icon/women6_new.png';
+import IconWomen7 from '../../assets/img/bot-icon/women7_new.png';
+import IconWomen8 from '../../assets/img/bot-icon/women8_new.png';
+import IconWomen9 from '../../assets/img/bot-icon/women9_new.png';
+import IconWomen10 from '../../assets/img/bot-icon/women10_new.png';
+import IconWomen11 from '../../assets/img/bot-icon/women11_new.png';
 import ModalNoti from '../../views/Popup/ModalNoti';
 import { Link } from 'react-router-dom';
 import { tokenExpired } from 'api/tokenExpired';
 import Cookies from 'js-cookie';
+import { MDBIcon } from 'mdbreact';
 
 const colors = [
-  {
-    color: '#327AED',
-  },
-  {
-    color: '#26B197',
-  },
-  {
-    color: '#fC7E02',
-  },
-  {
-    color: '#DCF843',
-  },
-  {
-    color: '#ED6D9E',
-  },
-  {
-    color: '#546DA7',
-  },
-  {
-    color: '#7C8290',
-  },
-  {
-    color: '#D8E2EF',
-  },
+  '#327AED',
+  '#26B197',
+  '#fC7E02',
+  '#DCF843',
+  '#ED6D9E',
+  '#546DA7',
+  '#7C8290',
+  '#D8E2EF',
 ];
 const images = [
-  {
-    image: IconManDefault,
-  },
-  {
-    image: IconWomenDefault,
-  },
+  IconManDefault,
+  IconWomenDefault,
+  IconWomen4,
+  IconWomen5,
+  IconWomen6,
+  IconWomen7,
+  IconWomen8,
+  IconWomen9,
+  IconWomen10,
+  IconWomen11,
 ];
 
 function AddBotchat() {
   // states
-  const [scenario, setScenario] = useState('');
-  const [urlExistForm, setUrlExistForm] = useState('');
+  // const [scenario, setScenario] = useState('');
+  // const [urlExistForm, setUrlExistForm] = useState('');
   const [mainColor, setMainColor] = useState('#327AED');
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [designType, setDesignType] = useState('flat');
-  const [botImage, setBotImage] = useState('');
+  const [botImage, setBotImage] = useState(IconManDefault);
   const [botName, setBotName] = useState('');
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState('');
+  const [isOpenPreview, setIsOpenPreview] = useState(false);
 
   // side effects
   useEffect(() => {
@@ -116,7 +114,6 @@ function AddBotchat() {
 
   // add new bot chat
   const addNewBotChat = () => {
-    // if (scenario && urlExistForm && title && subtitle && botName) {
     if (title && subtitle && botName) {
       let iconBot = '';
       if (botImage === '') {
@@ -136,7 +133,7 @@ function AddBotchat() {
       };
       var color;
       Object.entries(main_color).forEach(([key, val]) => {
-        if (mainColor == val) {
+        if (mainColor === val) {
           color = key;
         }
       });
@@ -153,19 +150,15 @@ function AddBotchat() {
       api
         .post(`api/v1/managements/chatbots`, bot)
         .then((res) => {
-          
           if (res.data.code === 1 || res.data.code === '1') {
-            Cookies.set('bot_id', res.data.data.id)
+            Cookies.set('bot_id', res.data.data.id);
             setMsgNoti('Add new bot chat successfully!');
             setIsOpenNoti(true);
-            setTimeout(()=>{
+            setTimeout(() => {
               setMsgNoti('');
-            setIsOpenNoti(false);
-            window.location.href = '/admin/scenario-list'
-            },1500)
-            
-            // console.log(res.data.data.id);
-            
+              setIsOpenNoti(false);
+              window.location.href = '/admin/scenario-list';
+            }, 1500);
           } else if (res.data?.code === 2 || res.data?.code === '2') {
             setMsgNoti(res.data.message);
             setIsOpenNoti(true);
@@ -174,19 +167,10 @@ function AddBotchat() {
         .catch((error) => {
           console.log(error);
           if (error.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     } else {
-      // if (!scenario) {
-      //   document.querySelector('.error-message.scenario-template').innerHTML =
-      //     'Please select scenario';
-      //   document.querySelector('.error-message.scenario-template').style.display = 'block';
-      // }
-      // if (!urlExistForm) {
-      //   document.querySelector('.error-message.url').innerHTML = 'Please input a url';
-      //   document.querySelector('.error-message.url').style.display = 'block';
-      // }
       if (!title) {
         document.querySelector('.error-message.title').innerHTML = 'Please input title';
         document.querySelector('.error-message.title').style.display = 'block';
@@ -199,6 +183,45 @@ function AddBotchat() {
         document.querySelector('.error-message.bot-name').innerHTML = 'Please input bot-name';
         document.querySelector('.error-message.bot-name').style.display = 'block';
       }
+    }
+  };
+
+  // handle preview
+  const handlePreview = () => {
+    if (title && subtitle) {
+      document.getElementById('sp-container').style.height = '610px';
+      document.getElementById('sp-header').style.position = 'static';
+      document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
+      document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
+      document.getElementById('sp-body').style.display = 'block';
+      setIsOpenPreview(true);
+    } else {
+      if (!title) {
+        document.querySelector('.error-message.title').innerHTML = 'Please input title';
+        document.querySelector('.error-message.title').style.display = 'block';
+      }
+      if (!subtitle) {
+        document.querySelector('.error-message.subtile').innerHTML = 'Please input subtile';
+        document.querySelector('.error-message.subtile').style.display = 'block';
+      }
+    }
+  };
+
+  // handle toggle preview
+  const handleTogglePreview = () => {
+    if (document.getElementById('sp-body').style.display === 'none') {
+      document.getElementById('sp-container').style.height = '610px';
+      document.getElementById('sp-header').style.position = 'static';
+      document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
+      document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
+      document.getElementById('sp-body').style.display = 'block';
+    } else {
+      document.getElementById('sp-container').style.height = '0px';
+      document.getElementById('sp-body').style.display = 'none';
+      document.getElementById('sp-header').style.borderBottomLeftRadius = '25px';
+      document.getElementById('sp-header').style.borderBottomRightRadius = '25px';
+      document.getElementById('sp-header').style.position = 'absolute';
+      document.getElementById('sp-header').style.bottom = '13px';
     }
   };
 
@@ -216,72 +239,39 @@ function AddBotchat() {
                   <div className="add-bot-container">
                     <div className="bot-left">
                       <div className="field-add-bot">
-                        <div className="field-container">
-                          <span className="label-field">Scenario template</span>
-                          <select
-                            className="input-field"
-                            id="select-scenario"
-                            name="scenario-template"
-                            onChange={(e) => setScenario(e.target.value)}
-                            value={scenario}
-                          >
-                            <option value="" disabled hidden>
-                              Select Scenario
-                            </option>
-                            <option value="1">Option 1</option>
-                            <option value="2">Option 2</option>
-                            <option value="3">Option 3</option>
-                          </select>
-                        </div>
-                        <span className="subtitle-field">
-                          * You can create a scenario that progresses in chat from a template.
-                        </span>
-                        <span className="error-message scenario-template"></span>
-                      </div>
-                      <div className="field-add-bot">
-                        <div className="field-container">
-                          <span className="label-field">URL of existing form</span>
-                          <input
-                            type="text"
-                            name="URL"
-                            className="input-field"
-                            placeholder="URL of the form you want to convert"
-                            onChange={(e) => setUrlExistForm(e.target.value)}
-                          />
-                        </div>
-                        <span className="subtitle-field">
-                          * AI automatically converts pages containing forms into chat forms. Choose
-                          a template if you don't have an existing form.
-                        </span>
-                        <span className="error-message url"></span>
-                      </div>
-                      <div className="field-add-bot">
-                        <div className="field-container">
+                        <div className="add-bot_field-container">
                           <span className="label-field">Title</span>
                           <input
                             type="text"
                             name="title"
                             className="input-field"
                             placeholder="Service name, etc. (e.g. BOTCHAN)"
-                            onChange={(e) => setTitle(e.target.value)}
+                            onChange={(e) => {
+                              setTitle(e.target.value);
+                              document.querySelector('.error-message.title').style.display = 'none';
+                            }}
                           />
                         </div>
                         <span className="error-message title"></span>
                       </div>
                       <div className="field-add-bot">
-                        <div className="field-container">
+                        <div className="add-bot_field-container">
                           <span className="label-field">Subtitle</span>
                           <input
                             type="text"
                             className="input-field"
                             placeholder="Purpose of the form (e.g. information request form)"
-                            onChange={(e) => setSubtitle(e.target.value)}
+                            onChange={(e) => {
+                              setSubtitle(e.target.value);
+                              document.querySelector('.error-message.subtile').style.display =
+                                'none';
+                            }}
                           />
                         </div>
                         <span className="error-message subtile"></span>
                       </div>
                       <div className="field-add-bot">
-                        <div className="field-container">
+                        <div className="add-bot_field-container">
                           <span className="label-field">Design type</span>
                           <div className="design-types">
                             <div className="type" onClick={(e) => designTypeClick(e)}>
@@ -298,16 +288,16 @@ function AddBotchat() {
                         <span className="error-message design-types"></span>
                       </div>
                       <div className="field-add-bot">
-                        <div className="field-container">
+                        <div className="add-bot_field-container">
                           <span className="label-field">Main color</span>
                           <div className="main-colors">
                             {colors.map((color, index) => (
                               <div
                                 key={index}
                                 className={`color color-${index}`}
-                                onClick={() => handleColorClick(index, color.color)}
+                                onClick={() => handleColorClick(index, color)}
                               >
-                                <span style={{ backgroundColor: color.color }}></span>
+                                <span style={{ backgroundColor: color }}></span>
                               </div>
                             ))}
                           </div>
@@ -315,7 +305,7 @@ function AddBotchat() {
                         <span className="error-message main-colors"></span>
                       </div>
                       <div className="btn-wrapper">
-                        <button type="button" className="btn btn-preview">
+                        <button type="button" className="btn btn-preview" onClick={handlePreview}>
                           Preview
                         </button>
                       </div>
@@ -323,23 +313,22 @@ function AddBotchat() {
                     <div className="bot-right">
                       <div>
                         <div className="field-add-bot">
-                          <div className="field-container">
+                          <div className="add-bot_field-container">
                             <span className="label-field">Icon</span>
                             <div className="icons">
                               {images.map((icon, index) => (
                                 <div
                                   key={index}
                                   className={`icon icon-${index}`}
-                                  onClick={() => handleIconClick(index, icon.image)}
+                                  onClick={() => handleIconClick(index, icon)}
                                 >
-                                  <img src={icon.image} alt="" />
+                                  <img src={icon} alt="" />
                                 </div>
                               ))}
                             </div>
                             <div className="add-icon">
                               <span>+</span>
                               <input
-                                className="input-field"
                                 type="file"
                                 id="bot_image"
                                 onChange={getBaseUrlAdd}
@@ -358,7 +347,7 @@ function AddBotchat() {
                           </div>
                         )}
                         <div className="field-add-bot">
-                          <div className="field-container">
+                          <div className="add-bot_field-container">
                             <span className="label-field">Bot name</span>
                             <input
                               type="text"
@@ -392,13 +381,47 @@ function AddBotchat() {
             </Card>
           </Col>
         </Row>
+        {/* preview */}
+        <div
+          id="sp-container"
+          className="sp-container"
+          style={{ display: !isOpenPreview && 'none' }}
+        >
+          <div
+            id="sp-header"
+            style={{ backgroundColor: mainColor }}
+            className="sp-header"
+            onClick={handleTogglePreview}
+          >
+            <div className="sp-header-left">
+              <div className="sp-header-left-avatar sp-avatar">
+                <img src={botImage} alt="" />
+              </div>
+              <div className="sp-header-left-label">
+                <div className="sp-header-left-label-sub-title">{subtitle}</div>
+                <div className="sp-header-left-label-title">{title}</div>
+              </div>
+            </div>
+            <div className="sp-header-right">
+              <div className="sp-header-right-arrow">
+                {isOpenPreview ? (
+                  <MDBIcon fas icon="chevron-down" />
+                ) : (
+                  <MDBIcon fas icon="chevron-up" />
+                )}
+              </div>
+            </div>
+          </div>
+          <div id="sp-body" className="sp-body"></div>
+        </div>
+        {/* end preview */}
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
             <span style={{ fontSize: '16px' }}>{msgNoti}</span>
           </div>
         </ModalNoti>
         <Link to={'/admin/scenario-list'}>
-          <button style={{display:'none'}}>SCL</button>
+          <button style={{ display: 'none' }}>SCL</button>
         </Link>
       </div>
     </>

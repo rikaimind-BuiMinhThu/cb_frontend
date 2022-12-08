@@ -25,6 +25,7 @@ function BotManagement() {
   const [msgNoti, setMsgNoti] = useState('');
   const [statusSelected, setStatusSelected] = useState('');
   const [search, setSearch] = useState('');
+  const [isActiveSearch, setIsActiveSearch] = useState('all');
 
   // side effects
   useEffect(() => {
@@ -43,13 +44,26 @@ function BotManagement() {
   }, []);
 
   useEffect(() => {
-    reloadList(1);
+    // reloadList(1);
+    api
+      .get(`/api/v1/managements/chatbots?page=1&status=all`)
+      .then((res) => {
+        console.log('bot list get data: ', res.data);
+        setBotList(res.data?.data);
+        setTotalPage(Math.ceil(res.data?.total / 10));
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
   }, []);
 
   function reloadList(pgIndex) {
     console.log(pgIndex);
     api
-      .get(`/api/v1/managements/chatbots?page=${pgIndex}&name=${search}`)
+      .get(`/api/v1/managements/chatbots?page=${pgIndex}&name=${search}&status=${isActiveSearch}`)
       .then((res) => {
         console.log('bot list get data: ', res.data);
         setBotList(res.data?.data);
@@ -88,7 +102,7 @@ function BotManagement() {
             setMsgNoti('');
           }, 2000);
           api
-            .get(`/api/v1/managements/chatbots?page=1`)
+            .get(`/api/v1/managements/chatbots?page=1&status=${isActiveSearch}`)
             .then((res) => {
               console.log('bot list get data: ', res.data);
               setBotList(res.data?.data);
@@ -149,7 +163,7 @@ function BotManagement() {
               setMsgNoti('');
             }, 2000);
             api
-              .get(`/api/v1/managements/chatbots?page=${page}`)
+              .get(`/api/v1/managements/chatbots?page=${page}&status=${isActiveSearch}`)
               .then((res) => {
                 console.log('bot list get data: ', res.data);
                 setBotList(res.data?.data);
@@ -199,7 +213,7 @@ function BotManagement() {
               setMsgNoti('');
             }, 2000);
             api
-              .get(`/api/v1/managements/chatbots?page=1`)
+              .get(`/api/v1/managements/chatbots?page=1&status=${isActiveSearch}`)
               .then((res) => {
                 console.log('bot list get data: ', res.data);
                 setBotList(res.data?.data);
@@ -270,7 +284,20 @@ function BotManagement() {
                       placeholder="search ..."
                       onChange={(e) => setSearch(e.target.value)}
                     />
-                    <button className="btn-add-bot" onClick={() => handleSearch()}>
+                    <div className="bm_status-filter">
+                      <h4>Bot status:</h4>
+                      <select
+                        name="bot-status"
+                        id="bm_bot-status"
+                        onChange={(e) => setIsActiveSearch(e.target.value)}
+                        value={isActiveSearch}
+                      >
+                        <option value="all">All</option>
+                        <option value="on">On</option>
+                        <option value="off">Off</option>
+                      </select>
+                    </div>
+                    <button className="btn-add-bot btn-bl-search" onClick={() => handleSearch()}>
                       Search
                     </button>
                   </div>
