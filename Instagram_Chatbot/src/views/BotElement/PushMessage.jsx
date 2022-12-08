@@ -212,6 +212,7 @@ function PushMessage() {
   function addPM() {
     getEmailList();
     setIsOpenAddPM(true);
+    setUpdate(false);
   }
 
   function closeAddPM() {
