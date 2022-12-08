@@ -384,19 +384,19 @@ function Preview({ onOpenPreview, isOpen }) {
                     return delayRender = setTimeout(() => {
                       for (let j = 0; j < messageArr[i].message_content.length; j++) {
                         if (messageArr[i].message_content[j].type === 'capture') {
-                          api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
+                          api.get(`https://svg-captcha-nodejs.vercel.app/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
                             console.log(res);
                             captcha.push({
                               index: i,
                               indexContent: j,
                               ...res.data
-                            }).catch((error) => {
-                              console.log(error);
-                              if (error.response?.data.code === 0) {
-                                tokenExpired()
-                              }
                             })
                             setCaptcha([...captcha]);
+                          }).catch((error) => {
+                            console.log(error);
+                            if (error.response?.data.code === 0) {
+                              tokenExpired()
+                            }
                           })
                           // break;
                         }
@@ -493,19 +493,19 @@ function Preview({ onOpenPreview, isOpen }) {
                   return delayRender = setTimeout(() => {
                     for (let j = 0; j < messageArr[i].message_content.length; j++) {
                       if (messageArr[i].message_content[j].type === 'capture') {
-                        api.get(`https://svg-captcha.herokuapp.com/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
+                        api.get(`https://svg-captcha-nodejs.vercel.app/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
                           console.log(res);
                           captcha.push({
                             index: i,
                             indexContent: j,
                             ...res.data
-                          }).catch((error) => {
-                            console.log(error);
-                            if (error.response?.data.code === 0) {
-                              tokenExpired()
-                            }
                           })
                           setCaptcha([...captcha]);
+                        }).catch((error) => {
+                          console.log(error);
+                          if (error.response?.data.code === 0) {
+                            tokenExpired()
+                          }
                         })
                       }
                     }
@@ -1275,19 +1275,19 @@ function Preview({ onOpenPreview, isOpen }) {
               return delayRender = setTimeout(() => {
                 for (let j = 0; j < dataMessages[i].message_content.length; j++) {
                   if (dataMessages[i].message_content[j].type === 'capture') {
-                    api.get(`https://svg-captcha.herokuapp.com/captcha?size=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].length}${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].type}`).then(res => {
+                    api.get(`https://svg-captcha-nodejs.vercel.app/captcha?size=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].length}${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].type}`).then(res => {
                       console.log(res);
                       captcha.push({
                         index: i,
                         indexContent: j,
                         ...res.data
-                      }).catch((error) => {
-                        console.log(error);
-                        if (error.response?.data.code === 0) {
-                          tokenExpired()
-                        }
                       })
                       setCaptcha([...captcha]);
+                    }).catch((error) => {
+                      console.log(error);
+                      if (error.response?.data.code === 0) {
+                        tokenExpired()
+                      }
                     })
                   }
                 }
@@ -1319,19 +1319,19 @@ function Preview({ onOpenPreview, isOpen }) {
           return delayRender = setTimeout(() => {
             for (let j = 0; j < dataMessages[indexMessageRender + 1].message_content.length; j++) {
               if (dataMessages[indexMessageRender + 1].message_content[j].type === 'capture') {
-                api.get(`https://svg-captcha.herokuapp.com/captcha?size=${dataMessages[indexMessageRender + 1].message_content[j][dataMessages[indexMessageRender + 1].message_content[j].type].length}${dataMessages[indexMessageRender + 1].message_content[j][dataMessages[indexMessageRender + 1].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[indexMessageRender + 1].message_content[j][dataMessages[indexMessageRender + 1].message_content[j].type].type}`).then(res => {
+                api.get(`https://svg-captcha-nodejs.vercel.app/captcha?size=${dataMessages[indexMessageRender + 1].message_content[j][dataMessages[indexMessageRender + 1].message_content[j].type].length}${dataMessages[indexMessageRender + 1].message_content[j][dataMessages[indexMessageRender + 1].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[indexMessageRender + 1].message_content[j][dataMessages[indexMessageRender + 1].message_content[j].type].type}`).then(res => {
                   console.log(res);
                   captcha.push({
                     index: indexMessageRender + 1,
                     indexContent: j,
                     ...res.data
-                  }).catch((error) => {
-                    console.log(error);
-                    if (error.response?.data.code === 0) {
-                      tokenExpired()
-                    }
                   })
                   setCaptcha([...captcha]);
+                }).catch((error) => {
+                  console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
                 })
               }
             }
@@ -1358,7 +1358,7 @@ function Preview({ onOpenPreview, isOpen }) {
                 return delayRender = setTimeout(() => {
                   for (let j = 0; j < dataMessages[i].message_content.length; j++) {
                     if (dataMessages[i].message_content[j].type === 'capture') {
-                      api.get(`https://svg-captcha.herokuapp.com/captcha?size=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].length}${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].type}`).then(res => {
+                      api.get(`https://svg-captcha-nodejs.vercel.app/captcha?size=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].length}${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].type}`).then(res => {
                         console.log(res);
                         captcha.push({
                           index: i,

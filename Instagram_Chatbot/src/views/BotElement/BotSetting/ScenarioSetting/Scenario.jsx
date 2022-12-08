@@ -8081,7 +8081,7 @@ const Scenario = () => {
                                                       </div>
                                                       <div className="ss-user-setting__item-bottom">
                                                         <div style={{ width: '90%' }}>
-                                                          <img style={{ width: '35%' }} src={`https://svg-captcha.herokuapp.com/captchapreview?size=${capture.length}${capture.colour ? "&color=true" : ""}&charPreset=${capture.type}`} />
+                                                          <img style={{ width: '35%' }} src={`https://svg-captcha-nodejs.vercel.app/captchapreview?size=${capture.length}${capture.colour ? "&color=true" : ""}&charPreset=${capture.type}`} />
                                                         </div>
                                                       </div>
                                                     </React.Fragment>
