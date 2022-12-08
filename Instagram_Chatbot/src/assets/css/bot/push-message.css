@@ -84,3 +84,8 @@
     margin-right: 10px;
     border-radius: 5px;
 }
+.pm_date_pick{
+    padding:7.5px 5px;
+    border:1px solid gray;
+    border-radius: 2.5px;
+}

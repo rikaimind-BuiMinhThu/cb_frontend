@@ -205,8 +205,16 @@ function PushMessage() {
   }
 
   function handleChangeDate(date) {
-    setStartDate(date);
-    utils.checkRequired('startDateTime', 'startDateTimeErr', 'Start date time');
+    console.log('dateChange');
+    console.log(date);
+    if(date == null){
+      console.log('deleted date');
+      console.log('start date', itemUpdate?.started_at);
+      setStartDate(startDate)
+    }else{
+      setStartDate(date);
+    }
+    // utils.checkRequired('startDateTime', 'startDateTimeErr', 'Start date time');
   }
 
   function addPM() {
@@ -785,8 +793,9 @@ function PushMessage() {
                   Start date time
                   <span style={{ color: 'red' }}>*</span>
                 </span>
-                <div className="push-message-input-form">
+                <div className="push-message-input-form" >
                   <DatePicker
+                  className='pm_date_pick'
                     name="started_at"
                     id="startDateTime"
                     selected={startDate}
