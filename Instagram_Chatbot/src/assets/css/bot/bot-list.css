@@ -13,14 +13,31 @@
   padding-bottom: 20px;
 }
 .div-add-bot--search {
-  width: 30%;
+  width: 50%;
   display: flex;
+  align-items: center;
 }
 .div-add-bot--search input {
   margin-right: 10px;
-  padding: 5px 15px 5px 15px;
-
-  /* padding: ; */
+  padding: 5px 15px;
+  border-radius: 10px;
+  border: 1px solid #7186a0;
+}
+.bm_status-filter {
+  display: flex;
+  align-items: center;
+}
+.bm_status-filter > h4 {
+  margin: 0 10px 0 0;
+  font-size: 16px;
+}
+.bm_status-filter > #bm_bot-status {
+  padding: 5px 12px;
+  font-size: 16px;
+  border-radius: 10px;
+}
+.btn-add-bot.btn-bl-search {
+  margin-left: 10px;
 }
 .btn-add-bot {
   border: none;
@@ -29,6 +46,7 @@
   background-color: #51cbce;
   padding: 5px 15px 5px 15px;
   border-radius: 5px;
+  text-transform: uppercase;
 }
 .btn-edit-bot {
   /* width: 25%; */
