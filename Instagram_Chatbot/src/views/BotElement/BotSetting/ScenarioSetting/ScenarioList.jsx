@@ -61,36 +61,40 @@ function ScenarioList() {
     }, []);
 
     const handleOpenPreview = (isOpen) => {
-        if(isOpen) {
-            document.getElementById('cp-container').style.height = "610px";
-            document.getElementById('cp-header').style.position = "static";
-            document.getElementById('cp-header').style.borderBottomLeftRadius = "0px";
-            document.getElementById('cp-header').style.borderBottomRightRadius = "0px";
-            document.getElementById('cp-process-bar').style.display = "block";
-            document.getElementById('cp-body').style.display = "block";
+        if (isOpen) {
+            document.getElementById('sp-container').style.height = "610px";
+            document.getElementById('sp-header').style.position = "static";
+            document.getElementById('sp-header').style.borderBottomLeftRadius = "0px";
+            document.getElementById('sp-header').style.borderBottomRightRadius = "0px";
+            document.getElementById('sp-process-bar').style.display = "block";
+            document.getElementById('sp-body').style.display = "block";
         } else {
-            document.getElementById('cp-container').style.height = "0px";
-            document.getElementById('cp-process-bar').style.display = "none";
-            document.getElementById('cp-body').style.display = "none";
-            document.getElementById('cp-header').style.borderBottomLeftRadius = "25px";
-            document.getElementById('cp-header').style.borderBottomRightRadius = "25px";
-            document.getElementById('cp-header').style.position = "absolute";
-            document.getElementById('cp-header').style.bottom = "13px";
-
+            document.getElementById('sp-container').style.height = "0px";
+            document.getElementById('sp-process-bar').style.display = "none";
+            document.getElementById('sp-body').style.display = "none";
+            document.getElementById('sp-header').style.borderBottomLeftRadius = "25px";
+            document.getElementById('sp-header').style.borderBottomRightRadius = "25px";
+            document.getElementById('sp-header').style.position = "absolute";
+            document.getElementById('sp-header').style.bottom = "13px";
         }
         setIsOpenPreview(!isOpenPreview);
     }
 
     const onClickPreview = (scenarioId) => {
-        setScenarioId(scenarioId);
+        Cookies.set('scenario_id', scenarioId);
+        setScenarioId("");
+        setTimeout(() => {
+            setScenarioId(scenarioId);
+        }, [100])
+        // handleOpenPreview(true);
         setIsOpenPreview(true);
     }
 
     const getListScenario = (pgIndex) => {
         api.get(`/api/v1/managements/chatbots/${Cookies.get('bot_id')}/scenarios?page=${pgIndex}`).then((res) => {
             console.log(res.data);
-            let scenarios = [...res.data.data];
-            let totalPage = Math.ceil(res.data.total / 25);
+            let scenarios = [...res?.data?.data];
+            let totalPage = Math.ceil(res?.data?.total / 25);
             setTotalPage(totalPage);
             setScenarioSelected(res.data.scenario_selected);
             setScenarioSelectedClone(res.data.scenario_selected);
@@ -128,6 +132,10 @@ function ScenarioList() {
                 console.log(res);
                 if (res.data.code === 1) {
                     setMessageNoti('Add scenario successfully');
+                    Cookies.set('scenario_id', res.data.data.id)
+                    setTimeout(() => {
+                        document.getElementById('to_scenario').click()
+                    }, 1500)
                 } else if (res.data.code === 2) {
                     setMessageNoti(res.data.message);
                 }
@@ -222,7 +230,7 @@ function ScenarioList() {
 
     const onclickEditScenario = (id) => {
         Cookies.set('scenario_id', id);
-    }   
+    }
 
     return (
         <div className="content">
@@ -357,9 +365,14 @@ function ScenarioList() {
                     <span style={{ fontSize: '16px' }}>{messageNoti}</span>
                 </div>
             </ModalNoti>
-            <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioId={scenarioId}/>
+            {scenarioId && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} />}
+            <Link to={`/admin/scenario-setting`}>
+                <button id='to_scenario' style={{ display: 'none' }}>ScSetting</button>
+            </Link>
         </div>
     );
 }
 
 export default ScenarioList;
+
+

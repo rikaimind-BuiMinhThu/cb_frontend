@@ -23,6 +23,7 @@ import ModalShortTem from "./../Popup/ModalShortTem";
 import { Pagination } from '@material-ui/lab';
 import { MDBIcon } from 'mdbreact';
 import { tokenExpired } from "api/tokenExpired";
+import {EC_CHATBOT_URL} from '../../variables/constants';
 
 function Chatbot() {
   const [groupList, setGroupList] = useState([])
@@ -1765,7 +1766,7 @@ function Chatbot() {
           })
           document.getElementById(`imgCustomKey${item.id}`).value = item.received_message
           document.getElementById(`imgNumSaved${item.id}`).addEventListener('change', (e) => loadFileSaved(e, item.id))
-          document.getElementById(`output${item.id}`).src = `https://ec-chatbot-test1.com${item.img_value.url}`
+          document.getElementById(`output${item.id}`).src = `${EC_CHATBOT_URL}${item.img_value.url}`
 
 
 
@@ -2211,14 +2212,14 @@ function Chatbot() {
           var element1 = document.getElementById(`outputOV${item.id}`)
           if (typeof (element1) != 'undefined' && element1 != null) {
             // Exists.
-            document.getElementById(`outputOV${item.id}`).src = `https://ec-chatbot-test1.com${item.img_value.url}`
+            document.getElementById(`outputOV${item.id}`).src = `${EC_CHATBOT_URL}${item.img_value.url}`
           } else if (element1 === null) {
             var abc = document.createElement(`div`)
             document.getElementById('logUserDiv').appendChild(abc)
             abc.innerHTML =
               `
               <div style="width: 100%; padding: 10px; margin:5px; display:block; float: right; border-radius: 10px">
-              <img id="outputOV${item.id}" style="max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" src="${`https://ec-chatbot-test1.com${item.img_value.url}`}">
+              <img id="outputOV${item.id}" style="max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" src="${`${EC_CHATBOT_URL}${item.img_value.url}`}">
                </div> 
               `
             // document.getElementById(`msgOVI${item.id}`).value = item.message_value
@@ -2424,7 +2425,7 @@ function Chatbot() {
           })
           document.getElementById(`imgMgsCustomKey${item.id}`).value = item.received_message
           document.getElementById(`imgMgsCustomSaved${item.id}`).value = item.message_value
-          document.getElementById(`outputImgMsgSaved${item.id}`).src = `https://ec-chatbot-test1.com${item.img_value.url}`
+          document.getElementById(`outputImgMsgSaved${item.id}`).src = `${EC_CHATBOT_URL}${item.img_value.url}`
 
 
 
@@ -2777,7 +2778,7 @@ function Chatbot() {
           if ((typeof (element1) != 'undefined' && element1 != null) || (typeof (element2) != 'undefined' && element2 != null)) {
             // Exists.
             document.getElementById(`imgMsgOVI${item.id}`).value = item.message_value
-            document.getElementById(`outputImgMsgOV${item.id}`).src = `https://ec-chatbot-test1.com${item.img_value.url}`
+            document.getElementById(`outputImgMsgOV${item.id}`).src = `${EC_CHATBOT_URL}${item.img_value.url}`
           } else if (element1 === null) {
             var abc = document.createElement(`div`)
             document.getElementById('logUserDiv').appendChild(abc)
@@ -2789,7 +2790,7 @@ function Chatbot() {
               `
             var abc1 = document.createElement(`div`)
             document.getElementById('logUserDiv').appendChild(abc1)
-            abc1.innerHTML = `<br /><img id="outputImgMsgOV${item.id}" style="max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" src="${`https://ec-chatbot-test1.com${item.img_value.url}`}">`
+            abc1.innerHTML = `<br /><img id="outputImgMsgOV${item.id}" style="max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" src="${`${EC_CHATBOT_URL}${item.img_value.url}`}">`
             document.getElementById(`imgMsgOVI${item.id}`).value = item.message_value
 
           }
@@ -8002,8 +8003,8 @@ function Chatbot() {
               </div>
               <label id="registrationTitleErr" style={{ display: 'none', color: "red" }}></label>
             </label><br /> */}
-            <div style={{ height: "325px", overflowY: "scroll" }}>
-              {hotTem.map((item, i) => (
+            <div style={{ height: "325px", overflowY: "scroll", display:`${hotTem.length != 0 ?'block': 'none'}` }}>
+              {hotTem?.map((item, i) => (
                 <div key={item.id}>
                   <br />
                   <label style={{ width: "100%" }}>

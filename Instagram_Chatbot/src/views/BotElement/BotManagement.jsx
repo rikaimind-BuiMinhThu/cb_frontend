@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
 import './../../assets/css/bot/bot-list.css';
@@ -14,6 +14,7 @@ function BotManagement() {
   // states
   const [botList, setBotList] = useState([]);
   const [page, setPage] = useState(1);
+  const [pageIndex, setPageIndex] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const [isOpenPopupConfirm, setIsOpenPopupConfirm] = useState(false);
   const [msgConfirm, setMsgConfirm] = useState('');
@@ -23,6 +24,7 @@ function BotManagement() {
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState('');
   const [statusSelected, setStatusSelected] = useState('');
+  const [search, setSearch] = useState('');
 
   // side effects
   useEffect(() => {
@@ -41,8 +43,13 @@ function BotManagement() {
   }, []);
 
   useEffect(() => {
+    reloadList(1);
+  }, []);
+
+  function reloadList(pgIndex) {
+    console.log(pgIndex);
     api
-      .get(`/api/v1/managements/chatbots?pages=1`)
+      .get(`/api/v1/managements/chatbots?page=${pgIndex}&name=${search}`)
       .then((res) => {
         console.log('bot list get data: ', res.data);
         setBotList(res.data?.data);
@@ -51,14 +58,18 @@ function BotManagement() {
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
-  }, []);
+  }
+
+  function handleSearch() {
+    reloadList(pageIndex);
+  }
 
   // open bot settings
   function openBotSetting(id) {
-    Cookies.remove('bot_id')
+    Cookies.remove('bot_id');
     Cookies.set('bot_type', 'bot');
     Cookies.set('bot_id', `${id}`);
     window.location.href = '/admin/scenario-list';
@@ -71,13 +82,13 @@ function BotManagement() {
         console.log('duplicate: ', res.data);
         if (res.data.code == 1) {
           setIsOpenNoti(true);
-          setMsgNoti("Duplicate bot successfully!");
+          setMsgNoti('Duplicate bot successfully!');
           setTimeout(() => {
             setIsOpenNoti(false);
             setMsgNoti('');
           }, 2000);
           api
-            .get(`/api/v1/managements/chatbots?pages=1`)
+            .get(`/api/v1/managements/chatbots?page=1`)
             .then((res) => {
               console.log('bot list get data: ', res.data);
               setBotList(res.data?.data);
@@ -86,7 +97,7 @@ function BotManagement() {
             .catch((error) => {
               console.log(error);
               if (error.response?.data.code === 0) {
-                tokenExpired()
+                tokenExpired();
               }
             });
         } else if (res.data.code == 2) {
@@ -101,28 +112,19 @@ function BotManagement() {
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }
 
   // handle change page
   const handleChangePage = (event, value) => {
-    setPage(parseInt(value));
-    api
-      .get(`/api/v1/managements/chatbots?pages=${value}`)
-      .then((res) => {
-        console.log('bot list get data: ', res.data);
-        setBotList(res.data?.data);
-        setTotalPage(Math.ceil(res.data?.total / 10));
-        document.querySelector('.main-panel').scrollTop = 0;
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
-      });
+    if (totalPage > 1) {
+      setPage(parseInt(value));
+      setPageIndex(value);
+      reloadList(value);
+      document.querySelector('.main-panel').scrollTop = 0;
+    }
   };
 
   // handle confirm action
@@ -147,7 +149,7 @@ function BotManagement() {
               setMsgNoti('');
             }, 2000);
             api
-              .get(`/api/v1/managements/chatbots?pages=${page}`)
+              .get(`/api/v1/managements/chatbots?page=${page}`)
               .then((res) => {
                 console.log('bot list get data: ', res.data);
                 setBotList(res.data?.data);
@@ -156,7 +158,7 @@ function BotManagement() {
               .catch((error) => {
                 console.log(error);
                 if (error.response?.data.code === 0) {
-                  tokenExpired()
+                  tokenExpired();
                 }
               });
           } else if (res.data?.code === 2) {
@@ -176,7 +178,7 @@ function BotManagement() {
         .catch((error) => {
           console.log(error);
           if (error.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     }
@@ -197,7 +199,7 @@ function BotManagement() {
               setMsgNoti('');
             }, 2000);
             api
-              .get(`/api/v1/managements/chatbots?pages=1`)
+              .get(`/api/v1/managements/chatbots?page=1`)
               .then((res) => {
                 console.log('bot list get data: ', res.data);
                 setBotList(res.data?.data);
@@ -206,7 +208,7 @@ function BotManagement() {
               .catch((error) => {
                 console.log(error);
                 if (error.response?.data.code === 0) {
-                  tokenExpired()
+                  tokenExpired();
                 }
               });
           } else if (res.data?.code === 2) {
@@ -225,7 +227,7 @@ function BotManagement() {
         .catch((error) => {
           console.log(error);
           if (error.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     }
@@ -262,6 +264,16 @@ function BotManagement() {
             <Card>
               <CardHeader>
                 <div className="div-add-bot">
+                  <div className="div-add-bot--search">
+                    <input
+                      type="text"
+                      placeholder="search ..."
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                    <button className="btn-add-bot" onClick={() => handleSearch()}>
+                      Search
+                    </button>
+                  </div>
                   <Link to={'/admin/add-bot-management'}>
                     <button className="btn-add-bot">Add bot</button>
                   </Link>
@@ -280,40 +292,48 @@ function BotManagement() {
                     </tr>
                   </thead>
                   <tbody>
-                    {botList.map((bot) => (
-                      <tr key={bot?.id}>
-                        <td className="border-table-bot">{bot?.id}</td>
-                        <td className="border-table-bot">{bot?.bot_name}</td>
-                        <td className="border-table-bot">{bot?.status}</td>
-                        <td className="border-table-bot">Hoang Cong Nghia</td>
-                        <td className="border-table-bot">Owner</td>
-                        <td className="border-table-bot action-table-bot">
-                          <div className="action-wrapper">
-                            <button className="btn-edit-bot" onClick={() => openBotSetting(bot.id)}>
-                              編集
-                            </button>
-                            <button className="btn-duplicate-bot" onClick={() => duplicateBot(bot.id)}>
-                              複製
-                            </button>
-                            <Link to={`/admin/demo-bot/${bot?.id}`}>
-                              <button className="btn-demo-bot">デモ</button>
-                            </Link>
-                            <button
-                              className="btn-stop-bot"
-                              onClick={() => handleStopBot(bot?.id, bot?.status)}
-                            >
-                              {bot?.status === 'off' ? 'スタート' : 'ストップ'}
-                            </button>
-                            <button
-                              className="btn-delete-bot"
-                              onClick={() => handleDeleteBot(bot?.id)}
-                            >
-                              削除
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                    {botList != []
+                      ? botList.map((bot) => (
+                          <tr key={bot?.id}>
+                            <td className="border-table-bot">{bot?.id}</td>
+                            <td className="border-table-bot">{bot?.bot_name}</td>
+                            <td className="border-table-bot">{bot?.status}</td>
+                            <td className="border-table-bot">Hoang Cong Nghia</td>
+                            <td className="border-table-bot">Owner</td>
+                            <td className="border-table-bot action-table-bot">
+                              <div className="action-wrapper">
+                                <button
+                                  className="btn-edit-bot"
+                                  onClick={() => openBotSetting(bot.id)}
+                                >
+                                  編集
+                                </button>
+                                <button
+                                  className="btn-duplicate-bot"
+                                  onClick={() => duplicateBot(bot.id)}
+                                >
+                                  複製
+                                </button>
+                                <Link to={`/admin/demo-bot/${bot?.id}`}>
+                                  <button className="btn-demo-bot">デモ</button>
+                                </Link>
+                                <button
+                                  className="btn-stop-bot"
+                                  onClick={() => handleStopBot(bot?.id, bot?.status)}
+                                >
+                                  {bot?.status === 'off' ? 'スタート' : 'ストップ'}
+                                </button>
+                                <button
+                                  className="btn-delete-bot"
+                                  onClick={() => handleDeleteBot(bot?.id)}
+                                >
+                                  削除
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      : ''}
                   </tbody>
                 </Table>
                 <Pagination

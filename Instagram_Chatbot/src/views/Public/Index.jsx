@@ -4,7 +4,7 @@ import Iframe from 'react-iframe'
 function Index() {
   return (
     <div>
-        <Iframe url="https://deel.co.jp/ecchatbot_9/"
+        <Iframe url="https://deel.co.jp/ec-chatbot/index.html"
         id="test"
         className=""
         display="block"

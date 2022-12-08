@@ -4,6 +4,7 @@ let dataClone = {
     {
       id: '1',
       hidden: true,
+      message_name: '',
       belong_to: 'user',
       conditions: [
         {
@@ -13,7 +14,135 @@ let dataClone = {
           inputCondition: ''
         }
       ],
-      message_content: [
+      message_content: [       
+        {
+          id: 12,
+          type: 'card_payment_radio_button',
+          card_payment_radio_button: {
+            type: '', //default, customized_style, picture_radio
+            save_input_content: 'yes', // yes-no
+            require: 'yes', //yes-no
+            title_require: 'yes', //yes-no
+            title: '', //string
+            is_hide_card_name: true,
+            is_hide_cvc: true,
+            separate_type: true,
+            validity_check: true,
+            type_date_of_expiry: 'MY', // 2 values: MY, YM
+            payment_method: [], // 6 types: visa, jcb, mastercard, american_express, discover
+            card_number_placeholder: '',
+            card_holder_placeholder: '',
+            month_placeholder: '',
+            year_placeholder: '',
+            cvc_placeholder: '',
+            initial_selection: '',
+            card_linked_setting: '',
+            // initial_selection_radio_img: '',
+            radio_contents: [
+              {
+                text: '',
+                value: ''
+              }
+            ],
+            radio_contents_img: [
+              {
+                id: 1,
+                contents: [
+                  {
+                    file_url: '',
+                    title: '',
+                    value: ''
+                  }
+                ]
+              }
+            ]
+          }
+        }, 
+        {
+          id: 20,
+          type: 'product_purchase',
+          product_purchase: {
+            title_require: true, //true-false
+            title: '', //string
+            require: true, //true-false
+            type: '', //type: text_with_thumbnail_image, text_with_image, consume_api_respone,
+            initial_selection: [],
+            quantity_designation_all: true,
+            product_number_display: false,
+            price_display: false,
+            product_name_display: false,
+            multiple_item_purchase: false,
+            products: [
+              {
+                img_url: '',
+                title: '',
+                item_number: '',
+                item_price: 0,
+                quantity_limit: 0, //number
+                price_display_custom: '',
+                is_quantity_designation: true
+              }
+            ]
+          }
+        },
+        {
+          id: 10,
+          type: 'carousel',
+          carousel: {
+            save_input_content: 'yes', // yes-no
+            use_api_input_value: 'yes', // yes-no
+            require: 'yes', //yes-no
+            title_require: 'yes', //yes-no
+            title: '', //string
+            type: 'default', // 7 values: text, urls, email_address,
+            //email_confirmation, phone_number, password, password_confirmation
+            default: {
+              contents: [
+                {
+                  title: '',
+                  subtitle: '',
+                  urls: '',
+                  fileUrl: '',
+                  buttonTitle: ''
+                }
+              ]
+            }
+          }
+        },
+        {
+          id: 12,
+          type: 'credit_card_payment',
+          credit_card_payment: {
+            save_input_content: 'yes', // yes-no
+            require: 'yes', //yes-no
+            title_require: 'yes', //yes-no
+            title: '', //string
+            is_hide_card_name: true,
+            is_hide_cvc: true,
+            separate_type: true,
+            validity_check: true,
+            type_date_of_expiry: 'MY', // 2 values: MY, YM
+            payment_method: [], // 6 types: visa, jcb, mastercard, american_express, discover
+            card_number_placeholder: '',
+            card_holder_placeholder: '',
+            month_placeholder: '',
+            year_placeholder: '',
+            cvc_placeholder: ''
+          }
+        },
+        {
+          id: 13,
+          type: 'capture',
+          capture: {
+            title_require: 'yes', //yes-no
+            title: '', //string
+            value: '',
+            type: '', //type: numbers, alphanumeric, alphabet_only,
+            length: 3,
+            colour: '', //type: can_be, none
+            value_captcha: ''
+          }
+        },
         {
           id: 1,
           type: 'text_input',
@@ -325,6 +454,7 @@ let dataClone = {
       id: '2',
       hidden: true,
       belong_to: 'bot',
+      message_name: '',
       message_content: [
         {
           type: 'text',

@@ -10,6 +10,8 @@ import Security from 'views/Public/Security';
 import Agreement from 'views/Public/Agreement';
 import Company from 'views/Public/Company';
 import Contact from 'views/Public/Contact';
+import ShortUrl from 'views/Public/ShortUrl';
+import PreviewClone from 'views/BotElement/BotSetting/PreviewClone';
 class App extends Component {
   render() {
     return (
@@ -32,10 +34,12 @@ class App extends Component {
             <Route exact path="/agreement" component={Agreement} />
             <Route exact path="/company" component={Company} />
             <Route exact path="/contact" component={Contact} />
+            <Route exact path="/preview-customer" component={PreviewClone} />
             <Route exact path="/" component={Login} />
             <Route path="/sign-in" component={Login} />
             <Route path="/admin" render={(props) => <Admin {...props} />} />
-            <Redirect to="/admin/dashboard" />
+            <Route component={ShortUrl}></Route>
+            {/* <Redirect to="/admin/dashboard" /> */}
           </Switch>
         </div>
       </BrowserRouter>

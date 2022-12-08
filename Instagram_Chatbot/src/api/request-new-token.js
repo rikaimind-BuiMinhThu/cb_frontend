@@ -3,12 +3,13 @@ import React, { useState } from "react";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
 import { setToken } from "./auth";
+import { EC_CHATBOT_URL } from "variables/constants";
 export default function requestNewToken(pathname) {
     var header = `Authorization: Bearer ${Cookies.get('refreshToken')}`;
     axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('refreshToken')}`;
     
     axios
-        .post("https://ec-chatbot-test1.com/api/v1/refresh_token", header)
+        .post(`${EC_CHATBOT_URL}/api/v1/refresh_token`, header)
         .then(data => {
             // console.log("data ne: ", data.data.token)
             // setToken('token', data.data.access_token);

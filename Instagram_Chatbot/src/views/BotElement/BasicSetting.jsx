@@ -15,6 +15,8 @@ function BasicSetting() {
   const [userDetail, setUserDetail] = useState({});
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState();
+  const [language, setLanguage] = useState('');
+  const [division, setDivision] = useState('');
 
   useEffect(() => {
     setUsreIdEC(Cookies.get('user_id'));
@@ -24,13 +26,14 @@ function BasicSetting() {
     api
       .get(`/api/v1/managements/users/${Cookies.get('user_id')}`)
       .then((res) => {
-        console.log(res.data.data);
         setUserDetail(res.data.data);
+        setLanguage(res.data.data.language);
+        setDivision(res.data.data.business_division);
       })
       .catch((err) => {
         console.log(err);
         if (err.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }, []);
@@ -42,8 +45,8 @@ function BasicSetting() {
     utils.checkMaxLength('job_title', 'errPosition', 'Position', 50);
     utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'The Mail address');
     utils.checkTel('phone_number', 'errPhone', 'The Tel');
-    utils.checkInput('post_code', 'errPostCost', 'The Zip code');
     utils.checkInput('address', 'errAddress', 'The Address');
+    utils.checkUrl('url', 'errUrl', 'The Url');
     if (
       utils.checkInput('fullname', 'errFullname', 'The name') &&
       utils.checkInput('companyName', 'errCompanyname', 'Company name') &&
@@ -51,8 +54,8 @@ function BasicSetting() {
       utils.checkMaxLength('job_title', 'errPosition', 'Position', 50) &&
       utils.checkEmailRequired('emailAddress', 'errEmailAddress', 'The Mail address') &&
       utils.checkTel('phone_number', 'errPhone', 'The Tel') &&
-      utils.checkInput('post_code', 'errPostCost', 'The Zip code') &&
-      utils.checkInput('address', 'errAddress', 'The Address')
+      utils.checkInput('address', 'errAddress', 'The Address') &&
+      utils.checkUrl('url', 'errUrl', 'The Url')
     ) {
       const form = document.getElementById('form-basic-setting');
       const obj = {};
@@ -84,7 +87,7 @@ function BasicSetting() {
         .catch((err) => {
           console.log(err);
           if (err.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     }
@@ -99,9 +102,12 @@ function BasicSetting() {
               <CardBody>
                 <form id="form-basic-setting">
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">Full name</span>
+                    <span className="bs-field-lable">
+                      Full name <span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="fullname"
                         type="text"
                         placeholder="enter input ..."
@@ -116,7 +122,12 @@ function BasicSetting() {
                   <div className="bs-field-container">
                     <span className="bs-field-lable">Business category</span>
                     <div className="bs-field-input">
-                      <select name="business_division" value={userDetail.business_division}>
+                      <select
+                        className="bs-field-input-select"
+                        name="business_division"
+                        value={division}
+                        onChange={(e) => setDivision(e.target.value)}
+                      >
                         <option value="sole_proprietorship">Sole proprietorship</option>
                         <option value="corporation">Corporation</option>
                       </select>
@@ -124,9 +135,12 @@ function BasicSetting() {
                   </div>
 
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">Company name</span>
+                    <span className="bs-field-lable">
+                      Company name <span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="companyName"
                         type="text"
                         placeholder="enter input ..."
@@ -144,6 +158,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">Department</span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="department"
                         type="text"
                         placeholder="enter input ..."
@@ -161,6 +176,7 @@ function BasicSetting() {
                     <span className="bs-field-lable">Position</span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="job_title"
                         type="text"
                         placeholder="enter input ..."
@@ -175,9 +191,12 @@ function BasicSetting() {
                   </div>
 
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">Email address</span>
+                    <span className="bs-field-lable">
+                      Email address<span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="emailAddress"
                         type="text"
                         placeholder="enter input ..."
@@ -196,9 +215,12 @@ function BasicSetting() {
                   </div>
 
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">Phone number</span>
+                    <span className="bs-field-lable">
+                      Phone number<span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="phone_number"
                         type="number"
                         placeholder="enter input ..."
@@ -214,23 +236,24 @@ function BasicSetting() {
                     <span className="bs-field-lable">Post code</span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="post_code"
                         type="number"
                         placeholder="enter input ..."
                         name="post_code"
                         defaultValue={userDetail.post_code}
-                        onChange={() =>
-                          utils.checkInput('post_code', 'errPostCost', 'The Zip code')
-                        }
                       ></input>
                       <span id="errPostCost" className="bs-err-format"></span>
                     </div>
                   </div>
 
                   <div className="bs-field-container">
-                    <span className="bs-field-lable">Address</span>
+                    <span className="bs-field-lable">
+                      Address<span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="bs-field-input">
                       <input
+                        className="bs-field-input-item"
                         id="address"
                         type="text"
                         placeholder="enter input ..."
@@ -241,16 +264,35 @@ function BasicSetting() {
                       <span id="errAddress" className="bs-err-format"></span>
                     </div>
                   </div>
-
                   <div className="bs-field-container">
                     <span className="bs-field-lable">Language</span>
                     <div className="bs-field-input">
-                      <select name="language" value={userDetail.language}>
+                      <select
+                        className="bs-field-input-select"
+                        name="language"
+                        value={language}
+                        onChange={(e) => setLanguage(e.target.value)}
+                      >
                         <option value="japanese">Japanese</option>
                         <option value="english">English</option>
                         <option value="vietnamese">Vietnamese</option>
                         <option value="chinese">Chinese</option>
                       </select>
+                    </div>
+                  </div>
+                  <div className="bs-field-container">
+                    <span className="bs-field-lable">URL</span>
+                    <div className="bs-field-input">
+                      <input
+                        className="bs-field-input-item"
+                        id="url"
+                        type="text"
+                        placeholder="enter input ..."
+                        name="url"
+                        defaultValue={userDetail.url}
+                        onChange={() => utils.checkUrl('url', 'errUrl', 'The Url')}
+                      ></input>
+                      <span id="errUrl" className="bs-err-format"></span>
                     </div>
                   </div>
                 </form>

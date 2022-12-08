@@ -9,6 +9,7 @@ import Cookies from 'js-cookie';
 import { setToken } from "api/auth";
 import logo from '../../assets/img/logoEC.jpg'
 import LoginFacebook from "./LoginFacebook";
+import {EC_CHATBOT_URL} from '../../variables/constants'
 class Login extends React.Component {
 
   constructor(props) {
@@ -42,7 +43,7 @@ class Login extends React.Component {
       document.getElementById('passwordMessage').innerHTML = ""
       // const loginInfo = { username: nameValue, password: password };
       const loginInfo = { user: { email: nameValue, password: password } }
-      axios.post(`https://ec-chatbot-test1.com/api/v1/sign_in`, loginInfo)
+      axios.post(`${EC_CHATBOT_URL}/api/v1/sign_in`, loginInfo)
         .then(res => {
           document.getElementById("loginErrorMsg").style.display = "none"
           const persons = res.data;
@@ -96,7 +97,7 @@ class Login extends React.Component {
       document.getElementById('passwordMessage').innerHTML = ""
       // const loginInfo = { username: nameValue, password: password };
       const loginInfo = { user: { email: nameValue, password: password } }
-      axios.post(`https://ec-chatbot-test1.com/api/v1/sign_in`, loginInfo)
+      axios.post(`${EC_CHATBOT_URL}/api/v1/sign_in`, loginInfo)
         .then(res => {
           document.getElementById("loginErrorMsg").style.display = "none"
           console.log(res)
