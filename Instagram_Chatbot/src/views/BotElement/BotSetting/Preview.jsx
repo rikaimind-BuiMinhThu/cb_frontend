@@ -1587,7 +1587,11 @@ function Preview({ onOpenPreview, isOpen }) {
       setScenarioId(null);
       setTimeout(() => {
         setScenarioId(Cookies.get('scenario_id'));
-        document.getElementById("action-bd").click();
+        if (document.getElementById("action-bd")) {
+          document.getElementById("action-bd").click();
+        } else {
+          onOpenPreview(false);
+        }
       }, 10);
     } else if (withdrawal.withdrawal_prevention_status === "standard_exit_popup" || withdrawal.withdrawal_prevention_status === "image_popup") {
       document.getElementById("sp-withdrawal-container").style.display = "block";
@@ -1626,7 +1630,11 @@ function Preview({ onOpenPreview, isOpen }) {
                 setScenarioId(null);
                 setTimeout(() => {
                   setScenarioId(Cookies.get('scenario_id'));
-                  document.getElementById("action-bd").click();
+                  if (document.getElementById("action-bd")) {
+                    document.getElementById("action-bd").click();
+                  } else {
+                    onOpenPreview(false);
+                  }
                 }, 10);
               }}>
                 Close up
@@ -1643,7 +1651,7 @@ function Preview({ onOpenPreview, isOpen }) {
                 <div className="sp-header-left-label-title">{botInfor?.title}</div>
               </div>
             </div>
-            <div className="sp-header-right" onClick={() => { isOpen ? handleOpenWithDrawal() : onOpenPreview(true)}}>
+            <div className="sp-header-right" onClick={() => { isOpen ? handleOpenWithDrawal() : onOpenPreview(true) }}>
               <div className="sp-header-right-arrow">
                 {isOpen ? <MDBIcon fas icon="chevron-down" /> : <MDBIcon fas icon="chevron-up" />}
               </div>
@@ -1750,7 +1758,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                     <img
                       src={content[content.type]?.content}
                       alt=""
-                      style={{ width: '50%', marginLeft: '8px' }} />
+                      style={{ width: '100%', marginLeft: '8px' }} />
                   }
                   {content[content.type]?.content.includes('pdf') &&
                     <span
