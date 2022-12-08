@@ -6188,6 +6188,7 @@ const Scenario = () => {
                                                                                                   />
                                                                                                   <MDBIcon onClick={() => {
                                                                                                     setIsOpenFileReference(true)
+                                                                                                    setAcceptFile(['image']);
                                                                                                     setVarFileReference({ indexContent, contentType: content.type, subContentType: 'checkbox_img', indexSubContentType: indexCheckbox, childSubContentType: 'contents', indexChildSubContentType: indexContentCheckbox, img: 'file_url' })
                                                                                                   }}
                                                                                                     fas icon="paperclip"
@@ -6417,6 +6418,7 @@ const Scenario = () => {
                                                           }
                                                           <CheckboxCustom
                                                             label="Use the dropdown"
+                                                            className="ss-user-setting-custom-width-checkbox"
                                                             style={{ width: '35%', paddingLeft: '7px', marginBottom: '0px' }}
                                                             onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_use_dropdown')}
                                                             value={zipCodeAddress.is_use_dropdown}
@@ -8079,7 +8081,7 @@ const Scenario = () => {
                                                       </div>
                                                       <div className="ss-user-setting__item-bottom">
                                                         <div style={{ width: '90%' }}>
-                                                          <img style={{ width: '35%' }} src={`https://svg-captcha.herokuapp.com/captchapreview?size=${capture.length}${capture.colour ? "&color=true" : ""}&charPreset=${capture.type}`} />
+                                                          <img style={{ width: '35%' }} src={`https://svg-captcha-nodejs.vercel.app/captchapreview?size=${capture.length}${capture.colour ? "&color=true" : ""}&charPreset=${capture.type}`} />
                                                         </div>
                                                       </div>
                                                     </React.Fragment>

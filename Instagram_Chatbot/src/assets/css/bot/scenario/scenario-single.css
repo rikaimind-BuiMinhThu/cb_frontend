@@ -1674,7 +1674,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-overview-product-purchase-style-width .ant-checkbox-wrapper span:nth-child(1) {
-  width: 4%;
+  width: 16px;
 }
 
 .ss-user-overview-product-purchase-style-width .ant-checkbox-wrapper span:nth-child(2) {
@@ -1875,3 +1875,6 @@ input#ss-message__content--user-checkbox--checkbox_img {
   color: #ccc !important;
 }
 
+.ss-user-setting-custom-width-checkbox {
+  width: 35% !important;
+}
