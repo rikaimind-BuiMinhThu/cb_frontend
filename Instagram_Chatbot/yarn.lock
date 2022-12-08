@@ -10094,6 +10094,11 @@
   "resolved" "https://registry.npmjs.org/mute-stdout/-/mute-stdout-1.0.1.tgz"
   "version" "1.0.1"
 
+"nano-metadata@^0.1.2":
+  "integrity" "sha512-2X7mlyq9BwpMNI1qcrVMbCkvAFmG9+xW8u8XfpTGZjspNPPano0cBSbUq+T7ufgpcn4AsciSKEEKf97MIiOtAw=="
+  "resolved" "https://registry.npmjs.org/nano-metadata/-/nano-metadata-0.1.2.tgz"
+  "version" "0.1.2"
+
 "nanoid@^3.3.4":
   "integrity" "sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw=="
   "resolved" "https://registry.npmjs.org/nanoid/-/nanoid-3.3.4.tgz"

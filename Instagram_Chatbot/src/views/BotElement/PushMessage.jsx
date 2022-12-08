@@ -8,6 +8,7 @@ import api from '../../api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
 import { Link } from 'react-router-dom';
 import ModalNoti from 'views/Popup/ModalNoti';
+import * as utils from './../../JS/validate.js';
 import ModalShort from 'views/Popup/ModalShort';
 function PushMessage() {
   const [startDate, setStartDate] = useState(null);
@@ -25,8 +26,8 @@ function PushMessage() {
   const [alternateSendTime, setAlternateSendTime] = useState([]);
   const [listExcludedTimeAlt, setListExcluedTimeAlt] = useState([]);
   const [update, setUpdate] = useState(false);
-  const [itemUpdate, setItemUpdate] = useState()
-  const [isChecked, setIsChecked] = useState(false)
+  const [itemUpdate, setItemUpdate] = useState();
+  const [isChecked, setIsChecked] = useState(false);
 
   useEffect(() => {
     let listAlternateTime = [];
@@ -106,7 +107,6 @@ function PushMessage() {
     setNumHotTemp(numHotTemp + 1);
   }
   function getEmailList() {
-    
     var bot_id = Cookies.get('bot_id');
     api
       .get(`/api/v1/managements/emails?page=all&chatbot_id=${bot_id}`)
@@ -124,14 +124,12 @@ function PushMessage() {
         }
         // setEmailDetailId(res?.data?.data[0].id)
         // set1stEmailDetailId()
-        // group.value = 
+        // group.value =
         console.log('check status update', update);
-        if(update == true){
-          if(group)
-          group.value = emailDetailId
-        }else{
-          if(group)
-          group.value = res?.data?.data[0].id
+        if (update == true) {
+          if (group) group.value = emailDetailId;
+        } else {
+          if (group) group.value = res?.data?.data[0].id;
         }
       })
       .catch((err) => {
@@ -206,13 +204,27 @@ function PushMessage() {
     }
   }
 
+  function handleChangeDate(date) {
+    console.log('dateChange');
+    console.log(date);
+    if(date == null){
+      console.log('deleted date');
+      console.log('start date', itemUpdate?.started_at);
+      setStartDate(startDate)
+    }else{
+      setStartDate(date);
+    }
+    // utils.checkRequired('startDateTime', 'startDateTimeErr', 'Start date time');
+  }
+
   function addPM() {
     getEmailList();
     setIsOpenAddPM(true);
+    setUpdate(false);
   }
 
   function closeAddPM() {
-    setUpdate(false)
+    setUpdate(false);
     setCustomDiv([]);
     setIsOpenAddPM(false);
   }
@@ -255,141 +267,149 @@ function PushMessage() {
   }
 
   function savePM() {
-    var bot_id = Cookies.get('bot_id');
-    const formAdd = document.getElementById('form_add_PM');
-    let push_message = {};
-    let variableList = [];
-    let sysVariableList = [];
-    let operatorList = [];
-    let valueList = [];
-    let checkedTitle = false;
-    let checkedStartAt = false;
-    for (let i = 0; i < formAdd.length; i++) {
-      if (formAdd[i].name.includes('title')) {
-        if (formAdd[i].value !== '') {
-          checkedTitle = true;
-        }
-      }
-      if (formAdd[i].name.includes('started_at')) {
-        if (formAdd[i].value !== '') {
-          checkedStartAt = true;
-        }
-      }
-      if (
-        !formAdd[i].name.includes('variable_id') &&
-        !formAdd[i].name.includes('operator') &&
-        !formAdd[i].name.includes('var') &&
-        !formAdd[i].name.includes('value')
-      ) {
-        if (formAdd[i].name.includes('has_timezone_exclusion')) {
-          if (document.getElementById('has_timezone_exclusion').checked == true) {
-            push_message[formAdd[i].name] = 'yes';
-          } else if (document.getElementById('has_timezone_exclusion').checked == false) {
-            push_message[formAdd[i].name] = 'no';
-          }
-        } else {
-          push_message[formAdd[i].name] = formAdd[i].value;
-        }
-      } else if (formAdd[i].name.includes('variable_id')) {
+    utils.checkRequired('title', 'titleErr', 'Push message name');
+    utils.checkRequired('startDateTime', 'startDateTimeErr', 'Start date time');
+    if (
+      utils.checkRequired('title', 'titleErr', 'Push message name') &&
+      utils.checkRequired('startDateTime', 'startDateTimeErr', 'Start date time')
+    ) {
+      var bot_id = Cookies.get('bot_id');
+      const formAdd = document.getElementById('form_add_PM');
+      let push_message = {};
+      let variableList = [];
+      let sysVariableList = [];
+      let operatorList = [];
+      let valueList = [];
+      // let checkedTitle = false;
+      // let checkedStartAt = false;
+      for (let i = 0; i < formAdd.length; i++) {
+        // if (formAdd[i].name.includes('title')) {
+        //   if (formAdd[i].value !== '') {
+        //     checkedTitle = true;
+        //   }
+        // }
+        // if (formAdd[i].name.includes('started_at')) {
+        //   if (formAdd[i].value !== '') {
+        //     checkedStartAt = true;
+        //   }
+        // }
         if (
-          formAdd[i].value !== 'current_url_param' ||
-          formAdd[i].value !== 'current_url' ||
-          formAdd[i].value !== 'current_url_title' ||
-          formAdd[i].value !== 'user_id' ||
-          formAdd[i].value !== 'bot_id' ||
-          formAdd[i].value !== 'preview_flg' ||
-          formAdd[i].value !== 'user_ip_address' ||
-          formAdd[i].value !== 'user_country' ||
-          formAdd[i].value !== 'user_device' ||
-          formAdd[i].value !== 'user_browser' ||
-          formAdd[i].value !== 'user_agent' ||
-          formAdd[i].value !== 'cv_datetime' ||
-          formAdd[i].value !== 'cv_flg' ||
-          formAdd[i].value !== 'start_datetime' ||
-          formAdd[i].value !== 'user_referer_firstopen' ||
-          formAdd[i].value !== 'user_referer_current'
+          !formAdd[i].name.includes('variable_id') &&
+          !formAdd[i].name.includes('operator') &&
+          !formAdd[i].name.includes('var') &&
+          !formAdd[i].name.includes('value')
         ) {
-          variableList.push(formAdd[i].value);
-          sysVariableList.push('');
-        } else {
-          variableList.push('');
-          sysVariableList.push(formAdd[i].value);
+          if (formAdd[i].name.includes('has_timezone_exclusion')) {
+            if (document.getElementById('has_timezone_exclusion').checked == true) {
+              push_message[formAdd[i].name] = 'yes';
+            } else if (document.getElementById('has_timezone_exclusion').checked == false) {
+              push_message[formAdd[i].name] = 'no';
+            }
+          } else {
+            push_message[formAdd[i].name] = formAdd[i].value;
+          }
+        } else if (formAdd[i].name.includes('variable_id')) {
+          if (
+            formAdd[i].value !== 'current_url_param' ||
+            formAdd[i].value !== 'current_url' ||
+            formAdd[i].value !== 'current_url_title' ||
+            formAdd[i].value !== 'user_id' ||
+            formAdd[i].value !== 'bot_id' ||
+            formAdd[i].value !== 'preview_flg' ||
+            formAdd[i].value !== 'user_ip_address' ||
+            formAdd[i].value !== 'user_country' ||
+            formAdd[i].value !== 'user_device' ||
+            formAdd[i].value !== 'user_browser' ||
+            formAdd[i].value !== 'user_agent' ||
+            formAdd[i].value !== 'cv_datetime' ||
+            formAdd[i].value !== 'cv_flg' ||
+            formAdd[i].value !== 'start_datetime' ||
+            formAdd[i].value !== 'user_referer_firstopen' ||
+            formAdd[i].value !== 'user_referer_current'
+          ) {
+            variableList.push(formAdd[i].value);
+            sysVariableList.push('');
+          } else {
+            variableList.push('');
+            sysVariableList.push(formAdd[i].value);
+          }
+        } else if (formAdd[i].name.includes('operator')) {
+          operatorList.push(formAdd[i].value);
+        } else if (formAdd[i].name.includes('value')) {
+          valueList.push(formAdd[i].value);
         }
-      } else if (formAdd[i].name.includes('operator')) {
-        operatorList.push(formAdd[i].value);
-      } else if (formAdd[i].name.includes('value')) {
-        valueList.push(formAdd[i].value);
-      }
-      // if( formAdd[i].name == 'has_timezone_exclusion'){
-      //   // console.log(document.getElementById('has_timezone_exclusion').checked)
+        // if( formAdd[i].name == 'has_timezone_exclusion'){
+        //   // console.log(document.getElementById('has_timezone_exclusion').checked)
 
-      //   // console.log(formAdd[i].value, 'value ne')
-      //   if(document.getElementById('has_timezone_exclusion').checked == true){
-      //     variableList.push('yes')
-      //   }else if(document.getElementById('has_timezone_exclusion').checked == false){
-      //     variableList.push('no')
-      //   }
-      // }
-    }
-    let varList = [];
-    for (var i = 0; i < variableList.length; i++) {
-      varList.push({
-        variable_id: variableList[i],
-        // variable_name: sysVariableList[i],
-        operator: operatorList[i],
-        value: valueList[i],
-      });
-    }
-    if (checkedStartAt == true && checkedTitle == true) {
+        //   // console.log(formAdd[i].value, 'value ne')
+        //   if(document.getElementById('has_timezone_exclusion').checked == true){
+        //     variableList.push('yes')
+        //   }else if(document.getElementById('has_timezone_exclusion').checked == false){
+        //     variableList.push('no')
+        //   }
+        // }
+      }
+      let varList = [];
+      for (var i = 0; i < variableList.length; i++) {
+        varList.push({
+          variable_id: variableList[i],
+          // variable_name: sysVariableList[i],
+          operator: operatorList[i],
+          value: valueList[i],
+        });
+      }
+      //if (checkedStartAt == true && checkedTitle == true) {
       push_message.variables = varList;
       // var pmAdd = {push_message: {user}}
       console.log({ push_message });
-      if(update == false){
+      if (update == false) {
         api
-        .post(`/api/v1/managements/push_messages?chatbot_id=${bot_id}`, {push_message})
-        .then((res) => {
-          if (res.data.code == 1) {
-            setMsgNoti('Add Push Message successfully');
-            setIsOpenNoti(true);
-            setTimeout(() => {
-              setIsOpenNoti(false);
-              setMsgNoti('');
-              reloadListPM();
-            }, 1500);
-            setIsOpenAddPM(false);
-          } else if (res.data.code == 2) {
-            console.log(res.data.message);
-          }
-        })
-        .catch((error) => {
-          if (error?.response.data.code == 0) {
-            tokenExpired();
-          }
-        });
-      }else{
-        api.patch(`/api/v1/managements/push_messages/${idPMUpdate}`,{push_message}).then((res) => {
-          if (res.data.code == 1) {
-            setMsgNoti('Update Push Message successfully');
-            setIsOpenNoti(true);
-            setTimeout(() => {
-              setIsOpenNoti(false);
-              setMsgNoti('');
-              reloadListPM();
-            }, 1500);
-            setIsOpenAddPM(false);
-          } else if (res.data.code == 2) {
-            console.log(res.data.message);
-          }
-        })
-        .catch((error) => {
-          if (error?.response.data.code == 0) {
-            tokenExpired();
-          }
-        });
+          .post(`/api/v1/managements/push_messages?chatbot_id=${bot_id}`, { push_message })
+          .then((res) => {
+            if (res.data.code == 1) {
+              setMsgNoti('Add Push Message successfully');
+              setIsOpenNoti(true);
+              setTimeout(() => {
+                setIsOpenNoti(false);
+                setMsgNoti('');
+                reloadListPM();
+              }, 1500);
+              setIsOpenAddPM(false);
+            } else if (res.data.code == 2) {
+              console.log(res.data.message);
+            }
+          })
+          .catch((error) => {
+            if (error?.response.data.code == 0) {
+              tokenExpired();
+            }
+          });
+      } else {
+        api
+          .patch(`/api/v1/managements/push_messages/${idPMUpdate}`, { push_message })
+          .then((res) => {
+            if (res.data.code == 1) {
+              setMsgNoti('Update Push Message successfully');
+              setIsOpenNoti(true);
+              setTimeout(() => {
+                setIsOpenNoti(false);
+                setMsgNoti('');
+                reloadListPM();
+              }, 1500);
+              setIsOpenAddPM(false);
+            } else if (res.data.code == 2) {
+              console.log(res.data.message);
+            }
+          })
+          .catch((error) => {
+            if (error?.response.data.code == 0) {
+              tokenExpired();
+            }
+          });
       }
-      
-    } else {
-      console.log('empty');
+      // } else {
+      //   console.log('empty');
+      // }
     }
 
     // console.log(varList)
@@ -399,14 +419,13 @@ function PushMessage() {
     console.log(value);
     if (value == true) {
       document.getElementById('excludedTime').style.display = 'block';
-      setIsChecked(true)
+      setIsChecked(true);
       // document.getElementById('alternateTime').style.display= 'block'
     } else {
       document.getElementById('excludedTime').style.display = 'none';
-      setIsChecked(false)
+      setIsChecked(false);
       // document.getElementById('alternateTime').style.display= 'none'
     }
-   
   }
 
   function changeStatus(item) {
@@ -416,7 +435,7 @@ function PushMessage() {
         .then((res) => {
           setIsOpenNoti(true);
           setMsgNoti(`Unsubscribe successfully!`);
-          reloadListPM()
+          reloadListPM();
           setTimeout(() => {
             setIsOpenNoti(false);
             setMsgNoti(``);
@@ -432,7 +451,7 @@ function PushMessage() {
       api
         .patch(`/api/v1/managements/push_messages/${item.id}/subscribe`)
         .then((res) => {
-          setIsOpenNoti(true)
+          setIsOpenNoti(true);
           setMsgNoti(`Subscribe successfully!`);
           reloadListPM();
           setTimeout(() => {
@@ -451,29 +470,29 @@ function PushMessage() {
     // /api/v1/managements/push_messages/id/unsubscribe
   }
 
-  const [emailDetailId, setEmailDetailId] = useState()
-  const [idPMUpdate, setIdPMUpdate] = useState()
+  const [emailDetailId, setEmailDetailId] = useState();
+  const [idPMUpdate, setIdPMUpdate] = useState();
   function editPushMessage(item) {
-    setUpdate(true)
-    setIdPMUpdate(item.id)
-    setEmailDetailId(item.email_id)
-    if(item.has_timezone_exclusion == 'yes'){
-       setIsChecked(true)
-    }else{
-      setIsChecked(false)
+    setUpdate(true);
+    setIdPMUpdate(item.id);
+    setEmailDetailId(item.email_id);
+    if (item.has_timezone_exclusion == 'yes') {
+      setIsChecked(true);
+    } else {
+      setIsChecked(false);
     }
-   
-    console.log('email detail id: ', item.email_id)
-    
+
+    console.log('email detail id: ', item.email_id);
+
     item.started_at = item.started_at.substring(0, 19).replaceAll('T', ' ');
     delete item.id;
     delete item.updated_at;
     delete item.created_at;
     console.log(item);
-    setItemUpdate(item)
-    let numDiv = []
+    setItemUpdate(item);
+    let numDiv = [];
     for (var i = 0; i < item.variables.length; i++) {
-      numDiv.push(`newDiv${i}`)
+      numDiv.push(`newDiv${i}`);
       // if(document.getElementById(`variable_id${i}`)!=null &&
       // document.getElementById(`operator${i}`) != null &&
       // document.getElementById(`value${i}`) != null){
@@ -481,12 +500,11 @@ function PushMessage() {
       //   // document.getElementById(`operator${i}`).value = item.variables[i].operator
       //   // document.getElementById(`value${i}`).value = item.variables[i].value
       // }
-
     }
-    setCustomDiv(numDiv)
+    setCustomDiv(numDiv);
     setNumHotTemp(item.variables.length);
-    
-    setIsOpenAddPM(true)
+
+    setIsOpenAddPM(true);
   }
 
   function deletePMConf(id) {
@@ -519,14 +537,13 @@ function PushMessage() {
       });
   }
 
-  function checkTZ(check){
+  function checkTZ(check) {
     // console.log('checked: ',check)
-    if(check == 'yes'){
-      setIsChecked(true)
-    }else{
-      setIsChecked(false)
+    if (check == 'yes') {
+      setIsChecked(true);
+    } else {
+      setIsChecked(false);
     }
-    
   }
 
   return (
@@ -589,24 +606,42 @@ function PushMessage() {
                           <td style={{ width: '150px', border: '1px solid #7186a0' }}>
                             <div style={{ width: '100%', display: 'flex' }}>
                               <button
-                                style={{ width: '32.33%', margin: '0px 1%', borderRadius: '5px', 
-                                backgroundColor:`${item.subscribe_status === 'subscribe' ? '#F39C12' : '#9B59B6'}`, border:'none', color:"white" }}
+                                style={{
+                                  width: '32.33%',
+                                  margin: '0px 1%',
+                                  borderRadius: '5px',
+                                  backgroundColor: `${
+                                    item.subscribe_status === 'subscribe' ? '#F39C12' : '#9B59B6'
+                                  }`,
+                                  border: 'none',
+                                  color: 'white',
+                                }}
                                 onClick={() => changeStatus(item)}
                               >
-                                {item.subscribe_status === 'subscribe'
-                                  ? '配信停止'
-                                  : '配信する'}
+                                {item.subscribe_status === 'subscribe' ? '配信停止' : '配信する'}
                               </button>
                               <button
-                                style={{ width: '32.33%', margin: '0px 1%', borderRadius: '5px', 
-                                backgroundColor:'#1ABC9C', border:'none', color:"white" }}
+                                style={{
+                                  width: '32.33%',
+                                  margin: '0px 1%',
+                                  borderRadius: '5px',
+                                  backgroundColor: '#1ABC9C',
+                                  border: 'none',
+                                  color: 'white',
+                                }}
                                 onClick={() => editPushMessage(item)}
                               >
                                 編集
                               </button>
                               <button
-                                style={{ width: '32.33%', margin: '0px 1%', borderRadius: '5px', 
-                                backgroundColor:'#E74C3C', border:'none', color:"white" }}
+                                style={{
+                                  width: '32.33%',
+                                  margin: '0px 1%',
+                                  borderRadius: '5px',
+                                  backgroundColor: '#E74C3C',
+                                  border: 'none',
+                                  color: 'white',
+                                }}
                                 onClick={() => deletePMConf(item.id)}
                               >
                                 削除
@@ -657,11 +692,11 @@ function PushMessage() {
                         onChange={(date) => selectDateEnd(date)}
                         dateFormat="yyyy-MM-dd"
                         value={endDate}
-                      // value={
-                      //   endDatePreview
-                      //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-                      //     : 'yyyy/mm/dd'
-                      // }
+                        // value={
+                        //   endDatePreview
+                        //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+                        //     : 'yyyy/mm/dd'
+                        // }
                       />
                     </div>
                     まで &emsp;<button className="push-message-btn-search">Search</button>
@@ -700,14 +735,23 @@ function PushMessage() {
           </Col>
         </Row>
         <ModalDetail open={isOpenAddPM} onClose={() => closeAddPM()}>
-          <div style={{ width: '100%', height: '97.5%', overflowY: 'auto' }} onLoad={getEmailList()}>
+          <div
+            style={{ width: '100%', height: '97.5%', overflowY: 'auto' }}
+            onLoad={getEmailList()}
+          >
             <form id="form_add_PM">
               <div className="push-message-add-form">
                 <span className="push-message-span-form">
                   Push message name
                   <span style={{ color: 'red' }}>*</span>
                 </span>
-                <input id="title" name="title" defaultValue={update == true ? itemUpdate.title : ''} className="push-message-input-form"></input>
+                <input
+                  id="title"
+                  name="title"
+                  defaultValue={update == true ? itemUpdate.title : ''}
+                  className="push-message-input-form"
+                  onChange={() => utils.checkRequired('title', 'titleErr', 'Push message name')}
+                ></input>
               </div>
               <div className="push-message-add-form">
                 <span className="push-message-span-form"></span>
@@ -720,9 +764,7 @@ function PushMessage() {
                 style={{ marginTop: '-20px', marginBottom: '5px' }}
               >
                 <span className="push-message-span-form"></span>
-                <span id="titleErr" style={{ color: 'red', display: 'none' }}>
-                  Please input message name
-                </span>
+                <span id="titleErr" style={{ color: 'red', display: 'none' }}></span>
               </div>
               <div className="push-message-add-form">
                 <span className="push-message-span-form">Sending method</span>
@@ -751,11 +793,13 @@ function PushMessage() {
                   Start date time
                   <span style={{ color: 'red' }}>*</span>
                 </span>
-                <div className="push-message-input-form">
+                <div className="push-message-input-form" >
                   <DatePicker
+                  className='pm_date_pick'
                     name="started_at"
+                    id="startDateTime"
                     selected={startDate}
-                    onChange={(date) => setStartDate(date)}
+                    onChange={(date) => handleChangeDate(date)}
                     showTimeSelect
                     timeFormat="HH:mm"
                     timeIntervals={15}
@@ -776,9 +820,7 @@ function PushMessage() {
                 style={{ marginTop: '-20px', marginBottom: '5px' }}
               >
                 <span className="push-message-span-form"></span>
-                <span id="startDateTimeErr" style={{ color: 'red', display: 'none' }}>
-                  Please select date and time.
-                </span>
+                <span id="startDateTimeErr" style={{ color: 'red', display: 'none' }}></span>
               </div>
               <div className="push-message-add-form">
                 <span className="push-message-span-form">
@@ -788,7 +830,9 @@ function PushMessage() {
                   <input
                     id="has_timezone_exclusion"
                     name="has_timezone_exclusion"
-                    onChange={(e) => selectTimezoneExclusion(e.target.checked,itemUpdate?.has_timezone_exclusion)}
+                    onChange={(e) =>
+                      selectTimezoneExclusion(e.target.checked, itemUpdate?.has_timezone_exclusion)
+                    }
                     type="checkbox"
                     checked={isChecked}
                     style={{ marginTop: '15px' }}
@@ -797,8 +841,15 @@ function PushMessage() {
                 </span>
               </div>
               <br />
-              <div id="excludedTime" 
-              style={{ width: '100%', display: `${(update == true && itemUpdate.has_timezone_exclusion === 'yes') ? 'block' : 'none'}` }}>
+              <div
+                id="excludedTime"
+                style={{
+                  width: '100%',
+                  display: `${
+                    update == true && itemUpdate.has_timezone_exclusion === 'yes' ? 'block' : 'none'
+                  }`,
+                }}
+              >
                 <div className="push-message-add-form">
                   <span className="push-message-span-form">
                     Excluded time
@@ -951,7 +1002,9 @@ function PushMessage() {
                       <option value="user_referer_firstopen">user_referer_firstopen</option>
                       <option value="user_referer_current">user_referer_current</option> */}
                       {listVar?.map((item, i) => (
-                        <option value={`${item.id}`} key={i}>{item.variable_name}</option>
+                        <option value={`${item.id}`} key={i}>
+                          {item.variable_name}
+                        </option>
                       ))}
                     </select>
                     <select
@@ -984,29 +1037,60 @@ function PushMessage() {
                     </button>
                   </div>
                 ))}
-                <button style={{ float: 'right', width:"130px", padding:"7.5px 15px", textAlign:"center", borderRadius:"5px",
-              border:'none', backgroundColor:'#52cbce', color:"white" }}  onClick={(e) => newTemp(e)}>
+                <button
+                  style={{
+                    float: 'right',
+                    width: '130px',
+                    padding: '7.5px 15px',
+                    textAlign: 'center',
+                    borderRadius: '5px',
+                    border: 'none',
+                    backgroundColor: '#52cbce',
+                    color: 'white',
+                  }}
+                  onClick={(e) => newTemp(e)}
+                >
                   Add condition
                 </button>
               </div>
             </form>
-            <div style={{ width: '95%', margin: '5% 2.5% 5% 2.5%', }}>
-              <button style={{ float: 'left', width:"110px", padding:"7.5px 35px", textAlign:"center", border:'none',borderRadius:"5px",
-              backgroundColor:'#66615b', color:'white' }} 
-              onClick={() => setIsOpenAddPM(false)}>
+            <div style={{ width: '95%', margin: '5% 2.5% 5% 2.5%' }}>
+              <button
+                style={{
+                  float: 'left',
+                  width: '110px',
+                  padding: '7.5px 35px',
+                  textAlign: 'center',
+                  border: 'none',
+                  borderRadius: '5px',
+                  backgroundColor: '#66615b',
+                  color: 'white',
+                }}
+                onClick={() => setIsOpenAddPM(false)}
+              >
                 Cancel
               </button>
-              <button style={{ float: 'right', width:"110px", padding:"7.5px 35px", textAlign:"center", borderRadius:"5px",
-              border:'none', backgroundColor:'#52cbce', color:"white" }} 
-              onClick={() => savePM()}>
+              <button
+                style={{
+                  float: 'right',
+                  width: '110px',
+                  padding: '7.5px 35px',
+                  textAlign: 'center',
+                  borderRadius: '5px',
+                  border: 'none',
+                  backgroundColor: '#52cbce',
+                  color: 'white',
+                }}
+                onClick={() => savePM()}
+              >
                 Save
               </button>
             </div>
           </div>
         </ModalDetail>
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-          <div>
-          <h6>{msgNoti}</h6>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
           </div>
         </ModalNoti>
         <ModalShort
