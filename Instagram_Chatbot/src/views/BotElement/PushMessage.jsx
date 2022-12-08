@@ -1079,8 +1079,8 @@ function PushMessage() {
           </div>
         </ModalDetail>
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-          <div>
-            <h6>{msgNoti}</h6>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
           </div>
         </ModalNoti>
         <ModalShort
