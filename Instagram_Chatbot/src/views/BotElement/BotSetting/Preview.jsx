@@ -164,6 +164,7 @@ function Preview({ onOpenPreview, isOpen }) {
   const [variables, setVariables] = useState([]);
   const [isDisplayButtonNext, setIsDisplayButtonNext] = useState(false);
   const [captcha, setCaptcha] = useState([]);
+  const [withdrawal, setWithdrawal] = useState({});
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
       current_url: window.location.href,
@@ -229,6 +230,20 @@ function Preview({ onOpenPreview, isOpen }) {
   //     }
   //   }).catch(err => console.log(err));
   // }, [])
+
+  useEffect(() => {
+    api.get(`/api/v1/chatbot_settings/withdrawal_preventions/${botId}`).then(res => {
+      console.log(res, 'cehckkkk withdraw');
+      if (res.data.code === 1) {
+        setWithdrawal(res.data.data);
+      }
+    }).catch((error) => {
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
+    })
+  }, [])
 
   useEffect(() => {
     if (scenarioId) {
@@ -375,6 +390,11 @@ function Preview({ onOpenPreview, isOpen }) {
                               index: i,
                               indexContent: j,
                               ...res.data
+                            }).catch((error) => {
+                              console.log(error);
+                              if (error.response?.data.code === 0) {
+                                tokenExpired()
+                              }
                             })
                             setCaptcha([...captcha]);
                           })
@@ -479,6 +499,11 @@ function Preview({ onOpenPreview, isOpen }) {
                             index: i,
                             indexContent: j,
                             ...res.data
+                          }).catch((error) => {
+                            console.log(error);
+                            if (error.response?.data.code === 0) {
+                              tokenExpired()
+                            }
                           })
                           setCaptcha([...captcha]);
                         })
@@ -509,7 +534,12 @@ function Preview({ onOpenPreview, isOpen }) {
             clearTimeout(delayRender);
           }
         }
-      }).catch(err => console.log(err));
+      }).catch((error) => {
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
+      });
     }
   }, [scenarioId])
 
@@ -895,9 +925,8 @@ function Preview({ onOpenPreview, isOpen }) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
         }
       }
-
       if (contentType.type === 'phone_number') {
-        let REGEX_PHONE = /^\d{10}$|^\d{11}$/;
+        let REGEX_PHONE = /^0\d{9}$|^0\d{10}$/;
         if (contentType[contentType.type].withHyphen) {
           if (!stringNullOrEmpty(contentType[contentType.type].value1)
             && !stringNullOrEmpty(contentType[contentType.type].value2)
@@ -1252,6 +1281,11 @@ function Preview({ onOpenPreview, isOpen }) {
                         index: i,
                         indexContent: j,
                         ...res.data
+                      }).catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired()
+                        }
                       })
                       setCaptcha([...captcha]);
                     })
@@ -1291,6 +1325,11 @@ function Preview({ onOpenPreview, isOpen }) {
                     index: indexMessageRender + 1,
                     indexContent: j,
                     ...res.data
+                  }).catch((error) => {
+                    console.log(error);
+                    if (error.response?.data.code === 0) {
+                      tokenExpired()
+                    }
                   })
                   setCaptcha([...captcha]);
                 })
@@ -1327,6 +1366,11 @@ function Preview({ onOpenPreview, isOpen }) {
                           ...res.data
                         })
                         setCaptcha([...captcha]);
+                      }).catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired()
+                        }
                       })
                     }
                   }
@@ -1484,10 +1528,40 @@ function Preview({ onOpenPreview, isOpen }) {
           } else if (contentType === 'radio_button') {
             item.default_value = dataContentType[dataContentType.type].find(item => item.id === value).text || item.default_value;
           } else if (contentType === 'checkbox') {
-            let dataTextChecked = dataContentType.checkedValue.map(itemChecked => {
-              return dataContentType[dataContentType.type].find(item => itemChecked === item.id).text;
-            })
+            let dataTextChecked;
+            if (field === 'checkedValue') {
+              dataTextChecked = dataContentType.checkedValue.map(itemChecked => {
+                return dataContentType[dataContentType.type].find(item => itemChecked === item.id).text;
+              })
+            } else if (field === 'initial_selection_picture') {
+              dataTextChecked = dataContentType.initial_selection_picture.map(itemChecked => {
+                let dataReturn;
+                dataContentType[dataContentType.type].forEach(item => {
+                  item.contents.forEach(subItem => {
+                    if (itemChecked === `${item.id}-${subItem.id}`) {
+                      dataReturn = subItem.text;
+                    }
+                  });
+                })
+                return dataReturn;
+              });
+            }
+            console.log(dataTextChecked);
             item.default_value = dataTextChecked.join(',') || item.default_value;
+          } else if (contentType === 'card_payment_radio_button') {
+            let dataTextChecked;
+            if (field === 'initial_selection') {
+              dataTextChecked = dataContentType.radio_contents.find(item => value === item.id).text;
+            } else {
+              dataContentType.radio_contents_img.forEach(item => {
+                item.contents.forEach(subItem => {
+                  if (value === `${item.id}-${subItem.id}`) {
+                    dataTextChecked = subItem.text;
+                  }
+                });
+              })
+            }
+            item.default_value = dataTextChecked || item.default_value;
           } else if (contentType === 'pull_down') {
             if (field === 'customization' || field === 'prefectures') {
               item.default_value = value;
@@ -1507,12 +1581,60 @@ function Preview({ onOpenPreview, isOpen }) {
     setDataMessages([...dataMessages]);
   }
 
+  const handleOpenWithDrawal = () => {
+    if (withdrawal.withdrawal_prevention_status === "invalid") {
+      setIndexUser(0);
+      setScenarioId(null);
+      setTimeout(() => {
+        setScenarioId(Cookies.get('scenario_id'));
+        document.getElementById("action-bd").click();
+      }, 10);
+    } else if (withdrawal.withdrawal_prevention_status === "standard_exit_popup" || withdrawal.withdrawal_prevention_status === "image_popup") {
+      document.getElementById("sp-withdrawal-container").style.display = "block";
+      document.getElementById("sp-withdrawal-content").style.display = "block";
+    }
+  }
+
   return (
     scenarioId ?
       <React.Fragment>
         <div id="sp-container" className="sp-container">
-          <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header" onClick={() => onOpenPreview(!isOpen)}>
-            <div className="sp-header-left">
+          <div id="sp-withdrawal-container" className="sp-withdrawal-container">
+          </div>
+          <div id="sp-withdrawal-content" className="sp-withdrawal-content">
+            <div className="sp-withdrawal-content-body">
+              {withdrawal.withdrawal_prevention_status === "standard_exit_popup" &&
+                <div>Do you want to exit?</div>
+              }
+              {withdrawal.withdrawal_prevention_status === "image_popup" &&
+                <a href={withdrawal.withdrawal_prevention_link_url || ""} target="_blank">
+                  <img src={withdrawal.withdrawal_prevention_image_url} />
+                </a>
+              }
+            </div>
+            <div className="sp-withdrawal-content-footer">
+              <div className="sp-withdrawal-content-footer-button sp-withdrawal-content-footer-button-back" onClick={() => {
+                document.getElementById("sp-withdrawal-container").style.display = "none";
+                document.getElementById("sp-withdrawal-content").style.display = "none";
+              }}>
+                Back to chat
+              </div>
+              <div className="sp-withdrawal-content-footer-button sp-withdrawal-content-footer-button-exit" onClick={() => {
+                document.getElementById("sp-withdrawal-container").style.display = "none";
+                document.getElementById("sp-withdrawal-content").style.display = "none";
+                setIndexUser(0);
+                setScenarioId(null);
+                setTimeout(() => {
+                  setScenarioId(Cookies.get('scenario_id'));
+                  document.getElementById("action-bd").click();
+                }, 10);
+              }}>
+                Close up
+              </div>
+            </div>
+          </div>
+          <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header">
+            <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
               <div className="sp-header-left-avatar sp-avatar">
                 <img src={botInfor?.icon?.url && ("https://ec-chatbot-test1.com/" + botInfor?.icon?.url)} />
               </div>
@@ -1521,7 +1643,7 @@ function Preview({ onOpenPreview, isOpen }) {
                 <div className="sp-header-left-label-title">{botInfor?.title}</div>
               </div>
             </div>
-            <div className="sp-header-right">
+            <div className="sp-header-right" onClick={() => { isOpen ? handleOpenWithDrawal() : onOpenPreview(true)}}>
               <div className="sp-header-right-arrow">
                 {isOpen ? <MDBIcon fas icon="chevron-down" /> : <MDBIcon fas icon="chevron-up" />}
               </div>
@@ -1711,7 +1833,12 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   useEffect(() => {
     api.get(`/api/v1/prefectures`).then((res) => {
       setDataPrefectures(res.data.data);
-    }).catch((error) => { console.error(error) });
+    }).catch((error) => {
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
+    });
   }, [])
 
   useEffect(() => {
@@ -2375,7 +2502,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         })}
                       </Checkbox.Group>
                     )}
-                    {checkbox.type === 'checkbox_img' && (
+                    {/* {checkbox.type === 'checkbox_img' && (
                       checkbox[checkbox.type].map((item, index) => {
                         return <div key={index} className="ss-message__content--user-checkbox--checkbox_img" style={{ marginBottom: '10px' }}>
                           <CheckboxCustom
@@ -2391,7 +2518,28 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <div style={{ textAlign: 'center' }}>{item.text}</div>
                         </div>
                       })
-                    )}
+                    )} */}
+                    {checkbox.type === 'checkbox_img' && checkbox[checkbox.type] &&
+                      <Checkbox.Group
+                        disabled={disabled}
+                        style={{ width: "100%", fontSize: '14px' }}
+                        className="ss-user-preview-product-purchase-checkbox-group-type-text_image ss-user-overview-product-purchase-style-width"
+                        onChange={(value) => onChangeValue(indexContent, content.type, value, 'initial_selection_picture')}
+                        value={checkbox.initial_selection_picture}
+                      >
+                        {checkbox[checkbox.type].map((itemCheckboxImg, indexCheckboxImg) => {
+                          return <div key={indexCheckboxImg} style={{ color: '#6789A6', display: 'flex' }}>
+                            {itemCheckboxImg.contents && itemCheckboxImg.contents.map((itemCheckContent, indexCheckboxContent) => {
+                              return <Checkbox value={`${itemCheckboxImg.id}-${itemCheckContent.id}`} key={indexCheckboxContent} style={{ marginRight: '0px' }}>
+                                <img src={itemCheckContent.file_url}></img>
+                                <div style={{ textAlign: 'center', fontSize: '14px', color: '#6789A6', fontWeight: '700' }}>{itemCheckContent.text}</div>
+                              </Checkbox>
+                            })}
+                          </div>
+                        })
+                        }
+                      </Checkbox.Group>
+                    }
                     {checkbox.type === 'consume_api_response' && (
                       <>
                         <div className="ss-message__content--user-checkbox">
@@ -2460,7 +2608,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                   <SelectCustom
                                     disabled={disabled}
                                     data={pullDown[pullDown.type].options_without_comment}
-                                    keyValue="value"
+                                    keyValue="text"
                                     style={{ width: '100%' }}
                                     placeholder={pullDown[pullDown.type].display_unselected}
                                     nameValue="text"
@@ -2472,7 +2620,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                   <SelectCustom
                                     disabled={disabled}
                                     data={pullDown[pullDown.type].options_with_comment}
-                                    keyValue="value"
+                                    keyValue="text"
                                     style={{ width: '49%' }}
                                     placeholder={pullDown[pullDown.type].display_unselected}
                                     nameValue="text"
@@ -2482,7 +2630,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                   <SelectCustom
                                     disabled={disabled}
                                     data={pullDown[pullDown.type].options_with_comment}
-                                    keyValue="value2"
+                                    keyValue="text2"
                                     style={{ width: '49%' }}
                                     placeholder={pullDown[pullDown.type].display_unselected}
                                     nameValue="text2"
@@ -4048,7 +4196,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                   dataValue = "";
                                 }
                                 onChangeValue(indexContent, content.type, dataValue, 'initial_selection_picture');
-                                if (cardPaymentRadioButton.card_linked_setting_picture !== dataValue) {
+                                if (cardPaymentRadioButton.card_linked_setting_picture !== dataValue && messageContent.length === 1) {
                                   console.log(cardPaymentRadioButton.card_linked_setting_picture !== dataValue, cardPaymentRadioButton.card_linked_setting_picture, dataValue)
                                   onClickNext();
                                 }

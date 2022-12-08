@@ -7,7 +7,62 @@
     background-color: #EBF7FF;
     border-top-left-radius: 25px;
     border-top-right-radius: 25px;
-    z-index: 101;
+    z-index: 901;
+}
+
+.sp-withdrawal-container {
+    background-color: #000;
+    height: 88%;
+    position: absolute;
+    width: 100%;
+    z-index: 1;
+    top: 75px;
+    opacity: 0.5;
+    display: none;
+}
+
+.sp-withdrawal-content {
+    background-color: #fff;
+    max-height: 50%;
+    position: absolute;
+    width: 98%;
+    z-index: 1;
+    top: 79px;
+    left: 4px;
+    min-height: 18%;
+    padding: 18px;
+    display: none;
+}
+
+.sp-withdrawal-content-body {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.sp-withdrawal-content-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.sp-withdrawal-content-footer-button {
+    border-radius: 3px;
+    width: 120px;
+    padding: 8px 0px;
+    text-align: center;
+}
+
+.sp-withdrawal-content-footer-button-back {
+    border: 1px solid #D0D6DC;
+    cursor: pointer;
+}
+
+.sp-withdrawal-content-footer-button-exit {
+    background-color: #D9534F;
+    border: 1px solid #D9534F;
+    color: #fff;
+    cursor: pointer;
 }
 
 .sp-header {
@@ -17,15 +72,16 @@
     border-top-left-radius: 25px;
     border-top-right-radius: 25px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 15px;
+    /* padding: 15px; */
 }
 
 .sp-header-left {
+    width: 92%;
     height: 100%;
     display: flex;
     align-items: center;
+    padding: 15px;
 }
 
 .sp-header-left-avatar {}
@@ -48,7 +104,10 @@
     font-size: 16px;
 }
 
-.sp-header-right {}
+.sp-header-right {
+    padding: 12px;
+    cursor: pointer;
+}
 
 .sp-header-right-arrow {
     color: #fff;
@@ -255,20 +314,14 @@
 
 .ss-user-preview-product-purchase-checkbox-group-type-text_image .ant-checkbox-wrapper .ant-checkbox {
     position: absolute;
-    top: 13px;
-    left: 16px;
+    top: 11px;
+    left: 6px;
 }
 
 .ss-user-preview-product-purchase-radio-group-type-text_image .ant-radio-wrapper {
     position: relative;
     width: 100%;
     padding: 5px 0px;
-}
-
-.ss-user-preview-product-purchase-radio-group-type-text_image .ant-radio-wrapper .ant-radio {
-    position: absolute;
-    top: 13px;
-    left: 16px;
 }
 
 .sp-body-user-side-messages .ant-radio-group-solid .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
@@ -307,3 +360,11 @@
     cursor: pointer
 }
 
+.ss-user-preview-product-purchase-checkbox-group-type-text_image .ant-checkbox+span {
+    padding: 0px;
+}
+
+.sp-body-user-side .ss-message__content--user-checkbox-wrapper .ss-message__content--user-checkbox {
+    padding: 0px;
+    padding-top: 9px;
+}

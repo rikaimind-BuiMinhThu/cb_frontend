@@ -3,10 +3,20 @@ import { useState } from 'react';
 import { Col, Row } from 'reactstrap';
 import '../../assets/css/bot/bot-demo.css';
 import IconManDefault from '../../assets/img/bot-icon/man1_new.png';
+import Preview from './BotSetting/Preview';
+import Cookies from 'js-cookie';
+import api from '../../api/api-management';
+import ModalNoti from '../../views/Popup/ModalNoti';
 
 const BotDemo = () => {
   // states
-  const [isChatBoxClick, setIsChatBoxClick] = useState(false);
+  const [isChatBoxClick, setIsChatBoxClick] = useState(true);
+  const [scenarioId, setScenarioId] = useState('');
+  const bot_id = Cookies.get('bot_id');
+
+  const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [messageNoti, setMessageNoti] = useState('');
+
 
   // side effects
   useEffect(() => {
@@ -14,6 +24,43 @@ const BotDemo = () => {
       setIsChatBoxClick(true);
     }, 300);
   }, []);
+
+  useEffect(() => {
+    api.get(`/api/v1/managements/chatbots/${bot_id}/get_scenario_selected`).then((response) => {
+      console.log(response);
+      if (response.data.data) {
+        setScenarioId(response.data.data.id);
+        Cookies.set('scenario_id', response.data.data.id);
+      } else {
+        setIsOpenNoti(true);
+        setMessageNoti("Don't have any scenario selected");
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          setMessageNoti("");
+        }, 2000)
+      }
+    })
+  }, [])
+
+  const handleOpenPreview = (isOpen) => {
+    if (isOpen) {
+      document.getElementById('sp-container').style.height = "620px";
+      document.getElementById('sp-header').style.position = "static";
+      document.getElementById('sp-header').style.borderBottomLeftRadius = "0px";
+      document.getElementById('sp-header').style.borderBottomRightRadius = "0px";
+      document.getElementById('sp-process-bar').style.display = "block";
+      document.getElementById('sp-body').style.display = "block";
+    } else {
+      document.getElementById('sp-container').style.height = "0px";
+      document.getElementById('sp-process-bar').style.display = "none";
+      document.getElementById('sp-body').style.display = "none";
+      document.getElementById('sp-header').style.borderBottomLeftRadius = "25px";
+      document.getElementById('sp-header').style.borderBottomRightRadius = "25px";
+      document.getElementById('sp-header').style.position = "absolute";
+      document.getElementById('sp-header').style.bottom = "13px";
+    }
+    setIsChatBoxClick(isOpen);
+  }
 
   return (
     <div className="content">
@@ -23,63 +70,25 @@ const BotDemo = () => {
           <div className="action-wrapper-bd">
             <h4 className="action-title-bd">Mouse action</h4>
             <div className="actions-bd">
-              <span className="action-bd" onClick={() => setIsChatBoxClick(!isChatBoxClick)}>
+              <span className="action-bd" onClick={() => handleOpenPreview(!isChatBoxClick)}>
                 open-close
               </span>
-              <span className="action-bd" onClick={() => setIsChatBoxClick(true)}>
+              <span className="action-bd" onClick={() => handleOpenPreview(true)}>
                 open
               </span>
-              <span className="action-bd" onClick={() => setIsChatBoxClick(false)}>
+              <span id="action-bd" className="action-bd" onClick={() => handleOpenPreview(false)}>
                 close
               </span>
             </div>
           </div>
         </Col>
       </Row>
-      <div className={`chat-wrapper-bd ${isChatBoxClick && 'active'}`}>
-        <div
-          className={`chat-header-bd ${isChatBoxClick && 'active'}`}
-          style={{ backgroundColor: 'blue' }}
-          onClick={() => setIsChatBoxClick(!isChatBoxClick)}
-        >
-          <div className="info-wrapper-bd">
-            <img src={IconManDefault} alt="" />
-            <div className="info__title">
-              <span>Title</span>
-              <span>Subtitle</span>
-            </div>
-          </div>
-          {!isChatBoxClick && <span>&rarr;</span>}
-          {isChatBoxClick && <span>&darr;</span>}
+      {scenarioId && <Preview isOpen={isChatBoxClick} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} />}
+      <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
+        <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+          <span style={{ fontSize: '16px' }}>{messageNoti}</span>
         </div>
-        <div className={`chat-body-bd`}>
-          <div className="message-groups-bd">
-            <div className="message-wrapper-bd">
-              <div className="message-avt-bd">
-                <img src={IconManDefault} alt="" />
-              </div>
-              <div className="message-bd">
-                <p>はじめまして！ 会員登録ありがとうございます。登録はたった1分で完了します！</p>
-              </div>
-            </div>
-            <div className="message-wrapper-bd">
-              <div className="message-avt-bd">
-                <img src={IconManDefault} alt="" />
-              </div>
-              <div className="message-bd">
-                <p>早速ですが、お客様のお名前を教えてください。</p>
-              </div>
-            </div>
-            <div className="message-wrapper-bd chat-right-bd">
-              <h4>Name</h4>
-              <input type="text" placeholder="Enter your name" />
-              <div className="btn-send-message-bd">
-                <button>Next</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      </ModalNoti>
     </div>
   );
 };
