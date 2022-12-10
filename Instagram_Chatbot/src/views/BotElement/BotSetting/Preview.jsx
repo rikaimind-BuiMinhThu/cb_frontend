@@ -165,6 +165,17 @@ function Preview({ onOpenPreview, isOpen }) {
   const [isDisplayButtonNext, setIsDisplayButtonNext] = useState(false);
   const [captcha, setCaptcha] = useState([]);
   const [withdrawal, setWithdrawal] = useState({});
+
+  const [dataPrefectures, setDataPrefectures] = useState([]);
+  const [dataCities, setDataCities] = useState([]);
+  const [dataTowns, setDataTowns] = useState([]);
+
+  const [prefectures, setPrefectures] = useState();
+  const [cities, setCities] = useState();
+  const [towns, setTowns] = useState();
+  const [zipcode, setZipcode] = useState();
+  const [indexContentZipcode, setContentZipcode] = useState();
+
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
       current_url: window.location.href,
@@ -243,6 +254,17 @@ function Preview({ onOpenPreview, isOpen }) {
         tokenExpired()
       }
     })
+  }, [])
+
+  useEffect(() => {
+    api.get(`/api/v1/prefectures`).then((res) => {
+      setDataPrefectures(res.data.data);
+    }).catch((error) => {
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired()
+      }
+    });
   }, [])
 
   useEffect(() => {
@@ -796,16 +818,6 @@ function Preview({ onOpenPreview, isOpen }) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select not over ${contentType.selection_limit_to} items.`;
             isValid = false;
           }
-        } else if (contentType.type === 'customization') {
-          if (contentType[contentType.type].is_comment) {
-            if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
-              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
-              isValid = false;
-            }
-          } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
-            isValid = false;
-          }
         } else if (contentType.type === 'time_hm') {
           if ((!stringNullOrEmpty(contentType[contentType.type].valueHour) || !stringNullOrEmpty(contentType[contentType.type].valueMinute))
             && (stringNullOrEmpty(contentType[contentType.type].valueMinute) || stringNullOrEmpty(contentType[contentType.type].valueHour))) {
@@ -986,7 +998,13 @@ function Preview({ onOpenPreview, isOpen }) {
         }
       }
       if (contentArr[i].type === 'attaching_file' && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
-        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`];
+        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`];
+        isValid = false;
+      }
+      console.log(errors);
+      if (contentArr[i].type === 'zip_code_address' && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
+        console.log(errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`])
+        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`];
         isValid = false;
       }
       if (contentArr[i].type === 'text_input' && contentType[contentType.type].range && contentType[contentType.type].range !== 'no_input'
@@ -1599,6 +1617,31 @@ function Preview({ onOpenPreview, isOpen }) {
     }
   }
 
+  const isPopUpZipCode = (isOpen, indexContent) => {
+    if (isOpen === true) {
+      setPrefectures(null);
+      setCities(null);
+      setTowns(null);
+      setZipcode(null);
+      document.getElementById("sp-withdrawal-container").style.display = "block";
+      document.getElementById("sp-popup-zip-code-address").style.display = "block";
+    } else {
+      document.getElementById("sp-withdrawal-container").style.display = "none";
+      document.getElementById("sp-popup-zip-code-address").style.display = "none";
+    }
+    console.log(indexContent, 'checkkkk indexContent');
+    if (indexContent !== undefined) {
+      setContentZipcode(indexContent);
+    }
+  }
+
+  const onChangeErrors = (field, value) => {
+    errors[field] = value;
+    setErrors({
+      ...errors
+    });
+  }
+
   return (
     scenarioId ?
       <React.Fragment>
@@ -1612,7 +1655,7 @@ function Preview({ onOpenPreview, isOpen }) {
               }
               {withdrawal.withdrawal_prevention_status === "image_popup" &&
                 <a href={withdrawal.withdrawal_prevention_link_url || ""} target="_blank">
-                  <img src={withdrawal.withdrawal_prevention_image_url} />
+                  <img src={withdrawal.withdrawal_prevention_image_url} style={{ maxHeight: '217px', width: '100%' }} />
                 </a>
               }
             </div>
@@ -1638,6 +1681,133 @@ function Preview({ onOpenPreview, isOpen }) {
                 }, 10);
               }}>
                 Close up
+              </div>
+            </div>
+          </div>
+          <div id="sp-popup-zip-code-address" className="sp-popup-zip-code-address">
+            <div className="sp-popup-zip-code-address-header">
+              <div className="sp-popup-zip-code-address-header-left">住所で郵便番号を検索する</div>
+              <div className="sp-popup-zip-code-address-header-right">
+                <MDBIcon
+                  style={{ width: '5%', marginLeft: '3px', cursor: 'pointer' }}
+                  fas
+                  onClick={() => isPopUpZipCode(false)}
+                  icon="times"
+                  className={"sp-plus-circle-option-icon-times-custom"}
+                />
+              </div>
+            </div>
+            <div className="sp-popup-zip-code-address-body">
+              <div className="sp-popup-zip-code-address-body-form">
+                <SelectCustom
+                  style={{ width: '100%', marginBottom: '7px' }}
+                  keyValue="name"
+                  nameValue="name"
+                  placeholder="都道府県を選択してください"
+                  data={dataPrefectures}
+                  onChange={async value => {
+                    setPrefectures(value);
+                    setCities(null);
+                    setTowns(null);
+                    setZipcode(null);
+                    if (value) {
+                      let prefecture_jis_code = dataPrefectures.find(item => item.name === value).prefecture_jis_code;
+                      api.get(`/api/v1/cities?prefecture_jis_code=${prefecture_jis_code}`).then(res => {
+                        console.log(res);
+                        if (res.data.code === 1) {
+                          setDataCities(res.data.data);
+                        }
+                      }).catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                      });
+                    }
+                  }}
+                  value={prefectures}
+                />
+                <SelectCustom
+                  style={{ width: '100%', marginBottom: '7px' }}
+                  keyValue="city_name"
+                  nameValue="city_name"
+                  placeholder="市区を選択してください"
+                  data={dataCities || []}
+                  onChange={async value => {
+                    setCities(value);
+                    setTowns(null);
+                    setZipcode(null);
+
+                    if (value) {
+                      let city_jis_code = dataCities.find(item => item.city_name === value).city_jis_code;
+                      api.get(`/api/v1/towns?city_jis_code=${city_jis_code}`).then(res => {
+                        console.log(res);
+                        if (res.data.code === 1) {
+                          setDataTowns(res.data.data);
+                        }
+                      }).catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                      })
+                    }
+                  }}
+                  value={cities}
+                />
+                <SelectCustom
+                  style={{ width: '100%', marginBottom: '7px' }}
+                  keyValue="town_name"
+                  nameValue="town_name"
+                  placeholder="町村を選択してください"
+                  data={dataTowns || []}
+                  onChange={value => {
+                    setTowns(value);
+                    if (value) {
+                      let zipcode = dataTowns.find(item => item.town_name === value).zip_code;
+                      setZipcode(zipcode);
+                    } else {
+                      setZipcode(null);
+                    }
+                  }}
+                  value={towns}
+                />
+                {zipcode &&
+                  <div className="sp-popup-zip-code-address-body-form-content">
+                    〒{zipcode}
+                  </div>
+                }
+              </div>
+              <div className="sp-popup-zip-code-address-body-button">
+                <div className="sp-popup-zip-code-address-body-button-cancel"
+                  onClick={() => isPopUpZipCode(false)}>
+                  Cancel
+                </div>
+                <div className="sp-popup-zip-code-address-body-button-selection"
+                  onClick={() => {
+                    console.log(dataMessages[indexMessageRender].message_content[indexContentZipcode], indexContentZipcode)
+                    if (zipcode && indexContentZipcode !== undefined && !dataMessages[indexMessageRender].message_content[indexContentZipcode].zip_code_address.split_postal_code) {
+                      onChangeValue(indexContentZipcode, 'zip_code_address', zipcode, 'value_post_code');
+                      onChangeValue(indexContentZipcode, 'zip_code_address', prefectures, 'value_prefecture');
+                      onChangeValue(indexContentZipcode, 'zip_code_address', `${cities}${towns}`, 'value_municipality');
+                      errors[`message${indexMessageRender}_content${indexContentZipcode}_zip_code_address`] = "";
+                      setErrors({ ...errors });
+                      document.getElementById("sp-withdrawal-container").style.display = "none";
+                      document.getElementById("sp-popup-zip-code-address").style.display = "none";
+                    } else if (zipcode && indexContentZipcode !== undefined && dataMessages[indexMessageRender].message_content[indexContentZipcode].zip_code_address.split_postal_code) {
+                      onChangeValue(indexContentZipcode, 'zip_code_address', zipcode.slice(0, 3), 'value_post_code_left');
+                      onChangeValue(indexContentZipcode, 'zip_code_address', zipcode.slice(3), 'value_post_code_right');
+                      onChangeValue(indexContentZipcode, 'zip_code_address', prefectures, 'value_prefecture');
+                      onChangeValue(indexContentZipcode, 'zip_code_address', `${cities}${towns}`, 'value_municipality');
+                      errors[`message${indexMessageRender}_content${indexContentZipcode}_zip_code_address`] = "";
+                      setErrors({ ...errors });
+                      document.getElementById("sp-withdrawal-container").style.display = "none";
+                      document.getElementById("sp-popup-zip-code-address").style.display = "none";
+                    }
+
+                  }}>
+                  Selection
+                </div>
               </div>
             </div>
           </div>
@@ -1693,6 +1863,8 @@ function Preview({ onOpenPreview, isOpen }) {
                               dataMessages[indexMessage].is_display_button_next = value;
                               setDataMessages([...dataMessages]);
                             }}
+                            isPopUpZipCode={(isOpen, indexContent) => isPopUpZipCode(isOpen, indexContent)}
+                            onChangeErrors={(field, value) => onChangeErrors(field, value)}
                           />
                           {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
                             && <div className="ss-user-message__action-wrapper">
@@ -1793,7 +1965,7 @@ const BotMessage = ({ content, index, botInfor }) => {
   )
 }
 
-const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext }) => {
+const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
   const [dataCity, setDataCity] = useState([]);
@@ -1858,6 +2030,12 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
           let i = 0;
           let date_select = "";
           console.log(handleDisableDateCalendar(moment().add(1, 'days'), calendar));
+          // do {
+          //   date_select = moment().add(i + 1, 'days').format("YYYY/MM/DD");
+          //   console.log(handleDisableDateCalendar(moment().add(i, 'days'), calendar));
+          //   i++;
+          // } while (handleDisableDateCalendar(moment().add(i, 'days'), calendar))
+          date_select = moment().add(i, 'days').format("YYYY/MM/DD");
           while (handleDisableDateCalendar(moment().add(i, 'days'), calendar)) {
             date_select = moment().add(i + 1, 'days').format("YYYY/MM/DD");
             console.log(handleDisableDateCalendar(moment().add(i, 'days'), calendar));
@@ -1887,53 +2065,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
     })
   }, [])
 
-  const onChangeValueCheckbox = (checkbox, indexContent, contentType, value, field) => {
-    // setChecked(prev => {
-    //   const isChecked = checked.includes(value);
-    //   console.log(checked);
-    //   if (isChecked) {
-    //     onChangeValue(indexContent, contentType, [...checked.filter(item => item !== value)], field);
-    //     // messageContent[indexContent][contentType][field] = [...checked.filter(item => item !== value)];
-    //     // setMessageContent([...messageContent])
-    //     return checked.filter(item => item !== value);
-    //   } else {
-    //     onChangeValue(indexContent, contentType, [...prev, value], field);
-    //     // messageContent[indexContent][contentType][field] = [...prev, value];
-    //     // setMessageContent([...messageContent])
-    //     return [...prev, value];
-    //   }
-    // })
-
-    setMessageContent(prev => {
-      let checkedArray = [...messageContent[indexContent][contentType].checkedValue];
-      const isChecked = checkedArray.includes(value);
-      if (isChecked) {
-        checkedArray = checkedArray.filter(item => item !== value);
-        console.log(checkedArray);
-        prev[indexContent][contentType].checkedValue = checkedArray;
-        return prev;
-      } else {
-        checkedArray.push(value);
-        prev[indexContent][contentType].checkedValue = checkedArray;
-        return prev;
-      }
-    })
-
-
-    // console.log(checkbox, indexContent, contentType, value, field);
-    // let checkboxClone = _.cloneDeep(checkbox);
-    // const isChecked = checkboxClone.checkedValue.includes(value);
-    // console.log(isChecked);
-    // if (isChecked) {
-    //   checkboxClone.checkedValue = checkboxClone.checkedValue.filter(item => item !== value);
-    //   console.log(checkboxClone.checkedValue)
-    //   onChangeValue(indexContent, contentType, checkboxClone.checkedValue, field);
-    // } else {
-    //   checkboxClone.checkedValue.push(value);
-    //   onChangeValue(indexContent, contentType, checkboxClone.checkedValue, field);
-    // }
-  }
-
   function botUploadFile() {
     document.getElementById('ss-bot-file-upload-preview').click();
   }
@@ -1941,17 +2072,17 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   function getBaseUrl(event, indexContent) {
     var file = event.target.files[0];
     const type = file.name.slice(file.name.lastIndexOf('.') + 1);
+    let messsageError = "";
     if (messageContent[indexContent].attaching_file.file_type.length > 0 && !messageContent[indexContent].attaching_file.file_type.includes(type)) {
-      errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = `Please specify a ${messageContent[indexContent].attaching_file.file_type.join(", ")} type file for the file.`;
-      setErrors({ ...errors });
+      console.log(messageContent[indexContent].attaching_file.file_type, type);
+      onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, `Please specify a ${messageContent[indexContent].attaching_file.file_type.join(", ")} type file for the file.`)
       return;
     } else if (file.size / 1024 / 1024 > 2) {
-      errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = "You need to upload file which size under 2MB.";
-      setErrors({ ...errors });
+      onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "You need to upload file which size under 2MB.");
       return;
     } else {
-      errors[`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`] = "";
-      setErrors({ ...errors });
+      console.log('asdasdasd', messageContent[indexContent].type)
+      onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "")
     }
     // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
     // var reader = new FileReader(file);
@@ -1991,16 +2122,15 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   }
 
   const handleDisableDateCalendar = (current, calendar) => {
-    console.log(calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD")))
     if (calendar.end_date || calendar.start_date
       || calendar?.fixed_date?.length !== 0 || calendar?.non_select_date_time?.length !== 0
       || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to
       || calendar.end_date_select) {
       return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD').add(1, 'days')
         || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
-        || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_select, 'YYYY/MM/DD'))
+        || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_select, 'YYYY/MM/DD').add(1, 'days'))
         || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
-        || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || calendar.non_select_date_time?.find(type => {
           if (type === 'today') {
@@ -2043,7 +2173,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
         || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
         || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') < moment(calendar.start_date_select, 'YYYY/MM/DD'))
         || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
-        || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
+        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current, 'YYYY/MM/DD') < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_select, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
         || moment(current, 'YYYY/MM/DD') > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_select, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
@@ -2981,7 +3111,23 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             style={{ width: '45%' }}
                             keyValue="name"
                             nameValue="name"
-                            onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'prefecture')}
+                            onChange={async value => {
+                              onChangeValue(indexContent, content.type, value, pullDown.type, 'prefecture');
+                              if(value) {
+                                let prefecture_jis_code = dataPrefectures.find(item => item.name === value).prefecture_jis_code;
+                                api.get(`/api/v1/cities?prefecture_jis_code=${prefecture_jis_code}`).then(res => {
+                                  if (res.data.code === 1) {
+                                    console.log(res.data.data);
+                                    setDataCity(res.data.data);
+                                  }
+                                }).catch((error) => {
+                                  console.log(error);
+                                  if (error.response?.data.code === 0) {
+                                    tokenExpired();
+                                  }
+                                });
+                              }
+                            }}
                             value={pullDown[pullDown.type].prefecture}
                           />
                           <span>~</span>
@@ -2990,8 +3136,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             data={dataCity}
                             placeholder="Select city"
                             style={{ width: '45%' }}
-                            keyValue="name"
-                            nameValue="name"
+                            keyValue="city_name"
+                            nameValue="city_name"
                             onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'city')}
                             value={pullDown[pullDown.type].city}
                           />
@@ -3012,6 +3158,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
             {
               content.type === 'zip_code_address' && (
                 <div style={{ marginBottom: '10px' }}>
+                  <div style={{ marginBottom: '10px', textDecoration: 'underline', color: '#2c76f0', textAlign: 'right' }}>
+                    <span style={{ cursor: 'pointer' }} onClick={() => isPopUpZipCode(true, indexContent)}>〒検索はこちら</span>
+                  </div>
                   {(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire) &&
                     <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
                       {zipCodeAddress.title_require &&
@@ -3034,25 +3183,117 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       </div>
                       {zipCodeAddress.split_postal_code !== true ?
                         <InputCustom
+                          type="number"
                           placeholder={zipCodeAddress.post_code}
                           disabled={disabled}
-                          style={{ width: '100%' }}
-                          onChange={value => onChangeValue(indexContent, content.type, value, 'value_post_code')}
+                          // controls={false}
+                          // className="ss-user-setting-input-limit-character"
+                          // maxLength={7}
+                          onKeyPress={(e) => { if (e.target.value.length >= 7) e.preventDefault() }}
+                          style={{ width: '100%', marginLeft: '0px' }}
+                          onChange={async value => {
+                            onChangeValue(indexContent, content.type, value, 'value_post_code');
+                            if ((value + "").length === 7) {
+                              api.get(`/api/v1/get_address_from_zip_code?zip_code=${value}`).then(res => {
+                                console.log(res);
+                                if (res.data && res.data.code === 1) {
+                                  onChangeValue(indexContent, content.type, res.data.data.prefecture_name, 'value_prefecture');
+                                  onChangeValue(indexContent, content.type, `${res.data.data.city_name}${res.data.data.town_name}`, 'value_municipality');
+                                  onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "");
+                                  document.getElementById("ss-user-input-address").focus();
+                                  document.getElementById("ss-user-input-address").select();
+                                } else {
+                                  onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "無効な郵便番号です。");
+                                }
+                              }).catch((error) => {
+                                onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "無効な郵便番号です。");
+                                console.log(error);
+                                if (error.response?.data.code === 0) {
+                                  tokenExpired();
+                                }
+                              })
+                            } else if ((value + "").length !== 0) {
+                              onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "無効な郵便番号です。");
+                            } else {
+                              onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "");
+                            }
+                          }}
                           value={zipCodeAddress.value_post_code}
                         /> :
                         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
                           <InputCustom
+                            type="number"
                             placeholder={zipCodeAddress.post_code_left}
                             disabled={disabled}
                             style={{ width: '49%' }}
-                            onChange={value => onChangeValue(indexContent, content.type, value, 'value_post_code_left')}
+                            onKeyPress={(e) => { if (e.target.value.length >= 3) e.preventDefault() }}
+                            onChange={async value => {
+                              if((value + "").length === 3) {
+                                document.getElementById("ss-user-post-code-right-input").focus();
+                                document.getElementById("ss-user-post-code-right-input").select();
+                              }
+                              onChangeValue(indexContent, content.type, value, 'value_post_code_left');
+                              if ((value + "").length === 3 && zipCodeAddress.value_post_code_right && (zipCodeAddress.value_post_code_right + "").length === 4) {
+                                api.get(`/api/v1/get_address_from_zip_code?zip_code=${value}${zipCodeAddress.value_post_code_right}`).then(res => {
+                                  console.log(res);
+                                  if (res.data && res.data.code === 1) {
+                                    onChangeValue(indexContent, content.type, res.data.data.prefecture_name, 'value_prefecture');
+                                    onChangeValue(indexContent, content.type, `${res.data.data.city_name}${res.data.data.town_name}`, 'value_municipality');
+                                    onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "");
+                                    document.getElementById("ss-user-input-address").focus();
+                                    document.getElementById("ss-user-input-address").select();
+                                  } else {
+                                    onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "無効な郵便番号です。");
+                                  }
+                                }).catch((error) => {
+                                  onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "無効な郵便番号です。");
+                                  console.log(error);
+                                  if (error.response?.data.code === 0) {
+                                    tokenExpired();
+                                  }
+                                })
+                              } else if ((value + "").length !== 0 || (zipCodeAddress.value_post_code_right + "").length !== 0) {
+                                onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "無効な郵便番号です。");
+                              } else {
+                                onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "");
+                              }
+                            }}
                             value={zipCodeAddress.value_post_code_left}
                           />
                           <InputCustom
+                            type="number"
                             placeholder={zipCodeAddress.post_code_right}
                             disabled={disabled}
+                            id="ss-user-post-code-right-input"
                             style={{ width: '49%' }}
-                            onChange={value => onChangeValue(indexContent, content.type, value, 'value_post_code_right')}
+                            onKeyPress={(e) => { if (e.target.value.length >= 4) e.preventDefault() }}
+                            onChange={async value => {
+                              onChangeValue(indexContent, content.type, value, 'value_post_code_right');
+                              if ((value + "").length === 4 && zipCodeAddress.value_post_code_left && (zipCodeAddress.value_post_code_left + "").length === 3) {
+                                api.get(`/api/v1/get_address_from_zip_code?zip_code=${zipCodeAddress.value_post_code_left}${value}`).then(res => {
+                                  console.log(res);
+                                  if (res.data && res.data.code === 1) {
+                                    onChangeValue(indexContent, content.type, res.data.data.prefecture_name, 'value_prefecture');
+                                    onChangeValue(indexContent, content.type, `${res.data.data.city_name}${res.data.data.town_name}`, 'value_municipality');
+                                    onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "");
+                                    document.getElementById("ss-user-input-address").focus();
+                                    document.getElementById("ss-user-input-address").select();
+                                  } else {
+                                    onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "無効な郵便番号です。");
+                                  }
+                                }).catch((error) => {
+                                  onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "無効な郵便番号です。");
+                                  console.log(error);
+                                  if (error.response?.data.code === 0) {
+                                    tokenExpired();
+                                  }
+                                })
+                              } else if ((value + "").length !== 0 || (zipCodeAddress.value_post_code_left + "").length !== 0) {
+                                onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "無効な郵便番号です。");
+                              } else {
+                                onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "");
+                              }
+                            }}
                             value={zipCodeAddress.value_post_code_right}
                           />
                         </div>
@@ -3064,13 +3305,25 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
                         Prefectures
                       </div>
-                      <InputCustom
-                        placeholder={zipCodeAddress.prefecture}
-                        disabled={disabled}
-                        style={{ width: '100%' }}
-                        onChange={value => onChangeValue(indexContent, content.type, value, 'value_prefecture')}
-                        value={zipCodeAddress.value_prefecture}
-                      />
+                      {zipCodeAddress.is_use_dropdown ?
+                        <SelectCustom
+                          style={{ width: '100%' }}
+                          value={zipCodeAddress?.value_prefecture}
+                          data={dataPrefectures}
+                          keyValue="name"
+                          nameValue="name"
+                          placeholder={zipCodeAddress.prefecture}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'value_prefecture')}
+                        /> :
+                        <InputCustom
+                          placeholder={zipCodeAddress.prefecture}
+                          disabled={disabled}
+                          style={{ width: '100%' }}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'value_prefecture')}
+                          value={zipCodeAddress.value_prefecture}
+                        />
+                      }
+
                     </div>
                   }
                   {zipCodeAddress.municipality !== undefined &&
@@ -3094,6 +3347,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       </div>
                       <InputCustom
                         placeholder={zipCodeAddress.address}
+                        id="ss-user-input-address"
                         disabled={disabled}
                         style={{ width: '100%' }}
                         onChange={value => onChangeValue(indexContent, content.type, value, 'value_address')}
@@ -3108,6 +3362,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       </div>
                       <InputCustom
                         placeholder={zipCodeAddress.building_name}
+                        id="ss-user-input-building"
                         disabled={disabled}
                         style={{ width: '100%' }}
                         onChange={value => onChangeValue(indexContent, content.type, value, 'value_building_name')}
@@ -3204,7 +3459,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {/* calendar: type = 'embedded' */}
                   {calendar.type === 'embedded' && (
                     <React.Fragment>
-                      {console.log(calendar.date_select)}
+                      {console.log(calendar.date_select, 'checkkkk date selectttt')}
                       <div className="ss-message__content--user-calender-embedded" style={{ marginTop: '5px' }}>
                         <Calendar
                           disabled={disabled}
@@ -3212,8 +3467,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           fullscreen={false}
                           onPanelChange={(value, mode) => console.log(value)}
                           style={{ top: '20px', width: '300px', border: '1px solid grey' }}
-                          value={calendar.date_select ? moment(calendar.date_select, "YYYY/MM/DD") : null}
-                          onChange={value => onChangeValue(indexContent, content.type, value.format("YYYY/MM/DD"), 'date_select')}
+                          value={calendar.date_select ? moment(calendar.date_select) : null}
+                          onChange={value => onChangeValue(indexContent, content.type, value, 'date_select')}
                           disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                         />
                       </div>
@@ -3623,13 +3878,13 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             value={productPurchase.initial_selection}
                           >
                             {productPurchase.products.map((itemProduct, indexProduct) => {
-                              return <React.Fragment key={indexProduct}>
+                              return <div key={indexProduct} style={{ padding: '5px', border: '1px solid #8BC5FF', marginBottom: '5px' }}>
                                 <Checkbox value={itemProduct.id}
+                                  style={{ border: 'none', padding: '0px' }}
                                   onChange={() => {
                                     let selectArr = [...productPurchase.initial_selection];
                                     if (selectArr.includes(itemProduct.id)) {
                                       selectArr = [...selectArr.filter(item => item !== itemProduct.id)];
-                                      console.log(selectArr, itemProduct.id, 'cehckkkkk');
                                     } else {
                                       selectArr.push(itemProduct.id);
                                     }
@@ -3661,31 +3916,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                             Price: {itemProduct.item_price} 円
                                           </div>
                                         }
-                                        {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
-                                          <InputNum
-                                            value={itemProduct.quantity_select}
-                                            onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
-                                            controls={false}
-                                            min={1}
-                                            max={itemProduct.quantity_limit}
-                                            addonAfter={<div
-                                              style={{ padding: '4px 11px' }}
-                                              onClick={() => {
-                                                if (itemProduct.quantity_select < itemProduct.quantity_limit) {
-                                                  onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                                }
-                                              }}
-                                            >+</div>}
-                                            addonBefore={<div
-                                              style={{ padding: '4px 11px' }}
-                                              onClick={() => {
-                                                if (itemProduct.quantity_select > 1) {
-                                                  onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
-                                                }
-                                              }}
-                                            >-</div>}
-                                          />
-                                        }
+
                                         {/* {productPurchase.multiple_item_purchase &&
                                         <div className="ss-user-overview-product-purchase-infor-price">
                                           Multiple item purchase
@@ -3695,7 +3926,43 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     }
                                   </div>
                                 </Checkbox>
-                              </React.Fragment>
+                                {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
+                                  <InputNum
+                                    style={{ width: '60%', marginLeft: '27px' }}
+                                    value={itemProduct.quantity_select}
+                                    onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
+                                    controls={false}
+                                    min={1}
+                                    max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
+                                    addonAfter={<div
+                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                      onClick={() => {
+                                        if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                        }
+                                        let selectArr = [...productPurchase.initial_selection];
+                                        if (!selectArr.includes(itemProduct.id)) {
+                                          selectArr.push(itemProduct.id);
+                                          onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                        }
+                                      }}
+                                    >+</div>}
+                                    addonBefore={<div
+                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                      onClick={() => {
+                                        if (itemProduct.quantity_select > 1) {
+                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                        }
+                                        let selectArr = [...productPurchase.initial_selection];
+                                        if (!selectArr.includes(itemProduct.id)) {
+                                          selectArr.push(itemProduct.id);
+                                          onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                        }
+                                      }}
+                                    >-</div>}
+                                  />
+                                }
+                              </div>
                             })}
                           </Checkbox.Group>
                         </React.Fragment>
@@ -3709,77 +3976,90 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             value={productPurchase.initial_selection[0]}
                           >
                             {productPurchase.products.map((itemProduct, indexProduct) => {
-                              return <Radio value={itemProduct.id} key={indexProduct}
-                                onChange={() => {
-                                  let selectArr = [...productPurchase.initial_selection];
-                                  let dataValue;
-                                  if (selectArr.includes(itemProduct.id)) {
-                                    dataValue = [];
-                                  } else {
-                                    dataValue = [itemProduct.id];
-                                  }
-                                  onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
-                                }}
-                              >
-                                <div className="ss-user-overview-product-purchase-container">
-                                  <div className="ss-user-preivew-product-purchase-img">
-                                    <img src={itemProduct.img_url} />
-                                  </div>
-                                  {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
-                                    <div className="ss-user-preivew-product-purchase-infor">
-                                      {productPurchase.product_name_display && itemProduct.title &&
-                                        <div className="ss-user-overview-product-purchase-infor-title">
-                                          {itemProduct.title}
-                                        </div>
-                                      }
-                                      {productPurchase.product_number_display && itemProduct.item_number &&
-                                        <div className="ss-user-overview-product-purchase-infor-item-number">
-                                          Item number: {itemProduct.item_number}
-                                        </div>
-                                      }
-                                      {itemProduct.price_display_custom ?
-                                        <div className="ss-user-overview-product-purchase-infor-price">
-                                          {itemProduct.price_display_custom}
-                                        </div> :
-                                        productPurchase.price_display && itemProduct.item_price &&
-                                        <div className="ss-user-overview-product-purchase-infor-price">
-                                          Price: {itemProduct.item_price} 円
-                                        </div>
-                                      }
-                                      {/* {productPurchase.multiple_item_purchase &&
+                              return <div style={{ padding: '5px', border: '1px solid #8BC5FF', marginBottom: '5px' }} key={indexProduct}>
+                                <Radio value={itemProduct.id}
+                                  style={{ border: 'none', padding: '0px' }}
+                                  onChange={() => {
+                                    let selectArr = [...productPurchase.initial_selection];
+                                    let dataValue;
+                                    if (selectArr.includes(itemProduct.id)) {
+                                      dataValue = [];
+                                    } else {
+                                      dataValue = [itemProduct.id];
+                                    }
+                                    onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
+                                  }}
+                                >
+                                  <div className="ss-user-overview-product-purchase-container">
+                                    <div className="ss-user-preivew-product-purchase-img">
+                                      <img src={itemProduct.img_url} />
+                                    </div>
+                                    {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                      <div className="ss-user-preivew-product-purchase-infor">
+                                        {productPurchase.product_name_display && itemProduct.title &&
+                                          <div className="ss-user-overview-product-purchase-infor-title">
+                                            {itemProduct.title}
+                                          </div>
+                                        }
+                                        {productPurchase.product_number_display && itemProduct.item_number &&
+                                          <div className="ss-user-overview-product-purchase-infor-item-number">
+                                            Item number: {itemProduct.item_number}
+                                          </div>
+                                        }
+                                        {itemProduct.price_display_custom ?
+                                          <div className="ss-user-overview-product-purchase-infor-price">
+                                            {itemProduct.price_display_custom}
+                                          </div> :
+                                          productPurchase.price_display && itemProduct.item_price &&
+                                          <div className="ss-user-overview-product-purchase-infor-price">
+                                            Price: {itemProduct.item_price} 円
+                                          </div>
+                                        }
+                                        {/* {productPurchase.multiple_item_purchase &&
                                         <div className="ss-user-overview-product-purchase-infor-price">
                                           Multiple item purchase
                                         </div>
                                       } */}
-                                      {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
-                                        <InputNum
-                                          value={itemProduct.quantity_select}
-                                          onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
-                                          controls={false}
-                                          min={1}
-                                          max={itemProduct.quantity_limit}
-                                          addonAfter={<div
-                                            style={{ padding: '4px 11px' }}
-                                            onClick={() => {
-                                              if (itemProduct.quantity_select < itemProduct.quantity_limit) {
-                                                onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                              }
-                                            }}
-                                          >+</div>}
-                                          addonBefore={<div
-                                            style={{ padding: '4px 11px' }}
-                                            onClick={() => {
-                                              if (itemProduct.quantity_select > 1) {
-                                                onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
-                                              }
-                                            }}
-                                          >-</div>}
-                                        />
-                                      }
-                                    </div>
-                                  }
-                                </div>
-                              </Radio>
+                                      </div>
+                                    }
+                                  </div>
+                                </Radio>
+                                {
+                                  (productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
+                                  <InputNum
+                                    style={{ width: '60%', marginLeft: '27px' }}
+                                    value={itemProduct.quantity_select}
+                                    onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
+                                    controls={false}
+                                    min={1}
+                                    max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
+                                    addonAfter={<div
+                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                      onClick={() => {
+                                        if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                        }
+                                        let selectArr = [...productPurchase.initial_selection];
+                                        if (!selectArr.includes(itemProduct.id)) {
+                                          onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                        }
+                                      }}
+                                    >+</div>}
+                                    addonBefore={<div
+                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                      onClick={() => {
+                                        if (itemProduct.quantity_select > 1) {
+                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                        }
+                                        let selectArr = [...productPurchase.initial_selection];
+                                        if (!selectArr.includes(itemProduct.id)) {
+                                          onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                        }
+                                      }}
+                                    >-</div>}
+                                  />
+                                }
+                              </div>
                             })}
                           </Radio.Group>
                         </React.Fragment>
@@ -3796,55 +4076,68 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             value={productPurchase.initial_selection}
                           >
                             {productPurchase.products.map((itemProduct, indexProduct) => {
-                              return <Checkbox key={indexProduct} value={itemProduct.id}
-                                onChange={() => {
-                                  let selectArr = [...productPurchase.initial_selection];
-                                  if (selectArr.includes(itemProduct.id)) {
-                                    selectArr = [...selectArr.filter(item => item !== itemProduct.id)];
-                                    console.log(selectArr, itemProduct.id, 'cehckkkkk');
-                                  } else {
-                                    selectArr.push(itemProduct.id);
-                                  }
-                                  onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
-                                  // onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')
-                                }}>
-                                <div className="ss-user-overview-product-purchase-container-type-text_image">
-                                  <div className="ss-user-overview-product-purchase-img-type-text_image">
-                                    <img src={itemProduct.img_url} />
-                                  </div>
-                                  {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
-                                    <div className="ss-user-overview-product-purchase-infor-type-text_image">
-                                      {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                              return <div key={indexProduct} style={{ padding: '5px', border: '1px solid #8BC5FF', marginBottom: '5px' }}>
+                                <Checkbox key={indexProduct} value={itemProduct.id}
+                                  onChange={() => {
+                                    let selectArr = [...productPurchase.initial_selection];
+                                    if (selectArr.includes(itemProduct.id)) {
+                                      selectArr = [...selectArr.filter(item => item !== itemProduct.id)];
+                                      console.log(selectArr, itemProduct.id, 'cehckkkkk');
+                                    } else {
+                                      selectArr.push(itemProduct.id);
+                                    }
+                                    onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                    // onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')
+                                  }}>
+                                  <div className="ss-user-overview-product-purchase-container-type-text_image">
+                                    <div className="ss-user-overview-product-purchase-img-type-text_image">
+                                      <img src={itemProduct.img_url} />
                                     </div>
-                                  }
-                                  {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
-                                    <InputNum
-                                      value={itemProduct.quantity_select}
-                                      onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
-                                      controls={false}
-                                      min={1}
-                                      style={{ width: '50%' }}
-                                      max={itemProduct.quantity_limit}
-                                      addonAfter={<div
-                                        style={{ padding: '4px 11px' }}
-                                        onClick={() => {
-                                          if (itemProduct.quantity_select < itemProduct.quantity_limit) {
-                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                          }
-                                        }}
-                                      >+</div>}
-                                      addonBefore={<div
-                                        style={{ padding: '4px 11px' }}
-                                        onClick={() => {
-                                          if (itemProduct.quantity_select > 1) {
-                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
-                                          }
-                                        }}
-                                      >-</div>}
-                                    />
-                                  }
-                                </div>
-                              </Checkbox>
+                                    {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                      <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                        {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                                      </div>
+                                    }
+
+                                  </div>
+                                </Checkbox>
+                                {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
+                                  <InputNum
+                                    value={itemProduct.quantity_select}
+                                    onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
+                                    controls={false}
+                                    min={1}
+                                    style={{ width: '60%' }}
+                                    max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
+                                    addonAfter={<div
+                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                      onClick={() => {
+                                        if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                        }
+                                        let selectArr = [...productPurchase.initial_selection];
+                                        if (!selectArr.includes(itemProduct.id)) {
+                                          selectArr.push(itemProduct.id);
+                                          onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                        }
+                                      }}
+                                    >+</div>}
+                                    addonBefore={<div
+                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                      onClick={() => {
+                                        if (itemProduct.quantity_select > 1) {
+                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                        }
+                                        let selectArr = [...productPurchase.initial_selection];
+                                        if (!selectArr.includes(itemProduct.id)) {
+                                          selectArr.push(itemProduct.id);
+                                          onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                        }
+                                      }}
+                                    >-</div>}
+                                  />
+                                }
+                              </div>
                             })}
                           </Checkbox.Group>
                         </React.Fragment>
@@ -3868,44 +4161,54 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             value={productPurchase.initial_selection[0]}
                           >
                             {productPurchase.products.map((itemProduct, indexProduct) => {
-                              return <Radio value={itemProduct.id} key={indexProduct}>
-                                <div className="ss-user-overview-product-purchase-container-type-text_image">
-                                  <div className="ss-user-overview-product-purchase-img-type-text_image">
-                                    <img src={itemProduct.img_url} />
-                                  </div>
-                                  {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
-                                    <div className="ss-user-overview-product-purchase-infor-type-text_image">
-                                      {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                              return <div style={{ padding: '5px', border: '1px solid #8BC5FF', marginBottom: '5px' }} key={indexProduct}>
+                                <Radio value={itemProduct.id} key={indexProduct}>
+                                  <div className="ss-user-overview-product-purchase-container-type-text_image">
+                                    <div className="ss-user-overview-product-purchase-img-type-text_image">
+                                      <img src={itemProduct.img_url} />
                                     </div>
-                                  }
-                                  {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
-                                    <InputNum
-                                      value={itemProduct.quantity_select}
-                                      onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
-                                      controls={false}
-                                      min={1}
-                                      style={{ width: '50%' }}
-                                      max={itemProduct.quantity_limit}
-                                      addonAfter={<div
-                                        style={{ padding: '4px 11px' }}
-                                        onClick={() => {
-                                          if (itemProduct.quantity_select < itemProduct.quantity_limit) {
-                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                          }
-                                        }}
-                                      >+</div>}
-                                      addonBefore={<div
-                                        style={{ padding: '4px 11px' }}
-                                        onClick={() => {
-                                          if (itemProduct.quantity_select > 1) {
-                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
-                                          }
-                                        }}
-                                      >-</div>}
-                                    />
-                                  }
-                                </div>
-                              </Radio>
+                                    {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
+                                      <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                        {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                                      </div>
+                                    }
+                                  </div>
+                                </Radio>
+                                {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
+                                  <InputNum
+                                    style={{ width: '60%' }}
+                                    value={itemProduct.quantity_select}
+                                    onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
+                                    controls={false}
+                                    min={1}
+                                    max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
+                                    addonAfter={<div
+                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                      onClick={() => {
+                                        if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                        }
+                                        let selectArr = [...productPurchase.initial_selection];
+                                        if (!selectArr.includes(itemProduct.id)) {
+                                          onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                        }
+                                      }}
+                                    >+</div>}
+                                    addonBefore={<div
+                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                      onClick={() => {
+                                        if (itemProduct.quantity_select > 1) {
+                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                        }
+                                        let selectArr = [...productPurchase.initial_selection];
+                                        if (!selectArr.includes(itemProduct.id)) {
+                                          onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                        }
+                                      }}
+                                    >-</div>}
+                                  />
+                                }
+                              </div>
                             })}
                           </Radio.Group>
                         </React.Fragment>
