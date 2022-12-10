@@ -59,7 +59,7 @@ function SubUserManagement() {
       if (res.data.code === 1) {
         setIsOpenPopupDelete(false);
         setIsOpenNoti(true);
-        setMsgNoti(`Delete successfully`);
+        setMsgNoti(`正常に削除されました！`);
         loadData()
         setTimeout(() => {
           setIsOpenNoti(false);
@@ -98,7 +98,7 @@ function SubUserManagement() {
       console.log(res);
       if (res.data.code === 1) {
         setIsOpenNoti(true);
-        setMsgNoti(`Edit successfully`);
+        setMsgNoti(`正常に編集されました！`);
         loadData();
         setIsOpenEdit(false);
         setTimeout(() => {
@@ -140,15 +140,16 @@ function SubUserManagement() {
           <Col md="12">
             <Card>
               <CardHeader>
-                <div className='sub-user__title'>Sub User Management</div>
+                <div className='sub-user__title'>サブユーザー管理</div>
                 <div className='sub-user__heading'>
-                  <p>View users who have been added as bot admins for your plan.
+                  <p>利用中のプランのボットの管理者として追加されているユーザーを表示します。
                     <br />
-                    If you want to add a user without a BOTCHAN account as an administrator, invite the user from the invite button on the right and then add the bot administrator.
+                    EC-CHATBOTのアカウントを持たないユーザーを管理者に追加したい場合は、
+右の招待ボタンからユーザーを招待してからボットの管理者を追加してください。
                   </p>
                   <div className='sub-user__heading-btn'>
                     <Link to={'/admin/add-sub-user'}>
-                      <button className='btn btn-primary'>User invitation</button>
+                      <button className='btn btn-primary'>ユーザー招待</button>
 
                     </Link>
                   </div>
@@ -158,11 +159,11 @@ function SubUserManagement() {
                 <Table>
                   <thead className="text-primary">
                     <tr>
-                      <th style={{ width: '10%' }}>No</th>
-                      <th style={{ width: '20%' }}>Full name</th>
-                      <th style={{ width: '20%' }}>email address</th>
-                      <th style={{ width: '15%' }}>authority</th>
-                      <th style={{ width: '10%' }}>Action</th>
+                      <th style={{ width: '10%' }}>NO.</th>
+                      <th style={{ width: '20%' }}>氏名</th>
+                      <th style={{ width: '20%' }}>メールアドレス</th>
+                      <th style={{ width: '15%' }}>権限</th>
+                      <th style={{ width: '10%' }}>アアクション</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -175,11 +176,11 @@ function SubUserManagement() {
                         <td className="sub-user__border-table">
                           <div className="sub-user__action-wrapper">
                             <div className='sub-user__btn'>
-                              <button className="sub-user__btn-edit" onClick={() => openPopupEdit(user)}>Edit</button>
+                              <button className="sub-user__btn-edit" onClick={() => openPopupEdit(user)}>編集</button>
 
                             </div>
                             <div className='sub-user__btn'>
-                              <button className="sub-user__btn-delete" onClick={() => openPopupDelete(user)}>Delete</button>
+                              <button className="sub-user__btn-delete" onClick={() => openPopupDelete(user)}>削除</button>
                             </div>
                           </div>
                         </td>
@@ -204,7 +205,7 @@ function SubUserManagement() {
             <h4>Sub UserEdit</h4>
             <form id='sub-user__edit-form'>
               <div className='sub-user__field-container sub-user__field-container-edit'>
-                <span className='sub-user__field-lable'>Full name</span>
+                <span className='sub-user__field-lable'>氏名</span>
                 <div className='sub-user__field-input'>
                   <input type='text' disabled name='full_name' defaultValue={detailUser.full_name}
                   ></input>
@@ -215,24 +216,24 @@ function SubUserManagement() {
                 <span className='sub-user__field-lable'>authority</span>
                 <div className='sub-user__field-input'>
                   <select name='role' defaultValue={detailUser.role}>
-                    <option value='bot_admin'>Administrator</option>
-                    <option value='editor'>Editor</option>
-                    <option value='reader'>Reader</option>
+                    <option value='bot_admin'>管理者</option>
+                    <option value='editor'>編集者</option>
+                    <option value='reader'>観覧者</option>
                   </select>
                 </div>
               </div>
             </form>
             <div className='btn-edit'>
-              <button className='btn btn-primary' onClick={() => handleEdit()}>Edit</button>
+              <button className='btn btn-primary' onClick={() => handleEdit()}>編集</button>
             </div>
           </div>
         </ModalShortTem>
 
         <ModalShort open={isOpenPopupDelete} onClose={() => setIsOpenPopupDelete(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-            <h4>Do you delete?</h4>
-            <Button onClick={() => handleDelete()}>Yes</Button>
-            <Button onClick={() => setIsOpenPopupDelete(false)}>No</Button>
+            <h4>本当にこのサブユーザーを削除しますか?</h4>
+            <Button onClick={() => handleDelete()}>はい</Button>
+            <Button onClick={() => setIsOpenPopupDelete(false)}>いいえ</Button>
           </div>
         </ModalShort>
 

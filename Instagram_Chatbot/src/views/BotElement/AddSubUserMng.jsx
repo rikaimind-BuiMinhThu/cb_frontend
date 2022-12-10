@@ -35,7 +35,7 @@ function AddSubUserMng() {
             const add = { "user_chatbot": { "chatbot_id": botId, ...user } }
             api.post(`/api/v1/managements/user_chatbots`, add).then(res => {
                 if (res.data.code === 1) {
-                    setMsgNoti(`Add successfully!`);
+                    setMsgNoti(`正常に追加されました！`);
                     setIsOpenNoti(true);
                     setTimeout(() => {
                         setMsgNoti('');
@@ -67,27 +67,27 @@ function AddSubUserMng() {
                     <Col md="12">
                         <Card>
                             <CardHeader>
-                                <div className='sub-user__title'>sub-user invitation</div>
+                                <div className='sub-user__title'>サブユーザー招待</div>
                             </CardHeader>
                             <CardBody>
                                 <form id='sub-user__add-form'>
 
                                     <div className='sub-user__field-container'>
-                                        <span className='sub-user__field-lable'>email address</span>
+                                        <span className='sub-user__field-lable'>メールアドレス</span>
                                         <div className='sub-user__field-input'>
-                                            <input id='add-email' type='text' placeholder='Please enter your e-mail address' name='email'
+                                            <input id='add-email' type='text' placeholder='メールアドレスは、必ず指定してください。' name='email'
                                                 onChange={() => utils.checkEmailRequired('add-email', 'errEmail', 'Email')}></input>
                                             <span id="errEmail" className='sub-user__err-format'></span>
                                         </div>
                                     </div>
 
                                     <div className='sub-user__field-container'>
-                                        <span className='sub-user__field-lable'>authority</span>
+                                        <span className='sub-user__field-lable'>権限</span>
                                         <div className='sub-user__field-input'>
                                             <select name='role'>
-                                                <option value='bot_admin'>Administrator</option>
-                                                <option value='editor'>Editor</option>
-                                                <option value='reader'>Reader</option>
+                                                <option value='bot_admin'>管理者</option>
+                                                <option value='editor'>編集者</option>
+                                                <option value='reader'>観覧者</option>
                                             </select>
                                         </div>
                                     </div>
@@ -96,8 +96,8 @@ function AddSubUserMng() {
                                 </form>
 
                                 <div className='sub-user__field-btn'>
-                                    <button className='btn' onClick={() => { window.location.href = `/admin/sub-user` }}>Return</button>
-                                    <button className='btn btn-primary' onClick={() => handleInvite()}>Invite</button>
+                                    <button className='btn' onClick={() => { window.location.href = `/admin/sub-user` }}>戻る</button>
+                                    <button className='btn btn-primary' onClick={() => handleInvite()}>招待する</button>
                                 </div>
                             </CardBody>
                         </Card>

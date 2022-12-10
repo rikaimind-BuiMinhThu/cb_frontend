@@ -53,7 +53,7 @@ function CreateEmail() {
                 ele.parentNode.removeChild(ele);
                 var listcc = ccList;
                 listcc.splice(i, 1);
-                console.log('listcc detail: ', listcc);
+                // console.log('listcc detail: ', listcc);
                 setCcAll(listcc);
               });
             });
@@ -125,11 +125,11 @@ function CreateEmail() {
         document.getElementById('errCcMail').style.display = 'none';
       } else {
         document.getElementById('errCcMail').style.display = 'block';
-        document.getElementById('errCcMail').innerText = 'Duplicate email!';
+        document.getElementById('errCcMail').innerText = 'メール複製';
       }
     } else {
       document.getElementById('errCcMail').style.display = 'block';
-      document.getElementById('errCcMail').innerText = 'Please input right format of email';
+      document.getElementById('errCcMail').innerText = 'メールの正しいフォーマットに入力してください。';
     }
   }
 
@@ -154,7 +154,7 @@ function CreateEmail() {
         `;
         bcc.appendChild(newBcc);
         document.getElementById(`deleteBCc${bccNum}FI`).addEventListener('click', () => {
-          console.log('clicked delete bcc');
+          // console.log('clicked delete bcc');
           var ele = document.getElementById(`bcc${bccNum}`);
           ele.parentNode.removeChild(ele);
           listbcc.splice(bccNum, 1);
@@ -165,11 +165,11 @@ function CreateEmail() {
         setBccNum(bccNum + 1);
         document.getElementById('errBccMail').style.display = 'none';
       } else {
-        document.getElementById('errBccMail').innerText = 'Duplicate email!';
+        document.getElementById('errBccMail').innerText = 'メール複製';
       }
     } else {
       document.getElementById('errBccMail').style.display = 'block';
-      document.getElementById('errBccMail').innerText = 'Please input right format of email';
+      document.getElementById('errBccMail').innerText = 'メールの正しいフォーマットに入力してください。';
     }
   }
 
@@ -226,7 +226,7 @@ function CreateEmail() {
         .then((res) => {
           if (res.data.code == 1) {
             setIsOpenNoti(true);
-            setMsgNoti(`Add successfully!`);
+            setMsgNoti(`正常に追加されました！!`);
             setTimeout(() => {
               setIsOpenNoti(false);
               setMsgNoti(``);
@@ -275,7 +275,7 @@ function CreateEmail() {
 
       var bot_id = Cookies.get('bot_id');
       obj.chatbot_id = bot_id;
-      console.log('bot_id: ', bot_id);
+      // console.log('bot_id: ', bot_id);
       let add = { email: obj };
       console.log(add);
 
@@ -284,7 +284,7 @@ function CreateEmail() {
         .then((res) => {
           if (res.data.code == 1) {
             setIsOpenNoti(true);
-            setMsgNoti(`Update successfully!`);
+            setMsgNoti(`正常に更新されました！`);
             setTimeout(() => {
               setIsOpenNoti(false);
               setMsgNoti(``);
@@ -313,7 +313,7 @@ function CreateEmail() {
     var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
     if (!regex.test(field(emailId).value)) {
       field(errEmail).style.display = 'block';
-      field(errEmail).innerHTML = `${lable} incorrect.`;
+      field(errEmail).innerHTML = `メールフォーマットが正しくありません`;
       return false;
     } else {
       field(errEmail).style.display = 'none';
@@ -325,7 +325,7 @@ function CreateEmail() {
   function checkRequired(emailId, errEmail, lable) {
     if (field(emailId).value === '') {
       field(errEmail).style.display = 'block';
-      field(errEmail).innerHTML = `${lable} required.`;
+      field(errEmail).innerHTML = `これは必須項目です。`;
       return false;
     } else {
       field(errEmail).style.display = 'none';
@@ -349,13 +349,13 @@ function CreateEmail() {
             <Card>
               <CardHeader>
                 <h4 style={{ margin: '10px 0' }}>
-                  {mailAction === false ? 'Edit Email' : 'Create Email'}
+                  {mailAction === false ? '編集' : 'メール作成'}
                 </h4>
               </CardHeader>
               <CardBody>
                 <form id="create-email-form">
                   <div className="field-container">
-                    <span className="field-lable">Email template name</span>
+                    <span className="field-lable">テンプレート名</span>
                     <div className="field-input">
                       <input
                         className="ce_input"
@@ -364,7 +364,7 @@ function CreateEmail() {
                           mailAction == false ? detailEmail?.email.email_template_name : ''
                         }
                         type="text"
-                        placeholder="Enter email template name"
+                        placeholder="テンプレート名は、必ず指定してください。"
                         name="email_template_name"
                         onChange={() =>
                           checkRequired('email_template_name', 'errEmailName', 'Emailtemplate name')
@@ -378,14 +378,14 @@ function CreateEmail() {
                   </div>
 
                   <div className="field-container">
-                    <span className="field-lable">Sender name</span>
+                    <span className="field-lable">差出人</span>
                     <div className="field-input">
                       <input
                         className="ce_input"
                         id="sender_name"
                         type="text"
                         defaultValue={mailAction == false ? detailEmail?.email.sender_name : ''}
-                        placeholder="Please enter the sender name"
+                        placeholder="差出人は、必ず指定してください。"
                         name="sender_name"
                       ></input>
                       <span id="errEmailSender" className="err-email-format"></span>
@@ -393,14 +393,14 @@ function CreateEmail() {
                   </div>
 
                   <div className="field-container">
-                    <span className="field-lable">To</span>
+                    <span className="field-lable">宛先</span>
                     <div className="field-input">
                       <input
                         className="ce_input"
                         id="to"
                         type="text"
                         defaultValue={mailAction == false ? detailEmail?.email.to : ''}
-                        placeholder="no-reply@botchan.chat"
+                        placeholder="no-reply@ec-chatbot.com"
                         name="to"
                         onChange={() => checkTo('to', 'errEmailTo', 'To')}
                         onBlur={() => checkTo('to', 'errEmailTo', 'To')}
@@ -417,7 +417,7 @@ function CreateEmail() {
                         className="ce_input"
                         id="cc"
                         type="text"
-                        placeholder="no-reply@botchan.chat"
+                        placeholder="no-reply@ec-chatbot.com"
                         onKeyUp={(e) => addCC(e)}
                       ></input>
                       {/* <textarea className='textarea-email' placeholder='no-reply@botchan.chat' name='cc'></textarea> */}
@@ -448,21 +448,21 @@ function CreateEmail() {
                         className="ce_input"
                         type="text"
                         defaultValue={mailAction == false ? detailEmail?.email.reply_to : ''}
-                        placeholder="no-reply@botchan.chat"
+                        placeholder="no-reply@ec-chatbot.com"
                         name="reply_to"
                       ></input>
                     </div>
                   </div>
 
                   <div className="field-container">
-                    <span className="field-lable">Subject</span>
+                    <span className="field-lable">件名</span>
                     <div className="field-input">
                       <input
                         className="ce_input"
                         id="subject"
                         type="text"
                         defaultValue={mailAction == false ? detailEmail?.email.subject : ''}
-                        placeholder="Please enter a subject"
+                        placeholder="件名は、必ず指定してください。"
                         name="subject"
                         onChange={() => checkRequired('subject', 'errSubject', 'Subject')}
                         onBlur={() => checkRequired('subject', 'errSubject', 'Subject')}
@@ -472,7 +472,7 @@ function CreateEmail() {
                   </div>
 
                   <div className="field-container">
-                    <span className="field-lable">Text</span>
+                    <span className="field-lable">メール内容</span>
                     <div className="field-input">
                       <textarea
                         className="ce_textArea"
@@ -480,7 +480,7 @@ function CreateEmail() {
                         cols="10"
                         rows="7"
                         defaultValue={mailAction == false ? detailEmail?.email.content : ''}
-                        placeholder="Please enter the text"
+                        placeholder="メール内容は、必ず指定してください。"
                         name="content"
                         onChange={() => checkRequired('text', 'errText', 'Text')}
                         onBlur={() => checkRequired('text', 'errText', 'Text')}
@@ -497,21 +497,21 @@ function CreateEmail() {
                       window.location.href = '/admin/list-email';
                     }}
                   >
-                    Return
+                    戻る
                   </button>
                   <button
                     className="btn btn-primary"
                     style={{ display: `${mailAction == false ? 'block' : 'none'}` }}
                     onClick={(e) => saveEmail(e)}
                   >
-                    Save
+                    保存
                   </button>
                   <button
                     className="btn btn-primary"
                     style={{ display: `${mailAction == false ? 'none' : 'block'}` }}
                     onClick={(e) => addEmail(e)}
                   >
-                    Add
+                    追加
                   </button>
                 </div>
               </CardBody>

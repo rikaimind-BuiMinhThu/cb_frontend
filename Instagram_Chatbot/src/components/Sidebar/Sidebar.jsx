@@ -458,7 +458,7 @@ function Sidebar(props) {
                         <p style={{ color: 'black' }}>Scenario List</p>
                       </NavLink>
                     </li>
-                    <li
+                    {/* <li
                       className={activeRoute('media-management') + (true ? ' active-pro' : '')}
                       key={'media-management'}
                     >
@@ -471,10 +471,10 @@ function Sidebar(props) {
                         <i className="nc-icon nc-badge" style={{ color: 'black' }} />
                         <p style={{ color: 'black' }}>Meida Management</p>
                       </NavLink>
-                    </li>
+                    </li> */}
                   </ul>
                 </li>
-                <li key={'media-management'}>
+                {/* <li key={'media-management'}>
                   <NavLink
                     onClick={() => displayDesignSetting()}
                     to="/admin/start-button"
@@ -523,7 +523,7 @@ function Sidebar(props) {
                       </NavLink>
                     </li>
                   </ul>
-                </li>
+                </li> */}
                 <li key={'create-email'}>
                   <NavLink
                     onClick={() => displayEmailSetting()}
@@ -602,7 +602,7 @@ function Sidebar(props) {
                     <p style={{ color: 'black' }}>Sub User Management</p>
                   </NavLink>
                 </li>
-                <li key={'api-setting'}>
+                {/* <li key={'api-setting'}>
                   <NavLink
                     onClick={() => displayAPISetting()}
                     to="/admin/create-email"
@@ -651,7 +651,7 @@ function Sidebar(props) {
                       </NavLink>
                     </li>
                   </ul>
-                </li>
+                </li> */}
                 <li
                   className={activeRoute('push-message') + (true ? ' active-pro' : '')}
                   key={'push-message'}

@@ -589,7 +589,7 @@ function PushMessage() {
                     <tbody>
                       {listPushMessage?.map((item, i) => (
                         <tr key={i}>
-                          <td style={{ width: '5%', border: '1px solid #7186a0' }}>{i}</td>
+                          <td style={{ width: '5%', border: '1px solid #7186a0' }}>{i+1}</td>
                           <td style={{ width: '25%', border: '1px solid #7186a0' }}>
                             {item.title}
                           </td>

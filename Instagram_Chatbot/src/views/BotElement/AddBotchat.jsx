@@ -232,7 +232,7 @@ function AddBotchat() {
           <Col md="12">
             <Card>
               <CardHeader>
-                <h4 style={{ margin: '10px 0' }}>Add Botchat</h4>
+                <h4 style={{ margin: '10px 0' }}>ボット追加</h4>
               </CardHeader>
               <CardBody>
                 <form action="">
@@ -240,7 +240,7 @@ function AddBotchat() {
                     <div className="bot-left">
                       <div className="field-add-bot">
                         <div className="add-bot_field-container">
-                          <span className="label-field">Title</span>
+                          <span className="label-field">タイトル</span>
                           <input
                             type="text"
                             name="title"
@@ -256,7 +256,7 @@ function AddBotchat() {
                       </div>
                       <div className="field-add-bot">
                         <div className="add-bot_field-container">
-                          <span className="label-field">Subtitle</span>
+                          <span className="label-field">サブタイトル</span>
                           <input
                             type="text"
                             className="input-field"
@@ -272,16 +272,16 @@ function AddBotchat() {
                       </div>
                       <div className="field-add-bot">
                         <div className="add-bot_field-container">
-                          <span className="label-field">Design type</span>
+                          <span className="label-field">デザインタイプ</span>
                           <div className="design-types">
                             <div className="type" onClick={(e) => designTypeClick(e)}>
-                              <span>pop</span>
+                              <span>ポップ</span>
                             </div>
                             <div className="type active" onClick={(e) => designTypeClick(e)}>
-                              <span>flat</span>
+                              <span>フラット</span>
                             </div>
                             <div className="type" onClick={(e) => designTypeClick(e)}>
-                              <span>material</span>
+                              <span>マテリアル</span>
                             </div>
                           </div>
                         </div>
@@ -289,7 +289,7 @@ function AddBotchat() {
                       </div>
                       <div className="field-add-bot">
                         <div className="add-bot_field-container">
-                          <span className="label-field">Main color</span>
+                          <span className="label-field">メインカラー</span>
                           <div className="main-colors">
                             {colors.map((color, index) => (
                               <div
@@ -306,7 +306,7 @@ function AddBotchat() {
                       </div>
                       <div className="btn-wrapper">
                         <button type="button" className="btn btn-preview" onClick={handlePreview}>
-                          Preview
+                        プレビュー
                         </button>
                       </div>
                     </div>
@@ -314,7 +314,7 @@ function AddBotchat() {
                       <div>
                         <div className="field-add-bot">
                           <div className="add-bot_field-container">
-                            <span className="label-field">Icon</span>
+                            <span className="label-field">アイコン</span>
                             <div className="icons">
                               {images.map((icon, index) => (
                                 <div
@@ -348,18 +348,17 @@ function AddBotchat() {
                         )}
                         <div className="field-add-bot">
                           <div className="add-bot_field-container">
-                            <span className="label-field">Bot name</span>
+                            <span className="label-field">ボット名称</span>
                             <input
                               type="text"
                               name="title"
                               className="input-field"
-                              placeholder="Sample bot"
+                              placeholder="サンプルボット..."
                               onChange={(e) => setBotName(e.target.value)}
                             />
                           </div>
                           <span className="subtitle-field">
-                            *This is the name for BOTCHAN management. It is never visible within the
-                            bot.
+                          ※EC-CHAT管理用の名称です。ボット内で表示されることはありません。
                           </span>
                           <span className="error-message bot-name"></span>
                         </div>
@@ -367,11 +366,11 @@ function AddBotchat() {
                       <div className="btn-wrapper">
                         <Link to={'/admin/bot'}>
                           <button type="button" className="btn btn-close">
-                            Close
+                          閉じる
                           </button>
                         </Link>
                         <button type="button" className="btn btn-new-bot" onClick={addNewBotChat}>
-                          New bot
+                        ボット新規作成
                         </button>
                       </div>
                     </div>

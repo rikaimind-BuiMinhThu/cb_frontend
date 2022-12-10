@@ -299,10 +299,10 @@ function FileManagement() {
                 <Table>
                   <thead className="text-primary">
                     <tr>
-                      <th style={{ width: '10%' }}>STT</th>
+                      <th style={{ width: '10%' }}>No.</th>
                       <th style={{ width: '15%' }}>Type</th>
                       <th style={{ width: '70%' }}>Url</th>
-                      <th style={{ width: '250px', minWidth: '250px' }}>Action</th>
+                      <th style={{ width: '250px', minWidth: '250px' }}>アアクション</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -314,26 +314,26 @@ function FileManagement() {
                         <td className="file-mng__border-table file-mng__action-table">
                           <div className="file-mng__action-wrapper">
                             <button
-                              className="file-mng__btn-edit"
+                              className="file-mng__btn-preview"
                               onClick={() => handlePreview(file)}
                             >
-                              Preview
+                              プレビュー
                             </button>
                             <button
-                              className="file-mng__btn-stop"
+                              className="file-mng__btn-copy"
                               onClick={() => {
                                 handleCopy(
                                   `https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/${file.file_url}`
                                 );
                               }}
                             >
-                              Copy
+                              コピー
                             </button>
                             <button
                               className="file-mng__btn-delete"
                               onClick={() => openDelete(file.id)}
                             >
-                              Delete
+                              削除
                             </button>
                           </div>
                         </td>

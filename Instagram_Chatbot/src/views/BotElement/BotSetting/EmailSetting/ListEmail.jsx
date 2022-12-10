@@ -85,7 +85,7 @@ function ListEmail() {
         if (res.data.code == 1) {
           setIsOpenDuplicate(false);
           setIsOpenNoti(true);
-          setMsgNoti(`Duplicate successfully!`);
+          setMsgNoti(`正常に複製されました！`);
           reLoad();
           setTimeout(() => {
             setIsOpenNoti(false);
@@ -121,7 +121,7 @@ function ListEmail() {
         if (res.data.code == 1) {
           setIsOpenDelete(false);
           setIsOpenNoti(true);
-          setMsgNoti(`Delete successfully!`);
+          setMsgNoti(`正常に削除されました！`);
           reLoad();
           setTimeout(() => {
             setIsOpenNoti(false);
@@ -159,28 +159,28 @@ function ListEmail() {
           <Col md="12">
             <Card>
               <CardHeader>
-                <h4 style={{ margin: '10px 0' }}>List Email</h4>
+                <h4 style={{ margin: '10px 0' }}>メール一覧</h4>
                 <button
                   className="btn btn-primary"
                   onClick={() => (window.location.href = '/admin/create-email')}
                 >
-                  Add new email
+                  新メール追加
                 </button>
               </CardHeader>
               <CardBody>
                 <div className="mail__list">
                   {emailList?.map((item, i) => (
                     <div className="mail__list-item" key={i}>
-                      <p>Test</p>
+                      <p>テスト</p>
                       <div className="mail-block">
                         <table className="mail-table">
                           <tbody>
                             <tr>
-                              <th>From</th>
-                              <td>{item.sender_name} (no-reply@botchan.chat)</td>
+                              <th>差出人</th>
+                              <td>{item.sender_name} (no-reply@ec-chatbot.com)</td>
                             </tr>
                             <tr>
-                              <th>To</th>
+                              <th>宛先</th>
                               <td>{item.to}</td>
                             </tr>
                             <tr>
@@ -213,15 +213,15 @@ function ListEmail() {
 
                         <div className="mail-detail">
                           <div className="email-detail--subject" type="text">
-                            <span>Subject: </span>
+                            <span>件名 </span>
                             {item.email_template_name}
                             <br />
-                            <span>Template name: </span>
+                            <span>テンプレート名 </span>
                             {item.subject}
                           </div>
 
                           <div className="mail-detail--text">
-                            <span>Text: </span>
+                            <span>メール内容 </span>
                             <p>{item.content}</p>
                           </div>
                         </div>
@@ -233,19 +233,19 @@ function ListEmail() {
                               window.location.href = `/admin/edit-email/${item?.id}`;
                             }}
                           >
-                            Edit
+                            編集
                           </button>
                           <button
                             className="mail-actions--btn btn btn-success"
                             onClick={() => openDuplicate(item.id)}
                           >
-                            Duplication
+                            複製
                           </button>
                           <button
                             className="mail-actions--btn btn btn-danger"
                             onClick={() => openDelete(item.id)}
                           >
-                            Delete
+                            削除
                           </button>
                         </div>
                       </div>
@@ -266,17 +266,17 @@ function ListEmail() {
 
         <ModalShort open={isOpenDuplicate} onClose={() => setIsOpenDuplicate(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-            <h4>Do you want to duplicate email?</h4>
-            <Button onClick={() => duplicateEmail()}>Yes</Button>
-            <Button onClick={() => setIsOpenDuplicate(false)}>No</Button>
+            <h4>本当に複製しますか。</h4>
+            <Button onClick={() => duplicateEmail()}>はい</Button>
+            <Button onClick={() => setIsOpenDuplicate(false)}>いいえ</Button>
           </div>
         </ModalShort>
 
         <ModalShort open={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-            <h4>Do you want to delete email?</h4>
-            <Button onClick={() => deleteEmail()}>Yes</Button>
-            <Button onClick={() => setIsOpenDelete(false)}>No</Button>
+            <h4>本当に削除しますか。</h4>
+            <Button onClick={() => deleteEmail()}>はい</Button>
+            <Button onClick={() => setIsOpenDelete(false)}>いいえ</Button>
           </div>
         </ModalShort>
 

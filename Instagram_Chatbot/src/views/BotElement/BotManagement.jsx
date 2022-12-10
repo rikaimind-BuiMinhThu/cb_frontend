@@ -281,7 +281,7 @@ function BotManagement() {
                   <div className="div-add-bot--search">
                     <input
                       type="text"
-                      placeholder="search ..."
+                      placeholder="ボット名 ..."
                       onChange={(e) => setSearch(e.target.value)}
                     />
                     <div className="bm_status-filter">
@@ -292,17 +292,17 @@ function BotManagement() {
                         onChange={(e) => setIsActiveSearch(e.target.value)}
                         value={isActiveSearch}
                       >
-                        <option value="all">All</option>
-                        <option value="on">On</option>
-                        <option value="off">Off</option>
+                        <option value="all">すべて</option>
+                        <option value="on">ON</option>
+                        <option value="off">OFF</option>
                       </select>
                     </div>
                     <button className="btn-add-bot btn-bl-search" onClick={() => handleSearch()}>
-                      Search
+                    検索
                     </button>
                   </div>
                   <Link to={'/admin/add-bot-management'}>
-                    <button className="btn-add-bot">Add bot</button>
+                    <button className="btn-add-bot">ボット追加</button>
                   </Link>
                 </div>
               </CardHeader>
@@ -310,23 +310,23 @@ function BotManagement() {
                 <Table>
                   <thead className="text-primary">
                     <tr>
-                      <th style={{ width: '10%' }}>ID</th>
-                      <th style={{ width: '20%' }}>Bot name</th>
-                      <th style={{ width: '15%' }}>Status</th>
-                      <th style={{ width: '20%' }}>Owner name</th>
-                      <th style={{ width: '15%' }}>My authority</th>
-                      <th style={{ width: '300px', minWidth: '300px' }}>Action</th>
+                      <th style={{ width: '10%' }}>No.</th>
+                      <th style={{ width: '20%' }}>ボット名</th>
+                      <th style={{ width: '15%' }}>ステータス</th>
+                      <th style={{ width: '20%' }}>所有者名</th>
+                      <th style={{ width: '15%' }}>自分の権限</th>
+                      <th style={{ width: '300px', minWidth: '300px' }}>アクション</th>
                     </tr>
                   </thead>
                   <tbody>
                     {botList != []
-                      ? botList.map((bot) => (
+                      ? botList.map((bot,i) => (
                           <tr key={bot?.id}>
-                            <td className="border-table-bot">{bot?.id}</td>
+                            <td className="border-table-bot">{i+1}</td>
                             <td className="border-table-bot">{bot?.bot_name}</td>
                             <td className="border-table-bot">{bot?.status}</td>
-                            <td className="border-table-bot">Hoang Cong Nghia</td>
-                            <td className="border-table-bot">Owner</td>
+                            <td className="border-table-bot">{bot?.owner_name}</td>
+                            <td className="border-table-bot">所有者</td>
                             <td className="border-table-bot action-table-bot">
                               <div className="action-wrapper">
                                 <button
