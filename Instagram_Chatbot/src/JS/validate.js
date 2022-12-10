@@ -4,7 +4,7 @@ export function checkEmail(inputId, errId, label) {
   var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
   if (!regex.test(field(inputId).value) && field(inputId).value != '') {
     field(errId).style.display = 'block';
-    field(errId).innerHTML = `${label} incorrect.`;
+    field(errId).innerHTML = `${label}項目は正しくありません。`;
     return false;
   } else {
     field(errId).style.display = 'none';
@@ -17,7 +17,7 @@ export function checkUrl(inputId, errId, label) {
     /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
   if (!regex.test(field(inputId).value) && field(inputId).value != '') {
     field(errId).style.display = 'block';
-    field(errId).innerHTML = `${label} incorrect format.`;
+    field(errId).innerHTML = `${label}フォーマとは正しくありません。`;
     return false;
   } else {
     field(errId).style.display = 'none';
@@ -29,7 +29,7 @@ export function checkUrl(inputId, errId, label) {
 export function checkMaxLength(inputId, errId, label, length) {
   if (field(inputId).value.length > length && field(inputId).value != '') {
     field(errId).style.display = 'block';
-    field(errId).innerHTML = `${label} must be less than ${length} characters.`;
+    field(errId).innerHTML = `${label}を${length}文字以下入力してください。`;
     return false;
   } else {
     field(errId).style.display = 'none';
@@ -41,7 +41,7 @@ export function checkMaxLength(inputId, errId, label, length) {
 export function checkRequired(inputId, errId, label) {
   if (field(inputId).value === '') {
     field(errId).style.display = 'block';
-    field(errId).innerHTML = `${label} field is required.`;
+    field(errId).innerHTML = `${label}は、必ず指定してください。`;
     return false;
   } else {
     field(errId).style.display = 'none';
@@ -53,7 +53,7 @@ export function checkRequired(inputId, errId, label) {
 export function checkSelect(inputId, errId, label) {
   if (field(inputId).value === '') {
     field(errId).style.display = 'block';
-    field(errId).innerHTML = `${label} hasn't been selected yet.`;
+    field(errId).innerHTML = `${label}はすでに選択されました！`;
     return false;
   } else {
     field(errId).style.display = 'none';

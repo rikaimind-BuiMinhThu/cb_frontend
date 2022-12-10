@@ -95,7 +95,7 @@ function PaymentGateway() {
                                 <Table>
                                     <thead>
                                         <tr>
-                                            <th style={{ width: "5%" }}>No</th>
+                                            <th style={{ width: "5%" }}>No.</th>
                                             <th style={{ width: "12.5%" }}>Payment gateway name</th>
                                             <th style={{ width: "12.5%" }}>Payment agency</th>
                                             <th style={{ width: "7.5%" }}>Mode</th>

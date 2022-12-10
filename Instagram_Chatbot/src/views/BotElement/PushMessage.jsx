@@ -125,7 +125,7 @@ function PushMessage() {
         // setEmailDetailId(res?.data?.data[0].id)
         // set1stEmailDetailId()
         // group.value =
-        console.log('check status update', update);
+        // console.log('check status update', update);
         if (update == true) {
           if (group) group.value = emailDetailId;
         } else {
@@ -197,7 +197,7 @@ function PushMessage() {
       parseInt(`${date.getFullYear()}${dateMonth}${dateDate}`)
     ) {
       validate.style.display = 'block';
-      validate.innerHTML = 'End date cannot be before start date.';
+      validate.innerHTML = '開始日の値は、終了日の値より小さいです。';
     } else {
       validate.style.display = 'none';
       validate.innerHTML = '';
@@ -205,11 +205,11 @@ function PushMessage() {
   }
 
   function handleChangeDate(date) {
-    console.log('dateChange');
-    console.log(date);
+    // console.log('dateChange');
+    // console.log(date);
     if (date == null) {
-      console.log('deleted date');
-      console.log('start date', itemUpdate?.started_at);
+      // console.log('deleted date');
+      // console.log('start date', itemUpdate?.started_at);
       setStartDate(startDate);
     } else {
       setStartDate(date);
@@ -268,10 +268,10 @@ function PushMessage() {
 
   function savePM() {
     utils.checkRequired('title', 'titleErr', 'Push message name');
-    utils.checkRequired('startDateTime', 'startDateTimeErr', 'Start date time');
+    utils.checkRequired('startDateTime', 'startDateTimeErr', '開始日時');
     if (
       utils.checkRequired('title', 'titleErr', 'Push message name') &&
-      utils.checkRequired('startDateTime', 'startDateTimeErr', 'Start date time')
+      utils.checkRequired('startDateTime', 'startDateTimeErr', '開始日時')
     ) {
       var bot_id = Cookies.get('bot_id');
       const formAdd = document.getElementById('form_add_PM');
@@ -367,7 +367,7 @@ function PushMessage() {
           .post(`/api/v1/managements/push_messages?chatbot_id=${bot_id}`, { push_message })
           .then((res) => {
             if (res.data.code == 1) {
-              setMsgNoti('Add Push Message successfully');
+              setMsgNoti('正常にブッシュメッセージを追加されました！');
               setIsOpenNoti(true);
               setTimeout(() => {
                 setIsOpenNoti(false);
@@ -389,7 +389,7 @@ function PushMessage() {
           .patch(`/api/v1/managements/push_messages/${idPMUpdate}`, { push_message })
           .then((res) => {
             if (res.data.code == 1) {
-              setMsgNoti('Update Push Message successfully');
+              setMsgNoti('正常にブッシュメッセージを追加されました！');
               setIsOpenNoti(true);
               setTimeout(() => {
                 setIsOpenNoti(false);
@@ -434,7 +434,7 @@ function PushMessage() {
         .patch(`/api/v1/managements/push_messages/${item?.id}/unsubscribe`)
         .then((res) => {
           setIsOpenNoti(true);
-          setMsgNoti(`Unsubscribe successfully!`);
+          setMsgNoti(`正常に更新されました！`);
           reloadListPM();
           setTimeout(() => {
             setIsOpenNoti(false);
@@ -452,7 +452,7 @@ function PushMessage() {
         .patch(`/api/v1/managements/push_messages/${item.id}/subscribe`)
         .then((res) => {
           setIsOpenNoti(true);
-          setMsgNoti(`Subscribe successfully!`);
+          setMsgNoti(`正常に更新されました！`);
           reloadListPM();
           setTimeout(() => {
             setIsOpenNoti(false);
@@ -483,7 +483,7 @@ function PushMessage() {
       setIsChecked(false);
     }
 
-    console.log('email detail id: ', item.email_id);
+    // console.log('email detail id: ', item.email_id);
 
     item.started_at = item.started_at.substring(0, 19).replaceAll('T', ' ');
     delete item.id;
@@ -520,7 +520,7 @@ function PushMessage() {
       .then((res) => {
         console.log(res);
         if (res.data.code == 1) {
-          setMsgNoti('Delete Push Message successfully');
+          setMsgNoti('正常にブッシュメッセージを削除されました！');
           setIsOpenNoti(true);
           setTimeout(() => {
             setMsgNoti('');
@@ -554,7 +554,7 @@ function PushMessage() {
           <Col md="12">
             <Card>
               <CardHeader>
-                <h4>Push message</h4>
+                <h4>ブッシュメッセージ</h4>
               </CardHeader>
               <CardBody>
                 <div className="push-message-option">
@@ -564,26 +564,26 @@ function PushMessage() {
                     className="push-message-option-item"
                     onClick={() => pushMessageList()}
                   >
-                    PUSH MESSAGE LIST
+                    ブッシュメッセージ一覧
                   </div>
                   <div
                     id="payment_management_order_his"
                     className="push-message-option-item"
                     onClick={() => deliveryHistory()}
                   >
-                    DELIVERY HISTORY
+                    配信履歴
                   </div>
                 </div>
                 <div id="table_push_message_list" style={{ width: '100%' }}>
                   <Table style={{ textAlign: 'center', tableLayout: 'fixed', overflow: 'hidden' }}>
                     <thead className="text-primary">
                       <tr>
-                        <th style={{ width: '5%' }}>No</th>
-                        <th style={{ width: '25%' }}>Push message name</th>
-                        <th style={{ width: '15%' }}>Sending method</th>
-                        <th style={{ width: '20%' }}>Start date and time</th>
-                        <th style={{ width: '15%' }}>Situation</th>
-                        <th style={{ width: '150px' }}>Action</th>
+                        <th style={{ width: '5%' }}>No.</th>
+                        <th style={{ width: '25%' }}>ブッシュメッセージ名</th>
+                        <th style={{ width: '15%' }}>配信方法</th>
+                        <th style={{ width: '20%' }}>開始時間</th>
+                        <th style={{ width: '15%' }}>状態</th>
+                        <th style={{ width: '150px' }}>アクション</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -601,8 +601,8 @@ function PushMessage() {
                           </td>
                           <td style={{ width: '15%', border: '1px solid #7186a0' }}>
                             {item.subscribe_status === 'subscribe'
-                              ? 'Under delivery reservation'
-                              : 'Unsubscribed'}
+                              ? '配信予約中'
+                              : '配信停止'}
                           </td>
                           <td style={{ width: '150px', border: '1px solid #7186a0' }}>
                             <div style={{ width: '100%', display: 'flex' }}>
@@ -655,7 +655,7 @@ function PushMessage() {
                   </Table>
                   <div style={{ width: '100%', textAlign: 'center', margin: 'auto' }}>
                     <button className="push-message-btn-adddition" onClick={() => addPM()}>
-                      Addition
+                    追加
                     </button>
                   </div>
                 </div>
@@ -668,7 +668,7 @@ function PushMessage() {
                         fontSize: '1.2em',
                       }}
                     >
-                      Aggregation period
+                      集計期間
                     </h4>
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
                       <DatePicker
@@ -700,16 +700,16 @@ function PushMessage() {
                         // }
                       />
                     </div>
-                    まで &emsp;<button className="push-message-btn-search">Search</button>
+                    まで &emsp;<button className="push-message-btn-search">検索</button>
                   </div>
                   <Table style={{ textAlign: 'center', tableLayout: 'fixed', overflow: 'hidden' }}>
                     <thead className="text-primary">
                       <tr>
                         <th style={{ width: '5%' }}>No</th>
-                        <th style={{ width: '30%' }}>Push message name</th>
-                        <th style={{ width: '15%' }}>Delivery date & time</th>
-                        <th style={{ width: '20%' }}>Number of sent SMS</th>
-                        <th style={{ width: '30%' }}>Number of failed SMS transmissions</th>
+                        <th style={{ width: '30%' }}>ブッシュメッセージ名</th>
+                        <th style={{ width: '15%' }}>配信日時</th>
+                        <th style={{ width: '20%' }}>SMS送信済みの件数</th>
+                        <th style={{ width: '30%' }}>SMS送信失敗の件数</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -743,7 +743,7 @@ function PushMessage() {
             <form id="form_add_PM">
               <div className="push-message-add-form">
                 <span className="push-message-span-form">
-                  Push message name
+                ブッシュメッセージ名
                   <span style={{ color: 'red' }}>*</span>
                 </span>
                 <input
@@ -751,13 +751,13 @@ function PushMessage() {
                   name="title"
                   defaultValue={update == true ? itemUpdate.title : ''}
                   className="push-message-input-form"
-                  onChange={() => utils.checkRequired('title', 'titleErr', 'Push message name')}
+                  onChange={() => utils.checkRequired('title', 'titleErr', 'ブッシュメッセージ名')}
                 ></input>
               </div>
               <div className="push-message-add-form">
                 <span className="push-message-span-form"></span>
                 <span className="push-message-input-form">
-                  * Give any name to the push message. This name will never appear in chat. <br />
+                ※プッシュメッセージに任意の名前をつけます。この名称がチャットに表示されることはありません。<br />
                 </span>
               </div>
               <div
@@ -768,20 +768,20 @@ function PushMessage() {
                 <span id="titleErr" style={{ color: 'red', display: 'none' }}></span>
               </div>
               <div className="push-message-add-form">
-                <span className="push-message-span-form">Sending method</span>
+                <span className="push-message-span-form">送信方法</span>
                 <select
                   id="push_message_sending_method"
                   name="sending_method"
                   className="push-message-input-form"
                 >
-                  <option value="email">Email</option>
+                  <option value="email">メール</option>
                   <option value="sms">SMS</option>
                 </select>
               </div>
               <br />
               <div className="push-message-add-form">
                 <span className="push-message-span-form">
-                  Email
+                メール
                   <span style={{ color: 'red' }}>*</span>
                 </span>
                 <select id="push_message_email" name="email_id" className="push-message-input-form">
@@ -791,7 +791,7 @@ function PushMessage() {
               <br />
               <div className="push-message-add-form">
                 <span className="push-message-span-form">
-                  Start date time
+                開始日時
                   <span style={{ color: 'red' }}>*</span>
                 </span>
                 <div className="push-message-input-form">
@@ -813,7 +813,7 @@ function PushMessage() {
               <div className="push-message-add-form">
                 <span className="push-message-span-form"></span>
                 <span className="push-message-input-form">
-                  * Specify the date and time to send the push message. <br />
+                ※プッシュメッセージを送信する日時を指定します。 <br />
                 </span>
               </div>
               <div
@@ -825,7 +825,7 @@ function PushMessage() {
               </div>
               <div className="push-message-add-form">
                 <span className="push-message-span-form">
-                  Time zone exclusions for autosend pushes
+                自動送信プッシュの時間帯除外
                 </span>
                 <span>
                   <input
@@ -853,7 +853,7 @@ function PushMessage() {
               >
                 <div className="push-message-add-form">
                   <span className="push-message-span-form">
-                    Excluded time
+                  除外時間
                     <span style={{ color: 'red' }}>*</span>
                   </span>
                   <span style={{ display: 'flex', width: '80%' }}>
@@ -889,7 +889,7 @@ function PushMessage() {
                 <br />
                 <div className="push-message-add-form">
                   <span className="push-message-span-form">
-                    Alternate send time
+                  代替送信時間
                     <span style={{ color: 'red' }}>*</span>
                   </span>
                   <span style={{ display: 'flex', width: '80%' }}>
@@ -916,10 +916,12 @@ function PushMessage() {
               <div
                 style={{ width: '98%', height: '1px', margin: '10px 1%', background: 'grey' }}
               ></div>
-              <span>Target person designation</span>
-              <p>*By adding conditions, you can narrow down the recipients of the push message.</p>
+              <span>対象者指定</span>
+              <p>※条件を加えることでプッシュメッセージを送信する対象者を絞り込むことができます。</p>
               <p>
-                Currently, there are 0 recipients.<span style={{ color: 'blue' }}>[update]</span>
+              現在、配信対象者は0名です。.<span style={{ color: 'blue' }}> [更新]</span>
+              {/* 現在、配信対象者は{`...number here...`}名です。.<span style={{ color: 'blue' }}>[update]</span> */}
+
               </p>
               <div style={{ width: '95%', margin: '10px 2.5%' }}>
                 <div style={{ width: '100%', display: 'flex' }}>
@@ -930,7 +932,7 @@ function PushMessage() {
                     defaultValue={'variable'}
                     style={{ width: '15%', margin: '1% 1%' }}
                   >
-                    <option value="variable">Variable</option>
+                    <option value="variable">変数</option>
                   </select>
                   <select
                     name="1stVar"
@@ -946,7 +948,7 @@ function PushMessage() {
                     id="operator"
                     style={{ width: '15%', margin: '1% 1%' }}
                   >
-                    <option value="of">Of</option>
+                    <option value="of">の</option>
                   </select>
                   <select
                     name="last_message_datetime_since"
@@ -969,7 +971,7 @@ function PushMessage() {
                       defaultValue={`and`}
                       style={{ width: '15%', margin: '1% 1%' }}
                     >
-                      <option value="and">And</option>
+                      <option value="and">AND</option>
                     </select>
                     <select
                       id={`var${i}`}
@@ -977,7 +979,7 @@ function PushMessage() {
                       defaultValue={'variable'}
                       style={{ width: '15%', margin: '1% 1%' }}
                     >
-                      <option value="variable">Variable</option>
+                      <option value="variable">変数</option>
                     </select>
                     <select
                       name={`variable_id${i}`}
@@ -1014,9 +1016,9 @@ function PushMessage() {
                       id={`operator${i}`}
                       style={{ width: '15%', margin: '1% 1%' }}
                     >
-                      <option value="is">Is</option>
-                      <option value="is_not">Is not</option>
-                      <option value="contains">Contains</option>
+                      <option value="is"><isindex />is</option>
+                      <option value="is_not">is not</option>
+                      <option value="contains">contains</option>
                     </select>
                     <input
                       name={`value${i}`}
@@ -1034,7 +1036,7 @@ function PushMessage() {
                       style={{ width: '15%', margin: '1% 1%' }}
                       onClick={(e) => deleteCDiv(e, i)}
                     >
-                      Delete
+                      削除
                     </button>
                   </div>
                 ))}
@@ -1051,7 +1053,7 @@ function PushMessage() {
                   }}
                   onClick={(e) => newTemp(e)}
                 >
-                  Add condition
+                  条件追加
                 </button>
               </div>
             </form>
@@ -1069,7 +1071,7 @@ function PushMessage() {
                 }}
                 onClick={() => setIsOpenAddPM(false)}
               >
-                Cancel
+                キャンセル
               </button>
               <button
                 style={{
@@ -1084,7 +1086,7 @@ function PushMessage() {
                 }}
                 onClick={() => savePM()}
               >
-                Save
+                保存
               </button>
             </div>
           </div>
@@ -1101,7 +1103,7 @@ function PushMessage() {
           }}
         >
           <div style={{ width: '100%' }}>
-            <h5>Do you want to delete this push message?</h5>
+            <h5>本当にこのプッシュメッセージを削除しますか。</h5>
             <div style={{ display: 'flex', margin: 'auto', width: '100%' }}>
               <button
                 style={{
@@ -1114,7 +1116,7 @@ function PushMessage() {
                 }}
                 onClick={() => deletePM()}
               >
-                Yes
+                はい
               </button>
               <button
                 style={{
@@ -1126,7 +1128,7 @@ function PushMessage() {
                 }}
                 onClick={() => setIsOpenDelete(false)}
               >
-                No
+                いいえ
               </button>
             </div>
           </div>

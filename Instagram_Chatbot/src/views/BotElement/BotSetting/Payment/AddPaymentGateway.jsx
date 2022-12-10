@@ -18,7 +18,7 @@ function AddPaymentGateway() {
                 if (res.data.code === 1) {
                     setDetailGw(res.data.data);
                 } else if (res.data.code === 2) {
-                    console.log('Not found')
+                    // console.log('Not found')
                     setMsgNoti('Gateway not found')
                     setIsOpenNoti(true)
                     setTimeout(() => {
@@ -224,7 +224,8 @@ function AddPaymentGateway() {
                                 </div>
                                 <div className='add-payment-gateway-add-form' style={{ padding: "0", marginTop: "-1.75%" }}>
                                     <span className='add-payment-gateway-span-form' ></span>
-                                    <span id='pm_gw_name_err' className='add-payment-gateway-input-form' style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>Please input Payment gateway name</span>
+                                    <span id='pm_gw_name_err' className='add-payment-gateway-input-form' 
+                                    style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>Please input Payment gateway name</span>
                                 </div>
                                 <div className='add-payment-gateway-add-form'>
                                     <span className='add-payment-gateway-span-form'>
@@ -262,7 +263,8 @@ function AddPaymentGateway() {
                                     <div className='add-payment-gateway-add-form'
                                         style={{ padding: "0", marginTop: "-1.75%" }}>
                                         <span className='add-payment-gateway-span-form'></span>
-                                        <span id='shop_id_err' className='add-payment-gateway-input-form' style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>Please input shop Id</span>
+                                        <span id='shop_id_err' className='add-payment-gateway-input-form' 
+                                        style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>Please input shop Id</span>
                                     </div>
                                     <div className='add-payment-gateway-add-form'>
                                         <span className='add-payment-gateway-span-form'>shop password</span>

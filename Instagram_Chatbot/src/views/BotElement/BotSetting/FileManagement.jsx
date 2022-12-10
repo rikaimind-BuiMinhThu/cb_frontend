@@ -35,7 +35,7 @@ function FileManagement() {
     api
       .get(`/api/v1/managements/file?page=1`)
       .then((res) => {
-        console.log('file management: ', res.data);
+        // console.log('file management: ', res.data);
         setFiles(res.data?.data);
         setTotalPage(Math.ceil(res.data?.total / 25));
       })
@@ -56,7 +56,7 @@ function FileManagement() {
     api
       .get(`/api/v1/managements/file?page=${pageIndex}`)
       .then((res) => {
-        console.log('file management: ', res.data);
+        // console.log('file management: ', res.data);
         setFiles(res.data?.data);
         setTotalPage(Math.ceil(res.data?.total / 25));
       })
@@ -92,16 +92,16 @@ function FileManagement() {
     let file;
     if (trueFile) {
       if (type != 'pdf' && type != 'mp4' && newFile.size / 1024 / 1024 > 2) {
-        setFileError(`You need to upload file which size under 2MB.`);
+        setFileError(`2MB以下のファイルをアップロードしてください。`);
         return;
       } else if (type === 'pdf' && newFile.size / 1024 / 1024 > 3) {
-        setFileError(`You need to upload file which size under 3MB.`);
+        setFileError(`3MB以下のファイルをアップロードしてください。`);
         return;
       } else if (type === 'mp4') {
         const vid = document.getElementById('preview-video');
         console.log(vid.duration);
         if (vid.duration > 15) {
-          setFileError(`You need to upload video which duration under 15 seconds.`);
+          setFileError(`15秒以下のビデオをアップロードしてください。`);
           return;
         }
       }
@@ -116,7 +116,7 @@ function FileManagement() {
       api
         .post(`/api/v1/managements/file/upload`, file)
         .then((res) => {
-          console.log('res upload file type: ', res);
+          // console.log('res upload file type: ', res);
           const urlFile = res.data.data.url;
           let filePost = { user_file: { file_type: type, file_url: res.data.data.path } };
           let typeUpload = '';
@@ -141,7 +141,7 @@ function FileManagement() {
                 .then((res) => {
                   if (res.data.code == 1) {
                     reload();
-                    setMsgNoti(`Add successfully!`);
+                    setMsgNoti(`正常にファイル追加されました！`);
                     setIsOpenNoti(true);
                     setNewFile(null);
                     setTimeout(() => {
@@ -149,7 +149,7 @@ function FileManagement() {
                       setMsgNoti(``);
                     }, 2000);
                   } else {
-                    setMsgNoti(`Add failed!`);
+                    setMsgNoti(`ファイルの追加ができませんでした。`);
                     setIsOpenNoti(true);
                     setTimeout(() => {
                       setIsOpenNoti(false);
@@ -178,7 +178,7 @@ function FileManagement() {
           }
         });
     } else {
-      setFileError(`You need enter format file is jpeg/ jpg/ png/ pdf/ mp4.`);
+      setFileError(`jpeg/ jpg/ png/ pdf/ mp4のファイルを入力が必要です。`);
     }
   }
 
@@ -200,7 +200,7 @@ function FileManagement() {
       .then((res) => {
         if (res.data.code == 1) {
           setIsOpenDelete(false);
-          setMsgNoti(`Delete successfully!`);
+          setMsgNoti(`正常に削除されました！`);
           setIsOpenNoti(true);
           reload();
           setTimeout(() => {
@@ -208,7 +208,7 @@ function FileManagement() {
             setMsgNoti(``);
           }, 2000);
         } else {
-          setMsgNoti(`Delete failed!`);
+          setMsgNoti(`削除できませんでした。`);
           setIsOpenNoti(true);
           setTimeout(() => {
             setIsOpenNoti(false);
@@ -226,7 +226,7 @@ function FileManagement() {
 
   function handleCopy(file_url) {
     navigator.clipboard.writeText(file_url);
-    setMsgNoti(`Copy successfully!`);
+    setMsgNoti(`正常にURLをコピーしました！`);
     setIsOpenNoti(true);
     setTimeout(() => {
       setIsOpenNoti(false);
@@ -247,7 +247,7 @@ function FileManagement() {
                     handleUpload();
                   }}
                 >
-                  Upload File
+                  ファイル追加
                 </Button>
                 <input
                   hidden
@@ -282,10 +282,10 @@ function FileManagement() {
                             setNewFile(null);
                           }}
                         >
-                          Cancle
+                          ファイル追加
                         </button>
                         <button className="btn btn-outline-primary" onClick={() => handleSave()}>
-                          Save
+                        保存
                         </button>
                       </div>
                       <span className="file-mng__error">{fileError}</span>
@@ -300,8 +300,8 @@ function FileManagement() {
                   <thead className="text-primary">
                     <tr>
                       <th style={{ width: '10%' }}>No.</th>
-                      <th style={{ width: '15%' }}>Type</th>
-                      <th style={{ width: '70%' }}>Url</th>
+                      <th style={{ width: '15%' }}>タイプ</th>
+                      <th style={{ width: '70%' }}>URL</th>
                       <th style={{ width: '250px', minWidth: '250px' }}>アアクション</th>
                     </tr>
                   </thead>
@@ -367,15 +367,15 @@ function FileManagement() {
                 )}
               </>
             )}
-            <Button onClick={() => setIsOpenPreview(false)}>Close</Button>
+            <Button onClick={() => setIsOpenPreview(false)}>閉じる</Button>
           </div>
         </ModalDetail>
 
         <ModalShort open={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-            <h4>Do you want to delete file?</h4>
-            <Button onClick={() => handleDelete()}>Yes</Button>
-            <Button onClick={() => setIsOpenDelete(false)}>No</Button>
+            <h4>本当にファイルを削除しますか。</h4>
+            <Button onClick={() => handleDelete()}>はい</Button>
+            <Button onClick={() => setIsOpenDelete(false)}>いいえ</Button>
           </div>
         </ModalShort>
 

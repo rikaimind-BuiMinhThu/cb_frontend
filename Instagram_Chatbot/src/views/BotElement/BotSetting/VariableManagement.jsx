@@ -97,8 +97,8 @@ function VariableManagement() {
 
   //save new variable
   function saveNewVar(index) {
-    checkInput(`variable_name_${index}`, `errVarName_${index}`, 'Variable name');
-    if (checkInput(`variable_name_${index}`, `errVarName_${index}`, 'Variable name')) {
+    checkInput(`variable_name_${index}`, `errVarName_${index}`, '変数名');
+    if (checkInput(`variable_name_${index}`, `errVarName_${index}`, '変数名')) {
       let name = document.getElementById(`variable_name_${index}`).value;
       let dfvalue = document.getElementById(`variable_value_${index}`).value;
       let add = { variable: { variable_name: name, default_value: dfvalue } };
@@ -110,7 +110,7 @@ function VariableManagement() {
             console.log(res);
             reloadListVariable(pageIndex);
             setIsOpenNoti(true);
-            setMsgNoti(`Save successfully!`);
+            setMsgNoti(`保存しました。`);
             setTimeout(() => {
               setIsOpenNoti(false);
               setMsgNoti(``);
@@ -153,7 +153,7 @@ function VariableManagement() {
         if (res.data.code == 1) {
           setIsOpenDelete(false);
           reloadListVariable(pageIndex);
-          setMsgNoti(`Delete successfully!`);
+          setMsgNoti(`削除しました。`);
           setIsOpenNoti(true);
           setTimeout(() => {
             setIsOpenNoti(false);
@@ -161,7 +161,7 @@ function VariableManagement() {
           }, 2000);
         } else {
           setIsOpenDelete(false);
-          setMsgNoti(`Delete failed!`);
+          setMsgNoti(`削除できませんでした。`);
           setIsOpenNoti(true);
           setTimeout(() => {
             setIsOpenNoti(false);
@@ -179,8 +179,8 @@ function VariableManagement() {
 
   //funtion update variable
   function updateVariable(id, index) {
-    checkInput(`up_variable_name_${index}`, `errUpVarName_${index}`, 'Variable name');
-    if (checkInput(`up_variable_name_${index}`, `errUpVarName_${index}`, 'Variable name')) {
+    checkInput(`up_variable_name_${index}`, `errUpVarName_${index}`, '変数名');
+    if (checkInput(`up_variable_name_${index}`, `errUpVarName_${index}`, '変数名')) {
       let name = document.getElementById(`up_variable_name_${index}`).value;
       let dfvalue = document.getElementById(`up_variable_value_${index}`).value;
       let editVariable = {
@@ -196,7 +196,7 @@ function VariableManagement() {
           if (res.data.code == 1) {
             reloadListVariable(pageIndex);
             setIsOpenNoti(true);
-            setMsgNoti(`Update successfully!`);
+            setMsgNoti(`更新しました。`);
             setTimeout(() => {
               setIsOpenNoti(false);
               setMsgNoti(``);
@@ -217,11 +217,11 @@ function VariableManagement() {
   function checkInput(idInput, errInput, lable) {
     if (field(idInput).value === '') {
       field(errInput).style.display = 'block';
-      field(errInput).innerHTML = `${lable} required.`;
+      field(errInput).innerHTML = `${lable}は、必ず指定してください。`;
       return false;
     } else if (field(idInput).value.length > 30) {
       field(errInput).style.display = 'block';
-      field(errInput).innerHTML = `${lable} > 30 charectors.`;
+      field(errInput).innerHTML = `${lable} 30 文字以上。`;
       return false;
     } else {
       field(errInput).style.display = 'none';
@@ -238,10 +238,10 @@ function VariableManagement() {
             <Card>
               <CardHeader>
                 <button className="btn btn-primary" onClick={() => setOpenVariable(true)}>
-                  USER-DEFINED VARIABLE
+                ユーザー定義関数
                 </button>
                 <button className="btn btn-primary" onClick={() => setOpenVariable(false)}>
-                  SYSTEM VARIABLES
+                システム変数
                 </button>
                 {openVariable ? (
                   <div className="var-variable-search">
@@ -251,22 +251,21 @@ function VariableManagement() {
                       placeholder="Search variable ..."
                       onChange={(e) => setSearch(e.target.value)}
                     />
-                    <Button onClick={() => handleSearch()}>Search</Button>
+                    <Button onClick={() => handleSearch()}>検索</Button>
                   </div>
                 ) : (
                   ''
                 )}
                 <p className="var-variable-note">
-                  * A variable that stores the user's input contents. It can be assigned and
-                  referenced in the scenario.
+                ※ユーザの入力内容などを保管する変数です。シナリオの中で代入や参照ができます。
                 </p>
               </CardHeader>
               <CardBody>
                 {openVariable ? (
                   <div className="var_defined-variable">
                     <div className="var-form__head">
-                      <label>Variable name</label>
-                      <label>Default value</label>
+                      <label>変数名</label>
+                      <label>デフォルト値</label>
                     </div>
                     <div className="var-form__variable">
                       {listVariable?.map((item, i) => (
@@ -278,19 +277,19 @@ function VariableManagement() {
                               defaultValue={
                                 item.variable_name == undefined ? '' : item.variable_name
                               }
-                              placeholder="Please input Variable name"
+                              placeholder="変数名をご入力ください"
                               onChange={() =>
                                 checkInput(
                                   `up_variable_name_${i}`,
                                   `errUpVarName_${i}`,
-                                  'Variable name'
+                                  '変数名'
                                 )
                               }
                               onBlur={() =>
                                 checkInput(
                                   `up_variable_name_${i}`,
                                   `errUpVarName_${i}`,
-                                  'Variable name'
+                                  '変数名'
                                 )
                               }
                             />
@@ -304,7 +303,7 @@ function VariableManagement() {
                               defaultValue={
                                 item.default_value == undefined ? '' : item.default_value
                               }
-                              placeholder="Please input variable value"
+                              placeholder="変数値をご入力ください"
                             />
                           </div>
 
@@ -332,12 +331,12 @@ function VariableManagement() {
                             <input
                               className="var-form-input"
                               id={`variable_name_${i}`}
-                              placeholder="Please input Variable name"
+                              placeholder="変数名をご入力ください"
                               onChange={() =>
-                                checkInput(`variable_name_${i}`, `errVarName_${i}`, 'Variable name')
+                                checkInput(`variable_name_${i}`, `errVarName_${i}`, '変数名')
                               }
                               onBlur={() =>
-                                checkInput(`variable_name_${i}`, `errVarName_${i}`, 'Variable name')
+                                checkInput(`variable_name_${i}`, `errVarName_${i}`, '変数名')
                               }
                             />
                             <span id={`errVarName_${i}`} className="err-varriable"></span>
@@ -346,7 +345,7 @@ function VariableManagement() {
                             <input
                               className="var-form-input"
                               id={`variable_value_${i}`}
-                              placeholder="Please input variable value"
+                              placeholder="変数値をご入力ください"
                             />
                           </div>
                           <div className="var-form__variable-delete">
@@ -374,7 +373,7 @@ function VariableManagement() {
                           onClick={() => addNewVar()}
                           className="var-btn-add-new"
                         >
-                          Add
+                          追加
                         </button>
                       </div>
                     </div>
@@ -388,8 +387,8 @@ function VariableManagement() {
                 ) : (
                   <div className="var_system-variable">
                     <div className="var-form__head">
-                      <label>Variable name</label>
-                      <label>Variable description</label>
+                      <label>変数名</label>
+                      <label>変数備考</label>
                     </div>
                     <div className="var-form__variable">
                       <div className="var-form__variable-group">
@@ -402,7 +401,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          URL of the page that opened the bot
+                        ボットを開いたページのURL
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -415,8 +414,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          Parameters in the URL of the page that opened the bot (character string
-                          after "?")
+                        ボットを開いたページのURLについてるパラメータ（「?」以降の文字列）
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -429,7 +427,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          The title of the webpage that opened the bot
+                          ボットを開いたwebページのタイトルZ
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -437,14 +435,14 @@ function VariableManagement() {
                           <input className="var-form-input" type="text" disabled value="user_id" />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          A unique ID automatically assigned to each user using the bot
+                        ボットを使用するユーザーごとに自動的に付与されるユニークなID
                         </div>
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
                           <input className="var-form-input" type="text" disabled value="bot_id" />
                         </div>
-                        <div className="var-form__variable-value var-none-border">the bot's ID</div>
+                        <div className="var-form__variable-value var-none-border">ボットのID</div>
                       </div>
                       <div className="var-form__variable-group">
                         <div className="var-form__variable-name">
@@ -456,7 +454,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          Flag for users using preview features (empty for normal users)
+                        プレビュー機能の使用ユーザーのフラグ（通常ユーザーは空）
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -469,7 +467,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          IP address of the accessing user
+                        アクセスしたユーザーのIPアドレス
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -482,7 +480,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          Country name calculated from IP address
+                        IPアドレスから割り出した国名
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -495,7 +493,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          Municipality calculated from the IP address
+                        IPアドレスから割り出した市区町村
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -508,7 +506,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          The type of device the user is using (PC, smartphone, tablet)
+                        ユーザーが使用しているデバイスの種類（PC、スマホ、タブレット）
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -521,7 +519,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          the type of browser the user is using
+                        ユーザーが使用しているブラウザの種類
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -534,7 +532,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          User's browser information and OS information (each type, version, etc.)
+                        ユーザーが使用しているブラウザ情報とOS情報（各種類、バージョンなど）
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -547,7 +545,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          The date and time when the user reached the end of the scenario
+                        ユーザーがシナリオの終端まできた時の日時
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -555,9 +553,7 @@ function VariableManagement() {
                           <input className="var-form-input" type="text" disabled value="cv_flg" />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          Flag when the user has reached the end of the scenario (returns a value of
-                          "1" for users who have reached the end, and a value of "0" for users in
-                          the middle)
+                        ユーザーがシナリオの終端まできた時にフラグ（終端まできたユーザーは「1」の値、途中のユーザーは「0」の値を返す）
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -570,8 +566,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          The date and time when you opened the chatbot and had your first
-                          conversation
+                        チャットボットを開き最初に会話をした日時
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -584,8 +579,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          User's referral when first opened (the URL of the page they were on before
-                          visiting the site)
+                        最初に開いた時のユーザーのリファラル（サイトに訪れる前に滞在していたページのURL）
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -598,8 +592,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                          User's last referral (the URL of the page they were on before visiting
-                          your site)
+                        最後に開いた時のユーザーのリファラル（サイトに訪れる前に滞在していたページのURL）
                         </div>
                       </div>
                     </div>
@@ -612,9 +605,9 @@ function VariableManagement() {
 
         <ModalShort open={isOpenDelete} onClose={() => setIsOpenDelete(false)}>
           <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
-            <h4>Do you want to delete this variable?</h4>
-            <Button onClick={() => deleteVariable()}>Yes</Button>
-            <Button onClick={() => setIsOpenDelete(false)}>No</Button>
+            <h4>変数を削除しますか。</h4>
+            <Button onClick={() => deleteVariable()}>はい</Button>
+            <Button onClick={() => setIsOpenDelete(false)}>いいえ</Button>
           </div>
         </ModalShort>
 

@@ -839,10 +839,18 @@ function PaymentManagement() {
                         <th>Consumption tax</th>
                         <th>Settlement fee (tax included)</th>
                         <th>Shipping fee (tax included)</th>
+                        <th>Total (tax included)</th>
+                        <th>Mode</th>
+                        <th>ituation</th>
+                        <th>Shipping fee (tax included)</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
+                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+                        <td style={{ border: '1px solid #7186a1' }}>123</td>
+                        <td style={{ border: '1px solid #7186a1' }}>123</td>
                         <td style={{ border: '1px solid #7186a1' }}>123</td>
                         <td style={{ border: '1px solid #7186a1' }}>123</td>
                         <td style={{ border: '1px solid #7186a1' }}>123</td>
