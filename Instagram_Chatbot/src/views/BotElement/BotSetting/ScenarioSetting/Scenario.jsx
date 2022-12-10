@@ -182,694 +182,6 @@ let dataEveryMinuteFixed = [
   },
 ];
 
-
-let dataClone = {
-  name: '',
-  messages: [
-    {
-      id: 1,
-      name: '',
-      hidden: false,
-      belong_to: 'user',
-      message_content: [
-        {
-          id: 11,
-          type: 'pull_down',
-          pull_down: {
-            save_input_content: '', //string
-            required: true, //yes-no
-            title_require: true, //yes-no
-            title: '', //string
-            type: 'customization', // 12 values: customization, time_hm, date_ymd, date_md, date_ym, date_ymd_hm, dob_ymd, dob_ym, timezone_from_to, period_from_to,prefectures, up_to_municipality,
-            customization: {
-              title_comment: '', //string
-              comment: '', //string
-              is_comment: true, //yes-no,
-              display_unselected: '',
-              options_with_comment: [
-                {
-                  id: 1,
-                  text: '',
-                  value: '',
-                  text2: '',
-                  value2: ''
-                }
-              ],
-              options_without_comment: [
-                {
-                  id: 1,
-                  text: '',
-                  value: ''
-                }
-              ],
-            },
-            time_hm: {
-              start_at: '2', //number
-              end_at: '5', //number
-              time: '2', //number
-              minute: '30', //number
-              every_minute: '0', //6 values: 0, 5, 10, 15, 30
-              comment: '', //string
-            },
-            date_ymd: {
-              start_year: 2022, //number
-              end_year: 2022, //number
-              year: 2022, //number
-              month: 10, //number
-              day: 25, //number
-              comment: '', //string
-            },
-            date_md: {
-              month: '', //string
-              day: '', //string
-              comment: '', //string
-            },
-            date_ym: {
-              start_year: 2022, //number
-              end_year: 2022, //number
-              year: 2022, //number
-              month: 10, //number
-              comment: '', //string
-            },
-            date_ymd_hm: {
-              year: 2022, //string
-              month: 10, //number
-              day: 25, //number
-              start_at: 2, //number
-              end_at: 5, //number
-              time: 2, //number
-              minute: 30, //number
-              every_minute: '0', //6 values: 0, 5, 10, 15, 30
-              comment: '', //string
-            },
-            dob_ymd: {
-              start_year: 2022, //number
-              end_year: 2022, //number
-              sort: 'asc', //asc-desc
-              year: 2022, //number
-              month: 10, //number
-              day: 25, //number
-              comment: '', //string
-            },
-            dob_ym: {
-              start_year: 2022, //number
-              end_year: 2022, //number
-              sort: 'asc', //asc-desc
-              year: 2022, //number
-              month: 10, //number
-              comment: '', //string
-            },
-            timezone_from_to: {
-              range_start: 2, //number
-              range_end: 5, //number
-              hour_start_at: 2, //number
-              hour_end_at: 3, //number
-              minute_start_at: 10, //number
-              minute_end_at: 15, //number
-              every_minute_start_at: '5', //6 values: 0, 5, 10, 15, 30
-              every_minute_end_at: '10', //6 values: 0, 5, 10, 15, 30
-              comment: '', //string
-            },
-            period_from_to: {
-              year_start_at: 2022, //number
-              year_end_at: 2022, //number
-              month_start_at: 10, //number
-              month_end_at: 11, //number
-              day_start_at: 25, //number
-              day_end_at: 25, //number
-              comment: '', //string
-            },
-            prefectures: '', //string
-            up_to_municipality: {
-              prefecture_comment: '', //string
-              prefecture: '', //string
-              city: '', //string
-              city_comment: '', //string
-            },
-            comsume_api_response: '', //(Pending)
-          },
-        },
-        {
-          id: 10,
-          type: 'agree_term',
-          agree_term: {
-            title_require: true, //yes-no
-            title: '', //string
-            type: 'detail_content', //2 values: detail_content, post_link_only
-            term: '', //string
-            detail_content: {
-              content: '', //string
-            },
-            post_link_only: [
-              {
-                title_comment: '', //string
-                title: '', //string
-                urls: '', //string
-                url_comment: '', //string
-              },
-            ],
-          },
-        },
-        {
-          id: 9,
-          type: 'calendar',
-          calendar: {
-            save_input_content: true, // yes-no
-            required: true, //yes-no
-            use_api_input_value: true, // yes-no
-            initial_selection: true, // yes-no
-            title_require: true, //yes-no
-            title: '', //string
-            start_date: '', //string
-            end_date: '', //string
-            non_select_date_time: [], //string
-            aggregation_target_period_from: 2, //number
-            aggregation_target_period_to: 6, //number
-            type: 'date_selection', //3 values: date_selection, embedded, start_end_date
-            fixed_date: [
-              '2022/09/27',
-              '2022/09/28', //...
-            ],
-            date_selection: {
-              date_select: '', //string
-            },
-            embedded: {
-              date_select: '', //string
-            },
-            start_end_date: {
-              date_select: '', //string
-              specified_period_from: 5, //number
-              specified_period_to: 10, //number
-            },
-          }
-        },
-        {
-          id: 8,
-          type: 'attaching_file',
-          attaching_file: {
-            save_input_content: true, // yes-no
-            require: true, //yes-no
-            multifile_upload: true, //yes-no
-            file_type: [
-              'jpg',
-              'png', //.....
-            ],
-            file_content: '', //base64
-          },
-        },
-        {
-          id: 7,
-          type: 'zip_code_address',
-          zip_code_address: {
-            save_input_content: true, // yes-no
-            use_api_input_value: true, // yes-no
-            require: true, //yes-no
-            all_items_require: true, //yes-no
-            split_postal_code: true, //yes-no
-            post_code: '', //string
-            use_drop_down: true, //yes-no
-            prefecture: '', //string
-            municipality: '', //string
-            address: '', //string
-            building_name: '', //string
-          },
-        },
-        {
-          id: 6,
-          type: 'checkbox',
-          checkbox: {
-            save_input_content: true, //yes-no
-            required: true, //yes-no
-            title_require: true, //yes-no
-            title: '', //string
-            all_item_checked: true, //yes-no
-            type: 'default', // 3 values: default, checkbox_img, consume_api_response(Pending)
-            default: [
-              {
-                default_text: '', //string
-                default_value: '', //string
-              }
-            ],
-            checkbox_img: [
-              {
-                img: '', //base64
-                checkbox_img_title: '', //string
-                checkbox_img_value: '', //string
-              }
-            ],
-            consume_api_response: '', //(Pending)
-          },
-        },
-        {
-          id: 5,
-          type: 'radio_button',
-          radio_button: {
-            save_input_content: true, //true-false
-            required: true, //true-false
-            title_require: true, //true-false
-            title: '', //string
-            type: 'default', //4 values: default, radio_button_img, block_style,consume_api_response(Pending)
-            default: [
-              {
-                id: 1,
-                default_text: '', //string
-                default_value: '', //string
-                initial_selection: true, //true-false
-              },
-              {
-                id: 2,
-                default_text: '', //string
-                default_value: '', //string
-                initial_selection: true, //true-false
-              }
-            ],
-            radio_button_img: [
-              {
-                id: 1,
-                img: '', //base64
-                img_title: '', //string
-                img_value: '', //string
-                initial_selection: true, // true-false
-              },
-              {
-                id: 2,
-                img: '', //base64
-                img_title: '', //string
-                img_value: '', //string
-                initial_selection: true, // true-false
-              },
-            ],
-            consume_api_response: '', //Pending            
-          },
-        },
-        {
-          id: 1,
-          type: 'text_input',
-          text_input: {
-            //txtIn: text_input
-            save_input_content: true, // yes-no
-            use_api_input_value: true, // yes-no
-            require: true, //yes-no
-            title_require: true, //yes-no
-            title: '', //string
-            type: 'text', // 7 values: text, urls, email_address,
-            //email_confirmation, phone_number, password, password_confirmation
-            text: {
-              range: '', // 8 values: no_input, alphabet, single_byte, alphanumeric_hyphen,
-              //alphanumeric, double_byte, double_byte_hiragana, full_width_katakana
-              character_limit_from: 1, //number
-              character_limit_to: 1000, //number
-              placeholder: '', //string
-              comment: '', //string
-            },
-            url: '', //string
-            email_address: '', //string
-            email_confirmation: {
-              cfEmlAdd_email: '', //string
-              cfEmlAdd_confirm_email: '', //string
-            },
-            phone_number: {
-              withHyphen: true,
-              number: '' //string
-            }, //string
-            password: {
-              character_limit_from: 1, //number
-              character_limit_to: 30, //number
-              password: '', //string
-            },
-            confirm_password: {
-              character_limit_from: 1, //number
-              character_limit_to: 30, //number
-              password: '', //string
-              confirm_password: '', //string
-            },
-          },
-          label: {
-            lbl_content: '', //string
-          },
-          textarea: {
-            save_input_content: '', //string
-            required: true, //yes-no
-            title_require: true, //yes-no
-            title: '', //string
-            type: 'text_input', // 3 values: text_input, invalid_input, consume_api_response(Pending)
-            text_input: {
-              character_limit_from: 1, //number
-              character_limit_to: 30, //number
-              content: '', //string
-            },
-            invalid_input_content: '', //string
-          },
-          radio_button: {
-            save_input_content: true, //yes-no
-            required: true, //yes-no
-            title_require: true, //yes-no
-            title: '', //string
-            type: 'default', //4 values: default, radio_button_img, block_style,consume_api_response(Pending)
-            default: {
-              default_text: '', //string
-              default_value: '', //string
-              initial_selection: true, //yes-no
-            },
-            radio_button_img: {
-              img: '', //base64
-              img_title: '', //string
-              img_value: '', //string
-              initial_selection: true, // yes-no
-            },
-            consume_api_response: '', //Pending
-            block_style: {
-              text: '', //string
-              value: '', //string
-              initial_selection: true, // yes-no
-            },
-          },
-          checkbox: {
-            save_input_content: true, //yes-no
-            required: true, //yes-no
-            title_require: true, //yes-no
-            title: '', //string
-            all_item_checked: true, //yes-no
-            type: 'default', // 3 values: default, checkbox_img, consume_api_response(Pending)
-            default: {
-              default_text: '', //string
-              default_value: '', //string
-            },
-            checkbox_img: {
-              img: '', //base64
-              checkbox_img_title: '', //string
-              checkbox_img_value: '', //string
-            },
-            consume_api_response: '', //(Pending)
-          },
-          pull_down: {
-            save_input_content: '', //string
-            required: true, //yes-no
-            title_require: true, //yes-no
-            title: '', //string
-            type: 'customization', // 12 values: customization, time_hm, date_ymd, date_md, date_ym, date_ym_hm,dob_ymd,dob_ym, timezone_from_to, period_from_to,prefectures, up_to_municipality,
-            customization: {
-              time_from_to_comment: '', //string
-              time_from_to: true, //yes-no
-              times: [
-                {
-                  from: '', //string,
-                  to: '', //string
-                },
-              ],
-              comment: '', //string
-            },
-            time_hm: {
-              start_at: 2, //number
-              end_at: 5, //number
-              time: 2, //number
-              minute: 30, //number
-              every_minute: '0', //6 values: 0, 5, 10, 15, 30
-              comment: '', //string
-            },
-            date_ymd: {
-              start_year: 2022, //number
-              end_year: 2022, //number
-              year: 2022, //number
-              month: 10, //number
-              day: 25, //number
-              comment: '', //string
-            },
-            date_md: {
-              month: '', //string
-              day: '', //string
-              comment: '', //string
-            },
-            date_ym: {
-              start_year: 2022, //number
-              end_year: 2022, //number
-              year: 2022, //number
-              month: 10, //number
-              comment: '', //string
-            },
-            date_ym_hm: {
-              year: 2022, //string
-              month: 10, //number
-              day: 25, //number
-              start_at: 2, //number
-              end_at: 5, //number
-              time: 2, //number
-              minute: 30, //number
-              every_minute: '0', //6 values: 0, 5, 10, 15, 30
-              comment: '', //string
-            },
-            dob_ymd: {
-              start_year: 2022, //number
-              end_year: 2022, //number
-              sort: 'asc', //asc-desc
-              year: 2022, //number
-              month: 10, //number
-              day: 25, //number
-              comment: '', //string
-            },
-            dob_ym: {
-              start_year: 2022, //number
-              end_year: 2022, //number
-              sort: 'asc', //asc-desc
-              year: 2022, //number
-              month: 10, //number
-              comment: '', //string
-            },
-            timezone_from_to: {
-              range_start: 2, //number
-              range_end: 5, //number
-              hour_start_at: 2, //number
-              hour_end_at: 3, //number
-              minute_start_at: 10, //number
-              minute_end_at: 15, //number
-              every_minute_start_at: '5', //6 values: 0, 5, 10, 15, 30
-              every_minute_end_at: '10', //6 values: 0, 5, 10, 15, 30
-              comment: '', //string
-            },
-            period_from_to: {
-              year_start_at: 2022, //number
-              year_end_at: 2022, //number
-              month_start_at: 10, //number
-              month_end_at: 11, //number
-              day_start_at: 25, //number
-              day_end_at: 25, //number
-              comment: '', //string
-            },
-            prefectures: '', //string
-            up_to_municipality: {
-              prefecture_comment: '', //string
-              prefecture: '', //string
-              city: '', //string
-              city_comment: '', //string
-            },
-            comsume_api_response: '', //(Pending)
-          },
-          zip_code_address: {
-            save_input_content: true, // yes-no
-            use_api_input_value: true, // yes-no
-            require: true, //yes-no
-            all_item_checked: true, //yes-no
-            split_postal_code: true, //yes-no
-            post_code: '', //string
-            use_drop_down: true, //yes-no
-            prefecture: '', //string
-            municipality: '', //string
-            address: '', //string
-            building_name: '', //string
-          },
-          attaching_file: {
-            save_input_content: true, // yes-no
-            require: true, //yes-no
-            multifile_upload: true, //yes-no
-            file_type: [
-              'jpg',
-              'png', //.....
-            ],
-            file_content: '', //base64
-          },
-          calendar: {
-            save_input_content: true, // yes-no
-            required: true, //yes-no
-            use_api_input_value: true, // yes-no
-            initial_selection: true, // yes-no
-            title_require: true, //yes-no
-            title: '', //string
-            start_date: '', //string
-            end_date: '', //string
-            non_select_date_time: '', //string
-            fixed_date: [
-              '2022/09/27',
-              '2022/09/28', //...
-            ],
-            aggregation_target_period_from: 2, //number
-            aggregation_target_period_to: 6, //number
-            type: 'date_selection', //3 values: date_selection, embedded, start_end_date
-            date_selection: {
-              date_select: '', //string
-            },
-            embedded: {
-              date_select: '', //string
-            },
-            start_end_date: {
-              date_select: '', //string
-              specified_period_from: 5, //number
-              specified_period_to: 10, //number
-            },
-          },
-          agree_term: {
-            title_require: true, //yes-no
-            title: '', //string
-            type: 'detail_content', //2 values: detail_content, post_link_only
-            term: '', //string
-            detail_content: {
-              content: '', //string
-            },
-            post_link_only: {
-              title_comment: '', //string
-              title: '', //string
-              urls: '', //string
-              url_comment: '', //string
-            },
-          },
-        },
-        {
-          id: 3,
-          type: 'textarea',
-          textarea: {
-            save_input_content: true,
-            required: true, //yes-no
-            title_require: true, //yes-no
-            title: '', //string
-            type: 'text', // 3 values: text_input, invalid_input, consume_api_response(Pending)
-            text_input: {
-              character_limit_from: 1, //number
-              character_limit_to: 30, //number
-              content: '', //string
-            },
-            invalid_input_content: '', //string
-          },
-        },
-        {
-          id: 2,
-          type: 'label',
-          label: {
-            lbl_content: '', //string
-          },
-        },
-        {
-          id: 4,
-          type: 'text_input',
-          text_input: {
-            //txtIn: text_input
-            save_input_content: true, // yes-no
-            use_api_input_value: true, // yes-no
-            require: true, //yes-no
-            title_require: true, //yes-no
-            title: '', //string
-            type: 'text', // 7 values: text, urls, email_address,
-            //email_confirmation, phone_number, password, password_confirmation
-            text: {
-              range: '', // 8 values: no_input, alphabet, single_byte, alphanumeric_hyphen,
-              //alphanumeric, double_byte, double_byte_hiragana, full_width_katakana
-              character_limit_from: 1, //number
-              character_limit_to: 1000, //number
-              placeholder: '', //string
-              comment: '', //string
-            },
-            url: '', //string
-            email_address: '', //string
-            email_confirmation: {
-              cfEmlAdd_email: '', //string
-              cfEmlAdd_confirm_email: '', //string
-            },
-            phone_number: {
-              withHyphen: true,
-              number: '' //string
-            }, //string
-            password: {
-              character_limit_from: 1, //number
-              character_limit_to: 30, //number
-              password: '', //string
-            },
-            confirm_password: {
-              character_limit_from: 1, //number
-              character_limit_to: 30, //number
-              password: '', //string
-              confirm_password: '', //string
-            },
-          }
-        }
-      ]
-    },
-    {
-      id: 2,
-      hidden: false,
-      belong_to: 'bot',
-      message_content: [
-        {
-          type: 'text_input',
-          text_input: {
-            content: '', //string
-            scroll_auto: true, //yes-no
-          },
-          email: {
-            email_id: '', //id get from list email
-          },
-          file: {
-            file_upload: '', //base64
-            scroll_auto: true, //yes-no
-            file_type: '', //string
-          },
-          script: {
-            script_content: '', //string
-          },
-          delay: {
-            delay_second: 1, // number(range: 1-10)
-            typing_on: true, //yes-no
-          },
-          api_link_age: {
-            //Pending
-            api_id: '', // get from api list(pending)
-          },
-        }
-      ]
-    },
-    {
-      id: 3,
-      hidden: false,
-      belong_to: 'bot',
-      message_content: [
-        {
-          type: 'text_input',
-          text_input: {
-            content: '', //string
-            scroll_auto: true, //yes-no
-          },
-          email: {
-            email_id: '', //id get from list email
-          },
-          file: {
-            file_upload: '', //base64
-            scroll_auto: true, //yes-no
-            file_type: '', //string
-          },
-          script: {
-            script_content: '', //string
-          },
-          delay: {
-            delay_second: 1, // number(range: 1-10)
-            typing_on: true, //yes-no
-          },
-          api_link_age: {
-            //Pending
-            api_id: '', // get from api list(pending)
-          },
-        }
-      ]
-    }
-  ]
-}
-
 let dataConsumeApiResponse = [];
 
 let agreeTermType = [
@@ -2778,7 +2090,6 @@ const Scenario = () => {
   }
 
   const handleDisableDateCalendar = (current, calendar) => {
-    console.log(calendar.start_date, calendar.end_date, calendar.fixed_date, calendar.non_select_date_time, calendar.aggregation_target_period_from, calendar.aggregation_target_period_to)
     if (calendar.end_date || calendar.start_date
       || calendar.fixed_date.length !== 0 || calendar.non_select_date_time
       || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to
@@ -3944,7 +3255,7 @@ const Scenario = () => {
                                                                       data={dataPrefectures}
                                                                       placeholder="Please select"
                                                                       style={{ width: '100%' }}
-                                                                      keyValue="id"
+                                                                      keyValue="prefecture_jis_code"
                                                                       nameValue="name"
                                                                     />
                                                                   </React.Fragment>
@@ -3957,7 +3268,7 @@ const Scenario = () => {
                                                                         data={dataPrefectures}
                                                                         placeholder="Select prefecture"
                                                                         style={{ width: '45%' }}
-                                                                        keyValue="id"
+                                                                        keyValue="prefecture_jis_code"
                                                                         nameValue="name"
                                                                       />
                                                                       <span>~</span>
@@ -5388,14 +4699,12 @@ const Scenario = () => {
                                                   {content.type === 'text_input' && (
                                                     <>
                                                       <div className="ss-user-setting__item-text_input-top">
-                                                        <div className="ss-user-setting__item-text_input-save-variable-wrapper">
-                                                          <CheckboxCustom
-                                                            label="Save the input contents in a variable."
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
-                                                            value={textInput.is_save_input_content}
-                                                            isOnChange={false}
-                                                          />
-                                                        </div>
+                                                        <CheckboxCustom
+                                                          label="Save the input contents in a variable."
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                          value={textInput.is_save_input_content}
+                                                          isOnChange={false}
+                                                        />
                                                         {textInput.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
@@ -6156,19 +5465,19 @@ const Scenario = () => {
                                                                                     }
                                                                                   </div> */}
                                                                                   {(checkbox.type === 'default') &&
-                                                                                      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px' }}>
-                                                                                        <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
-                                                                                        <InputDouble
-                                                                                          classCustom="ss-user-radio-custom-class"
-                                                                                          icon={array.length >= 2 ? "times-circle" : ""}
-                                                                                          onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'text' : 'value')}
-                                                                                          valueLeft={checkbox[checkbox.type][indexCheckbox].text}
-                                                                                          valueRight={checkbox[checkbox.type][indexCheckbox].value}
-                                                                                          placeholder={['text', 'value']}
-                                                                                          classIcon="ss-plus-circle-option-icon-times"
-                                                                                          onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
-                                                                                        />
-                                                                                      </div>
+                                                                                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px' }}>
+                                                                                      <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
+                                                                                      <InputDouble
+                                                                                        classCustom="ss-user-radio-custom-class"
+                                                                                        icon={array.length >= 2 ? "times-circle" : ""}
+                                                                                        onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'text' : 'value')}
+                                                                                        valueLeft={checkbox[checkbox.type][indexCheckbox].text}
+                                                                                        valueRight={checkbox[checkbox.type][indexCheckbox].value}
+                                                                                        placeholder={['text', 'value']}
+                                                                                        classIcon="ss-plus-circle-option-icon-times"
+                                                                                        onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
+                                                                                      />
+                                                                                    </div>
                                                                                   }
                                                                                   {checkbox.type === 'checkbox_img' &&
                                                                                     <div style={{ display: 'flex', marginBottom: '10px', backgroundColor: 'rgb(248, 249, 250)', position: 'relative' }}>
@@ -6273,13 +5582,11 @@ const Scenario = () => {
                                                   {content.type === 'zip_code_address' && (
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-text_input-top">
-                                                        <div className="ss-user-setting__item-text_input-save-variable-wrapper">
-                                                          <CheckboxCustom
-                                                            label="Save the input contents in a variable."
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
-                                                            value={zipCodeAddress.is_save_input_content}
-                                                          />
-                                                        </div>
+                                                        <CheckboxCustom
+                                                          label="Save the input contents in a variable."
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                          value={zipCodeAddress.is_save_input_content}
+                                                        />
                                                         {zipCodeAddress.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
@@ -6484,13 +5791,11 @@ const Scenario = () => {
                                                   {content.type === 'attaching_file' && (
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-text_input-top">
-                                                        <div className="ss-user-setting__item-text_input-save-variable-wrapper">
-                                                          <CheckboxCustom
-                                                            label="Save the input contents in a variable."
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
-                                                            value={attachingFile.is_save_input_content}
-                                                          />
-                                                        </div>
+                                                        <CheckboxCustom
+                                                          label="Save the input contents in a variable."
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                          value={attachingFile.is_save_input_content}
+                                                        />
                                                         {attachingFile.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
@@ -6542,13 +5847,11 @@ const Scenario = () => {
                                                   {content.type === 'calendar' && (
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-text_input-top">
-                                                        <div className="ss-user-setting__item-text_input-save-variable-wrapper">
-                                                          <CheckboxCustom
-                                                            label="Save the input contents in a variable."
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
-                                                            value={calendar.is_save_input_content}
-                                                          />
-                                                        </div>
+                                                        <CheckboxCustom
+                                                          label="Save the input contents in a variable."
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                          value={calendar.is_save_input_content}
+                                                        />
                                                         {calendar.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
@@ -6564,13 +5867,11 @@ const Scenario = () => {
                                                             </div>
                                                           </div>
                                                         }
-                                                        <div className="ss-user-setting__item-text_input-save-variable-wrapper">
-                                                          <CheckboxCustom
-                                                            label="Required"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
-                                                            value={calendar.require}
-                                                          />
-                                                        </div>
+                                                        <CheckboxCustom
+                                                          label="Required"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
+                                                          value={calendar.require}
+                                                        />
                                                         <div className="ss-user-setting__item-bottom">
                                                           <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                             <SelectCustom
@@ -6704,15 +6005,16 @@ const Scenario = () => {
                                                           </div>
                                                         }
                                                         {/* calendar: type = embedded */}
+                                                        {console.log(calendar.date_selection_test, "checkkkk data test")}
                                                         {calendar.type === 'embedded' &&
                                                           <div className="ss-user-setting__item-bottom-flex-start" style={{ height: '380px' }}>
                                                             <Calendar
                                                               className="ss-custom-calendar"
                                                               fullscreen={false}
-                                                              onPanelChange={(value, mode) => console.log(value)}
+                                                              onPanelChange={(value, mode) => console.log(value, mode)}
                                                               style={{ top: '20px', width: '300px', border: '1px solid grey' }}
                                                               value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value.format("DD/MM/YYYY"), 'date_selection_test')}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'date_selection_test')}
                                                               disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                                                             />
                                                           </div>
@@ -7585,7 +6887,7 @@ const Scenario = () => {
                                                                     disabled
                                                                     // onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text' : 'value')}
                                                                     valueLeft={item.name}
-                                                                    valueRight={index + 1}
+                                                                    valueRight={index < 9 ? `0${index + 1}` : `${index + 1}`}
                                                                     rightWidth={{ width: '50%' }}
                                                                   // placeholder={['text', 'value']}
                                                                   />
@@ -7655,14 +6957,12 @@ const Scenario = () => {
                                                   {content.type === 'carousel' && (
                                                     <>
                                                       <div className="ss-user-setting__item-text_input-top">
-                                                        <div className="ss-user-setting__item-text_input-save-variable-wrapper">
-                                                          <CheckboxCustom
-                                                            label="Save the input contents in a variable."
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
-                                                            value={carousel.is_save_input_content}
-                                                            isOnChange={false}
-                                                          />
-                                                        </div>
+                                                        <CheckboxCustom
+                                                          label="Save the input contents in a variable."
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                          value={carousel.is_save_input_content}
+                                                          isOnChange={false}
+                                                        />
                                                         {carousel.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
@@ -7845,13 +7145,11 @@ const Scenario = () => {
                                                   {content.type === 'credit_card_payment' && (
                                                     <>
                                                       <div className="ss-user-setting__item-text_input-top">
-                                                        <div className="ss-user-setting__item-text_input-save-variable-wrapper">
-                                                          <CheckboxCustom
-                                                            label="Save the input contents in a variable."
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
-                                                            value={creditCardPayment.is_save_input_content}
-                                                          />
-                                                        </div>
+                                                        <CheckboxCustom
+                                                          label="Save the input contents in a variable."
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                          value={creditCardPayment.is_save_input_content}
+                                                        />
                                                         {creditCardPayment.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">
@@ -7868,13 +7166,11 @@ const Scenario = () => {
                                                             </div>
                                                           </div>
                                                         }
-                                                        <div className="ss-user-setting__item-text_input-save-variable-wrapper">
-                                                          <CheckboxCustom
-                                                            label="Required"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
-                                                            value={creditCardPayment.require}
-                                                          />
-                                                        </div>
+                                                        <CheckboxCustom
+                                                          label="Required"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
+                                                          value={creditCardPayment.require}
+                                                        />
                                                         <div className="ss-user-setting__item-text_input-use-api-wrapper">
                                                           <div>
                                                             <CheckboxCustom
@@ -8732,13 +8028,11 @@ const Scenario = () => {
                                                   {content.type === 'card_payment_radio_button' && (
                                                     <>
                                                       <div className="ss-user-setting__item-text_input-top">
-                                                        <div className="ss-user-setting__item-text_input-save-variable-wrapper">
-                                                          <CheckboxCustom
-                                                            label="Save the input contents in a variable."
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
-                                                            value={cardPaymentRadioButton.is_save_input_content}
-                                                          />
-                                                        </div>
+                                                        <CheckboxCustom
+                                                          label="Save the input contents in a variable."
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
+                                                          value={cardPaymentRadioButton.is_save_input_content}
+                                                        />
                                                         {cardPaymentRadioButton.is_save_input_content &&
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-user-setting__item-select-bottom-wrapper-flex">

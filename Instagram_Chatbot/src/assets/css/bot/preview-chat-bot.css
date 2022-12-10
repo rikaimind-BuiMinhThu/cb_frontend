@@ -345,7 +345,11 @@
 }
 
 .sp-body-user-side .ant-picker-calendar-header .ant-picker-calendar-year-select {
-    min-width: 73px;
+    min-width: 70px;
+}
+
+.sp-body-user-side .ant-picker-calendar-header .ant-picker-calendar-month-select {
+    min-width: 65px;
 }
 
 .ss-img-list-bank img {
@@ -368,3 +372,67 @@
     padding: 0px;
     padding-top: 9px;
 }
+
+.sp-popup-zip-code-address {
+    background-color: #fff;
+    z-index: 99;
+    height: 85%;
+    position: absolute;
+    width: 95%;
+    top: 83px;
+    left: 9px;
+    display: none;
+}
+
+.sp-popup-zip-code-address-header {
+    background-color: #FAFAFA;
+    border-bottom: 1px solid #E5E5E5;
+    border-left: 4px solid #D74E56;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px;
+    font-size: 16px;
+}
+
+.sp-popup-zip-code-address-header-left {}
+
+.sp-popup-zip-code-address-header-right {}
+
+.sp-plus-circle-option-icon-times-custom {}
+
+.sp-popup-zip-code-address-body {
+    padding: 25px 20px;
+}
+
+.sp-popup-zip-code-address-body-form {}
+
+.sp-popup-zip-code-address-body-form-content {
+    font-weight: 700;
+    font-size: 19px;
+    margin-top: 6px;
+}
+
+.sp-popup-zip-code-address-body-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+}
+
+.sp-popup-zip-code-address-body-button div {
+    border-radius: 3px;
+    width: 120px;
+    padding: 8px 0px;
+    text-align: center;
+}
+
+.sp-popup-zip-code-address-body-button-cancel {
+    border: 1px solid #D0D6DC;
+    cursor: pointer;}
+
+.sp-popup-zip-code-address-body-button-selection {
+    background-color: #000;
+    border: 1px solid #000;
+    color: #fff;
+    cursor: pointer;}
