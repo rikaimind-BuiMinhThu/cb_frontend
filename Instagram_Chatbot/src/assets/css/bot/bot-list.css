@@ -13,14 +13,14 @@
   padding-bottom: 20px;
 }
 .div-add-bot--search {
-  width: 50%;
+  width: 65%;
   display: flex;
   align-items: center;
 }
 .div-add-bot--search input {
   margin-right: 10px;
   padding: 5px 15px;
-  border-radius: 10px;
+  border-radius: 5px;
   border: 1px solid #7186a0;
 }
 .bm_status-filter {

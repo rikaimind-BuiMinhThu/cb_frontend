@@ -238,10 +238,10 @@ function VariableManagement() {
             <Card>
               <CardHeader>
                 <button className="btn btn-primary" onClick={() => setOpenVariable(true)}>
-                ユーザー定義関数
+                  ユーザー定義関数
                 </button>
                 <button className="btn btn-primary" onClick={() => setOpenVariable(false)}>
-                システム変数
+                  システム変数
                 </button>
                 {openVariable ? (
                   <div className="var-variable-search">
@@ -251,13 +251,13 @@ function VariableManagement() {
                       placeholder="Search variable ..."
                       onChange={(e) => setSearch(e.target.value)}
                     />
-                    <Button onClick={() => handleSearch()}>検索</Button>
+                    <Button style={{ width: "100px" }} onClick={() => handleSearch()}>検索</Button>
                   </div>
                 ) : (
                   ''
                 )}
                 <p className="var-variable-note">
-                ※ユーザの入力内容などを保管する変数です。シナリオの中で代入や参照ができます。
+                  ※ユーザの入力内容などを保管する変数です。シナリオの中で代入や参照ができます。
                 </p>
               </CardHeader>
               <CardBody>
@@ -401,7 +401,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        ボットを開いたページのURL
+                          ボットを開いたページのURL
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -414,7 +414,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        ボットを開いたページのURLについてるパラメータ（「?」以降の文字列）
+                          ボットを開いたページのURLについてるパラメータ（「?」以降の文字列）
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -435,7 +435,7 @@ function VariableManagement() {
                           <input className="var-form-input" type="text" disabled value="user_id" />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        ボットを使用するユーザーごとに自動的に付与されるユニークなID
+                          ボットを使用するユーザーごとに自動的に付与されるユニークなID
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -454,7 +454,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        プレビュー機能の使用ユーザーのフラグ（通常ユーザーは空）
+                          プレビュー機能の使用ユーザーのフラグ（通常ユーザーは空）
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -467,7 +467,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        アクセスしたユーザーのIPアドレス
+                          アクセスしたユーザーのIPアドレス
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -480,7 +480,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        IPアドレスから割り出した国名
+                          IPアドレスから割り出した国名
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -493,7 +493,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        IPアドレスから割り出した市区町村
+                          IPアドレスから割り出した市区町村
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -506,7 +506,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        ユーザーが使用しているデバイスの種類（PC、スマホ、タブレット）
+                          ユーザーが使用しているデバイスの種類（PC、スマホ、タブレット）
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -519,7 +519,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        ユーザーが使用しているブラウザの種類
+                          ユーザーが使用しているブラウザの種類
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -532,7 +532,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        ユーザーが使用しているブラウザ情報とOS情報（各種類、バージョンなど）
+                          ユーザーが使用しているブラウザ情報とOS情報（各種類、バージョンなど）
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -545,7 +545,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        ユーザーがシナリオの終端まできた時の日時
+                          ユーザーがシナリオの終端まできた時の日時
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -553,7 +553,7 @@ function VariableManagement() {
                           <input className="var-form-input" type="text" disabled value="cv_flg" />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        ユーザーがシナリオの終端まできた時にフラグ（終端まできたユーザーは「1」の値、途中のユーザーは「0」の値を返す）
+                          ユーザーがシナリオの終端まできた時にフラグ（終端まできたユーザーは「1」の値、途中のユーザーは「0」の値を返す）
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -566,7 +566,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        チャットボットを開き最初に会話をした日時
+                          チャットボットを開き最初に会話をした日時
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -579,7 +579,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        最初に開いた時のユーザーのリファラル（サイトに訪れる前に滞在していたページのURL）
+                          最初に開いた時のユーザーのリファラル（サイトに訪れる前に滞在していたページのURL）
                         </div>
                       </div>
                       <div className="var-form__variable-group">
@@ -592,7 +592,7 @@ function VariableManagement() {
                           />
                         </div>
                         <div className="var-form__variable-value var-none-border">
-                        最後に開いた時のユーザーのリファラル（サイトに訪れる前に滞在していたページのURL）
+                          最後に開いた時のユーザーのリファラル（サイトに訪れる前に滞在していたページのURL）
                         </div>
                       </div>
                     </div>

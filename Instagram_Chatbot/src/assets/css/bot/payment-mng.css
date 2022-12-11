@@ -159,3 +159,8 @@
   margin-right: 10px;
   border-radius: 5px;
 }
+.payment-management-datePicker input{
+  border: 1px solid grey;
+  border-radius: 5px;
+  padding: 5px 10px;
+}

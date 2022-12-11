@@ -41,15 +41,15 @@ function WithdrawalPrevention() {
           // }
           setWithDrawal(res.data.data);
         }
-        
-        
+
+
       })
       .catch((err) => {
         if (err.response?.data.code === 0) {
           tokenExpired();
         }
       });
-  },[]);
+  }, []);
 
   function reload() {
     api
@@ -59,14 +59,14 @@ function WithdrawalPrevention() {
         if (res.data.code == 1) {
           setWithDrawal(res.data.data);
         }
-        if(res.data.data.withdrawal_prevention_status == 'invalid'){
-          setCheckedChoose({invalid: true,standard: false,image: false})
-        }else if(res.data.data.withdrawal_prevention_status == 'image_popup'){
-          setCheckedChoose({invalid: false,standard: false,image: true})
-        }else{
-          setCheckedChoose({invalid: false,standard: true,image: false})
+        if (res.data.data.withdrawal_prevention_status == 'invalid') {
+          setCheckedChoose({ invalid: true, standard: false, image: false })
+        } else if (res.data.data.withdrawal_prevention_status == 'image_popup') {
+          setCheckedChoose({ invalid: false, standard: false, image: true })
+        } else {
+          setCheckedChoose({ invalid: false, standard: true, image: false })
         }
-        
+
       })
       .catch((err) => {
         if (err.response?.data.code === 0) {
@@ -117,7 +117,7 @@ function WithdrawalPrevention() {
         .then((res) => {
           console.log(res);
           if (res.data.code == 1) {
-            setMsgNoti(`Update successfully!`);
+            setMsgNoti(`更新しました。`);
             setIsOpenNoti(true);
             reload();
             setTimeout(() => {
@@ -134,31 +134,31 @@ function WithdrawalPrevention() {
     }
   }
 
-  function checkRadioChecked(){
-    if(withDrawal.withdrawal_prevention_status == 'invalid'){
+  function checkRadioChecked() {
+    if (withDrawal.withdrawal_prevention_status == 'invalid') {
       document.getElementById('invalid').checked = true
       document.getElementById('standard_exit_popup').checked = false
       document.getElementById('image_popup').checked = false
-    }else if(withDrawal.withdrawal_prevention_status == 'standard_exit_popup'){
+    } else if (withDrawal.withdrawal_prevention_status == 'standard_exit_popup') {
       document.getElementById('invalid').checked = false
       document.getElementById('standard_exit_popup').checked = true
       document.getElementById('image_popup').checked = false
-    }else if(withDrawal.withdrawal_prevention_status == 'image_popup'){
+    } else if (withDrawal.withdrawal_prevention_status == 'image_popup') {
       document.getElementById('invalid').checked = false
       document.getElementById('standard_exit_popup').checked = false
       document.getElementById('image_popup').checked = true
     }
   }
 
-  function setInvalid(){
+  function setInvalid() {
     document.getElementById('display_img_url').style.display = 'none'
     document.getElementById('invalid').checked = true
   }
-  function setStandard(){
+  function setStandard() {
     document.getElementById('display_img_url').style.display = 'none'
     document.getElementById('standard_exit_popup').checked = true
   }
-  function setImage(){
+  function setImage() {
     document.getElementById('display_img_url').style.display = 'block'
     document.getElementById('image_popup').checked = true
   }
@@ -168,7 +168,7 @@ function WithdrawalPrevention() {
         <Row id="screenAll">
           <Col md="12">
             <Card>
-              <CardHeader>Withdrawal Prevention</CardHeader>
+              <CardHeader>離脱防止</CardHeader>
               <CardBody>
                 <div onLoad={checkRadioChecked()}>
                   <input
@@ -178,11 +178,11 @@ function WithdrawalPrevention() {
                     name="withdrawal-prevention"
                     defaultValue={`invalid`}
                     // defaultChecked={checkedChoose.invalid}
-                    onClick={() =>setInvalid()}
-                    
+                    onClick={() => setInvalid()}
+
                   />
                   <label className="wp-lable" htmlFor="invalid">
-                    invalid
+                    無効
                   </label>
                   <input
                     className="wp-input-radio"
@@ -194,7 +194,7 @@ function WithdrawalPrevention() {
                     onClick={() => setStandard()}
                   />
                   <label className="wp-lable" htmlFor="standard_exit_popup">
-                    Standard exit popup
+                    標準離脱ポップアップ
                   </label>
                   <input
                     className="wp-input-radio"
@@ -206,13 +206,13 @@ function WithdrawalPrevention() {
                     onClick={() => setImage()}
                   />
                   <label className="wp-lable" htmlFor="image_popup">
-                    image popup
+                    像ポップアップ
                   </label>
                 </div>
                 <div id='display_img_url' style={{ display: withDrawal.withdrawal_prevention_status == 'image_popup' ? 'block' : 'none' }}>
                   <div className="wp-image-item">
                     <label className="wp-image-label">
-                      image URL <span style={{ color: 'red' }}>*</span>
+                      画像URL<span style={{ color: 'red' }}>*</span>
                     </label>
                     <input
                       id="image_URL"
@@ -228,7 +228,7 @@ function WithdrawalPrevention() {
                     <span id="errImageURL" className="wp-image-err"></span>
                   </div>
                   <div className="wp-image-item">
-                    <label className="wp-image-label">Link URL</label>
+                    <label className="wp-image-label">リンクURL</label>
                     <input
                       id="link_URL"
                       className="wp-image-input"
@@ -241,7 +241,7 @@ function WithdrawalPrevention() {
                     />
                   </div>
                 </div>
-                <Button onClick={() => handleKeep()}>Keep</Button>
+                <Button onClick={() => handleKeep()}>保存</Button>
               </CardBody>
             </Card>
           </Col>

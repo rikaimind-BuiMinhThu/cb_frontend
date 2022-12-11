@@ -19,7 +19,7 @@ function AddPaymentGateway() {
                     setDetailGw(res.data.data);
                 } else if (res.data.code === 2) {
                     // console.log('Not found')
-                    setMsgNoti('Gateway not found')
+                    setMsgNoti('ゲートウェイが見つかりません。')
                     setIsOpenNoti(true)
                     setTimeout(() => {
                         setIsOpenNoti(false);
@@ -56,7 +56,7 @@ function AddPaymentGateway() {
         if (gw_agency == 'gmo') {
             if (gw_name == '' || gw_name == ' ') {
                 document.getElementById('pm_gw_name_err').style.display = 'block'
-                document.getElementById('pm_gw_name_err').innerHTML = 'Please input payment gateway'
+                document.getElementById('pm_gw_name_err').innerHTML = '必ず指定してください。'
                 checked_name = false
             } else {
                 document.getElementById('pm_gw_name_err').style.display = 'none'
@@ -65,7 +65,7 @@ function AddPaymentGateway() {
             }
             if (gw_shop_id == '' || gw_shop_id == ' ') {
                 document.getElementById('shop_id_err').style.display = 'block'
-                document.getElementById('shop_id_err').innerHTML = 'Please input shop Id'
+                document.getElementById('shop_id_err').innerHTML = '入力してください。'
                 checked_shop = false
             } else {
                 document.getElementById('shop_id_err').style.display = 'none'
@@ -124,10 +124,10 @@ function AddPaymentGateway() {
             }
 
             if (path.includes('edit-payment')) {
-                api.patch(`/api/v1/payment_managements/payment_gateways/${id}`, addPMGW).then(res =>{
+                api.patch(`/api/v1/payment_managements/payment_gateways/${id}`, addPMGW).then(res => {
                     if (res.data.code === 1) {
                         // console.log('oke')
-                        setMsgNoti('Update payment gateway successfully!')
+                        setMsgNoti('更新しました。')
                         setIsOpenNoti(true)
                         setTimeout(() => {
                             setIsOpenNoti(false);
@@ -136,34 +136,34 @@ function AddPaymentGateway() {
                     } else if (res.data.code === 2) {
                         console.log(res.data.message)
                     }
-                }).catch(error =>{
+                }).catch(error => {
                     console.log(error)
-                if (error.response?.data.code === 0) {
-                    tokenExpired()
-                }
+                    if (error.response?.data.code === 0) {
+                        tokenExpired()
+                    }
                 })
-            }else{
+            } else {
                 api.post(`/api/v1/payment_managements/payment_gateways`, addPMGW).then(res => {
-                if (res.data.code === 1) {
-                    // console.log('oke')
-                    setMsgNoti('Add payment gateway successfully!')
-                    setIsOpenNoti(true)
-                    setTimeout(() => {
-                        setIsOpenNoti(false);
-                        document.getElementById('return_list').click()
-                    }, 1000)
-                } else if (res.data.code === 2) {
-                    console.log(res.data.message)
-                }
-            }).catch(error => {
-                console.log(error)
-                if (error.response?.data.code === 0) {
-                    tokenExpired()
-                }
-            })
+                    if (res.data.code === 1) {
+                        // console.log('oke')
+                        setMsgNoti('決済ゲートウェイを追加しました。')
+                        setIsOpenNoti(true)
+                        setTimeout(() => {
+                            setIsOpenNoti(false);
+                            document.getElementById('return_list').click()
+                        }, 1000)
+                    } else if (res.data.code === 2) {
+                        console.log(res.data.message)
+                    }
+                }).catch(error => {
+                    console.log(error)
+                    if (error.response?.data.code === 0) {
+                        tokenExpired()
+                    }
+                })
             }
 
-            
+
         }
     }
 
@@ -177,30 +177,30 @@ function AddPaymentGateway() {
         }
     }
 
-    function checkPmGWName(name){
-        document.getElementById('pm_gw_name').value = name.replace(/ +(?= )/g,'')
-        if(name.length>50){
-            document.getElementById('pm_gw_name_err').innerHTML = 'Payment gateway name maximun 50 characters'
+    function checkPmGWName(name) {
+        document.getElementById('pm_gw_name').value = name.replace(/ +(?= )/g, '')
+        if (name.length > 50) {
+            document.getElementById('pm_gw_name_err').innerHTML = '最大50文字です。'
             document.getElementById('pm_gw_name_err').style.display = 'block'
-        }else{
+        } else {
             document.getElementById('pm_gw_name_err').innerHTML = ''
             document.getElementById('pm_gw_name_err').style.display = 'none'
         }
     }
 
-    function checkPMGWShopId(shopId){
-        document.getElementById('pm_gw_shop_id').value = shopId.replace(/ +(?= )/g,'')
-        if(shopId.length>25){
-            document.getElementById('shop_id_err').innerHTML = 'Payment gateway shop id maximun 25 characters'
+    function checkPMGWShopId(shopId) {
+        document.getElementById('pm_gw_shop_id').value = shopId.replace(/ +(?= )/g, '')
+        if (shopId.length > 25) {
+            document.getElementById('shop_id_err').innerHTML = '最大25文字です。'
             document.getElementById('shop_id_err').style.display = 'block'
-        }else{
+        } else {
             document.getElementById('shop_id_err').innerHTML = ''
             document.getElementById('shop_id_err').style.display = 'none'
         }
     }
 
-    function checkShopPassword(pass){
-        document.getElementById('pm_gw_shop_pass').value = pass.replace( /\s/g, '')
+    function checkShopPassword(pass) {
+        document.getElementById('pm_gw_shop_pass').value = pass.replace(/\s/g, '')
 
     }
 
@@ -210,72 +210,72 @@ function AddPaymentGateway() {
                 <Row id="screenAll">
                     <Col md="12">
                         <Card>
-                            <CardHeader>Add Payment gateway</CardHeader>
+                            <CardHeader>決済ゲートウェイ追加</CardHeader>
                             <CardBody style={{ textAlign: "center", width: "100%" }}>
                                 <div className='add-payment-gateway-add-form'>
 
                                     <span className='add-payment-gateway-span-form'>
-                                        Payment gateway name
+                                        決済ゲートウェイ名
                                         <span style={{ color: "red" }}>*</span>
                                     </span>
 
-                                    <input id='pm_gw_name' className='add-payment-gateway-input-form' onChange={(e)=>checkPmGWName(e.target.value)}
+                                    <input id='pm_gw_name' className='add-payment-gateway-input-form' onChange={(e) => checkPmGWName(e.target.value)}
                                         defaultValue={`${detailGw == undefined ? '' : detailGw.gateway_name}`}></input>
                                 </div>
                                 <div className='add-payment-gateway-add-form' style={{ padding: "0", marginTop: "-1.75%" }}>
                                     <span className='add-payment-gateway-span-form' ></span>
-                                    <span id='pm_gw_name_err' className='add-payment-gateway-input-form' 
-                                    style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>Please input Payment gateway name</span>
+                                    <span id='pm_gw_name_err' className='add-payment-gateway-input-form'
+                                        style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>決済ゲートウェイ名は、必ず指定してください。</span>
                                 </div>
                                 <div className='add-payment-gateway-add-form'>
                                     <span className='add-payment-gateway-span-form'>
-                                        Payment agency
+                                        決済代行会社
                                         <span style={{ color: "red" }}>*</span>
                                     </span>
                                     <select id='pm_gw_agency' defaultValue={`${detailGw == undefined ? 'gmo' : detailGw.payment_agency}`}
                                         className='add-payment-gateway-input-form'
                                         onChange={(e) => checkPaymentMethod(e.target.value)}>
-                                        <option value="gmo">GMO Payment Gateway</option>
-                                        <option value="np_payment">NP deferred payment</option>
+                                        <option value="gmo">GMOペイメントゲートウェイ</option>
+                                        <option value="np_payment">NP後払い</option>
                                     </select>
                                 </div>
                                 <div className='add-payment-gateway-add-form'>
                                     <span className='add-payment-gateway-span-form'>
-                                        Mode
+                                        モード
                                         <span style={{ color: "red" }}>*</span>
                                     </span>
                                     <select id='pm_gw_mode'
                                         defaultValue={`${detailGw == undefined ? 'test' : detailGw.mode}`}
                                         className='add-payment-gateway-input-form'>
-                                        <option value="test">Test</option>
-                                        <option value="production">Production</option>
+                                        <option value="test">テスト</option>
+                                        <option value="production">本番</option>
                                     </select>
                                 </div>
                                 <div id='GMO_pay'>
                                     <div className='add-payment-gateway-add-form'>
                                         <span className='add-payment-gateway-span-form'>
-                                            Shop ID
+                                            ショップID
                                             <span style={{ color: "red" }}>*</span>
                                         </span>
-                                        <input id='pm_gw_shop_id'onChange={(e)=>checkPMGWShopId(e.target.value)} defaultValue={`${detailGw == undefined ? '' : detailGw.shop_id}`}
+                                        <input id='pm_gw_shop_id' onChange={(e) => checkPMGWShopId(e.target.value)} defaultValue={`${detailGw == undefined ? '' : detailGw.shop_id}`}
                                             className='add-payment-gateway-input-form'></input>
                                     </div>
                                     <div className='add-payment-gateway-add-form'
                                         style={{ padding: "0", marginTop: "-1.75%" }}>
                                         <span className='add-payment-gateway-span-form'></span>
-                                        <span id='shop_id_err' className='add-payment-gateway-input-form' 
-                                        style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>Please input shop Id</span>
+                                        <span id='shop_id_err' className='add-payment-gateway-input-form'
+                                            style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>必ず指定してください。</span>
                                     </div>
                                     <div className='add-payment-gateway-add-form'>
-                                        <span className='add-payment-gateway-span-form'>shop password</span>
-                                        <input id='pm_gw_shop_pass' style={{border:"1px solid gray", borderRadius:"2.5px"}}  type={'password'} onChange={(e)=>checkShopPassword(e.target.value)}
+                                        <span className='add-payment-gateway-span-form'>ショップパスワード</span>
+                                        <input id='pm_gw_shop_pass' style={{ border: "1px solid gray", borderRadius: "2.5px" }} type={'password'} onChange={(e) => checkShopPassword(e.target.value)}
                                             className='add-payment-gateway-input-form'></input>
                                     </div>
                                 </div>
                                 <div id='NP_pay' style={{ display: 'none' }}>
                                     <div className='add-payment-gateway-add-form'>
                                         <span className='add-payment-gateway-span-form'>
-                                            Merchant code
+                                            加盟店コード
                                             <span style={{ color: "red" }}>*</span>
                                         </span>
                                         <input id='pm_gw_merchant_code' defaultValue={`${detailGw == undefined ? '' : detailGw.merchant_code}`}
@@ -285,11 +285,11 @@ function AddPaymentGateway() {
                                         style={{ padding: "0", marginTop: "-1.75%" }}>
                                         <span className='add-payment-gateway-span-form'></span>
                                         <span id='merchant_code_err' className='add-payment-gateway-input-form'
-                                            style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>Please input Merchant code</span>
+                                            style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>入力してください。</span>
                                     </div>
                                     <div className='add-payment-gateway-add-form'>
                                         <span className='add-payment-gateway-span-form'>
-                                            SP code
+                                            SPコード
                                             <span style={{ color: "red" }}>*</span>
                                         </span>
                                         <input id='pm_gw_sp_code' defaultValue={`${detailGw == undefined ? '' : detailGw.sp_code}`}
@@ -299,11 +299,11 @@ function AddPaymentGateway() {
                                         style={{ padding: "0", marginTop: "-1.75%" }}>
                                         <span className='add-payment-gateway-span-form'></span>
                                         <span id='sp_code_err' className='add-payment-gateway-input-form'
-                                            style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>Please input SP code</span>
+                                            style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>入力してください。</span>
                                     </div>
                                     <div className='add-payment-gateway-add-form'>
                                         <span className='add-payment-gateway-span-form'>
-                                            Terminal ID
+                                            ターミナルID
                                             <span style={{ color: "red" }}>*</span>
                                         </span>
                                         <input id='pm_gw_terminal_id' defaultValue={`${detailGw == undefined ? '' : detailGw.terminal_id}`}
@@ -313,14 +313,14 @@ function AddPaymentGateway() {
                                         style={{ padding: "0", marginTop: "-1.75%" }}>
                                         <span className='add-payment-gateway-span-form'></span>
                                         <span id='terminal_id_err' className='add-payment-gateway-input-form'
-                                            style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>Please input Terminal ID</span>
+                                            style={{ color: 'red', display: "none", marginBottom: "-3.5%" }}>入力してください。</span>
                                     </div>
                                 </div>
                                 <div className='add-payment-gateway-add-form'>
                                     <span className='add-payment-gateway-span-form'></span>
                                     <div>
-                                        <button className='add-payment-gateway-btn-return' onClick={() => { window.location.href = '/admin/payment-gateway' }}>Return</button>
-                                        <button className='add-payment-gateway-btn-save' onClick={() => savePaymentGateway()}>Save</button>
+                                        <button className='add-payment-gateway-btn-return' onClick={() => { window.location.href = '/admin/payment-gateway' }}>戻る</button>
+                                        <button className='add-payment-gateway-btn-save' onClick={() => savePaymentGateway()}>保存</button>
                                     </div>
                                 </div>
                             </CardBody>
@@ -334,7 +334,7 @@ function AddPaymentGateway() {
                 </ModalNoti>
             </div>
             <Link to={'/admin/payment-gateway'}>
-                <button id='return_list' style={{ display: 'none' }}>Back</button>
+                <button id='return_list' style={{ display: 'none' }}>戻る</button>
             </Link>
         </>
     )

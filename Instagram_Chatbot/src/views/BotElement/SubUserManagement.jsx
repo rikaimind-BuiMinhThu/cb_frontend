@@ -145,7 +145,7 @@ function SubUserManagement() {
                   <p>利用中のプランのボットの管理者として追加されているユーザーを表示します。
                     <br />
                     EC-CHATBOTのアカウントを持たないユーザーを管理者に追加したい場合は、
-右の招待ボタンからユーザーを招待してからボットの管理者を追加してください。
+                    右の招待ボタンからユーザーを招待してからボットの管理者を追加してください。
                   </p>
                   <div className='sub-user__heading-btn'>
                     <Link to={'/admin/add-sub-user'}>
@@ -202,20 +202,23 @@ function SubUserManagement() {
 
         <ModalShortTem open={isOpenEdit} onClose={() => setIsOpenEdit(false)}>
           <div style={{ width: "800px", color: "#51cbce" }}>
-            <h4>Sub UserEdit</h4>
+            <h4>サブユーザ編集</h4>
             <form id='sub-user__edit-form'>
               <div className='sub-user__field-container sub-user__field-container-edit'>
                 <span className='sub-user__field-lable'>氏名</span>
                 <div className='sub-user__field-input'>
-                  <input type='text' disabled name='full_name' defaultValue={detailUser.full_name}
+                  <input type='text'
+                    style={{ padding: '5px 15px', borderRadius: "5px", border: '1px solid grey' }}
+                    disabled name='full_name' defaultValue={detailUser.full_name}
                   ></input>
                   <span id="errEditFullname" className='sub-user__err-format'></span>
                 </div>
               </div>
               <div className='sub-user__field-container sub-user__field-container-edit'>
-                <span className='sub-user__field-lable'>authority</span>
+                <span className='sub-user__field-lable'>権限</span>
                 <div className='sub-user__field-input'>
-                  <select name='role' defaultValue={detailUser.role}>
+                  <select name='role' defaultValue={detailUser.role}
+                    style={{ padding: '5px 15px', borderRadius: '5px', border: '1px solid grey' }}>
                     <option value='bot_admin'>管理者</option>
                     <option value='editor'>編集者</option>
                     <option value='reader'>観覧者</option>

@@ -234,8 +234,8 @@ function PaymentManagement() {
         elements2 == false && elements3 == false
           ? ''
           : elements2 == true
-          ? 'truncation'
-          : 'rounded_up',
+            ? 'truncation'
+            : 'rounded_up',
     };
     let res = {
       consumption_tax: elements == true ? objDefault : obj,
@@ -785,15 +785,17 @@ function PaymentManagement() {
                       </h4>
                       <div style={{ borderRadius: '5px', padding: '5px' }}>
                         <DatePicker
+                          wrapperClassName="payment-management-datePicker"
+                          // style={{padding:'5px 15px', border:"1px solid #7186a0", borderRadius:'5px'}}
                           selected={startDate}
                           onChange={(date) => selectDateStart(date)}
                           dateFormat="yyyy-MM-dd"
                           value={startDate}
-                          // value={
-                          //   startDatePreview
-                          //     ? startDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-                          //     : 'yyyy/mm/dd'
-                          // }
+                        // value={
+                        //   startDatePreview
+                        //     ? startDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+                        //     : 'yyyy/mm/dd'
+                        // }
                         />
                       </div>
                       <h4
@@ -807,15 +809,16 @@ function PaymentManagement() {
                       </h4>
                       <div style={{ borderRadius: '5px', padding: '5px' }}>
                         <DatePicker
+                          wrapperClassName="payment-management-datePicker"
                           selected={endDate}
                           onChange={(date) => selectDateEnd(date)}
                           dateFormat="yyyy-MM-dd"
                           value={endDate}
-                          // value={
-                          //   endDatePreview
-                          //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-                          //     : 'yyyy/mm/dd'
-                          // }
+                        // value={
+                        //   endDatePreview
+                        //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+                        //     : 'yyyy/mm/dd'
+                        // }
                         />
                       </div>
                       まで &emsp;<button className="payment-management-btn-search">Search</button>
@@ -900,7 +903,7 @@ function PaymentManagement() {
                               }}
                             >
                               <span style={{ fontWeight: '500', color: '#767676' }}>
-                              消費税率（％）&emsp;
+                                消費税率（％）&emsp;
                                 <select
                                   id="sales_tax_rate"
                                   name="sales_tax_rate"
@@ -915,7 +918,7 @@ function PaymentManagement() {
                               </span>
                               <br />
                               <span style={{ fontWeight: '500', color: '#767676' }}>
-                              1円未満 &emsp;
+                                1円未満 &emsp;
                                 <input
                                   type="radio"
                                   name="truncation_rounded"
@@ -939,15 +942,15 @@ function PaymentManagement() {
                             </div>
                             <br />
                             <p>
-                            内税の場合は、商品金額小計をそのまま注文金額とします。
+                              内税の場合は、商品金額小計をそのまま注文金額とします。
                             </p>
                             <p>
-                            外税の場合は、商品金額小計に税率を上乗せして注文金額とします。
+                              外税の場合は、商品金額小計に税率を上乗せして注文金額とします。
                             </p>
                           </div>
                         </form>
                         <button className="btn btn-primary" onClick={() => saveConsumptionTax()}>
-                        保存
+                          保存
                         </button>
                       </div>
                     </div>
@@ -1017,7 +1020,7 @@ function PaymentManagement() {
                                 <div key={i} id={`specifyPGW${i}`}>
                                   <div style={{ display: 'flex' }}>
                                     <label style={{ width: '10%' }}>
-                                    変数値 <span style={{ color: 'red' }}>*</span>
+                                      変数値 <span style={{ color: 'red' }}>*</span>
                                     </label>
                                     <input
                                       style={{ width: '20%' }}
@@ -1030,7 +1033,7 @@ function PaymentManagement() {
                                       }
                                     />
                                     <label style={{ width: '105px', textAlign: 'center' }}>
-                                    決済ゲートウェイ
+                                      決済ゲートウェイ
                                     </label>
                                     <select
                                       style={{ width: '20%' }}
@@ -1038,7 +1041,7 @@ function PaymentManagement() {
                                       defaultValue={
                                         payment?.specify_payment_variables.length > 0
                                           ? payment?.specify_payment_variables[i]
-                                              ?.payment_gateway_name
+                                            ?.payment_gateway_name
                                           : null
                                       }
                                     >
@@ -1169,7 +1172,7 @@ function PaymentManagement() {
                               <div key={i} id={`settlementPGW${i}`}>
                                 <div style={{ display: 'flex' }}>
                                   <label style={{ width: '10%' }}>
-                                  変数値<span style={{ color: 'red' }}>*</span>
+                                    変数値<span style={{ color: 'red' }}>*</span>
                                   </label>
                                   <input
                                     style={{ width: '20%' }}
@@ -1182,7 +1185,7 @@ function PaymentManagement() {
                                     }
                                   />
                                   <label style={{ width: '105px', textAlign: 'center' }}>
-                                  手数料
+                                    手数料
                                   </label>
                                   <input
                                     style={{ width: '20%' }}
@@ -1290,12 +1293,12 @@ function PaymentManagement() {
                             }}
                           >
                             <span style={{ width: '35%', padding: '2%', color: '#767676' }}>
-                            都道府県
+                              都道府県
                             </span>
                             <span
                               style={{ width: '65%', padding: '2% 2% 2% 0%', color: '#767676' }}
                             >
-                             金額
+                              金額
                             </span>
                           </div>
                           <div style={{ width: '52%', height: '300px', overflowY: 'scroll' }}>
@@ -1330,7 +1333,7 @@ function PaymentManagement() {
                                     ></label>
                                   </span>
                                   <span style={{ width: '25%', padding: '2%', color: '#767676' }}>
-                                  円（税込）
+                                    円（税込）
                                   </span>
                                 </div>
                               ))}
@@ -1338,7 +1341,7 @@ function PaymentManagement() {
                           </div>
                         </div>
                         <button className="btn btn-primary" onClick={() => savePrefecturesTax()}>
-                        保存
+                          保存
                         </button>
                       </div>
                     </div>
@@ -1373,7 +1376,7 @@ function PaymentManagement() {
                         >
                           <div>
                             <span style={{ fontWeight: '400', color: '#767676' }}>
-                            請求書の同梱 &emsp;
+                              請求書の同梱 &emsp;
                               <input
                                 type="radio"
                                 name="invoice_included"
@@ -1395,12 +1398,12 @@ function PaymentManagement() {
                               <label>同梱する（NP後払いwiz）</label>
                             </span>
                             <span style={{ fontWeight: '400', color: '#767676' }}>
-                            ※別途ヤマトクレジットファイナンスとの契約が必要になります。
+                              ※別途ヤマトクレジットファイナンスとの契約が必要になります。
                             </span>
                           </div>
                           <div style={{ display: 'flex' }}>
                             <label style={{ marginRight: '20px' }}>
-                            上限金額<span style={{ color: 'red' }}>*</span>
+                              上限金額<span style={{ color: 'red' }}>*</span>
                             </label>
                             <span style={{ display: 'inline-block' }}>
                               <input
@@ -1416,7 +1419,7 @@ function PaymentManagement() {
                           </div>
                           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                             <label style={{ marginRight: '20px' }}>
-                            決済手数料（税込）<span style={{ color: 'red' }}>*</span>
+                              決済手数料（税込）<span style={{ color: 'red' }}>*</span>
                             </label>
                             <form id="customNP">
                               {customDivSettlementFee.map((cdiv, i) => (
@@ -1430,7 +1433,7 @@ function PaymentManagement() {
                                       defaultValue={
                                         payment?.np_value_settlements.length > 0
                                           ? payment?.np_value_settlements[i]
-                                              ?.np_settlement_fee_value
+                                            ?.np_settlement_fee_value
                                           : null
                                       }
                                     />
@@ -1449,7 +1452,7 @@ function PaymentManagement() {
                                       defaultValue={
                                         payment?.np_value_settlements.length > 0
                                           ? payment?.np_value_settlements[i]
-                                              ?.np_settlement_max_value
+                                            ?.np_settlement_max_value
                                           : null
                                       }
                                     />
@@ -1469,7 +1472,7 @@ function PaymentManagement() {
                                       defaultValue={
                                         payment?.np_value_settlements.length > 0
                                           ? payment?.np_value_settlements[i]
-                                              ?.np_settlement_min_value
+                                            ?.np_settlement_min_value
                                           : null
                                       }
                                     />
@@ -1502,7 +1505,7 @@ function PaymentManagement() {
                           </button>
                         </div>
                         <button className="btn btn-primary" onClick={() => saveNPDeferredPayment()}>
-                        保存
+                          保存
                         </button>
                       </div>
                     </div>

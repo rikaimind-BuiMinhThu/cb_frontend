@@ -29,15 +29,15 @@ function PaymentGateway() {
         })
     }, [])
 
-    function reloadListPMGW(pgIndex){
+    function reloadListPMGW(pgIndex) {
         console.log(pgIndex);
         api.get(`/api/v1/payment_managements/payment_gateways?page=${pgIndex}`).then(res => {
             console.log(res.data.data)
-            if(res?.data?.code ==1){
+            if (res?.data?.code == 1) {
                 setGateway(res.data.data)
-            setTotalPage(Math.ceil(res.data?.total / 25));
+                setTotalPage(Math.ceil(res.data?.total / 25));
             }
-            
+
         }).catch(error => {
             console.log(error);
             if (error.response?.data.code === 0) {
@@ -48,12 +48,12 @@ function PaymentGateway() {
 
     const handleChangePage = (event, value) => {
         if (totalPage > 1) {
-          setPage(parseInt(value));
-          setPageIndex(value);
-          reloadListPMGW(value);
-          document.querySelector('.main-panel').scrollTop = 0;
+            setPage(parseInt(value));
+            setPageIndex(value);
+            reloadListPMGW(value);
+            document.querySelector('.main-panel').scrollTop = 0;
         }
-      };
+    };
 
     function cnfDeleteGW(id) {
         setIdDelete(id)
@@ -65,9 +65,9 @@ function PaymentGateway() {
         api.delete(`/api/v1/payment_managements/payment_gateways/${idDelete}`).then(res => {
             if (res.data.code === 1) {
                 setIsOpenNoti(true)
-                setMsgNoti("Delete payment gateway successfully!")
+                setMsgNoti("決済ゲートウェイを削除しました。")
                 setTimeout(() => {
-                    
+
                     setIsOpenNoti(false)
                     setMsgNoti("")
                 }, 1500)
@@ -89,21 +89,21 @@ function PaymentGateway() {
                 <Row id="screenAll">
                     <Col md="12">
                         <Card>
-                            <CardHeader>Payment gateway</CardHeader>
+                            <CardHeader>決済ゲートウェイ名</CardHeader>
                             <CardBody>
-                                <h6>List of payment gateway</h6>
+                                <h6>決済ゲートウェイ一覧</h6>
                                 <Table>
                                     <thead>
                                         <tr>
                                             <th style={{ width: "5%" }}>No.</th>
                                             <th style={{ width: "12.5%" }}>Payment gateway name</th>
-                                            <th style={{ width: "12.5%" }}>Payment agency</th>
-                                            <th style={{ width: "7.5%" }}>Mode</th>
-                                            <th style={{ width: "12.5%" }}>Shop ID/Store openable</th>
-                                            <th style={{ width: "12.5%" }}>Merchant Code / Merchant Code</th>
-                                            <th style={{ width: "7.5%" }}>Client IP (IP code)</th>
-                                            <th style={{ width: "7.5%" }}>Store ID</th>
-                                            <th style={{ width: "100px" }}>Action</th>
+                                            <th style={{ width: "12.5%" }}>決済代行会社</th>
+                                            <th style={{ width: "7.5%" }}>モード</th>
+                                            <th style={{ width: "12.5%" }}>ショップID/店舗公開可能鍵</th>
+                                            <th style={{ width: "12.5%" }}>加盟店コード/加盟店コード</th>
+                                            <th style={{ width: "7.5%" }}>クライアントIP（IPコード）</th>
+                                            <th style={{ width: "7.5%" }}>店舗ID</th>
+                                            <th style={{ width: "100px" }}>アクション</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -119,10 +119,10 @@ function PaymentGateway() {
                                                 <td style={{ width: "7.5%", border: '1px solid #7186a1' }}>{item.store_id}</td>
                                                 <td style={{ width: "100px", border: '1px solid #7186a1' }}>
                                                     <Link to={`/admin/edit-payment-gateway/${item?.id}`}>
-                                                        <button className='payment-gatway-btn-edit'>Edit</button>
+                                                        <button className='payment-gatway-btn-edit'>編集</button>
                                                     </Link>
                                                     <button className='payment-gatway-btn-delete'
-                                                        onClick={() => cnfDeleteGW(item?.id)}>Delete</button>
+                                                        onClick={() => cnfDeleteGW(item?.id)}>削除</button>
                                                 </td>
                                             </tr>
                                         ))}
@@ -130,14 +130,14 @@ function PaymentGateway() {
 
                                 </Table>
                                 <Pagination
-                  count={totalPage}
-                  variant="outlined"
-                  page={page}
-                  onChange={handleChangePage}
-                />
+                                    count={totalPage}
+                                    variant="outlined"
+                                    page={page}
+                                    onChange={handleChangePage}
+                                />
                                 <div style={{ width: "100%", textAlign: "center" }}>
                                     <Link to={'/admin/add-payment-gateway'}>
-                                        <button className='payment-gatway-btn-add-gateway'>Addition</button>
+                                        <button className='payment-gatway-btn-add-gateway'>追加</button>
                                     </Link>
                                 </div>
                             </CardBody>
@@ -146,10 +146,10 @@ function PaymentGateway() {
                 </Row>
                 <ModalShort open={isOpenDeletePW} onClose={() => setIsOpenDeletePW(false)}>
                     <div>
-                        <h4>Do you want to delete the payment gateway?</h4>
+                        <h4>本当に削除しますか。</h4>
                         <div className='payment-gateway-cnf-btn'>
-                            <button className='payment-gateway-cnf-btn-detail-yes' onClick={() => deleteGW()}>Yes</button>
-                            <button className='payment-gateway-cnf-btn-detail-no' onClick={() => setIsOpenDeletePW(false)}>No</button>
+                            <button className='payment-gateway-cnf-btn-detail-yes' onClick={() => deleteGW()}>はい</button>
+                            <button className='payment-gateway-cnf-btn-detail-no' onClick={() => setIsOpenDeletePW(false)}>いいえ</button>
                         </div>
                     </div>
                 </ModalShort>

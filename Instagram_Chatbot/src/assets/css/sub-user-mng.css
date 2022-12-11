@@ -71,6 +71,7 @@
     margin-top: 14px;
 }
 .sub-user__field-input{
+    padding: 5px 15px;
     width: 60%;
     margin-bottom: 15px;
     position: relative;

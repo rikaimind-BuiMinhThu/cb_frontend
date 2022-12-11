@@ -75,7 +75,9 @@ function AddSubUserMng() {
                                     <div className='sub-user__field-container'>
                                         <span className='sub-user__field-lable'>メールアドレス</span>
                                         <div className='sub-user__field-input'>
-                                            <input id='add-email' type='text' placeholder='メールアドレスは、必ず指定してください。' name='email'
+                                            <input id='add-email' type='text'
+                                                placeholder='メールアドレスは、必ず指定してください。' name='email'
+                                                style={{ border: '1px solid grey', borderRadius: '5px', padding: '5px 15px' }}
                                                 onChange={() => utils.checkEmailRequired('add-email', 'errEmail', 'Email')}></input>
                                             <span id="errEmail" className='sub-user__err-format'></span>
                                         </div>
@@ -84,7 +86,8 @@ function AddSubUserMng() {
                                     <div className='sub-user__field-container'>
                                         <span className='sub-user__field-lable'>権限</span>
                                         <div className='sub-user__field-input'>
-                                            <select name='role'>
+                                            <select name='role'
+                                                style={{ padding: '5px 15px', borderRadius: '5px', border: '1px solid grey' }}>
                                                 <option value='bot_admin'>管理者</option>
                                                 <option value='editor'>編集者</option>
                                                 <option value='reader'>観覧者</option>

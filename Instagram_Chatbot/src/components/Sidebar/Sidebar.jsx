@@ -716,7 +716,7 @@ function Sidebar(props) {
                     <p style={{ color: 'black' }}>Installation Tag and Demo</p>
                   </NavLink>
                 </li>
-                <li
+                {/* <li
                   className={activeRoute('conversion') + (true ? ' active-pro' : '')}
                   key={'conversion'}
                 >
@@ -729,7 +729,7 @@ function Sidebar(props) {
                     <i className="nc-icon nc-badge" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>Conversion</p>
                   </NavLink>
-                </li>
+                </li> */}
                 {/* <li className={activeRoute('preview') + (true ? " active-pro" : "")} key={'preview'}>
                   <NavLink to="/admin/preview" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}>
                     <i className="nc-icon nc-badge" style={{ color: "black" }} />
