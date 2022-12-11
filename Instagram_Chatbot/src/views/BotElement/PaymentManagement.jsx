@@ -184,7 +184,7 @@ function PaymentManagement() {
       parseInt(`${endDate.getFullYear()}${endMonth}${endDatee}`)
     ) {
       validate.style.display = 'block';
-      validate.innerHTML = 'Start date cannot be after end date.';
+      validate.innerHTML = '開始日の値は、終了日の値より小さいです。';
     } else {
       validate.style.display = 'none';
       validate.innerHTML = '';
@@ -206,7 +206,7 @@ function PaymentManagement() {
       parseInt(`${date.getFullYear()}${dateMonth}${dateDate}`)
     ) {
       validate.style.display = 'block';
-      validate.innerHTML = 'End date cannot be before start date.';
+      validate.innerHTML = '開始日の値は、終了日の値より小さいです。';
     } else {
       validate.style.display = 'none';
       validate.innerHTML = '';
@@ -246,7 +246,7 @@ function PaymentManagement() {
       .then((respon) => {
         console.log(respon);
         if (respon.data.code == 1) {
-          setMsgNoti(`Update successfully!`);
+          setMsgNoti(`正常に更新されました！`);
           setIsOpenNoti(true);
           reload();
           setTimeout(() => {
@@ -322,7 +322,7 @@ function PaymentManagement() {
         checkVar = true;
         if (document.getElementById(`err_specifypgw_variable${i}`))
           document.getElementById(`err_specifypgw_variable${i}`).innerHTML =
-            'Please input variable';
+            '変数は、必ず指定してください。';
       } else {
         if (document.getElementById(`err_specifypgw_variable${i}`))
           document.getElementById(`err_specifypgw_variable${i}`).innerHTML = '';
@@ -331,7 +331,7 @@ function PaymentManagement() {
         checkVal = true;
         if (document.getElementById(`err_specifypgw_gw${i}`))
           document.getElementById(`err_specifypgw_gw${i}`).innerHTML =
-            'Please input payment gateway';
+            '決済ゲートウェイは、必ず指定してください。';
       } else {
         if (document.getElementById(`err_specifypgw_gw${i}`))
           document.getElementById(`err_specifypgw_gw${i}`).innerHTML = '';
@@ -383,7 +383,7 @@ function PaymentManagement() {
         .then((respon) => {
           console.log(respon);
           if (respon.data.code == 1) {
-            setMsgNoti(`Update successfully!`);
+            setMsgNoti(`正常に更新されました！`);
             setIsOpenNoti(true);
             reload();
             setTimeout(() => {
@@ -433,7 +433,7 @@ function PaymentManagement() {
       if (pm_var[i] == '') {
         checkVar = true;
         if (document.getElementById(`err_settpgw_variable${i}`))
-          document.getElementById(`err_settpgw_variable${i}`).innerHTML = 'Please input variable';
+          document.getElementById(`err_settpgw_variable${i}`).innerHTML = '変数は、必ず指定してください。';
       } else {
         if (document.getElementById(`err_settpgw_variable${i}`))
           document.getElementById(`err_settpgw_variable${i}`).innerHTML = '';
@@ -481,7 +481,7 @@ function PaymentManagement() {
         .then((respon) => {
           console.log(respon);
           if (respon.data.code == 1) {
-            setMsgNoti(`Update successfully!`);
+            setMsgNoti(`正常に更新されました！`);
             setIsOpenNoti(true);
             reload();
             setTimeout(() => {
@@ -530,7 +530,7 @@ function PaymentManagement() {
         checkAmount = true;
         if (document.getElementById(`err_amount_of_money_${i}`))
           document.getElementById(`err_amount_of_money_${i}`).innerHTML =
-            'Please input amount of money';
+            '必ず指定してください。';
       } else {
         if (document.getElementById(`err_amount_of_money_${i}`))
           document.getElementById(`err_amount_of_money_${i}`).innerHTML = '';
@@ -560,7 +560,7 @@ function PaymentManagement() {
         .then((respon) => {
           console.log(respon);
           if (respon.data.code == 1) {
-            setMsgNoti(`Update successfully!`);
+            setMsgNoti(`正常に更新されました！`);
             setIsOpenNoti(true);
             reload();
             setTimeout(() => {
@@ -623,7 +623,7 @@ function PaymentManagement() {
     if (np_maximum_amount === '') {
       checkMaxAmount = true;
       if (document.getElementById(`err_np_maximum_amount`))
-        document.getElementById(`err_np_maximum_amount`).innerHTML = 'Please input maximum amount ';
+        document.getElementById(`err_np_maximum_amount`).innerHTML = '必ず指定してください。';
     } else {
       if (document.getElementById(`err_np_maximum_amount`))
         document.getElementById(`err_np_maximum_amount`).innerHTML = '';
@@ -633,7 +633,7 @@ function PaymentManagement() {
         checkFreeValue = true;
         if (document.getElementById(`err_np_settlement_fee_value_${i}`)) {
           document.getElementById(`err_np_settlement_fee_value_${i}`).innerHTML =
-            'Please input np settlement fee value';
+            '必ず指定してください。';
         }
       } else {
         if (document.getElementById(`err_np_settlement_fee_value_${i}`))
@@ -643,12 +643,12 @@ function PaymentManagement() {
         checkMaxValue = true;
         if (document.getElementById(`err_np_settlement_max_value_${i}`))
           document.getElementById(`err_np_settlement_max_value_${i}`).innerHTML =
-            'Please input np settlement max value';
+            '必ず指定してください。';
       } else if (pmMaxValue[i] < pmMinValue[i]) {
         checkMaxValue = true;
         if (document.getElementById(`err_np_settlement_max_value_${i}`))
           document.getElementById(`err_np_settlement_max_value_${i}`).innerHTML =
-            'Np settlement max value must be greater than min value';
+            'NP 決済の最大値は最小値より大きくなければなりません。';
       } else {
         if (document.getElementById(`err_np_settlement_max_value_${i}`))
           document.getElementById(`err_np_settlement_max_value_${i}`).innerHTML = '';
@@ -657,7 +657,7 @@ function PaymentManagement() {
         checkMinValue = true;
         if (document.getElementById(`err_np_settlement_min_value_${i}`))
           document.getElementById(`err_np_settlement_min_value_${i}`).innerHTML =
-            'Please input np settlement min value';
+            '必ず指定してください。';
       } else {
         if (document.getElementById(`err_np_settlement_min_value_${i}`))
           document.getElementById(`err_np_settlement_min_value_${i}`).innerHTML = '';
@@ -701,7 +701,7 @@ function PaymentManagement() {
         .then((respon) => {
           console.log(respon);
           if (respon.data.code == 1) {
-            setMsgNoti(`Update successfully!`);
+            setMsgNoti(`正常に更新されました！`);
             setIsOpenNoti(true);
             reload();
             setTimeout(() => {
@@ -751,7 +751,7 @@ function PaymentManagement() {
       <Row id="screenAll">
         <Col md="12">
           <Card>
-            <CardHeader>Payment management</CardHeader>
+            <CardHeader>決済管理</CardHeader>
             <CardBody>
               <div className="payment-management-option">
                 <div
@@ -760,14 +760,14 @@ function PaymentManagement() {
                   className="payment-management-option-item"
                   onClick={() => orderHisSelected()}
                 >
-                  ORDER HISTORY
+                  注文履歴
                 </div>
                 <div
                   id="payment_management_setting"
                   className="payment-management-option-item"
                   onClick={() => settingSelected()}
                 >
-                  SETTING
+                  設定
                 </div>
               </div>
               {openHisOrder ? (
@@ -830,19 +830,19 @@ function PaymentManagement() {
                     <thead className="text-primary">
                       <tr>
                         <th style={{ width: '7.5%' }}>No</th>
-                        <th style={{ width: '7.5%' }}>User ID</th>
-                        <th style={{ width: '9%' }}>Order number</th>
-                        <th>Product name</th>
-                        <th style={{ width: '7.5%' }}>Unit price</th>
-                        <th style={{ width: '7.5%' }}>Quantity</th>
-                        <th style={{ width: '7.5%' }}>Price</th>
-                        <th>Consumption tax</th>
-                        <th>Settlement fee (tax included)</th>
-                        <th>Shipping fee (tax included)</th>
-                        <th>Total (tax included)</th>
-                        <th>Mode</th>
-                        <th>ituation</th>
-                        <th>Shipping fee (tax included)</th>
+                        <th style={{ width: '7.5%' }}>ユーザID</th>
+                        <th style={{ width: '9%' }}>注文番号</th>
+                        <th>商品名</th>
+                        <th style={{ width: '7.5%' }}>単価</th>
+                        <th style={{ width: '7.5%' }}>数量</th>
+                        <th style={{ width: '7.5%' }}>価格</th>
+                        <th>消費税</th>
+                        <th>決済手数料（税込）</th>
+                        <th>送料（税込）</th>
+                        <th>合計（税込）</th>
+                        <th>モード</th>
+                        <th>状態</th>
+                        <th>注文日時</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -869,7 +869,7 @@ function PaymentManagement() {
                 <div>
                   {/* 1.CONSUMPTION TAX */}
                   <div className="payment_management_setting__item">
-                    <h6>consumption tax</h6>
+                    <h6>消費税</h6>
                     <div className="payment_management_setting__body">
                       <div className="payment_management_setting__check">
                         <form id="consumption_tax">
@@ -881,7 +881,7 @@ function PaymentManagement() {
                             value={`internal_tax`}
                             onChange={() => setOpenTax(true)}
                           />
-                          <label> tax included</label>
+                          <label>内税</label>
                           <input
                             type="radio"
                             id="outside_tax"
@@ -890,7 +890,7 @@ function PaymentManagement() {
                             defaultChecked={!openTax}
                             onChange={() => setOpenTax(false)}
                           />
-                          <label>outside tax</label>
+                          <label>外税</label>
                           <br />
                           <div className="payment_management_setting__check-out">
                             <div
@@ -900,7 +900,7 @@ function PaymentManagement() {
                               }}
                             >
                               <span style={{ fontWeight: '500', color: '#767676' }}>
-                                sales tax rate(%) &emsp;
+                              消費税率（％）&emsp;
                                 <select
                                   id="sales_tax_rate"
                                   name="sales_tax_rate"
@@ -915,7 +915,7 @@ function PaymentManagement() {
                               </span>
                               <br />
                               <span style={{ fontWeight: '500', color: '#767676' }}>
-                                Less than 1 yen &emsp;
+                              1円未満 &emsp;
                                 <input
                                   type="radio"
                                   name="truncation_rounded"
@@ -926,7 +926,7 @@ function PaymentManagement() {
                                   }
                                   value={`truncation`}
                                 />
-                                <label> truncation</label>
+                                <label>切り捨て</label>
                                 <input
                                   type="radio"
                                   name="truncation_rounded"
@@ -934,22 +934,20 @@ function PaymentManagement() {
                                   defaultChecked={payment.calculate_one_yen == 'rounded_up'}
                                   value="rounded_up"
                                 />
-                                <label>rounded up</label>
+                                <label>切り捨て</label>
                               </span>
                             </div>
                             <br />
                             <p>
-                              In the case of tax-inclusive, the product price subtotal will be used
-                              as the order price.
+                            内税の場合は、商品金額小計をそのまま注文金額とします。
                             </p>
                             <p>
-                              In the case of tax-excluded, the order amount is calculated by adding
-                              the tax rate to the product price subtotal.
+                            外税の場合は、商品金額小計に税率を上乗せして注文金額とします。
                             </p>
                           </div>
                         </form>
                         <button className="btn btn-primary" onClick={() => saveConsumptionTax()}>
-                          Keep
+                        保存
                         </button>
                       </div>
                     </div>
@@ -957,7 +955,7 @@ function PaymentManagement() {
 
                   {/* 2.SPECIFY PAYMENT GATEWAY */}
                   <div className="payment_management_setting__item">
-                    <h6>Specify payment gateway</h6>
+                    <h6>決済ゲートウェイ指定</h6>
                     <div className="payment_management_setting__body">
                       <div className="payment_management_setting__check">
                         {/* <form action=""> */}
@@ -969,7 +967,7 @@ function PaymentManagement() {
                           defaultChecked={noCan}
                           onChange={() => setNoCan(true)}
                         />
-                        <label> None</label>
+                        <label>無し</label>
                         <input
                           type="radio"
                           id="specify_pg_canbe"
@@ -978,13 +976,13 @@ function PaymentManagement() {
                           defaultChecked={!noCan}
                           onChange={() => setNoCan(false)}
                         />
-                        <label>can be</label>
+                        <label>あり</label>
                         <br />
                         <div
                           className="payment_management_setting__can"
                           style={{ display: `${noCan == true ? 'none' : 'block'}` }}
                         >
-                          <label style={{ width: '20%' }}>Payment method variable name</label>
+                          <label style={{ width: '20%' }}>決済方法の変数名</label>
                           <select
                             name="specify_payment_method_variable"
                             style={{ width: '30%' }}
@@ -1019,7 +1017,7 @@ function PaymentManagement() {
                                 <div key={i} id={`specifyPGW${i}`}>
                                   <div style={{ display: 'flex' }}>
                                     <label style={{ width: '10%' }}>
-                                      variable value <span style={{ color: 'red' }}>*</span>
+                                    変数値 <span style={{ color: 'red' }}>*</span>
                                     </label>
                                     <input
                                       style={{ width: '20%' }}
@@ -1032,7 +1030,7 @@ function PaymentManagement() {
                                       }
                                     />
                                     <label style={{ width: '105px', textAlign: 'center' }}>
-                                      payment gateway
+                                    決済ゲートウェイ
                                     </label>
                                     <select
                                       style={{ width: '20%' }}
@@ -1104,7 +1102,7 @@ function PaymentManagement() {
                           className="btn btn-primary"
                           onClick={() => saveSpecifyPaymentGateway()}
                         >
-                          Keep
+                          保存
                         </button>
                       </div>
                     </div>
@@ -1112,7 +1110,7 @@ function PaymentManagement() {
 
                   {/* 3.SETTLEMENT FEE (TAX INCLUDED) */}
                   <div className="payment_management_setting__item">
-                    <h6>Settlement fee (tax included)</h6>
+                    <h6>決済手数料（税込）</h6>
                     <div className="payment_management_setting__body">
                       <div className="payment_management_setting__check">
                         <input
@@ -1123,7 +1121,7 @@ function PaymentManagement() {
                           checked={noPaid}
                           onChange={() => setNoPaid(true)}
                         />
-                        <label> free</label>
+                        <label>無料</label>
                         <input
                           type="radio"
                           name="settlement_fee"
@@ -1131,14 +1129,14 @@ function PaymentManagement() {
                           checked={!noPaid}
                           onChange={() => setNoPaid(false)}
                         />
-                        <label>Paid</label>
+                        <label>有料</label>
                         <br />
 
                         <div
                           className="payment_management_setting__can"
                           style={{ display: `${noPaid == true ? 'none' : 'block'}` }}
                         >
-                          <label style={{ width: '20%' }}>Payment method variable name</label>
+                          <label style={{ width: '20%' }}>決済方法の変数名</label>
                           <select
                             name="settlement_payment_method_variable"
                             style={{ width: '30%' }}
@@ -1171,7 +1169,7 @@ function PaymentManagement() {
                               <div key={i} id={`settlementPGW${i}`}>
                                 <div style={{ display: 'flex' }}>
                                   <label style={{ width: '10%' }}>
-                                    variable value <span style={{ color: 'red' }}>*</span>
+                                  変数値<span style={{ color: 'red' }}>*</span>
                                   </label>
                                   <input
                                     style={{ width: '20%' }}
@@ -1184,7 +1182,7 @@ function PaymentManagement() {
                                     }
                                   />
                                   <label style={{ width: '105px', textAlign: 'center' }}>
-                                    commission
+                                  手数料
                                   </label>
                                   <input
                                     style={{ width: '20%' }}
@@ -1197,7 +1195,7 @@ function PaymentManagement() {
                                         : null
                                     }
                                   />
-                                  <span>Yen (tax included)</span>
+                                  <span>円（税込）</span>
                                   <span
                                     style={{
                                       color: 'red',
@@ -1236,7 +1234,7 @@ function PaymentManagement() {
                           className="btn btn-primary"
                           onClick={() => saveSettlementPaymentGateway()}
                         >
-                          Keep
+                          保存
                         </button>
                       </div>
                     </div>
@@ -1244,7 +1242,7 @@ function PaymentManagement() {
 
                   {/* 4.SHIPPING FEE (TAX INCLUDED) */}
                   <div className="payment_management_setting__item">
-                    <h6>Shipping fee (tax included)</h6>
+                    <h6>送料（税込）</h6>
                     <div className="payment_management_setting__body">
                       <div className="payment_management_setting__check">
                         <input
@@ -1255,7 +1253,7 @@ function PaymentManagement() {
                           checked={noShip}
                           onChange={() => setNoShip(true)}
                         />
-                        <label> free</label>
+                        <label>無料</label>
                         <input
                           type="radio"
                           name="shipping_tax"
@@ -1263,13 +1261,13 @@ function PaymentManagement() {
                           checked={!noShip}
                           onChange={() => setNoShip(false)}
                         />
-                        <label>Paid</label>
+                        <label>有料</label>
                         <br />
                         <div
                           className="payment_management_setting__can"
                           style={{ display: noShip == true ? 'none' : 'block' }}
                         >
-                          <label style={{ width: '20%' }}>Address variable name</label>
+                          <label style={{ width: '20%' }}>住所の変数名</label>
                           <select
                             name="shipping_fee_address_variable"
                             style={{ width: '30%' }}
@@ -1292,12 +1290,12 @@ function PaymentManagement() {
                             }}
                           >
                             <span style={{ width: '35%', padding: '2%', color: '#767676' }}>
-                              Prefectures
+                            都道府県
                             </span>
                             <span
                               style={{ width: '65%', padding: '2% 2% 2% 0%', color: '#767676' }}
                             >
-                              Amount of money
+                             金額
                             </span>
                           </div>
                           <div style={{ width: '52%', height: '300px', overflowY: 'scroll' }}>
@@ -1332,7 +1330,7 @@ function PaymentManagement() {
                                     ></label>
                                   </span>
                                   <span style={{ width: '25%', padding: '2%', color: '#767676' }}>
-                                    Yen (tax included)
+                                  円（税込）
                                   </span>
                                 </div>
                               ))}
@@ -1340,7 +1338,7 @@ function PaymentManagement() {
                           </div>
                         </div>
                         <button className="btn btn-primary" onClick={() => savePrefecturesTax()}>
-                          Keep
+                        保存
                         </button>
                       </div>
                     </div>
@@ -1348,7 +1346,7 @@ function PaymentManagement() {
 
                   {/* 5.NP DEFERRED PAYMENT */}
                   <div className="payment_management_setting__item">
-                    <h6>NP deferred payment</h6>
+                    <h6>NP後払い</h6>
                     <div className="payment_management_setting__body">
                       <div className="payment_management_setting__check">
                         <input
@@ -1359,7 +1357,7 @@ function PaymentManagement() {
                           checked={noNP}
                           onChange={() => setNoNP(true)}
                         />
-                        <label> No</label>
+                        <label>無し</label>
                         <input
                           type="radio"
                           name="np_deferred"
@@ -1367,7 +1365,7 @@ function PaymentManagement() {
                           checked={!noNP}
                           onChange={() => setNoNP(false)}
                         />
-                        <label>Can be</label>
+                        <label>あり</label>
                         <br />
                         <div
                           className="payment_management_setting__can"
@@ -1375,7 +1373,7 @@ function PaymentManagement() {
                         >
                           <div>
                             <span style={{ fontWeight: '400', color: '#767676' }}>
-                              Invoice included &emsp;
+                            請求書の同梱 &emsp;
                               <input
                                 type="radio"
                                 name="invoice_included"
@@ -1386,7 +1384,7 @@ function PaymentManagement() {
                                   payment.np_invoice_included == null
                                 }
                               />
-                              <label> not included</label>
+                              <label>同梱しない</label>
                               <input
                                 type="radio"
                                 name="invoice_included"
@@ -1394,15 +1392,15 @@ function PaymentManagement() {
                                 value={`enclosed`}
                                 defaultChecked={payment.np_invoice_included == 'enclosed'}
                               />
-                              <label>Enclosed (NP postpay wiz)</label>
+                              <label>同梱する（NP後払いwiz）</label>
                             </span>
                             <span style={{ fontWeight: '400', color: '#767676' }}>
-                              * A separate contract with Yamato Credit Finance is required.
+                            ※別途ヤマトクレジットファイナンスとの契約が必要になります。
                             </span>
                           </div>
                           <div style={{ display: 'flex' }}>
                             <label style={{ marginRight: '20px' }}>
-                              Maximum amount <span style={{ color: 'red' }}>*</span>
+                            上限金額<span style={{ color: 'red' }}>*</span>
                             </label>
                             <span style={{ display: 'inline-block' }}>
                               <input
@@ -1414,11 +1412,11 @@ function PaymentManagement() {
                               <br />
                               <label style={{ color: 'red' }} id={`err_np_maximum_amount`}></label>
                             </span>
-                            Circle
+                            円
                           </div>
                           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                             <label style={{ marginRight: '20px' }}>
-                              Settlement fee <span style={{ color: 'red' }}>*</span>
+                            決済手数料（税込）<span style={{ color: 'red' }}>*</span>
                             </label>
                             <form id="customNP">
                               {customDivSettlementFee.map((cdiv, i) => (
@@ -1455,7 +1453,7 @@ function PaymentManagement() {
                                           : null
                                       }
                                     />
-                                    Circle
+                                    円
                                     <br />
                                     <label
                                       style={{ color: 'red', margin: '0 0 0 20px' }}
@@ -1475,7 +1473,7 @@ function PaymentManagement() {
                                           : null
                                       }
                                     />
-                                    Circle
+                                    円
                                     <br />
                                     <label
                                       style={{ color: 'red', margin: '0 0 0 20px' }}
@@ -1504,7 +1502,7 @@ function PaymentManagement() {
                           </button>
                         </div>
                         <button className="btn btn-primary" onClick={() => saveNPDeferredPayment()}>
-                          Keep
+                        保存
                         </button>
                       </div>
                     </div>
