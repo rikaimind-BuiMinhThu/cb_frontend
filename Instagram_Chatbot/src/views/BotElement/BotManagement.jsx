@@ -93,10 +93,10 @@ function BotManagement() {
     api
       .post(`/api/v1/managements/chatbots/${id}/duplicate`)
       .then((res) => {
-        console.log('duplicate: ', res.data);
+        // console.log('duplicate: ', res.data);
         if (res.data.code == 1) {
           setIsOpenNoti(true);
-          setMsgNoti('Duplicate bot successfully!');
+          setMsgNoti('正常に複製されました！');
           setTimeout(() => {
             setIsOpenNoti(false);
             setMsgNoti('');
@@ -157,7 +157,7 @@ function BotManagement() {
             setIdSelected('');
             setStatusSelected('');
             setIsOpenNoti(true);
-            setMsgNoti('Changed status successfully!');
+            setMsgNoti('正常に変更されました！');
             setTimeout(() => {
               setIsOpenNoti(false);
               setMsgNoti('');
@@ -207,7 +207,7 @@ function BotManagement() {
             setMsgConfirm('');
             setIdSelected('');
             setIsOpenNoti(true);
-            setMsgNoti('Delete successfully!');
+            setMsgNoti('正常に削除されました！');
             setTimeout(() => {
               setIsOpenNoti(false);
               setMsgNoti('');
@@ -253,9 +253,9 @@ function BotManagement() {
     setIsOpenPopupConfirm(true);
     // alert(status)
     if (status == 'on') {
-      setMsgConfirm('Are you sure you want to start this bot?');
+      setMsgConfirm('本当にボットをONにしますか。');
     } else if (status == 'off') {
-      setMsgConfirm('Are you sure you want to stop this bot?');
+      setMsgConfirm('本当にボットをOFFにしますか。');
     }
 
     setIdSelected(id);
@@ -266,7 +266,7 @@ function BotManagement() {
   const handleDeleteBot = (id) => {
     setIsDelete(true);
     setIsOpenPopupConfirm(true);
-    setMsgConfirm('Are you sure you want to delete this bot?');
+    setMsgConfirm('本当にボットを削除しますか。');
     setIdSelected(id);
   };
 

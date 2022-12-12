@@ -96,7 +96,7 @@ function PaymentGateway() {
                                     <thead>
                                         <tr>
                                             <th style={{ width: "5%" }}>No.</th>
-                                            <th style={{ width: "12.5%" }}>Payment gateway name</th>
+                                            <th style={{ width: "12.5%" }}>決済ゲートウェイ名</th>
                                             <th style={{ width: "12.5%" }}>決済代行会社</th>
                                             <th style={{ width: "7.5%" }}>モード</th>
                                             <th style={{ width: "12.5%" }}>ショップID/店舗公開可能鍵</th>
