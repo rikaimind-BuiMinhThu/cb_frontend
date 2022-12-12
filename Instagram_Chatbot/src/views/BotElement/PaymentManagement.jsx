@@ -781,7 +781,7 @@ function PaymentManagement() {
                           fontSize: '1.2em',
                         }}
                       >
-                        コンバージョン数
+                        注文日時
                       </h4>
                       <div style={{ borderRadius: '5px', padding: '5px' }}>
                         <DatePicker

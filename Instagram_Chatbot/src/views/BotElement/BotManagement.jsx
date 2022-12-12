@@ -29,8 +29,8 @@ function BotManagement() {
 
   // side effects
   useEffect(() => {
-    console.log('token in dashboard', Cookies.get('token'));
-    console.log('is_auth', Cookies.get('is_auth'));
+    // console.log('token in dashboard', Cookies.get('token'));
+    // console.log('is_auth', Cookies.get('is_auth'));
     if (
       Cookies.get('token') == undefined ||
       Cookies.get('token') == null ||
@@ -48,7 +48,7 @@ function BotManagement() {
     api
       .get(`/api/v1/managements/chatbots?page=1&status=all`)
       .then((res) => {
-        console.log('bot list get data: ', res.data);
+        // console.log('bot list get data: ', res.data);
         setBotList(res.data?.data);
         setTotalPage(Math.ceil(res.data?.total / 10));
       })
@@ -65,7 +65,7 @@ function BotManagement() {
     api
       .get(`/api/v1/managements/chatbots?page=${pgIndex}&name=${search}&status=${isActiveSearch}`)
       .then((res) => {
-        console.log('bot list get data: ', res.data);
+        // console.log('bot list get data: ', res.data);
         setBotList(res.data?.data);
         setTotalPage(Math.ceil(res.data?.total / 10));
       })
@@ -104,7 +104,7 @@ function BotManagement() {
           api
             .get(`/api/v1/managements/chatbots?page=1&status=${isActiveSearch}`)
             .then((res) => {
-              console.log('bot list get data: ', res.data);
+              // console.log('bot list get data: ', res.data);
               setBotList(res.data?.data);
               setTotalPage(Math.ceil(res.data?.total / 10));
             })
@@ -165,7 +165,7 @@ function BotManagement() {
             api
               .get(`/api/v1/managements/chatbots?page=${page}&status=${isActiveSearch}`)
               .then((res) => {
-                console.log('bot list get data: ', res.data);
+                // console.log('bot list get data: ', res.data);
                 setBotList(res.data?.data);
                 setTotalPage(Math.ceil(res.data?.total / 10));
               })
@@ -207,7 +207,7 @@ function BotManagement() {
             setMsgConfirm('');
             setIdSelected('');
             setIsOpenNoti(true);
-            setMsgNoti('Delete successfully');
+            setMsgNoti('Delete successfully!');
             setTimeout(() => {
               setIsOpenNoti(false);
               setMsgNoti('');
@@ -215,7 +215,7 @@ function BotManagement() {
             api
               .get(`/api/v1/managements/chatbots?page=1&status=${isActiveSearch}`)
               .then((res) => {
-                console.log('bot list get data: ', res.data);
+                // console.log('bot list get data: ', res.data);
                 setBotList(res.data?.data);
                 setTotalPage(Math.ceil(res.data?.total / 10));
               })
