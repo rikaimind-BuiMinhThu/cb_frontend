@@ -435,4 +435,9 @@
     background-color: #000;
     border: 1px solid #000;
     color: #fff;
-    cursor: pointer;}
+    cursor: pointer;
+}
+
+.ant-checkbox + span {
+    padding-right: 0px!important;
+}
