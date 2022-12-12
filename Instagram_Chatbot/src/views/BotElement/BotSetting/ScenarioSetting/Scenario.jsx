@@ -3728,11 +3728,11 @@ const Scenario = () => {
                                                                                       Price: {itemProduct.item_price} 円
                                                                                     </div>
                                                                                   }
-                                                                                  {/* {productPurchase.multiple_item_purchase &&
-                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                    Multiple item purchase
-                                                                                  </div>
-                                                                                } */}
+                                                                                  {itemProduct.quantity_limit &&
+                                                                                    <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                      数量：最大{itemProduct.quantity_limit}個まで
+                                                                                    </div>
+                                                                                  }
                                                                                 </div>
                                                                               }
                                                                             </div>
@@ -3775,6 +3775,11 @@ const Scenario = () => {
                                                                                       Price: {itemProduct.item_price} 円
                                                                                     </div>
                                                                                   }
+                                                                                  {itemProduct.quantity_limit &&
+                                                                                    <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                      数量：最大{itemProduct.quantity_limit}個まで
+                                                                                    </div>
+                                                                                  }
                                                                                   {/* {productPurchase.multiple_item_purchase &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-price">
                                                                                     Multiple item purchase
@@ -3809,6 +3814,11 @@ const Scenario = () => {
                                                                                   {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
                                                                                 </div>
                                                                               }
+                                                                              {itemProduct.quantity_limit &&
+                                                                                <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                                                                  数量：最大{itemProduct.quantity_limit}個まで
+                                                                                </div>
+                                                                              }
                                                                             </div>
                                                                           </Checkbox>
                                                                         })}
@@ -3831,6 +3841,11 @@ const Scenario = () => {
                                                                               {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
                                                                                 <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                                                                   {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                                                                                </div>
+                                                                              }
+                                                                              {itemProduct.quantity_limit &&
+                                                                                <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                                                                  数量：最大{itemProduct.quantity_limit}個まで
                                                                                 </div>
                                                                               }
                                                                             </div>
@@ -3892,7 +3907,11 @@ const Scenario = () => {
                                                                                     Item No.: {itemProduct.item_number}
                                                                                   </div>
                                                                                 }
-                                                                                {productPurchaseRadioButton.price_display && itemProduct.item_price &&
+                                                                                {itemProduct.price_display_custom ?
+                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
+                                                                                    {itemProduct.price_display_custom}
+                                                                                  </div> :
+                                                                                  productPurchaseRadioButton.price_display && itemProduct.item_price &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-price">
                                                                                     Price: {itemProduct.item_price} 円
                                                                                   </div>
@@ -3920,7 +3939,7 @@ const Scenario = () => {
                                                                             </div>
                                                                             {(productPurchaseRadioButton.product_name_display || productPurchaseRadioButton.price_display || productPurchaseRadioButton.product_number_display) &&
                                                                               <div className="ss-user-overview-product-purchase-infor-type-text_image">
-                                                                                {productPurchaseRadioButton.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchaseRadioButton.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {productPurchaseRadioButton.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : ""}
+                                                                                {productPurchaseRadioButton.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchaseRadioButton.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchaseRadioButton.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
                                                                               </div>
                                                                             }
                                                                           </div>
@@ -3980,8 +3999,9 @@ const Scenario = () => {
                                                                 <Slider
                                                                   trackStyle={{ backgroundColor: slider.color || '#2C75F0' }}
                                                                   min={slider.type === 'discrete_type' ? parseInt(slider.min_value) : 0}
-                                                                  max={slider.type === 'discrete_type' ? parseInt(slider.max_value) : 10}
+                                                                  max={slider.type === 'discrete_type' ? parseInt(slider.max_value) : 100}
                                                                   dots={slider.type === 'discrete_type'}
+                                                                  step={slider.type !== 'discrete_type' && 0.1}
                                                                   marks={
                                                                     slider.type === 'discrete_type' ?
                                                                       {
@@ -3990,7 +4010,7 @@ const Scenario = () => {
                                                                       } :
                                                                       {
                                                                         0: slider.min_label,
-                                                                        10: slider.max_label
+                                                                        100: slider.max_label
                                                                       }
                                                                   }
                                                                 />
@@ -4154,6 +4174,12 @@ const Scenario = () => {
                                                   })}
                                                 </div>
                                                 {message?.message_content.length !== 0 &&
+                                                  ((message?.message_content.length === 1 &&
+                                                    !(message.message_content[0].type === 'product_purchase_radio_button'
+                                                      || (message.message_content[0].type === 'carousel' && message.message_content[0]?.[message.message_content[0].type].require)
+                                                      || (message.message_content[0].type === 'radio_button' && !message.message_content[0][message.message_content[0].type].initial_selection))
+                                                  )
+                                                    || message?.message_content.length > 1) &&
                                                   <div className="ss-user-message__action-wrapper">
                                                     <Button className="ss-user-message__action-btn">
                                                       {message.buttonName || "To the next"}
@@ -8192,7 +8218,7 @@ const Scenario = () => {
                                                                                       <div className="ss-user-setting-payment-radio-container ss-user-setting-payment-radio-container-img"
                                                                                       >
                                                                                         {itemPaymentRadioImg.contents.map((itemContentPayment, indexContentPayment, arrContent) => {
-                                                                                          return <React.Fragment>
+                                                                                          return <React.Fragment key={indexContentPayment}>
                                                                                             <div style={{ width: arrContent.length > 1 ? `${(100 / arrContent.length) - 1}%` : '100%', padding: '5px' }}>
                                                                                               <div className="ss-user-setting__item-bottom" style={{ flexWrap: 'nowrap' }}>
                                                                                                 <InputCustom
@@ -8202,6 +8228,7 @@ const Scenario = () => {
                                                                                                   value={itemContentPayment.file_url}
                                                                                                 />
                                                                                                 <MDBIcon onClick={() => {
+                                                                                                  setAcceptFile(['image'])
                                                                                                   setIsOpenFileReference(true)
                                                                                                   setVarFileReference({ indexContent, contentType: content.type, subContentType: 'radio_contents_img', indexSubContentType: indexPaymentRadioImg, childSubContentType: 'contents', indexChildSubContentType: indexContentPayment, img: 'file_url' })
                                                                                                 }}

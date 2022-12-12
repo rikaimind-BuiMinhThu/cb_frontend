@@ -775,8 +775,11 @@ function Preview({ onOpenPreview, isOpen }) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
-        } else if (contentType.type === 'invalid_input') {
-
+        } else if (contentArr[i].type === 'textarea') {
+          if (stringNullOrEmpty(contentType[contentType.type].value)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
         } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
           isValid = false;
@@ -898,6 +901,14 @@ function Preview({ onOpenPreview, isOpen }) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
+        }
+      }
+      if (contentArr[i].type === 'textarea') {
+        console.log(contentType[contentType.type].value, 'cecjlllll')
+        if (!stringNullOrEmpty(contentType[contentType.type].value)
+          && (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Must be between ${limitFrom} and ${limitTo} characters.`;
+          isValid = false;
         }
       }
       if (contentArr[i].type === 'zip_code_address') {
@@ -1028,18 +1039,18 @@ function Preview({ onOpenPreview, isOpen }) {
             REGEX_CHECK = /[^A-Za-z0-9 ]+/;
             messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.";
             break;
-          // case 'double_byte_hiragana':
-          //   REGEX_CHECK = /[\u3040-\u309F]+/;
-          //   messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.";
-          //   break;
-          // case 'full_width_katakana':
-          //   REGEX_CHECK = /[\u30A0-\u30FF]+/;
-          //   messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.";
-          //   break;
-          // case 'double_byte':
-          //   REGEX_CHECK = /%{2}/;
-          //   messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.";
-          //   break;         
+          case 'double_byte_hiragana':
+            REGEX_CHECK = /[^ぁ-ん]+/;
+            messageLog = "Please input full width hiragana character.";
+            break;
+          case 'full_width_katakana':
+            REGEX_CHECK = /[^ァ-ン]+/;
+            messageLog = "Please input full width katakana type.";
+            break;
+          case 'double_byte':
+            REGEX_CHECK = /[^ァ-ンぁ-んｧ-ﾝﾞﾟ]+/;
+            messageLog = "Please enter in double-byte characters.";
+            break;
           default:
             REGEX_CHECK = "";
             break;
@@ -1055,38 +1066,40 @@ function Preview({ onOpenPreview, isOpen }) {
             isValid = false;
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
           }
-        } else if (REGEX_CHECK === "" && !contentType[contentType.type].isSplitInput) {
-          if (contentType[contentType.type].range === 'double_byte' && !isDoubleByte(contentType[contentType.type].value)) {
-            isValid = false;
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
-          } else if (contentType[contentType.type].range === 'full_width_katakana' && mbStrWidth(contentType[contentType.type].value) === 2) {
-            isValid = false;
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in full-width katakana characters.";
-          } else if (contentType[contentType.type].range === 'double_byte_hiragana' && !isDoubleByte(contentType[contentType.type].value)) {
-            isValid = false;
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte hiragana characters.";
-          }
-        } else if (REGEX_CHECK === "" && contentType[contentType.type].isSplitInput) {
-          if (contentType[contentType.type].range === 'double_byte'
-            && (!isDoubleByte(contentType[contentType.type].valueLeft) || !isDoubleByte(contentType[contentType.type].valueRight))) {
-            isValid = false;
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
-          } else if (contentType[contentType.type].range === 'full_width_katakana' &&
-            (mbStrWidth(contentType[contentType.type].valueLeft) === 2 || mbStrWidth(contentType[contentType.type].valueRight) === 2)) {
-            isValid = false;
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please input katakana type.";
-          } else if (contentType[contentType.type].range === 'double_byte_hiragana' &&
-            (!isDoubleByte(contentType[contentType.type].valueLeft) || !isDoubleByte(contentType[contentType.type].valueRight))) {
-            isValid = false;
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please input hiragana type.";
-          }
         }
+        //  else if (REGEX_CHECK === "" && !contentType[contentType.type].isSplitInput) {
+        //   if (contentType[contentType.type].range === 'double_byte' && !isDoubleByte(contentType[contentType.type].value)) {
+        //     isValid = false;
+        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
+        //   } else if (contentType[contentType.type].range === 'full_width_katakana' && mbStrWidth(contentType[contentType.type].value) === 2) {
+        //     isValid = false;
+        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in full-width katakana characters.";
+        //   } else if (contentType[contentType.type].range === 'double_byte_hiragana' && !isDoubleByte(contentType[contentType.type].value)) {
+        //     isValid = false;
+        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte hiragana characters.";
+        //   }
+        // } else if (REGEX_CHECK === "" && contentType[contentType.type].isSplitInput) {
+        //   if (contentType[contentType.type].range === 'double_byte'
+        //     && (!isDoubleByte(contentType[contentType.type].valueLeft) || !isDoubleByte(contentType[contentType.type].valueRight))) {
+        //     isValid = false;
+        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
+        //   } else if (contentType[contentType.type].range === 'full_width_katakana' &&
+        //     (mbStrWidth(contentType[contentType.type].valueLeft) === 2 || mbStrWidth(contentType[contentType.type].valueRight) === 2)) {
+        //     isValid = false;
+        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please input katakana type.";
+        //   } else if (contentType[contentType.type].range === 'double_byte_hiragana' &&
+        //     (!isDoubleByte(contentType[contentType.type].valueLeft) || !isDoubleByte(contentType[contentType.type].valueRight))) {
+        //     isValid = false;
+        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please input hiragana type.";
+        //   }
+        // }
       }
     }
 
     if (isValid) {
       errorsMess = {};
     }
+    console.log(errorsMess);
     setErrors({
       ...errorsMess
     });
@@ -1988,11 +2001,12 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   useEffect(() => {
     if (messageContent.length === 1) {
       let message = messageContent[0];
-      if (message.type === 'card_payment_radio_button'
+      if ((message.type === 'card_payment_radio_button' && !message[message.type].initial_selection)
         || message.type === 'product_purchase_radio_button'
         || (message?.[message.type].type === "picture_radio" ? (message?.[message.type]?.card_linked_setting || message?.[message.type]?.card_linked_setting === message?.[message.type]?.initial_selection)
           : (message?.[message.type]?.card_linked_setting_picture && message?.[message.type]?.card_linked_setting_picture === message?.[message.type]?.initial_selection_picture))
-        || (message.type === 'carousel' && message?.[message.type].require)) {
+        || (message.type === 'carousel' && message?.[message.type].require)
+        || (message.type === 'radio_button'&& !message[message.type].initial_selection)) {
         displayButtonNext(false);
       } else {
         displayButtonNext(true);
@@ -2487,9 +2501,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         value={textarea?.type === 'invalid_input' ? textarea[textarea.type]?.content : textarea[textarea.type]?.value}
                       ></textarea>
                     )}
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${textarea.type}`] &&
+                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${textarea.type}`]}
+                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -2522,7 +2536,10 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             type="radio"
                             id="ss-message__content--user-radio_button"
                             checked={radioButton.initial_selection === item.id}
-                            onChange={() => onChangeValue(indexContent, content.type, item.id, 'initial_selection')}
+                            onChange={() => {
+                              onChangeValue(indexContent, content.type, item.id, 'initial_selection');
+                              onClickNext();
+                            }}
                           />
                           {item.text &&
                             <label htmlFor="ss-message__content--user-radio_button">
@@ -2541,7 +2558,10 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             name="ss-message__content--user-radio_button--radio_button_img"
                             id="ss-message__content--user-radio_button--radio_button_img"
                             checked={radioButton.initial_selection === item.id}
-                            onChange={() => onChangeValue(indexContent, content.type, item.id, 'initial_selection')}
+                            onChange={() => {
+                              onChangeValue(indexContent, content.type, item.id, 'initial_selection');
+                              onClickNext();
+                            }}
                           />
                           <img
                             src={item.img}
@@ -2585,7 +2605,10 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           style={{ marginBottom: '10px', cursor: 'pointer', backgroundColor: radioButton.value ? (radioButton.value === item.id ? '#347AED' : '') : (radioButton.initial_selection === item.id ? '#347AED' : '') }}
                           key={index}
                           className="ss-message__content--user-radio_button--block_style"
-                          onClick={() => onChangeValue(indexContent, content.type, item.id, 'initial_selection')}
+                          onClick={() => {
+                            onChangeValue(indexContent, content.type, item.id, 'initial_selection');
+                            onClickNext();
+                          }}
                         >
                           <span>{item.text}</span>
                         </div>
@@ -3113,7 +3136,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             nameValue="name"
                             onChange={async value => {
                               onChangeValue(indexContent, content.type, value, pullDown.type, 'prefecture');
-                              if(value) {
+                              if (value) {
                                 let prefecture_jis_code = dataPrefectures.find(item => item.name === value).prefecture_jis_code;
                                 api.get(`/api/v1/cities?prefecture_jis_code=${prefecture_jis_code}`).then(res => {
                                   if (res.data.code === 1) {
@@ -3228,7 +3251,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             style={{ width: '49%' }}
                             onKeyPress={(e) => { if (e.target.value.length >= 3) e.preventDefault() }}
                             onChange={async value => {
-                              if((value + "").length === 3) {
+                              if ((value + "").length === 3) {
                                 document.getElementById("ss-user-post-code-right-input").focus();
                                 document.getElementById("ss-user-post-code-right-input").select();
                               }
@@ -3916,7 +3939,11 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                             Price: {itemProduct.item_price} 円
                                           </div>
                                         }
-
+                                        {itemProduct.quantity_limit &&
+                                          <div className="ss-user-overview-product-purchase-infor-price">
+                                            数量：最大{itemProduct.quantity_limit}個まで
+                                          </div>
+                                        }
                                         {/* {productPurchase.multiple_item_purchase &&
                                         <div className="ss-user-overview-product-purchase-infor-price">
                                           Multiple item purchase
@@ -4015,6 +4042,11 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                             Price: {itemProduct.item_price} 円
                                           </div>
                                         }
+                                        {itemProduct.quantity_limit &&
+                                          <div className="ss-user-overview-product-purchase-infor-price">
+                                            数量：最大{itemProduct.quantity_limit}個まで
+                                          </div>
+                                        }
                                         {/* {productPurchase.multiple_item_purchase &&
                                         <div className="ss-user-overview-product-purchase-infor-price">
                                           Multiple item purchase
@@ -4098,7 +4130,11 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                         {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
                                       </div>
                                     }
-
+                                    {itemProduct.quantity_limit &&
+                                      <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                        数量：最大{itemProduct.quantity_limit}個まで
+                                      </div>
+                                    }
                                   </div>
                                 </Checkbox>
                                 {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
@@ -4170,6 +4206,11 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     {(productPurchase.product_name_display || productPurchase.price_display || productPurchase.product_number_display) &&
                                       <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                         {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
+                                      </div>
+                                    }
+                                    {itemProduct.quantity_limit &&
+                                      <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                        数量：最大{itemProduct.quantity_limit}個まで
                                       </div>
                                     }
                                   </div>
@@ -4252,22 +4293,26 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           className="ss-user-preivew-product-purchase-radio-group ss-user-preivew-product-purchase-style-width"
                           style={{ width: "100%" }}
                           disabled={disabled}
-                          onChange={(value) => console.log(value)}
-                          value={productPurchaseRadioButton.initial_selection[0]}
+                          onChange={value => {
+                            console.log(value)
+                            onChangeValue(indexContent, content.type, value.target.value, 'initial_selection');
+                            onClickNext();
+                          }}
+                          value={productPurchaseRadioButton.initial_selection}
                         >
                           {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
                             return <Radio value={itemProduct.id} key={indexProduct}
-                              onChange={() => {
-                                let selectArr = [...productPurchaseRadioButton.initial_selection];
-                                let dataValue;
-                                if (selectArr.includes(itemProduct.id)) {
-                                  dataValue = [];
-                                } else {
-                                  dataValue = [itemProduct.id];
-                                }
-                                onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
-                                onClickNext();
-                              }}
+                              // onChange={() => {
+                              //   let selectArr = [...productPurchaseRadioButton.initial_selection];
+                              //   let dataValue;
+                              //   if (selectArr.includes(itemProduct.id)) {
+                              //     dataValue = [];
+                              //   } else {
+                              //     dataValue = [itemProduct.id];
+                              //   }
+                              //   onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
+                              //   onClickNext();
+                              // }}
                             >
                               <div className="ss-user-overview-product-purchase-container">
                                 <div className="ss-user-preivew-product-purchase-img">
@@ -4313,21 +4358,26 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           className="ss-user-preview-product-purchase-radio-group-type-text_image ss-user-preivew-product-purchase-style-width"
                           style={{ width: "100%" }}
                           disabled={disabled}
-                          value={productPurchaseRadioButton.initial_selection[0]}
+                          value={productPurchaseRadioButton.initial_selection}
+                          onChange={value => {
+                            onChangeValue(indexContent, content.type, value.target.value, 'initial_selection');
+                            onClickNext();
+                          }}
                         >
                           {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
                             return <Radio value={itemProduct.id} key={indexProduct}
-                              onChange={() => {
-                                let selectArr = [...productPurchaseRadioButton.initial_selection];
-                                let dataValue;
-                                if (selectArr.includes(itemProduct.id)) {
-                                  dataValue = [];
-                                } else {
-                                  dataValue = [itemProduct.id];
-                                }
-                                onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
-                                onClickNext();
-                              }}>
+                            // onChange={() => {
+                            //   let selectArr = [...productPurchaseRadioButton.initial_selection];
+                            //   let dataValue;
+                            //   if (selectArr.includes(itemProduct.id)) {
+                            //     dataValue = [];
+                            //   } else {
+                            //     dataValue = [itemProduct.id];
+                            //   }
+                            //   onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
+                            //   onClickNext();
+                            // }}
+                            >
                               <div className="ss-user-overview-product-purchase-container-type-text_image">
                                 <div className="ss-user-overview-product-purchase-img-type-text_image">
                                   <img src={itemProduct.img_url} />
@@ -4381,8 +4431,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       onChange={value => onChangeValue(indexContent, content.type, value, 'value')}
                       trackStyle={{ backgroundColor: slider.color || '#2C75F0' }}
                       min={slider.type === 'discrete_type' ? parseInt(slider.min_value) : 0}
-                      max={slider.type === 'discrete_type' ? parseInt(slider.max_value) : 10}
+                      max={slider.type === 'discrete_type' ? parseInt(slider.max_value) : 100}
                       dots={slider.type === 'discrete_type'}
+                      step={slider.type !== 'discrete_type' && 0.1}
                       marks={
                         slider.type === 'discrete_type' ?
                           {
@@ -4391,7 +4442,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           } :
                           {
                             0: slider.min_label,
-                            10: slider.max_label
+                            100: slider.max_label
                           }
                       }
                     />

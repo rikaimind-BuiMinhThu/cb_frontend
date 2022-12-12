@@ -1881,4 +1881,23 @@ input#ss-message__content--user-checkbox--checkbox_img {
 
 .ss-user-setting__item-checkbox {
   margin-bottom: 5px;
+  /* width: 90%!important; */
+}
+
+.ss-user-setting__item-custom-input-checkbox {
+  width: 90%!important;
+}
+
+
+.ss-user-setting__item-custom-input-checkbox .ant-checkbox-wrapper {
+  width: 100%;
+}
+
+.ss-user-setting__item-custom-input-checkbox .ant-checkbox-wrapper span:nth-child(1) {
+  width: 17px;
+}
+
+.ss-user-setting__item-custom-input-checkbox .ant-checkbox-wrapper span:nth-child(2) {
+  width: 97%;
+  padding-right: 0px;
 }
