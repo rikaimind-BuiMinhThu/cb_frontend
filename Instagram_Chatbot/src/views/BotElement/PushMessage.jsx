@@ -671,6 +671,7 @@ function PushMessage() {
                     </h4>
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
                       <DatePicker
+                        className="push-message-date"
                         selected={startDate}
                         onChange={(date) => selectDateStart(date)}
                         dateFormat="yyyy-MM-dd"
@@ -688,6 +689,7 @@ function PushMessage() {
                     </h4>
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
                       <DatePicker
+                        className="push-message-date"
                         selected={endDate}
                         onChange={(date) => selectDateEnd(date)}
                         dateFormat="yyyy-MM-dd"
@@ -703,7 +705,7 @@ function PushMessage() {
                   </div>
                   <span
                     id="push-message-err"
-                    style={{ color: 'red', margin: ' 0 0 20px 75px' }}
+                    style={{ color: 'red', margin: ' 0 0 20px 75px', display: 'none' }}
                   ></span>
                   <Table style={{ textAlign: 'center', tableLayout: 'fixed', overflow: 'hidden' }}>
                     <thead className="text-primary">

@@ -1,91 +1,100 @@
-.push-message-option{
-    display: flex;
+.push-message-option {
+  display: flex;
 }
-.push-message-option-item{
-    padding: 10px 25px;
-    font-size: 18px;
-    cursor: pointer;
+.push-message-option-item {
+  padding: 10px 25px;
+  font-size: 18px;
+  cursor: pointer;
 }
-.push-message-btn-search{
-    padding: 10px 25px;
-    border: none;
-    color:white;
-    font-weight: 600;
-    border-radius: 10px;
-    background-color: #57c8f0;
+.push-message-btn-search {
+  padding: 10px 25px;
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: 10px;
+  background-color: #57c8f0;
 }
-.span_end{
-    width: 2%;
-    padding-top: 5px;
-    text-align: center;
-    font-size: 15px;
+.span_end {
+  width: 2%;
+  padding-top: 5px;
+  text-align: center;
+  font-size: 15px;
 }
-.push-message-btn-adddition{
-    border: none;
-    font-weight: 500;
-    padding: 10px 35px;
-    color: white;
-    background-color: #51cbce;
-    border-radius: 5px;
+.push-message-btn-adddition {
+  border: none;
+  font-weight: 500;
+  padding: 10px 35px;
+  color: white;
+  background-color: #51cbce;
+  border-radius: 5px;
 }
-.push-message-{
-    width: 80%;
-    margin: 2% 10%;
-    display: flex;
+.push-message- {
+  width: 80%;
+  margin: 2% 10%;
+  display: flex;
+}
+.push-message-date {
+  display: block;
+  outline: 0;
+  border: 1px solid #7186a0;
+  border-radius: 3px;
+  padding: 10px 18px;
+  box-sizing: border-box;
+  width: 100%;
 }
 /* Payment-Gateway-CSS */
-.payment-gatway-btn-add-gateway{
-    padding:10px 70px;
-    background-color: #57c8f1;
-    color: white;
-    border: none;
-    border-radius: 10px;
+.payment-gatway-btn-add-gateway {
+  padding: 10px 70px;
+  background-color: #57c8f1;
+  color: white;
+  border: none;
+  border-radius: 10px;
 }
-.payment-gatway-btn-edit{
-    margin-right: 15px;
-    width: 70px;
-    border:none;
-    background-color: #57c8f0;
-    border-radius: 5px;
-    color:white;
-    padding:10px 10px
+.payment-gatway-btn-edit {
+  margin-right: 15px;
+  width: 70px;
+  border: none;
+  background-color: #57c8f0;
+  border-radius: 5px;
+  color: white;
+  padding: 10px 10px;
 }
 /* Add-Payment-Gateway-CSS */
-.push-message-add-form{
-    width: 100%;
-    /* margin: 2% 10%; */
-    display: flex;
+.push-message-add-form {
+  width: 100%;
+  /* margin: 2% 10%; */
+  display: flex;
 }
-.push-message-span-form{
-    width:20%;
-    text-align: right;
-    margin-right: 2.5%;
+.push-message-span-form {
+  width: 20%;
+  text-align: right;
+  margin-right: 2.5%;
 }
-.push-message-input-form{
-    width: 70%;
-    text-align: left;
-    height: 40px;
+.push-message-input-form {
+  width: 70%;
+  text-align: left;
+  height: 40px;
 }
-.add-payment-gateway-btn-return{
-    padding: 10px 30px;
-    color: white;
-    background-color: #c7cbd6;
-    border: none;
-    width: 120px;
-    margin-right: 10px;
-    border-radius: 5px;
+.add-payment-gateway-btn-return {
+  padding: 10px 30px;
+  color: white;
+  background-color: #c7cbd6;
+  border: none;
+  width: 120px;
+  margin-right: 10px;
+  border-radius: 5px;
 }
-.add-payment-gateway-btn-save{
-    padding: 10px 30px;
-    color: white;
-    background-color: #57c8f0;
-    border: none;
-    width: 120px;
-    margin-right: 10px;
-    border-radius: 5px;
+.add-payment-gateway-btn-save {
+  padding: 10px 30px;
+  color: white;
+  background-color: #57c8f0;
+  border: none;
+  width: 120px;
+  margin-right: 10px;
+  border-radius: 5px;
 }
-.pm_date_pick{
-    padding:7.5px 5px;
-    border:1px solid gray;
-    border-radius: 2.5px;
+.pm_date_pick {
+  padding: 7.5px 5px;
+  border: 1px solid gray;
+  border-radius: 2.5px;
 }
