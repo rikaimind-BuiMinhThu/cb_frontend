@@ -129,7 +129,8 @@ function CreateEmail() {
       }
     } else {
       document.getElementById('errCcMail').style.display = 'block';
-      document.getElementById('errCcMail').innerText = 'メールの正しいフォーマットに入力してください。';
+      document.getElementById('errCcMail').innerText =
+        'メールの正しいフォーマットに入力してください。';
     }
   }
 
@@ -169,7 +170,8 @@ function CreateEmail() {
       }
     } else {
       document.getElementById('errBccMail').style.display = 'block';
-      document.getElementById('errBccMail').innerText = 'メールの正しいフォーマットに入力してください。';
+      document.getElementById('errBccMail').innerText =
+        'メールの正しいフォーマットに入力してください。';
     }
   }
 
@@ -348,14 +350,14 @@ function CreateEmail() {
           <Col md="12">
             <Card>
               <CardHeader>
-                <h4 style={{ margin: '10px 0' }}>
-                  {mailAction === false ? '編集' : 'メール作成'}
-                </h4>
+                <h4 style={{ margin: '10px 0' }}>{mailAction === false ? '編集' : 'メール作成'}</h4>
               </CardHeader>
               <CardBody>
                 <form id="create-email-form">
                   <div className="field-container">
-                    <span className="field-lable">テンプレート名</span>
+                    <span className="field-lable">
+                      テンプレート名 <span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="field-input">
                       <input
                         className="ce_input"
@@ -393,7 +395,9 @@ function CreateEmail() {
                   </div>
 
                   <div className="field-container">
-                    <span className="field-lable">宛先</span>
+                    <span className="field-lable">
+                      TO <span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="field-input">
                       <input
                         className="ce_input"
@@ -455,7 +459,9 @@ function CreateEmail() {
                   </div>
 
                   <div className="field-container">
-                    <span className="field-lable">件名</span>
+                    <span className="field-lable">
+                      件名<span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="field-input">
                       <input
                         className="ce_input"
@@ -472,7 +478,9 @@ function CreateEmail() {
                   </div>
 
                   <div className="field-container">
-                    <span className="field-lable">メール内容</span>
+                    <span className="field-lable">
+                      メール内容<span style={{ color: 'red' }}>*</span>
+                    </span>
                     <div className="field-input">
                       <textarea
                         className="ce_textArea"
