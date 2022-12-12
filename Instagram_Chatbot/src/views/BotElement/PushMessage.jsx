@@ -164,34 +164,35 @@ function PushMessage() {
 
   function selectDateStart(date) {
     setStartDate(date);
-    // var validate = document.getElementById(`payment_management_date_err`)
-    var endMonth =
-      startDate.getMonth() + 1 < 10 ? `0${endDate.getMonth() + 1}` : `${endDate.getMonth() + 1}`;
-    var endDatee = startDate.getDate() < 10 ? `0${endDate.getDate()}` : `${endDate.getDate()}`;
+    var validate = document.getElementById(`push-message-err`);
     var dateMonth = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`;
     var dateDate = date.getDate() < 10 ? `0${date.getDate()}` : `${date.getDate()}`;
+    var endMonth =
+      endDate.getMonth() + 1 < 10 ? `0${endDate.getMonth() + 1}` : `${endDate.getMonth() + 1}`;
+    var endDatee = endDate.getDate() < 10 ? `0${endDate.getDate()}` : `${endDate.getDate()}`;
     if (
       parseInt(`${date.getFullYear()}${dateMonth}${dateDate}`) >
       parseInt(`${endDate.getFullYear()}${endMonth}${endDatee}`)
     ) {
-      // validate.style.display = 'block';
-      // validate.innerHTML = 'Start date cannot be after end date.'
+      validate.style.display = 'block';
+      validate.innerHTML = 'Start date cannot be after end date.';
     } else {
-      // validate.style.display = 'none';
-      // validate.innerHTML = ''
+      validate.style.display = 'none';
+      validate.innerHTML = '';
     }
-    console.log(parseInt(`${date.getFullYear()}${dateMonth}${dateDate}`));
-    console.log(parseInt(`${endDate.getFullYear()}${endMonth}${endDatee}`));
   }
 
   function selectDateEnd(date) {
     setEndDate(date);
-    var validate = document.getElementById(`payment_management_date_err`);
+    var validate = document.getElementById(`push-message-err`);
     var startMonth =
-      startDate.getMonth() + 1 ? `0${startDate.getMonth() + 1}` : `${startDate.getMonth() + 1}`;
-    var startDatee = startDate.getDate() ? `0${startDate.getDate()}` : `${startDate.getDate()}`;
-    var dateMonth = date.getMonth() + 1 ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`;
-    var dateDate = date.getDate() ? `0${date.getDate()}` : `${date.getDate()}`;
+      startDate.getMonth() + 1 < 10
+        ? `0${startDate.getMonth() + 1}`
+        : `${startDate.getMonth() + 1}`;
+    var startDatee =
+      startDate.getDate() < 10 ? `0${startDate.getDate()}` : `${startDate.getDate()}`;
+    var dateMonth = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`;
+    var dateDate = date.getDate() < 10 ? `0${date.getDate()}` : `${date.getDate()}`;
     if (
       parseInt(`${startDate.getFullYear()}${startMonth}${startDatee}`) >
       parseInt(`${date.getFullYear()}${dateMonth}${dateDate}`)
@@ -589,7 +590,7 @@ function PushMessage() {
                     <tbody>
                       {listPushMessage?.map((item, i) => (
                         <tr key={i}>
-                          <td style={{ width: '5%', border: '1px solid #7186a0' }}>{i+1}</td>
+                          <td style={{ width: '5%', border: '1px solid #7186a0' }}>{i + 1}</td>
                           <td style={{ width: '25%', border: '1px solid #7186a0' }}>
                             {item.title}
                           </td>
@@ -600,9 +601,7 @@ function PushMessage() {
                             {item.started_at.substring(0, 19).replaceAll('T', ' ')}
                           </td>
                           <td style={{ width: '15%', border: '1px solid #7186a0' }}>
-                            {item.subscribe_status === 'subscribe'
-                              ? '配信予約中'
-                              : '配信停止'}
+                            {item.subscribe_status === 'subscribe' ? '配信予約中' : '配信停止'}
                           </td>
                           <td style={{ width: '150px', border: '1px solid #7186a0' }}>
                             <div style={{ width: '100%', display: 'flex' }}>
@@ -655,7 +654,7 @@ function PushMessage() {
                   </Table>
                   <div style={{ width: '100%', textAlign: 'center', margin: 'auto' }}>
                     <button className="push-message-btn-adddition" onClick={() => addPM()}>
-                    追加
+                      追加
                     </button>
                   </div>
                 </div>
@@ -672,6 +671,7 @@ function PushMessage() {
                     </h4>
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
                       <DatePicker
+                        className="push-message-date"
                         selected={startDate}
                         onChange={(date) => selectDateStart(date)}
                         dateFormat="yyyy-MM-dd"
@@ -689,6 +689,7 @@ function PushMessage() {
                     </h4>
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
                       <DatePicker
+                        className="push-message-date"
                         selected={endDate}
                         onChange={(date) => selectDateEnd(date)}
                         dateFormat="yyyy-MM-dd"
@@ -702,6 +703,10 @@ function PushMessage() {
                     </div>
                     まで &emsp;<button className="push-message-btn-search">検索</button>
                   </div>
+                  <span
+                    id="push-message-err"
+                    style={{ color: 'red', margin: ' 0 0 20px 75px', display: 'none' }}
+                  ></span>
                   <Table style={{ textAlign: 'center', tableLayout: 'fixed', overflow: 'hidden' }}>
                     <thead className="text-primary">
                       <tr>
@@ -743,7 +748,7 @@ function PushMessage() {
             <form id="form_add_PM">
               <div className="push-message-add-form">
                 <span className="push-message-span-form">
-                ブッシュメッセージ名
+                  ブッシュメッセージ名
                   <span style={{ color: 'red' }}>*</span>
                 </span>
                 <input
@@ -757,7 +762,8 @@ function PushMessage() {
               <div className="push-message-add-form">
                 <span className="push-message-span-form"></span>
                 <span className="push-message-input-form">
-                ※プッシュメッセージに任意の名前をつけます。この名称がチャットに表示されることはありません。<br />
+                  ※プッシュメッセージに任意の名前をつけます。この名称がチャットに表示されることはありません。
+                  <br />
                 </span>
               </div>
               <div
@@ -781,7 +787,7 @@ function PushMessage() {
               <br />
               <div className="push-message-add-form">
                 <span className="push-message-span-form">
-                メール
+                  メール
                   <span style={{ color: 'red' }}>*</span>
                 </span>
                 <select id="push_message_email" name="email_id" className="push-message-input-form">
@@ -791,7 +797,7 @@ function PushMessage() {
               <br />
               <div className="push-message-add-form">
                 <span className="push-message-span-form">
-                開始日時
+                  開始日時
                   <span style={{ color: 'red' }}>*</span>
                 </span>
                 <div className="push-message-input-form">
@@ -813,7 +819,7 @@ function PushMessage() {
               <div className="push-message-add-form">
                 <span className="push-message-span-form"></span>
                 <span className="push-message-input-form">
-                ※プッシュメッセージを送信する日時を指定します。 <br />
+                  ※プッシュメッセージを送信する日時を指定します。 <br />
                 </span>
               </div>
               <div
@@ -824,9 +830,7 @@ function PushMessage() {
                 <span id="startDateTimeErr" style={{ color: 'red', display: 'none' }}></span>
               </div>
               <div className="push-message-add-form">
-                <span className="push-message-span-form">
-                自動送信プッシュの時間帯除外
-                </span>
+                <span className="push-message-span-form">自動送信プッシュの時間帯除外</span>
                 <span>
                   <input
                     id="has_timezone_exclusion"
@@ -853,7 +857,7 @@ function PushMessage() {
               >
                 <div className="push-message-add-form">
                   <span className="push-message-span-form">
-                  除外時間
+                    除外時間
                     <span style={{ color: 'red' }}>*</span>
                   </span>
                   <span style={{ display: 'flex', width: '80%' }}>
@@ -889,7 +893,7 @@ function PushMessage() {
                 <br />
                 <div className="push-message-add-form">
                   <span className="push-message-span-form">
-                  代替送信時間
+                    代替送信時間
                     <span style={{ color: 'red' }}>*</span>
                   </span>
                   <span style={{ display: 'flex', width: '80%' }}>
@@ -919,9 +923,8 @@ function PushMessage() {
               <span>対象者指定</span>
               <p>※条件を加えることでプッシュメッセージを送信する対象者を絞り込むことができます。</p>
               <p>
-              現在、配信対象者は0名です。.<span style={{ color: 'blue' }}> [更新]</span>
-              {/* 現在、配信対象者は{`...number here...`}名です。.<span style={{ color: 'blue' }}>[update]</span> */}
-
+                現在、配信対象者は0名です。.<span style={{ color: 'blue' }}> [更新]</span>
+                {/* 現在、配信対象者は{`...number here...`}名です。.<span style={{ color: 'blue' }}>[update]</span> */}
               </p>
               <div style={{ width: '95%', margin: '10px 2.5%' }}>
                 <div style={{ width: '100%', display: 'flex' }}>
@@ -1016,7 +1019,10 @@ function PushMessage() {
                       id={`operator${i}`}
                       style={{ width: '15%', margin: '1% 1%' }}
                     >
-                      <option value="is"><isindex />is</option>
+                      <option value="is">
+                        <isindex />
+                        is
+                      </option>
                       <option value="is_not">is not</option>
                       <option value="contains">contains</option>
                     </select>
