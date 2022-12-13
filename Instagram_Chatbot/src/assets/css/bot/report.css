@@ -27,11 +27,14 @@
   display: flex;
   justify-content: flex-start;
 }
+.report__item-pie {
+  width: 70%;
+}
 .report__item-2-head {
   width: calc(30% - 10px);
 }
 .report__item-2-head-main {
-  width: calc(70% - 10px);
+  width: calc(100% - 0px);
 }
 .report__item-2-head:nth-child(2) {
   text-align: center;
@@ -49,6 +52,26 @@
 .report__item-chart {
   height: 400px;
 }
+.report__item-content {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.report__item-content--fix-table {
+  width: 100%;
+  display: table;
+  border-spacing: 0;
+  border-collapse: separate;
+  overflow: visible;
+}
+.report__item-content-title {
+  top: 0;
+  left: 0;
+  z-index: 2;
+  position: sticky;
+  background-color: #fff;
+}
+
 .err-date {
   color: red;
   display: block;
@@ -60,7 +83,7 @@
   outline: 0;
   border: 1px solid #7186a0;
   border-radius: 3px;
-  padding: 10px 18px;
+  padding: 7.5px 18px;
   box-sizing: border-box;
   width: 100%;
 }
