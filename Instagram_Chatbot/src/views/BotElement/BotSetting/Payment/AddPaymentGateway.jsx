@@ -199,7 +199,7 @@ function AddPaymentGateway() {
             document.getElementById('pm_gw_name_err').innerHTML = '必ず指定してください。'
         }else if(name.match(/^\s*$/)){
             document.getElementById('pm_gw_name_err').style.display = 'block'
-            document.getElementById('pm_gw_name_err').innerHTML = 'Be sure to specify the payment gateway name.'
+            document.getElementById('pm_gw_name_err').innerHTML = '決済ゲートウェイ名を必ず指定してください。'
         }else if (name.length > 50) {
             document.getElementById('pm_gw_name_err').innerHTML = '最大50文字です。'
             document.getElementById('pm_gw_name_err').style.display = 'block'
@@ -216,7 +216,7 @@ function AddPaymentGateway() {
             document.getElementById('shop_id_err').innerHTML = '入力してください。'
         }else if(shopId.match(/^\s*$/)){
             document.getElementById('shop_id_err').style.display = 'block'
-            document.getElementById('shop_id_err').innerHTML = 'Be sure to specify the shop ID'
+            document.getElementById('shop_id_err').innerHTML = 'ショップIDを必ず指定してください。'
         }else if (shopId.length > 25) {
             document.getElementById('shop_id_err').innerHTML = '最大25文字です。'
             document.getElementById('shop_id_err').style.display = 'block'
