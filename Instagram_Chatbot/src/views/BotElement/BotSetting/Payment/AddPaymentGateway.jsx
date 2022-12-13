@@ -58,6 +58,12 @@ function AddPaymentGateway() {
                 document.getElementById('pm_gw_name_err').style.display = 'block'
                 document.getElementById('pm_gw_name_err').innerHTML = '必ず指定してください。'
                 checked_name = false
+            }else if(gw_name.match(/^\s*$/)){
+                checked_name = false
+            }else if(gw_name.length>50){
+                document.getElementById('pm_gw_name_err').style.display = 'block'
+                document.getElementById('pm_gw_name_err').innerHTML = '最大50文字です。'
+                checked_name = false
             } else {
                 document.getElementById('pm_gw_name_err').style.display = 'none'
                 document.getElementById('pm_gw_name_err').innerHTML = ''
@@ -67,16 +73,25 @@ function AddPaymentGateway() {
                 document.getElementById('shop_id_err').style.display = 'block'
                 document.getElementById('shop_id_err').innerHTML = '入力してください。'
                 checked_shop = false
+            }else if(gw_shop_id.match(/^\s*$/)){
+                checked_shop = false
             } else {
                 document.getElementById('shop_id_err').style.display = 'none'
                 document.getElementById('shop_id_err').innerHTML = ''
                 checked_shop = true
             }
         } else if (gw_agency == 'np_payment') {
-            if (gw_name == '') {
+            if (gw_name == '' ) {
                 document.getElementById('pm_gw_name_err').style.display = 'block'
+                document.getElementById('pm_gw_name_err').innerHTML = '必ず指定してください。'
                 checked_name = false
-            } else {
+            }else if(gw_name.match(/^\s*$/)){
+                checked_name = false
+            }else if(gw_name.length>50){
+                document.getElementById('pm_gw_name_err').style.display = 'block'
+                document.getElementById('pm_gw_name_err').innerHTML = '最大50文字です。'
+                checked_name = false
+            }else {
                 document.getElementById('pm_gw_name_err').style.display = 'none'
                 checked_name = true
             }
@@ -108,15 +123,15 @@ function AddPaymentGateway() {
             if (gw_agency == 'gmo') {
                 addPMGW = {
                     payment: {
-                        gateway_name: gw_name, payment_agency: gw_agency,
-                        mode: gw_mode, shop_id: gw_shop_id, shop_pass: gw_shop_pass,
+                        gateway_name: gw_name.trim(), payment_agency: gw_agency,
+                        mode: gw_mode, shop_id: gw_shop_id.trim(), shop_pass: gw_shop_pass,
                         merchant_code: "", sp_code: "", terminal_id: "", client_ip: "", store_id: ""
                     }
                 }
             } else if (gw_agency == 'np_payment') {
                 addPMGW = {
                     payment: {
-                        gateway_name: gw_name, payment_agency: gw_agency,
+                        gateway_name: gw_name.trim(), payment_agency: gw_agency,
                         mode: gw_mode, shop_id: "", shop_pass: "",
                         merchant_code: gw_merchant_code, sp_code: pm_gw_sp_code, terminal_id: pm_gw_terminal_id, client_ip: "", store_id: ""
                     }
@@ -178,8 +193,14 @@ function AddPaymentGateway() {
     }
 
     function checkPmGWName(name) {
-        document.getElementById('pm_gw_name').value = name.replace(/ +(?= )/g, '')
-        if (name.length > 50) {
+        // document.getElementById('pm_gw_name').value = name.replace(/ +(?= )/g, '')
+        if(name==''){
+            document.getElementById('pm_gw_name_err').style.display = 'block'
+            document.getElementById('pm_gw_name_err').innerHTML = '必ず指定してください。'
+        }else if(name.match(/^\s*$/)){
+            document.getElementById('pm_gw_name_err').style.display = 'block'
+            document.getElementById('pm_gw_name_err').innerHTML = 'Be sure to specify the payment gateway name.'
+        }else if (name.length > 50) {
             document.getElementById('pm_gw_name_err').innerHTML = '最大50文字です。'
             document.getElementById('pm_gw_name_err').style.display = 'block'
         } else {
@@ -189,8 +210,14 @@ function AddPaymentGateway() {
     }
 
     function checkPMGWShopId(shopId) {
-        document.getElementById('pm_gw_shop_id').value = shopId.replace(/ +(?= )/g, '')
-        if (shopId.length > 25) {
+        // document.getElementById('pm_gw_shop_id').value = shopId.replace(/ +(?= )/g, '')
+        if (shopId=='') {
+            document.getElementById('shop_id_err').style.display = 'block'
+            document.getElementById('shop_id_err').innerHTML = '入力してください。'
+        }else if(shopId.match(/^\s*$/)){
+            document.getElementById('shop_id_err').style.display = 'block'
+            document.getElementById('shop_id_err').innerHTML = 'Be sure to specify the shop ID'
+        }else if (shopId.length > 25) {
             document.getElementById('shop_id_err').innerHTML = '最大25文字です。'
             document.getElementById('shop_id_err').style.display = 'block'
         } else {
@@ -218,7 +245,6 @@ function AddPaymentGateway() {
                                         決済ゲートウェイ名
                                         <span style={{ color: "red" }}>*</span>
                                     </span>
-
                                     <input id='pm_gw_name' className='add-payment-gateway-input-form' onChange={(e) => checkPmGWName(e.target.value)}
                                         defaultValue={`${detailGw == undefined ? '' : detailGw.gateway_name}`}></input>
                                 </div>
