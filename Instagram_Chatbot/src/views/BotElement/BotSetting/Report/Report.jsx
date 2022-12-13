@@ -19,10 +19,329 @@ function Report() {
   const [endDate, setEndDate] = useState(new Date());
   const [dateState, setDateState] = useState(new Date());
   const [allScenarios, setAllScenarios] = useState([]);
+  const [dataReportCount, setDataReportCount] = useState();
+  const [device, setDevice] = useState('all');
+  const [numOfConversion, setNumofConversion] = useState(0);
+  const [numOfBotStart, setNumofBotStart] = useState();
+  const [numOfOpenBot, setNumOfOpenBot] = useState(0)
+  const [devicePieChartSeries, setDevicePieChartSeries] = useState([]);
+  const [devicePieChartSeriesCount, setDevicePieChartSeriesCount] = useState([]);
+  const [cvr, setCvr] = useState(0)
   const [barChart, setBarChart] = useState({
+    series: [{
+      name: 'Marine Sprite',
+      data: [44]
+    }, {
+      name: 'Striking Calf',
+      data: [53]
+    }
+    ],
+    options: {
+      chart: {
+        type: 'bar',
+        height: 380,
+        stacked: true,
+      },
+      plotOptions: {
+        bar: {
+          distributed: true,
+          horizontal: true,
+          dataLabels: {
+            total: {
+              enabled: true,
+              offsetX: 0,
+              style: {
+                fontSize: '13px',
+                fontWeight: 900
+              }
+            },
+            position: 'bottom',
+          }
+        },
+      },
+      colors: ['#33b2df', '#546E7A'],
+      dataLabels: {
+        enabled: true,
+        textAnchor: 'start',
+        style: {
+          colors: ['#fff'],
+        },
+        formatter: function (val, opt) {
+          return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val +'%';
+        },
+        offsetX: 0,
+        dropShadow: {
+          enabled: true,
+        },
+      },
+      stroke: {
+        width: 1,
+        colors: ['#fff'],
+      },
+      xaxis: {
+        categories: ['Total'],
+        labels: {
+          formatter: function (val) {
+            return val + "%"
+          }
+        }
+      },
+      yaxis: {
+        // labels: {
+        //   show: false,
+        // },
+        categories: ['Total'],
+      },
+      title: {
+        text: 'Custom DataLabels',
+        align: 'center',
+        floating: true,
+      },
+      subtitle: {
+        text: 'Category Names as DataLabels inside bars',
+        align: 'center',
+      },
+      tooltip: {
+        y: {
+          formatter: function (val) {
+            return val + "%"
+          }
+        }
+      },
+    },
+  });
+  // const [lineChart, setLineChart] = useState({
+  //   series: [
+  //     {
+  //       name: 'TEAM A',
+  //       type: 'area',
+  //       data: [44, 55, 31, 47, 31, 43, 26, 41, 31, 47, 33],
+  //     },
+  //     {
+  //       name: 'TEAM B',
+  //       type: 'line',
+  //       data: [55, 69, 45, 61, 43, 54, 37, 52, 44, 61, 43],
+  //     },
+  //   ],
+  //   options: {
+  //     chart: {
+  //       height: 350,
+  //       width: '100%',
+  //       type: 'line',
+  //     },
+  //     stroke: {
+  //       curve: 'smooth',
+  //     },
+  //     fill: {
+  //       type: 'solid',
+  //       opacity: [0.35, 1],
+  //     },
+  //     labels: [
+  //       'Dec 01',
+  //       'Dec 02',
+  //       'Dec 03',
+  //       'Dec 04',
+  //       'Dec 05',
+  //       'Dec 06',
+  //       'Dec 07',
+  //       'Dec 08',
+  //       'Dec 09 ',
+  //       'Dec 10',
+  //       'Dec 11',
+  //     ],
+  //     markers: {
+  //       size: 0,
+  //     },
+  //     yaxis: [
+  //       {
+  //         title: {
+  //           text: 'Series A',
+  //         },
+  //       },
+  //       {
+  //         opposite: true,
+  //         title: {
+  //           text: 'Series B',
+  //         },
+  //       },
+  //     ],
+  //     tooltip: {
+  //       shared: true,
+  //       intersect: false,
+  //       y: {
+  //         formatter: function (y) {
+  //           if (typeof y !== 'undefined') {
+  //             return y.toFixed(0) + ' points';
+  //           }
+  //           return y;
+  //         },
+  //       },
+  //     },
+  //   },
+  // });
+
+  var optionsCVR = {
+    series: [{
+      name: 'Conversion',
+      data: [numOfConversion]
+    }, {
+      name: 'Bot Load',
+      data: [numOfBotStart]
+    }
+    ],
+    options: {
+      chart: {
+        type: 'bar',
+        height: 380,
+        stacked: true,
+      },
+      plotOptions: {
+        bar: {
+          distributed: true,
+          horizontal: true,
+          dataLabels: {
+            total: {
+              enabled: true,
+              offsetX: 0,
+              style: {
+                fontSize: '13px',
+                fontWeight: 900
+              }
+            },
+            position: 'bottom',
+          }
+        },
+      },
+      colors: ['#33b2df', '#546E7A'],
+      dataLabels: {
+        enabled: true,
+        textAnchor: 'start',
+        style: {
+          colors: ['#fff'],
+        },
+        formatter: function (val, opt) {
+          return 'Total:  ' + val;
+        },
+        offsetX: 0,
+        dropShadow: {
+          enabled: true,
+        },
+      },
+      stroke: {
+        width: 1,
+        colors: ['#fff'],
+      },
+      xaxis: {
+        categories: [`CVR: ${numOfBotStart === 0 ? 0 :((Math.round(numOfConversion *100 / numOfBotStart)).toFixed(2))}%`],
+        labels: {
+          formatter: function (val) {
+            return val
+          }
+        }
+      },
+      yaxis: {
+        // labels: {
+        //   show: false,
+        // },
+        categories: ['Total'],
+      },
+      title: {
+        text: 'Custom DataLabels',
+        align: 'center',
+        floating: true,
+      },
+      subtitle: {
+        text: 'Category Names as DataLabels inside bars',
+        align: 'center',
+      },
+      tooltip: {
+        y: {
+          formatter: function (val) {
+            return val + "%"
+          }
+        }
+      },
+    },
+  };
+  // const [lineChartScenario, setLineChartScenario] = useState({
+  //   series: [
+  //     {
+  //       name: 'TEAM A',
+  //       type: 'area',
+  //       data: [44, 55, 31, 47, 31, 43, 26, 41, 31, 47, 33],
+  //     },
+  //     {
+  //       name: 'TEAM B',
+  //       type: 'line',
+  //       data: [55, 69, 45, 61, 43, 54, 37, 52, 44, 61, 43],
+  //     },
+  //     {
+  //       name: 'TEAM C',
+  //       type: 'line',
+  //       data: [65, 29, 35, 61, 73, 44, 87, 42, 34, 91, 23],
+  //     },
+  //   ],
+  //   options: {
+  //     chart: {
+  //       height: 350,
+  //       width: '100%',
+  //       type: 'line',
+  //     },
+  //     stroke: {
+  //       curve: 'smooth',
+  //     },
+  //     fill: {
+  //       type: 'solid',
+  //       opacity: [0.35, 1],
+  //     },
+  //     labels: [
+  //       'Dec 01',
+  //       'Dec 02',
+  //       'Dec 03',
+  //       'Dec 04',
+  //       'Dec 05',
+  //       'Dec 06',
+  //       'Dec 07',
+  //       'Dec 08',
+  //       'Dec 09 ',
+  //       'Dec 10',
+  //       'Dec 11',
+  //     ],
+  //     markers: {
+  //       size: 0,
+  //     },
+  //     yaxis: [
+  //       {
+  //         title: {
+  //           text: 'Series A',
+  //         },
+  //       },
+  //       // {
+  //       //   opposite: true,
+  //       //   title: {
+  //       //     text: 'Series B',
+  //       //   },
+  //       // },
+  //     ],
+  //     tooltip: {
+  //       shared: true,
+  //       intersect: false,
+  //       y: {
+  //         formatter: function (y) {
+  //           if (typeof y !== 'undefined') {
+  //             return y.toFixed(0) + ' points';
+  //           }
+  //           return y;
+  //         },
+  //       },
+  //     },
+  //   },
+  // });
+
+  const numOfConversionBotStart = {
     series: [
       {
-        data: [70, 95],
+        data: [numOfConversion, numOfBotStart],
       },
     ],
     options: {
@@ -60,7 +379,7 @@ function Report() {
         colors: ['#fff'],
       },
       xaxis: {
-        categories: ['South Korea', 'Canada'],
+        categories: ['Conversion', 'botStart'],
       },
       yaxis: {
         labels: {
@@ -68,12 +387,12 @@ function Report() {
         },
       },
       title: {
-        text: 'Custom DataLabels',
+        text: 'Conversion / Bot start',
         align: 'center',
         floating: true,
       },
       subtitle: {
-        text: 'Category Names as DataLabels inside bars',
+        text: 'Rate(Conversion / Bot start) inside bars',
         align: 'center',
       },
       tooltip: {
@@ -90,156 +409,9 @@ function Report() {
         },
       },
     },
-  });
-  const [lineChart, setLineChart] = useState({
-    series: [
-      {
-        name: 'TEAM A',
-        type: 'area',
-        data: [44, 55, 31, 47, 31, 43, 26, 41, 31, 47, 33],
-      },
-      {
-        name: 'TEAM B',
-        type: 'line',
-        data: [55, 69, 45, 61, 43, 54, 37, 52, 44, 61, 43],
-      },
-      {
-        name: 'TEAM C',
-        type: 'line',
-        data: [65, 29, 35, 61, 73, 44, 87, 42, 34, 91, 23],
-      },
-    ],
-    options: {
-      chart: {
-        height: 350,
-        width: '100%',
-        type: 'line',
-      },
-      stroke: {
-        curve: 'smooth',
-      },
-      fill: {
-        type: 'solid',
-        opacity: [0.35, 1],
-      },
-      labels: [
-        'Dec 01',
-        'Dec 02',
-        'Dec 03',
-        'Dec 04',
-        'Dec 05',
-        'Dec 06',
-        'Dec 07',
-        'Dec 08',
-        'Dec 09 ',
-        'Dec 10',
-        'Dec 11',
-      ],
-      markers: {
-        size: 0,
-      },
-      yaxis: [
-        {
-          title: {
-            text: 'Series A',
-          },
-        },
-        {
-          opposite: true,
-          title: {
-            text: 'Series B',
-          },
-        },
-      ],
-      tooltip: {
-        shared: true,
-        intersect: false,
-        y: {
-          formatter: function (y) {
-            if (typeof y !== 'undefined') {
-              return y.toFixed(0) + ' points';
-            }
-            return y;
-          },
-        },
-      },
-    },
-  });
-  const [lineChartScenario, setLineChartScenario] = useState({
-    series: [
-      {
-        name: 'TEAM A',
-        type: 'area',
-        data: [44, 55, 31, 47, 31, 43, 26, 41, 31, 47, 33],
-      },
-      {
-        name: 'TEAM B',
-        type: 'line',
-        data: [55, 69, 45, 61, 43, 54, 37, 52, 44, 61, 43],
-      },
-      {
-        name: 'TEAM C',
-        type: 'line',
-        data: [65, 29, 35, 61, 73, 44, 87, 42, 34, 91, 23],
-      },
-    ],
-    options: {
-      chart: {
-        height: 350,
-        width: '100%',
-        type: 'line',
-      },
-      stroke: {
-        curve: 'smooth',
-      },
-      fill: {
-        type: 'solid',
-        opacity: [0.35, 1],
-      },
-      labels: [
-        'Dec 01',
-        'Dec 02',
-        'Dec 03',
-        'Dec 04',
-        'Dec 05',
-        'Dec 06',
-        'Dec 07',
-        'Dec 08',
-        'Dec 09 ',
-        'Dec 10',
-        'Dec 11',
-      ],
-      markers: {
-        size: 0,
-      },
-      yaxis: [
-        {
-          title: {
-            text: 'Series A',
-          },
-        },
-        // {
-        //   opposite: true,
-        //   title: {
-        //     text: 'Series B',
-        //   },
-        // },
-      ],
-      tooltip: {
-        shared: true,
-        intersect: false,
-        y: {
-          formatter: function (y) {
-            if (typeof y !== 'undefined') {
-              return y.toFixed(0) + ' points';
-            }
-            return y;
-          },
-        },
-      },
-    },
-  });
-  const [devicePieChartSeries, setDevicePieChartSeries] = useState([]);
+  }
+
+  
 
   // chart
   let devicePieChartConfig = {
@@ -286,26 +458,26 @@ function Report() {
       });
   }, []);
 
-  //get data device pie chart
-  useEffect(() => {
-    api
-      .get(`/api/v1/analytics/chatbot_counts/${botId}`)
-      .then((res) => {
-        console.log(res?.data?.data?.chatbot);
-        let chatbotData = res?.data?.data?.chatbot;
-        let chatbotValue = [
-          chatbotData.num_of_pc_count,
-          chatbotData.num_of_sp_count,
-          chatbotData.num_of_tablet_count,
-        ];
-        setDevicePieChartSeries(chatbotValue);
-      })
-      .catch((err) => {
-        if (err.response?.data.code === 0) {
-          tokenExpired();
-        }
-      });
-  }, [botId]);
+  // // get data device pie chart
+  // useEffect(() => {
+  //   api
+  //     .get(`/api/v1/analytics/chatbot_counts/${botId}`)
+  //     .then((res) => {
+  //       console.log(res?.data?.data?.chatbot);
+  //       let chatbotData = res?.data?.data?.chatbot;
+  //       let chatbotValue = [
+  //         chatbotData.num_of_pc_count,
+  //         chatbotData.num_of_sp_count,
+  //         chatbotData.num_of_tablet_count,
+  //       ];
+  //       setDevicePieChartSeries(chatbotValue);
+  //     })
+  //     .catch((err) => {
+  //       if (err.response?.data.code === 0) {
+  //         tokenExpired();
+  //       }
+  //     });
+  // }, [botId]);
 
   //get All Scenarios
   useEffect(() => {
@@ -313,7 +485,39 @@ function Report() {
       .get(`/api/v1/managements/chatbots/${botId}/all_scenarios`)
       .then((res) => {
         if (res.data.code === 1) {
-          setAllScenarios(res.data.data);
+          let dataScenario = res?.data?.data
+          if (dataScenario != []) {
+            api.get(`/api/v1/analytics/scenario_counts/${dataScenario[0].id}`).then(ress => {
+              console.log('bot data: ', ress.data.data);
+              setDataReportCount(ress?.data?.data)
+              let chatbotData = ress?.data?.data
+              let chatbotDataCount = [1,1,1]
+              let chatbotValue = [
+                chatbotData.pc_count,
+                chatbotData.smartphone_count,
+                chatbotData.tablet_count,
+              ];
+              if (chatbotData.pc_count == 0 &&
+                chatbotData.pc_count == 0 &&
+                chatbotData.pc_count == 0) {
+                  chatbotValue = [1, 1, 1]
+                // setDevicePieChartSeriesCount(chatbotDataCount)
+              }
+              // console.log(chatbotValue)
+              let numOfCon = chatbotData.smartphone_count + chatbotData.pc_conversion_count + chatbotData.tablet_conversion_count
+              setNumofConversion(numOfCon)
+              let numOfBS = chatbotData.pc_open_chatbot_window_count + chatbotData.tablet_open_chatbot_window_count + chatbotData.smartphone_open_chatbot_window_count
+              setNumofBotStart(numOfBS)
+              let numOfOB = chatbotData.pc_count + chatbotData.tablet_count + chatbotData.smartphone_count
+              setNumOfOpenBot(numOfOB)
+              setDevicePieChartSeries(chatbotValue);
+              setDevicePieChartSeriesCount(chatbotValue)
+            }).catch(error => {
+              console.log(error);
+            })
+          }
+
+          setAllScenarios(dataScenario);
         }
       })
       .catch((err) => {
@@ -321,7 +525,7 @@ function Report() {
           tokenExpired();
         }
       });
-  }, [botId]);
+  }, []);
 
   function validDateRange(start, end) {
     const errDate = document.getElementById('errDate');
@@ -360,155 +564,159 @@ function Report() {
   function changeConversionRate() {
     // document.getElementById('conversion_rate').style.display = 'block'
     // document.getElementById('click_through_rate').style.display = 'none'
-    setBarChart({
-      series: [
-        {
-          data: [70, 95],
-        },
-      ],
-      options: {
-        chart: {
-          type: 'bar',
-          height: 380,
-        },
-        plotOptions: {
-          bar: {
-            barHeight: '100%',
-            distributed: true,
-            horizontal: true,
-            dataLabels: {
-              position: 'bottom',
-            },
-          },
-        },
-        colors: ['#33b2df', '#546E7A'],
-        dataLabels: {
-          enabled: true,
-          textAnchor: 'start',
-          style: {
-            colors: ['#fff'],
-          },
-          formatter: function (val, opt) {
-            return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
-          },
-          offsetX: 0,
-          dropShadow: {
-            enabled: true,
-          },
-        },
-        stroke: {
-          width: 1,
-          colors: ['#fff'],
-        },
-        xaxis: {
-          categories: ['South Korea', 'Canada'],
-        },
-        yaxis: {
-          labels: {
-            show: false,
-          },
-        },
-        title: {
-          text: 'Conversion rate',
-          align: 'center',
-          floating: true,
-        },
-        // subtitle: {
-        //   text: 'Category Names as DataLabels inside bars',
-        //   align: 'center',
-        // },
-        tooltip: {
-          theme: 'dark',
-          x: {
-            show: false,
-          },
-          y: {
-            title: {
-              formatter: function () {
-                return '';
-              },
-            },
-          },
-        },
-      },
-    });
+
+
+    // bart({
+    //   series: [
+    //     {
+    //       data: [70, 95],
+    //     },
+    //   ],
+    //   options: {
+    //     chart: {
+    //       type: 'bar',
+    //       height: 380,
+    //     },
+    //     plotOptions: {
+    //       bar: {
+    //         barHeight: '100%',
+    //         distributed: true,
+    //         horizontal: true,
+    //         dataLabels: {
+    //           position: 'bottom',
+    //         },
+    //       },
+    //     },
+    //     colors: ['#33b2df', '#546E7A'],
+    //     dataLabels: {
+    //       enabled: true,
+    //       textAnchor: 'start',
+    //       style: {
+    //         colors: ['#fff'],
+    //       },
+    //       formatter: function (val, opt) {
+    //         return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
+    //       },
+    //       offsetX: 0,
+    //       dropShadow: {
+    //         enabled: true,
+    //       },
+    //     },
+    //     stroke: {
+    //       width: 1,
+    //       colors: ['#fff'],
+    //     },
+    //     xaxis: {
+    //       categories: ['South Korea', 'Canada'],
+    //     },
+    //     yaxis: {
+    //       labels: {
+    //         show: false,
+    //       },
+    //     },
+    //     title: {
+    //       text: 'Conversion rate',
+    //       align: 'center',
+    //       floating: true,
+    //     },
+    //     // subtitle: {
+    //     //   text: 'Category Names as DataLabels inside bars',
+    //     //   align: 'center',
+    //     // },
+    //     tooltip: {
+    //       theme: 'dark',
+    //       x: {
+    //         show: false,
+    //       },
+    //       y: {
+    //         title: {
+    //           formatter: function () {
+    //             return '';
+    //           },
+    //         },
+    //       },
+    //     },
+    //   },
+    // });
   }
 
   function changeClickConversionRate() {
     // document.getElementById('conversion_rate').style.display = 'none'
     // document.getElementById('click_through_rate').style.display = 'block'
-    setBarChart({
-      series: [
-        {
-          data: [20, 85],
-        },
-      ],
-      options: {
-        chart: {
-          type: 'bar',
-          height: 380,
-        },
-        plotOptions: {
-          bar: {
-            barHeight: '100%',
-            distributed: true,
-            horizontal: true,
-            dataLabels: {
-              position: 'bottom',
-            },
-          },
-        },
-        colors: ['#33b2df', '#546E7A'],
-        dataLabels: {
-          enabled: true,
-          textAnchor: 'start',
-          style: {
-            colors: ['#fff'],
-          },
-          formatter: function (val, opt) {
-            return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
-          },
-          offsetX: 0,
-          dropShadow: {
-            enabled: true,
-          },
-        },
-        stroke: {
-          width: 1,
-          colors: ['#fff'],
-        },
-        xaxis: {
-          categories: ['Hien dang', 'no 50k'],
-        },
-        yaxis: {
-          labels: {
-            show: false,
-          },
-        },
-        title: {
-          text: 'Click Through Rate',
-          align: 'center',
-          floating: true,
-        },
-        // subtitle: {
-        //   text: 'Category Names as DataLabels inside bars',
-        //   align: 'center',
-        // },
-        tooltip: {
-          theme: 'dark',
-          x: {
-            show: false,
-          },
-          y: {
-            title: {
-              formatter: function () {
-                return '';
-              },
-            },
-          },
-        },
-      },
-    });
+
+    
+    // setBarChart({
+    //   series: [
+    //     {
+    //       data: [20, 85],
+    //     },
+    //   ],
+    //   options: {
+    //     chart: {
+    //       type: 'bar',
+    //       height: 380,
+    //     },
+    //     plotOptions: {
+    //       bar: {
+    //         barHeight: '100%',
+    //         distributed: true,
+    //         horizontal: true,
+    //         dataLabels: {
+    //           position: 'bottom',
+    //         },
+    //       },
+    //     },
+    //     colors: ['#33b2df', '#546E7A'],
+    //     dataLabels: {
+    //       enabled: true,
+    //       textAnchor: 'start',
+    //       style: {
+    //         colors: ['#fff'],
+    //       },
+    //       formatter: function (val, opt) {
+    //         return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
+    //       },
+    //       offsetX: 0,
+    //       dropShadow: {
+    //         enabled: true,
+    //       },
+    //     },
+    //     stroke: {
+    //       width: 1,
+    //       colors: ['#fff'],
+    //     },
+    //     xaxis: {
+    //       categories: ['Hien dang', 'no 50k'],
+    //     },
+    //     yaxis: {
+    //       labels: {
+    //         show: false,
+    //       },
+    //     },
+    //     title: {
+    //       text: 'Click Through Rate',
+    //       align: 'center',
+    //       floating: true,
+    //     },
+    //     // subtitle: {
+    //     //   text: 'Category Names as DataLabels inside bars',
+    //     //   align: 'center',
+    //     // },
+    //     tooltip: {
+    //       theme: 'dark',
+    //       x: {
+    //         show: false,
+    //       },
+    //       y: {
+    //         title: {
+    //           formatter: function () {
+    //             return '';
+    //           },
+    //         },
+    //       },
+    //     },
+    //   },
+    // });
   }
 
   return (
@@ -606,8 +814,8 @@ function Report() {
                     </div>
                     <div id="conversion_rate" className="report__item-chart">
                       <ReactApexChart
-                        options={barChart.options}
-                        series={barChart.series}
+                        options={optionsCVR.options}
+                        series={optionsCVR.series}
                         type="bar"
                         height={350}
                       />
@@ -625,9 +833,9 @@ function Report() {
                         <i className="far fa-question-circle"></i>
                       </a>
                       <ReactApexChart
-                        options={lineChart.options}
-                        series={lineChart.series}
-                        type="line"
+                        options={numOfConversionBotStart.options}
+                        series={numOfConversionBotStart.series}
+                        type="bar"
                         height={350}
                       />
                     </div>
@@ -646,7 +854,7 @@ function Report() {
                     </div>
                   </div>
 
-                  <div className="report__item">
+                  {/* <div className="report__item">
                     <div className="report__item-head">
                       SCENARIO TRANSITION
                       <a href="">
@@ -665,7 +873,7 @@ function Report() {
                         />
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* <div className="report__item">
                     <div className="report__item-head">
@@ -720,8 +928,8 @@ function Report() {
                         <a href="">
                           <i className="far fa-question-circle"></i>
                         </a>
-                        {devicePieChartSeries[0] > 0 ? (
-                          <div>{devicePieChartSeries[0]}</div>
+                        {devicePieChartSeriesCount[0] > 0 ? (
+                          <div>{devicePieChartSeriesCount[0]}</div>
                         ) : (
                           <div>There's no data.</div>
                         )}
@@ -731,8 +939,8 @@ function Report() {
                         <a href="">
                           <i className="far fa-question-circle"></i>
                         </a>
-                        {devicePieChartSeries[1] > 0 ? (
-                          <div>{devicePieChartSeries[1]}</div>
+                        {devicePieChartSeriesCount[1] > 0 ? (
+                          <div>{devicePieChartSeriesCount[1]}</div>
                         ) : (
                           <div>There's no data.</div>
                         )}
@@ -742,8 +950,8 @@ function Report() {
                         <a href="">
                           <i className="far fa-question-circle"></i>
                         </a>
-                        {devicePieChartSeries[2] > 0 ? (
-                          <div>{devicePieChartSeries[2]}</div>
+                        {devicePieChartSeriesCount[2] > 0 ? (
+                          <div>{devicePieChartSeriesCount[2]}</div>
                         ) : (
                           <div>There's no data.</div>
                         )}
