@@ -68,7 +68,7 @@ function Report() {
           let dataScenario = res?.data?.data
           if (dataScenario != []) {
             api.get(`/api/v1/analytics/scenario_counts/${dataScenario[0].id}?begin_date=${new Date(new Date().setDate(1)).toISOString().slice(0, 10)}&end_date=${new Date().toISOString().slice(0, 10)}`).then(ress => {
-              console.log('bot data: ', ress.data.data);
+              // console.log('bot data: ', ress.data.data);
               setDataReportCount(ress?.data?.data)
               let chatbotData = ress?.data?.data
               // let chatbotDataCount = [1,1,1]
@@ -106,7 +106,7 @@ function Report() {
             })
           }
           api.get(`/api/v1/analytics/scenario_pages/${dataScenario[0].id}`).then(resCon =>{
-            console.log('resCon: ', resCon.data.data);
+            // console.log('resCon: ', resCon.data.data);
             setListContent(resCon.data.data)
           })
 
@@ -122,10 +122,10 @@ function Report() {
 
   var optionsCVR = {
     series: [{
-      name: 'Conversion',
+      name: 'コンバージョン',
       data: [CVRCTR === false ? conversionCVRCTR : numOfOpenBot]
     }, {
-      name: 'Bot Open',
+      name: 'ボット開始',
       data: [CVRCTR === false ? numOfOpenBot : numOfBotStart]
     }
     ],
@@ -134,6 +134,7 @@ function Report() {
         type: 'bar',
         height: 380,
         stacked: true,
+        // background: ['#33b2df', '#546E7A'],
       },
       plotOptions: {
         bar: {
@@ -185,15 +186,15 @@ function Report() {
         // labels: {
         //   show: false,
         // },
-        categories: ['Total'],
+        categories: ['合計'],
       },
       title: {
-        text: 'Conversion Rate',
+        text: 'コンバージョン率(CVR)',
         align: 'center',
         floating: true,
       },
       subtitle: {
-        text: '(Conversion / Bot Open)',
+        text: 'コンバージョン数／ボット開始数',
         align: 'center',
       },
       tooltip: {
@@ -247,7 +248,7 @@ function Report() {
         colors: ['#fff'],
       },
       xaxis: {
-        categories: ['Conversion', 'Click-Throught'],
+        categories: ['コンバージョン数', 'クリックスルーレート(CTR)'],
       },
       yaxis: {
         labels: {
@@ -255,12 +256,12 @@ function Report() {
         },
       },
       title: {
-        text: 'Conversion / Bot starts',
+        text: 'コンバージョン数/BOT開始数',
         align: 'center',
         floating: true,
       },
       subtitle: {
-        text: `Conversation bounce rate: ${numOfOpenBot === 0 ? 0 : ((Math.round(numOfCloseBot * 100 / numOfOpenBot)).toFixed(2))}%`,
+        text: `離脱: ${numOfOpenBot === 0 ? 0 : ((Math.round(numOfCloseBot * 100 / numOfOpenBot)).toFixed(2))}%`,
         align: 'center',
       },
       tooltip: {
@@ -320,7 +321,7 @@ function Report() {
         colors: ['#fff'],
       },
       xaxis: {
-        categories: ['Conversion', 'Click-Throught'],
+        categories: ['コンバージョンレート', 'クリックスルーレート'],
       },
       yaxis: {
         labels: {
@@ -328,12 +329,12 @@ function Report() {
         },
       },
       title: {
-        text: 'Conversion / Bot starts',
+        text: 'コンバージョン数/BOT開始数',
         align: 'center',
         floating: true,
       },
       subtitle: {
-        text: `CTR(Conversion / Click-Throught): ${numOfBotStart === 0 ? 0 : ((Math.round(conversionCVRCTR * 100 / numOfBotStart)).toFixed(2))}%`,
+        text: `CTR (BOT開始数/BOT起動数: ${numOfBotStart === 0 ? 0 : ((Math.round(conversionCVRCTR * 100 / numOfBotStart)).toFixed(2))}%`,
         align: 'center',
       },
       tooltip: {
@@ -362,7 +363,7 @@ function Report() {
         width: 380,
         type: 'pie',
       },
-      labels: ['PC', 'SP', 'Tablet'],
+      labels: ['PC', 'スマートフォン', 'タブレット'],
     },
     responsive: [
       {
@@ -384,7 +385,7 @@ function Report() {
     const errDate = document.getElementById('errDate');
     if (start > end) {
       errDate.style.display = 'block';
-      errDate.innerHTML = 'Start date have to small than end date.';
+      errDate.innerHTML = '開始日時は終了日時より大きいです。';
     } else {
       errDate.style.display = 'none';
       errDate.innerHTML = '';
@@ -514,13 +515,13 @@ function Report() {
               <CardHeader>
                 <div className="report">
                   <form id="formSearch" className="report__info">
-                    <p className="report__group">Aggregation period:</p>
+                    <p className="report__group">集計期間:</p>
                     <div className="report__group">
                       <select className="report__group-select" onChange={(e) => chooseAggreation(e.target.value)} name="aggregation" id="">
-                        <option value="first">Aggregation period</option>
-                        <option value="1">The day before</option>
-                        <option value="7">Last 7 days</option>
-                        <option value="30">last 30 days</option>
+                        <option value="first">Specified period</option>
+                        <option value="1">前日</option>
+                        <option value="7">最近7日間</option>
+                        <option value="30">最近30日間</option>
                       </select>
                     </div>
                     <div className="report__group report-date">
@@ -543,16 +544,16 @@ function Report() {
                         dateFormat="yyyy/MM/dd"
                       />
                     </div>
-                    <p className="report__group">device</p>
+                    <p className="report__group">デバイス</p>
                     <div className="report__group">
                       <select className="report__group-select" name="device" id="">
-                        <option value="all">All</option>
-                        <option value="computer">computer</option>
-                        <option value="tablet">Tablet</option>
-                        <option value="smartphone">Smart phone</option>
+                        <option value="all">すべて</option>
+                        <option value="computer">PC</option>
+                        <option value="tablet">タブレット</option>
+                        <option value="smartphone">スマートフォン</option>
                       </select>
                     </div>
-                    <p className="report__group">scenario</p>
+                    <p className="report__group">シナリオ</p>
                     <div className="report__group">
                       <select className="report__group-select" name="scenarioId" id="">
                         {allScenarios?.map((scenario, index) => (
@@ -571,7 +572,9 @@ function Report() {
                   </form>
                   <div className="report__download">
                     <button className="btn btn-primary">Input contents download</button>
+                    {/* <button className="btn btn-primary">入力内容ダウンロード</button> */}
                     <button className="btn btn-primary">download</button>
+                    {/* <button className="btn btn-primary">ダウンロード</button> */}
                   </div>
                 </div>
               </CardHeader>
@@ -579,7 +582,7 @@ function Report() {
                 <div className="report__body">
                   <div className="report__item">
                     <div className="report__item-head">
-                      CONVERSION RATE (CVR) / CLICK-THROUGH RATE (CTR
+                    コンバージョンレート（CVR）/クリックスルレート（CTR）
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
@@ -590,14 +593,14 @@ function Report() {
                         id="btn_conversion_rate"
                         onClick={() => setCVRCTR(false)}
                       >
-                        Conversion rate (CVR)
+                        コンバージョンレート（CVR）
                       </button>
                       <button
                         className="btn btn-success"
                         id="btn_click_through_conversion_rate"
                         onClick={() => setCVRCTR(true)}
                       >
-                        Click-through rate (CTR)
+                        クリックスルレート（CTR）
                       </button>
                     </div>
                     <div id="conversion_rate" className="report__item-chart">
@@ -621,8 +624,8 @@ function Report() {
                         <i className="far fa-question-circle"></i>
                       </a>
                       <ReactApexChart
-                        options={numOfConversionBotStart.options}
-                        series={numOfConversionBotStart.series}
+                        options={leaveBot.options}
+                        series={leaveBot.series}
                         type="bar"
                         height={350}
                       />
@@ -632,7 +635,7 @@ function Report() {
 
                   <div className="report__item report__item-2">
                     <div className="report__item-head report__item-2-head-main">
-                      NUMBER OF CONVERSIONS / NUMBER OF BOT STARTS
+                    コンバージョン数/BOT開始数推移
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
@@ -681,22 +684,22 @@ function Report() {
 
                   <div className="report__item">
                     <div className="report__item-head">
-                      CONTENT
+                    コンテンツ
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
                       <div className="report__item-btn">
-                        <button className="btn btn-success" onClick={()=> setStartPage(true)}>start page</button>
-                        <button className="btn btn-success" onClick={()=> setStartPage(false)}>CV page</button>
+                        <button className="btn btn-success" onClick={()=> setStartPage(true)}>開始ページ</button>
+                        <button className="btn btn-success" onClick={()=> setStartPage(false)}>CVページ</button>
                       </div>
                       <div className="report__item-content">
                         <Table>
                           <thead className="text-primary">
                             <tr>
                               {/* <th style={{ width: '4%' }}>page</th> */}
-                              <th style={{ width: '4%' }}> starting number</th>
-                              <th style={{ width: '4%' }}>Number of CVs</th>
-                              <th style={{ width: '4%' }}>Urls</th>
+                              <th style={{ width: '4%' }}>開始数</th>
+                              <th style={{ width: '4%' }}>CV数</th>
+                              <th style={{ width: '4%' }}>URLS</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -727,7 +730,7 @@ function Report() {
 
                   <div className="report__item report__item-2">
                     <div className="report__item-head report__item-2-head-main">
-                      DEVICE
+                    デバイス
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
@@ -753,29 +756,29 @@ function Report() {
                         {devicePieChartSeriesCount[0] > 0 ? (
                           <div>{devicePieChartSeriesCount[0]}</div>
                         ) : (
-                          <div>There's no data.</div>
+                          <div>データがありません。</div>
                         )}
                       </div>
                       <div className="report__item-head report__item-2-head">
-                        Smartphone
+                      スマートフォン
                         <a href="">
                           <i className="far fa-question-circle"></i>
                         </a>
                         {devicePieChartSeriesCount[1] > 0 ? (
                           <div>{devicePieChartSeriesCount[1]}</div>
                         ) : (
-                          <div>There's no data.</div>
+                          <div>データがありません。</div>
                         )}
                       </div>
                       <div className="report__item-head report__item-2-head">
-                        Tablet
+                      タブレット
                         <a href="">
                           <i className="far fa-question-circle"></i>
                         </a>
                         {devicePieChartSeriesCount[2] > 0 ? (
                           <div>{devicePieChartSeriesCount[2]}</div>
                         ) : (
-                          <div>There's no data.</div>
+                          <div>データがありません。</div>
                         )}
                       </div>
                     </div>
@@ -783,7 +786,7 @@ function Report() {
 
                   <div className="report__item">
                     <div style={{ textAlign: 'center' }} className="report__item-head">
-                      SHORTENED LINK CLICKS
+                    リンククリックの短縮
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
@@ -798,16 +801,16 @@ function Report() {
                           <thead className="text-primary">
                             <tr>
                               <th className="report__item-content-title" style={{ width: '5%' }}>
-                                No
+                                No.
                               </th>
                               <th className="report__item-content-title" style={{ width: '15%' }}>
-                                Number of click
+                              クリック数
                               </th>
                               <th className="report__item-content-title" style={{ width: '60%' }}>
-                                Original URL
+                              クリック数
                               </th>
                               <th className="report__item-content-title" style={{ width: '20%' }}>
-                                Url Shortening
+                              短縮URL
                               </th>
                             </tr>
                           </thead>

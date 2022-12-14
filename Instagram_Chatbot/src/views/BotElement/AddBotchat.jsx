@@ -64,7 +64,15 @@ function AddBotchat() {
 
   // design type: handle click
   const designTypeClick = (e) => {
-    setDesignType(e.target.innerText);
+    let value = ''
+    if (e.target.innerText == 'ポップ') {
+      value = 'pop'
+    } else if (e.target.innerText == 'フラット') {
+      value = 'flat'
+    } else if (e.target.innerText == 'マテリアル') {
+      value = 'material'
+    }
+    setDesignType(value);
     const typeActive = document.querySelector('.design-types .type.active');
     typeActive.classList.remove('active');
     if (e.target.localName !== 'div') {
