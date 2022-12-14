@@ -327,7 +327,7 @@ function BotManagement() {
                     {botList != []
                       ? botList.map((bot, i) => (
                           <tr key={bot?.id}>
-                            <td className="border-table-bot">{i + 1}</td>
+                            <td className="border-table-bot">{i + 1 + 10 * (pageIndex - 1)}</td>
                             <td
                               className="border-table-bot bm__bot-name"
                               onClick={() => openBotSetting(bot.id)}
