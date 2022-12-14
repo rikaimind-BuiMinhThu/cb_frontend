@@ -103,3 +103,7 @@ table.table thead tr th {
   width: 100%;
   justify-content: space-between;
 }
+
+.bm__bot-name:hover {
+  color: #327aed;
+}

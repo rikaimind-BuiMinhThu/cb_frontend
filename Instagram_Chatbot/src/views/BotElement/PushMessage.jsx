@@ -11,8 +11,9 @@ import ModalNoti from 'views/Popup/ModalNoti';
 import * as utils from './../../JS/validate.js';
 import ModalShort from 'views/Popup/ModalShort';
 function PushMessage() {
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [startDate, setStartDate] = useState(new Date());
+  const [startDateSearch, setStartDateSearch] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
   const [msgNoti, setMsgNoti] = useState('');
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
@@ -142,10 +143,10 @@ function PushMessage() {
 
   useEffect(() => {
     var date = new Date();
-    if (date.getDate() != 1) {
-      setEndDate(new Date(date.setDate(date.getDate() - 1)));
-    }
-    setStartDate(new Date(date.setDate(1)));
+    // if (date.getDate() != 1) {
+    //   setEndDate(new Date(date.setDate(date.getDate() - 1)));
+    // }
+    setStartDateSearch(new Date(date.setDate(1)));
   }, []);
 
   function pushMessageList() {
@@ -163,7 +164,8 @@ function PushMessage() {
   }
 
   function selectDateStart(date) {
-    setStartDate(date);
+    // setStartDate(date);
+    setStartDateSearch(date);
     var validate = document.getElementById(`push-message-err`);
     var dateMonth = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`;
     var dateDate = date.getDate() < 10 ? `0${date.getDate()}` : `${date.getDate()}`;
@@ -186,15 +188,17 @@ function PushMessage() {
     setEndDate(date);
     var validate = document.getElementById(`push-message-err`);
     var startMonth =
-      startDate.getMonth() + 1 < 10
-        ? `0${startDate.getMonth() + 1}`
-        : `${startDate.getMonth() + 1}`;
+      startDateSearch.getMonth() + 1 < 10
+        ? `0${startDateSearch.getMonth() + 1}`
+        : `${startDateSearch.getMonth() + 1}`;
     var startDatee =
-      startDate.getDate() < 10 ? `0${startDate.getDate()}` : `${startDate.getDate()}`;
+      startDateSearch.getDate() < 10
+        ? `0${startDateSearch.getDate()}`
+        : `${startDateSearch.getDate()}`;
     var dateMonth = date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`;
     var dateDate = date.getDate() < 10 ? `0${date.getDate()}` : `${date.getDate()}`;
     if (
-      parseInt(`${startDate.getFullYear()}${startMonth}${startDatee}`) >
+      parseInt(`${startDateSearch.getFullYear()}${startMonth}${startDatee}`) >
       parseInt(`${date.getFullYear()}${dateMonth}${dateDate}`)
     ) {
       validate.style.display = 'block';
@@ -268,10 +272,10 @@ function PushMessage() {
   }
 
   function savePM() {
-    utils.checkRequired('title', 'titleErr', 'Push message name');
+    utils.checkRequired('title', 'titleErr', 'ブッシュメッセージ名');
     utils.checkRequired('startDateTime', 'startDateTimeErr', '開始日時');
     if (
-      utils.checkRequired('title', 'titleErr', 'Push message name') &&
+      utils.checkRequired('title', 'titleErr', 'ブッシュメッセージ名') &&
       utils.checkRequired('startDateTime', 'startDateTimeErr', '開始日時')
     ) {
       var bot_id = Cookies.get('bot_id');
@@ -672,7 +676,7 @@ function PushMessage() {
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
                       <DatePicker
                         className="push-message-date"
-                        selected={startDate}
+                        selected={startDateSearch}
                         onChange={(date) => selectDateStart(date)}
                         dateFormat="yyyy-MM-dd"
                         value={startDate}
@@ -1067,7 +1071,7 @@ function PushMessage() {
               <button
                 style={{
                   float: 'left',
-                  width: '110px',
+                  width: 'auto',
                   padding: '7.5px 35px',
                   textAlign: 'center',
                   border: 'none',
