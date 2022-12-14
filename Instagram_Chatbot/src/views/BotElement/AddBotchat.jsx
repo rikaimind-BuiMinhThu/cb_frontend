@@ -172,15 +172,18 @@ function AddBotchat() {
         });
     } else {
       if (!title) {
-        document.querySelector('.error-message.title').innerHTML = 'Please input title';
+        document.querySelector('.error-message.title').innerHTML =
+          'タイトルは、必ず指定してください。';
         document.querySelector('.error-message.title').style.display = 'block';
       }
       if (!subtitle) {
-        document.querySelector('.error-message.subtile').innerHTML = 'Please input subtile';
+        document.querySelector('.error-message.subtile').innerHTML =
+          'サブタイトルは、必ず指定ください。';
         document.querySelector('.error-message.subtile').style.display = 'block';
       }
       if (!botName) {
-        document.querySelector('.error-message.bot-name').innerHTML = 'Please input bot-name';
+        document.querySelector('.error-message.bot-name').innerHTML =
+          'ボット名は、必ず指定してください。';
         document.querySelector('.error-message.bot-name').style.display = 'block';
       }
     }
@@ -197,11 +200,13 @@ function AddBotchat() {
       setIsOpenPreview(true);
     } else {
       if (!title) {
-        document.querySelector('.error-message.title').innerHTML = 'Please input title';
+        document.querySelector('.error-message.title').innerHTML =
+          'タイトルは、必ず指定してください。';
         document.querySelector('.error-message.title').style.display = 'block';
       }
       if (!subtitle) {
-        document.querySelector('.error-message.subtile').innerHTML = 'Please input subtile';
+        document.querySelector('.error-message.subtile').innerHTML =
+          'サブタイトルは、必ず指定ください。';
         document.querySelector('.error-message.subtile').style.display = 'block';
       }
     }
@@ -240,7 +245,9 @@ function AddBotchat() {
                     <div className="bot-left">
                       <div className="field-add-bot">
                         <div className="add-bot_field-container">
-                          <span className="label-field">タイトル</span>
+                          <span className="label-field">
+                            タイトル <span style={{ color: 'red' }}>*</span>
+                          </span>
                           <input
                             type="text"
                             name="title"
@@ -256,7 +263,9 @@ function AddBotchat() {
                       </div>
                       <div className="field-add-bot">
                         <div className="add-bot_field-container">
-                          <span className="label-field">サブタイトル</span>
+                          <span className="label-field">
+                            サブタイトル <span style={{ color: 'red' }}>*</span>
+                          </span>
                           <input
                             type="text"
                             className="input-field"
@@ -306,7 +315,7 @@ function AddBotchat() {
                       </div>
                       <div className="btn-wrapper">
                         <button type="button" className="btn btn-preview" onClick={handlePreview}>
-                        プレビュー
+                          プレビュー
                         </button>
                       </div>
                     </div>
@@ -348,17 +357,23 @@ function AddBotchat() {
                         )}
                         <div className="field-add-bot">
                           <div className="add-bot_field-container">
-                            <span className="label-field">ボット名称</span>
+                            <span className="label-field">
+                              ボット名称 <span style={{ color: 'red' }}>*</span>
+                            </span>
                             <input
                               type="text"
                               name="title"
                               className="input-field"
                               placeholder="サンプルボット..."
-                              onChange={(e) => setBotName(e.target.value)}
+                              onChange={(e) => {
+                                setBotName(e.target.value);
+                                document.querySelector('.error-message.bot-name').style.display =
+                                  'none';
+                              }}
                             />
                           </div>
                           <span className="subtitle-field">
-                          ※EC-CHAT管理用の名称です。ボット内で表示されることはありません。
+                            ※EC-CHAT管理用の名称です。ボット内で表示されることはありません。
                           </span>
                           <span className="error-message bot-name"></span>
                         </div>
@@ -366,11 +381,11 @@ function AddBotchat() {
                       <div className="btn-wrapper">
                         <Link to={'/admin/bot'}>
                           <button type="button" className="btn btn-close">
-                          閉じる
+                            閉じる
                           </button>
                         </Link>
                         <button type="button" className="btn btn-new-bot" onClick={addNewBotChat}>
-                        ボット新規作成
+                          ボット新規作成
                         </button>
                       </div>
                     </div>
