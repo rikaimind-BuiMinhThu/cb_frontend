@@ -1326,7 +1326,20 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-setting__item-custom-input-checkbox {
-  width: 90%
+  width: 90%!important;
+}
+
+.ss-user-setting__item-custom-input-checkbox .ant-checkbox-wrapper {
+  width: 100%;
+}
+
+.ss-user-setting__item-custom-input-checkbox .ant-checkbox-wrapper span:nth-child(1) {
+  width: 16px;
+}
+
+.ss-user-setting__item-custom-input-checkbox .ant-checkbox-wrapper span:nth-child(2) {
+  padding-right: 0px;
+  width: 97%;
 }
 
 .ss-user-setting-custom-double-input {

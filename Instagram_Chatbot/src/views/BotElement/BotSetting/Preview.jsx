@@ -1547,12 +1547,49 @@ function Preview({ onOpenPreview, isOpen }) {
       dataMessages[indexMessageRender].message_content[indexContent][contentType][field] = value;
     }
 
+    if (contentType === 'product_purchase') {
+      let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
+
+      let arrayCode = [];
+      let arrayName = [];
+      let arrayPrice = [];
+
+      for (let i = 0; i < dataContentType.products.length; i++) {
+        for (let j = 0; j < value.length; j++) {
+          if (dataContentType.products[i].id === value[j]) {
+            arrayCode.push(dataContentType.products[i].item_number);
+            arrayName.push(dataContentType.products[i].title);
+            arrayPrice.push(dataContentType.products[i].item_price);
+          }
+        }
+      }
+
+      variables.push(
+        {
+          variable_name: 'product_code',
+          default_value: arrayCode.join(',')
+        },
+        {
+          variable_name: 'product_name',
+          default_value: arrayName.join(',')
+        },
+        {
+          variable_name: 'product_price',
+          default_value: arrayPrice.join(',')
+        }
+      )
+      setVariables([...variables]);
+      objParam.product_code = arrayCode.join(',');
+      objParam.product_name = arrayName.join(',');
+      objParam.product_price = arrayPrice.join(',');
+      setObjParam({ ...objParam });
+    }
     if (dataMessages[indexMessageRender].message_content[indexContent][contentType].is_save_input_content) {
       variables.forEach(item => {
+        console.log(item);
         if (dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content === item.variable_name) {
           let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
           if (contentType === 'zip_code_address') {
-            console.log(dataContentType, 'checkkkk value');
             item.default_value = `〒 ${dataContentType?.value_post_code} ${dataContentType?.value_prefecture}${dataContentType?.value_municipality} ${dataContentType?.value_address}${dataContentType?.value_building_name}`;
           } else if (field === 'start_date_select' || field === 'end_date_select') {
             item.default_value = `${dataContentType?.start_date_select || "start date"} ~ ${dataContentType?.end_date_select || "end date"}`;
@@ -1577,7 +1614,6 @@ function Preview({ onOpenPreview, isOpen }) {
                 return dataReturn;
               });
             }
-            console.log(dataTextChecked);
             item.default_value = dataTextChecked.join(',') || item.default_value;
           } else if (contentType === 'card_payment_radio_button') {
             let dataTextChecked;
@@ -2006,7 +2042,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
         || (message?.[message.type].type === "picture_radio" ? (message?.[message.type]?.card_linked_setting || message?.[message.type]?.card_linked_setting === message?.[message.type]?.initial_selection)
           : (message?.[message.type]?.card_linked_setting_picture && message?.[message.type]?.card_linked_setting_picture === message?.[message.type]?.initial_selection_picture))
         || (message.type === 'carousel' && message?.[message.type].require)
-        || (message.type === 'radio_button'&& !message[message.type].initial_selection)) {
+        || (message.type === 'radio_button' && !message[message.type].initial_selection)) {
         displayButtonNext(false);
       } else {
         displayButtonNext(true);
@@ -2538,7 +2574,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             checked={radioButton.initial_selection === item.id}
                             onChange={() => {
                               onChangeValue(indexContent, content.type, item.id, 'initial_selection');
-                              onClickNext();
+                              if (messageContent.length === 1) onClickNext();
                             }}
                           />
                           {item.text &&
@@ -2560,7 +2596,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             checked={radioButton.initial_selection === item.id}
                             onChange={() => {
                               onChangeValue(indexContent, content.type, item.id, 'initial_selection');
-                              onClickNext();
+                              if (messageContent.length === 1) onClickNext();
                             }}
                           />
                           <img
@@ -2607,7 +2643,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           className="ss-message__content--user-radio_button--block_style"
                           onClick={() => {
                             onChangeValue(indexContent, content.type, item.id, 'initial_selection');
-                            onClickNext();
+                            if (messageContent.length === 1) onClickNext();
                           }}
                         >
                           <span>{item.text}</span>
@@ -3625,9 +3661,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <div className="sp-carousel-preview-button" style={carousel.initial_selection === itemCarousel.id ? { backgroundColor: 'white' } : (disabled ? { backgroundColor: '#B2B0AE' } : {})} onClick={() => {
                             if (carousel.initial_selection !== itemCarousel.id && !disabled) {
                               onChangeValue(indexContent, content.type, itemCarousel.id, 'initial_selection');
-                              if (carousel.require) {
-                                onClickNext();
-                              }
+                              if (carousel.require && messageContent.length === 1) onClickNext();
                             }
                           }}>
                             {itemCarousel.buttonTitle || "Select"}
@@ -4296,23 +4330,23 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           onChange={value => {
                             console.log(value)
                             onChangeValue(indexContent, content.type, value.target.value, 'initial_selection');
-                            onClickNext();
+                            if(messageContent.length === 1) onClickNext();
                           }}
                           value={productPurchaseRadioButton.initial_selection}
                         >
                           {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
                             return <Radio value={itemProduct.id} key={indexProduct}
-                              // onChange={() => {
-                              //   let selectArr = [...productPurchaseRadioButton.initial_selection];
-                              //   let dataValue;
-                              //   if (selectArr.includes(itemProduct.id)) {
-                              //     dataValue = [];
-                              //   } else {
-                              //     dataValue = [itemProduct.id];
-                              //   }
-                              //   onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
-                              //   onClickNext();
-                              // }}
+                            // onChange={() => {
+                            //   let selectArr = [...productPurchaseRadioButton.initial_selection];
+                            //   let dataValue;
+                            //   if (selectArr.includes(itemProduct.id)) {
+                            //     dataValue = [];
+                            //   } else {
+                            //     dataValue = [itemProduct.id];
+                            //   }
+                            //   onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
+                            //   onClickNext();
+                            // }}
                             >
                               <div className="ss-user-overview-product-purchase-container">
                                 <div className="ss-user-preivew-product-purchase-img">
@@ -4361,7 +4395,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           value={productPurchaseRadioButton.initial_selection}
                           onChange={value => {
                             onChangeValue(indexContent, content.type, value.target.value, 'initial_selection');
-                            onClickNext();
+                            if(messageContent.length === 1) onClickNext();
                           }}
                         >
                           {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
@@ -4500,7 +4534,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             } else {
                               displayButtonNext(false);
                               onChangeValue(indexContent, content.type, false, 'is_display_card_payment');
-                              onClickNext();
+                              if(messageContent.length === 1) onClickNext();
                             }
                           }}>
                           {itemPayment.text}
@@ -4529,7 +4563,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             console.log(cardPaymentRadioButton.card_linked_setting, itemPayment.id)
                             onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
 
-                            if (cardPaymentRadioButton.card_linked_setting !== dataValue) {
+                            if (cardPaymentRadioButton.card_linked_setting !== dataValue && messageContent.length === 1) {
                               onClickNext();
                             }
                           }}>

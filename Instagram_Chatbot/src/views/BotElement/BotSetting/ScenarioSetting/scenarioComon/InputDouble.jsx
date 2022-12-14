@@ -18,7 +18,7 @@ const InputDouble = ({ id, valueLeft, valueRight, onChange, rightWidth, icon, on
                 <input
                     onChange={e => onChange(e.target.value, 'left')}
                     value={valueLeft}
-                    type="placeholder"
+                    type="text"
                     name="ss-user-setting__name"
                     placeholder={placeholder?.[0]}
                     disabled={disabled}

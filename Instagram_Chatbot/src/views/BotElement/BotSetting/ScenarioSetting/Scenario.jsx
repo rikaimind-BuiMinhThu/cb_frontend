@@ -4478,7 +4478,7 @@ const Scenario = () => {
                                       <span style={{ marginRight: '10px' }}>Delay (seconds)</span>
                                       <InputNum
                                         placeholder="00"
-                                        className="ss-user-setting-input-delay"
+                                        className="ss-user-setting-input-delay ss-user-setting-input-limit-character"
                                         min={0}
                                         max={10}
                                         value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
@@ -6320,7 +6320,7 @@ const Scenario = () => {
                                                                                             onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text2' : 'value2')}
                                                                                             valueLeft={itemPullDown.text2}
                                                                                             valueRight={itemPullDown.value2}
-                                                                                            placeholder={['text2', 'value2']}
+                                                                                            placeholder={['text', 'value']}
                                                                                           />
                                                                                         </React.Fragment>
                                                                                       }
@@ -8368,7 +8368,7 @@ const Scenario = () => {
                                                         </div>
                                                         <div className="ss-user-setting__item-bottom">
                                                           <div style={{ width: '95%' }}>
-                                                            <span>card payment linked setting</span>
+                                                            <span>credit card payment</span>
                                                           </div>
                                                         </div>
                                                         <div className="ss-user-setting__item-bottom">
