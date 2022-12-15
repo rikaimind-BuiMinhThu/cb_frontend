@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import api from './../../../../api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'api/tokenExpired';
+import { utils, writeFileXLSX } from 'xlsx';
 
 function Report() {
   // states
@@ -28,15 +29,15 @@ function Report() {
   //
   const [devicePieChartSeries, setDevicePieChartSeries] = useState([]);
   const [devicePieChartSeriesCount, setDevicePieChartSeriesCount] = useState([]);
-  const [conversionAll, setConversionAll] = useState(0)
-  const [opWinAll, setOpWinAll] = useState(0)
-  const [opPCAll, setOpPCAll] = useState(0)
-  const [closeAll, setCloseAll] = useState(0)
-  const [conversionCVRCTR, setConversionCVRCTR] = useState(0)
-  const [CVRCTR, setCVRCTR] = useState(false)
+  const [conversionAll, setConversionAll] = useState(0);
+  const [opWinAll, setOpWinAll] = useState(0);
+  const [opPCAll, setOpPCAll] = useState(0);
+  const [closeAll, setCloseAll] = useState(0);
+  const [conversionCVRCTR, setConversionCVRCTR] = useState(0);
+  const [CVRCTR, setCVRCTR] = useState(false);
 
   const [shortenedList, setShortenedList] = useState([]);
-  const [listContent, setListContent] = useState([])
+  const [listContent, setListContent] = useState([]);
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
@@ -65,50 +66,72 @@ function Report() {
       .get(`/api/v1/managements/chatbots/${botId}/all_scenarios`)
       .then((res) => {
         if (res.data.code === 1) {
-          let dataScenario = res?.data?.data
+          let dataScenario = res?.data?.data;
           if (dataScenario != []) {
-            api.get(`/api/v1/analytics/scenario_counts/${dataScenario[0].id}?begin_date=${new Date(new Date().setDate(1)).toISOString().slice(0, 10)}&end_date=${new Date().toISOString().slice(0, 10)}`).then(ress => {
-              // console.log('bot data: ', ress.data.data);
-              setDataReportCount(ress?.data?.data)
-              let chatbotData = ress?.data?.data
-              // let chatbotDataCount = [1,1,1]
-              let chatbotValue = [
-                chatbotData.pc_count,
-                chatbotData.smartphone_count,
-                chatbotData.tablet_count,
-              ];
-              if (chatbotData.pc_count == 0 &&
-                chatbotData.pc_count == 0 &&
-                chatbotData.pc_count == 0) {
-                chatbotValue = [1, 1, 1]
-                // setDevicePieChartSeriesCount(chatbotDataCount)
-              }
-              // console.log(chatbotValue)
-              let numOfCon = chatbotData.smartphone_count + chatbotData.pc_conversion_count + chatbotData.tablet_conversion_count
-              // setNumofConversion(numOfCon)
-              setConversionAll(numOfCon)
-              setConversionCVRCTR(numOfCon)
-              let numOfBS = chatbotData.pc_open_chatbot_window_count + chatbotData.tablet_open_chatbot_window_count + chatbotData.smartphone_open_chatbot_window_count
-              setOpWinAll(numOfBS)
-              setNumofBotStart(numOfBS)
-              // setBotCVRCTR(numOfBS)
-              let numOfOB = chatbotData.pc_count + chatbotData.tablet_count + chatbotData.smartphone_count
-              setOpPCAll(numOfOB)
-              setNumOfOpenBot(numOfOB)
-              let numOfCB = chatbotData.pc_close_chatbot_window_count + chatbotData.tablet_close_chatbot_window_count + chatbotData.smartphone_close_chatbot_window_count
-              setCloseAll(numOfCB)
-              setNumOfCloseBot(numOfCB)
-              //Pie chart///
-              setDevicePieChartSeries(chatbotValue);
-              setDevicePieChartSeriesCount(chatbotValue)
-            }).catch(error => {
-              console.log(error);
-            })
+            api
+              .get(
+                `/api/v1/analytics/scenario_counts/${dataScenario[0].id}?begin_date=${new Date(
+                  new Date().setDate(1)
+                )
+                  .toISOString()
+                  .slice(0, 10)}&end_date=${new Date().toISOString().slice(0, 10)}`
+              )
+              .then((res) => {
+                console.log('bot data: ', res.data);
+                setListContent(res.data?.scenario_pages);
+                setDataReportCount(res?.data?.data);
+                let chatbotData = res?.data?.data;
+                // let chatbotDataCount = [1,1,1]
+                let chatbotValue = [
+                  chatbotData.pc_count,
+                  chatbotData.smartphone_count,
+                  chatbotData.tablet_count,
+                ];
+                if (
+                  chatbotData.pc_count == 0 &&
+                  chatbotData.pc_count == 0 &&
+                  chatbotData.pc_count == 0
+                ) {
+                  chatbotValue = [1, 1, 1];
+                  // setDevicePieChartSeriesCount(chatbotDataCount)
+                }
+                // console.log(chatbotValue)
+                let numOfCon =
+                  chatbotData.smartphone_count +
+                  chatbotData.pc_conversion_count +
+                  chatbotData.tablet_conversion_count;
+                // setNumofConversion(numOfCon)
+                setConversionAll(numOfCon);
+                setConversionCVRCTR(numOfCon);
+                let numOfBS =
+                  chatbotData.pc_open_chatbot_window_count +
+                  chatbotData.tablet_open_chatbot_window_count +
+                  chatbotData.smartphone_open_chatbot_window_count;
+                setOpWinAll(numOfBS);
+                setNumofBotStart(numOfBS);
+                // setBotCVRCTR(numOfBS)
+                let numOfOB =
+                  chatbotData.pc_count + chatbotData.tablet_count + chatbotData.smartphone_count;
+                setOpPCAll(numOfOB);
+                setNumOfOpenBot(numOfOB);
+                let numOfCB =
+                  chatbotData.pc_close_chatbot_window_count +
+                  chatbotData.tablet_close_chatbot_window_count +
+                  chatbotData.smartphone_close_chatbot_window_count;
+                setCloseAll(numOfCB);
+                setNumOfCloseBot(numOfCB);
+                //Pie chart///
+                setDevicePieChartSeries(chatbotValue);
+                setDevicePieChartSeriesCount(chatbotValue);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
           }
-          api.get(`/api/v1/analytics/scenario_pages/${dataScenario[0].id}`).then(resCon =>{
-            // console.log('resCon: ', resCon.data.data);
-            setListContent(resCon.data.data)
-          })
+          // api.get(`/api/v1/analytics/scenario_pages/${dataScenario[0].id}`).then((resCon) => {
+          //   // console.log('resCon: ', resCon.data.data);
+          //   setListContent(resCon.data.data);
+          // });
 
           setAllScenarios(dataScenario);
         }
@@ -121,13 +144,15 @@ function Report() {
   }, []);
 
   var optionsCVR = {
-    series: [{
-      name: 'コンバージョン',
-      data: [CVRCTR === false ? conversionCVRCTR : numOfOpenBot]
-    }, {
-      name: 'ボット開始',
-      data: [CVRCTR === false ? numOfOpenBot : numOfBotStart]
-    }
+    series: [
+      {
+        name: 'コンバージョン',
+        data: [CVRCTR === false ? conversionCVRCTR : numOfOpenBot],
+      },
+      {
+        name: 'ボット開始',
+        data: [CVRCTR === false ? numOfOpenBot : numOfBotStart],
+      },
     ],
     options: {
       chart: {
@@ -146,11 +171,11 @@ function Report() {
               offsetX: 0,
               style: {
                 fontSize: '13px',
-                fontWeight: 900
-              }
+                fontWeight: 900,
+              },
             },
             position: 'bottom',
-          }
+          },
         },
       },
       colors: ['#33b2df', '#546E7A'],
@@ -173,14 +198,22 @@ function Report() {
         colors: ['#fff'],
       },
       xaxis: {
-        categories: [`CVR: ${CVRCTR === false ? numOfOpenBot === 0 ? 0 : ((Math.round(conversionCVRCTR * 100 / numOfOpenBot)).toFixed(2))
-          : numOfBotStart === 0 ? 0 : ((Math.round(numOfOpenBot * 100 / numOfBotStart)).toFixed(2))
-          }%`],
+        categories: [
+          `CVR: ${
+            CVRCTR === false
+              ? numOfOpenBot === 0
+                ? 0
+                : Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)
+              : numOfBotStart === 0
+              ? 0
+              : Math.round((numOfOpenBot * 100) / numOfBotStart).toFixed(2)
+          }%`,
+        ],
         labels: {
           formatter: function (val) {
-            return val
-          }
-        }
+            return val;
+          },
+        },
       },
       yaxis: {
         // labels: {
@@ -200,9 +233,9 @@ function Report() {
       tooltip: {
         y: {
           formatter: function (val) {
-            return val + ""
-          }
-        }
+            return val + '';
+          },
+        },
       },
     },
   };
@@ -261,7 +294,9 @@ function Report() {
         floating: true,
       },
       subtitle: {
-        text: `離脱: ${numOfOpenBot === 0 ? 0 : ((Math.round(numOfCloseBot * 100 / numOfOpenBot)).toFixed(2))}%`,
+        text: `離脱: ${
+          numOfOpenBot === 0 ? 0 : Math.round((numOfCloseBot * 100) / numOfOpenBot).toFixed(2)
+        }%`,
         align: 'center',
       },
       tooltip: {
@@ -278,7 +313,7 @@ function Report() {
         },
       },
     },
-  }
+  };
 
   const numOfConversionBotStart = {
     series: [
@@ -334,7 +369,9 @@ function Report() {
         floating: true,
       },
       subtitle: {
-        text: `CTR (BOT開始数/BOT起動数: ${numOfBotStart === 0 ? 0 : ((Math.round(conversionCVRCTR * 100 / numOfBotStart)).toFixed(2))}%`,
+        text: `CTR (BOT開始数/BOT起動数: ${
+          numOfBotStart === 0 ? 0 : Math.round((conversionCVRCTR * 100) / numOfBotStart).toFixed(2)
+        }%`,
         align: 'center',
       },
       tooltip: {
@@ -351,9 +388,7 @@ function Report() {
         },
       },
     },
-  }
-
-
+  };
 
   // chart
   let devicePieChartConfig = {
@@ -380,7 +415,6 @@ function Report() {
     ],
   };
 
-
   function validDateRange(start, end) {
     const errDate = document.getElementById('errDate');
     if (start > end) {
@@ -393,118 +427,150 @@ function Report() {
   }
 
   function selectStartDate(date) {
-    setStartDate(date);
-    const start = parseInt(format(date, 'yyyy/MM/dd').replaceAll('/', ''));
-    const end = parseInt(format(endDate, 'yyyy/MM/dd').replaceAll('/', ''));
-    validDateRange(start, end);
+    if (date) {
+      setStartDate(date);
+      const start = parseInt(format(date, 'yyyy/MM/dd').replaceAll('/', ''));
+      const end = parseInt(format(endDate, 'yyyy/MM/dd').replaceAll('/', ''));
+      validDateRange(start, end);
+    }
   }
 
   function selectEndDate(date) {
-    setEndDate(date);
-    const start = parseInt(format(startDate, 'yyyy/MM/dd').replaceAll('/', ''));
-    const end = parseInt(format(date, 'yyyy/MM/dd').replaceAll('/', ''));
-    validDateRange(start, end);
+    if (date) {
+      setEndDate(date);
+      const start = parseInt(format(startDate, 'yyyy/MM/dd').replaceAll('/', ''));
+      const end = parseInt(format(date, 'yyyy/MM/dd').replaceAll('/', ''));
+      validDateRange(start, end);
+    }
   }
 
   function handleSearch(e) {
     e.preventDefault();
     const formSearch = document.getElementById('formSearch');
     // console.log(formSearch.length);
-    var searchVal = {}
+    var searchVal = {};
     for (let i = 0; i < formSearch.length; i++) {
-      searchVal[formSearch[i].name] = formSearch[i].value
+      searchVal[formSearch[i].name] = formSearch[i].value;
     }
     console.log(searchVal);
 
+    api
+      .get(
+        `/api/v1/analytics/scenario_counts/${searchVal.scenarioId}?begin_date=${searchVal.startDate}&end_date=${searchVal.endDate}`
+      )
+      .then((res) => {
+        console.log('search data: ', res.data);
+        setListContent(res.data?.scenario_pages);
+        setDataReportCount(res?.data?.data);
+        let chatbotData = res?.data?.data;
+        // let chatbotDataCount = [1,1,1]
+        let chatbotValue = [
+          chatbotData.pc_count,
+          chatbotData.smartphone_count,
+          chatbotData.tablet_count,
+        ];
+        if (chatbotData.pc_count == 0 && chatbotData.pc_count == 0 && chatbotData.pc_count == 0) {
+          chatbotValue = [1, 1, 1];
+          // setDevicePieChartSeriesCount(chatbotDataCount)
+        }
+        // console.log(chatbotValue)
+        let numOfCon =
+          chatbotData.smartphone_count +
+          chatbotData.pc_conversion_count +
+          chatbotData.tablet_conversion_count;
+        // setNumofConversion(numOfCon)
+        setConversionAll(numOfCon);
+        // setConversionCVRCTR(numOfCon)
+        let numOfBS =
+          chatbotData.pc_open_chatbot_window_count +
+          chatbotData.tablet_open_chatbot_window_count +
+          chatbotData.smartphone_open_chatbot_window_count;
+        setOpWinAll(numOfBS);
+        // setNumofBotStart(numOfBS)
+        // setBotCVRCTR(numOfBS)
+        let numOfOB =
+          chatbotData.pc_count + chatbotData.tablet_count + chatbotData.smartphone_count;
+        setOpPCAll(numOfOB);
+        // setNumOfOpenBot(numOfOB)
+        let numOfCB =
+          chatbotData.pc_close_chatbot_window_count +
+          chatbotData.tablet_close_chatbot_window_count +
+          chatbotData.smartphone_close_chatbot_window_count;
+        setCloseAll(numOfCB);
+        // setNumOfCloseBot(numOfCB)
+        //Pie chart///
+        setDevicePieChartSeries(chatbotValue);
+        setDevicePieChartSeriesCount(chatbotValue);
 
-
-
-    api.get(`/api/v1/analytics/scenario_counts/${searchVal.scenarioId}?begin_date=${searchVal.startDate}&end_date=${searchVal.endDate}`).then(ress => {
-      console.log('bot data: ', ress.data.data);
-      setDataReportCount(ress?.data?.data)
-      let chatbotData = ress?.data?.data
-      // let chatbotDataCount = [1,1,1]
-      let chatbotValue = [
-        chatbotData.pc_count,
-        chatbotData.smartphone_count,
-        chatbotData.tablet_count,
-      ];
-      if (chatbotData.pc_count == 0 &&
-        chatbotData.pc_count == 0 &&
-        chatbotData.pc_count == 0) {
-        chatbotValue = [1, 1, 1]
-        // setDevicePieChartSeriesCount(chatbotDataCount)
-      }
-      // console.log(chatbotValue)
-      let numOfCon = chatbotData.smartphone_count + chatbotData.pc_conversion_count + chatbotData.tablet_conversion_count
-      // setNumofConversion(numOfCon)
-      setConversionAll(numOfCon)
-      // setConversionCVRCTR(numOfCon)
-      let numOfBS = chatbotData.pc_open_chatbot_window_count + chatbotData.tablet_open_chatbot_window_count + chatbotData.smartphone_open_chatbot_window_count
-      setOpWinAll(numOfBS)
-      // setNumofBotStart(numOfBS)
-      // setBotCVRCTR(numOfBS)
-      let numOfOB = chatbotData.pc_count + chatbotData.tablet_count + chatbotData.smartphone_count
-      setOpPCAll(numOfOB)
-      // setNumOfOpenBot(numOfOB)
-      let numOfCB = chatbotData.pc_close_chatbot_window_count + chatbotData.tablet_close_chatbot_window_count + chatbotData.smartphone_close_chatbot_window_count
-      setCloseAll(numOfCB)
-      // setNumOfCloseBot(numOfCB)
-      //Pie chart///
-      setDevicePieChartSeries(chatbotValue);
-      setDevicePieChartSeriesCount(chatbotValue)
-
-      if (searchVal.device == 'all') {
-        setConversionCVRCTR(numOfCon)
-        setNumofBotStart(numOfBS)
-        setNumOfOpenBot(numOfOB)
-        setNumOfCloseBot(numOfCB)
-      } else if (searchVal.device == 'computer') {
-        setConversionCVRCTR(chatbotData.pc_conversion_count)
-        setNumofBotStart(chatbotData.pc_open_chatbot_window_count)
-        setNumOfOpenBot(chatbotData.pc_count)
-        setNumOfCloseBot(chatbotData.pc_close_chatbot_window_count)
-      } else if (searchVal.device == 'tablet') {
-        setConversionCVRCTR(chatbotData.tablet_conversion_count)
-        setNumofBotStart(chatbotData.tablet_open_chatbot_window_count)
-        setNumOfOpenBot(chatbotData.tablet_count)
-        setNumOfCloseBot(chatbotData.tablet_close_chatbot_window_count)
-      } else if (searchVal.device == 'smartphone') {
-        setConversionCVRCTR(chatbotData.smartphone_count)
-        setNumofBotStart(chatbotData.smartphone_open_chatbot_window_count)
-        setNumOfOpenBot(chatbotData.smartphone_count)
-        setNumOfCloseBot(chatbotData.smartphone_close_chatbot_window_count)
-      }
-    }).catch(error => {
-      console.log(error);
-    })
-
+        if (searchVal.device == 'all') {
+          setConversionCVRCTR(numOfCon);
+          setNumofBotStart(numOfBS);
+          setNumOfOpenBot(numOfOB);
+          setNumOfCloseBot(numOfCB);
+        } else if (searchVal.device == 'computer') {
+          setConversionCVRCTR(chatbotData.pc_conversion_count);
+          setNumofBotStart(chatbotData.pc_open_chatbot_window_count);
+          setNumOfOpenBot(chatbotData.pc_count);
+          setNumOfCloseBot(chatbotData.pc_close_chatbot_window_count);
+        } else if (searchVal.device == 'tablet') {
+          setConversionCVRCTR(chatbotData.tablet_conversion_count);
+          setNumofBotStart(chatbotData.tablet_open_chatbot_window_count);
+          setNumOfOpenBot(chatbotData.tablet_count);
+          setNumOfCloseBot(chatbotData.tablet_close_chatbot_window_count);
+        } else if (searchVal.device == 'smartphone') {
+          setConversionCVRCTR(chatbotData.smartphone_count);
+          setNumofBotStart(chatbotData.smartphone_open_chatbot_window_count);
+          setNumOfOpenBot(chatbotData.smartphone_count);
+          setNumOfCloseBot(chatbotData.smartphone_close_chatbot_window_count);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   function chooseAggreation(value) {
     // setStartDate
     if (value == 'first') {
-      setStartDate(new Date().setDate(1))
+      setStartDate(new Date().setDate(1));
       console.log('date: ', new Date(new Date().setDate(new Date().getDate() - 7)));
     } else if (value == '1') {
-      setStartDate(new Date(new Date().setDate(new Date().getDate() - 1)))
-    }
-    else if (value == '7') {
-      setStartDate(new Date(new Date().setDate(new Date().getDate() - 7)))
-    }
-    else if (value == '30') {
-      setStartDate(new Date(new Date().setDate(new Date().getDate() - 30)))
+      setStartDate(new Date(new Date().setDate(new Date().getDate() - 1)));
+    } else if (value == '7') {
+      setStartDate(new Date(new Date().setDate(new Date().getDate() - 7)));
+    } else if (value == '30') {
+      setStartDate(new Date(new Date().setDate(new Date().getDate() - 30)));
     }
   }
 
   const [startPage, setStartPage] = useState(true);
-  function startPageContent(){
+  function startPageContent() {}
 
-  }
+  function cvPageContent() {}
 
-  function cvPageContent(){
-
-  }
+  // handle export
+  const handleExport = async () => {
+    try {
+      let wb = utils.book_new();
+      let ws1 = utils.aoa_to_sheet([
+        ['firstname', 'lastname', 'email'],
+        ['Ahmed', 'Tomi', 'ah@smthing.co.com'],
+        ['Raed', 'Labes', 'rl@smthing.co.com'],
+        ['Yezzi', 'Min l3b', 'ymin@cocococo.com'],
+      ]);
+      let ws2 = utils.aoa_to_sheet([
+        ['firstname', 'lastname', 'email'],
+        ['Ahmed', 'Tomi', 'ah@smthing.co.com'],
+        ['Raed', 'Labes', 'rl@smthing.co.com'],
+        ['Yezzi', 'Min l3b', 'ymin@cocococo.com'],
+      ]);
+      utils.book_append_sheet(wb, ws1, 'sheet này khum có data');
+      utils.book_append_sheet(wb, ws2, 'sheet 2');
+      writeFileXLSX(wb, 'Export.xlsx');
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <>
@@ -517,7 +583,12 @@ function Report() {
                   <form id="formSearch" className="report__info">
                     <p className="report__group">集計期間:</p>
                     <div className="report__group">
-                      <select className="report__group-select" onChange={(e) => chooseAggreation(e.target.value)} name="aggregation" id="">
+                      <select
+                        className="report__group-select"
+                        onChange={(e) => chooseAggreation(e.target.value)}
+                        name="aggregation"
+                        id=""
+                      >
                         <option value="first">Specified period</option>
                         <option value="1">前日</option>
                         <option value="7">最近7日間</option>
@@ -528,7 +599,7 @@ function Report() {
                       <DatePicker
                         className="report__group-input"
                         id="startDate"
-                        name='startDate'
+                        name="startDate"
                         selected={startDate}
                         onChange={(date) => selectStartDate(date)}
                         dateFormat="yyyy/MM/dd"
@@ -538,7 +609,7 @@ function Report() {
                       <DatePicker
                         className="report__group-input"
                         id="endDate"
-                        name='endDate'
+                        name="endDate"
                         selected={endDate}
                         onChange={(date) => selectEndDate(date)}
                         dateFormat="yyyy/MM/dd"
@@ -571,9 +642,11 @@ function Report() {
                     <span id="errDate" className="err-date"></span>
                   </form>
                   <div className="report__download">
-                    <button className="btn btn-primary">Input contents download</button>
+                    {/* <button className="btn btn-primary">Input contents download</button> */}
                     {/* <button className="btn btn-primary">入力内容ダウンロード</button> */}
-                    <button className="btn btn-primary">download</button>
+                    <button className="btn btn-primary" onClick={handleExport}>
+                      download
+                    </button>
                     {/* <button className="btn btn-primary">ダウンロード</button> */}
                   </div>
                 </div>
@@ -582,7 +655,7 @@ function Report() {
                 <div className="report__body">
                   <div className="report__item">
                     <div className="report__item-head">
-                    コンバージョンレート（CVR）/クリックスルレート（CTR）
+                      コンバージョンレート（CVR）/クリックスルレート（CTR）
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
@@ -632,10 +705,9 @@ function Report() {
                     </div>
                   </div>
 
-
                   <div className="report__item report__item-2">
                     <div className="report__item-head report__item-2-head-main">
-                    コンバージョン数/BOT開始数推移
+                      コンバージョン数/BOT開始数推移
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
@@ -684,13 +756,17 @@ function Report() {
 
                   <div className="report__item">
                     <div className="report__item-head">
-                    コンテンツ
+                      コンテンツ
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
                       <div className="report__item-btn">
-                        <button className="btn btn-success" onClick={()=> setStartPage(true)}>開始ページ</button>
-                        <button className="btn btn-success" onClick={()=> setStartPage(false)}>CVページ</button>
+                        <button className="btn btn-success" onClick={() => setStartPage(true)}>
+                          開始ページ
+                        </button>
+                        <button className="btn btn-success" onClick={() => setStartPage(false)}>
+                          CVページ
+                        </button>
                       </div>
                       <div className="report__item-content">
                         <Table>
@@ -704,24 +780,25 @@ function Report() {
                           </thead>
                           <tbody>
                             {/* <tr>sdsssd</tr> */}
-                            {startPage ? (listContent?.map((item, index)=>(
-                              <tr key={index}>
-                                <td>{item.num_of_start}</td>
-                                <td>{item.num_of_cv}</td>
-                                <td>{item.url}</td>
-                              </tr>
-                            ))) : (
-                               listContent?.map((item, index)=>(
-                                item.num_of_cv >0 ?
-                                <tr key={index}>
-                                  <td>{item.num_of_start}</td>
-                                  <td>{item.num_of_cv}</td>
-                                  <td>{item.url}</td>
-                                </tr>
-                                : <tr key={index}></tr>
-                              ))
-                            )}
-                            
+                            {startPage
+                              ? listContent?.map((item, index) => (
+                                  <tr key={index}>
+                                    <td>{item.num_of_start}</td>
+                                    <td>{item.num_of_cv}</td>
+                                    <td>{item.url}</td>
+                                  </tr>
+                                ))
+                              : listContent?.map((item, index) =>
+                                  item.num_of_cv > 0 ? (
+                                    <tr key={index}>
+                                      <td>{item.num_of_start}</td>
+                                      <td>{item.num_of_cv}</td>
+                                      <td>{item.url}</td>
+                                    </tr>
+                                  ) : (
+                                    <tr key={index}></tr>
+                                  )
+                                )}
                           </tbody>
                         </Table>
                       </div>
@@ -730,7 +807,7 @@ function Report() {
 
                   <div className="report__item report__item-2">
                     <div className="report__item-head report__item-2-head-main">
-                    デバイス
+                      デバイス
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
@@ -760,7 +837,7 @@ function Report() {
                         )}
                       </div>
                       <div className="report__item-head report__item-2-head">
-                      スマートフォン
+                        スマートフォン
                         <a href="">
                           <i className="far fa-question-circle"></i>
                         </a>
@@ -771,7 +848,7 @@ function Report() {
                         )}
                       </div>
                       <div className="report__item-head report__item-2-head">
-                      タブレット
+                        タブレット
                         <a href="">
                           <i className="far fa-question-circle"></i>
                         </a>
@@ -786,7 +863,7 @@ function Report() {
 
                   <div className="report__item">
                     <div style={{ textAlign: 'center' }} className="report__item-head">
-                    リンククリックの短縮
+                      リンククリックの短縮
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
@@ -804,19 +881,19 @@ function Report() {
                                 No.
                               </th>
                               <th className="report__item-content-title" style={{ width: '15%' }}>
-                              クリック数
+                                クリック数
                               </th>
                               <th className="report__item-content-title" style={{ width: '60%' }}>
-                              クリック数
+                                クリック数
                               </th>
                               <th className="report__item-content-title" style={{ width: '20%' }}>
-                              短縮URL
+                                短縮URL
                               </th>
                             </tr>
                           </thead>
                           <tbody>
                             {shortenedList?.map((item, index) => (
-                              <tr key={index} style={{ height: "20px" }}>
+                              <tr key={index} style={{ height: '20px' }}>
                                 <th>{item.id}</th>
                                 <td>{item.num_of_click}</td>
                                 <td>{item.origin_url}</td>
