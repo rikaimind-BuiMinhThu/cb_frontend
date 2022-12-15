@@ -149,11 +149,11 @@ function Report() {
   var optionsCVR = {
     series: [
       {
-        name: 'コンバージョン',
+        name: CVRCTR === false ? 'コンバージョン' : 'BOT起動',
         data: [CVRCTR === false ? conversionCVRCTR : numOfOpenBot],
       },
       {
-        name: 'ボット開始',
+        name: CVRCTR === false ? 'BOT起動' : 'BOT開始数',
         data: [CVRCTR === false ? numOfOpenBot : numOfBotStart],
       },
     ],
@@ -202,14 +202,14 @@ function Report() {
       },
       xaxis: {
         categories: [
-          `CVR: ${
+          ` ${
             CVRCTR === false
               ? numOfOpenBot === 0
-                ? 0
-                : Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)
+                ? `CVR: 0`
+                :`CVR: ${Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)}`
               : numOfBotStart === 0
-              ? 0
-              : Math.round((numOfOpenBot * 100) / numOfBotStart).toFixed(2)
+              ? `CTR: 0`
+              :`CTR: ${Math.round((numOfOpenBot * 100) / numOfBotStart).toFixed(2)}`
           }%`,
         ],
         labels: {
@@ -225,12 +225,12 @@ function Report() {
         categories: ['合計'],
       },
       title: {
-        text: 'コンバージョン率(CVR)',
+        text: CVRCTR === false ?'コンバージョン率(CVR)' : 'CTR (BOT起動数/BOT開始数）',
         align: 'center',
         floating: true,
       },
       subtitle: {
-        text: 'コンバージョン数／ボット開始数',
+        text: CVRCTR === false ? 'コンバージョン数／BOT開始' : 'BOT起動/BOT開始',
         align: 'center',
       },
       tooltip: {
@@ -693,14 +693,14 @@ function Report() {
                       />
                     </div>
                     {/* <div id='click_through_rate' className="report__item-chart" style={{ display: 'none' }}>
-                      <ReactApexChart options={barChart.options} series={barChart.series} type="bar" height={350} />
+                      <ReactApexChart options={barChart.options} series={barChart.series} type="bar" height={350} />   
 
                     </div> */}
                   </div>
 
                   <div className="report__item report__item-2">
                     <div className="report__item-head report__item-2-head-main">
-                      CONVERSASION BOUNCE RATE
+                    離脱
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
@@ -713,7 +713,7 @@ function Report() {
                     </div>
                   </div>
 
-                  <div className="report__item report__item-2">
+                  {/* <div className="report__item report__item-2">
                     <div className="report__item-head report__item-2-head-main">
                       コンバージョン数/BOT開始数推移
                       <a href="">
@@ -726,20 +726,8 @@ function Report() {
                         height={350}
                       />
                     </div>
-                    {/* <div className="report__item-head report__item-2-head">
-                      CHANGE IN MONTHLY CONVERSIONS
-                      <a href="">
-                        <i className="far fa-question-circle"></i>
-                      </a>
-                      <Calendar
-                        className="report__item-2-head-calender"
-                        value={dateState}
-                        onChange={(e) => {
-                          setDateState(e);
-                        }}
-                      />
-                    </div> */}
-                  </div>
+
+                  </div> */}
 
                   {/* <div className="report__item">
                     <div className="report__item-head">
