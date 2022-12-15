@@ -37,7 +37,7 @@ function InstallationTag() {
                 <span style={{ color: '#767676' }}>サイトにボットを埋め込む</span> <br />
                 <span style={{ color: '#767676', fontWeight: "400" }}>ページの右下にウェブチャットを表示するためにウェブサイトの &lt;body&gt; タグ内に以下のコードを貼り付けてください。</span>
                 <div style={{ width: "90%", border: '1px solid grey', color: '#767676', padding: '5px', borderRadius: '5px' }}>
-                  &lt;script&gt; sessionStorage.setItem("bot_id", "{botId}"); sessionStorage.setItem("scenario_id", "{scenarioIdSelected}");&lt;/script&gt; <br />
+                  &lt;script&gt; sessionStorage.setItem("bot_id", "{botId}");&lt;/script&gt; <br />
                   &lt;script src="https://ec-chatbot-test1.com/sdk.js" defer&gt;&lt;/script&gt;
                 </div>
                 <br />
