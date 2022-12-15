@@ -1,8 +1,16 @@
-var botId = sessionStorage.getItem('bot_id'); var scenarioId = sessionStorage.getItem('scenario_id'); var url = `https://ec-chatbot-test1.com/api/v1/analytics/chatbot_counts/${botId}`;
-var head = document.getElementsByTagName('head')[0]; var script = document.createElement('script'); script.type = 'text/javascript';
-
+var botId = sessionStorage.getItem('bot_id');var scenarioId = '';var head = document.getElementsByTagName('head')[0]; var script = document.createElement('script'); script.type = 'text/javascript';
 script.src = "https://code.jquery.com/jquery-3.6.0.min.js"; head.appendChild(script);
-function displayPopup() {
+async function displayPopup() {
+    var device = (mobileAndTabletcheck() == false && mobileCheck() == false) ? 'pc' : ((mobileAndTabletcheck() == true && mobileCheck() == false) ? 'tablet' : 'smartphone')
+    const response = await fetch(`https://ec-chatbot-test1.com/api/v1/managements/chatbots/${botId}/get_scenario_selected`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    });
+    const data = await response.json();
+    scenarioId = data.data.id
     var body = document.getElementsByTagName("BODY")[0]; var iframe = document.createElement('iframe');
     iframe.id = 'previewSdk'; iframe.style.position = "fixed"; iframe.style.bottom = "0"; iframe.style.right = "0";
     iframe.width = '400px'; iframe.height = '620px';
@@ -15,33 +23,31 @@ function displayPopup() {
         if (firstOpen == true) { iframe.width = '400px'; iframe.height = '620px'; } else if (e.data == true && firstOpen == false) {
             console.log('open')
             iframe.width = '400px'; iframe.height = '620px';
-            let add = { chatbot_data: "open_chatbot_window" }
-            submitForm(url, add)
+            let add = { chatbot_data: device }
+            // submitForm(url, add)
+            getUser(`https://ec-chatbot-test1.com/api/v1/analytics/scenario_counts/${scenarioId}`,add)
         } else if (e.data == false && firstOpen == false) { iframe.width = '400px'; iframe.height = '90px'; console.log('close') }
     }, false);
-    let device = (mobileAndTabletcheck() == false && mobileCheck() == false) ? 'pc' : ((mobileAndTabletcheck() == true && mobileCheck() == false) ? 'tablet' : 'sp')
-    // console.log('device: ', device)
+    console.log('device: ', device)
     setTimeout(() => {
-        let checkDevice = { chatbot_data: device }
-        submitForm(url, checkDevice)
+        let checkDevice = { scenario_data: `${device}_open_chatbot_window` }
+        // submitForm(url, checkDevice)
+        getUser(`https://ec-chatbot-test1.com/api/v1/analytics/scenario_counts/${scenarioId}`,checkDevice)
     }, 1000)
 
 }
-async function submitForm(url, data) {
-    $.ajax({
-        url: url,
-        data: {
-            data
-        },
-        error: function (e) {
-            console.log('error roi ', e);
-        },
-        dataType: 'data',
-        success: function (data) {
-            console.log('oke roi nhe');
-        },
-        type: 'PATCH'
-    });
+
+async function getUser(url,datacount) {
+    const response = await fetch(url, {
+        method: 'PATCH',
+		headers: {
+      		'Accept': 'application/json',
+      		'Content-Type': 'application/json'
+    	},
+       	body: JSON.stringify(datacount)
+  });
+  const data = await response.json();
+  console.log(data);
 }
 
 

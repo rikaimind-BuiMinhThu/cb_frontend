@@ -6,13 +6,15 @@ import '../../assets/css/general.css';
 import { CSVLink } from 'react-csv';
 import { MDBIcon } from 'mdbreact';
 import Cookies from 'js-cookie';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
+import ja from "date-fns/locale/ja";
 import requestNewToken from 'api/request-new-token';
 import * as utils from './../../JS/client.js';
 import { Pagination } from '@material-ui/lab';
 import { useEffect } from 'react';
 import { tokenExpired } from 'api/tokenExpired';
+registerLocale("ja", ja);
 // const categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
 
 function DataAnalyst() {
@@ -1505,6 +1507,7 @@ function DataAnalyst() {
                         selected={startDate}
                         onChange={(date) => selectDateStart(date)}
                         dateFormat="yyyy/MM/dd"
+                        locale='ja'
                       />
                     </div>
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
@@ -1512,6 +1515,7 @@ function DataAnalyst() {
                         selected={endDate}
                         onChange={(date) => selectDateEnd(date)}
                         dateFormat="yyyy/MM/dd"
+                        locale='ja'
                       />
                     </div>
                     {/* <select onChange={(e) => selectDate(e.target.value)} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800" }} defaultValue={"5d"} name="days_num_ec_cb" id="days_num_ec_cb">

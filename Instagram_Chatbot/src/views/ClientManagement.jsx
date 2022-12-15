@@ -13,10 +13,12 @@ import { Title } from 'chart.js';
 import { Pagination } from '@material-ui/lab';
 import ModalShort from './Popup/ModalShort';
 import $ from 'jquery';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from "react-datepicker";
+import ja from "date-fns/locale/ja";
 import 'react-datepicker/dist/react-datepicker.css';
 import { tokenExpired } from 'api/tokenExpired';
 import {EC_CHATBOT_URL} from '../variables/constants'
+registerLocale("ja", ja);
 
 function ClientManagement() {
   var [dataList, setDataList] = useState([]);
@@ -1353,6 +1355,7 @@ function ClientManagement() {
                             selected={startDate && startDate}
                             onChange={(date) => selectDateStart(date)}
                             dateFormat="yyyy/MM/dd"
+                            locale='ja'
                             value={
                               startDatePreview
                                 ? startDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
@@ -1374,6 +1377,7 @@ function ClientManagement() {
                             selected={endDate}
                             onChange={(date) => selectDateEnd(date)}
                             dateFormat="yyyy/MM/dd"
+                            locale='ja'
                             value={
                               endDatePreview
                                 ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
@@ -1398,30 +1402,38 @@ function ClientManagement() {
                 </div>
               </CardHeader>
               <CardBody>
-                <Table style={{ textAlign: 'center', tableLayout: 'fixed', overflow: 'hidden' }}>
+                <div style={{width:"100%", overflowX:"auto"}}>
+                <Table style={{ textAlign: 'center', tableLayout: 'fixed' }}>
                   <thead className="text-primary">
                     <tr>
-                      <th style={{ width: '4%' }}>ID</th>
-                      <th style={{ width: '7%' }}> 画像</th>
-                      <th style={{ width: '10%' }}>名称</th>
-                      <th style={{ width: '10%' }}>プラン</th>
-                      <th style={{ width: '7%' }}>ステータス</th>
+                      <th style={{ width: '100px' }}>ID</th>
+                      <th style={{ width: '150px' }}> 画像</th>
+                      <th style={{ width: '200px' }}>名称</th>
+                      <th style={{ width: '200px' }}>プラン</th>
+                      <th style={{ width: '150px' }}>ステータス</th>
                       {/* <th style={{ width: "10%" }}><select className="text-primary" style={{ border: "none", fontWeight: "bold" }} defaultValue={''}>
                         <option value="">プラン</option>
                         <option value={0}>スタートアッププラン</option>
                         <option value={1}>プレミアムプラン</option>
                         <option value={2}>エキスパートプラン のいづれかを表示</option>
                       </select></th> */}
-                      <th style={{ width: '10%' }}>プラン価格</th>
+                      <th style={{ width: '200px' }}>プラン価格</th>
                       {/**Plan price */}
-                      <th style={{ width: '10%' }}>課金開始日</th>
+                      <th style={{ width: '200px' }}>課金開始日</th>
                       {/**Date start count price */}
-                      <th style={{ width: '10%' }}>最低利用期間終了日</th>
+                      <th style={{ width: '200px' }}>最低利用期間終了日</th>
                       {/**Date end using */}
-                      <th style={{ minWidth: '165px', width: '165px' }}>住所</th>
+                      <th style={{ width: '200px' }}>住所</th>
                       {/**Address */}
-                      <th style={{ width: '10%' }}>コンバージョン数</th>
-                      <th style={{ width: '10%' }}>最終ログイン日時</th>
+                      <th style={{ width: '200px' }}>Instagram bot</th>
+                      <th style={{ width: '200px' }}>Web bot</th>
+                      <th style={{ width: '200px' }}>LineBot</th>
+                      <th style={{ width: '200px' }}>Tiktok bot</th>
+                      <th style={{ width: '200px' }}>Instagram bot CV</th>
+                      <th style={{ width: '200px' }}>Web bot CV</th>
+                      <th style={{ width: '200px' }}>Line bot CV</th>
+                      <th style={{ width: '200px' }}>Tiktok bot CV</th>
+                      <th style={{ width: '200px' }}>最終ログイン日時</th>
                       {/**Last login date_time */}
                       <th className="actionListClient">アクション</th>
                     </tr>
@@ -1498,7 +1510,14 @@ function ClientManagement() {
                               {item.prefecture}、{item.address}、{item.building_name}
                             </div>
                           </td>
-                          <td>{item.instagram_conversion_count}</td>
+                          <td></td> {/* Instagram bot */}
+                          <td></td> {/* Web bot */}
+                          <td></td> {/* Line bot */}
+                          <td></td> {/* Tiktok bot */}
+                          <td>{item.instagram_conversion_count}</td>{/* Instagram bot conversion  */}
+                          <td></td>{/* Web bot conversion  */}
+                          <td></td>{/* Line bot conversion  */}
+                          <td></td>{/* Tiktkl bot conversion  */}
                           <td>{item.last_sign_in_at?.replaceAll('/', '-')}</td>
                           <td className="actionListClient">
                             <div style={{ display: 'flex' }}>
@@ -1545,6 +1564,7 @@ function ClientManagement() {
                     {/* Modal key={item.id} */}
                   </tbody>
                 </Table>
+                </div>
 
                 <Pagination
                   count={totalPage}

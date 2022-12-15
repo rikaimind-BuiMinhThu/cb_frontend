@@ -1,4 +1,6 @@
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ja from "date-fns/locale/ja";
 import Cookies from 'js-cookie';
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardBody, Table, Row, Col } from 'reactstrap';
@@ -10,6 +12,7 @@ import { Link } from 'react-router-dom';
 import ModalNoti from 'views/Popup/ModalNoti';
 import * as utils from './../../JS/validate.js';
 import ModalShort from 'views/Popup/ModalShort';
+registerLocale("ja", ja);
 function PushMessage() {
   const [startDate, setStartDate] = useState(new Date());
   const [startDateSearch, setStartDateSearch] = useState(new Date());
@@ -679,6 +682,7 @@ function PushMessage() {
                         selected={startDateSearch}
                         onChange={(date) => selectDateStart(date)}
                         dateFormat="yyyy-MM-dd"
+                        locale='ja'
                         value={startDate}
                       />
                     </div>
@@ -697,6 +701,7 @@ function PushMessage() {
                         selected={endDate}
                         onChange={(date) => selectDateEnd(date)}
                         dateFormat="yyyy-MM-dd"
+                        locale='ja'
                         value={endDate}
                         // value={
                         //   endDatePreview
@@ -809,12 +814,13 @@ function PushMessage() {
                     className="pm_date_pick"
                     name="started_at"
                     id="startDateTime"
+                    locale='ja'
                     selected={startDate}
                     onChange={(date) => handleChangeDate(date)}
                     showTimeSelect
                     timeFormat="HH:mm"
                     timeIntervals={15}
-                    timeCaption="time"
+                    timeCaption="時刻"
                     dateFormat="yyyy-MM-dd HH:mm:ss"
                   />
                 </div>

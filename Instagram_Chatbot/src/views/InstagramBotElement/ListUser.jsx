@@ -6,10 +6,12 @@ import api from '../../api/api-management';
 import { MDBIcon } from 'mdbreact';
 import { CSVLink } from 'react-csv';
 import Cookies from 'js-cookie';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
+import ja from "date-fns/locale/ja";
 import * as utils from './../../JS/client.js';
 import { tokenExpired } from 'api/tokenExpired';
+registerLocale("ja", ja);
 
 function ListUser() {
   const [startDate, setStartDate] = useState(new Date());
@@ -738,6 +740,7 @@ function ListUser() {
                           selected={startDate}
                           onChange={(date) => selectDateStart(date)}
                           dateFormat="yyyy/MM/dd"
+                          locale='ja'
                         />
                       </div>
                       <div style={{ borderRadius: '5px', padding: '5px' }}>
@@ -745,6 +748,7 @@ function ListUser() {
                           selected={endDate}
                           onChange={(date) => selectDateEnd(date)}
                           dateFormat="yyyy/MM/dd"
+                          locale='ja'
                         />
                       </div>
                     </div>

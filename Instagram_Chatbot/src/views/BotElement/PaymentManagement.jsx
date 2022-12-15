@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
 import '../../assets/css/bot/payment-mng.css';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ja from "date-fns/locale/ja";
 import { useEffect } from 'react';
 import api from 'api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'api/tokenExpired';
 import ModalNoti from './../Popup/ModalNoti';
+registerLocale("ja", ja);
 
 function PaymentManagement() {
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
@@ -80,6 +83,19 @@ function PaymentManagement() {
     { prefectur: 'kagoshima', prefectureName: '鹿児島県' },
     { prefectur: 'okinawa', prefectureName: '沖縄県' },
   ]);
+
+  React.useEffect(() => {
+    var cook = Cookies.get('user_role');
+    if (cook == 'admin_deel') {
+
+    } else if (cook == 'admin_client') {
+      // window.location.href = '/admin/dashboard';
+      // var elem = document.getElementById('sidebarClient');
+      // elem.parentNode.removeChild(elem);
+    } else if (cook == 'client') {
+      // window.location.href = '/admin/dashboard';
+    }
+  });
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
@@ -790,6 +806,7 @@ function PaymentManagement() {
                           selected={startDate}
                           onChange={(date) => selectDateStart(date)}
                           dateFormat="yyyy-MM-dd"
+                          locale='ja'
                           value={startDate}
                         // value={
                         //   startDatePreview
@@ -813,6 +830,7 @@ function PaymentManagement() {
                           selected={endDate}
                           onChange={(date) => selectDateEnd(date)}
                           dateFormat="yyyy-MM-dd"
+                          locale='ja'
                           value={endDate}
                         // value={
                         //   endDatePreview

@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardBody, Row, Col, Table } from 'reactstrap';
 import ReactApexChart from 'react-apexcharts';
 import api from './../../api/api-management';
-import DatePicker from 'react-datepicker';
+import DatePicker, { registerLocale } from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
+import ja from "date-fns/locale/ja";
 import * as utils from '../../JS/client.js';
 import { tokenExpired } from 'api/tokenExpired';
+registerLocale("ja", ja);
 
 function AttractedCustomer() {
   // states
@@ -346,6 +348,7 @@ function AttractedCustomer() {
                     selected={startDate}
                     onChange={(date) => selectDateStart(date)}
                     dateFormat="yyyy/MM/dd"
+                    locale='ja'
                   />
                 </div>
                 <div style={{ padding: '5px' }}>
@@ -353,6 +356,7 @@ function AttractedCustomer() {
                     selected={endDate}
                     onChange={(date) => selectDateEnd(date)}
                     dateFormat="yyyy/MM/dd"
+                    locale='ja'
                   />
                 </div>
                 {/* <select
