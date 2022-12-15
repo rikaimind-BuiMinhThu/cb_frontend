@@ -1030,7 +1030,6 @@ function PushMessage() {
                       style={{ width: '15%', margin: '1% 1%' }}
                     >
                       <option value="is">
-                        <isindex />
                         is
                       </option>
                       <option value="is_not">is not</option>
