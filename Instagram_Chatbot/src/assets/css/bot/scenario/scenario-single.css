@@ -1401,7 +1401,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-bot-setting-condition-header-left {
-  width: 60%;
+  width: 45%;
   display: flex;
   justify-content: space-between;
   align-items: center;

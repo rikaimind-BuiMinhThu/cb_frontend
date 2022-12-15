@@ -34,7 +34,7 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
                                         style={fileType === 'IMAGE' ? { color: '#fff', backgroundColor: '#347AED' } : {}}
                                         onClick={() => setFileType('IMAGE')}
                                     >
-                                        IMAGE
+                                        画像
                                     </div>}
                                 {item === 'pdf' &&
                                     <div className="fr-popup-header-type"
@@ -48,7 +48,7 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
                                         style={fileType === 'MP4' ? { color: '#fff', backgroundColor: '#347AED' } : {}}
                                         onClick={() => setFileType('MP4')}
                                     >
-                                        VIDEO
+                                        ビデオ
                                     </div>
                                 }
                             </React.Fragment>;

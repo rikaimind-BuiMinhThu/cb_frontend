@@ -10,7 +10,7 @@ import {
   Button
 } from 'reactstrap';
 import ModalNoti from '../../../views/Popup/ModalNoti';
-import { Checkbox, Radio, Slider, Calendar } from 'antd';
+import { Checkbox, Radio, Slider, Calendar, Row, Select, Typography, Col } from 'antd';
 import moment from 'moment';
 import cvcIcon from '../../../assets/img/cvc-icon.png';
 import messageTypingGif from '../../../assets/img/icons8-dots-loading.gif';
@@ -27,6 +27,9 @@ import visa from '../../../assets/img/payment-method/visa.png';
 import {
   SHORTEN_URL
 } from '../../../variables/constants';
+import locale from 'antd/es/date-picker/locale/ja_JP';
+import 'moment/locale/zh-cn';
+
 
 const _ = require('lodash');
 
@@ -150,12 +153,13 @@ let dataPaymentMethod = [
 
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
-function Preview({ onOpenPreview, isOpen }) {
-
+function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
+  console.log(scenarioIdProps, 'check scenarioIdProps')
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
-  const [scenarioId, setScenarioId] = useState(Cookies.get('scenario_id'));
+  const [scenarioId, setScenarioId] = useState(scenarioIdProps || Cookies.get('scenario_id'));
   const [botInfor, setBotInfor] = useState();
   const [dataMessages, setDataMessages] = useState([]);
+  const [urlThanksPage, setUrlThanksPage] = useState();
   const [indexMessageRender, setIndexMessageRender] = useState(0);
   const [renderMessageArr, setRenderMessageArr] = useState([]);
   const [indexUser, setIndexUser] = useState(0);
@@ -272,7 +276,9 @@ function Preview({ onOpenPreview, isOpen }) {
       api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/preview`).then(async res => {
         if (res.data.code == 1) {
           let messageArr = [...res.data.data?.conversation?.messages];
+          let urlThanks = res.data.data?.conversation?.urlThanksPage || ''
           setDataMessages(messageArr);
+          setUrlThanksPage(urlThanks);
           setVariables([...res.data.variables]);
           setBotInfor(res.data.chatbot);
           res.data.variables.forEach(item => {
@@ -353,6 +359,16 @@ function Preview({ onOpenPreview, isOpen }) {
                       setRenderMessageArr([
                         ...renderMessage
                       ]);
+                    }).then(() => {
+                      if (messageArr.length - 1 === i && urlThanks) {
+                        let aTag = document.createElement('a');
+                        aTag.href = urlThanks;
+                        aTag.target = '_blank';
+
+                        setTimeout(() => {
+                          aTag.click();
+                        }, 2000)
+                      }
                     });
                   } else {
                     await new Promise((resolve) => {
@@ -361,7 +377,17 @@ function Preview({ onOpenPreview, isOpen }) {
                       }, messageArr[i]?.message_content[0]?.delay?.content * 1000);
                     }).then(() => {
                       setIndexMessageRender(i);
-                    })
+                    }).then(() => {
+                      if (messageArr.length - 1 === i && urlThanks) {
+                        let aTag = document.createElement('a');
+                        aTag.href = urlThanks;
+                        aTag.target = '_blank';
+
+                        setTimeout(() => {
+                          aTag.click();
+                        }, 2000)
+                      }
+                    });
                   }
                   index = i;
                 } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
@@ -469,7 +495,7 @@ function Preview({ onOpenPreview, isOpen }) {
                     console.log(data);
                     setRenderMessageArr([
                       ...renderMessage
-                    ]);
+                    ])
                     setIndexMessageRender(i);
                     if (isPauseScroll === false) {
                       scrollToBottom();
@@ -477,7 +503,17 @@ function Preview({ onOpenPreview, isOpen }) {
                     if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
                       isPauseScroll = true;
                     }
-                  })
+                  }).then(() => {
+                    if (messageArr.length - 1 === i && urlThanks) {
+                      let aTag = document.createElement('a');
+                      aTag.href = urlThanks;
+                      aTag.target = '_blank';
+
+                      setTimeout(() => {
+                        aTag.click();
+                      }, 2000)
+                    }
+                  });
                   index = i;
                 }
               } else if (messageArr[0].belong_to === 'user' && messageArr[i].message_content.length > 0) {
@@ -584,7 +620,7 @@ function Preview({ onOpenPreview, isOpen }) {
     let isValid = true;
     let errorsMess = {};
 
-    let messageError = "These are required fields."
+    let messageError = "この項目は必須です。"
     for (let i = 0; i < contentArr.length; i++) {
 
       let contentType = contentArr[i][contentArr[i].type];
@@ -601,14 +637,14 @@ function Preview({ onOpenPreview, isOpen }) {
               || contentType[contentType.type].valueLeft.length > limitTo
               || contentType[contentType.type].valueRight.length < limitFrom
               || contentType[contentType.type].valueRight.length > limitTo) {
-              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           } else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
             isValid = false;
           }
         } else if (contentType.type === 'phone_number') {
@@ -632,7 +668,7 @@ function Preview({ onOpenPreview, isOpen }) {
               || contentType[contentType.type].value.length > limitTo
               || contentType[contentType.type].valueConfirm.length < limitFrom
               || contentType[contentType.type].valueConfirm.length > limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
             isValid = false;
           }
         } else if (contentType.type === 'customization') {
@@ -731,8 +767,11 @@ function Preview({ onOpenPreview, isOpen }) {
           if (contentType.checkedValue && contentType.checkedValue.length === 0) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
-          } else if ((contentType.selection_limit_from || contentType.selection_limit_to) && (contentType.checkedValue.length < parseInt(contentType.selection_limit_from || 0) || contentType.checkedValue.length > parseInt(contentType.selection_limit_to))) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select from ${contentType.selection_limit_from || 0} to ${contentType.selection_limit_to} for this item.`;
+          } else if (contentType.selection_limit_from && contentType.checkedValue.length < parseInt(contentType.selection_limit_from)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_from || 0}個以上選択してください。`;
+            isValid = false;
+          } else if (contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
             isValid = false;
           }
         } else if (contentArr[i].type === 'carousel') {
@@ -746,7 +785,7 @@ function Preview({ onOpenPreview, isOpen }) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           } else if (captcha.filter(item => item.index === indexMessageRender && item.indexContent === i)?.[0]?.text.toLowerCase() !== contentType.value.toLowerCase()) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Wrong authorization code";
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "認証コードが間違っています。";
             isValid = false;
           }
         } else if (contentArr[i].type === 'product_purchase') {
@@ -784,7 +823,7 @@ function Preview({ onOpenPreview, isOpen }) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
           isValid = false;
         } else if ((limitFrom || limitTo) && (contentType[contentType.type]?.value?.length < limitFrom || contentType[contentType.type]?.value?.length > limitTo)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
           isValid = false;
         }
       } else {
@@ -792,11 +831,11 @@ function Preview({ onOpenPreview, isOpen }) {
           if (contentType[contentType.type].isSplitInput
             && (!stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))
             && (contentType[contentType.type].valueLeft.length >= limitTo || contentType[contentType.type].valueRight.length >= limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
             isValid = false;
           } else if (!stringNullOrEmpty(contentType[contentType.type].value)
             && contentType[contentType.type].value.length >= limitTo) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `characters cannot exceed ${limitFrom} ~ ${limitTo}`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
             isValid = false;
           }
         } else if (contentArr[i].type === 'credit_card_payment') {
@@ -813,12 +852,12 @@ function Preview({ onOpenPreview, isOpen }) {
           } else if ((contentType.card_number && (contentType.card_number + "").length !== 16) ||
             ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
               ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "Credit card number is invalid.";
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "クレジットカード番号は無効です。";
             isValid = false;
           }
         } else if (contentArr[i].type === 'checkbox') {
           if (contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Please select not over ${contentType.selection_limit_to} items.`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
             isValid = false;
           }
         } else if (contentType.type === 'time_hm') {
@@ -905,9 +944,11 @@ function Preview({ onOpenPreview, isOpen }) {
       }
       if (contentArr[i].type === 'textarea') {
         console.log(contentType[contentType.type].value, 'cecjlllll')
-        if (!stringNullOrEmpty(contentType[contentType.type].value)
-          && (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `Must be between ${limitFrom} and ${limitTo} characters.`;
+        if (!stringNullOrEmpty(contentType[contentType.type].value) && contentType[contentType.type].value.length < limitFrom) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `${limitFrom}文字以上入力してください。`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value) && contentType[contentType.type].value.length > limitTo) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `${limitTo}文字以下入力してください。`;
           isValid = false;
         }
       }
@@ -955,11 +996,11 @@ function Preview({ onOpenPreview, isOpen }) {
             && !stringNullOrEmpty(contentType[contentType.type].value2)
             && !stringNullOrEmpty(contentType[contentType.type].value3)
             && (!REGEX_PHONE.test(`${contentType[contentType.type].value1}${contentType[contentType.type].value2}${contentType[contentType.type].value3}`))) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Incorrect format.";
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "形式が正しくない。";
             isValid = false;
           }
         } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PHONE.test(contentType[contentType.type].value)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Incorrect format.";
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "形式が正しくない。";
           isValid = false;
         }
       }
@@ -967,7 +1008,7 @@ function Preview({ onOpenPreview, isOpen }) {
         let REGEX_URLS = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
         console.log(REGEX_URLS.test(contentType[contentType.type].value));
         if (!REGEX_URLS.test(contentType[contentType.type].value)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Please specify in valid URL format.`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なURL形式で指定してください。`;
           isValid = false;
         }
       }
@@ -975,36 +1016,36 @@ function Preview({ onOpenPreview, isOpen }) {
       if (contentType.type === 'email_address' && !stringNullOrEmpty(contentType[contentType.type].value)) {
         console.log(REGEX_EMAIL.test(contentType[contentType.type].value));
         if (!REGEX_EMAIL.test(contentType[contentType.type].value)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Please specify in the format a valid email address.`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
         }
       }
       let REGEX_PASSWORD = /^[A-Za-z0-9 ]+$/;
       if (contentType.type === 'password' && !stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
-        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.`;
+        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
         isValid = false;
       }
       if (contentType.type === 'password_confirmation') {
         if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
           isValid = false;
         } else if (!stringNullOrEmpty(contentType[contentType.type].valueConfirm) && !REGEX_PASSWORD.test(contentType[contentType.type].valueConfirm)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
           isValid = false;
         } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !stringNullOrEmpty(contentType[contentType.type].valueConfirm) && contentType[contentType.type].value !== contentType[contentType.type].valueConfirm) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Your password and password confirmation do not match.";
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "パスワードとパスワード確認が一致しません。";
           isValid = false;
         }
       }
       if (contentType.type === 'email_confirmation') {
         if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_EMAIL.test(contentType[contentType.type].value)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Please specify in the format a valid email address.`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
         } else if (!stringNullOrEmpty(contentType[contentType.type].valueConfirm) && !REGEX_EMAIL.test(contentType[contentType.type].valueConfirm)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Please specify in the format a valid email address.`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
         } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !stringNullOrEmpty(contentType[contentType.type].valueConfirm) && contentType[contentType.type].value !== contentType[contentType.type].valueConfirm) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `Your email address and email address confirmation do not match.`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `メールアドレスとメールアドレス確認が一致しません。`;
           isValid = false;
         }
       }
@@ -1025,31 +1066,31 @@ function Preview({ onOpenPreview, isOpen }) {
         switch (contentType[contentType.type].range) {
           case 'alphabet':
             REGEX_CHECK = /[^A-Za-z ]+/;
-            messageLog = "Only alphabets are allowed.";
+            messageLog = "アルファベッドのみ使用できます。";
             break;
           case 'single_byte':
             REGEX_CHECK = /[^0-9 ]+/;
-            messageLog = "Please enter a number.";
+            messageLog = "数字を入力してください。";
             break;
           case 'alphanumeric_hyphen':
             REGEX_CHECK = /[^A-Za-z0-9-_ ]+/;
-            messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9'), hyphens and underscores ('-', '_') can be used.";
+            messageLog = "英数字('A-Z','a-z','0-9')とハイフンと下線('-','_')が使用できます。";
             break;
           case 'alphanumeric':
             REGEX_CHECK = /[^A-Za-z0-9 ]+/;
-            messageLog = "Alphanumeric characters ('A-Z', 'a-z', '0-9') can be used.";
+            messageLog = "英数字('A-Z','a-z','0-9')が使用できます。";
             break;
           case 'double_byte_hiragana':
             REGEX_CHECK = /[^ぁ-ん]+/;
-            messageLog = "Please input full width hiragana character.";
+            messageLog = "全角ひらがなを入力してください。";
             break;
           case 'full_width_katakana':
             REGEX_CHECK = /[^ァ-ン]+/;
-            messageLog = "Please input full width katakana type.";
+            messageLog = "全角カタカナを入力してください。";
             break;
           case 'double_byte':
             REGEX_CHECK = /[^ァ-ンぁ-んｧ-ﾝﾞﾟ]+/;
-            messageLog = "Please enter in double-byte characters.";
+            messageLog = "全角文字を入力してください。";
             break;
           default:
             REGEX_CHECK = "";
@@ -1070,7 +1111,7 @@ function Preview({ onOpenPreview, isOpen }) {
         //  else if (REGEX_CHECK === "" && !contentType[contentType.type].isSplitInput) {
         //   if (contentType[contentType.type].range === 'double_byte' && !isDoubleByte(contentType[contentType.type].value)) {
         //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
+        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "全角文字を入力してください。";
         //   } else if (contentType[contentType.type].range === 'full_width_katakana' && mbStrWidth(contentType[contentType.type].value) === 2) {
         //     isValid = false;
         //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in full-width katakana characters.";
@@ -1082,7 +1123,7 @@ function Preview({ onOpenPreview, isOpen }) {
         //   if (contentType[contentType.type].range === 'double_byte'
         //     && (!isDoubleByte(contentType[contentType.type].valueLeft) || !isDoubleByte(contentType[contentType.type].valueRight))) {
         //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte characters.";
+        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "全角文字を入力してください。";
         //   } else if (contentType[contentType.type].range === 'full_width_katakana' &&
         //     (mbStrWidth(contentType[contentType.type].valueLeft) === 2 || mbStrWidth(contentType[contentType.type].valueRight) === 2)) {
         //     isValid = false;
@@ -1147,7 +1188,16 @@ function Preview({ onOpenPreview, isOpen }) {
     let isPauseScroll = false;
     let delayRender;
     setIndexUser(prev => prev + 1);
+    console.log(dataMessages.length, indexMessageRender);
+    if (dataMessages.length - 1 === indexMessageRender && urlThanksPage) {
+      let aTag = document.createElement('a');
+      aTag.href = urlThanksPage;
+      aTag.target = '_blank';
 
+      setTimeout(() => {
+        aTag.click();
+      }, 2000)
+    }
     if (!dataMessages[indexMessageRender + 1]) return;
     if (dataMessages[indexMessageRender + 1].belong_to === 'bot') {
       for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
@@ -1214,13 +1264,33 @@ function Preview({ onOpenPreview, isOpen }) {
                   setRenderMessageArr([
                     ...renderMessage
                   ]);
+                }).then(() => {
+                  if (dataMessages.length - 1 === i && urlThanksPage) {
+                    let aTag = document.createElement('a');
+                    aTag.href = urlThanksPage;
+                    aTag.target = '_blank';
+
+                    setTimeout(() => {
+                      aTag.click();
+                    }, 2000)
+                  }
                 });
               } else {
                 await new Promise((resolve) => {
                   return delayRender = setTimeout(() => {
                     resolve();
                   }, dataMessages[i]?.message_content[0]?.delay?.content * 1000);
-                })
+                }).then(() => {
+                  if (dataMessages.length - 1 === i && urlThanksPage) {
+                    let aTag = document.createElement('a');
+                    aTag.href = urlThanksPage;
+                    aTag.target = '_blank';
+
+                    setTimeout(() => {
+                      aTag.click();
+                    }, 2000)
+                  }
+                });
               }
               index = i;
               // promise.then(data => {
@@ -1298,7 +1368,17 @@ function Preview({ onOpenPreview, isOpen }) {
                 if (data.message_content[0][data.message_content[0]?.type]?.scroll_auto === true) {
                   isPauseScroll = true;
                 }
-              })
+              }).then(() => {
+                if (dataMessages.length - 1 === i && urlThanksPage) {
+                  let aTag = document.createElement('a');
+                  aTag.href = urlThanksPage;
+                  aTag.target = '_blank';
+
+                  setTimeout(() => {
+                    aTag.click();
+                  }, 2000)
+                }
+              });
               index = i;
             }
           } else if (dataMessages[i].belong_to === 'user' && dataMessages[i].message_content.length > 0) {
@@ -1700,7 +1780,7 @@ function Preview({ onOpenPreview, isOpen }) {
           <div id="sp-withdrawal-content" className="sp-withdrawal-content">
             <div className="sp-withdrawal-content-body">
               {withdrawal.withdrawal_prevention_status === "standard_exit_popup" &&
-                <div>Do you want to exit?</div>
+                <div>ウィンドウを閉じますか。</div>
               }
               {withdrawal.withdrawal_prevention_status === "image_popup" &&
                 <a href={withdrawal.withdrawal_prevention_link_url || ""} target="_blank">
@@ -1713,7 +1793,7 @@ function Preview({ onOpenPreview, isOpen }) {
                 document.getElementById("sp-withdrawal-container").style.display = "none";
                 document.getElementById("sp-withdrawal-content").style.display = "none";
               }}>
-                Back to chat
+                チャットに戻る
               </div>
               <div className="sp-withdrawal-content-footer-button sp-withdrawal-content-footer-button-exit" onClick={() => {
                 document.getElementById("sp-withdrawal-container").style.display = "none";
@@ -1729,7 +1809,7 @@ function Preview({ onOpenPreview, isOpen }) {
                   }
                 }, 10);
               }}>
-                Close up
+                閉じる
               </div>
             </div>
           </div>
@@ -1830,7 +1910,7 @@ function Preview({ onOpenPreview, isOpen }) {
               <div className="sp-popup-zip-code-address-body-button">
                 <div className="sp-popup-zip-code-address-body-button-cancel"
                   onClick={() => isPopUpZipCode(false)}>
-                  Cancel
+                  キャンセル
                 </div>
                 <div className="sp-popup-zip-code-address-body-button-selection"
                   onClick={() => {
@@ -1878,7 +1958,7 @@ function Preview({ onOpenPreview, isOpen }) {
           </div>
           <div id="sp-process-bar" className="sp-process-bar">
             <div className="sp-process-bar-color" style={{ width: `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` }}>
-              {messageUser.length !== (indexUser - 1) ? `${messageUser.length - indexUser + 1} tasks rest` : "Completed!"}
+              {messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。"}
             </div>
           </div>
           <div id="sp-body" className="sp-body">
@@ -1918,7 +1998,7 @@ function Preview({ onOpenPreview, isOpen }) {
                           {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
                             && <div className="ss-user-message__action-wrapper">
                               <Button disabled={message.disabled} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
-                                {message.buttonName || "To the next"}
+                                {message.buttonName || "次へ"}
                               </Button>
                             </div>
                           }
@@ -1985,7 +2065,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                     <span
                       style={{ color: '#089BE5', fontSize: '17px', display: 'block', height: '50px', cursor: 'pointer' }}
                       onClick={() => handleDownloadFile(content[content.type]?.content)}
-                    >Download this file</span>
+                    >ファイルをダウンロード</span>
                   }
                   {content[content.type]?.content.includes('mp4') &&
                     <div>
@@ -2079,26 +2159,29 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
         if (calendar.initial_selection && calendar.type !== "start_end_date") {
           let i = 0;
           let date_select = "";
-          console.log(handleDisableDateCalendar(moment().add(1, 'days'), calendar));
-          // do {
-          //   date_select = moment().add(i + 1, 'days').format("YYYY/MM/DD");
-          //   console.log(handleDisableDateCalendar(moment().add(i, 'days'), calendar));
-          //   i++;
-          // } while (handleDisableDateCalendar(moment().add(i, 'days'), calendar))
-          date_select = moment().add(i, 'days').format("YYYY/MM/DD");
+
+          date_select = moment().add(i, 'days').format("YYYY-MM-DD");
           while (handleDisableDateCalendar(moment().add(i, 'days'), calendar)) {
-            date_select = moment().add(i + 1, 'days').format("YYYY/MM/DD");
-            console.log(handleDisableDateCalendar(moment().add(i, 'days'), calendar));
+            if (i === 100) {
+              date_select = null;
+              break;
+            }
+            date_select = moment().add(i + 1, 'days').format("YYYY-MM-DD");
             i++;
           }
           calendar.date_select = date_select;
         } else if (calendar.initial_selection && calendar.type === "start_end_date") {
           let i = 0;
-          console.log(handleDisableDateCalendar(moment().add(1, 'days'), calendar));
+          calendar.start_date_select = moment();
+          calendar.end_date_select = moment().add(1, 'days');
           while (handleDisableDateCalendar(moment().add(i, 'days'), calendar)) {
+            if (i === 100) {
+              calendar.start_date_select = null;
+              calendar.end_date_select = null;
+              break;
+            }
             calendar.start_date_select = moment().add(i + 1, 'days');
             calendar.end_date_select = moment().add(i + 1, 'days');
-            console.log(handleDisableDateCalendar(moment().add(i, 'days'), calendar));
             i++;
           }
         }
@@ -2125,10 +2208,10 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
     let messsageError = "";
     if (messageContent[indexContent].attaching_file.file_type.length > 0 && !messageContent[indexContent].attaching_file.file_type.includes(type)) {
       console.log(messageContent[indexContent].attaching_file.file_type, type);
-      onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, `Please specify a ${messageContent[indexContent].attaching_file.file_type.join(", ")} type file for the file.`)
+      onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, `ファイルには${messageContent[indexContent].attaching_file.file_type.join(", ")}タイプのファイルを指定してください。`)
       return;
     } else if (file.size / 1024 / 1024 > 2) {
-      onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "You need to upload file which size under 2MB.");
+      onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "ファイルサイズは2MB以下です。");
       return;
     } else {
       console.log('asdasdasd', messageContent[indexContent].type)
@@ -2176,23 +2259,23 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
       || calendar?.fixed_date?.length !== 0 || calendar?.non_select_date_time?.length !== 0
       || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to
       || calendar.end_date_select) {
-      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD').add(1, 'days')
-        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
-        || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_select, 'YYYY/MM/DD').add(1, 'days'))
-        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
-        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+      return (moment(current, "YYYY-MM-DD") >= moment(calendar.end_date, "YYYY-MM-DD").add(1, 'days')
+        || moment(current, "YYYY-MM-DD") < moment(calendar.start_date, "YYYY-MM-DD")
+        || (calendar.type === "start_end_date" && moment(current, "YYYY-MM-DD").isSameOrAfter(moment(calendar.end_date_select, "YYYY-MM-DD")))
+        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY-MM-DD"))
+        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, "YYYY-MM-DD"))
+        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, "YYYY-MM-DD"))
         || calendar.non_select_date_time?.find(type => {
           if (type === 'today') {
-            return (moment().format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD"));
+            return (moment().format("YYYY-MM-DD") === moment(current).format("YYYY-MM-DD"));
           } else if (type === 'tomorrow') {
-            return moment().add(1, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+            return moment().add(1, 'days').format("YYYY-MM-DD") === moment(current).format("YYYY-MM-DD");
           } else if (type === 'day_after_tomorrow') {
-            return moment().add(2, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+            return moment().add(2, 'days').format("YYYY-MM-DD") === moment(current).format("YYYY-MM-DD");
           } else if (type === 'past') {
-            return moment(current).format("YYYY/MM/DD") < moment().format("YYYY/MM/DD");
+            return moment(current).format("YYYY-MM-DD") < moment().format("YYYY-MM-DD");
           } else if (type === 'future') {
-            return moment(current).format("YYYY/MM/DD") > moment().format("YYYY/MM/DD");
+            return moment(current).format("YYYY-MM-DD") > moment().format("YYYY-MM-DD");
           } else if (type === 'moon') {
             return moment(current).day() === 1;
           } else if (type === 'fire') {
@@ -2213,31 +2296,31 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   }
 
   const handleDisableEndDateCalendar = (current, calendar) => {
-    console.log(calendar.start_date, calendar[calendar.type].specified_period_from, calendar[calendar.type].specified_period_to)
+    console.log(calendar.end_date, 'checkkkkk end date')
     if (calendar.end_date || calendar.start_date
       || calendar?.fixed_date?.length !== 0 || calendar?.non_select_date_time?.length !== 0
       || calendar.start_date_select || calendar.specified_period_from
       || calendar.specified_period_to || calendar.aggregation_target_period_from
       || calendar.aggregation_target_period_to) {
-      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD').add(1, 'days')
-        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
-        || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') < moment(calendar.start_date_select, 'YYYY/MM/DD'))
-        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
-        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current, 'YYYY/MM/DD') < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_select, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current, 'YYYY/MM/DD') > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_select, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+      return (moment(current, "YYYY-MM-DD").isSameOrAfter(moment(calendar.end_date, "YYYY-MM-DD").add(1, 'days'))
+        || moment(current, "YYYY-MM-DD") < moment(calendar.start_date, "YYYY-MM-DD")
+        || (calendar.type === "start_end_date" && moment(current, "YYYY-MM-DD").isSameOrBefore(moment(calendar.start_date_select, "YYYY-MM-DD")))
+        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY-MM-DD"))
+        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, "YYYY-MM-DD"))
+        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, "YYYY-MM-DD"))
+        || moment(current, "YYYY-MM-DD") < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_select, "YYYY-MM-DD").add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, "YYYY-MM-DD"))
+        || moment(current, "YYYY-MM-DD") > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_select, "YYYY-MM-DD").add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, "YYYY-MM-DD"))
         || calendar.non_select_date_time?.find(type => {
           if (type === 'today') {
-            return (moment().format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD"));
+            return (moment().format("YYYY-MM-DD") === moment(current).format("YYYY-MM-DD"));
           } else if (type === 'tomorrow') {
-            return moment().add(1, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+            return moment().add(1, 'days').format("YYYY-MM-DD") === moment(current).format("YYYY-MM-DD");
           } else if (type === 'day_after_tomorrow') {
-            return moment().add(2, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+            return moment().add(2, 'days').format("YYYY-MM-DD") === moment(current).format("YYYY-MM-DD");
           } else if (type === 'past') {
-            return moment(current).format("YYYY/MM/DD") < moment().format("YYYY/MM/DD");
+            return moment(current).format("YYYY-MM-DD") < moment().format("YYYY-MM-DD");
           } else if (type === 'future') {
-            return moment(current).format("YYYY/MM/DD") > moment().format("YYYY/MM/DD");
+            return moment(current).format("YYYY-MM-DD") > moment().format("YYYY-MM-DD");
           } else if (type === 'moon') {
             return moment(current).day() === 1;
           } else if (type === 'fire') {
@@ -2287,6 +2370,18 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
     })
   }
 
+  function checkLoadCalendar() {
+    // if (document.getElementsByClassName('ant-picker-calendar-year-select')) {
+    //   console.log('loaded');
+    //   const divs = document.querySelectorAll('.ant-picker-calendar-year-select');
+
+    //   divs.forEach(el => el.addEventListener('click', event => {
+    //     alert('Please select')
+    //   }));
+    // }
+  }
+
+
   return (
     <div className="ss-user-message__content-wrapper">
       {messageContent?.map((content, indexContent) => {
@@ -2327,7 +2422,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {textInput.require === true &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -2501,7 +2596,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     </span>
                     {label?.require === true &&
                       <span className="ss-message__content--user-required">
-                        * required
+                        ※必須
                       </span>
                     }
                   </div>
@@ -2521,7 +2616,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {textarea.require === true && textarea?.type === 'text_input' &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -2558,7 +2653,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {radioButton.require === true &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -2620,7 +2715,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             id="ss-message__content--user-radio_button"
                           />
                           <label htmlFor="ss-message__content--user-radio_button">
-                            label
+                            ラベル
                           </label>
                         </div>
                         <div className="ss-message__content--user-radio_button">
@@ -2630,7 +2725,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             id="ss-message__content--user-radio_button"
                           />
                           <label htmlFor="ss-message__content--user-radio_button">
-                            label
+                            ラベル
                           </label>
                         </div>
                       </>
@@ -2672,7 +2767,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {checkbox.require === true &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -2746,7 +2841,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             id="ss-message__content--user-checkbox"
                           />
                           <label htmlFor="ss-message__content--user-checkbox">
-                            label
+                            ラベル
                           </label>
                         </div>
                         <div className="ss-message__content--user-checkbox">
@@ -2756,7 +2851,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             id="ss-message__content--user-checkbox"
                           />
                           <label htmlFor="ss-message__content--user-checkbox">
-                            label
+                            ラベル
                           </label>
                         </div>
                       </>
@@ -2783,7 +2878,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {pullDown.require === true &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -2854,7 +2949,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataHour.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_at) || "0") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_at) || "23"))}
-                              placeholder="Time"
+                              placeholder="時"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour')}
                               value={pullDown[pullDown.type].valueHour}
@@ -2862,7 +2957,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataMinutes}
-                              placeholder="Minutes"
+                              placeholder="分"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinute')}
                               value={pullDown[pullDown.type].valueMinute}
@@ -2885,7 +2980,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               <SelectCustom
                                 disabled={disabled}
                                 data={dataYear.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_year) || "1935") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_year) || "2072"))}
-                                placeholder="Year"
+                                placeholder="年"
                                 style={{ width: '32%' }}
                                 onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear')}
                                 value={pullDown[pullDown.type].valueYear}
@@ -2893,7 +2988,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               <SelectCustom
                                 disabled={disabled}
                                 data={dataMonth}
-                                placeholder="Month"
+                                placeholder="月"
                                 style={{ width: '32%' }}
                                 onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMonth')}
                                 value={pullDown[pullDown.type].valueMonth}
@@ -2901,7 +2996,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               <SelectCustom
                                 disabled={disabled}
                                 data={dataDay}
-                                placeholder="Day"
+                                placeholder="日"
                                 style={{ width: '32%' }}
                                 onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueDay')}
                                 value={pullDown[pullDown.type].valueDay}
@@ -2923,7 +3018,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataMonth}
-                              placeholder="Month"
+                              placeholder="月"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMonth')}
                               value={pullDown[pullDown.type].valueMonth}
@@ -2931,7 +3026,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataDay}
-                              placeholder="Day"
+                              placeholder="日"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueDay')}
                               value={pullDown[pullDown.type].valueDay}
@@ -2954,7 +3049,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               <SelectCustom
                                 disabled={disabled}
                                 data={dataYear.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_year) || "1935") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_year) || "2072"))}
-                                placeholder="Year"
+                                placeholder="年"
                                 style={{ width: '32%' }}
                                 onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear')}
                                 value={pullDown[pullDown.type].valueYear}
@@ -2962,7 +3057,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               <SelectCustom
                                 disabled={disabled}
                                 data={dataMonth}
-                                placeholder="Month"
+                                placeholder="月"
                                 style={{ width: '32%' }}
                                 onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMonth')}
                                 value={pullDown[pullDown.type].valueMonth}
@@ -2984,7 +3079,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataYear.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_year) || "1935") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_year) || "2072"))}
-                              placeholder="Year"
+                              placeholder="年"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear')}
                               value={pullDown[pullDown.type].valueYear}
@@ -2992,7 +3087,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataMonth}
-                              placeholder="Month"
+                              placeholder="月"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMonth')}
                               value={pullDown[pullDown.type].valueMonth}
@@ -3000,7 +3095,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataDay}
-                              placeholder="Day"
+                              placeholder="日"
                               style={{ width: '32%', marginBottom: '10px' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueDay')}
                               value={pullDown[pullDown.type].valueDay}
@@ -3008,7 +3103,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataHour.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_at) || "0") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_at) || "23"))}
-                              placeholder="Time"
+                              placeholder="時"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour')}
                               value={pullDown[pullDown.type].valueHour}
@@ -3016,7 +3111,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataMinutes}
-                              placeholder="Minutes"
+                              placeholder="分"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinute')}
                               value={pullDown[pullDown.type].valueMinute}
@@ -3038,7 +3133,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataHour.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_at) || "0") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_at) || "23"))}
-                              placeholder="Time"
+                              placeholder="時"
                               style={{ width: '49%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour1')}
                               value={pullDown[pullDown.type].valueHour1}
@@ -3046,7 +3141,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataMinutes}
-                              placeholder="Minutes"
+                              placeholder="分"
                               style={{ width: '49%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinute1')}
                               value={pullDown[pullDown.type].valueMinute1}
@@ -3057,7 +3152,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataHour.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_at) || "0") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_at) || "23"))}
-                              placeholder="Time"
+                              placeholder="時"
                               style={{ width: '49%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueHour2')}
                               value={pullDown[pullDown.type].valueHour2}
@@ -3065,7 +3160,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataMinutes}
-                              placeholder="Minutes"
+                              placeholder="分"
                               style={{ width: '49%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMinute2')}
                               value={pullDown[pullDown.type].valueMinute2}
@@ -3087,7 +3182,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataYear.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_year) || "1935") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_year) || "2072"))}
-                              placeholder="Year"
+                              placeholder="年"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear1')}
                               value={pullDown[pullDown.type].valueYear1}
@@ -3095,7 +3190,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataMonth}
-                              placeholder="Month"
+                              placeholder="月"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMonth1')}
                               value={pullDown[pullDown.type].valueMonth1}
@@ -3103,7 +3198,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataDay}
-                              placeholder="Day"
+                              placeholder="日"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueDay1')}
                               value={pullDown[pullDown.type].valueDay1}
@@ -3114,7 +3209,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataYear.filter(item => parseInt(item.value) >= (parseInt(pullDown[pullDown.type].start_year) || "1935") && parseInt(item.value) <= (parseInt(pullDown[pullDown.type].end_year) || "2072"))}
-                              placeholder="Year"
+                              placeholder="年"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueYear2')}
                               value={pullDown[pullDown.type].valueYear2}
@@ -3122,7 +3217,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataMonth}
-                              placeholder="Month"
+                              placeholder="月"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueMonth2')}
                               value={pullDown[pullDown.type].valueMonth2}
@@ -3130,7 +3225,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               disabled={disabled}
                               data={dataDay}
-                              placeholder="Day"
+                              placeholder="日"
                               style={{ width: '32%' }}
                               onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'valueDay2')}
                               value={pullDown[pullDown.type].valueDay2}
@@ -3150,7 +3245,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         <SelectCustom
                           disabled={disabled}
                           data={dataPrefectures}
-                          placeholder="Please select"
+                          placeholder="選択してください。"
                           style={{ width: '100%' }}
                           keyValue="name"
                           nameValue="name"
@@ -3166,7 +3261,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <SelectCustom
                             disabled={disabled}
                             data={dataPrefectures}
-                            placeholder="Select prefecture"
+                            placeholder="都道府県を選択"
                             style={{ width: '45%' }}
                             keyValue="name"
                             nameValue="name"
@@ -3193,7 +3288,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <SelectCustom
                             disabled={disabled}
                             data={dataCity}
-                            placeholder="Select city"
+                            placeholder="市区町村を選択"
                             style={{ width: '45%' }}
                             keyValue="city_name"
                             nameValue="city_name"
@@ -3230,7 +3325,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       {(zipCodeAddress.isCheckRequire === 'all_items_require' ||
                         zipCodeAddress.isCheckRequire === 'require') &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -3238,7 +3333,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {zipCodeAddress.post_code !== undefined && (
                     <div className="ss-user-setting__item-bottom">
                       <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '5px' }}>
-                        Post code
+                        郵便番号
                       </div>
                       {zipCodeAddress.split_postal_code !== true ?
                         <InputCustom
@@ -3362,7 +3457,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {zipCodeAddress.prefecture !== undefined &&
                     <div className="ss-user-setting__item-bottom">
                       <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                        Prefectures
+                        都道府県
                       </div>
                       {zipCodeAddress.is_use_dropdown ?
                         <SelectCustom
@@ -3388,7 +3483,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {zipCodeAddress.municipality !== undefined &&
                     <div className="ss-user-setting__item-bottom">
                       <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                        Municipalities
+                        市区町村
                       </div>
                       <InputCustom
                         placeholder={zipCodeAddress.municipality}
@@ -3402,7 +3497,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {zipCodeAddress.address !== undefined &&
                     <div className="ss-user-setting__item-bottom">
                       <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                        Address
+                        番地
                       </div>
                       <InputCustom
                         placeholder={zipCodeAddress.address}
@@ -3417,7 +3512,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {zipCodeAddress.building_name !== undefined &&
                     <div className="ss-user-setting__item-bottom">
                       <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                        Building name
+                        建物名
                       </div>
                       <InputCustom
                         placeholder={zipCodeAddress.building_name}
@@ -3445,7 +3540,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     <div className="ss-message__content--user-attaching_file-top">
                       {attachingFile.require === true &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -3453,7 +3548,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   <div className="ss-message__content--user-attaching_file">
                     <div style={{ position: 'relative' }}>
                       <InputCustom
-                        value={attachingFile.value || "Not selected"}
+                        value={attachingFile.value || "未選択"}
                         disabled={true}
                       />
                       <MDBIcon fas icon="times-circle"
@@ -3474,7 +3569,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     <Button id={`sp-button-upload-${indexContent}`} className="ss-message__content--user-attaching_file-btn" style={{ backgroundColor: '#A3B1BF', marginTop: '3px', width: '100%' }}
                       disabled={disabled}
                       onClick={botUploadFile}>
-                      Select file
+                      ファイルを選択
                     </Button>
                   </div>
                   {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
@@ -3498,7 +3593,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {calendar.require === true &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -3508,25 +3603,108 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     <React.Fragment>
                       <DatePickerCustom
                         disabled={disabled}
+                        locale={locale}
+                        format={"YYYY-MM-DD"}
                         style={{ width: '99%', marginTop: '5px' }}
-                        value={calendar.date_select ? moment(calendar.date_select) : null}
+                        value={calendar.date_select ? moment(calendar.date_select, "YYYY-MM-DD") : null}
                         onChange={(date, dateString) => onChangeValue(indexContent, content.type, dateString, 'date_select')}
                         disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                       />
                     </React.Fragment>
                   )}
                   {/* calendar: type = 'embedded' */}
+                  {console.log(calendar.date_select, 'checkkkk calendar.date_select')}
+                  {/* {console.log(locale)} */}
                   {calendar.type === 'embedded' && (
                     <React.Fragment>
-                      {console.log(calendar.date_select, 'checkkkk date selectttt')}
                       <div className="ss-message__content--user-calender-embedded" style={{ marginTop: '5px' }}>
                         <Calendar
+                          // onLoad={
+                          //   checkLoadCalendar()
+                          // }
                           disabled={disabled}
                           className="ss-custom-calendar"
                           fullscreen={false}
-                          onPanelChange={(value, mode) => console.log(value)}
+                          locale={locale}
+                          // format={"YYYY-MM-DD"}
+                          headerRender={({ value, type, onChange, onTypeChange }) => {
+                            const start = 0;
+                            const end = 12;
+                            const monthOptions = [];
+                            console.log(value)
+                            value = value ? value : moment();
+                            let current = value.clone();
+                            const localeData = value.localeData();
+                            const months = [];
+                            for (let i = 0; i < 12; i++) {
+                              current = current.month(i);
+                              months.push(localeData.monthsShort(current));
+                            }
+
+                            for (let i = start; i < end; i++) {
+                              monthOptions.push(
+                                <Select.Option key={i} value={i} className="month-item">
+                                  {months[i]}
+                                </Select.Option>,
+                              );
+                            }
+
+                            const year = value.year();
+                            const month = value.month();
+                            const options = [];
+                            for (let i = year - 50; i < year + 50; i += 1) {
+                              options.push(
+                                <Select.Option key={i} value={i} className="year-item">
+                                  {i}
+                                </Select.Option>,
+                              );
+                            }
+                            return (
+                              <div style={{ padding: 8 }}>
+                                <Row gutter={8}>
+                                  <Col>
+                                    <Radio.Group
+                                      size="small"
+                                      onChange={(e) => onTypeChange(e.target.value)}
+                                      value={type}
+                                    >
+                                      <Radio.Button value="month">月</Radio.Button>
+                                      <Radio.Button value="year">年</Radio.Button>
+                                    </Radio.Group>
+                                  </Col>
+                                  <Col>
+                                    <Select
+                                      size="small"
+                                      dropdownMatchSelectWidth={false}
+                                      className="my-year-select"
+                                      value={year}
+                                      onChange={(newYear) => {
+                                        const now = value.clone().year(newYear);
+                                        onChange(now);
+                                      }}
+                                    >
+                                      {options}
+                                    </Select>
+                                  </Col>
+                                  <Col>
+                                    <Select
+                                      size="small"
+                                      dropdownMatchSelectWidth={false}
+                                      value={month}
+                                      onChange={(newMonth) => {
+                                        const now = value.clone().month(newMonth);
+                                        onChange(now);
+                                      }}
+                                    >
+                                      {monthOptions}
+                                    </Select>
+                                  </Col>
+                                </Row>
+                              </div>
+                            );
+                          }}
                           style={{ top: '20px', width: '300px', border: '1px solid grey' }}
-                          value={calendar.date_select ? moment(calendar.date_select) : null}
+                          value={calendar.date_select ? moment(calendar.date_select, "YYYY-MM-DD") : null}
                           onChange={value => onChangeValue(indexContent, content.type, value, 'date_select')}
                           disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                         />
@@ -3534,20 +3712,21 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     </React.Fragment>
                   )}
                   {/* calendar: type = 'start_end_date' */}
+                  {console.log(calendar.start_date_select, 'chekckkkk calendar.start_date_select')}
                   {calendar.type === 'start_end_date' && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <DatePickerCustom
                         disabled={disabled}
                         style={{ width: '49%', marginTop: '5px' }}
                         disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
-                        value={calendar.start_date_select ? moment(calendar.start_date_select) : null}
+                        value={calendar.start_date_select ? moment(calendar.start_date_select, "YYYY-MM-DD") : null}
                         onChange={(date, dateString) => onChangeValue(indexContent, content.type, dateString, 'start_date_select')}
                       />
                       <DatePickerCustom
                         disabled={disabled}
                         style={{ width: '49%', marginTop: '5px' }}
                         disabledDate={(current) => handleDisableEndDateCalendar(current, calendar)}
-                        value={calendar.end_date_select ? moment(calendar.end_date_select) : null}
+                        value={calendar.end_date_select ? moment(calendar.end_date_select, "YYYY-MM-DD") : null}
                         onChange={(date, dateString) => onChangeValue(indexContent, content.type, dateString, 'end_date_select')}
                       />
                     </div>
@@ -3572,7 +3751,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       </span>
                     }
                     <span className="ss-message__content--user-text-input-required">
-                      * required
+                      ※必須
                     </span>
                   </div>
                   {/* } */}
@@ -3636,7 +3815,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {carousel.require &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -3664,7 +3843,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               if (carousel.require && messageContent.length === 1) onClickNext();
                             }
                           }}>
-                            {itemCarousel.buttonTitle || "Select"}
+                            {itemCarousel.buttonTitle || "選択"}
                           </div>
                         </div>
                       })}
@@ -3691,7 +3870,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {(creditCardPayment.require) &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -3710,7 +3889,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       <InputNum
                         styleLabel={{ width: '100%' }}
                         className="ss-user-setting-input-limit-character"
-                        label="Card number"
+                        label="カード番号"
                         controls={false}
                         max={Number.MAX_SAFE_INTEGER}
                         maxLength={16}
@@ -3722,7 +3901,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       />
                     </div> :
                     <div className="ss-user-setting__item-bottom">
-                      <div style={{ width: '100%' }}>Card number</div>
+                      <div style={{ width: '100%' }}>カード番号</div>
                       <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type" style={{ width: '100%' }}>
                         <InputNum
                           max={9999}
@@ -3796,7 +3975,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     <div className="ss-user-setting__item-bottom">
                       <InputCustom
                         styleLabel={{ width: '100%' }}
-                        label="Card holder"
+                        label="カード名義"
                         inline={false}
                         disabled={disabled}
                         value={creditCardPayment.card_holder}
@@ -3806,7 +3985,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     </div>
                   }
                   <div className="ss-user-setting__item-bottom">
-                    <div style={{ width: '100%' }}>Date of expiry</div>
+                    <div style={{ width: '100%' }}>有効期限</div>
                     {creditCardPayment.type_date_of_expiry === 'ym' &&
                       <div style={{ display: 'flex', width: '100%' }}>
                         <SelectCustom
@@ -3857,7 +4036,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         maxLength={4}
                         disabled={disabled}
                         controls={false}
-                        label={<span style={{ fontWeight: '400' }}>CVC <img style={{ width: '8%' }} src={cvcIcon} /></span>}
+                        label={<span style={{ fontWeight: '400' }}>CVC非表示 <img style={{ width: '8%' }} src={cvcIcon} /></span>}
                         value={creditCardPayment.cvc}
                         placeholder={creditCardPayment.cvc_placeholder}
                         onChange={value => onChangeValue(indexContent, content.type, value, 'cvc')}
@@ -3883,7 +4062,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       </span>
                     }
                     <span className="ss-message__content--user-text-input-required">
-                      * required
+                      ※必須
                     </span>
                   </div>
                   <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px' }}>
@@ -3918,7 +4097,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {productPurchase.require === true &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -3961,7 +4140,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                         }
                                         {productPurchase.product_number_display && itemProduct.item_number &&
                                           <div className="ss-user-overview-product-purchase-infor-item-number">
-                                            Item number: {itemProduct.item_number}
+                                            商品番号: {itemProduct.item_number}
                                           </div>
                                         }
                                         {itemProduct.price_display_custom ?
@@ -3970,7 +4149,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                           </div> :
                                           productPurchase.price_display && itemProduct.item_price &&
                                           <div className="ss-user-overview-product-purchase-infor-price">
-                                            Price: {itemProduct.item_price} 円
+                                            値段: {itemProduct.item_price} 円
                                           </div>
                                         }
                                         {itemProduct.quantity_limit &&
@@ -4064,7 +4243,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                         }
                                         {productPurchase.product_number_display && itemProduct.item_number &&
                                           <div className="ss-user-overview-product-purchase-infor-item-number">
-                                            Item number: {itemProduct.item_number}
+                                            商品番号: {itemProduct.item_number}
                                           </div>
                                         }
                                         {itemProduct.price_display_custom ?
@@ -4073,7 +4252,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                           </div> :
                                           productPurchase.price_display && itemProduct.item_price &&
                                           <div className="ss-user-overview-product-purchase-infor-price">
-                                            Price: {itemProduct.item_price} 円
+                                            値段: {itemProduct.item_price} 円
                                           </div>
                                         }
                                         {itemProduct.quantity_limit &&
@@ -4315,7 +4494,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {productPurchaseRadioButton.require === true &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -4361,7 +4540,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     }
                                     {productPurchaseRadioButton.product_number_display && itemProduct.item_number &&
                                       <div className="ss-user-overview-product-purchase-infor-item-number">
-                                        Item number: {itemProduct.item_number}
+                                        商品番号: {itemProduct.item_number}
                                       </div>
                                     }
                                     {itemProduct.price_display_custom ?
@@ -4370,7 +4549,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                       </div> :
                                       productPurchaseRadioButton.price_display && itemProduct.item_price &&
                                       <div className="ss-user-overview-product-purchase-infor-price">
-                                        Price: {itemProduct.item_price} 円
+                                        値段: {itemProduct.item_price} 円
                                       </div>
                                     }
                                     {/* {productPurchaseRadioButton.multiple_item_purchase &&
@@ -4453,7 +4632,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {slider.require === true &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -4502,7 +4681,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {cardPaymentRadioButton.require === true &&
                         <span className="ss-message__content--user-text-input-required">
-                          * required
+                          ※必須
                         </span>
                       }
                     </div>
@@ -4622,7 +4801,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <InputNum
                             styleLabel={{ width: '100%' }}
                             className="ss-user-setting-input-limit-character"
-                            label="Card number"
+                            label="カード番号"
                             controls={false}
                             max={Number.MAX_SAFE_INTEGER}
                             maxLength={16}
@@ -4634,7 +4813,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           />
                         </div> :
                         <div className="ss-user-setting__item-bottom">
-                          <div style={{ width: '100%' }}>Card number</div>
+                          <div style={{ width: '100%' }}>カード番号</div>
                           <div style={{ width: '100%' }} className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type">
                             <InputNum
                               max={9999}
@@ -4709,7 +4888,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <InputCustom
                             className="ss-user-setting-input-overview"
                             styleLabel={{ width: '100%' }}
-                            label="Card holder"
+                            label="カード名義"
                             inline={false}
                             disabled={disabled}
                             value={cardPaymentRadioButton.card_holder}
@@ -4719,21 +4898,21 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         </div>
                       }
                       <div className="ss-user-setting__item-bottom">
-                        <div style={{ width: '100%' }}>Date of expiry</div>
+                        <div style={{ width: '100%' }}>有効期限</div>
                         {cardPaymentRadioButton.type_date_of_expiry === 'ym' &&
                           <div style={{ display: 'flex', width: '100%' }}>
                             <SelectCustom
                               style={{ width: '33%' }}
                               value={cardPaymentRadioButton.year}
                               disabled={disabled}
-                              placeholder={"year"}
+                              placeholder={"年"}
                               data={dataYearFixed.filter(item => item.key >= new Date().getFullYear() && item.key <= (new Date().getFullYear() + 10))}
                               onChange={value => onChangeValue(indexContent, content.type, value, 'year')}
                             />
                             <SelectCustom
                               style={{ width: '33%', marginLeft: '10px' }}
                               value={cardPaymentRadioButton.month}
-                              placeholder={"month"}
+                              placeholder={"月"}
                               data={dataMonth}
                               disabled={disabled}
                               onChange={value => onChangeValue(indexContent, content.type, value, 'month')}
@@ -4745,7 +4924,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <SelectCustom
                               style={{ width: '33%' }}
                               value={cardPaymentRadioButton.month}
-                              placeholder={"month"}
+                              placeholder={"月"}
                               data={dataMonth}
                               disabled={disabled}
                               onChange={value => onChangeValue(indexContent, content.type, value, 'month')}
@@ -4754,7 +4933,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               style={{ width: '33%', marginLeft: '10px' }}
                               value={cardPaymentRadioButton.year}
                               disabled={disabled}
-                              placeholder={"year"}
+                              placeholder={"年"}
                               data={dataYearFixed.filter(item => item.key >= new Date().getFullYear() && item.key <= (new Date().getFullYear() + 10))}
                               onChange={value => onChangeValue(indexContent, content.type, value, 'year')}
                             />
@@ -4766,7 +4945,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           <InputCustom
                             className="ss-user-setting-input-overview"
                             styleLabel={{ width: '100%' }}
-                            label="CVC"
+                            label="CVC非表示"
                             inline={false}
                             disabled={disabled}
                             value={cardPaymentRadioButton.cvc}
