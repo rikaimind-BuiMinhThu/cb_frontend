@@ -2160,13 +2160,13 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
           let i = 0;
           let date_select = "";
 
-          date_select = moment().add(i, 'days').format("YYYY年MM月DD日");
+          date_select = moment().add(i, 'days').format("YYYY-MM-DD");
           while (handleDisableDateCalendar(moment().add(i, 'days'), calendar)) {
             if (i === 100) {
               date_select = null;
               break;
             }
-            date_select = moment().add(i + 1, 'days').format("YYYY年MM月DD日");
+            date_select = moment().add(i + 1, 'days').format("YYYY-MM-DD");
             i++;
           }
           calendar.date_select = date_select;
@@ -2259,23 +2259,23 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
       || calendar?.fixed_date?.length !== 0 || calendar?.non_select_date_time?.length !== 0
       || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to
       || calendar.end_date_select) {
-      return (moment(current, "YYYY年MM月DD日") >= moment(calendar.end_date, "YYYY年MM月DD日").add(1, 'days')
-        || moment(current, "YYYY年MM月DD日") < moment(calendar.start_date, "YYYY年MM月DD日")
-        || (calendar.type === "start_end_date" && moment(current, "YYYY年MM月DD日").isSameOrAfter(moment(calendar.end_date_select, "YYYY年MM月DD日")))
-        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY年MM月DD日"))
-        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, "YYYY年MM月DD日"))
-        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, "YYYY年MM月DD日"))
+      return (moment(current, "YYYY-MM-DD") >= moment(calendar.end_date, "YYYY-MM-DD").add(1, 'days')
+        || moment(current, "YYYY-MM-DD") < moment(calendar.start_date, "YYYY-MM-DD")
+        || (calendar.type === "start_end_date" && moment(current, "YYYY-MM-DD").isSameOrAfter(moment(calendar.end_date_select, "YYYY-MM-DD")))
+        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY-MM-DD"))
+        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, "YYYY-MM-DD"))
+        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, "YYYY-MM-DD"))
         || calendar.non_select_date_time?.find(type => {
           if (type === 'today') {
-            return (moment().format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日"));
+            return (moment().format("YYYY-MM-DD") === moment(current).format("YYYY-MM-DD"));
           } else if (type === 'tomorrow') {
-            return moment().add(1, 'days').format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日");
+            return moment().add(1, 'days').format("YYYY-MM-DD") === moment(current).format("YYYY-MM-DD");
           } else if (type === 'day_after_tomorrow') {
-            return moment().add(2, 'days').format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日");
+            return moment().add(2, 'days').format("YYYY-MM-DD") === moment(current).format("YYYY-MM-DD");
           } else if (type === 'past') {
-            return moment(current).format("YYYY年MM月DD日") < moment().format("YYYY年MM月DD日");
+            return moment(current).format("YYYY-MM-DD") < moment().format("YYYY-MM-DD");
           } else if (type === 'future') {
-            return moment(current).format("YYYY年MM月DD日") > moment().format("YYYY年MM月DD日");
+            return moment(current).format("YYYY-MM-DD") > moment().format("YYYY-MM-DD");
           } else if (type === 'moon') {
             return moment(current).day() === 1;
           } else if (type === 'fire') {
@@ -2302,25 +2302,25 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
       || calendar.start_date_select || calendar.specified_period_from
       || calendar.specified_period_to || calendar.aggregation_target_period_from
       || calendar.aggregation_target_period_to) {
-      return (moment(current, "YYYY年MM月DD日").isSameOrAfter(moment(calendar.end_date, "YYYY年MM月DD日").add(1, 'days'))
-        || moment(current, "YYYY年MM月DD日") < moment(calendar.start_date, "YYYY年MM月DD日")
-        || (calendar.type === "start_end_date" && moment(current, "YYYY年MM月DD日").isSameOrBefore(moment(calendar.start_date_select, "YYYY年MM月DD日")))
-        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY年MM月DD日"))
-        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, "YYYY年MM月DD日"))
-        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, "YYYY年MM月DD日"))
-        || moment(current, "YYYY年MM月DD日") < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_select, "YYYY年MM月DD日").add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, "YYYY年MM月DD日"))
-        || moment(current, "YYYY年MM月DD日") > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_select, "YYYY年MM月DD日").add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, "YYYY年MM月DD日"))
+      return (moment(current, "YYYY-MM-DD").isSameOrAfter(moment(calendar.end_date, "YYYY-MM-DD").add(1, 'days'))
+        || moment(current, "YYYY-MM-DD") < moment(calendar.start_date, "YYYY-MM-DD")
+        || (calendar.type === "start_end_date" && moment(current, "YYYY-MM-DD").isSameOrBefore(moment(calendar.start_date_select, "YYYY-MM-DD")))
+        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY-MM-DD"))
+        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, "YYYY-MM-DD"))
+        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, "YYYY-MM-DD"))
+        || moment(current, "YYYY-MM-DD") < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_select, "YYYY-MM-DD").add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, "YYYY-MM-DD"))
+        || moment(current, "YYYY-MM-DD") > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_select, "YYYY-MM-DD").add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, "YYYY-MM-DD"))
         || calendar.non_select_date_time?.find(type => {
           if (type === 'today') {
-            return (moment().format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日"));
+            return (moment().format("YYYY-MM-DD") === moment(current).format("YYYY-MM-DD"));
           } else if (type === 'tomorrow') {
-            return moment().add(1, 'days').format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日");
+            return moment().add(1, 'days').format("YYYY-MM-DD") === moment(current).format("YYYY-MM-DD");
           } else if (type === 'day_after_tomorrow') {
-            return moment().add(2, 'days').format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日");
+            return moment().add(2, 'days').format("YYYY-MM-DD") === moment(current).format("YYYY-MM-DD");
           } else if (type === 'past') {
-            return moment(current).format("YYYY年MM月DD日") < moment().format("YYYY年MM月DD日");
+            return moment(current).format("YYYY-MM-DD") < moment().format("YYYY-MM-DD");
           } else if (type === 'future') {
-            return moment(current).format("YYYY年MM月DD日") > moment().format("YYYY年MM月DD日");
+            return moment(current).format("YYYY-MM-DD") > moment().format("YYYY-MM-DD");
           } else if (type === 'moon') {
             return moment(current).day() === 1;
           } else if (type === 'fire') {
@@ -3604,9 +3604,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       <DatePickerCustom
                         disabled={disabled}
                         locale={locale}
-                        format={"YYYY年MM月DD日"}
+                        format={"YYYY-MM-DD"}
                         style={{ width: '99%', marginTop: '5px' }}
-                        value={calendar.date_select ? moment(calendar.date_select, "YYYY年MM月DD日") : null}
+                        value={calendar.date_select ? moment(calendar.date_select, "YYYY-MM-DD") : null}
                         onChange={(date, dateString) => onChangeValue(indexContent, content.type, dateString, 'date_select')}
                         disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                       />
@@ -3626,7 +3626,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           className="ss-custom-calendar"
                           fullscreen={false}
                           locale={locale}
-                          // format={"YYYY年MM月DD日"}
+                          // format={"YYYY-MM-DD"}
                           headerRender={({ value, type, onChange, onTypeChange }) => {
                             const start = 0;
                             const end = 12;
@@ -3652,7 +3652,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             const year = value.year();
                             const month = value.month();
                             const options = [];
-                            for (let i = year - 10; i < year + 10; i += 1) {
+                            for (let i = year - 50; i < year + 50; i += 1) {
                               options.push(
                                 <Select.Option key={i} value={i} className="year-item">
                                   {i}
@@ -3704,7 +3704,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             );
                           }}
                           style={{ top: '20px', width: '300px', border: '1px solid grey' }}
-                          value={calendar.date_select ? moment(calendar.date_select, "YYYY年MM月DD日") : null}
+                          value={calendar.date_select ? moment(calendar.date_select, "YYYY-MM-DD") : null}
                           onChange={value => onChangeValue(indexContent, content.type, value, 'date_select')}
                           disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                         />
@@ -3719,14 +3719,14 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         disabled={disabled}
                         style={{ width: '49%', marginTop: '5px' }}
                         disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
-                        value={calendar.start_date_select ? moment(calendar.start_date_select, "YYYY年MM月DD日") : null}
+                        value={calendar.start_date_select ? moment(calendar.start_date_select, "YYYY-MM-DD") : null}
                         onChange={(date, dateString) => onChangeValue(indexContent, content.type, dateString, 'start_date_select')}
                       />
                       <DatePickerCustom
                         disabled={disabled}
                         style={{ width: '49%', marginTop: '5px' }}
                         disabledDate={(current) => handleDisableEndDateCalendar(current, calendar)}
-                        value={calendar.end_date_select ? moment(calendar.end_date_select, "YYYY年MM月DD日") : null}
+                        value={calendar.end_date_select ? moment(calendar.end_date_select, "YYYY-MM-DD") : null}
                         onChange={(date, dateString) => onChangeValue(indexContent, content.type, dateString, 'end_date_select')}
                       />
                     </div>
