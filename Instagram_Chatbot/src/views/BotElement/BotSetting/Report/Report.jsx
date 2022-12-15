@@ -17,7 +17,7 @@ function Report() {
   // states
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
   const [startDate, setStartDate] = useState(new Date().setDate(1));
-  const [endDate, setEndDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date().setDate(new Date().getDate() - 1));
   const [dateState, setDateState] = useState(new Date());
   const [allScenarios, setAllScenarios] = useState([]);
   const [dataReportCount, setDataReportCount] = useState();
@@ -25,6 +25,7 @@ function Report() {
   const [numOfBotStart, setNumofBotStart] = useState();
   const [numOfOpenBot, setNumOfOpenBot] = useState(0);
   const [numOfCloseBot, setNumOfCloseBot] = useState(0);
+  const [reportGroupSelect, setReportGroupSelect] = useState('first');
 
   //
   const [devicePieChartSeries, setDevicePieChartSeries] = useState([]);
@@ -74,7 +75,9 @@ function Report() {
                   new Date().setDate(1)
                 )
                   .toISOString()
-                  .slice(0, 10)}&end_date=${new Date().toISOString().slice(0, 10)}`
+                  .slice(0, 10)}&end_date=${new Date(new Date().setDate(new Date().getDate() - 1))
+                  .toISOString()
+                  .slice(0, 10)}`
               )
               .then((res) => {
                 console.log('bot data: ', res.data);
@@ -141,7 +144,7 @@ function Report() {
           tokenExpired();
         }
       });
-  }, []);
+  }, [botId]);
 
   var optionsCVR = {
     series: [
@@ -531,9 +534,11 @@ function Report() {
 
   function chooseAggreation(value) {
     // setStartDate
+    setReportGroupSelect(value);
+    setEndDate(new Date().setDate(new Date().getDate() - 1));
     if (value == 'first') {
-      setStartDate(new Date().setDate(1));
       console.log('date: ', new Date(new Date().setDate(new Date().getDate() - 7)));
+      setStartDate(new Date().setDate(1));
     } else if (value == '1') {
       setStartDate(new Date(new Date().setDate(new Date().getDate() - 1)));
     } else if (value == '7') {
@@ -588,6 +593,7 @@ function Report() {
                         onChange={(e) => chooseAggreation(e.target.value)}
                         name="aggregation"
                         id=""
+                        value={reportGroupSelect}
                       >
                         <option value="first">Specified period</option>
                         <option value="1">前日</option>
@@ -603,6 +609,7 @@ function Report() {
                         selected={startDate}
                         onChange={(date) => selectStartDate(date)}
                         dateFormat="yyyy/MM/dd"
+                        disabled={reportGroupSelect !== 'first'}
                       />
                     </div>
                     <div className="report__group report-date">
@@ -613,6 +620,7 @@ function Report() {
                         selected={endDate}
                         onChange={(date) => selectEndDate(date)}
                         dateFormat="yyyy/MM/dd"
+                        disabled={reportGroupSelect !== 'first'}
                       />
                     </div>
                     <p className="report__group">デバイス</p>
