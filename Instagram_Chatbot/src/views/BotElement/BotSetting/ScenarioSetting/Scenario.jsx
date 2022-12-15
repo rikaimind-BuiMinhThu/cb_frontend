@@ -27,7 +27,7 @@ import {
 } from '../../../../variables/constants';
 import { tokenExpired } from 'api/tokenExpired';
 import DatePickerCustom from './scenarioComon/DatePickerCustom';
-import { Carousel, Checkbox, Radio, Slider, Calendar } from 'antd';
+import { Carousel, Checkbox, Radio, Slider, Calendar, Select } from 'antd';
 import CheckboxGroupCustom from './scenarioComon/CheckboxGroupCustom';
 import american_express from '../../../../assets/img/payment-method/american_express.png';
 import diner_club from '../../../../assets/img/payment-method/diner_club.png';
@@ -36,6 +36,8 @@ import jcb from '../../../../assets/img/payment-method/jcb.png';
 import master_card from '../../../../assets/img/payment-method/master_card.png';
 import visa from '../../../../assets/img/payment-method/visa.png';
 import nanoMetadata from 'nano-metadata';
+import locale from 'antd/es/date-picker/locale/ja_JP';
+import 'moment/locale/zh-cn';
 
 const _ = require('lodash');
 
@@ -780,6 +782,7 @@ const Scenario = () => {
   // states
   const [fileVideo, setFileVideo] = useState('');
   const [scenarioName, setScenarioName] = useState('');
+  const [urlThanks, setUrlThanks] = useState('');
   const [errorScenarioName, setErrorScenarioName] = useState('');
 
   const [belongTo, setBelongTo] = useState('bot');
@@ -896,7 +899,7 @@ const Scenario = () => {
     api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`).then((res) => {
       setDataMessages(res.data.data?.conversation?.messages || []);
       setScenarioName(res.data.data?.scenario_name || '');
-
+      setUrlThanks(res.data.data?.conversation?.urlThanksPage || '');
     }).catch((error) => {
       console.log(error);
       if (error.response?.data.code === 0) {
@@ -1703,7 +1706,7 @@ const Scenario = () => {
   const onChangeFixedDate = (indexMessage, indexContent, type, value, name) => {
     console.log(value);
     if (value) {
-      dataMessages[indexMessage].message_content[indexContent][type][name].push(moment(value).format('YYYY/MM/DD'));
+      dataMessages[indexMessage].message_content[indexContent][type][name].push(moment(value, "YYYY年MM月DD日").format("YYYY年MM月DD日"));
     }
     dataMessages[indexMessage].message_content[indexContent][type].select_fixed_date = value;
     setDataMessages([...dataMessages]);
@@ -1811,6 +1814,7 @@ const Scenario = () => {
     let data = {
       conversation: {
         messages: [...dataMessages],
+        urlThanksPage: urlThanks
       },
       scenario_name: scenarioName
     }
@@ -1851,6 +1855,7 @@ const Scenario = () => {
     let data = {
       conversation: {
         messages: [...dataMessages],
+        urlThanksPage: urlThanks
       },
       scenario_name: scenarioName
     }
@@ -2095,25 +2100,25 @@ const Scenario = () => {
       || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to
       || calendar.end_date_test || calendar[calendar.type].specified_period_from
       || calendar[calendar.type].specified_period_to) {
-      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD').add(1, 'days')
-        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
-        || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_test, 'YYYY/MM/DD'))
-        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
-        || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current, 'YYYY/MM/DD') < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_test, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current, 'YYYY/MM/DD') > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_test, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+      return (moment(current, "YYYY年MM月DD日") >= moment(calendar.end_date, "YYYY年MM月DD日").add(1, 'days')
+        || moment(current, "YYYY年MM月DD日") < moment(calendar.start_date, "YYYY年MM月DD日")
+        || (calendar.type === "start_end_date" && moment(current, "YYYY年MM月DD日").isSameOrAfter(moment(calendar.end_date_test, "YYYY年MM月DD日")))
+        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY年MM月DD日"))
+        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, "YYYY年MM月DD日"))
+        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, "YYYY年MM月DD日"))
+        // || moment(current, "YYYY年MM月DD日") < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_test, "YYYY年MM月DD日").add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, "YYYY年MM月DD日"))
+        // || moment(current, "YYYY年MM月DD日") > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_test, "YYYY年MM月DD日").add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, "YYYY年MM月DD日"))
         || calendar.non_select_date_time?.find(type => {
           if (type === 'today') {
-            return (moment().format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD"));
+            return (moment().format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日"));
           } else if (type === 'tomorrow') {
-            return moment().add(1, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+            return moment().add(1, 'days').format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日");
           } else if (type === 'day_after_tomorrow') {
-            return moment().add(2, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+            return moment().add(2, 'days').format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日");
           } else if (type === 'past') {
-            return moment(current).format("YYYY/MM/DD") < moment().format("YYYY/MM/DD");
+            return moment(current).format("YYYY年MM月DD日") < moment().format("YYYY年MM月DD日");
           } else if (type === 'future') {
-            return moment(current).format("YYYY/MM/DD") > moment().format("YYYY/MM/DD");
+            return moment(current).format("YYYY年MM月DD日") > moment().format("YYYY年MM月DD日");
           } else if (type === 'moon') {
             return moment(current).day() === 1;
           } else if (type === 'fire') {
@@ -2140,25 +2145,25 @@ const Scenario = () => {
       || calendar.start_date_test || calendar.specified_period_from
       || calendar.specified_period_to || calendar.aggregation_target_period_from
       || calendar.aggregation_target_period_to) {
-      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD').add(1, 'days')
-        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
-        || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') < moment(calendar.start_date_test, 'YYYY/MM/DD'))
-        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
-        || moment(current) < (calendar.aggregation_target_period_from ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current, 'YYYY/MM/DD') < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_test, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current, 'YYYY/MM/DD') > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_test, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+      return (moment(current, "YYYY年MM月DD日").isSameOrAfter(moment(calendar.end_date, "YYYY年MM月DD日").add(1, 'days'))
+        || moment(current, "YYYY年MM月DD日") < moment(calendar.start_date, "YYYY年MM月DD日")
+        || (calendar.type === "start_end_date" && moment(current, "YYYY年MM月DD日").isSameOrBefore(moment(calendar.start_date_test, "YYYY年MM月DD日")))
+        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY年MM月DD日"))
+        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, "YYYY年MM月DD日"))
+        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, "YYYY年MM月DD日"))
+        || moment(current, "YYYY年MM月DD日") < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_test, "YYYY年MM月DD日").add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, "YYYY年MM月DD日"))
+        || moment(current, "YYYY年MM月DD日") > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_test, "YYYY年MM月DD日").add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, "YYYY年MM月DD日"))
         || calendar.non_select_date_time?.find(type => {
           if (type === 'today') {
-            return (moment().format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD"));
+            return (moment().format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日"));
           } else if (type === 'tomorrow') {
-            return moment().add(1, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+            return moment().add(1, 'days').format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日");
           } else if (type === 'day_after_tomorrow') {
-            return moment().add(2, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+            return moment().add(2, 'days').format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日");
           } else if (type === 'past') {
-            return moment(current).format("YYYY/MM/DD") < moment().format("YYYY/MM/DD");
+            return moment(current).format("YYYY年MM月DD日") < moment().format("YYYY年MM月DD日");
           } else if (type === 'future') {
-            return moment(current).format("YYYY/MM/DD") > moment().format("YYYY/MM/DD");
+            return moment(current).format("YYYY年MM月DD日") > moment().format("YYYY年MM月DD日");
           } else if (type === 'moon') {
             return moment(current).day() === 1;
           } else if (type === 'fire') {
@@ -2206,10 +2211,17 @@ const Scenario = () => {
                       placeholder="シナリオ名入力"
                     />
                     {errorScenarioName && <span style={{ fontSize: '12px', color: '#FF621D' }}>{errorScenarioName}</span>}
-
+                  </div>
+                  <div>
+                    <InputCustom
+                      style={{ width: '100%', marginTop: '5px' }}
+                      value={urlThanks}
+                      onChange={value => setUrlThanks(value)}
+                      placeholder="感謝ページへのURLを入力する。"
+                    />
                   </div>
                   {/* Overview scenario */}
-                  <div style={{ height: 'calc(100% - 44px)', backgroundColor: '#f6fbff' }}>
+                  <div style={{ height: 'calc(100% - 87px)', backgroundColor: '#f6fbff' }}>
                     <div className="ss-overview-detail">
                       {(!dataMessages || dataMessages.length === 0) &&
                         <div className="ss-add-action-wrapper-empty-data">
@@ -2266,7 +2278,16 @@ const Scenario = () => {
                                               <React.Fragment>
                                                 <div style={{ width: '65%' }}>
                                                   <div style={{ display: 'flex', paddingLeft: '10px' }}>
-                                                    {content.type !== 'text_input' && <div className="ss-sub-title-message">{content.type}</div>}
+                                                    {content.type !== 'text_input' && <div className="ss-sub-title-message">
+                                                      {content.type === 'delay' && "遅延"}
+                                                      {content.type === 'file' && "ファイル"}
+                                                      {content.type === 'email' && "メール"}
+                                                      {content.type === 'api_linkage' && "API連携"}
+                                                      {content.type === 'script' && "スクリプト"}
+                                                      {content.type === 'clear_variable' && "変数クリア"}
+                                                      {content.type === 'variable_set' && "変数セット"}
+                                                      {content.type === 'pause' && "一時停止"}
+                                                    </div>}
                                                     {message.message_name && <div className="ss-sub-title-message ss-truncation-text" style={{ backgroundColor: '#fff', maxWidth: '60%' }}>{message.message_name}</div>}
                                                   </div>
                                                   {/* bot: type == 'text_input' */}
@@ -3428,7 +3449,7 @@ const Scenario = () => {
                                                                 <React.Fragment>
                                                                   <DatePickerCustom
                                                                     style={{ width: '99%', marginTop: '5px' }}
-                                                                    value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
+                                                                    value={calendar.date_selection_test ? moment(calendar.date_selection_test, "YYYY年MM月DD日") : null}
                                                                     onChange={(date, dateString) => console.log(dateString)}
                                                                     disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                                                                   />
@@ -3441,9 +3462,85 @@ const Scenario = () => {
                                                                     <Calendar
                                                                       className="ss-custom-calendar"
                                                                       fullscreen={false}
-                                                                      onPanelChange={(value, mode) => console.log(value)}
+                                                                      locale={locale}
+                                                                      headerRender={({ value, type, onChange, onTypeChange }) => {
+                                                                        const start = 0;
+                                                                        const end = 12;
+                                                                        const monthOptions = [];
+                                                                        console.log(value)
+                                                                        value = value ? value : moment();
+                                                                        let current = value.clone();
+                                                                        const localeData = value.localeData();
+                                                                        const months = [];
+                                                                        for (let i = 0; i < 12; i++) {
+                                                                          current = current.month(i);
+                                                                          months.push(localeData.monthsShort(current));
+                                                                        }
+
+                                                                        for (let i = start; i < end; i++) {
+                                                                          monthOptions.push(
+                                                                            <Select.Option key={i} value={i} className="month-item">
+                                                                              {months[i]}
+                                                                            </Select.Option>,
+                                                                          );
+                                                                        }
+
+                                                                        const year = value.year();
+                                                                        const month = value.month();
+                                                                        const options = [];
+                                                                        for (let i = year - 10; i < year + 10; i += 1) {
+                                                                          options.push(
+                                                                            <Select.Option key={i} value={i} className="year-item">
+                                                                              {i}
+                                                                            </Select.Option>,
+                                                                          );
+                                                                        }
+                                                                        return (
+                                                                          <div style={{ padding: 8 }}>
+                                                                            <Row gutter={8}>
+                                                                              <Col>
+                                                                                <Radio.Group
+                                                                                  size="small"
+                                                                                  onChange={(e) => onTypeChange(e.target.value)}
+                                                                                  value={type}
+                                                                                >
+                                                                                  <Radio.Button value="month">月</Radio.Button>
+                                                                                  <Radio.Button value="year">年</Radio.Button>
+                                                                                </Radio.Group>
+                                                                              </Col>
+                                                                              <Col>
+                                                                                <Select
+                                                                                  size="small"
+                                                                                  dropdownMatchSelectWidth={false}
+                                                                                  className="my-year-select"
+                                                                                  value={year}
+                                                                                  onChange={(newYear) => {
+                                                                                    const now = value.clone().year(newYear);
+                                                                                    onChange(now);
+                                                                                  }}
+                                                                                >
+                                                                                  {options}
+                                                                                </Select>
+                                                                              </Col>
+                                                                              <Col>
+                                                                                <Select
+                                                                                  size="small"
+                                                                                  dropdownMatchSelectWidth={false}
+                                                                                  value={month}
+                                                                                  onChange={(newMonth) => {
+                                                                                    const now = value.clone().month(newMonth);
+                                                                                    onChange(now);
+                                                                                  }}
+                                                                                >
+                                                                                  {monthOptions}
+                                                                                </Select>
+                                                                              </Col>
+                                                                            </Row>
+                                                                          </div>
+                                                                        );
+                                                                      }}
                                                                       style={{ top: '20px', width: '300px', border: '1px solid grey' }}
-                                                                      value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
+                                                                      value={calendar.date_selection_test ? moment(calendar.date_selection_test, "YYYY年MM月DD日") : null}
                                                                       onChange={value => console.log(value.format("DD/MM/YYYY"))}
                                                                       disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                                                                     />
@@ -3456,13 +3553,13 @@ const Scenario = () => {
                                                                   <DatePickerCustom
                                                                     style={{ width: '49%', marginTop: '5px' }}
                                                                     disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
-                                                                    value={calendar.start_date_test ? moment(calendar.start_date_test) : null}
+                                                                    value={calendar.start_date_test ? moment(calendar.start_date_test, "YYYY年MM月DD日") : null}
                                                                     onChange={(date, dateString) => console.log(dateString)}
                                                                   />
                                                                   <DatePickerCustom
                                                                     style={{ width: '49%', marginTop: '5px' }}
                                                                     disabledDate={(current) => handleDisableEndDateCalendar(current, calendar)}
-                                                                    value={calendar.end_date_test ? moment(calendar.end_date_test) : null}
+                                                                    value={calendar.end_date_test ? moment(calendar.end_date_test, "YYYY年MM月DD日") : null}
                                                                     onChange={(date, dateString) => console.log(dateString)}
                                                                   />
                                                                 </div>
@@ -4586,7 +4683,7 @@ const Scenario = () => {
                             <div className="ss-bot-setting-condition-header">
                               <div className="ss-bot-setting-condition-header-left">
                                 <span style={{ fontWeight: '400' }}>表示対象者の条件設定</span>
-                                <MDBIcon far icon="question-circle" style={{ color: '#FF7E00' }} />
+                                <MDBIcon far icon="question-circle" style={{ color: '#FF7E00', padding: '10px' }} />
                                 <span className="ss-bot-setting-condition-icon-label">Standard</span>
                                 <span className="ss-bot-setting-condition-icon-label" style={{ width: '50px', backgroundColor: '#7A52A3' }}>Pro</span>
                               </div>
@@ -5928,13 +6025,13 @@ const Scenario = () => {
                                                           <span className="ss-user-setting-label" style={{ marginRight: '12px' }}>開始日～終了日</span>
                                                           <DatePickerCustom
                                                             style={{ width: '39%' }}
-                                                            value={calendar.start_date ? moment(calendar.start_date) : null}
+                                                            value={calendar.start_date ? moment(calendar.start_date, "YYYY年MM月DD日") : null}
                                                             onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'start_date')}
                                                           />
                                                           <span style={{ fontSize: '30px', marginLeft: '10px', opacity: '0.4', marginRight: '10px' }}>~</span>
                                                           <DatePickerCustom
                                                             style={{ width: '39%' }}
-                                                            value={calendar.end_date ? moment(calendar.end_date) : null}
+                                                            value={calendar.end_date ? moment(calendar.end_date, "YYYY年MM月DD日") : null}
                                                             onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'end_date')}
                                                           />
                                                         </div>
@@ -5947,12 +6044,43 @@ const Scenario = () => {
                                                           label="初期選択（今日から最短の日付）"
                                                           onChange={value => {
                                                             if (value === true) {
-                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY/MM/DD"), 'date_selection_test');
-                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY/MM/DD"), 'date_select');
-                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY/MM/DD"), 'start_date_select');
-                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY/MM/DD"), 'end_date_select');
-                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY/MM/DD"), 'start_date_test');
-                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY/MM/DD"), 'end_date_test');
+                                                              // onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY年MM月DD日"), 'date_selection_test');
+                                                              // onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY年MM月DD日"), 'date_select');
+                                                              // onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY年MM月DD日"), 'start_date_select');
+                                                              // onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY年MM月DD日"), 'end_date_select');
+                                                              // onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY年MM月DD日"), 'start_date_test');
+                                                              // onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, moment().format("YYYY年MM月DD日"), 'end_date_test');
+                                                              if (calendar.type !== "start_end_date") {
+                                                                let i = 0;
+                                                                let date_select = "";
+                                                                date_select = moment().add(i, 'days').format("YYYY年MM月DD日");
+                                                                while (handleDisableDateCalendar(moment().add(i, 'days'), calendar)) {
+                                                                  if (i === 100) {
+                                                                    date_select = null;
+                                                                    break;
+                                                                  }
+                                                                  date_select = moment().add(i + 1, 'days').format("YYYY年MM月DD日");
+                                                                  i++;
+                                                                }
+                                                                // calendar.date_select = date_select;
+                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, date_select, 'date_selection_test');
+                                                              } else if (calendar.type === "start_end_date") {
+                                                                let i = 0;
+                                                                let start_date_select;
+                                                                let end_date_select;
+                                                                while (handleDisableDateCalendar(moment().add(i, 'days'), calendar)) {
+                                                                  if (i === 100) {
+                                                                    start_date_select = null;
+                                                                    end_date_select = null;
+                                                                    break;
+                                                                  }
+                                                                  start_date_select = moment().add(i + 1, 'days');
+                                                                  end_date_select = moment().add(i + 1, 'days');
+                                                                  i++;
+                                                                }
+                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, start_date_select, 'start_date_test');
+                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, end_date_select, 'end_date_test');
+                                                              }
                                                             } else {
                                                               onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, null, 'date_selection_test');
                                                               onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, null, 'date_select');
@@ -5966,20 +6094,22 @@ const Scenario = () => {
                                                           value={calendar.initial_selection}
                                                         />
                                                         <div className="ss-user-setting__item-bottom">
-                                                          <SelectCustom
-                                                            label="選択不可の日時"
-                                                            mode="multiple"
-                                                            styleLabel={{ fontWeight: '700' }}
-                                                            style={{ width: '66%' }}
-                                                            data={dataSelectDateTime}
-                                                            onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'non_select_date_time')}
-                                                            value={calendar.non_select_date_time}
-                                                          />
+                                                          <div style={{ width: '98%' }}>
+                                                            <SelectCustom
+                                                              label="選択不可の日時"
+                                                              mode="multiple"
+                                                              styleLabel={{ fontWeight: '700', marginRight: '17px' }}
+                                                              style={{ width: '81%' }}
+                                                              data={dataSelectDateTime}
+                                                              onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'non_select_date_time')}
+                                                              value={calendar.non_select_date_time}
+                                                            />
+                                                          </div>
                                                         </div>
                                                         <div className="ss-user-setting__item-bottom-flex-start ss-user-setting__item-custom">
                                                           <span className="ss-user-setting-label" style={{ marginRight: '10px' }}>固定日付</span>
                                                           <DatePickerCustom
-                                                            value={calendar.select_fixed_date ? moment(calendar.select_fixed_date) : null}
+                                                            value={calendar.select_fixed_date ? moment(calendar.select_fixed_date, "YYYY年MM月DD日") : null}
                                                             onChange={(date, dateString) => onChangeFixedDate(indexMessageSelect, indexContent, content.type, dateString, 'fixed_date')}
                                                             style={{ width: '88%' }}
                                                             allowClear={true}
@@ -6024,7 +6154,7 @@ const Scenario = () => {
                                                           <div className="ss-user-setting__item-bottom">
                                                             <DatePickerCustom
                                                               style={{ width: '99%' }}
-                                                              value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
+                                                              value={calendar.date_selection_test ? moment(calendar.date_selection_test, "YYYY年MM月DD日") : null}
                                                               onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'date_selection_test')}
                                                               disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                                                             />
@@ -6037,7 +6167,83 @@ const Scenario = () => {
                                                             <Calendar
                                                               className="ss-custom-calendar"
                                                               fullscreen={false}
-                                                              onPanelChange={(value, mode) => console.log(value, mode)}
+                                                              locale={locale}
+                                                              headerRender={({ value, type, onChange, onTypeChange }) => {
+                                                                const start = 0;
+                                                                const end = 12;
+                                                                const monthOptions = [];
+                                                                console.log(value)
+                                                                value = value ? value : moment();
+                                                                let current = value.clone();
+                                                                const localeData = value.localeData();
+                                                                const months = [];
+                                                                for (let i = 0; i < 12; i++) {
+                                                                  current = current.month(i);
+                                                                  months.push(localeData.monthsShort(current));
+                                                                }
+
+                                                                for (let i = start; i < end; i++) {
+                                                                  monthOptions.push(
+                                                                    <Select.Option key={i} value={i} className="month-item">
+                                                                      {months[i]}
+                                                                    </Select.Option>,
+                                                                  );
+                                                                }
+
+                                                                const year = value.year();
+                                                                const month = value.month();
+                                                                const options = [];
+                                                                for (let i = year - 10; i < year + 10; i += 1) {
+                                                                  options.push(
+                                                                    <Select.Option key={i} value={i} className="year-item">
+                                                                      {i}
+                                                                    </Select.Option>,
+                                                                  );
+                                                                }
+                                                                return (
+                                                                  <div style={{ padding: 8 }}>
+                                                                    <Row>
+                                                                      <Col xs={4}>
+                                                                        <Radio.Group
+                                                                          size="small"
+                                                                          onChange={(e) => onTypeChange(e.target.value)}
+                                                                          value={type}
+                                                                        >
+                                                                          <Radio.Button value="month">月</Radio.Button>
+                                                                          <Radio.Button value="year">年</Radio.Button>
+                                                                        </Radio.Group>
+                                                                      </Col>
+                                                                      <Col xs={4}>
+                                                                        <Select
+                                                                          size="small"
+                                                                          dropdownMatchSelectWidth={false}
+                                                                          className="my-year-select"
+                                                                          value={year}
+                                                                          onChange={(newYear) => {
+                                                                            const now = value.clone().year(newYear);
+                                                                            onChange(now);
+                                                                          }}
+                                                                        >
+                                                                          {options}
+                                                                        </Select>
+                                                                      </Col>
+                                                                      <Col xs={4}>
+                                                                        <Select
+                                                                          size="small"
+                                                                          dropdownMatchSelectWidth={false}
+                                                                          value={month}
+                                                                          onChange={(newMonth) => {
+                                                                            const now = value.clone().month(newMonth);
+                                                                            onChange(now);
+                                                                          }}
+                                                                        >
+                                                                          {monthOptions}
+                                                                        </Select>
+                                                                      </Col>
+                                                                    </Row>
+                                                                  </div>
+                                                                );
+                                                              }}
                                                               style={{ top: '20px', width: '300px', border: '1px solid grey' }}
                                                               value={calendar.date_selection_test ? moment(calendar.date_selection_test) : null}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'date_selection_test')}
@@ -6077,13 +6283,13 @@ const Scenario = () => {
                                                               <DatePickerCustom
                                                                 style={{ width: '49%' }}
                                                                 disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
-                                                                value={calendar.start_date_test ? moment(calendar.start_date_test) : null}
+                                                                value={calendar.start_date_test ? moment(calendar.start_date_test, "YYYY年MM月DD日") : null}
                                                                 onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'start_date_test')}
                                                               />
                                                               <DatePickerCustom
                                                                 style={{ width: '49%' }}
                                                                 disabledDate={(current) => handleDisableEndDateCalendar(current, calendar)}
-                                                                value={calendar.end_date_test ? moment(calendar.end_date_test) : null}
+                                                                value={calendar.end_date_test ? moment(calendar.end_date_test, "YYYY年MM月DD日") : null}
                                                                 onChange={(date, dateString) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, dateString, 'end_date_test')}
                                                               />
                                                             </div>
@@ -8581,7 +8787,7 @@ const Scenario = () => {
                               <div className="ss-bot-setting-condition-header">
                                 <div className="ss-bot-setting-condition-header-left">
                                   <span style={{ fontWeight: '400' }}>表示対象者の条件設定</span>
-                                  <MDBIcon far icon="question-circle" style={{ color: '#FF7E00' }} />
+                                  <MDBIcon far icon="question-circle" style={{ color: '#FF7E00', padding: '10px' }} />
                                   <span className="ss-bot-setting-condition-icon-label">Standard</span>
                                   <span className="ss-bot-setting-condition-icon-label" style={{ width: '50px', backgroundColor: '#7A52A3' }}>Pro</span>
                                 </div>

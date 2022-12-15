@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { DatePicker } from 'antd';
+import locale from 'antd/es/date-picker/locale/ja_JP';
 
-const DatePickerCustom = ({ allowClear = true, disabledDate, label, value, onChange, placeholder, className = "", disabled = false, style, styleLabel }) => {
+const DatePickerCustom = ({ allowClear = true, format = "YYYY年MM月DD日", disabledDate, label, value, onChange, placeholder, className = "", disabled = false, style, styleLabel }) => {
 
     return (
         <React.Fragment>
             {label && <div style={{ ...styleLabel }}>{label}</div>}
             <DatePicker
                 allowClear={allowClear}
-                format={"YYYY/MM/DD"}
+                locale={locale}
+                format={format}
                 onChange={(date, dateString) => onChange(date, dateString)}
                 value={value}
                 disabled={disabled}

@@ -10,7 +10,7 @@ import {
   Button
 } from 'reactstrap';
 import ModalNoti from '../../../views/Popup/ModalNoti';
-import { Checkbox, Radio, Slider, Calendar } from 'antd';
+import { Checkbox, Radio, Slider, Calendar, Row, Select, Typography, Col } from 'antd';
 import moment from 'moment';
 import cvcIcon from '../../../assets/img/cvc-icon.png';
 import messageTypingGif from '../../../assets/img/icons8-dots-loading.gif';
@@ -27,6 +27,9 @@ import visa from '../../../assets/img/payment-method/visa.png';
 import {
   SHORTEN_URL
 } from '../../../variables/constants';
+import locale from 'antd/es/date-picker/locale/ja_JP';
+import 'moment/locale/zh-cn';
+
 
 const _ = require('lodash');
 
@@ -156,6 +159,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
   const [scenarioId, setScenarioId] = useState(scenarioIdProps || Cookies.get('scenario_id'));
   const [botInfor, setBotInfor] = useState();
   const [dataMessages, setDataMessages] = useState([]);
+  const [urlThanksPage, setUrlThanksPage] = useState();
   const [indexMessageRender, setIndexMessageRender] = useState(0);
   const [renderMessageArr, setRenderMessageArr] = useState([]);
   const [indexUser, setIndexUser] = useState(0);
@@ -272,7 +276,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
       api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/preview`).then(async res => {
         if (res.data.code == 1) {
           let messageArr = [...res.data.data?.conversation?.messages];
+          let urlThanks = res.data.data?.conversation?.urlThanksPage || ''
           setDataMessages(messageArr);
+          setUrlThanksPage(urlThanks);
           setVariables([...res.data.variables]);
           setBotInfor(res.data.chatbot);
           res.data.variables.forEach(item => {
@@ -353,6 +359,16 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                       setRenderMessageArr([
                         ...renderMessage
                       ]);
+                    }).then(() => {
+                      if (messageArr.length - 1 === i && urlThanks) {
+                        let aTag = document.createElement('a');
+                        aTag.href = urlThanks;
+                        aTag.target = '_blank';
+
+                        setTimeout(() => {
+                          aTag.click();
+                        }, 2000)
+                      }
                     });
                   } else {
                     await new Promise((resolve) => {
@@ -361,7 +377,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                       }, messageArr[i]?.message_content[0]?.delay?.content * 1000);
                     }).then(() => {
                       setIndexMessageRender(i);
-                    })
+                    }).then(() => {
+                      if (messageArr.length - 1 === i && urlThanks) {
+                        let aTag = document.createElement('a');
+                        aTag.href = urlThanks;
+                        aTag.target = '_blank';
+
+                        setTimeout(() => {
+                          aTag.click();
+                        }, 2000)
+                      }
+                    });
                   }
                   index = i;
                 } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
@@ -469,7 +495,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                     console.log(data);
                     setRenderMessageArr([
                       ...renderMessage
-                    ]);
+                    ])
                     setIndexMessageRender(i);
                     if (isPauseScroll === false) {
                       scrollToBottom();
@@ -477,7 +503,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                     if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
                       isPauseScroll = true;
                     }
-                  })
+                  }).then(() => {
+                    if (messageArr.length - 1 === i && urlThanks) {
+                      let aTag = document.createElement('a');
+                      aTag.href = urlThanks;
+                      aTag.target = '_blank';
+
+                      setTimeout(() => {
+                        aTag.click();
+                      }, 2000)
+                    }
+                  });
                   index = i;
                 }
               } else if (messageArr[0].belong_to === 'user' && messageArr[i].message_content.length > 0) {
@@ -1152,7 +1188,16 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
     let isPauseScroll = false;
     let delayRender;
     setIndexUser(prev => prev + 1);
+    console.log(dataMessages.length, indexMessageRender);
+    if (dataMessages.length - 1 === indexMessageRender && urlThanksPage) {
+      let aTag = document.createElement('a');
+      aTag.href = urlThanksPage;
+      aTag.target = '_blank';
 
+      setTimeout(() => {
+        aTag.click();
+      }, 2000)
+    }
     if (!dataMessages[indexMessageRender + 1]) return;
     if (dataMessages[indexMessageRender + 1].belong_to === 'bot') {
       for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
@@ -1219,13 +1264,33 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                   setRenderMessageArr([
                     ...renderMessage
                   ]);
+                }).then(() => {
+                  if (dataMessages.length - 1 === i && urlThanksPage) {
+                    let aTag = document.createElement('a');
+                    aTag.href = urlThanksPage;
+                    aTag.target = '_blank';
+
+                    setTimeout(() => {
+                      aTag.click();
+                    }, 2000)
+                  }
                 });
               } else {
                 await new Promise((resolve) => {
                   return delayRender = setTimeout(() => {
                     resolve();
                   }, dataMessages[i]?.message_content[0]?.delay?.content * 1000);
-                })
+                }).then(() => {
+                  if (dataMessages.length - 1 === i && urlThanksPage) {
+                    let aTag = document.createElement('a');
+                    aTag.href = urlThanksPage;
+                    aTag.target = '_blank';
+
+                    setTimeout(() => {
+                      aTag.click();
+                    }, 2000)
+                  }
+                });
               }
               index = i;
               // promise.then(data => {
@@ -1303,7 +1368,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                 if (data.message_content[0][data.message_content[0]?.type]?.scroll_auto === true) {
                   isPauseScroll = true;
                 }
-              })
+              }).then(() => {
+                if (dataMessages.length - 1 === i && urlThanksPage) {
+                  let aTag = document.createElement('a');
+                  aTag.href = urlThanksPage;
+                  aTag.target = '_blank';
+
+                  setTimeout(() => {
+                    aTag.click();
+                  }, 2000)
+                }
+              });
               index = i;
             }
           } else if (dataMessages[i].belong_to === 'user' && dataMessages[i].message_content.length > 0) {
@@ -2084,26 +2159,29 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
         if (calendar.initial_selection && calendar.type !== "start_end_date") {
           let i = 0;
           let date_select = "";
-          console.log(handleDisableDateCalendar(moment().add(1, 'days'), calendar));
-          // do {
-          //   date_select = moment().add(i + 1, 'days').format("YYYY/MM/DD");
-          //   console.log(handleDisableDateCalendar(moment().add(i, 'days'), calendar));
-          //   i++;
-          // } while (handleDisableDateCalendar(moment().add(i, 'days'), calendar))
-          date_select = moment().add(i, 'days').format("YYYY/MM/DD");
+
+          date_select = moment().add(i, 'days').format("YYYY年MM月DD日");
           while (handleDisableDateCalendar(moment().add(i, 'days'), calendar)) {
-            date_select = moment().add(i + 1, 'days').format("YYYY/MM/DD");
-            console.log(handleDisableDateCalendar(moment().add(i, 'days'), calendar));
+            if (i === 100) {
+              date_select = null;
+              break;
+            }
+            date_select = moment().add(i + 1, 'days').format("YYYY年MM月DD日");
             i++;
           }
           calendar.date_select = date_select;
         } else if (calendar.initial_selection && calendar.type === "start_end_date") {
           let i = 0;
-          console.log(handleDisableDateCalendar(moment().add(1, 'days'), calendar));
+          calendar.start_date_select = moment();
+          calendar.end_date_select = moment().add(1, 'days');
           while (handleDisableDateCalendar(moment().add(i, 'days'), calendar)) {
+            if (i === 100) {
+              calendar.start_date_select = null;
+              calendar.end_date_select = null;
+              break;
+            }
             calendar.start_date_select = moment().add(i + 1, 'days');
             calendar.end_date_select = moment().add(i + 1, 'days');
-            console.log(handleDisableDateCalendar(moment().add(i, 'days'), calendar));
             i++;
           }
         }
@@ -2181,23 +2259,23 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
       || calendar?.fixed_date?.length !== 0 || calendar?.non_select_date_time?.length !== 0
       || calendar.aggregation_target_period_from || calendar.aggregation_target_period_to
       || calendar.end_date_select) {
-      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD').add(1, 'days')
-        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
-        || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') > moment(calendar.end_date_select, 'YYYY/MM/DD').add(1, 'days'))
-        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
-        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+      return (moment(current, "YYYY年MM月DD日") >= moment(calendar.end_date, "YYYY年MM月DD日").add(1, 'days')
+        || moment(current, "YYYY年MM月DD日") < moment(calendar.start_date, "YYYY年MM月DD日")
+        || (calendar.type === "start_end_date" && moment(current, "YYYY年MM月DD日").isSameOrAfter(moment(calendar.end_date_select, "YYYY年MM月DD日")))
+        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY年MM月DD日"))
+        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, "YYYY年MM月DD日"))
+        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, "YYYY年MM月DD日"))
         || calendar.non_select_date_time?.find(type => {
           if (type === 'today') {
-            return (moment().format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD"));
+            return (moment().format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日"));
           } else if (type === 'tomorrow') {
-            return moment().add(1, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+            return moment().add(1, 'days').format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日");
           } else if (type === 'day_after_tomorrow') {
-            return moment().add(2, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+            return moment().add(2, 'days').format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日");
           } else if (type === 'past') {
-            return moment(current).format("YYYY/MM/DD") < moment().format("YYYY/MM/DD");
+            return moment(current).format("YYYY年MM月DD日") < moment().format("YYYY年MM月DD日");
           } else if (type === 'future') {
-            return moment(current).format("YYYY/MM/DD") > moment().format("YYYY/MM/DD");
+            return moment(current).format("YYYY年MM月DD日") > moment().format("YYYY年MM月DD日");
           } else if (type === 'moon') {
             return moment(current).day() === 1;
           } else if (type === 'fire') {
@@ -2218,31 +2296,31 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   }
 
   const handleDisableEndDateCalendar = (current, calendar) => {
-    console.log(calendar.start_date, calendar[calendar.type].specified_period_from, calendar[calendar.type].specified_period_to)
+    console.log(calendar.end_date, 'checkkkkk end date')
     if (calendar.end_date || calendar.start_date
       || calendar?.fixed_date?.length !== 0 || calendar?.non_select_date_time?.length !== 0
       || calendar.start_date_select || calendar.specified_period_from
       || calendar.specified_period_to || calendar.aggregation_target_period_from
       || calendar.aggregation_target_period_to) {
-      return (moment(current, 'YYYY/MM/DD') > moment(calendar.end_date, 'YYYY/MM/DD').add(1, 'days')
-        || moment(current, 'YYYY/MM/DD') < moment(calendar.start_date, 'YYYY/MM/DD')
-        || (calendar.type === "start_end_date" && moment(current, 'YYYY/MM/DD') < moment(calendar.start_date_select, 'YYYY/MM/DD'))
-        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY/MM/DD"))
-        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current, 'YYYY/MM/DD') < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_select, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, 'YYYY/MM/DD'))
-        || moment(current, 'YYYY/MM/DD') > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_select, 'YYYY/MM/DD').add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, 'YYYY/MM/DD'))
+      return (moment(current, "YYYY年MM月DD日").isSameOrAfter(moment(calendar.end_date, "YYYY年MM月DD日").add(1, 'days'))
+        || moment(current, "YYYY年MM月DD日") < moment(calendar.start_date, "YYYY年MM月DD日")
+        || (calendar.type === "start_end_date" && moment(current, "YYYY年MM月DD日").isSameOrBefore(moment(calendar.start_date_select, "YYYY年MM月DD日")))
+        || calendar.fixed_date?.find(date => date === moment(current).format("YYYY年MM月DD日"))
+        || moment(current) < ((calendar.aggregation_target_period_from !== null && calendar.aggregation_target_period_from !== undefined) ? moment().add(calendar.aggregation_target_period_from - 1, 'days') : moment(undefined, "YYYY年MM月DD日"))
+        || moment(current) > (calendar.aggregation_target_period_to ? moment().add(calendar.aggregation_target_period_to, 'days') : moment(undefined, "YYYY年MM月DD日"))
+        || moment(current, "YYYY年MM月DD日") < (calendar[calendar.type].specified_period_from ? moment(calendar.start_date_select, "YYYY年MM月DD日").add(calendar[calendar.type].specified_period_from, 'days') : moment(undefined, "YYYY年MM月DD日"))
+        || moment(current, "YYYY年MM月DD日") > (calendar[calendar.type].specified_period_to ? moment(calendar.start_date_select, "YYYY年MM月DD日").add(calendar[calendar.type].specified_period_to, 'days') : moment(undefined, "YYYY年MM月DD日"))
         || calendar.non_select_date_time?.find(type => {
           if (type === 'today') {
-            return (moment().format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD"));
+            return (moment().format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日"));
           } else if (type === 'tomorrow') {
-            return moment().add(1, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+            return moment().add(1, 'days').format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日");
           } else if (type === 'day_after_tomorrow') {
-            return moment().add(2, 'days').format("YYYY/MM/DD") === moment(current).format("YYYY/MM/DD");
+            return moment().add(2, 'days').format("YYYY年MM月DD日") === moment(current).format("YYYY年MM月DD日");
           } else if (type === 'past') {
-            return moment(current).format("YYYY/MM/DD") < moment().format("YYYY/MM/DD");
+            return moment(current).format("YYYY年MM月DD日") < moment().format("YYYY年MM月DD日");
           } else if (type === 'future') {
-            return moment(current).format("YYYY/MM/DD") > moment().format("YYYY/MM/DD");
+            return moment(current).format("YYYY年MM月DD日") > moment().format("YYYY年MM月DD日");
           } else if (type === 'moon') {
             return moment(current).day() === 1;
           } else if (type === 'fire') {
@@ -2291,6 +2369,18 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
       }
     })
   }
+
+  function checkLoadCalendar() {
+    // if (document.getElementsByClassName('ant-picker-calendar-year-select')) {
+    //   console.log('loaded');
+    //   const divs = document.querySelectorAll('.ant-picker-calendar-year-select');
+
+    //   divs.forEach(el => el.addEventListener('click', event => {
+    //     alert('Please select')
+    //   }));
+    // }
+  }
+
 
   return (
     <div className="ss-user-message__content-wrapper">
@@ -3513,24 +3603,108 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     <React.Fragment>
                       <DatePickerCustom
                         disabled={disabled}
+                        locale={locale}
+                        format={"YYYY年MM月DD日"}
                         style={{ width: '99%', marginTop: '5px' }}
-                        value={calendar.date_select ? moment(calendar.date_select) : null}
+                        value={calendar.date_select ? moment(calendar.date_select, "YYYY年MM月DD日") : null}
                         onChange={(date, dateString) => onChangeValue(indexContent, content.type, dateString, 'date_select')}
                         disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                       />
                     </React.Fragment>
                   )}
                   {/* calendar: type = 'embedded' */}
+                  {console.log(calendar.date_select, 'checkkkk calendar.date_select')}
+                  {/* {console.log(locale)} */}
                   {calendar.type === 'embedded' && (
                     <React.Fragment>
                       <div className="ss-message__content--user-calender-embedded" style={{ marginTop: '5px' }}>
                         <Calendar
+                          // onLoad={
+                          //   checkLoadCalendar()
+                          // }
                           disabled={disabled}
                           className="ss-custom-calendar"
                           fullscreen={false}
-                          onPanelChange={(value, mode) => console.log(value)}
+                          locale={locale}
+                          // format={"YYYY年MM月DD日"}
+                          headerRender={({ value, type, onChange, onTypeChange }) => {
+                            const start = 0;
+                            const end = 12;
+                            const monthOptions = [];
+                            console.log(value)
+                            value = value ? value : moment();
+                            let current = value.clone();
+                            const localeData = value.localeData();
+                            const months = [];
+                            for (let i = 0; i < 12; i++) {
+                              current = current.month(i);
+                              months.push(localeData.monthsShort(current));
+                            }
+
+                            for (let i = start; i < end; i++) {
+                              monthOptions.push(
+                                <Select.Option key={i} value={i} className="month-item">
+                                  {months[i]}
+                                </Select.Option>,
+                              );
+                            }
+
+                            const year = value.year();
+                            const month = value.month();
+                            const options = [];
+                            for (let i = year - 10; i < year + 10; i += 1) {
+                              options.push(
+                                <Select.Option key={i} value={i} className="year-item">
+                                  {i}
+                                </Select.Option>,
+                              );
+                            }
+                            return (
+                              <div style={{ padding: 8 }}>
+                                <Row gutter={8}>
+                                  <Col>
+                                    <Radio.Group
+                                      size="small"
+                                      onChange={(e) => onTypeChange(e.target.value)}
+                                      value={type}
+                                    >
+                                      <Radio.Button value="month">月</Radio.Button>
+                                      <Radio.Button value="year">年</Radio.Button>
+                                    </Radio.Group>
+                                  </Col>
+                                  <Col>
+                                    <Select
+                                      size="small"
+                                      dropdownMatchSelectWidth={false}
+                                      className="my-year-select"
+                                      value={year}
+                                      onChange={(newYear) => {
+                                        const now = value.clone().year(newYear);
+                                        onChange(now);
+                                      }}
+                                    >
+                                      {options}
+                                    </Select>
+                                  </Col>
+                                  <Col>
+                                    <Select
+                                      size="small"
+                                      dropdownMatchSelectWidth={false}
+                                      value={month}
+                                      onChange={(newMonth) => {
+                                        const now = value.clone().month(newMonth);
+                                        onChange(now);
+                                      }}
+                                    >
+                                      {monthOptions}
+                                    </Select>
+                                  </Col>
+                                </Row>
+                              </div>
+                            );
+                          }}
                           style={{ top: '20px', width: '300px', border: '1px solid grey' }}
-                          value={calendar.date_select ? moment(calendar.date_select) : null}
+                          value={calendar.date_select ? moment(calendar.date_select, "YYYY年MM月DD日") : null}
                           onChange={value => onChangeValue(indexContent, content.type, value, 'date_select')}
                           disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
                         />
@@ -3538,20 +3712,21 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     </React.Fragment>
                   )}
                   {/* calendar: type = 'start_end_date' */}
+                  {console.log(calendar.start_date_select, 'chekckkkk calendar.start_date_select')}
                   {calendar.type === 'start_end_date' && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <DatePickerCustom
                         disabled={disabled}
                         style={{ width: '49%', marginTop: '5px' }}
                         disabledDate={(current) => handleDisableDateCalendar(current, calendar)}
-                        value={calendar.start_date_select ? moment(calendar.start_date_select) : null}
+                        value={calendar.start_date_select ? moment(calendar.start_date_select, "YYYY年MM月DD日") : null}
                         onChange={(date, dateString) => onChangeValue(indexContent, content.type, dateString, 'start_date_select')}
                       />
                       <DatePickerCustom
                         disabled={disabled}
                         style={{ width: '49%', marginTop: '5px' }}
                         disabledDate={(current) => handleDisableEndDateCalendar(current, calendar)}
-                        value={calendar.end_date_select ? moment(calendar.end_date_select) : null}
+                        value={calendar.end_date_select ? moment(calendar.end_date_select, "YYYY年MM月DD日") : null}
                         onChange={(date, dateString) => onChangeValue(indexContent, content.type, dateString, 'end_date_select')}
                       />
                     </div>
