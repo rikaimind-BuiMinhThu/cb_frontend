@@ -624,14 +624,14 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
               || contentType[contentType.type].valueLeft?.length > limitTo
               || contentType[contentType.type].valueRight?.length < limitFrom
               || contentType[contentType.type].valueRight?.length > limitTo) {
-              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           } else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
             isValid = false;
           }
         } else if (contentType.type === 'phone_number') {
@@ -655,7 +655,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
               || contentType[contentType.type].value.length > limitTo
               || contentType[contentType.type].valueConfirm.length < limitFrom
               || contentType[contentType.type].valueConfirm.length > limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
             isValid = false;
           }
         } else if (contentType.type === 'customization') {
@@ -810,7 +810,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
           isValid = false;
         } else if ((limitFrom || limitTo) && (contentType[contentType.type]?.value?.length < limitFrom || contentType[contentType.type]?.value?.length > limitTo)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
           isValid = false;
         }
       } else {
@@ -821,11 +821,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
               || contentType[contentType.type].valueLeft?.length > limitTo
               || contentType[contentType.type].valueRight?.length < limitFrom
               || contentType[contentType.type].valueRight?.length > limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
             isValid = false;
           } else if (!stringNullOrEmpty(contentType[contentType.type].value)
             && (contentType[contentType.type].value?.length < limitFrom || contentType[contentType.type].value?.length > limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
             isValid = false;
           }
         } else if (contentArr[i].type === 'credit_card_payment') {

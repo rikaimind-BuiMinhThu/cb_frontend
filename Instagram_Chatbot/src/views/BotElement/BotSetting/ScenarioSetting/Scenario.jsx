@@ -521,39 +521,39 @@ let dataTypePullDown = [
   },
   {
     key: 'time_hm',
-    value: '時間'
+    value: '時間(H:m)'
   },
   {
     key: 'date_ymd',
-    value: '日付'
+    value: '日付(Ymd)'
   },
   {
     key: 'date_md',
-    value: '日付'
+    value: '日付(Md)'
   },
   {
     key: 'date_ym',
-    value: '日付'
+    value: '日付 (Ym)'
   },
   {
     key: 'date_ymd_hm',
-    value: '日時'
+    value: '日時 (Ymd H:m)'
   },
   {
     key: 'dob_ymd',
-    value: '生年月日'
+    value: '生年月日(Ymd)'
   },
   {
     key: 'dob_ym',
-    value: '生年月日'
+    value: '生年月日(Ym)'
   },
   {
     key: 'timezone_from_to',
-    value: '時間帯'
+    value: '時間帯 (H:m to H:m)'
   },
   {
     key: 'period_from_to',
-    value: '期間'
+    value: '期間(Ymd to Ymd)'
   },
   {
     key: 'prefectures',
