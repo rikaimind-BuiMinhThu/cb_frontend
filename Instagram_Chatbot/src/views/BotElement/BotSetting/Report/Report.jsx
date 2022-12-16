@@ -96,7 +96,7 @@ function Report() {
                   chatbotData.pc_count == 0
                 ) {
                   // chatbotValue = [1, 1, 1];
-                  setEmptyDevice(true)
+                  setEmptyDevice(true);
                   // setDevicePieChartSeriesCount(chatbotDataCount)
                 }
                 // console.log(chatbotValue)
@@ -205,12 +205,12 @@ function Report() {
         categories: [
           ` ${
             CVRCTR === false
-              ? (numOfOpenBot === 0
+              ? numOfOpenBot === 0
                 ? `CVR: 0`
-                :`CVR: ${Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)}`)
-              : (numOfBotStart === 0
+                : `CVR: ${Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)}`
+              : numOfBotStart === 0
               ? `CTR: 0`
-              :`CTR: ${Math.round((numOfOpenBot * 100) / numOfBotStart).toFixed(2)}`)
+              : `CTR: ${Math.round((numOfOpenBot * 100) / numOfBotStart).toFixed(2)}`
           }%`,
         ],
         labels: {
@@ -226,7 +226,7 @@ function Report() {
         categories: ['合計'],
       },
       title: {
-        text: CVRCTR === false ?'コンバージョン率(CVR)' : 'CTR (BOT起動数/BOT開始数）',
+        text: CVRCTR === false ? 'コンバージョン率(CVR)' : 'CTR (BOT起動数/BOT開始数）',
         align: 'center',
         floating: true,
       },
@@ -396,7 +396,7 @@ function Report() {
 
   // chart
   let devicePieChartConfig = {
-    series: emptyDevice == true ? [0,0,0]: devicePieChartSeries,
+    series: emptyDevice == true ? [0, 0, 0] : devicePieChartSeries,
     options: {
       chart: {
         width: 380,
@@ -424,117 +424,130 @@ function Report() {
     if (start > end) {
       errDate.style.display = 'block';
       errDate.innerHTML = '開始日時は終了日時より大きいです。';
+      return false;
     } else {
       errDate.style.display = 'none';
       errDate.innerHTML = '';
+      return true;
     }
   }
 
   function selectStartDate(date) {
     if (date) {
       setStartDate(date);
-      const start = parseInt(format(date, 'yyyy/MM/dd').replaceAll('/', ''));
-      const end = parseInt(format(endDate, 'yyyy/MM/dd').replaceAll('/', ''));
-      validDateRange(start, end);
+    } else {
+      setStartDate(null);
     }
   }
 
   function selectEndDate(date) {
     if (date) {
       setEndDate(date);
-      const start = parseInt(format(startDate, 'yyyy/MM/dd').replaceAll('/', ''));
-      const end = parseInt(format(date, 'yyyy/MM/dd').replaceAll('/', ''));
-      validDateRange(start, end);
+    } else {
+      setEndDate(null);
     }
   }
 
-  const [emptyDevice, setEmptyDevice] = useState(false)
+  const [emptyDevice, setEmptyDevice] = useState(false);
   function handleSearch(e) {
     e.preventDefault();
     const formSearch = document.getElementById('formSearch');
-    // console.log(formSearch.length);
     var searchVal = {};
     for (let i = 0; i < formSearch.length; i++) {
       searchVal[formSearch[i].name] = formSearch[i].value;
     }
     console.log(searchVal);
 
-    api
-      .get(
-        `/api/v1/analytics/scenario_counts/${searchVal.scenarioId}?begin_date=${searchVal.startDate}&end_date=${searchVal.endDate}`
-      )
-      .then((res) => {
-        console.log('search data: ', res.data);
-        setListContent(res.data?.scenario_pages);
-        setDataReportCount(res?.data?.data);
-        let chatbotData = res?.data?.data;
-        // let chatbotDataCount = [1,1,1]
-        let chatbotValue = [
-          chatbotData.pc_count,
-          chatbotData.smartphone_count,
-          chatbotData.tablet_count,
-        ];
-        if (chatbotData.pc_count == 0 && chatbotData.pc_count == 0 && chatbotData.pc_count == 0) {
-          // chatbotValue = [1, 1, 1];
-          setEmptyDevice(true)
-          // setDevicePieChartSeriesCount(chatbotDataCount)
-        }else{
-          setEmptyDevice(false)
-        }
-        // console.log(chatbotValue)
-        let numOfCon =
-          chatbotData.smartphone_count +
-          chatbotData.pc_conversion_count +
-          chatbotData.tablet_conversion_count;
-        // setNumofConversion(numOfCon)
-        setConversionAll(numOfCon);
-        // setConversionCVRCTR(numOfCon)
-        let numOfBS =
-          chatbotData.pc_open_chatbot_window_count +
-          chatbotData.tablet_open_chatbot_window_count +
-          chatbotData.smartphone_open_chatbot_window_count;
-        setOpWinAll(numOfBS);
-        // setNumofBotStart(numOfBS)
-        // setBotCVRCTR(numOfBS)
-        let numOfOB =
-          chatbotData.pc_count + chatbotData.tablet_count + chatbotData.smartphone_count;
-        setOpPCAll(numOfOB);
-        // setNumOfOpenBot(numOfOB)
-        let numOfCB =
-          chatbotData.pc_close_chatbot_window_count +
-          chatbotData.tablet_close_chatbot_window_count +
-          chatbotData.smartphone_close_chatbot_window_count;
-        setCloseAll(numOfCB);
-        // setNumOfCloseBot(numOfCB)
-        //Pie chart///
-        setDevicePieChartSeries(chatbotValue);
-        setDevicePieChartSeriesCount(chatbotValue);
+    if (!searchVal.startDate || !searchVal.endDate) {
+      const errDate = document.getElementById('errDate');
+      errDate.style.display = 'block';
+      errDate.innerHTML = 'Date cannot blank';
+    } else {
+      const start = parseInt(format(startDate, 'yyyy/MM/dd').replaceAll('/', ''));
+      const end = parseInt(format(endDate, 'yyyy/MM/dd').replaceAll('/', ''));
+      if (validDateRange(start, end) === true) {
+        api
+          .get(
+            `/api/v1/analytics/scenario_counts/${searchVal.scenarioId}?begin_date=${searchVal.startDate}&end_date=${searchVal.endDate}`
+          )
+          .then((res) => {
+            console.log('search data: ', res.data);
+            setListContent(res.data?.scenario_pages);
+            setDataReportCount(res?.data?.data);
+            let chatbotData = res?.data?.data;
+            // let chatbotDataCount = [1,1,1]
+            let chatbotValue = [
+              chatbotData.pc_count,
+              chatbotData.smartphone_count,
+              chatbotData.tablet_count,
+            ];
+            if (
+              chatbotData.pc_count == 0 &&
+              chatbotData.pc_count == 0 &&
+              chatbotData.pc_count == 0
+            ) {
+              // chatbotValue = [1, 1, 1];
+              setEmptyDevice(true);
+              // setDevicePieChartSeriesCount(chatbotDataCount)
+            } else {
+              setEmptyDevice(false);
+            }
+            // console.log(chatbotValue)
+            let numOfCon =
+              chatbotData.smartphone_count +
+              chatbotData.pc_conversion_count +
+              chatbotData.tablet_conversion_count;
+            // setNumofConversion(numOfCon)
+            setConversionAll(numOfCon);
+            // setConversionCVRCTR(numOfCon)
+            let numOfBS =
+              chatbotData.pc_open_chatbot_window_count +
+              chatbotData.tablet_open_chatbot_window_count +
+              chatbotData.smartphone_open_chatbot_window_count;
+            setOpWinAll(numOfBS);
+            // setNumofBotStart(numOfBS)
+            // setBotCVRCTR(numOfBS)
+            let numOfOB =
+              chatbotData.pc_count + chatbotData.tablet_count + chatbotData.smartphone_count;
+            setOpPCAll(numOfOB);
+            // setNumOfOpenBot(numOfOB)
+            let numOfCB =
+              chatbotData.pc_close_chatbot_window_count +
+              chatbotData.tablet_close_chatbot_window_count +
+              chatbotData.smartphone_close_chatbot_window_count;
+            setCloseAll(numOfCB);
+            // setNumOfCloseBot(numOfCB)
+            //Pie chart///
+            setDevicePieChartSeries(chatbotValue);
+            setDevicePieChartSeriesCount(chatbotValue);
 
-        if (searchVal.device == 'all') {
-          setConversionCVRCTR(numOfCon);
-          setNumofBotStart(numOfBS);
-          setNumOfOpenBot(numOfOB);
-          setNumOfCloseBot(numOfCB);
-        } else if (searchVal.device == 'computer') {
-          setConversionCVRCTR(chatbotData.pc_conversion_count);
-          setNumofBotStart(chatbotData.pc_open_chatbot_window_count);
-          setNumOfOpenBot(chatbotData.pc_count);
-          setNumOfCloseBot(chatbotData.pc_close_chatbot_window_count);
-        } else if (searchVal.device == 'tablet') {
-          setConversionCVRCTR(chatbotData.tablet_conversion_count);
-          setNumofBotStart(chatbotData.tablet_open_chatbot_window_count);
-          setNumOfOpenBot(chatbotData.tablet_count);
-          setNumOfCloseBot(chatbotData.tablet_close_chatbot_window_count);
-        } else if (searchVal.device == 'smartphone') {
-          setConversionCVRCTR(chatbotData.smartphone_count);
-          setNumofBotStart(chatbotData.smartphone_open_chatbot_window_count);
-          setNumOfOpenBot(chatbotData.smartphone_count);
-          setNumOfCloseBot(chatbotData.smartphone_close_chatbot_window_count);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+            if (searchVal.device == 'all') {
+              setConversionCVRCTR(numOfCon);
+              setNumofBotStart(numOfBS);
+              setNumOfOpenBot(numOfOB);
+              setNumOfCloseBot(numOfCB);
+            } else if (searchVal.device == 'computer') {
+              setConversionCVRCTR(chatbotData.pc_conversion_count);
+              setNumofBotStart(chatbotData.pc_open_chatbot_window_count);
+              setNumOfOpenBot(chatbotData.pc_count);
+              setNumOfCloseBot(chatbotData.pc_close_chatbot_window_count);
+            } else if (searchVal.device == 'tablet') {
+              setConversionCVRCTR(chatbotData.tablet_conversion_count);
+              setNumofBotStart(chatbotData.tablet_open_chatbot_window_count);
+              setNumOfOpenBot(chatbotData.tablet_count);
+              setNumOfCloseBot(chatbotData.tablet_close_chatbot_window_count);
+            } else if (searchVal.device == 'smartphone') {
+              setConversionCVRCTR(chatbotData.smartphone_count);
+              setNumofBotStart(chatbotData.smartphone_open_chatbot_window_count);
+              setNumOfOpenBot(chatbotData.smartphone_count);
+              setNumOfCloseBot(chatbotData.smartphone_close_chatbot_window_count);
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    }
   }
 
   function chooseAggreation(value) {
@@ -705,7 +718,7 @@ function Report() {
 
                   <div className="report__item report__item-2">
                     <div className="report__item-head report__item-2-head-main">
-                    離脱
+                      離脱
                       <a href="">
                         <i className="far fa-question-circle"></i>
                       </a>
@@ -817,15 +830,18 @@ function Report() {
                         <button className="btn btn-success">Conversions (CV)</button>
                       </div> */}
                       <div className="report__item-pie">
-                        {emptyDevice == true ? 
-                        <div style={{width:"100%", textAlign:'center', marginTop:"50px"}}><span>デバイスがありません。</span></div> :
-                        <ReactApexChart
-                        options={devicePieChartConfig.options}
-                        series={devicePieChartConfig.series}
-                        type="pie"
-                        height={350}
-                      />
-                        } 
+                        {emptyDevice == true ? (
+                          <div style={{ width: '100%', textAlign: 'center', marginTop: '50px' }}>
+                            <span>デバイスがありません。</span>
+                          </div>
+                        ) : (
+                          <ReactApexChart
+                            options={devicePieChartConfig.options}
+                            series={devicePieChartConfig.series}
+                            type="pie"
+                            height={350}
+                          />
+                        )}
                       </div>
                     </div>
                     <div className="report__item-head report__item-2-head">
@@ -835,7 +851,11 @@ function Report() {
                           <i className="far fa-question-circle"></i>
                         </a>
                         {devicePieChartSeriesCount[0] > 0 ? (
-                          emptyDevice == true ? <div>データがありません。</div> : <div>{devicePieChartSeriesCount[0]}</div>
+                          emptyDevice == true ? (
+                            <div>データがありません。</div>
+                          ) : (
+                            <div>{devicePieChartSeriesCount[0]}</div>
+                          )
                         ) : (
                           <div>データがありません。</div>
                         )}
@@ -846,7 +866,11 @@ function Report() {
                           <i className="far fa-question-circle"></i>
                         </a>
                         {devicePieChartSeriesCount[1] > 0 ? (
-                          emptyDevice == true ? <div>データがありません。</div> : <div>{devicePieChartSeriesCount[1]}</div>
+                          emptyDevice == true ? (
+                            <div>データがありません。</div>
+                          ) : (
+                            <div>{devicePieChartSeriesCount[1]}</div>
+                          )
                         ) : (
                           <div>データがありません。</div>
                         )}
@@ -857,7 +881,11 @@ function Report() {
                           <i className="far fa-question-circle"></i>
                         </a>
                         {devicePieChartSeriesCount[2] > 0 ? (
-                          emptyDevice == true ? <div>データがありません。</div> : <div>{devicePieChartSeriesCount[2]}</div>
+                          emptyDevice == true ? (
+                            <div>データがありません。</div>
+                          ) : (
+                            <div>{devicePieChartSeriesCount[2]}</div>
+                          )
                         ) : (
                           <div>データがありません。</div>
                         )}
@@ -888,7 +916,7 @@ function Report() {
                                 クリック数
                               </th>
                               <th className="report__item-content-title" style={{ width: '60%' }}>
-                                クリック数
+                                URL
                               </th>
                               <th className="report__item-content-title" style={{ width: '20%' }}>
                                 短縮URL
@@ -901,7 +929,7 @@ function Report() {
                                 <th>{item.id}</th>
                                 <td>{item.num_of_click}</td>
                                 <td>{item.origin_url}</td>
-                                <td>{item.shorten_code}</td>
+                                <td>https://ec-chatbot1.com/s/{item.shorten_code}</td>
                               </tr>
                             ))}
                           </tbody>
