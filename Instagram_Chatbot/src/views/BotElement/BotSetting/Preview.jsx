@@ -30,7 +30,6 @@ import {
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
 
-
 const _ = require('lodash');
 
 let dataHourFixed = [];
@@ -169,6 +168,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
   const [isDisplayButtonNext, setIsDisplayButtonNext] = useState(false);
   const [captcha, setCaptcha] = useState([]);
   const [withdrawal, setWithdrawal] = useState({});
+  // const
 
   const [dataPrefectures, setDataPrefectures] = useState([]);
   const [dataCities, setDataCities] = useState([]);
@@ -258,6 +258,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
   }, [])
 
   useEffect(() => {
+    let delayRender;
+
     if (scenarioId) {
       api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/preview`).then(async res => {
         if (res.data.code == 1) {
@@ -277,7 +279,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           setMessageUser([...messageUserVar]);
           let renderMessage = [];
           let index;
-          let delayRender;
           let isPauseScroll = false;
           for (let i = 0; i < messageArr.length; i++) {
             if (messageArr[i].hidden !== true) {
@@ -574,9 +575,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           }
           // setIndexMessageRender(index);
           // setRenderMessageArr(renderMessage);
-          return () => {
-            clearTimeout(delayRender);
-          }
+
         }
       }).catch((error) => {
         console.log(error);
@@ -585,7 +584,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
         }
       });
     }
+    return () => {
+      console.log('chcekkkkkkkk quitttt')
+      clearTimeout(delayRender);
+    }
   }, [scenarioId])
+
+  // useEffect(() => {
+  //   return () => {
+  //     setIsContinuePromise(false);
+  //   }
+  // }, [])
 
   const scrollToBottom = () => {
     if (document.getElementById('sp-body')) {
@@ -624,14 +633,14 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
               || contentType[contentType.type].valueLeft?.length > limitTo
               || contentType[contentType.type].valueRight?.length < limitFrom
               || contentType[contentType.type].valueRight?.length > limitTo) {
-              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           } else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
             isValid = false;
           }
         } else if (contentType.type === 'phone_number') {
@@ -655,7 +664,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
               || contentType[contentType.type].value.length > limitTo
               || contentType[contentType.type].valueConfirm.length < limitFrom
               || contentType[contentType.type].valueConfirm.length > limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
             isValid = false;
           }
         } else if (contentType.type === 'customization') {
@@ -810,7 +819,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
           isValid = false;
         } else if ((limitFrom || limitTo) && (contentType[contentType.type]?.value?.length < limitFrom || contentType[contentType.type]?.value?.length > limitTo)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
           isValid = false;
         }
       } else {
@@ -821,11 +830,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
               || contentType[contentType.type].valueLeft?.length > limitTo
               || contentType[contentType.type].valueRight?.length < limitFrom
               || contentType[contentType.type].valueRight?.length > limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
             isValid = false;
           } else if (!stringNullOrEmpty(contentType[contentType.type].value)
             && (contentType[contentType.type].value?.length < limitFrom || contentType[contentType.type].value?.length > limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
             isValid = false;
           }
         } else if (contentArr[i].type === 'credit_card_payment') {
@@ -1659,6 +1668,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
         console.log(item);
         if (dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content === item.variable_name) {
           let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
+          console.log(dataContentType);
           if (contentType === 'zip_code_address') {
             item.default_value = `〒 ${dataContentType?.value_post_code} ${dataContentType?.value_prefecture}${dataContentType?.value_municipality} ${dataContentType?.value_address}${dataContentType?.value_building_name}`;
           } else if (field === 'start_date_select' || field === 'end_date_select') {
@@ -1684,6 +1694,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                 return dataReturn;
               });
             }
+            console.log(item.variable_name, item.default_value, dataTextChecked);
             item.default_value = dataTextChecked.join(',') || item.default_value;
           } else if (contentType === 'card_payment_radio_button') {
             let dataTextChecked;
@@ -1707,6 +1718,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             } else {
               item.default_value = `${(dataContentType[field]?.valueYear || dataContentType[field]?.valueMonth || dataContentType[field]?.valueDay) ? `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}-${dataContentType[field]?.valueDay}` : ""} ${(dataContentType[field]?.valueHour || dataContentType[field]?.valueMinute) ? `${dataContentType[field]?.valueHour}:${dataContentType[field]?.valueMinute}` : ""}`;
             }
+          } else if(dataContentType.type === 'embedded') {
+            item.default_value = `${moment(value).format("YYYY-MM-DD")}`
           } else {
             item.default_value = value;
           }
@@ -1982,6 +1995,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                               dataMessages[indexMessage].is_display_button_next = value;
                               setDataMessages([...dataMessages]);
                             }}
+                            dataPrefectures={[...dataPrefectures]}
                             isPopUpZipCode={(isOpen, indexContent) => isPopUpZipCode(isOpen, indexContent)}
                             onChangeErrors={(field, value) => onChangeErrors(field, value)}
                           />
@@ -2084,11 +2098,11 @@ const BotMessage = ({ content, index, botInfor }) => {
   )
 }
 
-const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors }) => {
+const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors, dataPrefectures }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
   const [dataCity, setDataCity] = useState([]);
-  const [dataPrefectures, setDataPrefectures] = useState([]);
+  // const [dataPrefectures, setDataPrefectures] = useState([...dataPrefectures]);
   const [startDate, setStartDate] = useState(new Date());
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
@@ -2096,6 +2110,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   const [bot_id, setBotId] = useState(Cookies.get('bot_id'));
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState('');
+
+  console.log(indexMessageRender, 'checkekkkk indexMessageRender')
 
   function loadCaptcha(indexContent) {
     console.log('load captcha');
@@ -2131,17 +2147,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   }, [messageContentProps])
 
   useEffect(() => {
-    api.get(`/api/v1/prefectures`).then((res) => {
-      setDataPrefectures(res.data.data);
-    }).catch((error) => {
-      console.log(error);
-      if (error.response?.data.code === 0) {
-        tokenExpired()
-      }
-    });
-  }, [])
-
-  useEffect(() => {
     messageContent.forEach((content, indexContent) => {
       console.log(content)
       if (content.type === "calendar") {
@@ -2159,7 +2164,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
             date_select = moment().add(i + 1, 'days').format("YYYY-MM-DD");
             i++;
           }
-          calendar.date_select = date_select;
+          // calendar.date_select = date_select;
+          onChangeValue(indexContent, content.type, date_select, 'date_select')
         } else if (calendar.initial_selection && calendar.type === "start_end_date") {
           let i = 0;
           calendar.start_date_select = moment();
@@ -3270,6 +3276,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     tokenExpired();
                                   }
                                 });
+                              } else {
+                                onChangeValue(indexContent, content.type, null, pullDown.type, 'city');
+                                setDataCity([]);
                               }
                             }}
                             value={pullDown[pullDown.type].prefecture}
@@ -3603,8 +3612,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     </React.Fragment>
                   )}
                   {/* calendar: type = 'embedded' */}
-                  {console.log(calendar.date_select, 'checkkkk calendar.date_select')}
-                  {/* {console.log(locale)} */}
                   {calendar.type === 'embedded' && (
                     <React.Fragment>
                       <div className="ss-message__content--user-calender-embedded" style={{ marginTop: '5px' }}>
@@ -3621,7 +3628,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             const start = 0;
                             const end = 12;
                             const monthOptions = [];
-                            console.log(value)
                             value = value ? value : moment();
                             let current = value.clone();
                             const localeData = value.localeData();
@@ -3702,7 +3708,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     </React.Fragment>
                   )}
                   {/* calendar: type = 'start_end_date' */}
-                  {console.log(calendar.start_date_select, 'chekckkkk calendar.start_date_select')}
                   {calendar.type === 'start_end_date' && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <DatePickerCustom
@@ -3814,7 +3819,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {carousel.type === 'default' && (
                     <div className="sp-carousel-container-preivew">
                       {carousel[carousel.type].contents && carousel[carousel.type].contents.map((itemCarousel, indexCarousel) => {
-                        console.log(itemCarousel);
                         return <div className="sp-carousel-container-block-item" key={indexCarousel}>
                           <div className="sp-carousel-container-block-item-infor" onClick={() => handleClickCarousel(itemCarousel.urls, carousel.use_shortened_urls)}>
                             <div className="sp-carousel-preview-img">
@@ -4389,7 +4393,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             onChange={(e) => {
                               let selectArr = [...productPurchase.initial_selection];
                               let dataValue;
-                              console.log(selectArr, e.target.value, selectArr.includes(e.target.value))
                               if (selectArr.includes(e.target.value)) {
                                 dataValue = [];
                               } else {
