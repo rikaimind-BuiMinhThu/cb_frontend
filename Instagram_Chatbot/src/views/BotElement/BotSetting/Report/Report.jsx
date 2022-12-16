@@ -95,7 +95,8 @@ function Report() {
                   chatbotData.pc_count == 0 &&
                   chatbotData.pc_count == 0
                 ) {
-                  chatbotValue = [1, 1, 1];
+                  // chatbotValue = [1, 1, 1];
+                  setEmptyDevice(true)
                   // setDevicePieChartSeriesCount(chatbotDataCount)
                 }
                 // console.log(chatbotValue)
@@ -204,12 +205,12 @@ function Report() {
         categories: [
           ` ${
             CVRCTR === false
-              ? numOfOpenBot === 0
+              ? (numOfOpenBot === 0
                 ? `CVR: 0`
-                :`CVR: ${Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)}`
-              : numOfBotStart === 0
+                :`CVR: ${Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)}`)
+              : (numOfBotStart === 0
               ? `CTR: 0`
-              :`CTR: ${Math.round((numOfOpenBot * 100) / numOfBotStart).toFixed(2)}`
+              :`CTR: ${Math.round((numOfOpenBot * 100) / numOfBotStart).toFixed(2)}`)
           }%`,
         ],
         labels: {
@@ -395,7 +396,7 @@ function Report() {
 
   // chart
   let devicePieChartConfig = {
-    series: devicePieChartSeries,
+    series: emptyDevice == true ? [0,0,0]: devicePieChartSeries,
     options: {
       chart: {
         width: 380,
@@ -447,6 +448,7 @@ function Report() {
     }
   }
 
+  const [emptyDevice, setEmptyDevice] = useState(false)
   function handleSearch(e) {
     e.preventDefault();
     const formSearch = document.getElementById('formSearch');
@@ -473,8 +475,11 @@ function Report() {
           chatbotData.tablet_count,
         ];
         if (chatbotData.pc_count == 0 && chatbotData.pc_count == 0 && chatbotData.pc_count == 0) {
-          chatbotValue = [1, 1, 1];
+          // chatbotValue = [1, 1, 1];
+          setEmptyDevice(true)
           // setDevicePieChartSeriesCount(chatbotDataCount)
+        }else{
+          setEmptyDevice(false)
         }
         // console.log(chatbotValue)
         let numOfCon =
@@ -812,12 +817,15 @@ function Report() {
                         <button className="btn btn-success">Conversions (CV)</button>
                       </div> */}
                       <div className="report__item-pie">
+                        {emptyDevice == true ? 
+                        <div style={{width:"100%", textAlign:'center', marginTop:"50px"}}><span>デバイスがありません。</span></div> :
                         <ReactApexChart
-                          options={devicePieChartConfig.options}
-                          series={devicePieChartConfig.series}
-                          type="pie"
-                          height={350}
-                        />
+                        options={devicePieChartConfig.options}
+                        series={devicePieChartConfig.series}
+                        type="pie"
+                        height={350}
+                      />
+                        } 
                       </div>
                     </div>
                     <div className="report__item-head report__item-2-head">
@@ -827,7 +835,7 @@ function Report() {
                           <i className="far fa-question-circle"></i>
                         </a>
                         {devicePieChartSeriesCount[0] > 0 ? (
-                          <div>{devicePieChartSeriesCount[0]}</div>
+                          emptyDevice == true ? <div>データがありません。</div> : <div>{devicePieChartSeriesCount[0]}</div>
                         ) : (
                           <div>データがありません。</div>
                         )}
@@ -838,7 +846,7 @@ function Report() {
                           <i className="far fa-question-circle"></i>
                         </a>
                         {devicePieChartSeriesCount[1] > 0 ? (
-                          <div>{devicePieChartSeriesCount[1]}</div>
+                          emptyDevice == true ? <div>データがありません。</div> : <div>{devicePieChartSeriesCount[1]}</div>
                         ) : (
                           <div>データがありません。</div>
                         )}
@@ -849,7 +857,7 @@ function Report() {
                           <i className="far fa-question-circle"></i>
                         </a>
                         {devicePieChartSeriesCount[2] > 0 ? (
-                          <div>{devicePieChartSeriesCount[2]}</div>
+                          emptyDevice == true ? <div>データがありません。</div> : <div>{devicePieChartSeriesCount[2]}</div>
                         ) : (
                           <div>データがありません。</div>
                         )}
