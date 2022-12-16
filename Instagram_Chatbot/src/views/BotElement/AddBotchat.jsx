@@ -64,13 +64,13 @@ function AddBotchat() {
 
   // design type: handle click
   const designTypeClick = (e) => {
-    let value = ''
+    let value = '';
     if (e.target.innerText == 'ポップ') {
-      value = 'pop'
+      value = 'pop';
     } else if (e.target.innerText == 'フラット') {
-      value = 'flat'
+      value = 'flat';
     } else if (e.target.innerText == 'マテリアル') {
-      value = 'material'
+      value = 'material';
     }
     setDesignType(value);
     const typeActive = document.querySelector('.design-types .type.active');
@@ -160,7 +160,7 @@ function AddBotchat() {
         .then((res) => {
           if (res.data.code === 1 || res.data.code === '1') {
             Cookies.set('bot_id', res.data.data.id);
-            setMsgNoti('Add new bot chat successfully!');
+            setMsgNoti('ボットを正常に作成されました！');
             setIsOpenNoti(true);
             setTimeout(() => {
               setMsgNoti('');
