@@ -29,7 +29,7 @@ const BotDemo = () => {
       console.log(response);
       if (response.data.data) {
         setScenarioId(response.data.data.id);
-        // Cookies.set('scenario_id', response.data.data.id);
+        Cookies.set('scenario_id', response.data.data.id);
       } else {
         setIsOpenNoti(true);
         setMessageNoti('シナリオがありません。');
