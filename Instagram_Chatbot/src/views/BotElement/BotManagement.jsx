@@ -328,7 +328,7 @@ function BotManagement() {
                       ? botList.map((bot, i) => (
                         <tr key={bot?.id}>
                           <td className="border-table-bot">{i + 1}</td>
-                          <td className="border-table-bot">{bot?.bot_name}</td>
+                          <td className="border-table-bot" style={{cursor: 'default'}} onClick={() => openBotSetting(bot?.id)}>{bot?.bot_name}</td>
                           <td className="border-table-bot">{bot?.status}</td>
                           <td className="border-table-bot">{bot?.owner_name}</td>
                           <td className="border-table-bot">所有者</td>
@@ -336,13 +336,13 @@ function BotManagement() {
                             <div className="action-wrapper">
                               <button
                                 className="btn-edit-bot"
-                                onClick={() => openBotSetting(bot.id)}
+                                onClick={() => openBotSetting(bot?.id)}
                               >
                                 編集
                               </button>
                               <button
                                 className="btn-duplicate-bot"
-                                onClick={() => duplicateBot(bot.id)}
+                                onClick={() => duplicateBot(bot?.id)}
                               >
                                 複製
                               </button>

@@ -171,7 +171,7 @@ function Preview() {
   const [variables, setVariables] = useState([]);
   const [isDisplayButtonNext, setIsDisplayButtonNext] = useState(false);
   const [captcha, setCaptcha] = useState([]);
-  const [withdrawal, setWithdrawal] = useState({});
+  // const [withdrawal, setWithdrawal] = useState({});
 
   const [dataPrefectures, setDataPrefectures] = useState([]);
   const [dataCities, setDataCities] = useState([]);
@@ -280,19 +280,19 @@ function Preview() {
   //   }).catch(err => console.log(err));
   // }, [])
 
-  useEffect(() => {
-    api.get(`/api/v1/chatbot_settings/withdrawal_preventions/${botId}`).then(res => {
-      console.log(res, 'cehckkkk withdraw');
-      if (res.data.code === 1) {
-        setWithdrawal(res.data.data);
-      }
-    }).catch((error) => {
-      console.log(error);
-      if (error.response?.data.code === 0) {
-        tokenExpired()
-      }
-    })
-  }, [])
+  // useEffect(() => {
+  //   api.get(`/api/v1/chatbot_settings/withdrawal_preventions/${botId}`).then(res => {
+  //     console.log(res, 'cehckkkk withdraw');
+  //     if (res.data.code === 1) {
+  //       setWithdrawal(res.data.data);
+  //     }
+  //   }).catch((error) => {
+  //     console.log(error);
+  //     if (error.response?.data.code === 0) {
+  //       tokenExpired()
+  //     }
+  //   })
+  // }, [])
 
   useEffect(() => {
     api.get(`/api/v1/prefectures`).then((res) => {
@@ -1775,7 +1775,7 @@ function Preview() {
   }
 
   const handleOpenWithDrawal = () => {
-    if (withdrawal.withdrawal_prevention_status === "invalid") {
+    if (botInfor.withdrawal_prevention_status === "invalid") {
       setIndexUser(0);
       setScenarioId(null);
       setTimeout(() => {
@@ -1786,7 +1786,7 @@ function Preview() {
           onOpenPreview(false);
         }
       }, 10);
-    } else if (withdrawal.withdrawal_prevention_status === "standard_exit_popup" || withdrawal.withdrawal_prevention_status === "image_popup") {
+    } else if (botInfor.withdrawal_prevention_status === "standard_exit_popup" || botInfor.withdrawal_prevention_status === "image_popup") {
       document.getElementById("sp-withdrawal-container").style.display = "block";
       document.getElementById("sp-withdrawal-content").style.display = "block";
     }
@@ -1825,12 +1825,12 @@ function Preview() {
           </div>
           <div id="sp-withdrawal-content" className="sp-withdrawal-content">
             <div className="sp-withdrawal-content-body">
-              {withdrawal.withdrawal_prevention_status === "standard_exit_popup" &&
+              {botInfor && botInfor.withdrawal_prevention_status === "standard_exit_popup" &&
                 <div>ウィンドウを閉じますか。</div>
               }
-              {withdrawal.withdrawal_prevention_status === "image_popup" &&
-                <a href={withdrawal.withdrawal_prevention_link_url || ""} target="_blank">
-                  <img src={withdrawal.withdrawal_prevention_image_url} style={{ maxHeight: '217px', width: '100%' }} />
+              {botInfor && botInfor.withdrawal_prevention_status === "image_popup" &&
+                <a href={botInfor && botInfor.withdrawal_prevention_link_url || ""} target="_blank">
+                  <img src={botInfor && botInfor.withdrawal_prevention_image_url} style={{ maxHeight: '217px', width: '100%' }} />
                 </a>
               }
             </div>

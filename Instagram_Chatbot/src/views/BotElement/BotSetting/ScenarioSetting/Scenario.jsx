@@ -420,7 +420,7 @@ let hyphenPhoneNumber = [
 let type = [
   {
     key: 'text',
-    value: 'text'
+    value: 'テキスト'
   },
   {
     key: 'urls',
@@ -2217,11 +2217,11 @@ const Scenario = () => {
                       style={{ width: '100%', marginTop: '5px' }}
                       value={urlThanks}
                       onChange={value => setUrlThanks(value)}
-                      placeholder="感謝ページへのURLを入力する。"
+                      placeholder="サンクスページのURL"
                     />
                   </div>
                   {/* Overview scenario */}
-                  <div style={{ ...errorScenarioName ? {height: 'calc(100% - 109px)'} : {height: 'calc(100% - 87px)'}, backgroundColor: '#f6fbff' }}>
+                  <div style={{ ...errorScenarioName ? { height: 'calc(100% - 109px)' } : { height: 'calc(100% - 87px)' }, backgroundColor: '#f6fbff' }}>
                     <div className="ss-overview-detail">
                       {(!dataMessages || dataMessages.length === 0) &&
                         <div className="ss-add-action-wrapper-empty-data">
@@ -3499,16 +3499,6 @@ const Scenario = () => {
                                                                           <div style={{ padding: 8 }}>
                                                                             <Row gutter={8}>
                                                                               <Col>
-                                                                                <Radio.Group
-                                                                                  size="small"
-                                                                                  onChange={(e) => onTypeChange(e.target.value)}
-                                                                                  value={type}
-                                                                                >
-                                                                                  <Radio.Button value="month">月</Radio.Button>
-                                                                                  <Radio.Button value="year">年</Radio.Button>
-                                                                                </Radio.Group>
-                                                                              </Col>
-                                                                              <Col>
                                                                                 <Select
                                                                                   size="small"
                                                                                   dropdownMatchSelectWidth={false}
@@ -3534,6 +3524,16 @@ const Scenario = () => {
                                                                                 >
                                                                                   {monthOptions}
                                                                                 </Select>
+                                                                              </Col>
+                                                                              <Col>
+                                                                                <Radio.Group
+                                                                                  size="small"
+                                                                                  onChange={(e) => onTypeChange(e.target.value)}
+                                                                                  value={type}
+                                                                                >
+                                                                                  <Radio.Button value="month">月</Radio.Button>
+                                                                                  <Radio.Button value="year">年</Radio.Button>
+                                                                                </Radio.Group>
                                                                               </Col>
                                                                             </Row>
                                                                           </div>
@@ -6204,16 +6204,6 @@ const Scenario = () => {
                                                                   <div style={{ padding: 8 }}>
                                                                     <Row>
                                                                       <Col xs={4}>
-                                                                        <Radio.Group
-                                                                          size="small"
-                                                                          onChange={(e) => onTypeChange(e.target.value)}
-                                                                          value={type}
-                                                                        >
-                                                                          <Radio.Button value="month">月</Radio.Button>
-                                                                          <Radio.Button value="year">年</Radio.Button>
-                                                                        </Radio.Group>
-                                                                      </Col>
-                                                                      <Col xs={4}>
                                                                         <Select
                                                                           size="small"
                                                                           dropdownMatchSelectWidth={false}
@@ -6239,6 +6229,16 @@ const Scenario = () => {
                                                                         >
                                                                           {monthOptions}
                                                                         </Select>
+                                                                      </Col>
+                                                                      <Col xs={4}>
+                                                                        <Radio.Group
+                                                                          size="small"
+                                                                          onChange={(e) => onTypeChange(e.target.value)}
+                                                                          value={type}
+                                                                        >
+                                                                          <Radio.Button value="month">月</Radio.Button>
+                                                                          <Radio.Button value="year">年</Radio.Button>
+                                                                        </Radio.Group>
                                                                       </Col>
                                                                     </Row>
                                                                   </div>

@@ -247,20 +247,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
   // }, [])
 
   useEffect(() => {
-    api.get(`/api/v1/chatbot_settings/withdrawal_preventions/${botId}`).then(res => {
-      console.log(res, 'cehckkkk withdraw');
-      if (res.data.code === 1) {
-        setWithdrawal(res.data.data);
-      }
-    }).catch((error) => {
-      console.log(error);
-      if (error.response?.data.code === 0) {
-        tokenExpired()
-      }
-    })
-  }, [])
-
-  useEffect(() => {
     api.get(`/api/v1/prefectures`).then((res) => {
       setDataPrefectures(res.data.data);
     }).catch((error) => {
@@ -629,14 +615,15 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
       if (contentType.require) {
         console.log(contentType.type, contentType.date_select)
         if (contentType.type === 'text' || contentType.type === 'password') {
+          console.log(contentType[contentType.type].value, 'checklkkkk')
           if (contentType[contentType.type].isSplitInput) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
               errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
-            } else if (contentType[contentType.type].valueLeft.length < limitFrom
-              || contentType[contentType.type].valueLeft.length > limitTo
-              || contentType[contentType.type].valueRight.length < limitFrom
-              || contentType[contentType.type].valueRight.length > limitTo) {
+            } else if (contentType[contentType.type].valueLeft?.length < limitFrom
+              || contentType[contentType.type].valueLeft?.length > limitTo
+              || contentType[contentType.type].valueRight?.length < limitFrom
+              || contentType[contentType.type].valueRight?.length > limitTo) {
               errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
               isValid = false;
             }
@@ -830,11 +817,14 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
         if (contentType.type === 'text' || contentType.type === 'password') {
           if (contentType[contentType.type].isSplitInput
             && (!stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))
-            && (contentType[contentType.type].valueLeft.length >= limitTo || contentType[contentType.type].valueRight.length >= limitTo)) {
+            && (contentType[contentType.type].valueLeft?.length < limitFrom
+              || contentType[contentType.type].valueLeft?.length > limitTo
+              || contentType[contentType.type].valueRight?.length < limitFrom
+              || contentType[contentType.type].valueRight?.length > limitTo)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
             isValid = false;
           } else if (!stringNullOrEmpty(contentType[contentType.type].value)
-            && contentType[contentType.type].value.length >= limitTo) {
+            && (contentType[contentType.type].value?.length < limitFrom || contentType[contentType.type].value?.length > limitTo)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
             isValid = false;
           }
@@ -1729,7 +1719,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
   }
 
   const handleOpenWithDrawal = () => {
-    if (withdrawal.withdrawal_prevention_status === "invalid") {
+    if (botInfor.withdrawal_prevention_status === "invalid") {
       setIndexUser(0);
       setScenarioId(null);
       setTimeout(() => {
@@ -1740,7 +1730,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           onOpenPreview(false);
         }
       }, 10);
-    } else if (withdrawal.withdrawal_prevention_status === "standard_exit_popup" || withdrawal.withdrawal_prevention_status === "image_popup") {
+    } else if (botInfor.withdrawal_prevention_status === "standard_exit_popup" || botInfor.withdrawal_prevention_status === "image_popup") {
       document.getElementById("sp-withdrawal-container").style.display = "block";
       document.getElementById("sp-withdrawal-content").style.display = "block";
     }
@@ -1779,12 +1769,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           </div>
           <div id="sp-withdrawal-content" className="sp-withdrawal-content">
             <div className="sp-withdrawal-content-body">
-              {withdrawal.withdrawal_prevention_status === "standard_exit_popup" &&
+              {botInfor && botInfor.withdrawal_prevention_status === "standard_exit_popup" &&
                 <div>ウィンドウを閉じますか。</div>
               }
-              {withdrawal.withdrawal_prevention_status === "image_popup" &&
-                <a href={withdrawal.withdrawal_prevention_link_url || ""} target="_blank">
-                  <img src={withdrawal.withdrawal_prevention_image_url} style={{ maxHeight: '217px', width: '100%' }} />
+              {botInfor && botInfor.withdrawal_prevention_status === "image_popup" &&
+                <a href={botInfor.withdrawal_prevention_link_url || ""} target="_blank">
+                  <img src={botInfor.withdrawal_prevention_image_url} style={{ maxHeight: '217px', width: '100%' }} />
                 </a>
               }
             </div>
@@ -3663,16 +3653,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               <div style={{ padding: 8 }}>
                                 <Row gutter={8}>
                                   <Col>
-                                    <Radio.Group
-                                      size="small"
-                                      onChange={(e) => onTypeChange(e.target.value)}
-                                      value={type}
-                                    >
-                                      <Radio.Button value="month">月</Radio.Button>
-                                      <Radio.Button value="year">年</Radio.Button>
-                                    </Radio.Group>
-                                  </Col>
-                                  <Col>
                                     <Select
                                       size="small"
                                       dropdownMatchSelectWidth={false}
@@ -3698,6 +3678,16 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     >
                                       {monthOptions}
                                     </Select>
+                                  </Col>
+                                  <Col>
+                                    <Radio.Group
+                                      size="small"
+                                      onChange={(e) => onTypeChange(e.target.value)}
+                                      value={type}
+                                    >
+                                      <Radio.Button value="month">月</Radio.Button>
+                                      <Radio.Button value="year">年</Radio.Button>
+                                    </Radio.Group>
                                   </Col>
                                 </Row>
                               </div>
@@ -4509,7 +4499,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           onChange={value => {
                             console.log(value)
                             onChangeValue(indexContent, content.type, value.target.value, 'initial_selection');
-                            if(messageContent.length === 1) onClickNext();
+                            if (messageContent.length === 1) onClickNext();
                           }}
                           value={productPurchaseRadioButton.initial_selection}
                         >
@@ -4574,7 +4564,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           value={productPurchaseRadioButton.initial_selection}
                           onChange={value => {
                             onChangeValue(indexContent, content.type, value.target.value, 'initial_selection');
-                            if(messageContent.length === 1) onClickNext();
+                            if (messageContent.length === 1) onClickNext();
                           }}
                         >
                           {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
@@ -4713,7 +4703,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             } else {
                               displayButtonNext(false);
                               onChangeValue(indexContent, content.type, false, 'is_display_card_payment');
-                              if(messageContent.length === 1) onClickNext();
+                              if (messageContent.length === 1) onClickNext();
                             }
                           }}>
                           {itemPayment.text}

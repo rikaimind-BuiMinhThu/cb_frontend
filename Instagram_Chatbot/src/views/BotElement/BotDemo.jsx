@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { Col, Row } from 'reactstrap';
 import '../../assets/css/bot/bot-demo.css';
-import IconManDefault from '../../assets/img/bot-icon/man1_new.png';
+// import IconManDefault from '../../assets/img/bot-icon/man1_new.png';
 import Preview from './BotSetting/Preview';
 import Cookies from 'js-cookie';
 import api from '../../api/api-management';
@@ -17,7 +17,6 @@ const BotDemo = () => {
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState('');
 
-
   // side effects
   useEffect(() => {
     setTimeout(() => {
@@ -30,37 +29,37 @@ const BotDemo = () => {
       console.log(response);
       if (response.data.data) {
         setScenarioId(response.data.data.id);
-        // Cookies.set('scenario_id', response.data.data.id);
+        Cookies.set('scenario_id', response.data.data.id);
       } else {
         setIsOpenNoti(true);
-        setMessageNoti("Don't have any scenario selected");
+        setMessageNoti('シナリオがありません。');
         setTimeout(() => {
           setIsOpenNoti(false);
-          setMessageNoti("");
-        }, 2000)
+          setMessageNoti('');
+        }, 2000);
       }
-    })
-  }, [])
+    });
+  }, []);
 
   const handleOpenPreview = (isOpen) => {
     if (isOpen) {
-      document.getElementById('sp-container').style.height = "620px";
-      document.getElementById('sp-header').style.position = "static";
-      document.getElementById('sp-header').style.borderBottomLeftRadius = "0px";
-      document.getElementById('sp-header').style.borderBottomRightRadius = "0px";
-      document.getElementById('sp-process-bar').style.display = "block";
-      document.getElementById('sp-body').style.display = "block";
+      document.getElementById('sp-container').style.height = '620px';
+      document.getElementById('sp-header').style.position = 'static';
+      document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
+      document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
+      document.getElementById('sp-process-bar').style.display = 'block';
+      document.getElementById('sp-body').style.display = 'block';
     } else {
-      document.getElementById('sp-container').style.height = "0px";
-      document.getElementById('sp-process-bar').style.display = "none";
-      document.getElementById('sp-body').style.display = "none";
-      document.getElementById('sp-header').style.borderBottomLeftRadius = "25px";
-      document.getElementById('sp-header').style.borderBottomRightRadius = "25px";
-      document.getElementById('sp-header').style.position = "absolute";
-      document.getElementById('sp-header').style.bottom = "13px";
+      document.getElementById('sp-container').style.height = '0px';
+      document.getElementById('sp-process-bar').style.display = 'none';
+      document.getElementById('sp-body').style.display = 'none';
+      document.getElementById('sp-header').style.borderBottomLeftRadius = '25px';
+      document.getElementById('sp-header').style.borderBottomRightRadius = '25px';
+      document.getElementById('sp-header').style.position = 'absolute';
+      document.getElementById('sp-header').style.bottom = '13px';
     }
     setIsChatBoxClick(isOpen);
-  }
+  };
 
   return (
     <div className="content">
@@ -68,7 +67,7 @@ const BotDemo = () => {
         <Col md="12">
           <h2 className="title-bd">Demo</h2>
           <div className="action-wrapper-bd">
-            <h4 className="action-title-bd">Mouse action</h4>
+            <h4 className="action-title-bd">アクションクリック</h4>
             <div className="actions-bd">
               <span className="action-bd" onClick={() => handleOpenPreview(!isChatBoxClick)}>
                 open-close
@@ -83,7 +82,13 @@ const BotDemo = () => {
           </div>
         </Col>
       </Row>
-      {scenarioId && <Preview isOpen={isChatBoxClick} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioIdProps={scenarioId} />}
+      {scenarioId && (
+        <Preview
+          isOpen={isChatBoxClick}
+          onOpenPreview={(isOpen) => handleOpenPreview(isOpen)}
+          scenarioIdProps={scenarioId}
+        />
+      )}
       <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
         <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
           <span style={{ fontSize: '16px' }}>{messageNoti}</span>
