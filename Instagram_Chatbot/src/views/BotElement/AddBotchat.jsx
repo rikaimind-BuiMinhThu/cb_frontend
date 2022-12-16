@@ -64,13 +64,13 @@ function AddBotchat() {
 
   // design type: handle click
   const designTypeClick = (e) => {
-    let value = '';
+    let value = ''
     if (e.target.innerText == 'ポップ') {
-      value = 'pop';
+      value = 'pop'
     } else if (e.target.innerText == 'フラット') {
-      value = 'flat';
+      value = 'flat'
     } else if (e.target.innerText == 'マテリアル') {
-      value = 'material';
+      value = 'material'
     }
     setDesignType(value);
     const typeActive = document.querySelector('.design-types .type.active');
@@ -95,6 +95,15 @@ function AddBotchat() {
     document.querySelector(`.icons .icon.icon-${index}`).classList.add('active');
     // console.log('imageDefault: ', imageDefault);
     setBotImage(imageDefault);
+    console.log('imageDefault: ', imageDefault);
+    if(!imageDefault.includes('image/png;base64')){
+      toDataURL(imageDefault)
+      .then(dataUrl => {
+        console.log('RESULT:',)
+        setDefaultIcon(dataUrl)
+      })
+    }
+    
   };
 
   // get base url image add
@@ -119,6 +128,18 @@ function AddBotchat() {
       return false;
     }
   };
+
+  const [defaultIcon, setDefaultIcon] = useState('')
+
+  const toDataURL = url => fetch(url)
+    .then(response => response.blob())
+    .then(blob => new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onloadend = () => resolve(reader.result)
+      reader.onerror = reject
+      reader.readAsDataURL(blob)
+    }))
+
 
   // add new bot chat
   const addNewBotChat = () => {
@@ -151,21 +172,25 @@ function AddBotchat() {
           subtitle: subtitle,
           design_type: designType,
           main_color: color,
-          icon: iconBot,
+          icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
           bot_name: botName,
         },
       };
+
+
+      // console.log('bot info: ', bot)
+
       api
         .post(`api/v1/managements/chatbots`, bot)
         .then((res) => {
           if (res.data.code === 1 || res.data.code === '1') {
             Cookies.set('bot_id', res.data.data.id);
-            setMsgNoti('ボットを正常に作成されました！');
+            setMsgNoti('Add new bot chat successfully!');
             setIsOpenNoti(true);
             setTimeout(() => {
               setMsgNoti('');
               setIsOpenNoti(false);
-              window.location.href = '/admin/scenario-list';
+              // window.location.href = '/admin/scenario-list';
             }, 1500);
           } else if (res.data?.code === 2 || res.data?.code === '2') {
             setMsgNoti(res.data.message);
@@ -451,3 +476,4 @@ function AddBotchat() {
 }
 
 export default AddBotchat;
+
