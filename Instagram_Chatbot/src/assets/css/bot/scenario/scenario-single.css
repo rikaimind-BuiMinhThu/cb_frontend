@@ -308,6 +308,7 @@ textarea.ss-message__content--bot-delay {
   color: black;
   font-size: 12px;
   margin-right: 8px;
+  white-space: pre-wrap;
 }
 
 .ss-message__content--user-label-required {
@@ -1069,9 +1070,14 @@ input#ss-message__content--user-checkbox--checkbox_img {
   margin: 0 auto;
 }
 
+/* #ss-user-setting__select-type {
+  padding: 9px 12px!important;
+} */
+
 .ss-user-setting__select-btn-add {
   background-color: #78a8f3;
   margin-left: 10px;
+  word-break: keep-all;
 }
 
 .ss-user-setting__checkbox-wrapper {

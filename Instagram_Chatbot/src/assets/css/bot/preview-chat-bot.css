@@ -441,3 +441,7 @@
 .ant-checkbox + span {
     padding-right: 0px!important;
 }
+
+.sp-body-bot-side-messages .ss-bot-chat-detail-content {
+    white-space: pre-wrap;
+}

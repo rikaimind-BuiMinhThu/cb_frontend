@@ -6,7 +6,7 @@ import {
 } from '../../../../variables/constants';
 import iconPdf from '../../../../assets/img/icons8-pdf-80.png';
 import {
-    Col, Row, Card, CardBody, Button
+    Button
 } from 'reactstrap';
 
 function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf', 'mp4'] }) {
@@ -123,14 +123,14 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
                     className="ss-popup-add-variable-input-close-button"
                     onClick={() => onCancel()}
                 >
-                    Cancel
+                    キャンセル
                 </Button>
                 <Button
                     style={{ backgroundColor: '#024BB9' }}
                     className="ss-popup-add-variable-input-keep-button"
                     onClick={() => onReferFile(S3_UPLOAD_URL + fileChose)}
                 >
-                    file reference
+                    ファイル参照
                 </Button>
             </div>
         </React.Fragment>
