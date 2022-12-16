@@ -10,6 +10,7 @@ async function displayPopup() {
         }
     });
     const data = await response.json();
+    console.log('datane: ', data)
     scenarioId = data.data.id
     var body = document.getElementsByTagName("BODY")[0]; var iframe = document.createElement('iframe');
     iframe.id = 'previewSdk'; iframe.style.position = "fixed"; iframe.style.bottom = "0"; iframe.style.right = "0";

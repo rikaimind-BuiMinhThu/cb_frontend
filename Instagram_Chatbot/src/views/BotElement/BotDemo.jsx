@@ -30,7 +30,7 @@ const BotDemo = () => {
       console.log(response);
       if (response.data.data) {
         setScenarioId(response.data.data.id);
-        Cookies.set('scenario_id', response.data.data.id);
+        // Cookies.set('scenario_id', response.data.data.id);
       } else {
         setIsOpenNoti(true);
         setMessageNoti("Don't have any scenario selected");
@@ -83,7 +83,7 @@ const BotDemo = () => {
           </div>
         </Col>
       </Row>
-      {scenarioId && <Preview isOpen={isChatBoxClick} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} />}
+      {scenarioId && <Preview isOpen={isChatBoxClick} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} scenarioIdProps={scenarioId} />}
       <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
         <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
           <span style={{ fontSize: '16px' }}>{messageNoti}</span>
