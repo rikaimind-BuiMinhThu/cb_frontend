@@ -8,18 +8,24 @@ import iconPdf from '../../../../assets/img/icons8-pdf-80.png';
 import {
     Button
 } from 'reactstrap';
+import { tokenExpired } from 'api/tokenExpired';
 
 function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf', 'mp4'] }) {
 
     const [fileType, setFileType] = useState('IMAGE');
-    const [dataDataFile, setDataFile] = useState([]);
+    const [dataFile, setDataFile] = useState([]);
     const [fileChose, setFileChose] = useState('');
 
     useEffect(() => {
         api.get(`/api/v1//managements/file`).then(res => {
             console.log(res);
             setDataFile(res.data.data);
-        })
+        }).catch((error) => {
+            console.log(error);
+            if (error.response?.data.code === 0) {
+                tokenExpired();
+            }
+        });
     }, [])
     console.log(acceptFile)
     return (
@@ -57,7 +63,7 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
                 <div className="fr-popup-body">
                     {/* {fileType === 'IMAGE' && */}
                     <React.Fragment>
-                        {dataDataFile && dataDataFile.map((item, index) => {
+                        {dataFile && dataFile.map((item, index) => {
                             console.log(item.file_url === fileChose)
                             if (fileType === 'IMAGE' && item.file_type === 'image') {
                                 return (
@@ -109,7 +115,7 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
                     {/* }
                     {fileType === 'PDF' &&
                         <React.Fragment>
-                            {dataDataFile && dataDataFile.map((item, index) => {
+                            {dataFile && dataFile.map((item, index) => {
                                 return (
                                     <React.Fragment></React.Fragment>
                                 )
