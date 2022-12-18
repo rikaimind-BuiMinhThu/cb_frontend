@@ -2203,7 +2203,6 @@ const Scenario = () => {
                 {/* ss overview */}
                 <div className="ss-sc-content ss-overview">
                   {/* Input name of scenario */}
-
                   <div>
                     <InputCustom
                       style={{ width: '100%' }}
@@ -2261,6 +2260,18 @@ const Scenario = () => {
                                     console.log(type, 'checkkk type');
                                   }
                                 }
+                                let titleMessage = "";
+                                if (content) {
+                                  if (content.type === 'delay') { titleMessage = "遅延" }
+                                  else if (content.type === 'file') { titleMessage = "ファイル" }
+                                  else if (content.type === 'email') { titleMessage = "メール" }
+                                  else if (content.type === 'api_linkage') { titleMessage = "API連携" }
+                                  else if (content.type === 'script') { titleMessage = "スクリプト" }
+                                  else if (content.type === 'clear_variable') { titleMessage = "変数クリア" }
+                                  else if (content.type === 'variable_set') { titleMessage = "変数セット" }
+                                  else if (content.type === 'pause') { titleMessage = "一時停止" }
+                                }
+
                                 return message.belong_to === 'bot' ? (
                                   <Draggable key={message.id} draggableId={message.id?.toString()} index={index}>
                                     {(provided) => (
@@ -2280,14 +2291,7 @@ const Scenario = () => {
                                                 <div style={{ width: '65%' }}>
                                                   <div style={{ display: 'flex', paddingLeft: '10px' }}>
                                                     {content.type !== 'text_input' && <div className="ss-sub-title-message">
-                                                      {content.type === 'delay' && "遅延"}
-                                                      {content.type === 'file' && "ファイル"}
-                                                      {content.type === 'email' && "メール"}
-                                                      {content.type === 'api_linkage' && "API連携"}
-                                                      {content.type === 'script' && "スクリプト"}
-                                                      {content.type === 'clear_variable' && "変数クリア"}
-                                                      {content.type === 'variable_set' && "変数セット"}
-                                                      {content.type === 'pause' && "一時停止"}
+                                                      {titleMessage}
                                                     </div>}
                                                     {message.message_name && <div className="ss-sub-title-message ss-truncation-text" style={{ backgroundColor: '#fff', maxWidth: '60%' }}>{message.message_name}</div>}
                                                   </div>
@@ -4476,7 +4480,7 @@ const Scenario = () => {
                                       </div>
                                     }
                                     <CheckboxCustom
-                                      label={<span>do not scroll automatically<MDBIcon fas icon="question-circle" style={{ color: '#347AED', marginLeft: '5px', fontSize: '13px' }} /></span>}
+                                      label={<span>自動でスクロールさせない<MDBIcon fas icon="question-circle" style={{ color: '#347AED', marginLeft: '5px', fontSize: '13px' }} /></span>}
                                       value={dataMessages[indexMessageSelect].message_content[0][messageType]?.scroll_auto || false}
                                       onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'scroll_auto')}
                                     />
@@ -4597,7 +4601,7 @@ const Scenario = () => {
                               {messageType === 'clear_variable' && (
                                 <div className="ss-bot-statement-wrapper" style={{ marginTop: '15px' }}>
                                   {console.log(dataMessages[indexMessageSelect].message_content[0][messageType]?.variables)}
-                                  <span style={{ fontWeight: '400' }}>variable</span>
+                                  <span style={{ fontWeight: '400' }}>変数</span>
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.variables &&
                                     dataMessages[indexMessageSelect].message_content[0][messageType]?.variables
                                       .map((item, index, arr) => {
@@ -4635,7 +4639,7 @@ const Scenario = () => {
                                 <div className="ss-bot-statement-wrapper" style={{ marginTop: '15px' }}>
                                   {console.log(dataMessages[indexMessageSelect].message_content[0][messageType]?.variables)}
                                   <span>※直後の条件分岐に変数を使用したい場合、ユーザー側の変数セットブロックをご利用ください。</span>
-                                  <span style={{ fontWeight: '400', marginTop: '15px', display: 'block' }}>variable</span>
+                                  <span style={{ fontWeight: '400', marginTop: '15px', display: 'block' }}>変数</span>
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.variables &&
                                     dataMessages[indexMessageSelect].message_content[0][messageType]?.variables
                                       .map((item, index, arr) => {
@@ -4676,7 +4680,7 @@ const Scenario = () => {
 
                               {/* type: pause */}
                               {messageType === 'pause' && (
-                                <div style={{ marginTop: '15px', fontWeight: '700' }}>pause</div>
+                                <div style={{ marginTop: '15px', fontWeight: '700' }}>一時停止</div>
                               )}
                             </div>
                           </div>

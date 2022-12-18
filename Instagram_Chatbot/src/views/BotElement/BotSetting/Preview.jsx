@@ -617,7 +617,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
 
     let messageError = "この項目は必須です。"
     for (let i = 0; i < contentArr.length; i++) {
-
       let contentType = contentArr[i][contentArr[i].type];
       let limitFrom = contentType[contentType.type]?.character_limit_from;
       let limitTo = contentType[contentType.type]?.character_limit_to || Number.MAX_SAFE_INTEGER;
@@ -645,7 +644,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           }
         } else if (contentType.type === 'phone_number') {
           if (contentType[contentType.type].withHyphen) {
-            if (stringNullOrEmpty(contentType[contentType.type].value1) || stringNullOrEmpty(contentType[contentType.type].value2)) {
+            if (stringNullOrEmpty(contentType[contentType.type].value1)
+              || stringNullOrEmpty(contentType[contentType.type].value2)
+              || stringNullOrEmpty(contentType[contentType.type].value3)) {
               errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
             }
@@ -823,21 +824,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           isValid = false;
         }
       } else {
-        if (contentType.type === 'text' || contentType.type === 'password') {
-          if (contentType[contentType.type].isSplitInput
-            && (!stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))
-            && (contentType[contentType.type].valueLeft?.length < limitFrom
-              || contentType[contentType.type].valueLeft?.length > limitTo
-              || contentType[contentType.type].valueRight?.length < limitFrom
-              || contentType[contentType.type].valueRight?.length > limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
-            isValid = false;
-          } else if (!stringNullOrEmpty(contentType[contentType.type].value)
-            && (contentType[contentType.type].value?.length < limitFrom || contentType[contentType.type].value?.length > limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === 'credit_card_payment') {
+        if (contentArr[i].type === 'credit_card_payment') {
           if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
             || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
             || (contentType.separate_type === true && (stringNullOrEmpty(contentType.card_number1) || stringNullOrEmpty(contentType.card_number2) || stringNullOrEmpty(contentType.card_number3) || stringNullOrEmpty(contentType.card_number4)))
@@ -857,6 +844,16 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
         } else if (contentArr[i].type === 'checkbox') {
           if (contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+            isValid = false;
+          }
+        } else if (contentType.type === 'phone_number' && contentType[contentType.type].withHyphen) {
+          if ((!stringNullOrEmpty(contentType[contentType.type].value1)
+            || !stringNullOrEmpty(contentType[contentType.type].value2)
+            || !stringNullOrEmpty(contentType[contentType.type].value3))
+            && (stringNullOrEmpty(contentType[contentType.type].value1)
+              || stringNullOrEmpty(contentType[contentType.type].value2)
+              || stringNullOrEmpty(contentType[contentType.type].value3))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'time_hm') {
@@ -941,7 +938,46 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           }
         }
       }
-      if (contentArr[i].type === 'textarea') {
+      let REGEX_EMAIL = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+      let REGEX_PASSWORD = /^[A-Za-z0-9 ]+$/;
+
+      if (contentType.type === 'text' || contentType.type === 'password') {
+        if (contentType[contentType.type].isSplitInput
+          && (!stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))
+          && (contentType[contentType.type].valueLeft?.length < limitFrom
+            || contentType[contentType.type].valueLeft?.length > limitTo
+            || contentType[contentType.type].valueRight?.length < limitFrom
+            || contentType[contentType.type].valueRight?.length > limitTo)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value)
+          && (contentType[contentType.type].value?.length < limitFrom || contentType[contentType.type].value?.length > limitTo)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          isValid = false;
+        } else if (contentType.type === 'password' && !stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
+          isValid = false;
+        }
+      } else if (contentType.type === 'password_confirmation') {
+        if ((!stringNullOrEmpty(contentType[contentType.type].value)
+          || !stringNullOrEmpty(contentType[contentType.type].valueConfirm))
+          && (contentType[contentType.type].value?.length < limitFrom
+            || contentType[contentType.type].value?.length > limitTo
+            || contentType[contentType.type].valueConfirm?.length < limitFrom
+            || contentType[contentType.type].valueConfirm?.length > limitTo)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].valueConfirm) && !REGEX_PASSWORD.test(contentType[contentType.type].valueConfirm)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !stringNullOrEmpty(contentType[contentType.type].valueConfirm) && contentType[contentType.type].value !== contentType[contentType.type].valueConfirm) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "パスワードとパスワード確認が一致しません。";
+          isValid = false;
+        }
+      } else if (contentArr[i].type === 'textarea') {
         console.log(contentType[contentType.type].value, 'cecjlllll')
         if (!stringNullOrEmpty(contentType[contentType.type].value) && contentType[contentType.type].value.length < limitFrom) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `${limitFrom}文字以上入力してください。`;
@@ -950,17 +986,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `${limitTo}文字以下入力してください。`;
           isValid = false;
         }
-      }
-      if (contentArr[i].type === 'zip_code_address') {
+      } else if (contentArr[i].type === 'zip_code_address') {
+        let isValidZipCode = true;
         if (contentType.isCheckRequire === "require") {
           if (contentType.post_code !== undefined) {
             if (contentType.split_postal_code) {
               if (stringNullOrEmpty(contentType.value_post_code_left)
                 || stringNullOrEmpty(contentType.value_post_code_right)) {
-                isValid = false;
+                isValidZipCode = false;
               }
             } else if (stringNullOrEmpty(contentType.value_post_code)) {
-              isValid = false;
+              isValidZipCode = false;
             }
           }
         } else if (contentType.isCheckRequire === "all_items_require") {
@@ -968,27 +1004,30 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             if (contentType.split_postal_code) {
               if (stringNullOrEmpty(contentType.value_post_code_left)
                 || stringNullOrEmpty(contentType.value_post_code_right)) {
-                isValid = false;
+                isValidZipCode = false;
               }
             } else if (stringNullOrEmpty(contentType.value_post_code)) {
-              isValid = false;
+              isValidZipCode = false;
             }
           }
           if (contentType.prefecture !== undefined && stringNullOrEmpty(contentType.value_prefecture)) {
-            isValid = false;
+            isValidZipCode = false;
           }
           if (contentType.municipality !== undefined && stringNullOrEmpty(contentType.value_municipality)) {
-            isValid = false;
+            isValidZipCode = false;
           }
           if (contentType.address !== undefined && stringNullOrEmpty(contentType.value_address)) {
-            isValid = false;
+            isValidZipCode = false;
           }
         }
-        if (isValid === false) {
+        if (isValidZipCode === false) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+          isValid = false;
+        } else if (errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`];
+          isValid = false;
         }
-      }
-      if (contentType.type === 'phone_number') {
+      } else if (contentType.type === 'phone_number' && !errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`]) {
         let REGEX_PHONE = /^0\d{9}$|^0\d{10}$/;
         if (contentType[contentType.type].withHyphen) {
           if (!stringNullOrEmpty(contentType[contentType.type].value1)
@@ -1002,41 +1041,20 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "形式が正しくない。";
           isValid = false;
         }
-      }
-      if (contentType.type === 'urls' && !stringNullOrEmpty(contentType[contentType.type].value)) {
+      } else if (contentType.type === 'urls' && !stringNullOrEmpty(contentType[contentType.type].value)) {
         let REGEX_URLS = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
         console.log(REGEX_URLS.test(contentType[contentType.type].value));
         if (!REGEX_URLS.test(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なURL形式で指定してください。`;
           isValid = false;
         }
-      }
-      let REGEX_EMAIL = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-      if (contentType.type === 'email_address' && !stringNullOrEmpty(contentType[contentType.type].value)) {
+      } else if (contentType.type === 'email_address' && !stringNullOrEmpty(contentType[contentType.type].value)) {
         console.log(REGEX_EMAIL.test(contentType[contentType.type].value));
         if (!REGEX_EMAIL.test(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
         }
-      }
-      let REGEX_PASSWORD = /^[A-Za-z0-9 ]+$/;
-      if (contentType.type === 'password' && !stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
-        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
-        isValid = false;
-      }
-      if (contentType.type === 'password_confirmation') {
-        if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
-          isValid = false;
-        } else if (!stringNullOrEmpty(contentType[contentType.type].valueConfirm) && !REGEX_PASSWORD.test(contentType[contentType.type].valueConfirm)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
-          isValid = false;
-        } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !stringNullOrEmpty(contentType[contentType.type].valueConfirm) && contentType[contentType.type].value !== contentType[contentType.type].valueConfirm) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "パスワードとパスワード確認が一致しません。";
-          isValid = false;
-        }
-      }
-      if (contentType.type === 'email_confirmation') {
+      } else if (contentType.type === 'email_confirmation') {
         if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_EMAIL.test(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
@@ -1047,14 +1065,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `メールアドレスとメールアドレス確認が一致しません。`;
           isValid = false;
         }
-      }
-      if (contentArr[i].type === 'attaching_file' && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
-        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`];
-        isValid = false;
-      }
-      console.log(errors);
-      if (contentArr[i].type === 'zip_code_address' && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
-        console.log(errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`])
+      } else if (contentArr[i].type === 'attaching_file' && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
         errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`];
         isValid = false;
       }
@@ -1102,37 +1113,10 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             isValid = false;
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
           } else if (REGEX_CHECK.test(contentType[contentType.type].value)) {
-            console.log(REGEX_CHECK)
             isValid = false;
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
           }
         }
-        //  else if (REGEX_CHECK === "" && !contentType[contentType.type].isSplitInput) {
-        //   if (contentType[contentType.type].range === 'double_byte' && !isDoubleByte(contentType[contentType.type].value)) {
-        //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "全角文字を入力してください。";
-        //   } else if (contentType[contentType.type].range === 'full_width_katakana' && mbStrWidth(contentType[contentType.type].value) === 2) {
-        //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in full-width katakana characters.";
-        //   } else if (contentType[contentType.type].range === 'double_byte_hiragana' && !isDoubleByte(contentType[contentType.type].value)) {
-        //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte hiragana characters.";
-        //   }
-        // } else if (REGEX_CHECK === "" && contentType[contentType.type].isSplitInput) {
-        //   if (contentType[contentType.type].range === 'double_byte'
-        //     && (!isDoubleByte(contentType[contentType.type].valueLeft) || !isDoubleByte(contentType[contentType.type].valueRight))) {
-        //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "全角文字を入力してください。";
-        //   } else if (contentType[contentType.type].range === 'full_width_katakana' &&
-        //     (mbStrWidth(contentType[contentType.type].valueLeft) === 2 || mbStrWidth(contentType[contentType.type].valueRight) === 2)) {
-        //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please input katakana type.";
-        //   } else if (contentType[contentType.type].range === 'double_byte_hiragana' &&
-        //     (!isDoubleByte(contentType[contentType.type].valueLeft) || !isDoubleByte(contentType[contentType.type].valueRight))) {
-        //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please input hiragana type.";
-        //   }
-        // }
       }
     }
 
@@ -1718,8 +1702,10 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             } else {
               item.default_value = `${(dataContentType[field]?.valueYear || dataContentType[field]?.valueMonth || dataContentType[field]?.valueDay) ? `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}-${dataContentType[field]?.valueDay}` : ""} ${(dataContentType[field]?.valueHour || dataContentType[field]?.valueMinute) ? `${dataContentType[field]?.valueHour}:${dataContentType[field]?.valueMinute}` : ""}`;
             }
-          } else if(dataContentType.type === 'embedded') {
+          } else if (dataContentType.type === 'embedded') {
             item.default_value = `${moment(value).format("YYYY-MM-DD")}`
+          } else if (field === 'phone_number') {
+            item.default_value = `${dataContentType[field]?.value1}${dataContentType[field]?.value2}${dataContentType[field]?.value3}`
           } else {
             item.default_value = value;
           }
@@ -1732,7 +1718,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
   }
 
   const handleOpenWithDrawal = () => {
-    if (botInfor.withdrawal_prevention_status === "invalid") {
+    if (botInfor && botInfor.withdrawal_prevention_status === "invalid") {
       setIndexUser(0);
       setScenarioId(null);
       setTimeout(() => {
@@ -1743,7 +1729,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           onOpenPreview(false);
         }
       }, 10);
-    } else if (botInfor.withdrawal_prevention_status === "standard_exit_popup" || botInfor.withdrawal_prevention_status === "image_popup") {
+    } else if (botInfor?.withdrawal_prevention_status === "standard_exit_popup" || botInfor?.withdrawal_prevention_status === "image_popup") {
       document.getElementById("sp-withdrawal-container").style.display = "block";
       document.getElementById("sp-withdrawal-content").style.display = "block";
     }
@@ -1916,6 +1902,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                   キャンセル
                 </div>
                 <div className="sp-popup-zip-code-address-body-button-selection"
+                  style={zipcode ? {} : { opacity: '0.5' }}
                   onClick={() => {
                     console.log(dataMessages[indexMessageRender].message_content[indexContentZipcode], indexContentZipcode)
                     if (zipcode && indexContentZipcode !== undefined && !dataMessages[indexMessageRender].message_content[indexContentZipcode].zip_code_address.split_postal_code) {
@@ -1936,9 +1923,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                       document.getElementById("sp-withdrawal-container").style.display = "none";
                       document.getElementById("sp-popup-zip-code-address").style.display = "none";
                     }
+                    document.getElementById("ss-user-input-address").focus();
+                    document.getElementById("ss-user-input-address").select();
 
                   }}>
-                  Selection
+                  選択
                 </div>
               </div>
             </div>
