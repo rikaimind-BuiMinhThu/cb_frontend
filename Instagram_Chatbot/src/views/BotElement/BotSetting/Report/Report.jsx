@@ -26,7 +26,6 @@ function Report() {
   const [numOfOpenBot, setNumOfOpenBot] = useState(0);
   const [numOfCloseBot, setNumOfCloseBot] = useState(0);
   const [reportGroupSelect, setReportGroupSelect] = useState('first');
-
   //
   const [devicePieChartSeries, setDevicePieChartSeries] = useState([]);
   const [devicePieChartSeriesCount, setDevicePieChartSeriesCount] = useState([]);
@@ -36,9 +35,19 @@ function Report() {
   const [closeAll, setCloseAll] = useState(0);
   const [conversionCVRCTR, setConversionCVRCTR] = useState(0);
   const [CVRCTR, setCVRCTR] = useState(false);
-
   const [shortenedList, setShortenedList] = useState([]);
   const [listContent, setListContent] = useState([]);
+  //
+  const [conversionExport, setConversionExport] = useState([]);
+  const [clickThroughExport, setClickThroughExport] = useState([]);
+  const [leaveBotExport, setLeaveBotExport] = useState([]);
+  const [conversionRateExport, setConversionRateExport] = useState([]);
+  const [clickThroughRateExport, setClickThroughRateExport] = useState([]);
+  const [botLeaveRate, setBotLeaveRate] = useState([]);
+  const [startPageExport, setStartPageExport] = useState([])
+  const [cvPageExport, setCvPageExport] = useState([])
+  // const [deviceExport, setDeviceExport] = useState([]);
+
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
@@ -71,17 +80,29 @@ function Report() {
           if (dataScenario != []) {
             api
               .get(
-                `/api/v1/analytics/scenario_counts/${dataScenario[0].id}?begin_date=${new Date(
-                  new Date().setDate(1)
-                )
-                  .toISOString()
-                  .slice(0, 10)}&end_date=${new Date(new Date().setDate(new Date().getDate() - 1))
-                  .toISOString()
-                  .slice(0, 10)}`
+                `/api/v1/analytics/scenario_counts/${dataScenario[0].id}?begin_date=${new Date(new Date().setDate(1))
+                  .toISOString().slice(0, 10)}&end_date=${new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}`
               )
               .then((res) => {
-                console.log('bot data: ', res.data);
+                // console.log('bot data: ', res.data);
                 setListContent(res.data?.scenario_pages);
+                //set page export
+                let pages = res.data?.scenario_pages
+                let startPageExportData = [['集計期間', `${new Date(new Date().setDate(1))
+                  .toISOString().slice(0, 10)}~${new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}`]]
+                startPageExportData.push(['開始ページ', 'CV数', 'URLs'])
+                let contentPageExport = [['集計期間', `${new Date(new Date().setDate(1))
+                  .toISOString().slice(0, 10)}~${new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}`]]
+                contentPageExport.push(['開始ページ', 'CV数', 'URLs'])
+                pages.forEach(index => {
+                  startPageExportData.push([index.num_of_start, index.num_of_cv, index.url])
+                  if (index.num_of_cv > 0) {
+                    contentPageExport.push([index.num_of_start, index.num_of_cv, index.url])
+                  }
+                });
+                setStartPageExport(startPageExportData)
+                setCvPageExport(contentPageExport)
+
                 setDataReportCount(res?.data?.data);
                 let chatbotData = res?.data?.data;
                 // let chatbotDataCount = [1,1,1]
@@ -129,6 +150,74 @@ function Report() {
                 setDevicePieChartSeriesCount(chatbotValue);
               })
               .catch((error) => {
+                console.log(error);
+              });
+            api.get(`/api/v1/analytics/scenario_counts/${dataScenario[0].id}/download?begin_date=${new Date(new Date().setDate(1))
+              .toISOString().slice(0, 10)}&end_date=${new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}`).then(res => {
+                // console.log(`download: `, res.data.data)
+                let exportData = res?.data.data;
+                let totalConversion = 0
+                let totalBotStart = 0
+                let totalBotOpen = 0
+                let totalBotLeave = 0
+                let cvrPC = 0;
+                let cvrTB = 0;
+                let cvrSP = 0;
+                let ctrPC = 0;
+                let ctrTB = 0;
+                let ctrSP = 0;
+                let lBPC = 0;
+                let lBTB = 0;
+                let lBSP = 0;
+                let exportCV = [['集計期間', 'CV PC', 'CV タブレット', 'CV スマートフォン']]
+                let exportClickThrough = [['集計期間', 'BOT開始', 'BOT起動']]
+                let exportBotLeave = [['集計期間', 'PC離脱', 'タブレット離脱', 'スマートフォン離脱', 'BOT開始', 'BOT離脱']]
+                let exportCVR = [['集計期間', `${new Date(new Date().setDate(1))
+                  .toISOString().slice(0, 10)}~${new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}`]]
+                exportCVR.push(['CV PC', 'CV タブレット', 'CV スマートフォン', 'CV合計数', 'BOT開始'])
+                let exportCTR = [['Date', `${new Date(new Date().setDate(1))
+                  .toISOString().slice(0, 10)}~${new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}`]]
+                exportCTR.push(['CT PC', 'CT タブレット', 'CT スマートフォン', 'CT合計数', 'BOT開始'])
+                let exportLeaveBotRate = [['集計期間', `${new Date(new Date().setDate(1))
+                  .toISOString().slice(0, 10)}~${new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}`]]
+                exportLeaveBotRate.push(['PC', 'タブレット', 'スマートフォン', '合計', 'BOT開始'])
+                exportData.forEach(index => {
+                  exportCV.push([index.log_date, index.pc_conversion_count, index.tablet_conversion_count, index.smartphone_conversion_count])
+                  totalConversion += index.pc_conversion_count + index.tablet_conversion_count + index.smartphone_conversion_count
+                  cvrPC += index.pc_conversion_count
+                  cvrTB += index.tablet_conversion_count
+                  cvrSP += index.smartphone_conversion_count
+                  exportClickThrough.push([index.log_date, (index.pc_open_chatbot_window_count + index.smartphone_open_chatbot_window_count + index.tablet_open_chatbot_window_count),
+                  (index.pc_count + index.smartphone_count + index.tablet_count)])
+                  totalBotStart += (index.pc_open_chatbot_window_count + index.smartphone_open_chatbot_window_count + index.tablet_open_chatbot_window_count)
+                  totalBotOpen += (index.pc_count + index.smartphone_count + index.tablet_count)
+                  ctrPC += index.pc_open_chatbot_window_count
+                  ctrTB += index.tablet_open_chatbot_window_count
+                  ctrSP += index.smartphone_open_chatbot_window_count
+                  exportBotLeave.push([index.log_date, index.pc_close_chatbot_window_count, index.tablet_close_chatbot_window_count, index.smartphone_close_chatbot_window_count,
+                  (index.pc_open_chatbot_window_count + index.smartphone_open_chatbot_window_count + index.tablet_open_chatbot_window_count),
+                  (index.pc_close_chatbot_window_count + index.tablet_close_chatbot_window_count + index.smartphone_close_chatbot_window_count)])
+                  totalBotLeave += (index.pc_close_chatbot_window_count + index.tablet_close_chatbot_window_count + index.smartphone_close_chatbot_window_count)
+                  lBPC += index.pc_close_chatbot_window_count
+                  lBTB += index.tablet_close_chatbot_window_count
+                  lBSP += index.smartphone_close_chatbot_window_count
+                });
+                exportCVR.push([cvrPC, cvrTB, cvrSP, totalConversion, totalBotStart])
+                exportCVR.push(['', '', '', 'CVR', `${Math.round((totalConversion * 100) / totalBotStart).toFixed(2)}%`])
+                exportCTR.push([ctrPC, ctrTB, ctrSP, totalBotStart, totalBotOpen])
+                exportCTR.push(['', '', '', 'CTR', `${Math.round((totalBotStart * 100) / totalBotOpen).toFixed(2)}%`])
+                exportLeaveBotRate.push([lBPC, lBTB, lBSP, totalBotLeave, totalBotStart])
+                exportLeaveBotRate.push(['', '', '', '離脱率', `${Math.round((totalBotLeave * 100) / totalBotStart).toFixed(2)}%`])
+                exportCV.push(['', '合計', '', totalConversion])
+                exportClickThrough.push(['合計', totalBotStart, totalBotOpen])
+                exportBotLeave.push(['', '合計', '', '', totalBotStart, totalBotOpen])
+                setConversionExport(exportCV)
+                setClickThroughExport(exportClickThrough)
+                setLeaveBotExport(exportBotLeave)
+                setConversionRateExport(exportCVR)
+                setClickThroughRateExport(exportCTR)
+                setBotLeaveRate(exportLeaveBotRate)
+              }).catch((error) => {
                 console.log(error);
               });
           }
@@ -203,12 +292,11 @@ function Report() {
       },
       xaxis: {
         categories: [
-          ` ${
-            CVRCTR === false
-              ? numOfOpenBot === 0
-                ? `CVR: 0`
-                : `CVR: ${Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)}`
-              : numOfBotStart === 0
+          ` ${CVRCTR === false
+            ? numOfOpenBot === 0
+              ? `CVR: 0`
+              : `CVR: ${Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)}`
+            : numOfBotStart === 0
               ? `CTR: 0`
               : `CTR: ${Math.round((numOfOpenBot * 100) / numOfBotStart).toFixed(2)}`
           }%`,
@@ -285,7 +373,7 @@ function Report() {
         colors: ['#fff'],
       },
       xaxis: {
-        categories: ['コンバージョン数', 'クリックスルーレート(CTR)'],
+        categories: ['離脱', 'BOT開始'],
       },
       yaxis: {
         labels: {
@@ -293,14 +381,13 @@ function Report() {
         },
       },
       title: {
-        text: 'コンバージョン数/BOT開始数',
+        text: '離脱/BOT開始',
         align: 'center',
         floating: true,
       },
       subtitle: {
-        text: `離脱: ${
-          numOfOpenBot === 0 ? 0 : Math.round((numOfCloseBot * 100) / numOfOpenBot).toFixed(2)
-        }%`,
+        text: `離脱: ${numOfOpenBot === 0 ? 0 : Math.round((numOfCloseBot * 100) / numOfOpenBot).toFixed(2)
+          }%`,
         align: 'center',
       },
       tooltip: {
@@ -373,9 +460,8 @@ function Report() {
         floating: true,
       },
       subtitle: {
-        text: `CTR (BOT開始数/BOT起動数: ${
-          numOfBotStart === 0 ? 0 : Math.round((conversionCVRCTR * 100) / numOfBotStart).toFixed(2)
-        }%`,
+        text: `CTR (BOT開始数/BOT起動数: ${numOfBotStart === 0 ? 0 : Math.round((conversionCVRCTR * 100) / numOfBotStart).toFixed(2)
+          }%`,
         align: 'center',
       },
       tooltip: {
@@ -471,8 +557,25 @@ function Report() {
             `/api/v1/analytics/scenario_counts/${searchVal.scenarioId}?begin_date=${searchVal.startDate}&end_date=${searchVal.endDate}`
           )
           .then((res) => {
-            console.log('search data: ', res.data);
+            // console.log('search data: ', res.data);
             setListContent(res.data?.scenario_pages);
+            //set page export
+            let pages = res.data?.scenario_pages
+            let startPageExportData = [['集計期間', `${new Date(new Date().setDate(1))
+              .toISOString().slice(0, 10)}~${new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}`]]
+            startPageExportData.push(['開始ページ', 'CV数', 'URLs'])
+            let contentPageExport = [['集計期間', `${new Date(new Date().setDate(1))
+              .toISOString().slice(0, 10)}~${new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}`]]
+            contentPageExport.push(['開始ページ', 'CV数', 'URLs'])
+            pages.forEach(index => {
+              startPageExportData.push([index.num_of_start, index.num_of_cv, index.url])
+              if (index.num_of_cv > 0) {
+                contentPageExport.push([index.num_of_start, index.num_of_cv, index.url])
+              }
+            });
+            setStartPageExport(startPageExportData)
+            setCvPageExport(contentPageExport)
+
             setDataReportCount(res?.data?.data);
             let chatbotData = res?.data?.data;
             // let chatbotDataCount = [1,1,1]
@@ -546,6 +649,73 @@ function Report() {
           .catch((error) => {
             console.log(error);
           });
+          api.get(`/api/v1/analytics/scenario_counts/${searchVal.scenarioId}}/download?begin_date=${searchVal.startDate}&end_date=${searchVal.endDate}`).then(res => {
+              // console.log(`download: `, res.data.data)
+              let exportData = res?.data.data;
+              let totalConversion = 0
+              let totalBotStart = 0
+              let totalBotOpen = 0
+              let totalBotLeave = 0
+              let cvrPC = 0;
+              let cvrTB = 0;
+              let cvrSP = 0;
+              let ctrPC = 0;
+              let ctrTB = 0;
+              let ctrSP = 0;
+              let lBPC = 0;
+              let lBTB = 0;
+              let lBSP = 0;
+              let exportCV = [['集計期間', 'CV PC', 'CV タブレット', 'CV スマートフォン']]
+              let exportClickThrough = [['集計期間', 'BOT開始', 'BOT起動']]
+              let exportBotLeave = [['集計期間', 'PC離脱', 'タブレット離脱', 'スマートフォン離脱', 'BOT開始', 'BOT離脱']]
+              let exportCVR = [['集計期間', `${new Date(new Date().setDate(1))
+                .toISOString().slice(0, 10)}~${new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}`]]
+              exportCVR.push(['CV PC', 'CV タブレット', 'CV スマートフォン', 'CV合計数', 'BOT開始'])
+              let exportCTR = [['Date', `${new Date(new Date().setDate(1))
+                .toISOString().slice(0, 10)}~${new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}`]]
+              exportCTR.push(['CT PC', 'CT タブレット', 'CT スマートフォン', 'CT合計数', 'BOT開始'])
+              let exportLeaveBotRate = [['集計期間', `${new Date(new Date().setDate(1))
+                .toISOString().slice(0, 10)}~${new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)}`]]
+              exportLeaveBotRate.push(['PC', 'タブレット', 'スマートフォン', '合計', 'BOT開始'])
+              exportData.forEach(index => {
+                exportCV.push([index.log_date, index.pc_conversion_count, index.tablet_conversion_count, index.smartphone_conversion_count])
+                totalConversion += index.pc_conversion_count + index.tablet_conversion_count + index.smartphone_conversion_count
+                cvrPC += index.pc_conversion_count
+                cvrTB += index.tablet_conversion_count
+                cvrSP += index.smartphone_conversion_count
+                exportClickThrough.push([index.log_date, (index.pc_open_chatbot_window_count + index.smartphone_open_chatbot_window_count + index.tablet_open_chatbot_window_count),
+                (index.pc_count + index.smartphone_count + index.tablet_count)])
+                totalBotStart += (index.pc_open_chatbot_window_count + index.smartphone_open_chatbot_window_count + index.tablet_open_chatbot_window_count)
+                totalBotOpen += (index.pc_count + index.smartphone_count + index.tablet_count)
+                ctrPC += index.pc_open_chatbot_window_count
+                ctrTB += index.tablet_open_chatbot_window_count
+                ctrSP += index.smartphone_open_chatbot_window_count
+                exportBotLeave.push([index.log_date, index.pc_close_chatbot_window_count, index.tablet_close_chatbot_window_count, index.smartphone_close_chatbot_window_count,
+                (index.pc_open_chatbot_window_count + index.smartphone_open_chatbot_window_count + index.tablet_open_chatbot_window_count),
+                (index.pc_close_chatbot_window_count + index.tablet_close_chatbot_window_count + index.smartphone_close_chatbot_window_count)])
+                totalBotLeave += (index.pc_close_chatbot_window_count + index.tablet_close_chatbot_window_count + index.smartphone_close_chatbot_window_count)
+                lBPC += index.pc_close_chatbot_window_count
+                lBTB += index.tablet_close_chatbot_window_count
+                lBSP += index.smartphone_close_chatbot_window_count
+              });
+              exportCVR.push([cvrPC, cvrTB, cvrSP, totalConversion, totalBotStart])
+              exportCVR.push(['', '', '', 'CVR', `${Math.round((totalConversion * 100) / totalBotStart).toFixed(2)}%`])
+              exportCTR.push([ctrPC, ctrTB, ctrSP, totalBotStart, totalBotOpen])
+              exportCTR.push(['', '', '', 'CTR', `${Math.round((totalBotStart * 100) / totalBotOpen).toFixed(2)}%`])
+              exportLeaveBotRate.push([lBPC, lBTB, lBSP, totalBotLeave, totalBotStart])
+              exportLeaveBotRate.push(['', '', '', '離脱率', `${Math.round((totalBotLeave * 100) / totalBotStart).toFixed(2)}%`])
+              exportCV.push(['', '合計', '', totalConversion])
+              exportClickThrough.push(['合計', totalBotStart, totalBotOpen])
+              exportBotLeave.push(['', '合計', '', '', totalBotStart, totalBotOpen])
+              setConversionExport(exportCV)
+              setClickThroughExport(exportClickThrough)
+              setLeaveBotExport(exportBotLeave)
+              setConversionRateExport(exportCVR)
+              setClickThroughRateExport(exportCTR)
+              setBotLeaveRate(exportLeaveBotRate)
+            }).catch((error) => {
+              console.log(error);
+            });
       }
     }
   }
@@ -567,28 +737,31 @@ function Report() {
   }
 
   const [startPage, setStartPage] = useState(true);
-  function startPageContent() {}
+  function startPageContent() { }
 
-  function cvPageContent() {}
+  function cvPageContent() { }
 
   // handle export
   const handleExport = async () => {
     try {
       let wb = utils.book_new();
-      let ws1 = utils.aoa_to_sheet([
-        ['firstname', 'lastname', 'email'],
-        ['Ahmed', 'Tomi', 'ah@smthing.co.com'],
-        ['Raed', 'Labes', 'rl@smthing.co.com'],
-        ['Yezzi', 'Min l3b', 'ymin@cocococo.com'],
-      ]);
-      let ws2 = utils.aoa_to_sheet([
-        ['firstname', 'lastname', 'email'],
-        ['Ahmed', 'Tomi', 'ah@smthing.co.com'],
-        ['Raed', 'Labes', 'rl@smthing.co.com'],
-        ['Yezzi', 'Min l3b', 'ymin@cocococo.com'],
-      ]);
-      utils.book_append_sheet(wb, ws1, 'sheet này khum có data');
-      utils.book_append_sheet(wb, ws2, 'sheet 2');
+      let cvr = utils.aoa_to_sheet(conversionRateExport);
+      let ws1 = utils.aoa_to_sheet(conversionExport);
+      let ctr = utils.aoa_to_sheet(clickThroughRateExport);
+      let ws2 = utils.aoa_to_sheet(clickThroughExport);
+      let lbr = utils.aoa_to_sheet(botLeaveRate);
+      let ws3 = utils.aoa_to_sheet(leaveBotExport);
+      let startPage = utils.aoa_to_sheet(startPageExport);
+      let cvPage = utils.aoa_to_sheet(cvPageExport);
+
+      utils.book_append_sheet(wb, cvr, 'Conversion Rate');
+      utils.book_append_sheet(wb, ws1, 'Conversion');
+      utils.book_append_sheet(wb, ctr, 'Click Through Rate');
+      utils.book_append_sheet(wb, ws2, 'Click Through');
+      utils.book_append_sheet(wb, lbr, 'Bot leave rate');
+      utils.book_append_sheet(wb, ws3, 'Bot leave');
+      utils.book_append_sheet(wb, startPage, 'Start Pages');
+      utils.book_append_sheet(wb, cvPage, 'Conversion Pages');
       writeFileXLSX(wb, 'Export.xlsx');
     } catch (error) {
       console.log(error);
@@ -613,7 +786,7 @@ function Report() {
                         id=""
                         value={reportGroupSelect}
                       >
-                        <option value="first">Specified period</option>
+                        <option value="first">指定期間</option>
                         <option value="1">前日</option>
                         <option value="7">最近7日間</option>
                         <option value="30">最近30日間</option>
@@ -671,7 +844,7 @@ function Report() {
                     {/* <button className="btn btn-primary">Input contents download</button> */}
                     {/* <button className="btn btn-primary">入力内容ダウンロード</button> */}
                     <button className="btn btn-primary" onClick={handleExport}>
-                      download
+                      ダウンロード
                     </button>
                     {/* <button className="btn btn-primary">ダウンロード</button> */}
                   </div>
@@ -796,23 +969,23 @@ function Report() {
                             {/* <tr>sdsssd</tr> */}
                             {startPage
                               ? listContent?.map((item, index) => (
+                                <tr key={index}>
+                                  <td>{item.num_of_start}</td>
+                                  <td>{item.num_of_cv}</td>
+                                  <td>{item.url}</td>
+                                </tr>
+                              ))
+                              : listContent?.map((item, index) =>
+                                item.num_of_cv > 0 ? (
                                   <tr key={index}>
                                     <td>{item.num_of_start}</td>
                                     <td>{item.num_of_cv}</td>
                                     <td>{item.url}</td>
                                   </tr>
-                                ))
-                              : listContent?.map((item, index) =>
-                                  item.num_of_cv > 0 ? (
-                                    <tr key={index}>
-                                      <td>{item.num_of_start}</td>
-                                      <td>{item.num_of_cv}</td>
-                                      <td>{item.url}</td>
-                                    </tr>
-                                  ) : (
-                                    <tr key={index}></tr>
-                                  )
-                                )}
+                                ) : (
+                                  <tr key={index}></tr>
+                                )
+                              )}
                           </tbody>
                         </Table>
                       </div>
@@ -916,7 +1089,7 @@ function Report() {
                                 クリック数
                               </th>
                               <th className="report__item-content-title" style={{ width: '60%' }}>
-                                URL
+                                元のURL
                               </th>
                               <th className="report__item-content-title" style={{ width: '20%' }}>
                                 短縮URL
@@ -926,7 +1099,7 @@ function Report() {
                           <tbody>
                             {shortenedList?.map((item, index) => (
                               <tr key={index} style={{ height: '20px' }}>
-                                <th>{item.id}</th>
+                                <td>{index + 1}</td>
                                 <td>{item.num_of_click}</td>
                                 <td>{item.origin_url}</td>
                                 <td>https://ec-chatbot1.com/s/{item.shorten_code}</td>

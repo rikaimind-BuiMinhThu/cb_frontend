@@ -94,14 +94,17 @@ function AddBotchat() {
     document.querySelector('.icons .icon.active').classList.remove('active');
     document.querySelector(`.icons .icon.icon-${index}`).classList.add('active');
     // console.log('imageDefault: ', imageDefault);
-    setBotImage(imageDefault);
-    console.log('imageDefault: ', imageDefault);
+    
+    // console.log('imageDefault: ', imageDefault);
     if(!imageDefault.includes('image/png;base64')){
       toDataURL(imageDefault)
       .then(dataUrl => {
         console.log('RESULT:',)
-        setDefaultIcon(dataUrl)
+        // setDefaultIcon(dataUrl)
+        setBotImage(dataUrl)
       })
+    }else{
+      setBotImage(imageDefault);
     }
     
   };
@@ -172,7 +175,8 @@ function AddBotchat() {
           subtitle: subtitle,
           design_type: designType,
           main_color: color,
-          icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
+          // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
+          icon: iconBot,
           bot_name: botName,
         },
       };
@@ -190,7 +194,7 @@ function AddBotchat() {
             setTimeout(() => {
               setMsgNoti('');
               setIsOpenNoti(false);
-              // window.location.href = '/admin/scenario-list';
+              window.location.href = '/admin/scenario-list';
             }, 1500);
           } else if (res.data?.code === 2 || res.data?.code === '2') {
             setMsgNoti(res.data.message);
