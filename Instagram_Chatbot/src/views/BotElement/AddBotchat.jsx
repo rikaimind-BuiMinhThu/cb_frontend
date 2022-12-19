@@ -94,7 +94,19 @@ function AddBotchat() {
     document.querySelector('.icons .icon.active').classList.remove('active');
     document.querySelector(`.icons .icon.icon-${index}`).classList.add('active');
     // console.log('imageDefault: ', imageDefault);
-    setBotImage(imageDefault);
+    
+    // console.log('imageDefault: ', imageDefault);
+    if(!imageDefault.includes('image/png;base64')){
+      toDataURL(imageDefault)
+      .then(dataUrl => {
+        console.log('RESULT:',)
+        // setDefaultIcon(dataUrl)
+        setBotImage(dataUrl)
+      })
+    }else{
+      setBotImage(imageDefault);
+    }
+    
   };
 
   // get base url image add
@@ -119,6 +131,18 @@ function AddBotchat() {
       return false;
     }
   };
+
+  const [defaultIcon, setDefaultIcon] = useState('')
+
+  const toDataURL = url => fetch(url)
+    .then(response => response.blob())
+    .then(blob => new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onloadend = () => resolve(reader.result)
+      reader.onerror = reject
+      reader.readAsDataURL(blob)
+    }))
+
 
   // add new bot chat
   const addNewBotChat = () => {
@@ -151,10 +175,15 @@ function AddBotchat() {
           subtitle: subtitle,
           design_type: designType,
           main_color: color,
+          // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
           icon: iconBot,
           bot_name: botName,
         },
       };
+
+
+      // console.log('bot info: ', bot)
+
       api
         .post(`api/v1/managements/chatbots`, bot)
         .then((res) => {
@@ -451,3 +480,4 @@ function AddBotchat() {
 }
 
 export default AddBotchat;
+

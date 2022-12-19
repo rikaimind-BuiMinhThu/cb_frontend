@@ -409,11 +409,11 @@ let rangeText = [
 let hyphenPhoneNumber = [
   {
     key: false,
-    value: 'No hyphen'
+    value: 'ハイフンなし'
   },
   {
     key: true,
-    value: 'With hyphens'
+    value: 'ハイフンあり'
   }
 ];
 
@@ -521,39 +521,39 @@ let dataTypePullDown = [
   },
   {
     key: 'time_hm',
-    value: '時間'
+    value: '時間(H:m)'
   },
   {
     key: 'date_ymd',
-    value: '日付'
+    value: '日付(Ymd)'
   },
   {
     key: 'date_md',
-    value: '日付'
+    value: '日付(Md)'
   },
   {
     key: 'date_ym',
-    value: '日付'
+    value: '日付 (Ym)'
   },
   {
     key: 'date_ymd_hm',
-    value: '日時'
+    value: '日時 (Ymd H:m)'
   },
   {
     key: 'dob_ymd',
-    value: '生年月日'
+    value: '生年月日(Ymd)'
   },
   {
     key: 'dob_ym',
-    value: '生年月日'
+    value: '生年月日(Ym)'
   },
   {
     key: 'timezone_from_to',
-    value: '時間帯'
+    value: '時間帯 (H:m to H:m)'
   },
   {
     key: 'period_from_to',
-    value: '期間'
+    value: '期間(Ymd to Ymd)'
   },
   {
     key: 'prefectures',
@@ -2049,6 +2049,7 @@ const Scenario = () => {
       document.getElementById('sp-header').style.position = "absolute";
       document.getElementById('sp-header').style.bottom = "13px";
     }
+    // Cookies.set('scenario_id', null);
     setIsOpenPreview(!isOpenPreview);
   }
 
@@ -2202,7 +2203,6 @@ const Scenario = () => {
                 {/* ss overview */}
                 <div className="ss-sc-content ss-overview">
                   {/* Input name of scenario */}
-
                   <div>
                     <InputCustom
                       style={{ width: '100%' }}
@@ -2260,6 +2260,18 @@ const Scenario = () => {
                                     console.log(type, 'checkkk type');
                                   }
                                 }
+                                let titleMessage = "";
+                                if (content) {
+                                  if (content.type === 'delay') { titleMessage = "遅延" }
+                                  else if (content.type === 'file') { titleMessage = "ファイル" }
+                                  else if (content.type === 'email') { titleMessage = "メール" }
+                                  else if (content.type === 'api_linkage') { titleMessage = "API連携" }
+                                  else if (content.type === 'script') { titleMessage = "スクリプト" }
+                                  else if (content.type === 'clear_variable') { titleMessage = "変数クリア" }
+                                  else if (content.type === 'variable_set') { titleMessage = "変数セット" }
+                                  else if (content.type === 'pause') { titleMessage = "一時停止" }
+                                }
+
                                 return message.belong_to === 'bot' ? (
                                   <Draggable key={message.id} draggableId={message.id?.toString()} index={index}>
                                     {(provided) => (
@@ -2279,14 +2291,7 @@ const Scenario = () => {
                                                 <div style={{ width: '65%' }}>
                                                   <div style={{ display: 'flex', paddingLeft: '10px' }}>
                                                     {content.type !== 'text_input' && <div className="ss-sub-title-message">
-                                                      {content.type === 'delay' && "遅延"}
-                                                      {content.type === 'file' && "ファイル"}
-                                                      {content.type === 'email' && "メール"}
-                                                      {content.type === 'api_linkage' && "API連携"}
-                                                      {content.type === 'script' && "スクリプト"}
-                                                      {content.type === 'clear_variable' && "変数クリア"}
-                                                      {content.type === 'variable_set' && "変数セット"}
-                                                      {content.type === 'pause' && "一時停止"}
+                                                      {titleMessage}
                                                     </div>}
                                                     {message.message_name && <div className="ss-sub-title-message ss-truncation-text" style={{ backgroundColor: '#fff', maxWidth: '60%' }}>{message.message_name}</div>}
                                                   </div>
@@ -4475,7 +4480,7 @@ const Scenario = () => {
                                       </div>
                                     }
                                     <CheckboxCustom
-                                      label={<span>do not scroll automatically<MDBIcon fas icon="question-circle" style={{ color: '#347AED', marginLeft: '5px', fontSize: '13px' }} /></span>}
+                                      label={<span>自動でスクロールさせない<MDBIcon fas icon="question-circle" style={{ color: '#347AED', marginLeft: '5px', fontSize: '13px' }} /></span>}
                                       value={dataMessages[indexMessageSelect].message_content[0][messageType]?.scroll_auto || false}
                                       onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'scroll_auto')}
                                     />
@@ -4596,7 +4601,7 @@ const Scenario = () => {
                               {messageType === 'clear_variable' && (
                                 <div className="ss-bot-statement-wrapper" style={{ marginTop: '15px' }}>
                                   {console.log(dataMessages[indexMessageSelect].message_content[0][messageType]?.variables)}
-                                  <span style={{ fontWeight: '400' }}>variable</span>
+                                  <span style={{ fontWeight: '400' }}>変数</span>
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.variables &&
                                     dataMessages[indexMessageSelect].message_content[0][messageType]?.variables
                                       .map((item, index, arr) => {
@@ -4634,7 +4639,7 @@ const Scenario = () => {
                                 <div className="ss-bot-statement-wrapper" style={{ marginTop: '15px' }}>
                                   {console.log(dataMessages[indexMessageSelect].message_content[0][messageType]?.variables)}
                                   <span>※直後の条件分岐に変数を使用したい場合、ユーザー側の変数セットブロックをご利用ください。</span>
-                                  <span style={{ fontWeight: '400', marginTop: '15px', display: 'block' }}>variable</span>
+                                  <span style={{ fontWeight: '400', marginTop: '15px', display: 'block' }}>変数</span>
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.variables &&
                                     dataMessages[indexMessageSelect].message_content[0][messageType]?.variables
                                       .map((item, index, arr) => {
@@ -4675,7 +4680,7 @@ const Scenario = () => {
 
                               {/* type: pause */}
                               {messageType === 'pause' && (
-                                <div style={{ marginTop: '15px', fontWeight: '700' }}>pause</div>
+                                <div style={{ marginTop: '15px', fontWeight: '700' }}>一時停止</div>
                               )}
                             </div>
                           </div>
@@ -4840,7 +4845,7 @@ const Scenario = () => {
                                                                 nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -4884,6 +4889,7 @@ const Scenario = () => {
                                                           />
                                                           <SelectCustom
                                                             id="type"
+                                                            allowClear={false}
                                                             style={{ width: '49%' }}
                                                             value={textInput.type}
                                                             data={type}
@@ -4941,7 +4947,7 @@ const Scenario = () => {
                                                               valueRight={textInput[textInput.type]?.placeholderRight}
                                                               onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, name === 'left' ? 'placeholderLeft' : 'placeholderRight')}
                                                               onClickIcon={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, !textInput[textInput.type]?.isSplitInput, textInput.type, 'isSplitInput')}
-                                                              placeholder={['placeholder', 'placeholder']}
+                                                              placeholder={['プレースホルダ', 'プレースホルダ']}
                                                             />
                                                           </div>
                                                         </React.Fragment>
@@ -5092,7 +5098,7 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-bottom">
                                                         <textarea
                                                           className="ss-user-setting-item-textarea-label ss-input-value"
-                                                          placeholder="input"
+                                                          placeholder="テキスト"
                                                           rows="5"
                                                           value={label.lbl_content}
                                                           onChange={e => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.value, 'lbl_content')}
@@ -5107,7 +5113,7 @@ const Scenario = () => {
                                                       {textarea.type === 'text_input' && (
                                                         <div className="ss-user-setting__item-text_input-top">
                                                           <CheckboxCustom
-                                                            label="Save the input contents in a variable"
+                                                            label="入力された内容を変数に保存する。"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'textarea', value, 'is_save_input_content')}
                                                             value={textarea.is_save_input_content}
                                                           />
@@ -5123,7 +5129,7 @@ const Scenario = () => {
                                                                   nameValue="variable_name"
                                                                   onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                                 />
-                                                                <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                                <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
                                                               </div>
                                                             </div>
                                                           }
@@ -5146,6 +5152,7 @@ const Scenario = () => {
                                                           />
                                                           <SelectCustom
                                                             id="type"
+                                                            allowClear={false}
                                                             style={{ width: '49%' }}
                                                             value={textarea.type}
                                                             data={typeTextarea}
@@ -5218,7 +5225,7 @@ const Scenario = () => {
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
-                                                          label="Save the input contents in a variable"
+                                                          label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
                                                           value={radioButton.is_save_input_content}
                                                         />
@@ -5234,7 +5241,7 @@ const Scenario = () => {
                                                                 nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -5255,6 +5262,7 @@ const Scenario = () => {
                                                           />
                                                           <SelectCustom
                                                             id="type"
+                                                            allowClear={false}
                                                             style={{ width: '49%' }}
                                                             value={radioButton?.type}
                                                             data={typeRadio}
@@ -5326,7 +5334,7 @@ const Scenario = () => {
                                                                                           onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, name === 'left' ? 'text' : 'value')}
                                                                                           onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, radioButton.type, indexRadio)}
                                                                                           icon={array.length >= 2 ? "times-circle" : ""}
-                                                                                          placeholder={['title', 'value']}
+                                                                                          placeholder={['タイトル', '値']}
                                                                                           classIcon="ss-plus-circle-option-icon-times"
                                                                                           valueLeft={itemRadio.text}
                                                                                           valueRight={itemRadio.value}
@@ -5355,7 +5363,7 @@ const Scenario = () => {
                                                                                             onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, name === 'left' ? 'text' : 'value')}
                                                                                             valueLeft={itemRadio.text}
                                                                                             valueRight={itemRadio.value}
-                                                                                            placeholder={['title', 'value']}
+                                                                                            placeholder={['タイトル', '値']}
                                                                                             classIcon="ss-plus-circle-option-icon-times"
                                                                                             onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, radioButton.type, indexRadio)}
                                                                                           />
@@ -5404,7 +5412,7 @@ const Scenario = () => {
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
-                                                          label="Save the input contents in a variable"
+                                                          label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
                                                           value={checkbox.is_save_input_content}
                                                         />
@@ -5420,7 +5428,7 @@ const Scenario = () => {
                                                                 nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -5441,6 +5449,7 @@ const Scenario = () => {
                                                           />
                                                           <SelectCustom
                                                             id="type"
+                                                            allowClear={false}
                                                             style={{ width: '49%' }}
                                                             value={checkbox?.type}
                                                             data={typeCheckbox}
@@ -5483,7 +5492,7 @@ const Scenario = () => {
                                                               placeholder="0000"
                                                               className="ss-user-setting-input-limit-character"
                                                               min={checkbox.selection_limit_from || 0}
-                                                              max={checkbox?.[checkbox.type].length}
+                                                              max={checkbox?.[checkbox.type]?.length}
                                                               value={checkbox.selection_limit_to}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'selection_limit_to')}
                                                             />
@@ -5596,7 +5605,7 @@ const Scenario = () => {
                                                                                         onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, checkbox.type, indexCheckbox, name === 'left' ? 'text' : 'value')}
                                                                                         valueLeft={checkbox[checkbox.type][indexCheckbox].text}
                                                                                         valueRight={checkbox[checkbox.type][indexCheckbox].value}
-                                                                                        placeholder={['text', 'value']}
+                                                                                        placeholder={['テキスト', '値']}
                                                                                         classIcon="ss-plus-circle-option-icon-times"
                                                                                         onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, checkbox.type, indexCheckbox)}
                                                                                       />
@@ -5629,7 +5638,7 @@ const Scenario = () => {
                                                                                                 </div>
                                                                                                 <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                                                                                                   <InputDouble
-                                                                                                    placeholder={["text", "値"]}
+                                                                                                    placeholder={["テキスト", "値"]}
                                                                                                     valueLeft={itemContentCheckbox.text}
                                                                                                     valueRight={itemContentCheckbox.value}
                                                                                                     onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'checkbox_img', indexCheckbox, 'contents', indexContentCheckbox, name === 'left' ? 'text' : 'value')}
@@ -5722,7 +5731,7 @@ const Scenario = () => {
                                                                 nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -5827,7 +5836,13 @@ const Scenario = () => {
                                                               keyValue="name"
                                                               nameValue="name"
                                                               placeholder="プレースホルダ"
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'prefecture')}
+                                                              onChange={value => {
+                                                                if (value) {
+                                                                  onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'prefecture')
+                                                                } else {
+                                                                  onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, null, 'prefecture')
+                                                                }
+                                                              }}
                                                             /> :
                                                             <InputCustom
                                                               className={"ss-user-setting__item-input-zip-code"}
@@ -5931,7 +5946,7 @@ const Scenario = () => {
                                                                 nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -5986,7 +6001,7 @@ const Scenario = () => {
                                                                 nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -6004,6 +6019,7 @@ const Scenario = () => {
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
                                                             />
                                                             <SelectCustom
+                                                              allowClear={false}
                                                               style={{ width: '49%' }}
                                                               value={calendar?.type}
                                                               data={typeCalendar}
@@ -6311,6 +6327,7 @@ const Scenario = () => {
                                                           />
                                                           <SelectCustom
                                                             style={{ width: '49%' }}
+                                                            allowClear={false}
                                                             value={agreeTerm?.type}
                                                             data={agreeTermType}
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type')}
@@ -6333,7 +6350,7 @@ const Scenario = () => {
                                                           <textarea
                                                             style={{ width: '90%' }}
                                                             className="ss-user-setting-item-textarea-label ss-input-value"
-                                                            placeholder="text"
+                                                            placeholder="テキスト"
                                                             rows="5"
                                                             value={agreeTerm.detail_content.content}
                                                             onChange={e => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.value, 'detail_content', 'content')}
@@ -6364,7 +6381,7 @@ const Scenario = () => {
                                                                         onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, agreeTerm.type, indexAgree, name === 'left' ? 'title' : 'urls')}
                                                                         valueLeft={agreeTermItem.title}
                                                                         valueRight={agreeTermItem.urls}
-                                                                        placeholder={['title', 'URLs']}
+                                                                        placeholder={['タイトル', 'URLs']}
                                                                       />
                                                                       <InputCustom
                                                                         style={{ width: '100%', marginBottom: '10px' }}
@@ -6395,7 +6412,7 @@ const Scenario = () => {
                                                           disabled
                                                           label={
                                                             <InputCustom
-                                                              placeholder="text"
+                                                              placeholder="テキスト"
                                                               style={{ width: '100%' }}
                                                               value={agreeTerm.term}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'term')}
@@ -6412,7 +6429,7 @@ const Scenario = () => {
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
-                                                          label="Save the input contents in a variable"
+                                                          label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
                                                           value={pullDown.is_save_input_content}
                                                         />
@@ -6428,7 +6445,7 @@ const Scenario = () => {
                                                                 nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -6450,6 +6467,7 @@ const Scenario = () => {
                                                           />
                                                           <SelectCustom
                                                             id="type"
+                                                            allowClear={false}
                                                             style={{ width: '49%' }}
                                                             value={pullDown?.type}
                                                             placeholder="type"
@@ -6485,7 +6503,7 @@ const Scenario = () => {
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div style={{ backgroundColor: '#F8F9FA', width: '90%', padding: '5px' }} >
                                                               <InputCustom
-                                                                label="未選択中の表示テキスト"
+                                                                label="デフォルトオプション"
                                                                 style={{ width: '60%', marginBottom: '10px', marginLeft: '10px' }}
                                                                 placeholder="コメント"
                                                                 value={pullDown[pullDown.type]?.display_unselected}
@@ -6516,7 +6534,7 @@ const Scenario = () => {
                                                                                         onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text' : 'value')}
                                                                                         valueLeft={itemPullDown.text}
                                                                                         valueRight={itemPullDown.value}
-                                                                                        placeholder={['text', 'value']}
+                                                                                        placeholder={['テキスト', '値']}
                                                                                       />
                                                                                       {pullDown[pullDown.type]?.is_comment === true &&
                                                                                         <React.Fragment>
@@ -6526,7 +6544,7 @@ const Scenario = () => {
                                                                                             onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, pullDown.type, isComment ? 'options_with_comment' : 'options_without_comment', indexPullDown, name === 'left' ? 'text2' : 'value2')}
                                                                                             valueLeft={itemPullDown.text2}
                                                                                             valueRight={itemPullDown.value2}
-                                                                                            placeholder={['text', 'value']}
+                                                                                            placeholder={['テキスト', '値']}
                                                                                           />
                                                                                         </React.Fragment>
                                                                                       }
@@ -7121,7 +7139,7 @@ const Scenario = () => {
                                                                     valueLeft={item.name}
                                                                     valueRight={index < 9 ? `0${index + 1}` : `${index + 1}`}
                                                                     rightWidth={{ width: '50%' }}
-                                                                  // placeholder={['text', 'value']}
+                                                                  // placeholder={['テキスト', 'value']}
                                                                   />
                                                                 )
                                                               })
@@ -7207,7 +7225,7 @@ const Scenario = () => {
                                                                 nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -7240,6 +7258,7 @@ const Scenario = () => {
                                                           />
                                                           <SelectCustom
                                                             id="type"
+                                                            allowClear={false}
                                                             style={{ width: '49%' }}
                                                             value={carousel.type}
                                                             data={carouselType}
@@ -7394,7 +7413,7 @@ const Scenario = () => {
                                                                 nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -7427,17 +7446,18 @@ const Scenario = () => {
                                                               value={creditCardPayment.separate_type}
                                                             />
                                                           </div>
-                                                          <div className="ss-user-setting__item-text_input-use-api-required" style={{ marginLeft: '80px' }}>
+                                                          <div className="ss-user-setting__item-text_input-use-api-required" style={{ marginLeft: '95px' }}>
                                                             <CheckboxCustom
                                                               label="有効性チェックをする"
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'validity_check')}
                                                               value={creditCardPayment.validity_check}
                                                             />
                                                           </div>
-                                                          <div className="ss-user-setting__item-text_input-use-api-required" style={{ width: '35%', marginLeft: '20px', display: 'flex', justifyContent: 'space-between' }}>
+                                                          <div className="ss-user-setting__item-text_input-use-api-required" style={{ width: '35%', marginLeft: '52px', display: 'flex', justifyContent: 'space-between' }}>
                                                             <span style={{ paddingTop: '3px' }}>有効期限</span>
                                                             <SelectCustom
                                                               style={{ width: '53%' }}
+                                                              allowClear={false}
                                                               value={creditCardPayment.type_date_of_expiry}
                                                               data={[{ key: 'ym', value: 'YM' }, { key: 'my', value: 'MY' }]}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type_date_of_expiry')}
@@ -7638,6 +7658,7 @@ const Scenario = () => {
                                                           />
                                                           <SelectCustom
                                                             id="type"
+                                                            allowClear={false}
                                                             style={{ width: '49%' }}
                                                             value={productPurchase.type}
                                                             data={[
@@ -7898,6 +7919,7 @@ const Scenario = () => {
                                                           />
                                                           <SelectCustom
                                                             id="type"
+                                                            allowClear={false}
                                                             style={{ width: '49%' }}
                                                             value={productPurchaseRadioButton.type}
                                                             data={[
@@ -8112,7 +8134,7 @@ const Scenario = () => {
                                                         <textarea
                                                           style={{ width: '90%' }}
                                                           className="ss-user-setting-item-textarea-label ss-input-value"
-                                                          placeholder="text"
+                                                          placeholder="テキスト"
                                                           rows="5"
                                                           value={afteePaymentModule.content}
                                                           onChange={e => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.value, 'content')}
@@ -8144,7 +8166,7 @@ const Scenario = () => {
                                                               nameValue="variable_name"
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                             />
-                                                            <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                            <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
                                                           </div>
                                                         </div>
                                                       }
@@ -8168,6 +8190,7 @@ const Scenario = () => {
                                                           />
                                                           <SelectCustom
                                                             id="type"
+                                                            allowClear={false}
                                                             style={{ width: '49%' }}
                                                             value={slider.type}
                                                             data={[
@@ -8276,7 +8299,7 @@ const Scenario = () => {
                                                                 nameValue="variable_name"
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'save_input_content')}
                                                               />
-                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>Addition</Button>
+                                                              <Button style={{ margin: '0px', lineHeight: '0px' }} className="ss-user-setting__select-btn-add" onClick={() => setIsOpenAddVariable(true)}>追加</Button>
                                                             </div>
                                                           </div>
                                                         }
@@ -8306,6 +8329,7 @@ const Scenario = () => {
                                                               id="type"
                                                               style={{ width: '49%' }}
                                                               value={cardPaymentRadioButton.type}
+                                                              allowClear={false}
                                                               data={[
                                                                 { key: 'default', value: 'デフォルト' },
                                                                 { key: 'customized_style', value: 'カスタマイズスタイル（四角い枠）' },
@@ -8347,7 +8371,7 @@ const Scenario = () => {
                                                                                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                                                                                       <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
                                                                                       <InputDouble
-                                                                                        placeholder={["text", "値"]}
+                                                                                        placeholder={["テキスト", "値"]}
                                                                                         valueLeft={itemPaymentRadio.text}
                                                                                         valueRight={itemPaymentRadio.value}
                                                                                         onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'radio_contents', indexPaymentRadio, name === 'left' ? 'text' : 'value')}
@@ -8366,7 +8390,7 @@ const Scenario = () => {
                                                                                         }}
                                                                                       />
                                                                                       <CheckboxCustom
-                                                                                        label="Card payment linked setting"
+                                                                                        label="カード決済連動設定"
                                                                                         value={cardPaymentRadioButton.card_linked_setting === itemPaymentRadio.id}
                                                                                         onChange={() => {
                                                                                           if (cardPaymentRadioButton.card_linked_setting !== itemPaymentRadio.id) {
@@ -8444,7 +8468,7 @@ const Scenario = () => {
                                                                                               </div>
                                                                                               <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
                                                                                                 <InputDouble
-                                                                                                  placeholder={["text", "値"]}
+                                                                                                  placeholder={["テキスト", "値"]}
                                                                                                   valueLeft={itemContentPayment.text}
                                                                                                   valueRight={itemContentPayment.value}
                                                                                                   onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'radio_contents_img', indexPaymentRadioImg, 'contents', indexContentPayment, name === 'left' ? 'text' : 'value')}
@@ -8463,7 +8487,7 @@ const Scenario = () => {
                                                                                                   }}
                                                                                                 />
                                                                                                 <CheckboxCustom
-                                                                                                  label="Card payment linked setting"
+                                                                                                  label="カード決済連動設定"
                                                                                                   value={cardPaymentRadioButton.card_linked_setting_picture === `${itemPaymentRadioImg.id}-${itemContentPayment.id}`}
                                                                                                   onChange={() => {
                                                                                                     if (cardPaymentRadioButton.card_linked_setting_picture !== `${itemPaymentRadioImg.id}-${itemContentPayment.id}`) {
@@ -8611,10 +8635,11 @@ const Scenario = () => {
                                                                 value={cardPaymentRadioButton.validity_check}
                                                               />
                                                             </div>
-                                                            <div style={{ width: '35%', marginLeft: '38px', display: 'flex', justifyContent: 'space-between' }}>
+                                                            <div style={{ width: '35%', marginLeft: '70px', display: 'flex', justifyContent: 'space-between' }}>
                                                               <span style={{ paddingTop: '3px', fontWeight: '400' }}>有効期限</span>
                                                               <SelectCustom
                                                                 style={{ width: '53%' }}
+                                                                allowClear={false}
                                                                 value={cardPaymentRadioButton.type_date_of_expiry}
                                                                 data={[{ key: 'ym', value: 'YM' }, { key: 'my', value: 'MY' }]}
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'type_date_of_expiry')}
@@ -8717,7 +8742,7 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-bottom">
                                                         <textarea
                                                           style={{ width: '90%' }}
-                                                          placeholder="text"
+                                                          placeholder="テキスト"
                                                           rows="5"
                                                           value={labelNoTransition.value}
                                                           onChange={e => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.value, 'value')}
@@ -8774,7 +8799,7 @@ const Scenario = () => {
                                     ラベル（推移記録なし）
                                   </option>
                                 </select>
-                                <Button className="ss-user-setting__select-btn-add" onClick={() => handleAddItemSetting(messageType || 'text_input')}>Addition</Button>
+                                <Button className="ss-user-setting__select-btn-add" style={{ padding: '9px 23px' }} onClick={() => handleAddItemSetting(messageType || 'text_input')}>追加</Button>
                               </div>
                             }
                             <div className="ss-user-setting__checkbox-wrapper">
