@@ -1221,7 +1221,8 @@ const Scenario = () => {
                 { id: 1 }
               ]
             }],
-            checkedValue: []
+            checkedValue: [],
+            initial_selection_picture: []
           }
         }
       );
@@ -1838,7 +1839,7 @@ const Scenario = () => {
       }, 2000);
     }).catch((error) => {
       console.log(error);
-      if (error.response?.data.code === 0) {
+      if (error?.response?.data?.code === 0) {
         tokenExpired()
       }
     })
@@ -5308,7 +5309,6 @@ const Scenario = () => {
                                                                             <Draggable draggable={true} key={itemRadio.id} draggableId={itemRadio.id + ''} index={indexRadio}>
                                                                               {(providedChild) => (
                                                                                 <div {...providedChild.draggableProps} {...providedChild.dragHandleProps} ref={providedChild.innerRef}>
-                                                                                  {console.log(itemRadio)}
                                                                                   <div style={{ marginBottom: '10px', width: '100%', backgroundColor: '#F8F9FA', padding: '5px' }}>
                                                                                     {radioButton.type === 'radio_button_img' &&
                                                                                       <React.Fragment>
@@ -5353,7 +5353,36 @@ const Scenario = () => {
                                                                                         />
                                                                                       </React.Fragment>
                                                                                     }
-                                                                                    {(radioButton.type === 'default' || radioButton.type === 'block_style') &&
+                                                                                    {(radioButton.type === 'default') &&
+                                                                                      <React.Fragment>
+                                                                                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                                                                                          <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
+                                                                                          <InputDouble
+                                                                                            classCustom="ss-user-radio-custom-class"
+                                                                                            icon={array.length >= 2 ? "times-circle" : ""}
+                                                                                            onChange={(value, name) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, radioButton.type, indexRadio, name === 'left' ? 'text' : 'value')}
+                                                                                            valueLeft={itemRadio.text}
+                                                                                            valueRight={itemRadio.value}
+                                                                                            placeholder={['タイトル', '値']}
+                                                                                            classIcon="ss-plus-circle-option-icon-times"
+                                                                                            onClickIcon={() => handleRemoveItemContent(indexMessageSelect, indexContent, content.type, radioButton.type, indexRadio)}
+                                                                                          />
+                                                                                        </div>
+                                                                                        <CheckboxCustom
+                                                                                          label="初期選択設定"
+                                                                                          onChange={() => {
+                                                                                            if (radioButton.initial_selection !== itemRadio.id) {
+                                                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.id, 'initial_selection');
+                                                                                            } else {
+                                                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection');
+                                                                                            }
+                                                                                          }}
+                                                                                          value={radioButton.initial_selection === itemRadio.id}
+                                                                                          isOnChange={false}
+                                                                                        />
+                                                                                      </React.Fragment>
+                                                                                    }
+                                                                                    {(radioButton.type === 'block_style') &&
                                                                                       <React.Fragment>
                                                                                         <div style={{ display: 'flex', alignItems: 'center' }}>
                                                                                           <MDBIcon fas icon="grip-horizontal" style={{ marginRight: '10px' }} />
@@ -6597,15 +6626,16 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               value={pullDown?.[pullDown.type]?.start_at}
                                                               placeholder="開始時"
-                                                              data={dataHourFixed}
+                                                              data={dataHourFixed.filter(item => parseInt(item.value) < parseInt(pullDown[pullDown.type].end_at || "23"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at', 'dataHour')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
+                                                            {console.log(pullDown?.[pullDown.type]?.start_at)}
                                                             <SelectCustom
                                                               style={{ width: '18%' }}
                                                               placeholder="終了時"
                                                               value={pullDown?.[pullDown.type]?.end_at}
-                                                              data={dataHourFixed}
+                                                              data={dataHourFixed.filter(item => parseInt(item.value) > parseInt(pullDown[pullDown.type].start_at || "0"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at', 'dataHour')}
                                                             />
                                                           </div>
@@ -6651,7 +6681,7 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               value={pullDown?.[pullDown.type]?.start_year}
                                                               placeholder="開始年"
-                                                              data={dataYearFixed}
+                                                              data={dataYearFixed.filter(item => parseInt(item.value) < parseInt(pullDown[pullDown.type].end_year || "2072"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_year', 'dataYear')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
@@ -6659,7 +6689,7 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               placeholder="終了年"
                                                               value={pullDown?.[pullDown.type]?.end_year}
-                                                              data={dataYearFixed}
+                                                              data={dataYearFixed.filter(item => parseInt(item.value) > parseInt(pullDown[pullDown.type].start_year || "1935"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_year', 'dataYear')}
                                                             />
                                                           </div>
@@ -6734,7 +6764,7 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               value={pullDown?.[pullDown.type]?.start_year}
                                                               placeholder="開始年"
-                                                              data={dataYearFixed}
+                                                              data={dataYearFixed.filter(item => parseInt(item.value) < parseInt(pullDown[pullDown.type].end_year || "2072"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_year', 'dataYear')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
@@ -6742,7 +6772,7 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               placeholder="終了年"
                                                               value={pullDown?.[pullDown.type]?.end_year}
-                                                              data={dataYearFixed}
+                                                              data={dataYearFixed.filter(item => parseInt(item.value) > parseInt(pullDown[pullDown.type].start_year || "1935"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_year', 'dataYear')}
                                                             />
                                                           </div>
@@ -6806,7 +6836,7 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               value={pullDown?.[pullDown.type]?.start_at}
                                                               placeholder="開始時"
-                                                              data={dataHourFixed}
+                                                              data={dataHourFixed.filter(item => parseInt(item.value) < parseInt(pullDown[pullDown.type].end_at || "23"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at', 'dataHour')}
 
                                                             />
@@ -6815,7 +6845,7 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               placeholder="終了時"
                                                               value={pullDown?.[pullDown.type]?.end_at}
-                                                              data={dataHourFixed}
+                                                              data={dataHourFixed.filter(item => parseInt(item.value) > parseInt(pullDown[pullDown.type].start_at || "0"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at', 'dataHour')}
                                                             />
                                                           </div>
@@ -6861,7 +6891,7 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               value={pullDown?.[pullDown.type]?.start_year}
                                                               placeholder="開始年"
-                                                              data={dataYearFixed}
+                                                              data={dataYearFixed.filter(item => parseInt(item.value) < parseInt(pullDown[pullDown.type].end_year || "2072"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_year', 'dataYear')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
@@ -6869,7 +6899,7 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               placeholder="終了年"
                                                               value={pullDown?.[pullDown.type]?.end_year}
-                                                              data={dataYearFixed}
+                                                              data={dataYearFixed.filter(item => parseInt(item.value) > parseInt(pullDown[pullDown.type].start_year || "1935"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_year', 'dataYear')}
                                                             />
                                                             <SelectCustom
@@ -6928,7 +6958,7 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               value={pullDown?.[pullDown.type]?.start_year}
                                                               placeholder="開始年"
-                                                              data={dataYear}
+                                                              data={dataYearFixed.filter(item => parseInt(item.value) < parseInt(pullDown[pullDown.type].end_year || "2072"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_year', 'dataYear')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
@@ -6936,7 +6966,7 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               placeholder="終了年"
                                                               value={pullDown?.[pullDown.type]?.end_year}
-                                                              data={dataYear}
+                                                              data={dataYearFixed.filter(item => parseInt(item.value) > parseInt(pullDown[pullDown.type].start_year || "1935"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_year', 'dataYear')}
                                                             />
                                                             <SelectCustom
@@ -6988,7 +7018,7 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               value={pullDown?.[pullDown.type]?.start_at}
                                                               placeholder="開始時"
-                                                              data={dataHour}
+                                                              data={dataHourFixed.filter(item => parseInt(item.value) < parseInt(pullDown[pullDown.type].end_at || "23"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'start_at', 'dataHour')}
                                                             />
                                                             <span style={{ fontSize: '30px', marginLeft: '10px', marginRight: '10px', opacity: '0.4' }}>~</span>
@@ -6996,7 +7026,7 @@ const Scenario = () => {
                                                               style={{ width: '18%' }}
                                                               placeholder="終了時"
                                                               value={pullDown?.[pullDown.type]?.end_at}
-                                                              data={dataHour}
+                                                              data={dataHourFixed.filter(item => parseInt(item.value) > parseInt(pullDown[pullDown.type].start_at || "0"))}
                                                               onChange={value => onChangeTimePullDown(indexMessageSelect, indexContent, content.type, value, pullDown.type, 'end_at', 'dataHour')}
                                                             />
                                                           </div>
