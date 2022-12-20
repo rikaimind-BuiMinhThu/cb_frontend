@@ -29,6 +29,7 @@ import {
 } from '../../../variables/constants';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
+import { rgbToHex } from '@material-ui/core';
 
 const _ = require('lodash');
 
@@ -273,6 +274,56 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
 
           setDataMessages(messageArr);
           setUrlThanksPage(urlThanks);
+          if (res.data.chatbot) {
+            let opacity_color, message_color, gardient_color, font_color;
+            console.log(res.data.chatbot.main_color)
+            if (res.data.chatbot.main_color === 'blue') {
+              opacity_color = '#D6E0EF';
+              message_color = '#3CACEF';
+              gardient_color = '#36D0DC';
+              font_color = '#fff'
+            } else if (res.data.chatbot.main_color === 'green') {
+              opacity_color = '#DEEADB';
+              message_color = '#9DDB7C';
+              gardient_color = '#F8C03F';
+              font_color = '#fff'
+            } else if (res.data.chatbot.main_color === 'orange') {
+              opacity_color = '#F4E5DA';
+              message_color = '#EF8D2F';
+              gardient_color = '#D6DB4B';
+              font_color = '#fff'
+            } else if (res.data.chatbot.main_color === 'yellow') {
+              opacity_color = '#F0EFEB';
+              message_color = '#F3AA2D';
+              gardient_color = '#FF8402';
+              font_color = '#fff'
+            } else if (res.data.chatbot.main_color === 'pink') {
+              opacity_color = '#EBDDE3';
+              message_color = 'rgba(220, 110, 139)';
+              gardient_color = '#94C0EB';
+              font_color = '#fff'
+            } else if (res.data.chatbot.main_color === 'purple') {
+              opacity_color = '#E9E8F1';
+              message_color = '#AF82D5';
+              gardient_color = '#FAAA88';
+              font_color = '#fff'
+            } else if (res.data.chatbot.main_color === 'black') {
+              opacity_color = '#333333';
+              message_color = '#fff';
+              gardient_color = '#333333';
+              font_color = '#333333'
+            } else if (res.data.chatbot.main_color === 'white') {
+              opacity_color = '#fff';
+              message_color = '#F5F5F5';
+              gardient_color = '#fff';
+              font_color = '#000'
+            }
+            res.data.chatbot.opacity_color = opacity_color;
+            res.data.chatbot.message_color = message_color;
+            res.data.chatbot.gardient_color = gardient_color;
+            res.data.chatbot.font_color = font_color;
+          }
+
           setBotInfor(res.data.chatbot);
           if (res.data.variables) {
             setVariables([...res.data.variables]);
@@ -1028,45 +1079,47 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           isValid = false;
         }
       } else if (contentArr[i].type === 'zip_code_address') {
-        let isValidZipCode = true;
-        if (contentType.isCheckRequire === "require") {
-          if (contentType.post_code !== undefined) {
-            if (contentType.split_postal_code) {
-              if (stringNullOrEmpty(contentType.value_post_code_left)
-                || stringNullOrEmpty(contentType.value_post_code_right)) {
-                isValidZipCode = false;
-              }
-            } else if (stringNullOrEmpty(contentType.value_post_code)) {
-              isValidZipCode = false;
-            }
-          }
-        } else if (contentType.isCheckRequire === "all_items_require") {
-          if (contentType.post_code !== undefined) {
-            if (contentType.split_postal_code) {
-              if (stringNullOrEmpty(contentType.value_post_code_left)
-                || stringNullOrEmpty(contentType.value_post_code_right)) {
-                isValidZipCode = false;
-              }
-            } else if (stringNullOrEmpty(contentType.value_post_code)) {
-              isValidZipCode = false;
-            }
-          }
-          if (contentType.prefecture !== undefined && stringNullOrEmpty(contentType.value_prefecture)) {
-            isValidZipCode = false;
-          }
-          if (contentType.municipality !== undefined && stringNullOrEmpty(contentType.value_municipality)) {
-            isValidZipCode = false;
-          }
-          if (contentType.address !== undefined && stringNullOrEmpty(contentType.value_address)) {
-            isValidZipCode = false;
-          }
-        }
-        if (isValidZipCode === false) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
-          isValid = false;
-        } else if (errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
+        if (errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] !== messageError) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`];
           isValid = false;
+        } else {
+          let isValidZipCode = true;
+          if (contentType.isCheckRequire === "require") {
+            if (contentType.post_code !== undefined) {
+              if (contentType.split_postal_code) {
+                if (stringNullOrEmpty(contentType.value_post_code_left)
+                  || stringNullOrEmpty(contentType.value_post_code_right)) {
+                  isValidZipCode = false;
+                }
+              } else if (stringNullOrEmpty(contentType.value_post_code)) {
+                isValidZipCode = false;
+              }
+            }
+          } else if (contentType.isCheckRequire === "all_items_require") {
+            if (contentType.post_code !== undefined) {
+              if (contentType.split_postal_code) {
+                if (stringNullOrEmpty(contentType.value_post_code_left)
+                  || stringNullOrEmpty(contentType.value_post_code_right)) {
+                  isValidZipCode = false;
+                }
+              } else if (stringNullOrEmpty(contentType.value_post_code)) {
+                isValidZipCode = false;
+              }
+            }
+            if (contentType.prefecture !== undefined && stringNullOrEmpty(contentType.value_prefecture)) {
+              isValidZipCode = false;
+            }
+            if (contentType.municipality !== undefined && stringNullOrEmpty(contentType.value_municipality)) {
+              isValidZipCode = false;
+            }
+            if (contentType.address !== undefined && stringNullOrEmpty(contentType.value_address)) {
+              isValidZipCode = false;
+            }
+          }
+          if (isValidZipCode === false) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+            isValid = false;
+          }
         }
       } else if (contentType.type === 'phone_number' && !errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`]) {
         let REGEX_PHONE = /^0\d{9}$|^0\d{10}$/;
@@ -1696,7 +1749,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
           console.log(dataContentType);
           if (contentType === 'zip_code_address') {
-            item.default_value = `〒 ${dataContentType?.value_post_code} ${dataContentType?.value_prefecture}${dataContentType?.value_municipality} ${dataContentType?.value_address}${dataContentType?.value_building_name}`;
+            let dataPostCode = !dataContentType.split_postal_code ? dataContentType?.value_post_code : `${dataContentType.value_post_code_left}${dataContentType.value_post_code_right}`
+            item.default_value = `〒 ${dataPostCode} ${dataContentType?.value_prefecture || ""}${dataContentType?.value_municipality || ""} ${dataContentType?.value_address || ""}${dataContentType?.value_building_name || ""}`;
           } else if (field === 'start_date_select' || field === 'end_date_select') {
             item.default_value = `${dataContentType?.start_date_select || "start date"} ~ ${dataContentType?.end_date_select || "end date"}`;
           } else if (contentType === 'radio_button') {
@@ -1745,10 +1799,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
               item.default_value = value;
             } else if (field === 'up_to_municipality') {
               item.default_value = `${dataContentType[field].prefecture}${dataContentType[field].city}`
-            } else if(field === 'timezone_from_to') {
+            } else if (field === 'timezone_from_to') {
               item.default_value = `${dataContentType[field]?.valueHour1}:${dataContentType[field]?.valueMinute1}-${dataContentType[field]?.valueHour2}:${dataContentType[field]?.valueMinute2}`;
-            } else if(field === 'date_ym') {
+            } else if (field === 'date_ym') {
               item.default_value = `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}`;
+            } else if (field === 'period_from_to') {
+              item.default_value = `${dataContentType[field]?.valueYear1}-${dataContentType[field]?.valueMonth1}-${dataContentType[field]?.valueDay1} ~ ${dataContentType[field]?.valueYear2}-${dataContentType[field]?.valueMonth2}-${dataContentType[field]?.valueDay2}`;
             } else {
               item.default_value = `${(dataContentType[field]?.valueYear || dataContentType[field]?.valueMonth || dataContentType[field]?.valueDay) ? `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}-${dataContentType[field]?.valueDay}` : ""} ${(dataContentType[field]?.valueHour || dataContentType[field]?.valueMinute) ? `${dataContentType[field]?.valueHour}:${dataContentType[field]?.valueMinute}` : ""}`;
             }
@@ -1811,7 +1867,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
   }
 
   return (
-    scenarioId ?
+    scenarioId && botInfor ?
       <React.Fragment>
         <div id="sp-container" className="sp-container">
           <div id="sp-withdrawal-container" className="sp-withdrawal-container">
@@ -1982,7 +2038,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
               </div>
             </div>
           </div>
-          <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header">
+          <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color, backgroundImage: `linear-gradient(to right, ${botInfor?.gardient_color}, ${botInfor?.main_color})` }} className="sp-header">
             <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
               <div className="sp-header-left-avatar sp-avatar">
                 <img src={botInfor?.icon?.url && ("https://ec-chatbot-test1.com/" + botInfor?.icon?.url)} />
@@ -1994,16 +2050,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             </div>
             <div className="sp-header-right" onClick={() => { isOpen ? handleOpenWithDrawal() : onOpenPreview(true) }}>
               <div className="sp-header-right-arrow">
-                {isOpen ? <MDBIcon fas icon="chevron-down" /> : <MDBIcon fas icon="chevron-up" />}
+                {isOpen ? <MDBIcon fas icon="chevron-circle-down" /> : <MDBIcon fas icon="chevron-circle-up" />}
               </div>
             </div>
           </div>
-          <div id="sp-process-bar" className="sp-process-bar">
-            <div className="sp-process-bar-color" style={{ width: `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` }}>
+          <div id="sp-process-bar" className="sp-process-bar" style={{ backgroundColor: botInfor?.opacity_color }}>
+            <div className="sp-process-bar-color" style={{ width: `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%`, ...botInfor?.main_color && { backgroundColor: botInfor?.main_color, backgroundImage: `linear-gradient(to right, ${botInfor?.gardient_color}, ${botInfor?.main_color})` } }}>
               {messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。"}
             </div>
           </div>
-          <div id="sp-body" className="sp-body">
+          {console.log(botInfor?.opacity_color)}
+          <div id="sp-body" className="sp-body" style={{ backgroundColor: botInfor?.opacity_color }}>
             {
               renderMessageArr.map((message, indexMessage) => {
                 return (
@@ -2039,8 +2096,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                             onChangeErrors={(field, value) => onChangeErrors(field, value)}
                           />
                           {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
-                            && <div className="ss-user-message__action-wrapper">
-                              <Button disabled={message.disabled} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
+                            && <div className="sp-user-message-button-action">
+                              <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
                                 {message.buttonName || "次へ"}
                               </Button>
                             </div>
@@ -2088,7 +2145,7 @@ const BotMessage = ({ content, index, botInfor }) => {
             {content.type === 'text_input' && (
               <div
                 className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                style={{ overflowWrap: 'break-word', backgroundColor: 'white', height: 'auto', overflowY: 'hidden' }}
+                style={{ overflowWrap: 'break-word', backgroundColor: botInfor?.message_color, color: botInfor?.font_color, height: 'auto', overflowY: 'hidden', border: 'none', borderRadius: '2px' }}
               // value={content[content.type]?.content || ''}
               // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
               >
@@ -2102,7 +2159,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                     <img
                       src={content[content.type]?.content}
                       alt=""
-                      style={{ width: '100%', marginLeft: '8px' }} />
+                      style={{ width: '100%' }} />
                   }
                   {content[content.type]?.content.includes('pdf') &&
                     <span
@@ -2113,7 +2170,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                   {content[content.type]?.content.includes('mp4') &&
                     <div>
                       <video
-                        style={{ width: '100%', height: '100%', borderRadius: '5px' }}
+                        style={{ width: '100%', height: '100%', borderRadius: '2px' }}
                         src={content[content.type]?.content}
                         autoPlay
                         controls
@@ -2126,6 +2183,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                   className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                   value={''}
                   readOnly
+                  style={{ backgroundColor: botInfor?.message_color, border: 'none', borderRadius: '2px', color: botInfor?.font_color }}
                 ></textarea>
             )}
             {content.type === 'delay' && (
@@ -2253,12 +2311,11 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   function getBaseUrl(event, indexContent) {
     var file = event.target.files[0];
     const type = file.name.slice(file.name.lastIndexOf('.') + 1);
-    let messsageError = "";
-    if (messageContent[indexContent].attaching_file.file_type.length > 0 && !messageContent[indexContent].attaching_file.file_type.includes(type)) {
+    if (messageContent[indexContent].attaching_file.file_type.length > 0 && !messageContent[indexContent].attaching_file.file_type.includes(type.toLowerCase())) {
       console.log(messageContent[indexContent].attaching_file.file_type, type);
       onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, `ファイルには${messageContent[indexContent].attaching_file.file_type.join(", ")}タイプのファイルを指定してください。`)
       return;
-    } else if (file.size / 1024 / 1024 > 2) {
+    } else if (file.size / 1024 / 1024 >= 2) {
       onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "ファイルサイズは2MB以下です。");
       return;
     } else {
@@ -3363,8 +3420,10 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
             {
               content.type === 'zip_code_address' && (
                 <div style={{ marginBottom: '10px' }}>
-                  <div style={{ marginBottom: '10px', textDecoration: 'underline', color: '#2c76f0', textAlign: 'right' }}>
-                    <span style={{ cursor: 'pointer' }} onClick={() => isPopUpZipCode(true, indexContent)}>〒検索はこちら</span>
+                  <div style={{ marginBottom: '10px', textDecoration: 'underline', ...!disabled ? { color: '#2c76f0' } : { color: 'gray' }, textAlign: 'right' }}>
+                    <span style={!disabled ? { cursor: 'pointer' } : {}} onClick={() => {
+                      if (disabled !== true) isPopUpZipCode(true, indexContent)
+                    }}>〒検索はこちら</span>
                   </div>
                   {(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire) &&
                     <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>

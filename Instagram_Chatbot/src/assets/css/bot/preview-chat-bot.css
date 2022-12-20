@@ -5,18 +5,39 @@
     width: 380px;
     height: 620px;
     background-color: #EBF7FF;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
     z-index: 900;
 }
 
+.sp-header {
+    /* background-color: #546DA7; */
+    width: 380px;
+    height: 65px;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    display: flex;
+    align-items: center;
+    /* padding: 15px; */
+}
+
+.sp-header-left {
+    width: 92%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+}
+
+.sp-header-left-avatar {}
+
 .sp-withdrawal-container {
     background-color: #000;
-    height: 88%;
+    height: 90%;
     position: absolute;
     width: 100%;
     z-index: 1;
-    top: 75px;
+    top: 65px;
     opacity: 0.5;
     display: none;
 }
@@ -27,7 +48,7 @@
     position: absolute;
     width: 98%;
     z-index: 10;
-    top: 79px;
+    top: 70px;
     left: 4px;
     min-height: 18%;
     padding: 18px;
@@ -65,27 +86,6 @@
     cursor: pointer;
 }
 
-.sp-header {
-    /* background-color: #546DA7; */
-    width: 380px;
-    height: 75px;
-    border-top-left-radius: 25px;
-    border-top-right-radius: 25px;
-    display: flex;
-    align-items: center;
-    /* padding: 15px; */
-}
-
-.sp-header-left {
-    width: 92%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    padding: 15px;
-}
-
-.sp-header-left-avatar {}
-
 .sp-avatar img {
     border-radius: 50%;
     width: 50px;
@@ -97,11 +97,12 @@
 }
 
 .sp-header-left-label-sub-title {
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .sp-header-left-label-title {
     font-size: 16px;
+    font-weight: 600;
 }
 
 .sp-header-right {
@@ -111,7 +112,7 @@
 
 .sp-header-right-arrow {
     color: #fff;
-    font-size: 35px;
+    font-size: 20px;
 }
 
 .sp-process-bar {
@@ -130,7 +131,7 @@
 .sp-body {
     padding: 10px;
     overflow-y: auto;
-    height: 84%;
+    height: calc(86% + 1px);
 }
 
 .sp-body input {
@@ -183,8 +184,13 @@
     width: 79%;
     background-color: #fff;
     padding: 10px;
-    border: 1px solid #A3B1BF;
-    border-radius: 6px;
+    /* border: 1px solid #A3B1BF; */
+    border-radius: 2px;
+}
+
+.sp-user-message-button-action {
+    display: flex;
+    justify-content: center;
 }
 
 .sp-body-user-side-messages button {
@@ -192,6 +198,7 @@
     width: 40%;
     font-size: 10px;
     padding: 13px;
+    border-radius: 2px;
 }
 
 .sp-body-user-side-messages .ss-message__content--user-pull_down-col {
