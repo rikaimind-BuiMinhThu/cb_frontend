@@ -3,12 +3,16 @@
   justify-content: space-between;
   flex-wrap: wrap;
   margin-bottom: 20px;
+  align-items: center;
 }
 .report__info {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  width: 75%;
+  /* width: 75%; */
+}
+.report__download > .btn {
+  margin: 0;
 }
 .report__group {
   display: inline-block;

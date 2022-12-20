@@ -153,11 +153,13 @@ let dataPaymentMethod = [
 
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
+
 function Preview() {
 
   const [isOpen, setIsOpen] = useState(false)
   const [urlSend, setUrlSend] = useState()
   const [urlReceive, setUrlReceive] = useState()
+  const [deviceReceive, setDeviceReceive] = useState()
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
   const [scenarioId, setScenarioId] = useState(Cookies.get('scenario_id'));
   const [botInfor, setBotInfor] = useState();
@@ -203,6 +205,8 @@ function Preview() {
     });
     return dataObj;
   });
+
+  
 
   function getAllUrlParams(url) {
     var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
@@ -311,12 +315,15 @@ function Preview() {
     let params = new URLSearchParams(url.search);
     let botIdGet = params.get('bot_id') // 'chrome-instant'
     let urlRe = params.get('urlReceive') // 'chrome-instant'
+    let deviceRe = params.get('deviceReceive') // 'chrome-instant'
     let scenarioIdGet = params.get('scenario_id') // 'mdn query string'
     console.log('url ne: ', urlRe)
     setUrlSend(url.href)
     setUrlReceive(urlRe)
-    console.log('botIdGet: ', botIdGet)
-    console.log('scenarioIdGet: ', scenarioIdGet)
+    setDeviceReceive(deviceRe)
+    // console.log('botIdGet: ', botIdGet)
+    // console.log('scenarioIdGet: ', scenarioIdGet)
+    console.log('deviceRe: ', deviceRe)
     setBotId(botIdGet)
     setScenarioId(scenarioIdGet)
       api.get(`/api/v1/managements/chatbots/${botIdGet}/scenarios/${scenarioIdGet}/preview`).then(async res => {
@@ -1776,6 +1783,7 @@ function Preview() {
 
   const handleOpenWithDrawal = () => {
     if (botInfor.withdrawal_prevention_status === "invalid") {
+      // console.log('out lun');
       setIndexUser(0);
       setScenarioId(null);
       setTimeout(() => {
@@ -1785,10 +1793,17 @@ function Preview() {
         } else {
           onOpenPreview(false);
         }
+        let withdrawal = {scenario_data: `${deviceReceive}_close_chatbot_window`} 
+                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`,withdrawal).then(res=>{
+                      console.log(res)
+                    }).catch(err=>{
+                      console.log(err)
+                    })
       }, 10);
     } else if (botInfor.withdrawal_prevention_status === "standard_exit_popup" || botInfor.withdrawal_prevention_status === "image_popup") {
       document.getElementById("sp-withdrawal-container").style.display = "block";
       document.getElementById("sp-withdrawal-content").style.display = "block";
+      // console.log('binh tinh da');
     }
   }
 
@@ -1850,7 +1865,19 @@ function Preview() {
                   setScenarioId(Cookies.get('scenario_id'));
                   if (document.getElementById("action-bd")) {
                     document.getElementById("action-bd").click();
+                    let withdrawal = {scenario_data: `${deviceReceive}_close_chatbot_window`} 
+                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`,withdrawal).then(res=>{
+                      console.log(res)
+                    }).catch(err=>{
+                      console.log(err)
+                    })
                   } else {
+                    let withdrawal = {scenario_data: `${deviceReceive}_close_chatbot_window`} 
+                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`,withdrawal).then(res=>{
+                      console.log(res)
+                    }).catch(err=>{
+                      console.log(err)
+                    })
                     onOpenPreview(false);
                   }
                 }, 10);
@@ -1996,9 +2023,9 @@ function Preview() {
                 <div className="sp-header-left-label-title">{botInfor?.title}</div>
               </div>
             </div>
-            <div className="sp-header-right" onClick={() => { isOpen ? handleOpenWithDrawal() : onOpenPreview(true) }}>
+            <div className="sp-header-right" onClick={() => { isOpen ? onOpenPreview(true) : handleOpenWithDrawal() }}>
               <div className="sp-header-right-arrow">
-                {isOpen ? <MDBIcon fas icon="chevron-down" /> : <MDBIcon fas icon="chevron-up" />}
+                {isOpen ? <MDBIcon fas icon="chevron-up"/> : <MDBIcon fas icon="chevron-down" />}
               </div>
             </div>
           </div>

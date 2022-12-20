@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
 import '../../assets/css/bot/payment-mng.css';
-import DatePicker, { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import ja from "date-fns/locale/ja";
+import DatePicker, { registerLocale } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import ja from 'date-fns/locale/ja';
 import { useEffect } from 'react';
 import api from 'api/api-management';
 import Cookies from 'js-cookie';
 import { tokenExpired } from 'api/tokenExpired';
 import ModalNoti from './../Popup/ModalNoti';
-registerLocale("ja", ja);
+registerLocale('ja', ja);
 
 function PaymentManagement() {
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
@@ -83,19 +83,35 @@ function PaymentManagement() {
     { prefectur: 'kagoshima', prefectureName: '鹿児島県' },
     { prefectur: 'okinawa', prefectureName: '沖縄県' },
   ]);
+  // authorization
+  const [isAdminDeel, setIsAdminDeel] = useState(false);
+  const [allClient, setAllClient] = useState([]);
+  const [allBot, setAllBot] = useState([]);
+  const [currentClientId, setCurrentClientId] = useState('deel');
 
-  React.useEffect(() => {
-    var cook = Cookies.get('user_role');
-    if (cook == 'admin_deel') {
-
-    } else if (cook == 'admin_client') {
-      // window.location.href = '/admin/dashboard';
-      // var elem = document.getElementById('sidebarClient');
-      // elem.parentNode.removeChild(elem);
-    } else if (cook == 'client') {
-      // window.location.href = '/admin/dashboard';
+  useEffect(() => {
+    if (Cookies.get('user_role') === 'admin_deel') {
+      setIsAdminDeel(true);
+    } else {
+      setIsAdminDeel(false);
     }
-  });
+  }, []);
+
+  useEffect(() => {
+    if (isAdminDeel) {
+      api
+        .get('/api/v1/managements/get_client_with_name')
+        .then((res) => {
+          console.log('all client: ', res.data);
+          if (res.data?.code === 1) {
+            setAllClient(res.data?.data);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [isAdminDeel]);
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
@@ -449,7 +465,8 @@ function PaymentManagement() {
       if (pm_var[i] == '') {
         checkVar = true;
         if (document.getElementById(`err_settpgw_variable${i}`))
-          document.getElementById(`err_settpgw_variable${i}`).innerHTML = '変数は、必ず指定してください。';
+          document.getElementById(`err_settpgw_variable${i}`).innerHTML =
+            '変数は、必ず指定してください。';
       } else {
         if (document.getElementById(`err_settpgw_variable${i}`))
           document.getElementById(`err_settpgw_variable${i}`).innerHTML = '';
@@ -545,8 +562,7 @@ function PaymentManagement() {
       if (formAdd[i].value == '') {
         checkAmount = true;
         if (document.getElementById(`err_amount_of_money_${i}`))
-          document.getElementById(`err_amount_of_money_${i}`).innerHTML =
-            '必ず指定してください。';
+          document.getElementById(`err_amount_of_money_${i}`).innerHTML = '必ず指定してください。';
       } else {
         if (document.getElementById(`err_amount_of_money_${i}`))
           document.getElementById(`err_amount_of_money_${i}`).innerHTML = '';
@@ -745,21 +761,39 @@ function PaymentManagement() {
 
   function deleteCdivSpecifyPGW(id) {
     var ele = document.getElementById(`specifyPGW${id}`);
-    document.getElementById(`customSPGW`).removeChild(ele)
+    document.getElementById(`customSPGW`).removeChild(ele);
     // ele.remove();
   }
 
   function deleteCdivSettlementPGW(id) {
     var ele = document.getElementById(`settlementPGW${id}`);
-    document.getElementById(`settlement_PMGW`).removeChild(ele)
+    document.getElementById(`settlement_PMGW`).removeChild(ele);
     // ele.remove();
   }
 
   function deleteCdivSettlementFee(id) {
     var ele = document.getElementById(`settlementFee${id}`);
-    document.getElementById(`customNP`).removeChild(ele)
+    document.getElementById(`customNP`).removeChild(ele);
     // ele.remove();
   }
+
+  // handle select client
+  const handleSelectClient = (value) => {
+    if (value === 'deel') {
+      setCurrentClientId(value);
+    } else {
+      setCurrentClientId(value);
+      api.get(`/api/v1/managements/get_list_chatbot_by_client?client_id=${value}`).then(res => {
+        console.log(res?.data?.data)
+        setAllBot(res?.data?.data)
+      }).catch(err => {
+        console.log(err)
+        if (err?.response?.data?.code == 0) {
+          tokenExpired()
+        }
+      })
+    }
+  };
 
   return (
     // <div>
@@ -806,7 +840,7 @@ function PaymentManagement() {
                           selected={startDate}
                           onChange={(date) => selectDateStart(date)}
                           dateFormat="yyyy-MM-dd"
-                          locale='ja'
+                          locale="ja"
                           value={startDate}
                         // value={
                         //   startDatePreview
@@ -830,7 +864,7 @@ function PaymentManagement() {
                           selected={endDate}
                           onChange={(date) => selectDateEnd(date)}
                           dateFormat="yyyy-MM-dd"
-                          locale='ja'
+                          locale="ja"
                           value={endDate}
                         // value={
                         //   endDatePreview
@@ -839,7 +873,43 @@ function PaymentManagement() {
                         // }
                         />
                       </div>
-                      まで &emsp;<button className="payment-management-btn-search">Search</button>
+                      <h4
+                        style={{
+                          margin: '0',
+                          fontWeight: '400',
+                          fontSize: '1.2em',
+                        }}
+                      >
+                        まで
+                      </h4>
+                      {isAdminDeel && (
+                        <>
+                          <select
+                            className="pm-select"
+                            value={currentClientId}
+                            onChange={(e) => handleSelectClient(e.target.value)}
+                          >
+                            <option value={'deel'}>Deel</option>
+                            {allClient.map((client, index) => (
+                              <option key={index} value={client.id}>
+                                {client.name}
+                              </option>
+                            ))}
+                          </select>
+                        </>
+                      )}
+                      {currentClientId !== 'deel' && (
+                        <>
+                          <select className="pm-select">
+                            {allBot.map((item, index) => (
+                              <option key={index} value={item.id}>
+                                {item.bot_name}
+                              </option>
+                            ))}
+                          </select>
+                        </>
+                      )}
+                      &emsp;<button className="payment-management-btn-search">Search</button>
                     </div>
                     <span
                       id="payment_management_date_err"
@@ -959,12 +1029,8 @@ function PaymentManagement() {
                               </span>
                             </div>
                             <br />
-                            <p>
-                              内税の場合は、商品金額小計をそのまま注文金額とします。
-                            </p>
-                            <p>
-                              外税の場合は、商品金額小計に税率を上乗せして注文金額とします。
-                            </p>
+                            <p>内税の場合は、商品金額小計をそのまま注文金額とします。</p>
+                            <p>外税の場合は、商品金額小計に税率を上乗せして注文金額とします。</p>
                           </div>
                         </form>
                         <button className="btn btn-primary" onClick={() => saveConsumptionTax()}>

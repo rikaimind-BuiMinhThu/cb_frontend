@@ -16,7 +16,7 @@ async function displayPopup() {
     iframe.id = 'previewSdk'; iframe.style.position = "fixed"; iframe.style.bottom = "0"; iframe.style.right = "0";
     iframe.width = '400px'; iframe.height = '620px';
     iframe.style.border = 'none'; iframe.style.padding = '0'; iframe.style.margin = '0'; iframe.style.borderRadius = '30px'
-    iframe.src = `https://ec-chatbot1.com/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}`;
+    iframe.src = `https://localhost:3000/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}`;
     body.appendChild(iframe)
     window.addEventListener('message', function (e) {
         let firstOpen = false
@@ -24,7 +24,7 @@ async function displayPopup() {
         if (firstOpen == true) { iframe.width = '400px'; iframe.height = '620px'; } else if (e.data == true && firstOpen == false) {
             console.log('open')
             iframe.width = '400px'; iframe.height = '620px';
-            let add = { chatbot_data: device }
+            let add = { scenario_data: device }
             // submitForm(url, add)
             getUser(`https://ec-chatbot-test1.com/api/v1/analytics/scenario_counts/${scenarioId}`,add)
         } else if (e.data == false && firstOpen == false) { iframe.width = '400px'; iframe.height = '90px'; console.log('close') }
