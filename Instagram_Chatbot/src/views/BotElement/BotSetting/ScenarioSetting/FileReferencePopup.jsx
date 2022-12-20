@@ -9,25 +9,46 @@ import {
     Button
 } from 'reactstrap';
 import { tokenExpired } from 'api/tokenExpired';
+import Pagination from '@material-ui/lab/Pagination';
 
 function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf', 'mp4'] }) {
 
-    const [fileType, setFileType] = useState('IMAGE');
+    const [fileType, setFileType] = useState('image');
     const [dataFile, setDataFile] = useState([]);
     const [fileChose, setFileChose] = useState('');
+    var [pageIndex, setPageIndex] = useState(1);
+    var [totalPage, setTotalPage] = useState();
+    var [page, setPage] = useState(1);
 
     useEffect(() => {
-        api.get(`/api/v1//managements/file`).then(res => {
+        getListFile(1);
+    }, [fileType])
+
+    const getListFile = (pgIndex) => {
+        api.get(`/api/v1//managements/file?page=${pgIndex}&file_type=${fileType}`).then(res => {
             console.log(res);
             setDataFile(res.data.data);
+            let totalPage = Math.ceil(res?.data?.total / 25);
+            setTotalPage(totalPage);
         }).catch((error) => {
             console.log(error);
             if (error.response?.data.code === 0) {
                 tokenExpired();
             }
         });
-    }, [])
-    console.log(acceptFile)
+    }
+
+    function handleChange(event, value) {
+        console.log(value);
+        if (totalPage > 1) {
+            // console.log('pageIndex: ', value);
+            setPage(parseInt(value));
+            setPageIndex(value);
+            getListFile(value);
+            // window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
     return (
         <React.Fragment>
             <div className="fr-popup-container">
@@ -37,22 +58,31 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
                             return <React.Fragment key={index}>
                                 {item === 'image' &&
                                     <div className="fr-popup-header-type"
-                                        style={fileType === 'IMAGE' ? { color: '#fff', backgroundColor: '#347AED' } : {}}
-                                        onClick={() => setFileType('IMAGE')}
+                                        style={fileType === 'image' ? { color: '#fff', backgroundColor: '#347AED' } : {}}
+                                        onClick={() => {
+                                            setFileType('image');
+                                            setPage(1);
+                                        }}
                                     >
                                         画像
                                     </div>}
                                 {item === 'pdf' &&
                                     <div className="fr-popup-header-type"
-                                        style={fileType === 'PDF' ? { color: '#fff', backgroundColor: '#347AED' } : {}}
-                                        onClick={() => setFileType('PDF')}
+                                        style={fileType === 'pdf' ? { color: '#fff', backgroundColor: '#347AED' } : {}}
+                                        onClick={() => {
+                                            setFileType('pdf');
+                                            setPage(1);
+                                        }}
                                     >
                                         PDF
                                     </div>}
                                 {item === 'mp4' &&
                                     <div className="fr-popup-header-type"
-                                        style={fileType === 'MP4' ? { color: '#fff', backgroundColor: '#347AED' } : {}}
-                                        onClick={() => setFileType('MP4')}
+                                        style={fileType === 'mp4' ? { color: '#fff', backgroundColor: '#347AED' } : {}}
+                                        onClick={() => {
+                                            setFileType('mp4');
+                                            setPage(1);
+                                        }}
                                     >
                                         ビデオ
                                     </div>
@@ -60,12 +90,21 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
                             </React.Fragment>;
                         })}
                 </div>
-                <div className="fr-popup-body">
-                    {/* {fileType === 'IMAGE' && */}
+                <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'flex-end' }}>
+                    <Pagination
+                        count={totalPage}
+                        variant="outlined"
+                        page={page}
+                        onChange={handleChange}
+                    />
+                </div>
+                <div id="fr-popup-body" className="fr-popup-body">
+
+                    {/* {fileType === 'image' && */}
                     <React.Fragment>
                         {dataFile && dataFile.map((item, index) => {
                             console.log(item.file_url === fileChose)
-                            if (fileType === 'IMAGE' && item.file_type === 'image') {
+                            if (fileType === 'image' && item.file_type === 'image') {
                                 return (
                                     <div
                                         key={index}
@@ -79,7 +118,7 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
                                         <div className="fr-popup-body-name-img">{item.file_url.split('/')[2]}</div>
                                     </div>
                                 )
-                            } else if (fileType === 'PDF' && item.file_type === 'pdf') {
+                            } else if (fileType === 'pdf' && item.file_type === 'pdf') {
                                 return (
                                     <div
                                         key={index}
@@ -93,7 +132,7 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
                                         <div className="fr-popup-body-name-img">{item.file_url.split('/')[2]}</div>
                                     </div>
                                 )
-                            } else if (fileType === 'MP4' && item.file_type === 'mp4') {
+                            } else if (fileType === 'mp4' && item.file_type === 'mp4') {
                                 return (
                                     <div
                                         key={index}
@@ -113,7 +152,7 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
                         )}
                     </React.Fragment>
                     {/* }
-                    {fileType === 'PDF' &&
+                    {fileType === 'pdf' &&
                         <React.Fragment>
                             {dataFile && dataFile.map((item, index) => {
                                 return (

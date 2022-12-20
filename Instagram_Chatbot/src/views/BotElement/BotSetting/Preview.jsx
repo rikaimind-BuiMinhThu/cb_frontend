@@ -153,7 +153,6 @@ let dataPaymentMethod = [
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
 function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
-  console.log(scenarioIdProps, 'check scenarioIdProps')
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
   const [scenarioId, setScenarioId] = useState(scenarioIdProps || Cookies.get('scenario_id'));
   const [botInfor, setBotInfor] = useState();
@@ -262,16 +261,26 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
 
     if (scenarioId) {
       api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/preview`).then(async res => {
+        console.log(res, 'cehckkkk bugs')
         if (res.data.code == 1) {
-          let messageArr = [...res.data.data?.conversation?.messages];
-          let urlThanks = res.data.data?.conversation?.urlThanksPage || ''
+          let messageArr = [];
+          if (res.data.data?.conversation?.messages?.length > 0) {
+            messageArr = [...res.data.data?.conversation?.messages];
+          }
+          let urlThanks = res.data.data?.conversation?.urlThanksPage || '';
+          console.log(messageArr);
+          console.log(res.data.chatbot);
+
           setDataMessages(messageArr);
           setUrlThanksPage(urlThanks);
-          setVariables([...res.data.variables]);
           setBotInfor(res.data.chatbot);
-          res.data.variables.forEach(item => {
-            objParam[item.variable_name] = item.default_value;
-          });
+          if (res.data.variables) {
+            setVariables([...res.data.variables]);
+            res.data.variables.forEach(item => {
+              objParam[item.variable_name] = item.default_value;
+            });
+          }
+
           setObjParam({ ...objParam });
           console.log(objParam, 'ceghckkkkkkkkkkkkkkk objParam')
           let variables = [...res.data.variables];
@@ -618,7 +627,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
     let messageError = "この項目は必須です。"
     for (let i = 0; i < contentArr.length; i++) {
       let contentType = contentArr[i][contentArr[i].type];
-      let limitFrom = contentType[contentType.type]?.character_limit_from;
+      let limitFrom = contentType[contentType.type]?.character_limit_from || 0;
       let limitTo = contentType[contentType.type]?.character_limit_to || Number.MAX_SAFE_INTEGER;
       if (contentType.require) {
         console.log(contentType.type, contentType.date_select)
@@ -628,20 +637,22 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
               errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
-            } else if (contentType[contentType.type].valueLeft?.length < limitFrom
-              || contentType[contentType.type].valueLeft?.length > limitTo
-              || contentType[contentType.type].valueRight?.length < limitFrom
-              || contentType[contentType.type].valueRight?.length > limitTo) {
-              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
-              isValid = false;
             }
+            // else if (contentType[contentType.type].valueLeft?.length < limitFrom
+            //   || contentType[contentType.type].valueLeft?.length > limitTo
+            //   || contentType[contentType.type].valueRight?.length < limitFrom
+            //   || contentType[contentType.type].valueRight?.length > limitTo) {
+            //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+            //   isValid = false;
+            // }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
-          } else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
-            isValid = false;
           }
+          //  else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
+          //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          //   isValid = false;
+          // }
         } else if (contentType.type === 'phone_number') {
           if (contentType[contentType.type].withHyphen) {
             if (stringNullOrEmpty(contentType[contentType.type].value1)
@@ -655,19 +666,18 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             isValid = false;
           }
         } else if (contentType.type === 'email_confirmation' || contentType.type === 'password_confirmation') {
-          let limitFrom = contentType[contentType.type]?.character_limit_from;
-          let limitTo = contentType[contentType.type]?.character_limit_to;
           if (stringNullOrEmpty(contentType[contentType.type].value) || stringNullOrEmpty(contentType[contentType.type].valueConfirm)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
-          } else if (contentType.type === 'password_confirmation' &&
-            (contentType[contentType.type].value.length < limitFrom
-              || contentType[contentType.type].value.length > limitTo
-              || contentType[contentType.type].valueConfirm.length < limitFrom
-              || contentType[contentType.type].valueConfirm.length > limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
-            isValid = false;
           }
+          //  else if (contentType.type === 'password_confirmation' &&
+          //   (contentType[contentType.type].value.length < limitFrom
+          //     || contentType[contentType.type].value.length > limitTo
+          //     || contentType[contentType.type].valueConfirm.length < limitFrom
+          //     || contentType[contentType.type].valueConfirm.length > limitTo)) {
+          //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          //   isValid = false;
+          // }
         } else if (contentType.type === 'customization') {
           if (contentType[contentType.type].is_comment) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
@@ -761,15 +771,29 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             isValid = false;
           }
         } else if (contentArr[i].type === 'checkbox') {
-          if (contentType.checkedValue && contentType.checkedValue.length === 0) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
-            isValid = false;
-          } else if (contentType.selection_limit_from && contentType.checkedValue.length < parseInt(contentType.selection_limit_from)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_from || 0}個以上選択してください。`;
-            isValid = false;
-          } else if (contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
-            isValid = false;
+          console.log(contentType.type, contentType)
+          if (contentType.type !== 'checkbox_img') {
+            if (contentType.checkedValue && contentType.checkedValue.length === 0) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+              isValid = false;
+            } else if (contentType.selection_limit_from && contentType.checkedValue.length < parseInt(contentType.selection_limit_from)) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
+              isValid = false;
+            } else if (contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+              isValid = false;
+            }
+          } else {
+            if (contentType.initial_selection_picture && contentType.initial_selection_picture.length === 0) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+              isValid = false;
+            } else if (contentType.selection_limit_from && contentType.initial_selection_picture.length < parseInt(contentType.selection_limit_from)) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
+              isValid = false;
+            } else if (contentType.selection_limit_to && contentType.initial_selection_picture.length > parseInt(contentType.selection_limit_to)) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+              isValid = false;
+            }
           }
         } else if (contentArr[i].type === 'carousel') {
           if (stringNullOrEmpty(contentType.initial_selection)) {
@@ -842,7 +866,10 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             isValid = false;
           }
         } else if (contentArr[i].type === 'checkbox') {
-          if (contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
+          if (contentType.type !== 'checkbox_img' && contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+            isValid = false;
+          } else if (contentType.type === 'checkbox_img' && contentType.selection_limit_to && contentType.initial_selection_picture.length > parseInt(contentType.selection_limit_to)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
             isValid = false;
           }
@@ -942,17 +969,27 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
       let REGEX_PASSWORD = /^[A-Za-z0-9 ]+$/;
 
       if (contentType.type === 'text' || contentType.type === 'password') {
-        if (contentType[contentType.type].isSplitInput
-          && (!stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))
-          && (contentType[contentType.type].valueLeft?.length < limitFrom
-            || contentType[contentType.type].valueLeft?.length > limitTo
-            || contentType[contentType.type].valueRight?.length < limitFrom
-            || contentType[contentType.type].valueRight?.length > limitTo)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+        if (contentType[contentType.type].isSplitInput) {
+          if ((!stringNullOrEmpty(contentType[contentType.type].valueLeft)
+            || !stringNullOrEmpty(contentType[contentType.type].valueRight))
+            && (contentType[contentType.type].valueLeft?.length < limitFrom
+              || contentType[contentType.type].valueRight?.length < limitFrom)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上入力してください。`;
+            isValid = false;
+          } else if ((!stringNullOrEmpty(contentType[contentType.type].valueLeft)
+            || !stringNullOrEmpty(contentType[contentType.type].valueRight))
+            && (contentType[contentType.type].valueLeft?.length > limitTo
+              || contentType[contentType.type].valueRight?.length > limitTo)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitTo}文字以下入力してください。`;
+            isValid = false;
+          }
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value)
+          && contentType[contentType.type].value?.length < limitFrom) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上入力してください。`;
           isValid = false;
         } else if (!stringNullOrEmpty(contentType[contentType.type].value)
-          && (contentType[contentType.type].value?.length < limitFrom || contentType[contentType.type].value?.length > limitTo)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          && contentType[contentType.type].value?.length > limitTo) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitTo}文字以下入力してください。`;
           isValid = false;
         } else if (contentType.type === 'password' && !stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
@@ -962,10 +999,14 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
         if ((!stringNullOrEmpty(contentType[contentType.type].value)
           || !stringNullOrEmpty(contentType[contentType.type].valueConfirm))
           && (contentType[contentType.type].value?.length < limitFrom
-            || contentType[contentType.type].value?.length > limitTo
-            || contentType[contentType.type].valueConfirm?.length < limitFrom
+            || contentType[contentType.type].valueConfirm?.length < limitFrom)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上入力してください。`;
+          isValid = false;
+        } else if ((!stringNullOrEmpty(contentType[contentType.type].value)
+          || !stringNullOrEmpty(contentType[contentType.type].valueConfirm))
+          && (contentType[contentType.type].value?.length > limitTo
             || contentType[contentType.type].valueConfirm?.length > limitTo)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitTo}文字以下入力してください。`;
           isValid = false;
         } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
@@ -1221,6 +1262,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                 }
               }
             }
+            console.log(checked, 'cehckkkk')
             if (checked === false) {
               if (dataMessages[i].belong_to === 'user') setIndexUser(prev => prev + 1);
               continue;
@@ -1661,11 +1703,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             item.default_value = dataContentType[dataContentType.type].find(item => item.id === value).text || item.default_value;
           } else if (contentType === 'checkbox') {
             let dataTextChecked;
-            if (field === 'checkedValue') {
+            if (field === 'checkedValue' && dataContentType.checkedValue.length > 0) {
+              console.log(dataContentType.checkedValue)
               dataTextChecked = dataContentType.checkedValue.map(itemChecked => {
                 return dataContentType[dataContentType.type].find(item => itemChecked === item.id).text;
               })
-            } else if (field === 'initial_selection_picture') {
+            } else if (field === 'initial_selection_picture' && dataContentType.initial_selection_picture.length > 0) {
               dataTextChecked = dataContentType.initial_selection_picture.map(itemChecked => {
                 let dataReturn;
                 dataContentType[dataContentType.type].forEach(item => {
@@ -1677,9 +1720,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                 })
                 return dataReturn;
               });
+            } else {
+              dataTextChecked = [];
             }
             console.log(item.variable_name, item.default_value, dataTextChecked);
-            item.default_value = dataTextChecked.join(',') || item.default_value;
+
+            item.default_value = dataTextChecked.join(',') ?? item.default_value;
           } else if (contentType === 'card_payment_radio_button') {
             let dataTextChecked;
             if (field === 'initial_selection') {
@@ -1699,13 +1745,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
               item.default_value = value;
             } else if (field === 'up_to_municipality') {
               item.default_value = `${dataContentType[field].prefecture}${dataContentType[field].city}`
+            } else if(field === 'timezone_from_to') {
+              item.default_value = `${dataContentType[field]?.valueHour1}:${dataContentType[field]?.valueMinute1}-${dataContentType[field]?.valueHour2}:${dataContentType[field]?.valueMinute2}`;
+            } else if(field === 'date_ym') {
+              item.default_value = `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}`;
             } else {
               item.default_value = `${(dataContentType[field]?.valueYear || dataContentType[field]?.valueMonth || dataContentType[field]?.valueDay) ? `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}-${dataContentType[field]?.valueDay}` : ""} ${(dataContentType[field]?.valueHour || dataContentType[field]?.valueMinute) ? `${dataContentType[field]?.valueHour}:${dataContentType[field]?.valueMinute}` : ""}`;
             }
           } else if (dataContentType.type === 'embedded') {
             item.default_value = `${moment(value).format("YYYY-MM-DD")}`
           } else if (field === 'phone_number') {
-            item.default_value = `${dataContentType[field]?.value1}${dataContentType[field]?.value2}${dataContentType[field]?.value3}`
+            item.default_value = `${dataContentType[field]?.value1}-${dataContentType[field]?.value2}-${dataContentType[field]?.value3}`
           } else {
             item.default_value = value;
           }
@@ -2172,12 +2222,25 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
         }
       } else if (content.type === "checkbox") {
         let checkbox = content.checkbox;
-        if (checkbox.all_item_checked) {
+        if (checkbox.all_item_checked && checkbox.type !== 'checkbox_img') {
           checkbox[checkbox.type].forEach(item => {
             checkbox.checkedValue.push(item.id);
           })
           onChangeValue(indexContent, content.type, checkbox.checkedValue, 'checkedValue');
-          console.log(checkbox.checkedValue)
+        } else if (checkbox.all_item_checked && checkbox.type === 'checkbox_img') {
+          checkbox[checkbox.type].forEach(item => {
+            item.contents.forEach(itemContent => {
+              checkbox.initial_selection_picture.push(`${item.id}-${itemContent.id}`);
+            })
+          });
+          onChangeValue(indexContent, content.type, checkbox.initial_selection_picture, 'initial_selection_picture');
+          console.log(checkbox.initial_selection_picture);
+        }
+      } else if (content.type === "radio_button") {
+        let radioButton = content.radio_button;
+        console.log(radioButton)
+        if (radioButton.initial_selection) {
+          onChangeValue(indexContent, content.type, radioButton.initial_selection, 'initial_selection');
         }
       }
     })
