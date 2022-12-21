@@ -832,10 +832,9 @@ function Report() {
             let lBPC = 0;
             let lBTB = 0;
             let lBSP = 0;
-            let exportCV
-            exportCV = searchVal.device == 'all' ? [['集計期間', 'CV PC', 'CV タブレット', 'CV スマートフォン']] :
-              (searchVal.device == 'computer;' ? [['集計期間', 'CV PC']] : (searchVal.device == 'tablet' ?
-                [['集計期間', 'CV タブレット']] : [['集計期間', 'CV スマートフォン']]));
+            let exportCV = (searchVal.device == 'all' ? [['集計期間', 'CV PC', 'CV タブレット', 'CV スマートフォン']] :
+              (searchVal.device == 'computer' ? [['集計期間', 'CV PC']] : (searchVal.device == 'tablet' ?
+                [['集計期間', 'CV タブレット']] : [['集計期間', 'CV スマートフォン']])));
 
             let exportCVR = [
               [
@@ -844,7 +843,7 @@ function Report() {
               ],
             ];
             exportCVR.push(searchVal.device == 'all' ? ['CV PC', 'CV タブレット', 'CV スマートフォン', 'CV合計数', 'BOT開始'] :
-              (searchVal == 'computer' ? ['CV PC', 'CV合計数', 'BOT開始'] : (searchVal == 'tablet' ? ['CV タブレット', 'CV合計数', 'BOT開始'] : ['CV スマートフォン', 'CV合計数', 'BOT開始'])));
+              (searchVal.device == 'computer' ? ['CV PC', 'CV合計数', 'BOT開始'] : (searchVal.device == 'tablet' ? ['CV タブレット', 'CV合計数', 'BOT開始'] : ['CV スマートフォン', 'CV合計数', 'BOT開始'])));
             let exportCTR = [
               [
                 '集計期間',
