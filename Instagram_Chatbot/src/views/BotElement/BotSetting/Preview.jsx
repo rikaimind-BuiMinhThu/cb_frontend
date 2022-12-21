@@ -508,6 +508,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                     if (isPauseScroll === false) {
                       scrollToBottom();
                     }
+                  }).then(() => {
+                    // document.getElementById(`sp-body-user-side-${i}`).style.animation = 'moveRight 2s linear';
                   }).catch((error) => {
                     console.log(error);
                     if (error.response?.data.code === 0) {
@@ -891,7 +893,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
-        } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+        } else if (contentArr[i].type !== 'credit_card_payment' && stringNullOrEmpty(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
           isValid = false;
         } else if ((limitFrom || limitTo) && (contentType[contentType.type]?.value?.length < limitFrom || contentType[contentType.type]?.value?.length > limitTo)) {
@@ -899,24 +901,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           isValid = false;
         }
       } else {
-        if (contentArr[i].type === 'credit_card_payment') {
-          if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
-            || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
-            || (contentType.separate_type === true && (stringNullOrEmpty(contentType.card_number1) || stringNullOrEmpty(contentType.card_number2) || stringNullOrEmpty(contentType.card_number3) || stringNullOrEmpty(contentType.card_number4)))
-            || (contentType.separate_type === false && stringNullOrEmpty(contentType.card_number))
-            || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
-            || (stringNullOrEmpty(contentType.year))
-            || (stringNullOrEmpty(contentType.month))
-          ) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
-            isValid = false;
-          } else if ((contentType.card_number && (contentType.card_number + "").length !== 16) ||
-            ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
-              ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "クレジットカード番号は無効です。";
-            isValid = false;
-          }
-        } else if (contentArr[i].type === 'checkbox') {
+        if (contentArr[i].type === 'checkbox') {
           if (contentType.type !== 'checkbox_img' && contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
             isValid = false;
@@ -1046,6 +1031,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
           isValid = false;
         }
+      } else if (contentArr[i].type === 'product_purchase' && contentType.initial_selection.length !== 0) {
+        console.log(contentType);
+        contentType.initial_selection.forEach((item, index) => {
+          contentType.products.forEach((itemProduct, indexProduct) => {
+            console.log(itemProduct.quantity_select)
+            if (item === itemProduct.id && !itemProduct.quantity_select) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${indexProduct}`] = messageError;
+              isValid = false;
+            }
+          })
+        })
       } else if (contentType.type === 'password_confirmation') {
         if ((!stringNullOrEmpty(contentType[contentType.type].value)
           || !stringNullOrEmpty(contentType[contentType.type].valueConfirm))
@@ -1162,6 +1158,26 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
       } else if (contentArr[i].type === 'attaching_file' && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
         errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`];
         isValid = false;
+      } else if (contentArr[i].type === 'credit_card_payment') {
+        if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
+          || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
+          || (contentType.separate_type === true && (stringNullOrEmpty(contentType.card_number1) || stringNullOrEmpty(contentType.card_number2) || stringNullOrEmpty(contentType.card_number3) || stringNullOrEmpty(contentType.card_number4)))
+          || (contentType.separate_type === false && stringNullOrEmpty(contentType.card_number))
+          || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
+          || (stringNullOrEmpty(contentType.year))
+          || (stringNullOrEmpty(contentType.month))
+        ) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+          isValid = false;
+        } else if ((contentType.card_number && (contentType.card_number + "").length !== 16) ||
+          ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
+            ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "クレジットカード番号は無効です。";
+          isValid = false;
+        } else if (moment(`${contentType.year}-${contentType.month}}`, "YYYY-MM").isBefore(moment().format("YYYY-MM"))) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "有効期限に誤りがあるために、決済を完了できませんでした。";
+          isValid = false;
+        }
       }
       if (contentArr[i].type === 'text_input' && contentType[contentType.type].range && contentType[contentType.type].range !== 'no_input'
         && (!stringNullOrEmpty(contentType[contentType.type].value) || !stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))) {
@@ -1705,7 +1721,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
       dataMessages[indexMessageRender].message_content[indexContent][contentType][field] = value;
     }
 
-    if (contentType === 'product_purchase') {
+    if (contentType === 'product_purchase' && field === 'initial_selection') {
       let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
 
       let arrayCode = [];
@@ -1812,7 +1828,10 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             item.default_value = `${moment(value).format("YYYY-MM-DD")}`
           } else if (field === 'phone_number') {
             item.default_value = `${dataContentType[field]?.value1}-${dataContentType[field]?.value2}-${dataContentType[field]?.value3}`
-          } else {
+          } else if (contentType === 'carousel') {
+            console.log(dataContentType)
+            item.default_value = dataContentType[dataContentType.type].contents.find(item => item.id === value).title;
+          } else if (contentType !== 'credit_card_payment') {
             item.default_value = value;
           }
         }
@@ -1869,7 +1888,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
   return (
     scenarioId && botInfor ?
       <React.Fragment>
-        <div id="sp-container" className="sp-container">
+        <div id="sp-container" className="sp-container slideUp">
           <div id="sp-withdrawal-container" className="sp-withdrawal-container">
           </div>
           <div id="sp-withdrawal-content" className="sp-withdrawal-content">
@@ -1961,7 +1980,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                     setCities(value);
                     setTowns(null);
                     setZipcode(null);
-
                     if (value) {
                       let city_jis_code = dataCities.find(item => item.city_name === value).city_jis_code;
                       api.get(`/api/v1/towns?city_jis_code=${city_jis_code}`).then(res => {
@@ -2055,8 +2073,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             </div>
           </div>
           <div id="sp-process-bar" className="sp-process-bar" style={{ backgroundColor: botInfor?.opacity_color }}>
-            <div className="sp-process-bar-color" style={{ width: `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%`, ...botInfor?.main_color && { backgroundColor: botInfor?.main_color, backgroundImage: `linear-gradient(to right, ${botInfor?.gardient_color}, ${botInfor?.main_color})` } }}>
-              {messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。"}
+            <div className="sp-process-bar-color animation" style={{ width: indexUser ? `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` : '100%', ...botInfor?.main_color && { backgroundColor: botInfor?.main_color, backgroundImage: `linear-gradient(to right, ${botInfor?.gardient_color}, ${botInfor?.main_color})` } }}>
+              {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。") : `あと${messageUser.length}間`}
             </div>
           </div>
           {console.log(botInfor?.opacity_color)}
@@ -2076,7 +2094,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                       })
                     }
                     {message.belong_to === 'user' &&
-                      <div className="sp-body-user-side">
+                      <div
+                        // id={`sp-body-user-side-${indexMessage}`} 
+                        className="sp-body-user-side slideLeft">
                         <div className="sp-body-user-side-messages">
                           <UserMessage
                             captcha={captcha}
@@ -2131,7 +2151,7 @@ const BotMessage = ({ content, index, botInfor }) => {
   }
 
   return (
-    <div key={index} className="sp-body-bot-side">
+    <div key={index} className="sp-body-bot-side slideRight">
       {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay') && (
         <div className="sp-body-bot-side-avatar sp-avatar">
           <img src={"https://ec-chatbot-test1.com/" + botInfor?.icon?.url} />
@@ -3868,7 +3888,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         <textarea
                           name="ss-message__content--user-agree_to_term-detail_content"
                           id=""
-                          rows="5"
+                          rows={agreeTerm[agreeTerm.type].content?.length > 200 ? 8 : 5}
                           value={agreeTerm[agreeTerm.type].content}
                           className="ss-input-value"
                           readOnly
@@ -4272,40 +4292,53 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                   </div>
                                 </Checkbox>
                                 {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
-                                  <InputNum
-                                    style={{ width: '60%', marginLeft: '27px' }}
-                                    value={itemProduct.quantity_select}
-                                    onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
-                                    controls={false}
-                                    min={1}
-                                    max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
-                                    addonAfter={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                        }
-                                        let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
-                                          selectArr.push(itemProduct.id);
-                                          onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
-                                        }
-                                      }}
-                                    >+</div>}
-                                    addonBefore={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (itemProduct.quantity_select > 1) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
-                                        }
-                                        let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
-                                          selectArr.push(itemProduct.id);
-                                          onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
-                                        }
-                                      }}
-                                    >-</div>}
-                                  />
+                                  <div>
+                                    <InputNum
+                                      className="sp-product-purchase-custom-input-quantity"
+                                      style={{ width: '46%', marginLeft: '137px' }}
+                                      value={itemProduct.quantity_select}
+                                      onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
+                                      controls={false}
+                                      min={1}
+                                      disabled={disabled}
+                                      max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
+                                      addonAfter={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              selectArr.push(itemProduct.id);
+                                              onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                            }
+                                          }
+                                        }}
+                                      >+</div>}
+                                      addonBefore={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select > 1) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              selectArr.push(itemProduct.id);
+                                              onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                            }
+                                          }
+                                        }}
+                                      >-</div>}
+                                    />
+                                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
+                                      <div style={{ color: '#FF7E00', fontSize: '12px', width: '46%', marginLeft: '137px' }}>
+                                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
+                                      </div>
+                                    }
+                                  </div>
                                 }
                               </div>
                             })}
@@ -4377,33 +4410,39 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                 {
                                   (productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
                                   <InputNum
-                                    style={{ width: '60%', marginLeft: '27px' }}
+                                    className="sp-product-purchase-custom-input-quantity"
+                                    style={{ width: '46%', marginLeft: '137px' }}
                                     value={itemProduct.quantity_select}
                                     onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
                                     controls={false}
+                                    disabled={disabled}
                                     min={1}
                                     max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
                                     addonAfter={<div
                                       style={{ padding: '4px 11px', cursor: 'pointer' }}
                                       onClick={() => {
-                                        if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                        }
-                                        let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
-                                          onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                        if (!disabled) {
+                                          if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                          }
+                                          let selectArr = [...productPurchase.initial_selection];
+                                          if (!selectArr.includes(itemProduct.id)) {
+                                            onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                          }
                                         }
                                       }}
                                     >+</div>}
                                     addonBefore={<div
                                       style={{ padding: '4px 11px', cursor: 'pointer' }}
                                       onClick={() => {
-                                        if (itemProduct.quantity_select > 1) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
-                                        }
-                                        let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
-                                          onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                        if (!disabled) {
+                                          if (itemProduct.quantity_select > 1) {
+                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                          }
+                                          let selectArr = [...productPurchase.initial_selection];
+                                          if (!selectArr.includes(itemProduct.id)) {
+                                            onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                          }
                                         }
                                       }}
                                     >-</div>}
@@ -4457,35 +4496,41 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                 </Checkbox>
                                 {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
                                   <InputNum
+                                    className="sp-product-purchase-custom-input-quantity"
                                     value={itemProduct.quantity_select}
                                     onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
                                     controls={false}
                                     min={1}
+                                    disabled={disabled}
                                     style={{ width: '60%' }}
                                     max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
                                     addonAfter={<div
                                       style={{ padding: '4px 11px', cursor: 'pointer' }}
                                       onClick={() => {
-                                        if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                        }
-                                        let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
-                                          selectArr.push(itemProduct.id);
-                                          onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                        if (!disabled) {
+                                          if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                          }
+                                          let selectArr = [...productPurchase.initial_selection];
+                                          if (!selectArr.includes(itemProduct.id)) {
+                                            selectArr.push(itemProduct.id);
+                                            onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                          }
                                         }
                                       }}
                                     >+</div>}
                                     addonBefore={<div
                                       style={{ padding: '4px 11px', cursor: 'pointer' }}
                                       onClick={() => {
-                                        if (itemProduct.quantity_select > 1) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
-                                        }
-                                        let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
-                                          selectArr.push(itemProduct.id);
-                                          onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                        if (!disabled) {
+                                          if (itemProduct.quantity_select > 1) {
+                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                          }
+                                          let selectArr = [...productPurchase.initial_selection];
+                                          if (!selectArr.includes(itemProduct.id)) {
+                                            selectArr.push(itemProduct.id);
+                                            onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                          }
                                         }
                                       }}
                                     >-</div>}
@@ -4534,7 +4579,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                 </Radio>
                                 {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
                                   <InputNum
+                                    className="sp-product-purchase-custom-input-quantity"
                                     style={{ width: '60%' }}
+                                    disabled={disabled}
                                     value={itemProduct.quantity_select}
                                     onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
                                     controls={false}
@@ -4543,24 +4590,28 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     addonAfter={<div
                                       style={{ padding: '4px 11px', cursor: 'pointer' }}
                                       onClick={() => {
-                                        if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                        }
-                                        let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
-                                          onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                        if (!disabled) {
+                                          if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                          }
+                                          let selectArr = [...productPurchase.initial_selection];
+                                          if (!selectArr.includes(itemProduct.id)) {
+                                            onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                          }
                                         }
                                       }}
                                     >+</div>}
                                     addonBefore={<div
                                       style={{ padding: '4px 11px', cursor: 'pointer' }}
                                       onClick={() => {
-                                        if (itemProduct.quantity_select > 1) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
-                                        }
-                                        let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
-                                          onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                        if (!disabled) {
+                                          if (itemProduct.quantity_select > 1) {
+                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                          }
+                                          let selectArr = [...productPurchase.initial_selection];
+                                          if (!selectArr.includes(itemProduct.id)) {
+                                            onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                          }
                                         }
                                       }}
                                     >-</div>}
