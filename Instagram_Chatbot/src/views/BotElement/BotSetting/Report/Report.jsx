@@ -51,9 +51,8 @@ function Report() {
   const [allClient, setAllClient] = useState([]);
   const [currentClientId, setCurrentClientId] = useState('deel');
 
-  const [startDateEx, setStartDateEx] = useState()
-  const [endDateEx, setEndDateEx] = useState()
-
+  const [startDateEx, setStartDateEx] = useState();
+  const [endDateEx, setEndDateEx] = useState();
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
@@ -115,8 +114,8 @@ function Report() {
                 )
                   .toISOString()
                   .slice(0, 10)}&end_date=${new Date(new Date().setDate(new Date().getDate() - 1))
-                    .toISOString()
-                    .slice(0, 10)}`
+                  .toISOString()
+                  .slice(0, 10)}`
               )
               .then((res) => {
                 // console.log('bot data: ', res.data);
@@ -205,16 +204,19 @@ function Report() {
               });
             api
               .get(
-                `/api/v1/analytics/scenario_counts/${dataScenario[0].id
+                `/api/v1/analytics/scenario_counts/${
+                  dataScenario[0].id
                 }/download?begin_date=${new Date(new Date().setDate(1))
                   .toISOString()
                   .slice(0, 10)}&end_date=${new Date(new Date().setDate(new Date().getDate() - 1))
-                    .toISOString()
-                    .slice(0, 10)}`
+                  .toISOString()
+                  .slice(0, 10)}`
               )
               .then((res) => {
-                setStartDateEx(new Date(new Date().setDate(1)).toISOString().slice(0, 10))
-                setEndDateEx(new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10))
+                setStartDateEx(new Date(new Date().setDate(1)).toISOString().slice(0, 10));
+                setEndDateEx(
+                  new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().slice(0, 10)
+                );
                 // console.log(`download: `, res.data.data)
                 let exportData = res?.data.data;
                 let totalConversion = 0;
@@ -304,8 +306,8 @@ function Report() {
                   exportClickThrough.push([
                     index.log_date,
                     index.pc_open_chatbot_window_count +
-                    index.smartphone_open_chatbot_window_count +
-                    index.tablet_open_chatbot_window_count,
+                      index.smartphone_open_chatbot_window_count +
+                      index.tablet_open_chatbot_window_count,
                     index.pc_count + index.smartphone_count + index.tablet_count,
                   ]);
                   totalBotStart +=
@@ -322,11 +324,11 @@ function Report() {
                     index.tablet_close_chatbot_window_count,
                     index.smartphone_close_chatbot_window_count,
                     index.pc_open_chatbot_window_count +
-                    index.smartphone_open_chatbot_window_count +
-                    index.tablet_open_chatbot_window_count,
+                      index.smartphone_open_chatbot_window_count +
+                      index.tablet_open_chatbot_window_count,
                     index.pc_close_chatbot_window_count +
-                    index.tablet_close_chatbot_window_count +
-                    index.smartphone_close_chatbot_window_count,
+                      index.tablet_close_chatbot_window_count +
+                      index.smartphone_close_chatbot_window_count,
                   ]);
                   totalBotLeave +=
                     index.pc_close_chatbot_window_count +
@@ -445,11 +447,12 @@ function Report() {
       },
       xaxis: {
         categories: [
-          ` ${CVRCTR === false
-            ? numOfOpenBot === 0
-              ? `CVR: 0`
-              : `CVR: ${Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)}`
-            : numOfBotStart === 0
+          ` ${
+            CVRCTR === false
+              ? numOfOpenBot === 0
+                ? `CVR: 0`
+                : `CVR: ${Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)}`
+              : numOfBotStart === 0
               ? `CTR: 0`
               : `CTR: ${Math.round((numOfOpenBot * 100) / numOfBotStart).toFixed(2)}`
           }%`,
@@ -539,8 +542,9 @@ function Report() {
         floating: true,
       },
       subtitle: {
-        text: `離脱: ${numOfBotStart === 0 ? 0 : Math.round((numOfCloseBot * 100) / numOfBotStart).toFixed(2)
-          }%`,
+        text: `離脱: ${
+          numOfBotStart === 0 ? 0 : Math.round((numOfCloseBot * 100) / numOfBotStart).toFixed(2)
+        }%`,
         align: 'center',
       },
       tooltip: {
@@ -613,8 +617,9 @@ function Report() {
         floating: true,
       },
       subtitle: {
-        text: `CTR (BOT開始数/BOT起動数: ${numOfBotStart === 0 ? 0 : Math.round((conversionCVRCTR * 100) / numOfBotStart).toFixed(2)
-          }%`,
+        text: `CTR (BOT開始数/BOT起動数: ${
+          numOfBotStart === 0 ? 0 : Math.round((conversionCVRCTR * 100) / numOfBotStart).toFixed(2)
+        }%`,
         align: 'center',
       },
       tooltip: {
@@ -710,25 +715,15 @@ function Report() {
             `/api/v1/analytics/scenario_counts/${searchVal.scenarioId}?begin_date=${searchVal.startDate}&end_date=${searchVal.endDate}`
           )
           .then((res) => {
-            setStartDateEx(searchVal.startDate)
-            setEndDateEx(searchVal.endDate)
+            setStartDateEx(searchVal.startDate?.replaceAll('/', '-'));
+            setEndDateEx(searchVal.endDate?.replaceAll('/', '-'));
             // console.log('search data: ', res.data);
             setListContent(res.data?.scenario_pages);
             //set page export
             let pages = res.data?.scenario_pages;
-            let startPageExportData = [
-              [
-                '集計期間',
-                `${searchVal.startDate}~${searchVal.endDate}`,
-              ],
-            ];
+            let startPageExportData = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
             startPageExportData.push(['開始ページ', 'CV数', 'URLs']);
-            let contentPageExport = [
-              [
-                '集計期間',
-                `${searchVal.startDate}~${searchVal.endDate}`,
-              ],
-            ];
+            let contentPageExport = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
             contentPageExport.push(['開始ページ', 'CV数', 'URLs']);
             pages.forEach((index) => {
               startPageExportData.push([index.num_of_start, index.num_of_cv, index.url]);
@@ -832,104 +827,189 @@ function Report() {
             let lBPC = 0;
             let lBTB = 0;
             let lBSP = 0;
-            let exportCV = (searchVal.device == 'all' ? [['集計期間', 'CV PC', 'CV タブレット', 'CV スマートフォン']] :
-              (searchVal.device == 'computer' ? [['集計期間', 'CV PC']] : (searchVal.device == 'tablet' ?
-                [['集計期間', 'CV タブレット']] : [['集計期間', 'CV スマートフォン']])));
+            let exportCV =
+              searchVal.device == 'all'
+                ? [['集計期間', 'CV PC', 'CV タブレット', 'CV スマートフォン']]
+                : searchVal.device == 'computer'
+                ? [['集計期間', 'CV PC']]
+                : searchVal.device == 'tablet'
+                ? [['集計期間', 'CV タブレット']]
+                : [['集計期間', 'CV スマートフォン']];
 
-            let exportCVR = [
-              [
-                '集計期間',
-                `${searchVal.startDate}~${searchVal.endDate}`,
-              ],
-            ];
-            exportCVR.push(searchVal.device == 'all' ? ['CV PC', 'CV タブレット', 'CV スマートフォン', 'CV合計数', 'BOT開始'] :
-              (searchVal.device == 'computer' ? ['CV PC', 'CV合計数', 'BOT開始'] : (searchVal.device == 'tablet' ? ['CV タブレット', 'CV合計数', 'BOT開始'] : ['CV スマートフォン', 'CV合計数', 'BOT開始'])));
-            let exportCTR = [
-              [
-                '集計期間',
-                `${searchVal.startDate}~${searchVal.endDate}`,
-              ],
-            ];
+            let exportCVR = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
+            exportCVR.push(
+              searchVal.device == 'all'
+                ? ['CV PC', 'CV タブレット', 'CV スマートフォン', 'CV合計数', 'BOT開始']
+                : searchVal.device == 'computer'
+                ? ['CV PC', 'CV合計数', 'BOT開始']
+                : searchVal.device == 'tablet'
+                ? ['CV タブレット', 'CV合計数', 'BOT開始']
+                : ['CV スマートフォン', 'CV合計数', 'BOT開始']
+            );
+            let exportCTR = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
             let exportClickThrough = [['集計期間', 'BOT開始', 'BOT起動']];
             let exportBotLeave = [
-              searchVal.device == 'all' ? ['集計期間', 'PC離脱', 'タブレット離脱', 'スマートフォン離脱', 'BOT開始', 'BOT離脱'] :
-                (searchVal.device == 'computer' ? ['集計期間', 'PC離脱', 'BOT開始', 'BOT離脱'] :
-                  (searchVal.device == 'tablet' ? ['集計期間', 'タブレット離脱', 'BOT開始', 'BOT離脱'] : ['集計期間', 'スマートフォン離脱', 'BOT開始', 'BOT離脱'])),
+              searchVal.device == 'all'
+                ? [
+                    '集計期間',
+                    'PC離脱',
+                    'タブレット離脱',
+                    'スマートフォン離脱',
+                    'BOT開始',
+                    'BOT離脱',
+                  ]
+                : searchVal.device == 'computer'
+                ? ['集計期間', 'PC離脱', 'BOT開始', 'BOT離脱']
+                : searchVal.device == 'tablet'
+                ? ['集計期間', 'タブレット離脱', 'BOT開始', 'BOT離脱']
+                : ['集計期間', 'スマートフォン離脱', 'BOT開始', 'BOT離脱'],
             ];
-            exportCTR.push(searchVal.device == 'all' ? ['CT PC', 'CT タブレット', 'CT スマートフォン', 'CT合計数', 'BOT開始'] :
-              searchVal.device == 'computer' ? ['CT PC', 'CT合計数', 'BOT開始'] : (searchVal.device == 'tablet' ? ['CT タブレット', 'CT合計数', 'BOT開始'] : ['CT スマートフォン', 'CT合計数', 'BOT開始']));
-            let exportLeaveBotRate = [
-              [
-                '集計期間',
-                `${searchVal.startDate}~${searchVal.endDate}`,
-              ],
-            ];
-            exportLeaveBotRate.push(searchVal.device == 'all' ? ['PC', 'タブレット', 'スマートフォン', '合計', 'BOT開始'] :
-              (searchVal.device == 'computer' ? ['PC', '合計', 'BOT開始'] : (searchVal.device == 'tablet'
-                ? ['タブレット', '合計', 'BOT開始'] : ['スマートフォン', '合計', 'BOT開始'])));
+            exportCTR.push(
+              searchVal.device == 'all'
+                ? ['CT PC', 'CT タブレット', 'CT スマートフォン', 'CT合計数', 'BOT開始']
+                : searchVal.device == 'computer'
+                ? ['CT PC', 'CT合計数', 'BOT開始']
+                : searchVal.device == 'tablet'
+                ? ['CT タブレット', 'CT合計数', 'BOT開始']
+                : ['CT スマートフォン', 'CT合計数', 'BOT開始']
+            );
+            let exportLeaveBotRate = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
+            exportLeaveBotRate.push(
+              searchVal.device == 'all'
+                ? ['PC', 'タブレット', 'スマートフォン', '合計', 'BOT開始']
+                : searchVal.device == 'computer'
+                ? ['PC', '合計', 'BOT開始']
+                : searchVal.device == 'tablet'
+                ? ['タブレット', '合計', 'BOT開始']
+                : ['スマートフォン', '合計', 'BOT開始']
+            );
             exportData.forEach((index) => {
-              exportCV.push(searchVal.device == 'all' ?
-                [
-                  index.log_date, index.pc_conversion_count, index.tablet_conversion_count, index.smartphone_conversion_count,
-                ] : (searchVal.device == 'computer' ?
-                  [
-                    index.log_date, index.pc_conversion_count
-                  ] : (searchVal.device == 'tablet' ?
-                    [
-                      index.log_date, index.tablet_conversion_count
-                    ] : [
-                      index.log_date, index.smartphone_conversion_count])));
-              totalConversion += searchVal.device == 'all' ?
-                (index.pc_conversion_count + index.tablet_conversion_count + index.smartphone_conversion_count) : (searchVal.device == 'computer' ?
-                  index.pc_conversion_count : (searchVal.device == 'tablet' ? index.tablet_conversion_count : index.smartphone_conversion_count));
+              exportCV.push(
+                searchVal.device == 'all'
+                  ? [
+                      index.log_date,
+                      index.pc_conversion_count,
+                      index.tablet_conversion_count,
+                      index.smartphone_conversion_count,
+                    ]
+                  : searchVal.device == 'computer'
+                  ? [index.log_date, index.pc_conversion_count]
+                  : searchVal.device == 'tablet'
+                  ? [index.log_date, index.tablet_conversion_count]
+                  : [index.log_date, index.smartphone_conversion_count]
+              );
+              totalConversion +=
+                searchVal.device == 'all'
+                  ? index.pc_conversion_count +
+                    index.tablet_conversion_count +
+                    index.smartphone_conversion_count
+                  : searchVal.device == 'computer'
+                  ? index.pc_conversion_count
+                  : searchVal.device == 'tablet'
+                  ? index.tablet_conversion_count
+                  : index.smartphone_conversion_count;
 
               cvrPC += index.pc_conversion_count;
               cvrTB += index.tablet_conversion_count;
               cvrSP += index.smartphone_conversion_count;
               exportClickThrough.push([
-                index.log_date, (searchVal.device == 'all' ? (index.pc_open_chatbot_window_count + index.smartphone_open_chatbot_window_count + index.tablet_open_chatbot_window_count) :
-                  searchVal.device == 'computer' ? index.pc_open_chatbot_window_count : (searchVal.device == 'tablet' ? index.tablet_open_chatbot_window_count : index.smartphone_open_chatbot_window_count)),
-                (searchVal.device == 'all' ? (index.pc_count + index.smartphone_count + index.tablet_count) : (searchVal.device == 'computer' ? index.pc_count :
-                  (searchVal == 'tablet' ? index.tablet_count : index.smartphone_count))),
+                index.log_date,
+                searchVal.device == 'all'
+                  ? index.pc_open_chatbot_window_count +
+                    index.smartphone_open_chatbot_window_count +
+                    index.tablet_open_chatbot_window_count
+                  : searchVal.device == 'computer'
+                  ? index.pc_open_chatbot_window_count
+                  : searchVal.device == 'tablet'
+                  ? index.tablet_open_chatbot_window_count
+                  : index.smartphone_open_chatbot_window_count,
+                searchVal.device == 'all'
+                  ? index.pc_count + index.smartphone_count + index.tablet_count
+                  : searchVal.device == 'computer'
+                  ? index.pc_count
+                  : searchVal == 'tablet'
+                  ? index.tablet_count
+                  : index.smartphone_count,
               ]);
-              totalBotStart += (searchVal.device == 'all' ? (index.pc_open_chatbot_window_count + index.smartphone_open_chatbot_window_count + index.tablet_open_chatbot_window_count) :
-                (searchVal.device == 'computer' ? index.pc_open_chatbot_window_count : (searchVal.device == 'tablet' ? index.tablet_open_chatbot_window_count : index.smartphone_open_chatbot_window_count)))
-                ;
-              totalBotOpen += searchVal.device == 'all' ? (index.pc_count + index.smartphone_count + index.tablet_count) :
-                (searchVal.device == 'computer' ? index.pc_count : (searchVal.device == 'tablet' ? index.tablet_count : index.smartphone_count));
+              totalBotStart +=
+                searchVal.device == 'all'
+                  ? index.pc_open_chatbot_window_count +
+                    index.smartphone_open_chatbot_window_count +
+                    index.tablet_open_chatbot_window_count
+                  : searchVal.device == 'computer'
+                  ? index.pc_open_chatbot_window_count
+                  : searchVal.device == 'tablet'
+                  ? index.tablet_open_chatbot_window_count
+                  : index.smartphone_open_chatbot_window_count;
+              totalBotOpen +=
+                searchVal.device == 'all'
+                  ? index.pc_count + index.smartphone_count + index.tablet_count
+                  : searchVal.device == 'computer'
+                  ? index.pc_count
+                  : searchVal.device == 'tablet'
+                  ? index.tablet_count
+                  : index.smartphone_count;
               ctrPC += index.pc_open_chatbot_window_count;
               ctrTB += index.tablet_open_chatbot_window_count;
               ctrSP += index.smartphone_open_chatbot_window_count;
               exportBotLeave.push(
-                searchVal.device == 'all' ?
-                  [index.log_date, index.pc_close_chatbot_window_count, index.tablet_close_chatbot_window_count, index.smartphone_close_chatbot_window_count,
-                  index.pc_open_chatbot_window_count + index.smartphone_open_chatbot_window_count + index.tablet_open_chatbot_window_count,
-                  index.pc_close_chatbot_window_count + index.tablet_close_chatbot_window_count + index.smartphone_close_chatbot_window_count,]
-                  : (searchVal.device == 'computer' ?
-                    [index.log_date, index.pc_close_chatbot_window_count,
-                    index.pc_open_chatbot_window_count,
-                    index.pc_close_chatbot_window_count,]
-                    : (searchVal.device == 'tablet' ?
-                      [index.log_date, index.tablet_close_chatbot_window_count,
+                searchVal.device == 'all'
+                  ? [
+                      index.log_date,
+                      index.pc_close_chatbot_window_count,
+                      index.tablet_close_chatbot_window_count,
+                      index.smartphone_close_chatbot_window_count,
+                      index.pc_open_chatbot_window_count +
+                        index.smartphone_open_chatbot_window_count +
+                        index.tablet_open_chatbot_window_count,
+                      index.pc_close_chatbot_window_count +
+                        index.tablet_close_chatbot_window_count +
+                        index.smartphone_close_chatbot_window_count,
+                    ]
+                  : searchVal.device == 'computer'
+                  ? [
+                      index.log_date,
+                      index.pc_close_chatbot_window_count,
+                      index.pc_open_chatbot_window_count,
+                      index.pc_close_chatbot_window_count,
+                    ]
+                  : searchVal.device == 'tablet'
+                  ? [
+                      index.log_date,
+                      index.tablet_close_chatbot_window_count,
                       index.tablet_open_chatbot_window_count,
-                      index.smartphone_close_chatbot_window_count,]
-                      :
-                      [index.log_date, index.smartphone_close_chatbot_window_count,
+                      index.smartphone_close_chatbot_window_count,
+                    ]
+                  : [
+                      index.log_date,
+                      index.smartphone_close_chatbot_window_count,
                       index.smartphone_open_chatbot_window_count,
-                      index.smartphone_close_chatbot_window_count,]
-                    )
-                  )
+                      index.smartphone_close_chatbot_window_count,
+                    ]
               );
-              totalBotLeave += (searchVal.device == 'all' ? (index.pc_close_chatbot_window_count + index.tablet_close_chatbot_window_count + index.smartphone_close_chatbot_window_count) :
-                (searchVal.device == 'computer' ? index.pc_close_chatbot_window_count : (searchVal.device == 'tablet' ? index.tablet_close_chatbot_window_count : index.smartphone_close_chatbot_window_count)))
-                ;
+              totalBotLeave +=
+                searchVal.device == 'all'
+                  ? index.pc_close_chatbot_window_count +
+                    index.tablet_close_chatbot_window_count +
+                    index.smartphone_close_chatbot_window_count
+                  : searchVal.device == 'computer'
+                  ? index.pc_close_chatbot_window_count
+                  : searchVal.device == 'tablet'
+                  ? index.tablet_close_chatbot_window_count
+                  : index.smartphone_close_chatbot_window_count;
               lBPC += index.pc_close_chatbot_window_count;
               lBTB += index.tablet_close_chatbot_window_count;
               lBSP += index.smartphone_close_chatbot_window_count;
             });
-            exportCVR.push(searchVal.device == 'all' ? [cvrPC, cvrTB, cvrSP, totalConversion, totalBotOpen]
-              : (searchVal.device == 'computer' ? [cvrPC, totalConversion, totalBotOpen] : searchVal.device == 'tablet' ?
-                [cvrTB, totalConversion, totalBotOpen] : [cvrSP, totalConversion, totalBotOpen]));
+            exportCVR.push(
+              searchVal.device == 'all'
+                ? [cvrPC, cvrTB, cvrSP, totalConversion, totalBotOpen]
+                : searchVal.device == 'computer'
+                ? [cvrPC, totalConversion, totalBotOpen]
+                : searchVal.device == 'tablet'
+                ? [cvrTB, totalConversion, totalBotOpen]
+                : [cvrSP, totalConversion, totalBotOpen]
+            );
             exportCVR.push([
               '',
               'CVR',
@@ -937,8 +1017,15 @@ function Report() {
               '',
               '',
             ]);
-            exportCTR.push(searchVal.device == 'all' ? [ctrPC, ctrTB, ctrSP, totalBotStart, totalBotOpen] : (searchVal.device == 'computer' ?
-              [ctrPC, totalBotStart, totalBotOpen] : (searchVal.device == 'tablet' ? [ctrTB, totalBotStart, totalBotOpen] : [ctrSP, totalBotStart, totalBotOpen])));
+            exportCTR.push(
+              searchVal.device == 'all'
+                ? [ctrPC, ctrTB, ctrSP, totalBotStart, totalBotOpen]
+                : searchVal.device == 'computer'
+                ? [ctrPC, totalBotStart, totalBotOpen]
+                : searchVal.device == 'tablet'
+                ? [ctrTB, totalBotStart, totalBotOpen]
+                : [ctrSP, totalBotStart, totalBotOpen]
+            );
             exportCTR.push([
               '',
               'CTR',
@@ -946,9 +1033,15 @@ function Report() {
               '',
               '',
             ]);
-            exportLeaveBotRate.push(searchVal.device == 'all' ? [lBPC, lBTB, lBSP, totalBotLeave, totalBotStart] :
-              (searchVal.device == 'computer' ? [lBPC, totalBotLeave, totalBotStart] :
-                (searchVal.device == 'tablet' ? [lBTB, totalBotLeave, totalBotStart] : [lBSP, totalBotLeave, totalBotStart])));
+            exportLeaveBotRate.push(
+              searchVal.device == 'all'
+                ? [lBPC, lBTB, lBSP, totalBotLeave, totalBotStart]
+                : searchVal.device == 'computer'
+                ? [lBPC, totalBotLeave, totalBotStart]
+                : searchVal.device == 'tablet'
+                ? [lBTB, totalBotLeave, totalBotStart]
+                : [lBSP, totalBotLeave, totalBotStart]
+            );
             exportLeaveBotRate.push([
               '',
               '',
@@ -958,7 +1051,7 @@ function Report() {
             ]);
             exportCV.push(['', '合計', totalConversion, '']);
             exportClickThrough.push(['合計', totalBotStart, totalBotOpen]);
-            exportBotLeave.push(['', '合計', totalBotStart, totalBotOpen, '', '',]);
+            exportBotLeave.push(['', '合計', totalBotStart, totalBotOpen, '', '']);
             setConversionExport(exportCV);
             setClickThroughExport(exportClickThrough);
             setLeaveBotExport(exportBotLeave);
@@ -990,9 +1083,9 @@ function Report() {
   }
 
   const [startPage, setStartPage] = useState(true);
-  function startPageContent() { }
+  function startPageContent() {}
 
-  function cvPageContent() { }
+  function cvPageContent() {}
 
   // handle export
   const handleExport = async () => {
@@ -1015,7 +1108,7 @@ function Report() {
       utils.book_append_sheet(wb, ws3, '離脱数');
       utils.book_append_sheet(wb, startPage, '開始ページ');
       utils.book_append_sheet(wb, cvPage, 'CVページ');
-      writeFileXLSX(wb, `Export ${startDateEx}~${endDateEx}.xlsx`);
+      writeFileXLSX(wb, `Export ${startDateEx}_${endDateEx}.xlsx`);
     } catch (error) {
       console.log(error);
     }
@@ -1042,7 +1135,7 @@ function Report() {
         .then((res) => {
           console.log('da: ', res.data);
           // if (res.data?.code === 1) {
-            setAllScenarios(res.data?.data);
+          setAllScenarios(res.data?.data);
           // }
         })
         .catch((error) => {
@@ -1274,23 +1367,23 @@ function Report() {
                             {/* <tr>sdsssd</tr> */}
                             {startPage
                               ? listContent?.map((item, index) => (
-                                <tr key={index}>
-                                  <td>{item.num_of_start}</td>
-                                  <td>{item.num_of_cv}</td>
-                                  <td>{item.url}</td>
-                                </tr>
-                              ))
-                              : listContent?.map((item, index) =>
-                                item.num_of_cv > 0 ? (
                                   <tr key={index}>
                                     <td>{item.num_of_start}</td>
                                     <td>{item.num_of_cv}</td>
                                     <td>{item.url}</td>
                                   </tr>
-                                ) : (
-                                  <tr key={index}></tr>
-                                )
-                              )}
+                                ))
+                              : listContent?.map((item, index) =>
+                                  item.num_of_cv > 0 ? (
+                                    <tr key={index}>
+                                      <td>{item.num_of_start}</td>
+                                      <td>{item.num_of_cv}</td>
+                                      <td>{item.url}</td>
+                                    </tr>
+                                  ) : (
+                                    <tr key={index}></tr>
+                                  )
+                                )}
                           </tbody>
                         </Table>
                       </div>
