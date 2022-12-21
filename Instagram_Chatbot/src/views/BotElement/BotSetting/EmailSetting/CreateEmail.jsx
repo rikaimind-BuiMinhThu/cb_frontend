@@ -19,6 +19,15 @@ function CreateEmail() {
   const [detailEmail, setDetailEmail] = useState();
   const [listCcDetail, setListCcDetail] = useState([]);
   const [listBccDetail, setListBccDetail] = useState([]);
+  const [isAdminDeel, setIsAdminDeel] = useState(false);
+
+  useEffect(() => {
+    if (Cookies.get('user_role') === 'admin_deel') {
+      setIsAdminDeel(true);
+    } else {
+      setIsAdminDeel(false);
+    }
+  }, []);
 
   useEffect(() => {
     const url = window.location.pathname;
