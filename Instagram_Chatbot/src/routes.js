@@ -69,6 +69,7 @@ import PaymentManagement from "views/BotElement/PaymentManagement";
 import Payment from "views/BotElement/BotSetting/Payment/Payment";
 import PaymentGateway from "views/BotElement/BotSetting/Payment/PaymentGateway";
 import AddPaymentGateway from "views/BotElement/BotSetting/Payment/AddPaymentGateway";
+import RelpyMailManagement from "views/BotElement/RelpyMailManagement";
 
 var routes = [
   {
@@ -195,6 +196,13 @@ var routes = [
     name: "アカウント情報",
     // icon: "nc-icon nc-single-02",
     component: AccountInformation,
+    layout: "/admin",
+  },
+  {
+    path: "/reply-mail-management",
+    name: "Reply Mail Management",
+    // icon: "nc-icon nc-single-02",
+    component: RelpyMailManagement,
     layout: "/admin",
   },
   {
