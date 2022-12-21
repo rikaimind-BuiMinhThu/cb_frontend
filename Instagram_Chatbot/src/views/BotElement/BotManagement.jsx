@@ -312,7 +312,7 @@ function BotManagement() {
                 </div>
               </CardHeader>
               <CardBody>
-                <Table>
+                <Table className="bl-table">
                   <thead className="text-primary">
                     <tr>
                       <th style={{ width: '10%' }}>No.</th>
@@ -326,45 +326,56 @@ function BotManagement() {
                   <tbody>
                     {botList != []
                       ? botList.map((bot, i) => (
-                        <tr key={bot?.id}>
-                          <td className="border-table-bot">{i + 1}</td>
-                          <td className="border-table-bot" style={{cursor: 'default'}} onClick={() => openBotSetting(bot?.id)}>{bot?.bot_name}</td>
-                          <td className="border-table-bot">{bot?.status}</td>
-                          <td className="border-table-bot">{bot?.owner_name}</td>
-                          <td className="border-table-bot">所有者</td>
-                          <td className="border-table-bot action-table-bot">
-                            <div className="action-wrapper">
-                              <button
-                                className="btn-edit-bot"
-                                onClick={() => openBotSetting(bot?.id)}
-                              >
-                                編集
-                              </button>
-                              <button
-                                className="btn-duplicate-bot"
-                                onClick={() => duplicateBot(bot?.id)}
-                              >
-                                複製
-                              </button>
-                              <Link to={`/admin/demo-bot/${bot?.id}`} onClick={() =>{Cookies.set('bot_id', `${bot?.id}`)}}>
-                                <button className="btn-demo-bot">デモ</button>
-                              </Link>
-                              <button
-                                className="btn-stop-bot"
-                                onClick={() => handleStopBot(bot?.id, bot?.status)}
-                              >
-                                {bot?.status === 'off' ? 'スタート' : 'ストップ'}
-                              </button>
-                              <button
-                                className="btn-delete-bot"
-                                onClick={() => handleDeleteBot(bot?.id)}
-                              >
-                                削除
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))
+                          <tr key={bot?.id}>
+                            <td className="border-table-bot">{i + 1 + 10 * (pageIndex - 1)}</td>
+                            <td
+                              className="border-table-bot bm__bot-name"
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => openBotSetting(bot?.id)}
+                            >
+                              {bot?.bot_name}
+                            </td>
+                            <td className="border-table-bot">{bot?.status}</td>
+                            <td className="border-table-bot">{bot?.owner_name}</td>
+                            <td className="border-table-bot">所有者</td>
+                            <td className="border-table-bot action-table-bot">
+                              <div className="action-wrapper">
+                                <button
+                                  className="btn-edit-bot"
+                                  onClick={() => openBotSetting(bot?.id)}
+                                >
+                                  編集
+                                </button>
+                                <button
+                                  className="btn-duplicate-bot"
+                                  onClick={() => duplicateBot(bot?.id)}
+                                >
+                                  複製
+                                </button>
+                                <Link
+                                  to={`/admin/demo-bot/${bot?.id}`}
+                                  onClick={() => {
+                                    Cookies.set('bot_id', `${bot?.id}`);
+                                  }}
+                                >
+                                  <button className="btn-demo-bot">デモ</button>
+                                </Link>
+                                <button
+                                  className="btn-stop-bot"
+                                  onClick={() => handleStopBot(bot?.id, bot?.status)}
+                                >
+                                  {bot?.status === 'off' ? 'スタート' : 'ストップ'}
+                                </button>
+                                <button
+                                  className="btn-delete-bot"
+                                  onClick={() => handleDeleteBot(bot?.id)}
+                                >
+                                  削除
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
                       : ''}
                   </tbody>
                 </Table>
