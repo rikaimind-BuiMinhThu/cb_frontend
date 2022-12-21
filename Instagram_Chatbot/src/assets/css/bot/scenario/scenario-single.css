@@ -1550,7 +1550,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
   display: flex;
   flex-wrap: wrap;
   padding: 5px 2px;
-  margin-top: 25px;
+  margin-top: 15px;
   overflow-x: auto;
   justify-content: flex-start;
 }

@@ -50,6 +50,8 @@ function ScenarioList() {
             document.getElementById('sp-header').style.position = 'static';
             document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
             document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
+            document.getElementById('sp-header').style.borderTopLeftRadius = "2px";
+            document.getElementById('sp-header').style.borderTopRightRadius = "2px";
             document.getElementById('sp-process-bar').style.display = 'block';
             document.getElementById('sp-body').style.display = 'block';
         } else {
@@ -58,6 +60,8 @@ function ScenarioList() {
             document.getElementById('sp-body').style.display = 'none';
             document.getElementById('sp-header').style.borderBottomLeftRadius = '25px';
             document.getElementById('sp-header').style.borderBottomRightRadius = '25px';
+            document.getElementById('sp-header').style.borderTopLeftRadius = "25px";
+            document.getElementById('sp-header').style.borderTopRightRadius = "25px";
             document.getElementById('sp-header').style.position = 'absolute';
             document.getElementById('sp-header').style.bottom = '13px';
         }
