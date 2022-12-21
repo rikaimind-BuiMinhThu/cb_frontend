@@ -338,6 +338,20 @@ function Sidebar(props) {
                   </NavLink>
                 </li>
                 <li
+                  className={activeRoute('reply-mail-management') + (true ? ' active-pro' : '')}
+                  key={'reply-mail-management'}
+                >
+                  <NavLink
+                    to="/admin/reply-mail-management"
+                    className="nav-link"
+                    activeClassName="active"
+                    activeStyle={{ color: 'black' }}
+                  >
+                    <i className="nc-icon nc-badge" style={{ color: 'black' }} />
+                    <p style={{ color: 'black' }}>reply mail management</p>
+                  </NavLink>
+                </li>
+                <li
                   id="sidebarClient"
                   className={activeRoute('client-management') + (true ? ' active-pro' : '')}
                   key={'client-management'}
