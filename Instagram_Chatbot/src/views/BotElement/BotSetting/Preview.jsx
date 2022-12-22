@@ -501,10 +501,10 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                   }).then(data => {
                     renderMessage.push(data);
                     console.log(renderMessage);
+                    setIndexMessageRender(i);
                     setRenderMessageArr([
                       ...renderMessage
                     ]);
-                    setIndexMessageRender(i);
                     if (isPauseScroll === false) {
                       scrollToBottom();
                     }
@@ -540,12 +540,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                       resolve({ ...messageArr[i] });
                     }, 1000);
                   }).then(data => {
+                    setIndexMessageRender(i);
                     renderMessage.push(data);
                     console.log(data);
                     setRenderMessageArr([
                       ...renderMessage
                     ])
-                    setIndexMessageRender(i);
                     if (isPauseScroll === false) {
                       scrollToBottom();
                     }
@@ -619,11 +619,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                     resolve({ ...messageArr[i] });
                   }, 1000);
                 }).then(data => {
+                  setIndexMessageRender(i);
                   renderMessage.push(data);
                   setRenderMessageArr([
                     ...renderMessage
                   ]);
-                  setIndexMessageRender(i);
                   if (isPauseScroll === false) {
                     scrollToBottom();
                   }
@@ -1354,6 +1354,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                     }, (dataMessages[i]?.message_content[0].delay.content * 1000));
                   });
                 }).then(() => {
+                  setIndexMessageRender(i)
                   renderMessage.pop();
                   setRenderMessageArr([
                     ...renderMessage
@@ -1386,7 +1387,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                   }
                 });
               }
-              index = i;
               // promise.then(data => {
               //   renderMessage.push(data);
               //   setRenderMessageArr([
@@ -1451,6 +1451,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                   resolve({ ...dataMessages[i] });
                 }, 1000);
               }).then(data => {
+                setIndexMessageRender(i);
                 renderMessage.push(data);
                 console.log(data)
                 setRenderMessageArr([
@@ -1499,6 +1500,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                 resolve({ ...dataMessages[i] });
               }, 1000);
             }).then(data => {
+              setIndexMessageRender(i);
               renderMessage.push(data);
               setRenderMessageArr([
                 ...renderMessage
@@ -1512,10 +1514,10 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           }
         }
       }
-      setIndexMessageRender(index);
-      setRenderMessageArr([
-        ...renderMessage
-      ]);
+      // setIndexMessageRender(index);
+      // setRenderMessageArr([
+      //   ...renderMessage
+      // ]);
     } else {
       // handle check message_content for user 
       //if message_content.length !== 0 => show message
@@ -1543,6 +1545,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             resolve({ ...dataMessages[indexMessageRender + 1] });
           }, 1000);
         }).then(data => {
+          setIndexMessageRender(indexMessageRender + 1);
           renderMessage.push(data);
           console.log(data)
           setRenderMessageArr([
@@ -1552,7 +1555,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
             scrollToBottom();
           }
         });
-        index = indexMessageRender + 1;
+        // index = indexMessageRender + 1;
       }
       //if message_content.length === 0 => loop until meet message have message_content.length !== 0 => show message
       else {
@@ -1582,6 +1585,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                   resolve({ ...dataMessages[i] });
                 }, 1000);
               }).then(data => {
+                setIndexMessageRender(i);
                 renderMessage.push(data);
                 console.log(data)
                 setRenderMessageArr([
@@ -1609,6 +1613,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                       }, (dataMessages[i]?.message_content[0].delay.content * 1000));
                     });
                   }).then(() => {
+                    setIndexMessageRender(i);
                     renderMessage.pop();
                     setRenderMessageArr([
                       ...renderMessage
@@ -1679,6 +1684,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                     resolve({ ...dataMessages[i] });
                   }, 1000);
                 }).then(data => {
+                  setIndexMessageRender(i);
                   renderMessage.push(data);
                   console.log(data)
                   setRenderMessageArr([
@@ -1693,7 +1699,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           }
         }
       }
-      setIndexMessageRender(index);
+      // setIndexMessageRender(index);
       // setIndexUser(prev => prev );
     }
 
@@ -1703,7 +1709,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
   }
 
   const onChangeValue = (indexContent, contentType, value, field, subFiled, name) => {
-    console.log(dataMessages[indexMessageRender].message_content[indexContent], indexContent, contentType, value, field, subFiled, name);
+    console.log(dataMessages[indexMessageRender].message_content[indexContent], indexMessageRender, indexContent, contentType, value, field, subFiled, name);
     if (name) {
       if (dataMessages[indexMessageRender].message_content[indexContent][contentType][field][subFiled] === undefined) {
         dataMessages[indexMessageRender].message_content[indexContent][contentType][field][subFiled] = {}
@@ -1770,13 +1776,13 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           } else if (field === 'start_date_select' || field === 'end_date_select') {
             item.default_value = `${dataContentType?.start_date_select || "start date"} ~ ${dataContentType?.end_date_select || "end date"}`;
           } else if (contentType === 'radio_button') {
-            item.default_value = dataContentType[dataContentType.type].find(item => item.id === value).text || item.default_value;
+            item.default_value = dataContentType[dataContentType.type].find(item => item.id === value)?.text || item.default_value;
           } else if (contentType === 'checkbox') {
             let dataTextChecked;
             if (field === 'checkedValue' && dataContentType.checkedValue.length > 0) {
               console.log(dataContentType.checkedValue)
               dataTextChecked = dataContentType.checkedValue.map(itemChecked => {
-                return dataContentType[dataContentType.type].find(item => itemChecked === item.id).text;
+                return dataContentType[dataContentType.type].find(item => itemChecked === item.id)?.text;
               })
             } else if (field === 'initial_selection_picture' && dataContentType.initial_selection_picture.length > 0) {
               dataTextChecked = dataContentType.initial_selection_picture.map(itemChecked => {
@@ -2111,6 +2117,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                               dataMessages[indexMessage].is_display_button_next = value;
                               setDataMessages([...dataMessages]);
                             }}
+                            dataMessages={[...dataMessages]}
                             dataPrefectures={[...dataPrefectures]}
                             isPopUpZipCode={(isOpen, indexContent) => isPopUpZipCode(isOpen, indexContent)}
                             onChangeErrors={(field, value) => onChangeErrors(field, value)}
@@ -2215,7 +2222,7 @@ const BotMessage = ({ content, index, botInfor }) => {
   )
 }
 
-const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors, dataPrefectures }) => {
+const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors, dataPrefectures }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
   const [dataCity, setDataCity] = useState([]);
@@ -2264,7 +2271,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   }, [messageContentProps])
 
   useEffect(() => {
-    messageContent.forEach((content, indexContent) => {
+    console.log(indexMessage);
+    dataMessages[indexMessage].message_content.forEach((content, indexContent) => {
       console.log(content)
       if (content.type === "calendar") {
         let calendar = content.calendar;
