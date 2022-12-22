@@ -172,7 +172,7 @@ function Report() {
                 }
                 // console.log(chatbotValue)
                 let numOfCon =
-                  chatbotData.smartphone_count +
+                  chatbotData.smartphone_conversion_count +
                   chatbotData.pc_conversion_count +
                   chatbotData.tablet_conversion_count;
                 // setNumofConversion(numOfCon)
@@ -338,13 +338,16 @@ function Report() {
                   lBTB += index.tablet_close_chatbot_window_count;
                   lBSP += index.smartphone_close_chatbot_window_count;
                 });
-                exportCVR.push([cvrPC, cvrTB, cvrSP, totalConversion, totalBotStart]);
+                console.log('totalBotStart: ', totalBotStart);
+                exportCVR.push([cvrPC, cvrTB, cvrSP, totalConversion, totalBotOpen]);
                 exportCVR.push([
                   '',
                   '',
                   '',
                   'CVR',
-                  `${Math.round((totalConversion * 100) / totalBotStart).toFixed(2)}%`,
+                  totalBotOpen === 0
+                    ? `0%`
+                    : `${Math.round((totalConversion * 100) / totalBotOpen).toFixed(2)}%`,
                 ]);
                 exportCTR.push([ctrPC, ctrTB, ctrSP, totalBotStart, totalBotOpen]);
                 exportCTR.push([
@@ -352,7 +355,9 @@ function Report() {
                   '',
                   '',
                   'CTR',
-                  `${Math.round((totalBotStart * 100) / totalBotOpen).toFixed(2)}%`,
+                  totalBotOpen === 0
+                    ? `0%`
+                    : `${Math.round((totalBotStart * 100) / totalBotOpen).toFixed(2)}%`,
                 ]);
                 exportLeaveBotRate.push([lBPC, lBTB, lBSP, totalBotLeave, totalBotStart]);
                 exportLeaveBotRate.push([
@@ -360,7 +365,9 @@ function Report() {
                   '',
                   '',
                   '離脱率',
-                  `${Math.round((totalBotLeave * 100) / totalBotStart).toFixed(2)}%`,
+                  totalBotStart === 0
+                    ? `0%`
+                    : `${Math.round((totalBotLeave * 100) / totalBotStart).toFixed(2)}%`,
                 ]);
                 exportCV.push(['', '合計', '', totalConversion]);
                 exportClickThrough.push(['合計', totalBotStart, totalBotOpen]);
@@ -755,7 +762,7 @@ function Report() {
             }
             // console.log(chatbotValue)
             let numOfCon =
-              chatbotData.smartphone_count +
+              chatbotData.smartphone_conversion_count +
               chatbotData.pc_conversion_count +
               chatbotData.tablet_conversion_count;
             // setNumofConversion(numOfCon)
@@ -798,7 +805,7 @@ function Report() {
               setNumOfOpenBot(chatbotData.tablet_count);
               setNumOfCloseBot(chatbotData.tablet_close_chatbot_window_count);
             } else if (searchVal.device == 'smartphone') {
-              setConversionCVRCTR(chatbotData.smartphone_count);
+              setConversionCVRCTR(chatbotData.smartphone_conversion_count);
               setNumofBotStart(chatbotData.smartphone_open_chatbot_window_count);
               setNumOfOpenBot(chatbotData.smartphone_count);
               setNumOfCloseBot(chatbotData.smartphone_close_chatbot_window_count);
@@ -1013,7 +1020,9 @@ function Report() {
             exportCVR.push([
               '',
               'CVR',
-              `${Math.round((totalConversion * 100) / totalBotOpen).toFixed(2)}%`,
+              totalBotOpen === 0
+                ? `0%`
+                : `${Math.round((totalConversion * 100) / totalBotOpen).toFixed(2)}%`,
               '',
               '',
             ]);
@@ -1029,7 +1038,9 @@ function Report() {
             exportCTR.push([
               '',
               'CTR',
-              `${Math.round((totalBotOpen * 100) / totalBotStart).toFixed(2)}%`,
+              totalBotStart === 0
+                ? `0%`
+                : `${Math.round((totalBotOpen * 100) / totalBotStart).toFixed(2)}%`,
               '',
               '',
             ]);
@@ -1047,7 +1058,9 @@ function Report() {
               '',
               '',
               '離脱率',
-              `${Math.round((totalBotLeave * 100) / totalBotStart).toFixed(2)}%`,
+              totalBotStart === 0
+                ? `0%`
+                : `${Math.round((totalBotLeave * 100) / totalBotStart).toFixed(2)}%`,
             ]);
             exportCV.push(['', '合計', totalConversion, '']);
             exportClickThrough.push(['合計', totalBotStart, totalBotOpen]);
