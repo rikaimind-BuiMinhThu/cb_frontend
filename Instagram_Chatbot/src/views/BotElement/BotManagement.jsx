@@ -253,9 +253,9 @@ function BotManagement() {
     setIsOpenPopupConfirm(true);
     // alert(status)
     if (status == 'on') {
-      setMsgConfirm('本当にボットをONにしますか。');
-    } else if (status == 'off') {
       setMsgConfirm('本当にボットをOFFにしますか。');
+    } else if (status == 'off') {
+      setMsgConfirm('本当にボットをONにしますか。');
     }
 
     setIdSelected(id);
@@ -335,7 +335,9 @@ function BotManagement() {
                             >
                               {bot?.bot_name}
                             </td>
-                            <td className="border-table-bot">{bot?.status}</td>
+                            <td className="border-table-bot" style={{ textTransform: 'uppercase' }}>
+                              {bot?.status}
+                            </td>
                             <td className="border-table-bot">{bot?.owner_name}</td>
                             <td className="border-table-bot">所有者</td>
                             <td className="border-table-bot action-table-bot">
@@ -364,7 +366,7 @@ function BotManagement() {
                                   className="btn-stop-bot"
                                   onClick={() => handleStopBot(bot?.id, bot?.status)}
                                 >
-                                  {bot?.status === 'off' ? 'スタート' : 'ストップ'}
+                                  {bot?.status === 'off' ? 'ON' : 'OFF'}
                                 </button>
                                 <button
                                   className="btn-delete-bot"
