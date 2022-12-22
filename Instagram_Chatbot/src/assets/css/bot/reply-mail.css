@@ -1,0 +1,18 @@
+/* table */
+table.rm-table {
+  text-align: center;
+  table-layout: fixed;
+  overflow: hidden;
+  border: 1px solid;
+}
+table.rm-table th,
+td {
+  border: 1px solid #7186a0;
+}
+
+/* input */
+.rm-input-field {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: solid 1px #7186a0;
+}
