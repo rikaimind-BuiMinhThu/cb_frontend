@@ -18,7 +18,7 @@ const InputNum = ({ id, addonAfter, maxLength, addonBefore, label, value, onChan
                 addonBefore={addonBefore}
                 controls={controls}
                 placeholder={placeholder}
-                className={`${addonAfter ? '' : 'ss-input-value'} ${className}`}
+                className={`${addonAfter ? '' : 'ss-input-value'} ${className && className}`}
                 onChange={value => onChange(value)}
                 value={value}
                 disabled={disabled}

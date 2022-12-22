@@ -2058,21 +2058,6 @@ const Scenario = () => {
     setIsOpenPreview(!isOpenPreview);
   }
 
-  const SampleNextArrow = props => {
-    const { className, style, onClick } = props
-    return (
-      <RightOutlined
-        className={className}
-        style={{
-          ...style,
-          color: 'black',
-          fontSize: '15px',
-          lineHeight: '1.5715'
-        }}
-        onClick={onClick} />
-    )
-  }
-
   function isColor(strColor) {
     var s = new Option().style;
     s.color = strColor;
@@ -2083,21 +2068,6 @@ const Scenario = () => {
     } else {
       return false;
     }
-  }
-
-  const SamplePrevArrow = props => {
-    const { className, style, onClick } = props
-    return (
-      <LeftOutlined
-        className={className}
-        style={{
-          ...style,
-          color: 'black',
-          fontSize: '15px',
-          lineHeight: '1.5715'
-        }}
-        onClick={onClick} />
-    )
   }
 
   const handleDisableDateCalendar = (current, calendar) => {
@@ -2187,6 +2157,36 @@ const Scenario = () => {
           }
         }))
     }
+  }
+
+  const SampleNextArrow = props => {
+    const { className, style, onClick } = props
+    return (
+      <RightOutlined
+        className={className}
+        style={{
+          ...style,
+          color: 'black',
+          fontSize: '15px',
+          lineHeight: '1.5715'
+        }}
+        onClick={onClick} />
+    )
+  }
+
+  const SamplePrevArrow = props => {
+    const { className, style, onClick } = props
+    return (
+      <LeftOutlined
+        className={className}
+        style={{
+          ...style,
+          color: 'black',
+          fontSize: '15px',
+          lineHeight: '1.5715'
+        }}
+        onClick={onClick} />
+    )
   }
 
   const settingsCarousel = {
@@ -3823,7 +3823,7 @@ const Scenario = () => {
                                                                                   }
                                                                                   {productPurchase.product_number_display && itemProduct.item_number &&
                                                                                     <div className="ss-user-overview-product-purchase-infor-item-number">
-                                                                                      Item number: {itemProduct.item_number}
+                                                                                      商品番号: {itemProduct.item_number}
                                                                                     </div>
                                                                                   }
                                                                                   {itemProduct.price_display_custom ?
@@ -3832,7 +3832,7 @@ const Scenario = () => {
                                                                                     </div> :
                                                                                     productPurchase.price_display && itemProduct.item_price &&
                                                                                     <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                      Price: {itemProduct.item_price} 円
+                                                                                      値段: {itemProduct.item_price} 円
                                                                                     </div>
                                                                                   }
                                                                                   {itemProduct.quantity_limit &&
@@ -3870,7 +3870,7 @@ const Scenario = () => {
                                                                                   }
                                                                                   {productPurchase.product_number_display && itemProduct.item_number &&
                                                                                     <div className="ss-user-overview-product-purchase-infor-item-number">
-                                                                                      Item number: {itemProduct.item_number}
+                                                                                      商品番号: {itemProduct.item_number}
                                                                                     </div>
                                                                                   }
                                                                                   {itemProduct.price_display_custom ?
@@ -3879,7 +3879,7 @@ const Scenario = () => {
                                                                                     </div> :
                                                                                     productPurchase.price_display && itemProduct.item_price &&
                                                                                     <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                      Price: {itemProduct.item_price} 円
+                                                                                      値段: {itemProduct.item_price} 円
                                                                                     </div>
                                                                                   }
                                                                                   {itemProduct.quantity_limit &&
@@ -4020,7 +4020,7 @@ const Scenario = () => {
                                                                                   </div> :
                                                                                   productPurchaseRadioButton.price_display && itemProduct.item_price &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                    Price: {itemProduct.item_price} 円
+                                                                                    値段: {itemProduct.item_price} 円
                                                                                   </div>
                                                                                 }
                                                                               </div>
@@ -4817,7 +4817,7 @@ const Scenario = () => {
                                         if (content.type === 'checkbox') {
                                           if (checkbox.type === 'default') {
                                             numberMaxLength = checkbox?.[checkbox.type]?.length;
-                                          } else if(checkbox.type === 'checkbox_img') {
+                                          } else if (checkbox.type === 'checkbox_img') {
                                             checkbox?.[checkbox.type].forEach(item => {
                                               numberMaxLength += item.contents.length;
                                             });
@@ -6390,8 +6390,9 @@ const Scenario = () => {
                                                           disabled
                                                           label={
                                                             <InputCustom
+                                                              maxLength={Number.MAX_SAFE_INTEGER}
                                                               placeholder="テキスト"
-                                                              style={{ width: '100%' }}
+                                                              style={{ width: '100%', color: '#252422' }}
                                                               value={agreeTerm.term}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'term')}
                                                             />
@@ -7330,7 +7331,7 @@ const Scenario = () => {
                                                             </Carousel>
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom" style={{ marginTop: '20px' }}>
-                                                            <span style={{ fontWeight: '400', width: '90%' }}>※JPEGまたはPNG/縦横比1:91:1の横向き画像または縦横比1:1の正方形画像</span>
+                                                            <span style={{ fontWeight: '400', width: '90%' }}>※JPEGまたはPNG/縦横比1.91:1の横向き画像または縦横比1:1の正方形画像</span>
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-file-upload-wrapper" style={{ width: '90%' }}>
@@ -7770,7 +7771,7 @@ const Scenario = () => {
                                                                                         <div style={{ width: '50%' }}>
                                                                                           <InputCustom
                                                                                             className="ss-mg-bottom-5"
-                                                                                            label="Price display contents (customized)"
+                                                                                            label="値段表示内容（カスタマイズ）"
                                                                                             value={itemProduct.price_display_custom}
                                                                                             onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')}
                                                                                           />
@@ -8002,7 +8003,7 @@ const Scenario = () => {
                                                                                         <div style={{ width: '50%' }}>
                                                                                           <InputCustom
                                                                                             className="ss-mg-bottom-5"
-                                                                                            label="Price display contents (customized)"
+                                                                                            label="値段表示内容（カスタマイズ）"
                                                                                             value={itemProduct.price_display_custom}
                                                                                             onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')}
                                                                                           />

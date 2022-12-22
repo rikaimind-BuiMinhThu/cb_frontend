@@ -436,7 +436,8 @@
 
 .sp-popup-zip-code-address-body-button-cancel {
     border: 1px solid #D0D6DC;
-    cursor: pointer;}
+    cursor: pointer;
+}
 
 .sp-popup-zip-code-address-body-button-selection {
     background-color: #000;
@@ -445,10 +446,135 @@
     cursor: pointer;
 }
 
-.ant-checkbox + span {
-    padding-right: 0px!important;
+.ant-checkbox+span {
+    padding-right: 0px !important;
 }
 
 .sp-body-bot-side-messages .ss-bot-chat-detail-content {
     white-space: pre-wrap;
+}
+
+.sp-product-purchase-custom-input-quantity input {
+    text-align: center;
+}
+
+.animation {
+    transition: all 1.5s;
+    -webkit-transition: all 1.5s;
+}
+
+.slideRight{
+	animation-name: slideRight;
+	-webkit-animation-name: slideRight;	
+
+	animation-duration: 1.5s;	
+	-webkit-animation-duration: 1.5s;
+
+	animation-timing-function: ease;	
+	-webkit-animation-timing-function: ease;		
+
+}
+
+@keyframes slideRight {
+	0% {
+		transform: translateX(-100%);
+		opacity: 0;
+	}		
+	100% {
+		transform: translateX(0%);
+		opacity: 1;
+	}	
+}
+
+@-webkit-keyframes slideRight {
+	0% {
+		-webkit-transform: translateX(-100%);
+		opacity: 0;
+	}		
+	100% {
+		-webkit-transform: translateX(0%);
+		opacity: 1;
+	}
+}
+
+/*
+==========
+slideLeft
+==========
+*/
+
+
+.slideLeft{
+	animation-name: slideLeft;
+	-webkit-animation-name: slideLeft;	
+
+	animation-duration: 1.5s;	
+	-webkit-animation-duration: 1.5s;
+
+	animation-timing-function: ease;	
+	-webkit-animation-timing-function: ease;		
+
+}
+
+@keyframes slideLeft {
+	0% {
+		transform: translateX(90%);
+		opacity: 0;
+	}		
+	100% {
+		transform: translateX(0%);
+		opacity: 1;
+	}	
+}
+
+@-webkit-keyframes slideLeft {
+	0% {
+		-webkit-transform: translateX(90%);
+		opacity: 0;
+	}		
+	100% {
+		-webkit-transform: translateX(0%);
+		opacity: 1;
+	}
+}
+
+/*
+==========
+slideUp
+==========
+*/
+
+
+.slideUp{
+	animation-name: slideUp;
+	-webkit-animation-name: slideUp;	
+
+	animation-duration: 1s;	
+	-webkit-animation-duration: 1s;
+
+	animation-timing-function: ease;
+	-webkit-animation-timing-function: ease;
+	
+}
+
+@keyframes slideUp {
+	0% {
+		transform: translateY(100%);
+		opacity: 0;
+	}
+	100% {
+		transform: translateY(0%);
+		opacity: 1;
+	}	
+}
+
+@-webkit-keyframes slideUp {
+	0% {
+		-webkit-transform: translateY(100%);
+		opacity: 0;
+	}	
+	100% {
+		-webkit-transform: translateY(0%);
+		opacity: 1;
+	}	
 }
