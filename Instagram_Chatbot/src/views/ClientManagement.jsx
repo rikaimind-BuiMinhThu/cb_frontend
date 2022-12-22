@@ -92,7 +92,7 @@ function ClientManagement() {
   });
 
   React.useEffect(() => {
-    console.log('token in dashboard', Cookies.get('token'));
+    // console.log('token in dashboard', Cookies.get('token'));
     console.log('is_auth', Cookies.get('is_auth'));
     if (
       Cookies.get('token') == undefined ||
@@ -115,7 +115,7 @@ function ClientManagement() {
     api
       .get(`/api/v1/managements/clients`, paramSearch)
       .then((res) => {
-        // console.log('list client: ', res.data.data);
+        console.log('list client: ', res.data.data);
         var totalPage = Math.ceil(res.data.data.total / 25);
         setTotalPage(totalPage);
         setDataList(res.data.data);
@@ -1425,15 +1425,15 @@ function ClientManagement() {
                       {/**Date end using */}
                       <th style={{ width: '200px' }}>住所</th>
                       {/**Address */}
-                      <th style={{ width: '200px' }}>Instagram bot</th>
-                      <th style={{ width: '200px' }}>Web bot</th>
-                      <th style={{ width: '200px' }}>LineBot</th>
-                      <th style={{ width: '200px' }}>Tiktok bot</th>
-                      <th style={{ width: '200px' }}>Instagram bot CV</th>
-                      <th style={{ width: '200px' }}>Web bot CV</th>
-                      <th style={{ width: '200px' }}>Line bot CV</th>
-                      <th style={{ width: '200px' }}>Tiktok bot CV</th>
-                      <th style={{ width: '200px' }}>最終ログイン日時</th>
+                      <th style={{ width: '180px' }}>Instagram bot</th>
+                      <th style={{ width: '180px' }}>Web bot</th>
+                      <th style={{ width: '180px' }}>LineBot</th>
+                      <th style={{ width: '180px' }}>Tiktok bot</th>
+                      <th style={{ width: '180px' }}>Instagram bot CV</th>
+                      <th style={{ width: '180px' }}>Web bot CV</th>
+                      <th style={{ width: '180px' }}>Line bot CV</th>
+                      <th style={{ width: '180px' }}>Tiktok bot CV</th>
+                      <th style={{ width: '180px' }}>最終ログイン日時</th>
                       {/**Last login date_time */}
                       <th className="actionListClient">アクション</th>
                     </tr>
@@ -1510,12 +1510,12 @@ function ClientManagement() {
                               {item.prefecture}、{item.address}、{item.building_name}
                             </div>
                           </td>
-                          <td></td> {/* Instagram bot */}
-                          <td></td> {/* Web bot */}
-                          <td></td> {/* Line bot */}
-                          <td></td> {/* Tiktok bot */}
+                          <td>{item?.is_instagram ? 'あり' : 'なし'}</td> {/* Instagram bot */}
+                          <td>{item?.is_web ? 'あり' : 'なし'}</td> {/* Web bot */}
+                          <td>{item?.is_line ? 'あり' : 'なし'}</td> {/* Line bot */}
+                          <td>{item?.is_tiktok ? 'あり' : 'なし'}</td> {/* Tiktok bot */}
                           <td>{item.instagram_conversion_count}</td>{/* Instagram bot conversion  */}
-                          <td></td>{/* Web bot conversion  */}
+                          <td>{item?.web_conversation_count}</td>{/* Web bot conversion  */}
                           <td></td>{/* Line bot conversion  */}
                           <td></td>{/* Tiktkl bot conversion  */}
                           <td>{item.last_sign_in_at?.replaceAll('/', '-')}</td>
