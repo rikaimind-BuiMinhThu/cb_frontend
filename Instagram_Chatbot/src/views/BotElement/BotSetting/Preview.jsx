@@ -2309,13 +2309,19 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
       document.getElementById(`captcha-${indexMessage}-${indexContent}`).innerHTML = captcha.filter(item => item.index === indexMessage && item.indexContent === indexContent)?.[0]?.data || "";
   }
 
+  const stringNullOrEmpty = (string) => {
+    if (string === undefined || string === null || (string && (string + "")?.trim() === "") || string === "") return true
+    return false
+  }
+
   useEffect(() => {
     if (messageContent.length === 1) {
       let message = messageContent[0];
-      if ((message.type === 'card_payment_radio_button' && !message[message.type].initial_selection)
+      console.log(message?.[message.type], message.type === 'card_payment_radio_button' && stringNullOrEmpty(message?.[message.type]?.initial_selection) && stringNullOrEmpty(message?.[message.type]?.initial_selection_picture), 'checkk message[message.type].initial_selection')
+      if ((message.type === 'card_payment_radio_button' && (stringNullOrEmpty(message?.[message.type]?.initial_selection) && stringNullOrEmpty(message?.[message.type]?.initial_selection_picture)))
         || message.type === 'product_purchase_radio_button'
-        || (message?.[message.type].type === "picture_radio" ? (message?.[message.type]?.card_linked_setting || message?.[message.type]?.card_linked_setting === message?.[message.type]?.initial_selection)
-          : (message?.[message.type]?.card_linked_setting_picture && message?.[message.type]?.card_linked_setting_picture === message?.[message.type]?.initial_selection_picture))
+        || (message?.[message.type].type !== "picture_radio" ? ( stringNullOrEmpty(message?.[message.type]?.initial_selection) && message?.[message.type]?.card_linked_setting !== message?.[message.type]?.initial_selection)
+          : (stringNullOrEmpty(message?.[message.type]?.initial_selection_picture) && message?.[message.type]?.card_linked_setting_picture !== message?.[message.type]?.initial_selection_picture))
         || (message.type === 'carousel' && message?.[message.type].require)
         || (message.type === 'radio_button' && !message[message.type].initial_selection)) {
         displayButtonNext(false);
