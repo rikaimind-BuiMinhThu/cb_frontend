@@ -23,9 +23,9 @@ const colors = [
   '#327AED',
   '#26B197',
   '#fC7E02',
-  '#DCF843',
-  '#ED6D9E',
-  '#546DA7',
+  '#F6CA21',
+  '#F16FAA',
+  '#8C66D9',
   '#7C8290',
   '#D8E2EF',
 ];
@@ -94,19 +94,19 @@ function AddBotchat() {
     document.querySelector('.icons .icon.active').classList.remove('active');
     document.querySelector(`.icons .icon.icon-${index}`).classList.add('active');
     // console.log('imageDefault: ', imageDefault);
-    
+
     // console.log('imageDefault: ', imageDefault);
-    if(!imageDefault.includes('image/png;base64')){
+    if (!imageDefault.includes('image/png;base64')) {
       toDataURL(imageDefault)
-      .then(dataUrl => {
-        console.log('RESULT:',)
-        // setDefaultIcon(dataUrl)
-        setBotImage(dataUrl)
-      })
-    }else{
+        .then(dataUrl => {
+          console.log('RESULT:',)
+          // setDefaultIcon(dataUrl)
+          setBotImage(dataUrl)
+        })
+    } else {
       setBotImage(imageDefault);
     }
-    
+
   };
 
   // get base url image add
@@ -157,9 +157,9 @@ function AddBotchat() {
         blue: '#327AED',
         green: '#26B197',
         orange: '#fC7E02',
-        yellow: '#DCF843',
-        pink: '#ED6D9E',
-        purple: '#546DA7',
+        yellow: '#F6CA21',
+        pink: '#F16FAA',
+        purple: '#8C66D9',
         black: '#7C8290',
         white: '#D8E2EF',
       };

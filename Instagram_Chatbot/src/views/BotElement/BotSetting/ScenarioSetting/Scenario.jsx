@@ -139,10 +139,17 @@ for (let i = 1935; i <= 2072; i++) {
 
 let dataMonthFixed = [];
 for (let i = 1; i <= 12; i++) {
-  dataMonthFixed.push({
-    key: i + '',
-    value: i + ''
-  });
+  if (i < 10) {
+    dataMonthFixed.push({
+      key: `0${i}` + '',
+      value: `0${i}` + ''
+    });
+  } else {
+    dataMonthFixed.push({
+      key: i + '',
+      value: i + ''
+    });
+  }
 }
 
 let dataMaxRangSlider = [];
@@ -3835,10 +3842,11 @@ const Scenario = () => {
                                                                                       値段: {itemProduct.item_price} 円
                                                                                     </div>
                                                                                   }
-                                                                                  {itemProduct.quantity_limit &&
+                                                                                  {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                                                                     <div className="ss-user-overview-product-purchase-infor-price">
                                                                                       数量：最大{itemProduct.quantity_limit}個まで
-                                                                                    </div>
+                                                                                    </div> :
+                                                                                    ""
                                                                                   }
                                                                                 </div>
                                                                               }
@@ -3882,10 +3890,11 @@ const Scenario = () => {
                                                                                       値段: {itemProduct.item_price} 円
                                                                                     </div>
                                                                                   }
-                                                                                  {itemProduct.quantity_limit &&
+                                                                                  {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                                                                     <div className="ss-user-overview-product-purchase-infor-price">
                                                                                       数量：最大{itemProduct.quantity_limit}個まで
-                                                                                    </div>
+                                                                                    </div> :
+                                                                                    ""
                                                                                   }
                                                                                   {/* {productPurchase.multiple_item_purchase &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-price">
@@ -3921,10 +3930,11 @@ const Scenario = () => {
                                                                                   {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
                                                                                 </div>
                                                                               }
-                                                                              {itemProduct.quantity_limit &&
+                                                                              {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                                                                 <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                                                                   数量：最大{itemProduct.quantity_limit}個まで
-                                                                                </div>
+                                                                                </div> :
+                                                                                ""
                                                                               }
                                                                             </div>
                                                                           </Checkbox>
@@ -3949,11 +3959,12 @@ const Scenario = () => {
                                                                                 <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                                                                   {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
                                                                                 </div>
-                                                                              }
-                                                                              {itemProduct.quantity_limit &&
+                                                                              }                                                                              
+                                                                              {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                                                                 <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                                                                   数量：最大{itemProduct.quantity_limit}個まで
-                                                                                </div>
+                                                                                </div> :
+                                                                                ""
                                                                               }
                                                                             </div>
                                                                           </Radio>
@@ -8253,7 +8264,7 @@ const Scenario = () => {
                                                           <div style={{ width: '95px', height: '36px', backgroundColor: slider.color || '#2C75F0', marginLeft: '13px' }}></div>
                                                         </div>
                                                         {(slider.color && !isColor(slider.color)) &&
-                                                          <div style={{ width: '90%', color: '#b94a48', marginLeft: '21%' }}>Specify a valid regular expression for color.</div>
+                                                          <div style={{ width: '90%', color: '#b94a48', marginLeft: '21%' }}>カラーには、有効な正規表現を指定してください。</div>
                                                         }
                                                       </div>
                                                     </React.Fragment>
