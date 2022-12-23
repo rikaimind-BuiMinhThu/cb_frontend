@@ -153,7 +153,7 @@ let dataPaymentMethod = [
 
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
-function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
+function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
   const [scenarioId, setScenarioId] = useState(scenarioIdProps || Cookies.get('scenario_id'));
   const [botInfor, setBotInfor] = useState();
@@ -1172,7 +1172,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
         ) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
           isValid = false;
-        } else if ((contentType.card_number && (contentType.card_number + "").length !== 16 || /[^0-9]+/.test(contentType.card_number)) ||
+        } else if ((contentType.card_number && ((contentType.card_number + "").length !== 16 || /[^0-9]+/.test(contentType.card_number))) ||
           ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
             ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "クレジットカード番号は無効です。";
@@ -1185,7 +1185,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
         && errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] !== messageError
         && ((contentType?.initial_selection || contentType?.card_linked_setting) && contentType?.initial_selection === contentType?.card_linked_setting
           || (contentType?.initial_selection_picture || contentType?.card_linked_setting_picture) && contentType?.initial_selection_picture === contentType?.card_linked_setting_picture)) {
-        console.log('chjalsdjlkajsdlasj checkkkkkk')
         if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
           || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
           || (contentType.separate_type === true && (stringNullOrEmpty(contentType.card_number1) || stringNullOrEmpty(contentType.card_number2) || stringNullOrEmpty(contentType.card_number3) || stringNullOrEmpty(contentType.card_number4)))
@@ -1196,7 +1195,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
         ) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
           isValid = false;
-        } else if ((contentType.card_number && (contentType.card_number + "").length !== 16 || /[^0-9]+/.test(contentType.card_number)) ||
+        } else if ((contentType.card_number && ((contentType.card_number + "").length !== 16 || /[^0-9]+/.test(contentType.card_number))) ||
           ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
             ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "クレジットカード番号は無効です。";
@@ -1759,7 +1758,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
       let arrayName = [];
       let arrayPrice = [];
 
-      for (let i = 0; i < dataContentType.products.length; i++) {
+      for (let i = 0; i < dataContentType.products?.length; i++) {
         for (let j = 0; j < value.length; j++) {
           if (dataContentType.products[i].id === value[j]) {
             arrayCode.push(dataContentType.products[i].item_number);
@@ -1795,7 +1794,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
       let valueName;
       let valuePrice;
 
-      for (let i = 0; i < dataContentType.products.length; i++) {
+      for (let i = 0; i < dataContentType.products?.length; i++) {
         if (dataContentType.products[i].id === value) {
           valueCode = dataContentType.products[i].item_number;
           valueName = dataContentType.products[i].title;
@@ -1911,9 +1910,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
   const handleOpenWithDrawal = () => {
     if (botInfor && botInfor.withdrawal_prevention_status === "invalid") {
       setIndexUser(0);
-      setScenarioId(null);
+      if (!isFromScenario) setScenarioId(null);
       setTimeout(() => {
-        setScenarioId(Cookies.get('scenario_id'));
+        if (!isFromScenario) setScenarioId(Cookies.get('scenario_id'));
         if (document.getElementById("action-bd")) {
           document.getElementById("action-bd").click();
         } else {

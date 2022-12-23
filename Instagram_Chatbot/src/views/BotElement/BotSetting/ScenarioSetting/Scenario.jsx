@@ -4022,7 +4022,7 @@ const Scenario = () => {
                                                                                 }
                                                                                 {productPurchaseRadioButton.product_number_display && itemProduct.item_number &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-item-number">
-                                                                                    Item No.: {itemProduct.item_number}
+                                                                                    商品番号: {itemProduct.item_number}
                                                                                   </div>
                                                                                 }
                                                                                 {itemProduct.price_display_custom ?
@@ -8970,7 +8970,7 @@ const Scenario = () => {
           />
         </div>
       </ModalShort>
-      {isOpenPreview && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} />}
+      {isOpenPreview && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} isFromScenario={true} />}
     </div >
   );
 };
