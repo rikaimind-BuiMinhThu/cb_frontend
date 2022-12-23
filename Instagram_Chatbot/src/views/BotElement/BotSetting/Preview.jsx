@@ -296,16 +296,19 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
               opacity_color = '#F0EFEB';
               message_color = '#F3AA2D';
               gardient_color = '#FF8402';
+              res.data.chatbot.main_color = "#F6CA21";
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'pink') {
               opacity_color = '#EBDDE3';
-              message_color = 'rgba(220, 110, 139)';
-              gardient_color = '#94C0EB';
+              message_color = '#E65B83';
+              gardient_color = '#94C1EC';
+              res.data.chatbot.main_color = "#F170AA";
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'purple') {
               opacity_color = '#E9E8F1';
               message_color = '#AF82D5';
               gardient_color = '#FAAA88';
+              res.data.chatbot.main_color = "#8C66D9";
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'black') {
               opacity_color = '#333333';
@@ -1169,7 +1172,31 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
         ) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
           isValid = false;
-        } else if ((contentType.card_number && (contentType.card_number + "").length !== 16) ||
+        } else if ((contentType.card_number && (contentType.card_number + "").length !== 16 || /[^0-9]+/.test(contentType.card_number)) ||
+          ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
+            ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "クレジットカード番号は無効です。";
+          isValid = false;
+        } else if (moment(`${contentType.year}-${contentType.month}}`, "YYYY-MM").isBefore(moment().format("YYYY-MM"))) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "有効期限に誤りがあるために、決済を完了できませんでした。";
+          isValid = false;
+        }
+      } else if (contentArr[i].type === 'card_payment_radio_button'
+        && errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] !== messageError
+        && ((contentType?.initial_selection || contentType?.card_linked_setting) && contentType?.initial_selection === contentType?.card_linked_setting
+          || (contentType?.initial_selection_picture || contentType?.card_linked_setting_picture) && contentType?.initial_selection_picture === contentType?.card_linked_setting_picture)) {
+        console.log('chjalsdjlkajsdlasj checkkkkkk')
+        if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
+          || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
+          || (contentType.separate_type === true && (stringNullOrEmpty(contentType.card_number1) || stringNullOrEmpty(contentType.card_number2) || stringNullOrEmpty(contentType.card_number3) || stringNullOrEmpty(contentType.card_number4)))
+          || (contentType.separate_type === false && stringNullOrEmpty(contentType.card_number))
+          || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
+          || (stringNullOrEmpty(contentType.year))
+          || (stringNullOrEmpty(contentType.month))
+        ) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+          isValid = false;
+        } else if ((contentType.card_number && (contentType.card_number + "").length !== 16 || /[^0-9]+/.test(contentType.card_number)) ||
           ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
             ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "クレジットカード番号は無効です。";
@@ -1699,8 +1726,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           }
         }
       }
-      // setIndexMessageRender(index);
-      // setIndexUser(prev => prev );
     }
 
     // clearTimeout(delayRender);
@@ -1727,7 +1752,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
       dataMessages[indexMessageRender].message_content[indexContent][contentType][field] = value;
     }
 
-    if (contentType === 'product_purchase' && field === 'initial_selection') {
+    if (contentType === 'product_purchase' && field === 'initial_selection' && value.length > 0) {
       let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
 
       let arrayCode = [];
@@ -1754,16 +1779,52 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
           default_value: arrayName.join(',')
         },
         {
-          variable_name: 'product_price',
+          variable_name: 'product_unit_price',
           default_value: arrayPrice.join(',')
         }
       )
       setVariables([...variables]);
       objParam.product_code = arrayCode.join(',');
       objParam.product_name = arrayName.join(',');
-      objParam.product_price = arrayPrice.join(',');
+      objParam.product_unit_price = arrayPrice.join(',');
+      setObjParam({ ...objParam });
+    } else if (contentType === 'product_purchase_radio_button' && field === 'initial_selection') {
+      let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
+
+      let valueCode;
+      let valueName;
+      let valuePrice;
+
+      for (let i = 0; i < dataContentType.products.length; i++) {
+        if (dataContentType.products[i].id === value) {
+          valueCode = dataContentType.products[i].item_number;
+          valueName = dataContentType.products[i].title;
+          valuePrice = dataContentType.products[i].item_price;
+        }
+      }
+
+      variables.push(
+        {
+          variable_name: 'product_code',
+          default_value: valueCode
+        },
+        {
+          variable_name: 'product_name',
+          default_value: valueName
+        },
+        {
+          variable_name: 'product_unit_price',
+          default_value: valuePrice
+        }
+      )
+      setVariables([...variables]);
+      objParam.product_code = valueCode;
+      objParam.product_name = valueName;
+      objParam.product_unit_price = valuePrice;
       setObjParam({ ...objParam });
     }
+
+
     if (dataMessages[indexMessageRender].message_content[indexContent][contentType].is_save_input_content) {
       variables.forEach(item => {
         console.log(item);
@@ -1800,7 +1861,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
               dataTextChecked = [];
             }
             console.log(item.variable_name, item.default_value, dataTextChecked);
-
             item.default_value = dataTextChecked.join(',') ?? item.default_value;
           } else if (contentType === 'card_payment_radio_button') {
             let dataTextChecked;
@@ -2117,7 +2177,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
                               dataMessages[indexMessage].is_display_button_next = value;
                               setDataMessages([...dataMessages]);
                             }}
-                            dataMessages={[...dataMessages]}
                             dataPrefectures={[...dataPrefectures]}
                             isPopUpZipCode={(isOpen, indexContent) => isPopUpZipCode(isOpen, indexContent)}
                             onChangeErrors={(field, value) => onChangeErrors(field, value)}
@@ -2172,7 +2231,14 @@ const BotMessage = ({ content, index, botInfor }) => {
             {content.type === 'text_input' && (
               <div
                 className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                style={{ overflowWrap: 'break-word', backgroundColor: botInfor?.message_color, color: botInfor?.font_color, height: 'auto', overflowY: 'hidden', border: 'none', borderRadius: '2px' }}
+                style={{
+                  overflowWrap: 'break-word',
+                  backgroundColor: botInfor?.message_color,
+                  color: botInfor?.font_color, height: 'auto',
+                  overflowY: 'hidden',
+                  border: 'none',
+                  borderRadius: '20px'
+                }}
               // value={content[content.type]?.content || ''}
               // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
               >
@@ -2210,7 +2276,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                   className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                   value={''}
                   readOnly
-                  style={{ backgroundColor: botInfor?.message_color, border: 'none', borderRadius: '2px', color: botInfor?.font_color }}
+                  style={{ backgroundColor: botInfor?.message_color, border: 'none', borderRadius: '20px', color: botInfor?.font_color }}
                 ></textarea>
             )}
             {content.type === 'delay' && (
@@ -2222,7 +2288,7 @@ const BotMessage = ({ content, index, botInfor }) => {
   )
 }
 
-const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors, dataPrefectures }) => {
+const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors, dataPrefectures }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
   const [dataCity, setDataCity] = useState([]);
@@ -2272,7 +2338,7 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
 
   useEffect(() => {
     console.log(indexMessage);
-    dataMessages[indexMessage].message_content.forEach((content, indexContent) => {
+    messageContent.forEach((content, indexContent) => {
       console.log(content)
       if (content.type === "calendar") {
         let calendar = content.calendar;
@@ -2320,14 +2386,23 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
             })
           });
           onChangeValue(indexContent, content.type, checkbox.initial_selection_picture, 'initial_selection_picture');
-          console.log(checkbox.initial_selection_picture);
         }
       } else if (content.type === "radio_button") {
         let radioButton = content.radio_button;
-        console.log(radioButton)
         if (radioButton.initial_selection) {
           onChangeValue(indexContent, content.type, radioButton.initial_selection, 'initial_selection');
         }
+      } else if (content.type === "card_payment_radio_button") {
+        let cardPaymentRadioButton = content.card_payment_radio_button;
+        if (cardPaymentRadioButton.type !== "picture_radio" && cardPaymentRadioButton.initial_selection) {
+          onChangeValue(indexContent, content.type, cardPaymentRadioButton.initial_selection, 'initial_selection');
+        } else if (cardPaymentRadioButton.initial_selection_picture) {
+          onChangeValue(indexContent, content.type, cardPaymentRadioButton.initial_selection_picture, 'initial_selection_picture');
+        }
+      } else if (content.type === 'product_purchase') {
+        let productPurchase = content.product_purchase;
+        console.log(productPurchase);
+        onChangeValue(indexContent, content.type, productPurchase.initial_selection, 'initial_selection');
       }
     })
   }, [])
@@ -4026,6 +4101,16 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                         controls={false}
                         max={Number.MAX_SAFE_INTEGER}
                         maxLength={16}
+                        onPaste={e => {
+                          // Get the pasted value and remove all white space
+                          const value = e.clipboardData.getData('text').replace(/\s/g, '');
+                          console.log(value)
+                          // Set the value of the input to the pasted value
+                          onChangeValue(indexContent, content.type, value, 'card_number')
+                          e.target.value = value;
+                        }}
+                        formatter={(value) => value.replace(/\s/g, "")}
+                        parser={(value) => value.replace(/\s/g, "")}
                         disabled={disabled}
                         style={{ width: '100%', marginLeft: '0px' }}
                         value={creditCardPayment.card_number}
@@ -4169,7 +4254,7 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                         maxLength={4}
                         disabled={disabled}
                         controls={false}
-                        label={<span style={{ fontWeight: '400' }}>CVC非表示 <img style={{ width: '8%' }} src={cvcIcon} /></span>}
+                        label={<span style={{ fontWeight: '400' }}>CVC <img style={{ width: '8%' }} src={cvcIcon} /></span>}
                         value={creditCardPayment.cvc}
                         placeholder={creditCardPayment.cvc_placeholder}
                         onChange={value => onChangeValue(indexContent, content.type, value, 'cvc')}
@@ -4285,16 +4370,12 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                                             値段: {itemProduct.item_price} 円
                                           </div>
                                         }
-                                        {itemProduct.quantity_limit &&
+                                        {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                           <div className="ss-user-overview-product-purchase-infor-price">
                                             数量：最大{itemProduct.quantity_limit}個まで
-                                          </div>
+                                          </div> :
+                                          ""
                                         }
-                                        {/* {productPurchase.multiple_item_purchase &&
-                                        <div className="ss-user-overview-product-purchase-infor-price">
-                                          Multiple item purchase
-                                        </div>
-                                      } */}
                                       </div>
                                     }
                                   </div>
@@ -4305,7 +4386,14 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                                       className="sp-product-purchase-custom-input-quantity"
                                       style={{ width: '46%', marginLeft: '137px' }}
                                       value={itemProduct.quantity_select}
-                                      onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
+                                      onChange={value => {
+                                        let selectArr = [...productPurchase.initial_selection];
+                                        if (!selectArr.includes(itemProduct.id) && value) {
+                                          selectArr.push(itemProduct.id);
+                                          onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                        }
+                                        onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')
+                                      }}
                                       controls={false}
                                       min={1}
                                       disabled={disabled}
@@ -4342,7 +4430,7 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                                       >-</div>}
                                     />
                                     {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
-                                      <div style={{ color: '#FF7E00', fontSize: '12px', width: '46%', marginLeft: '137px' }}>
+                                      <div style={{ color: '#FF7E00', fontSize: '11px', width: '46%', marginLeft: '137px' }}>
                                         {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
                                       </div>
                                     }
@@ -4401,10 +4489,11 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                                             値段: {itemProduct.item_price} 円
                                           </div>
                                         }
-                                        {itemProduct.quantity_limit &&
+                                        {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                           <div className="ss-user-overview-product-purchase-infor-price">
                                             数量：最大{itemProduct.quantity_limit}個まで
-                                          </div>
+                                          </div> :
+                                          ""
                                         }
                                         {/* {productPurchase.multiple_item_purchase &&
                                         <div className="ss-user-overview-product-purchase-infor-price">
@@ -4417,44 +4506,57 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                                 </Radio>
                                 {
                                   (productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
-                                  <InputNum
-                                    className="sp-product-purchase-custom-input-quantity"
-                                    style={{ width: '46%', marginLeft: '137px' }}
-                                    value={itemProduct.quantity_select}
-                                    onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
-                                    controls={false}
-                                    disabled={disabled}
-                                    min={1}
-                                    max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
-                                    addonAfter={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (!disabled) {
-                                          if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
-                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                          }
-                                          let selectArr = [...productPurchase.initial_selection];
-                                          if (!selectArr.includes(itemProduct.id)) {
-                                            onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
-                                          }
+                                  <div>
+                                    <InputNum
+                                      className="sp-product-purchase-custom-input-quantity"
+                                      style={{ width: '46%', marginLeft: '137px' }}
+                                      value={itemProduct.quantity_select}
+                                      onChange={value => {
+                                        let selectArr = [...productPurchase.initial_selection];
+                                        if (!selectArr.includes(itemProduct.id) && value) {
+                                          onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
                                         }
+                                        onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')
                                       }}
-                                    >+</div>}
-                                    addonBefore={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (!disabled) {
-                                          if (itemProduct.quantity_select > 1) {
-                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                      controls={false}
+                                      disabled={disabled}
+                                      min={1}
+                                      max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
+                                      addonAfter={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                            }
                                           }
-                                          let selectArr = [...productPurchase.initial_selection];
-                                          if (!selectArr.includes(itemProduct.id)) {
-                                            onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                        }}
+                                      >+</div>}
+                                      addonBefore={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select > 1) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                            }
                                           }
-                                        }
-                                      }}
-                                    >-</div>}
-                                  />
+                                        }}
+                                      >-</div>}
+                                    />
+                                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
+                                      <div style={{ color: '#FF7E00', fontSize: '11px', width: '46%', marginLeft: '137px' }}>
+                                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
+                                      </div>
+                                    }
+                                  </div>
                                 }
                               </div>
                             })}
@@ -4479,7 +4581,6 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                                     let selectArr = [...productPurchase.initial_selection];
                                     if (selectArr.includes(itemProduct.id)) {
                                       selectArr = [...selectArr.filter(item => item !== itemProduct.id)];
-                                      console.log(selectArr, itemProduct.id, 'cehckkkkk');
                                     } else {
                                       selectArr.push(itemProduct.id);
                                     }
@@ -4495,54 +4596,69 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                                         {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
                                       </div>
                                     }
-                                    {itemProduct.quantity_limit &&
+                                    {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                       <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                         数量：最大{itemProduct.quantity_limit}個まで
-                                      </div>
+                                      </div> :
+                                      ""
                                     }
                                   </div>
                                 </Checkbox>
                                 {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
-                                  <InputNum
-                                    className="sp-product-purchase-custom-input-quantity"
-                                    value={itemProduct.quantity_select}
-                                    onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
-                                    controls={false}
-                                    min={1}
-                                    disabled={disabled}
-                                    style={{ width: '60%' }}
-                                    max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
-                                    addonAfter={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (!disabled) {
-                                          if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
-                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                          }
-                                          let selectArr = [...productPurchase.initial_selection];
-                                          if (!selectArr.includes(itemProduct.id)) {
-                                            selectArr.push(itemProduct.id);
-                                            onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
-                                          }
+                                  <div>
+                                    <InputNum
+                                      className="sp-product-purchase-custom-input-quantity"
+                                      value={itemProduct.quantity_select}
+                                      onChange={value => {
+                                        let selectArr = [...productPurchase.initial_selection];
+                                        if (!selectArr.includes(itemProduct.id) && value) {
+                                          selectArr.push(itemProduct.id);
+                                          onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
                                         }
+                                        onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')
                                       }}
-                                    >+</div>}
-                                    addonBefore={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (!disabled) {
-                                          if (itemProduct.quantity_select > 1) {
-                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                      controls={false}
+                                      min={1}
+                                      disabled={disabled}
+                                      style={{ width: '60%' }}
+                                      max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
+                                      addonAfter={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              selectArr.push(itemProduct.id);
+                                              onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                            }
                                           }
-                                          let selectArr = [...productPurchase.initial_selection];
-                                          if (!selectArr.includes(itemProduct.id)) {
-                                            selectArr.push(itemProduct.id);
-                                            onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                        }}
+                                      >+</div>}
+                                      addonBefore={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select > 1) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              selectArr.push(itemProduct.id);
+                                              onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                            }
                                           }
-                                        }
-                                      }}
-                                    >-</div>}
-                                  />
+                                        }}
+                                      >-</div>}
+                                    />
+                                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
+                                      <div style={{ color: '#FF7E00', fontSize: '11px' }}>
+                                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
+                                      </div>
+                                    }
+                                  </div>
                                 }
                               </div>
                             })}
@@ -4578,52 +4694,66 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                                         {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
                                       </div>
                                     }
-                                    {itemProduct.quantity_limit &&
+                                    {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                       <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                         数量：最大{itemProduct.quantity_limit}個まで
-                                      </div>
+                                      </div> :
+                                      ""
                                     }
                                   </div>
                                 </Radio>
                                 {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
-                                  <InputNum
-                                    className="sp-product-purchase-custom-input-quantity"
-                                    style={{ width: '60%' }}
-                                    disabled={disabled}
-                                    value={itemProduct.quantity_select}
-                                    onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
-                                    controls={false}
-                                    min={1}
-                                    max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
-                                    addonAfter={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (!disabled) {
-                                          if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
-                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                          }
-                                          let selectArr = [...productPurchase.initial_selection];
-                                          if (!selectArr.includes(itemProduct.id)) {
-                                            onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
-                                          }
+                                  <div>
+                                    <InputNum
+                                      className="sp-product-purchase-custom-input-quantity"
+                                      style={{ width: '60%' }}
+                                      disabled={disabled}
+                                      value={itemProduct.quantity_select}
+                                      onChange={value => {
+                                        let selectArr = [...productPurchase.initial_selection];
+                                        if (!selectArr.includes(itemProduct.id) && value) {
+                                          onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
                                         }
+                                        onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')
                                       }}
-                                    >+</div>}
-                                    addonBefore={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (!disabled) {
-                                          if (itemProduct.quantity_select > 1) {
-                                            onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                      controls={false}
+                                      min={1}
+                                      max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
+                                      addonAfter={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                            }
                                           }
-                                          let selectArr = [...productPurchase.initial_selection];
-                                          if (!selectArr.includes(itemProduct.id)) {
-                                            onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                        }}
+                                      >+</div>}
+                                      addonBefore={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select > 1) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                            }
                                           }
-                                        }
-                                      }}
-                                    >-</div>}
-                                  />
+                                        }}
+                                      >-</div>}
+                                    />
+                                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
+                                      <div style={{ color: '#FF7E00', fontSize: '11px' }}>
+                                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
+                                      </div>
+                                    }
+                                  </div>
                                 }
                               </div>
                             })}
@@ -4905,8 +5035,16 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                             console.log(cardPaymentRadioButton.card_linked_setting, itemPayment.id)
                             onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
 
-                            if (cardPaymentRadioButton.card_linked_setting !== dataValue && messageContent.length === 1) {
-                              onClickNext();
+                            // if (cardPaymentRadioButton.card_linked_setting !== dataValue && messageContent.length === 1) {
+                            //   onClickNext();
+                            // }
+                            if (cardPaymentRadioButton.card_linked_setting === dataValue) {
+                              onChangeValue(indexContent, content.type, true, 'is_display_card_payment');
+                              displayButtonNext(true);
+                            } else {
+                              displayButtonNext(false);
+                              onChangeValue(indexContent, content.type, false, 'is_display_card_payment');
+                              if (messageContent.length === 1) onClickNext();
                             }
                           }}>
                           {itemPayment.text}
@@ -4934,9 +5072,17 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                                   dataValue = "";
                                 }
                                 onChangeValue(indexContent, content.type, dataValue, 'initial_selection_picture');
-                                if (cardPaymentRadioButton.card_linked_setting_picture !== dataValue && messageContent.length === 1) {
-                                  console.log(cardPaymentRadioButton.card_linked_setting_picture !== dataValue, cardPaymentRadioButton.card_linked_setting_picture, dataValue)
-                                  onClickNext();
+                                // if (cardPaymentRadioButton.card_linked_setting_picture !== dataValue && messageContent.length === 1) {
+                                //   console.log(cardPaymentRadioButton.card_linked_setting_picture !== dataValue, cardPaymentRadioButton.card_linked_setting_picture, dataValue)
+                                //   onClickNext();
+                                // }
+                                if (cardPaymentRadioButton.card_linked_setting_picture === dataValue) {
+                                  onChangeValue(indexContent, content.type, true, 'is_display_card_payment');
+                                  displayButtonNext(true);
+                                } else {
+                                  displayButtonNext(false);
+                                  onChangeValue(indexContent, content.type, false, 'is_display_card_payment');
+                                  if (messageContent.length === 1) onClickNext();
                                 }
                               }}>
                               <img src={itemPaymentContent.file_url}></img>
@@ -4968,6 +5114,16 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                             controls={false}
                             max={Number.MAX_SAFE_INTEGER}
                             maxLength={16}
+                            onPaste={e => {
+                              // Get the pasted value and remove all white space
+                              const value = e.clipboardData.getData('text').replace(/\s/g, '');
+                              console.log(value)
+                              // Set the value of the input to the pasted value
+                              onChangeValue(indexContent, content.type, value, 'card_number');
+                              e.target.value = value;
+                            }}
+                            formatter={(value) => value.replace(/\s/g, "")}
+                            parser={(value) => value.replace(/\s/g, "")}
                             disabled={disabled}
                             style={{ width: '100%', marginLeft: '0px' }}
                             value={cardPaymentRadioButton.card_number}
@@ -5104,16 +5260,18 @@ const UserMessage = ({ dataMessages, messageContentProps, onChangeValue, disable
                         }
                       </div>
                       {cardPaymentRadioButton.is_hide_cvc === false &&
-                        <div className="ss-user-setting__item-bottom">
-                          <InputCustom
-                            className="ss-user-setting-input-overview"
-                            styleLabel={{ width: '100%' }}
-                            label="CVC非表示"
-                            inline={false}
+                        <div className="ss-user-setting__item-bottom" style={{ display: 'block' }}>
+                          <InputNum
+                            style={{ marginLeft: '0px', width: '33%' }}
+                            className="ss-user-setting-input-limit-character"
+                            max={9999}
+                            maxLength={4}
                             disabled={disabled}
+                            controls={false}
+                            label={<span style={{ fontWeight: '400' }}>CVC <img style={{ width: '8%' }} src={cvcIcon} /></span>}
                             value={cardPaymentRadioButton.cvc}
-                            onChange={value => onChangeValue(indexContent, content.type, value, 'cvc')}
                             placeholder={cardPaymentRadioButton.cvc_placeholder}
+                            onChange={value => onChangeValue(indexContent, content.type, value, 'cvc')}
                           />
                         </div>
                       }
