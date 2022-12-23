@@ -24,7 +24,6 @@ import discover from '../../../assets/img/payment-method/discover.png';
 import jcb from '../../../assets/img/payment-method/jcb.png';
 import master_card from '../../../assets/img/payment-method/master_card.png';
 import visa from '../../../assets/img/payment-method/visa.png';
-import iconMessage from '../../../assets/img/icon-message.png';
 import {
   SHORTEN_URL
 } from '../../../variables/constants';
@@ -1173,7 +1172,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
         ) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
           isValid = false;
-        } else if ((contentType.card_number && (contentType.card_number + "").length !== 16) ||
+        } else if ((contentType.card_number && (contentType.card_number + "").length !== 16 || /[^0-9]+/.test(contentType.card_number)) ||
           ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
             ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "クレジットカード番号は無効です。";
@@ -1197,7 +1196,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps }) {
         ) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
           isValid = false;
-        } else if ((contentType.card_number && (contentType.card_number + "").length !== 16) ||
+        } else if ((contentType.card_number && (contentType.card_number + "").length !== 16 || /[^0-9]+/.test(contentType.card_number)) ||
           ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
             ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "クレジットカード番号は無効です。";
@@ -4110,16 +4109,13 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           onChangeValue(indexContent, content.type, value, 'card_number')
                           e.target.value = value;
                         }}
-                        // formatter={(value) => value.replace(/\s/g, "")}
-                        // parser={(value) => value.replace(/\s/g, "")}
+                        formatter={(value) => value.replace(/\s/g, "")}
+                        parser={(value) => value.replace(/\s/g, "")}
                         disabled={disabled}
                         style={{ width: '100%', marginLeft: '0px' }}
                         value={creditCardPayment.card_number}
                         placeholder={creditCardPayment.card_number_placeholder}
-                        onChange={value => {
-                          console.log(value)
-                          onChangeValue(indexContent, content.type, value, 'card_number')
-                      }}
+                        onChange={value => onChangeValue(indexContent, content.type, value, 'card_number')}
                       />
                     </div> :
                     <div className="ss-user-setting__item-bottom">
@@ -5118,6 +5114,16 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             controls={false}
                             max={Number.MAX_SAFE_INTEGER}
                             maxLength={16}
+                            onPaste={e => {
+                              // Get the pasted value and remove all white space
+                              const value = e.clipboardData.getData('text').replace(/\s/g, '');
+                              console.log(value)
+                              // Set the value of the input to the pasted value
+                              onChangeValue(indexContent, content.type, value, 'card_number');
+                              e.target.value = value;
+                            }}
+                            formatter={(value) => value.replace(/\s/g, "")}
+                            parser={(value) => value.replace(/\s/g, "")}
                             disabled={disabled}
                             style={{ width: '100%', marginLeft: '0px' }}
                             value={cardPaymentRadioButton.card_number}
