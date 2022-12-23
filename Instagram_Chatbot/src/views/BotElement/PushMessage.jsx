@@ -29,6 +29,7 @@ function PushMessage() {
   const [numHotTemp, setNumHotTemp] = useState(0);
   const [alternateSendTime, setAlternateSendTime] = useState([]);
   const [listExcludedTimeAlt, setListExcluedTimeAlt] = useState([]);
+  const [listExcludedTimeAltText, setListExcluedTimeAltText] = useState([]);
   const [update, setUpdate] = useState(false);
   const [itemUpdate, setItemUpdate] = useState();
   const [isChecked, setIsChecked] = useState(false);
@@ -41,10 +42,17 @@ function PushMessage() {
     setAlternateSendTime(listAlternateTime);
 
     let listExcludedTimeAltEx = [];
+    let listExcludedTimeAltExText = [];
     for (var i = 0; i < 24; i++) {
       listExcludedTimeAltEx.push(i);
+      if (i<10){
+        listExcludedTimeAltExText.push(`0${i}`)
+      }else{
+        listExcludedTimeAltExText.push(i);
+      }
     }
     setListExcluedTimeAlt(listExcludedTimeAltEx);
+    setListExcluedTimeAltText(listExcludedTimeAltExText)
   }, []);
   useEffect(() => {
     var bot_id = Cookies.get('bot_id');
@@ -110,6 +118,13 @@ function PushMessage() {
     setCustomDiv(cDivs);
     setNumHotTemp(numHotTemp + 1);
   }
+  function removeOptions(selectElement) {
+    var i,
+      L = selectElement.options.length - 1;
+    for (i = L; i >= 0; i--) {
+      selectElement.remove(i);
+    }
+  }
   function getEmailList() {
     var bot_id = Cookies.get('bot_id');
     api
@@ -119,12 +134,38 @@ function PushMessage() {
           console.log(res.data.data);
           // setEmailList(res.data.data);
           var group = document.getElementById(`push_message_email`);
+          removeOptions(group)
           for (let i = 0; i < res.data?.data.length; i++) {
             let option = document.createElement('option');
             option.value = res.data.data[i].id;
             option.text = res.data.data[i].email_template_name;
             group?.add(option);
           }
+        }
+        for (var i = 0; i < group?.length; i++) {
+          if (i > 0) {
+            if (group[i].value == group[i - 1].value) {
+              // alert('same')
+              group.remove(i);
+            }
+          }
+        }
+
+        //////////////Display err msg///////////////
+        console.log('res.data?.data: ',res.data?.data)
+        if(res.data?.data.length ==0){
+          if(document.getElementById('push_message_email')!= null){
+            document.getElementById('push_message_email').style.display = 'none'
+          document.getElementById('EmailErr').style.display = 'block'
+        }else{
+          if(document.getElementById('push_message_email')!= null){
+            document.getElementById('push_message_email').style.display = 'block'
+          document.getElementById('EmailErr').style.display = 'none'
+          }
+          }
+          
+         
+          
         }
         // setEmailDetailId(res?.data?.data[0].id)
         // set1stEmailDetailId()
@@ -802,7 +843,9 @@ function PushMessage() {
                 </span>
                 <select id="push_message_email" name="email_id" className="push-message-input-form">
                   {/* <option value="">Please select email</option> */}
+                  
                 </select>
+                <span id="EmailErr" style={{ color: 'red', display: 'none' }}>データがありません。</span>
               </div>
               <br />
               <div className="push-message-add-form">
@@ -881,7 +924,7 @@ function PushMessage() {
                     >
                       {listExcludedTimeAlt.map((item, i) => (
                         <option key={i} value={item}>
-                          {item}
+                          {listExcludedTimeAltText[i]}
                         </option>
                       ))}
                     </select>
@@ -895,7 +938,7 @@ function PushMessage() {
                     >
                       {listExcludedTimeAlt.map((item, i) => (
                         <option key={i} value={item}>
-                          {item}
+                          {listExcludedTimeAltText[i]}
                         </option>
                       ))}
                     </select>
@@ -917,7 +960,7 @@ function PushMessage() {
                     >
                       {listExcludedTimeAlt.map((item, i) => (
                         <option key={i} value={item}>
-                          {item}
+                          {listExcludedTimeAltText[i]}
                         </option>
                       ))}
                     </select>

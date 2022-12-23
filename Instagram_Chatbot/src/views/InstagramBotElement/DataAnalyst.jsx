@@ -1,20 +1,21 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardBody, Row, Col, Table, Button } from 'reactstrap';
+// import { Chart as ChartJS, registerables } from 'chart.js';
+import { Line } from 'react-chartjs-2';
+import { VictoryPie } from 'victory-pie';
+// import { AgChartsReact } from "ag-charts-react";
 import api from '../../api/api-management';
 import ReactApexChart from 'react-apexcharts';
 import '../../assets/css/general.css';
 import { CSVLink } from 'react-csv';
 import { MDBIcon } from 'mdbreact';
 import Cookies from 'js-cookie';
-import DatePicker, { registerLocale } from "react-datepicker";
+import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import ja from "date-fns/locale/ja";
 import requestNewToken from 'api/request-new-token';
 import * as utils from './../../JS/client.js';
 import { Pagination } from '@material-ui/lab';
 import { useEffect } from 'react';
-import { tokenExpired } from 'api/tokenExpired';
-registerLocale("ja", ja);
 // const categories = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
 
 function DataAnalyst() {
@@ -94,9 +95,9 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //     requestNewToken(path)
+        // }
       });
   }, []);
 
@@ -318,9 +319,6 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
 
     ////////////////////////////////////////////////
@@ -342,9 +340,6 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
     ///////////////////////////////////////////////
     api
@@ -363,14 +358,12 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
     ///////////////////////////////////////////////
     api
       .get(
-        `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${month - 6
+        `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${
+          month - 6
         }-15&end_date=${dateEnd}`
       )
       .then((res) => {
@@ -384,9 +377,6 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }, []);
 
@@ -438,9 +428,6 @@ function DataAnalyst() {
             })
             .catch((error) => {
               console.log(error);
-              if (error.response?.data.code === 0) {
-                tokenExpired()
-              }
             });
         }
         // console.log('msgDataAll: ', msgDataAll);
@@ -448,9 +435,6 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }, []);
 
@@ -643,9 +627,6 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
       ////////////////////////////////////////////////
       api
@@ -676,9 +657,6 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
       ///////////////////////////////////////////////
       // api
@@ -711,9 +689,6 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
           });
       } else {
         api
@@ -727,9 +702,6 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
       }
       ///////////////////////////////////////////////
@@ -752,9 +724,6 @@ function DataAnalyst() {
                 })
                 .catch((error) => {
                   console.log(error);
-                  if (error.response?.data.code === 0) {
-                    tokenExpired()
-                  }
                 });
             }
             // console.log('msgDataAll: ', msgDataAll);
@@ -762,9 +731,6 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
       } else {
         api
@@ -784,9 +750,6 @@ function DataAnalyst() {
                 })
                 .catch((error) => {
                   console.log(error);
-                  if (error.response?.data.code === 0) {
-                    tokenExpired()
-                  }
                 });
             }
             // console.log('msgDataAll: ', msgDataAll);
@@ -794,9 +757,6 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
       }
     } else {
@@ -979,9 +939,6 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
       ////////////////////////////////////////////////
       api
@@ -997,9 +954,6 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
       ///////////////////////////////////////////////
       api
@@ -1015,9 +969,6 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
       ///////////////////////////////////////////////
       // api
@@ -1048,9 +999,6 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
       } else {
         api
@@ -1064,9 +1012,6 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
       }
       ///////////////////////////////////////////////
@@ -1089,9 +1034,6 @@ function DataAnalyst() {
                 })
                 .catch((error) => {
                   console.log(error);
-                  if (error.response?.data.code === 0) {
-                    tokenExpired()
-                  }
                 });
             }
             // console.log('msgDataAll: ', msgDataAll);
@@ -1099,9 +1041,6 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
       } else {
         api
@@ -1121,9 +1060,6 @@ function DataAnalyst() {
                 })
                 .catch((error) => {
                   console.log(error);
-                  if (error.response?.data.code === 0) {
-                    tokenExpired()
-                  }
                 });
             }
             // console.log('msgDataAll: ', msgDataAll);
@@ -1131,9 +1067,6 @@ function DataAnalyst() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
       }
     } else {
@@ -1163,9 +1096,6 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   };
 
@@ -1191,9 +1121,6 @@ function DataAnalyst() {
             })
             .catch((error) => {
               console.log(error);
-              if (error.response?.data.code === 0) {
-                tokenExpired()
-              }
             });
         }
         // console.log('msgDataAll: ', msgDataAll);
@@ -1201,9 +1128,6 @@ function DataAnalyst() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   };
 
@@ -1265,9 +1189,6 @@ function DataAnalyst() {
               })
               .catch((error) => {
                 console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
               });
           } else {
             setLiveData(res.data?.live_usages);
@@ -1276,9 +1197,6 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     } else {
       api
@@ -1297,9 +1215,6 @@ function DataAnalyst() {
               })
               .catch((error) => {
                 console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
               });
           } else {
             setLiveData(res.data?.live_usages);
@@ -1308,9 +1223,6 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     }
   };
@@ -1349,9 +1261,6 @@ function DataAnalyst() {
                     })
                     .catch((error) => {
                       console.log(error);
-                      if (error.response?.data.code === 0) {
-                        tokenExpired()
-                      }
                     });
                 }
                 // console.log('msgDataAll: ', msgDataAll);
@@ -1359,9 +1268,6 @@ function DataAnalyst() {
               })
               .catch((error) => {
                 console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
               });
           } else {
             setListGroup(res?.data?.data);
@@ -1374,9 +1280,6 @@ function DataAnalyst() {
                 })
                 .catch((error) => {
                   console.log(error);
-                  if (error.response?.data.code === 0) {
-                    tokenExpired()
-                  }
                 });
             }
             // console.log('msgDataAll: ', msgDataAll);
@@ -1385,9 +1288,6 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     } else {
       api
@@ -1416,9 +1316,6 @@ function DataAnalyst() {
                     })
                     .catch((error) => {
                       console.log(error);
-                      if (error.response?.data.code === 0) {
-                        tokenExpired()
-                      }
                     });
                 }
                 // console.log('msgDataAll: ', msgDataAll);
@@ -1426,9 +1323,6 @@ function DataAnalyst() {
               })
               .catch((error) => {
                 console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
               });
           } else {
             setListGroup(res?.data?.data);
@@ -1441,9 +1335,6 @@ function DataAnalyst() {
                 })
                 .catch((error) => {
                   console.log(error);
-                  if (error.response?.data.code === 0) {
-                    tokenExpired()
-                  }
                 });
             }
             // console.log('msgDataAll: ', msgDataAll);
@@ -1452,9 +1343,6 @@ function DataAnalyst() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     }
   };
@@ -1507,7 +1395,6 @@ function DataAnalyst() {
                         selected={startDate}
                         onChange={(date) => selectDateStart(date)}
                         dateFormat="yyyy/MM/dd"
-                        locale='ja'
                       />
                     </div>
                     <div style={{ borderRadius: '5px', padding: '5px' }}>
@@ -1515,7 +1402,6 @@ function DataAnalyst() {
                         selected={endDate}
                         onChange={(date) => selectDateEnd(date)}
                         dateFormat="yyyy/MM/dd"
-                        locale='ja'
                       />
                     </div>
                     {/* <select onChange={(e) => selectDate(e.target.value)} style={{ padding: "5px 10px 5px 10px", border: "none", borderRadius: "7.5px", backgroundColor: "#64cbcb", color: "#FFFFFF", fontWeight: "800" }} defaultValue={"5d"} name="days_num_ec_cb" id="days_num_ec_cb">
@@ -1604,7 +1490,7 @@ function DataAnalyst() {
                           </thead>
                           <tbody>
                             {liveData &&
-                              liveData.map((item) => (
+                              liveData?.map((item) => (
                                 <tr
                                   key={item.media_start_at}
                                   style={{ overflow: 'hidden', height: '14px' }}
@@ -1721,7 +1607,7 @@ function DataAnalyst() {
                       </tr>
                     </thead>
                     <tbody>
-                      {listGroup.map((item, i) => (
+                      {listGroup?.map((item, i) => (
                         <tr key={item?.id} style={{ overflow: 'hidden', height: '14px' }}>
                           <td>{item?.group_name}</td>
                           {userRole && <td>{item?.client_name}</td>}

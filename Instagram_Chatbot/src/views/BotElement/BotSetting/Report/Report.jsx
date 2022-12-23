@@ -114,8 +114,8 @@ function Report() {
                 )
                   .toISOString()
                   .slice(0, 10)}&end_date=${new Date(new Date().setDate(new Date().getDate() - 1))
-                  .toISOString()
-                  .slice(0, 10)}`
+                    .toISOString()
+                    .slice(0, 10)}`
               )
               .then((res) => {
                 // console.log('bot data: ', res.data);
@@ -204,13 +204,12 @@ function Report() {
               });
             api
               .get(
-                `/api/v1/analytics/scenario_counts/${
-                  dataScenario[0].id
+                `/api/v1/analytics/scenario_counts/${dataScenario[0].id
                 }/download?begin_date=${new Date(new Date().setDate(1))
                   .toISOString()
                   .slice(0, 10)}&end_date=${new Date(new Date().setDate(new Date().getDate() - 1))
-                  .toISOString()
-                  .slice(0, 10)}`
+                    .toISOString()
+                    .slice(0, 10)}`
               )
               .then((res) => {
                 setStartDateEx(new Date(new Date().setDate(1)).toISOString().slice(0, 10));
@@ -259,7 +258,7 @@ function Report() {
                   'CV タブレット',
                   'CV スマートフォン',
                   'CV合計数',
-                  'BOT開始',
+                  'BOT起動',
                 ]);
                 let exportCTR = [
                   [
@@ -275,8 +274,8 @@ function Report() {
                   'CT PC',
                   'CT タブレット',
                   'CT スマートフォン',
-                  'CT合計数',
                   'BOT開始',
+                  'BOT起動',
                 ]);
                 let exportLeaveBotRate = [
                   [
@@ -306,8 +305,8 @@ function Report() {
                   exportClickThrough.push([
                     index.log_date,
                     index.pc_open_chatbot_window_count +
-                      index.smartphone_open_chatbot_window_count +
-                      index.tablet_open_chatbot_window_count,
+                    index.smartphone_open_chatbot_window_count +
+                    index.tablet_open_chatbot_window_count,
                     index.pc_count + index.smartphone_count + index.tablet_count,
                   ]);
                   totalBotStart +=
@@ -324,11 +323,11 @@ function Report() {
                     index.tablet_close_chatbot_window_count,
                     index.smartphone_close_chatbot_window_count,
                     index.pc_open_chatbot_window_count +
-                      index.smartphone_open_chatbot_window_count +
-                      index.tablet_open_chatbot_window_count,
+                    index.smartphone_open_chatbot_window_count +
+                    index.tablet_open_chatbot_window_count,
                     index.pc_close_chatbot_window_count +
-                      index.tablet_close_chatbot_window_count +
-                      index.smartphone_close_chatbot_window_count,
+                    index.tablet_close_chatbot_window_count +
+                    index.smartphone_close_chatbot_window_count,
                   ]);
                   totalBotLeave +=
                     index.pc_close_chatbot_window_count +
@@ -357,7 +356,7 @@ function Report() {
                   'CTR',
                   totalBotOpen === 0
                     ? `0%`
-                    : `${Math.round((totalBotStart * 100) / totalBotOpen).toFixed(2)}%`,
+                    : `${Math.round((totalBotOpen * 100) / totalBotStart).toFixed(2)}%`,
                 ]);
                 exportLeaveBotRate.push([lBPC, lBTB, lBSP, totalBotLeave, totalBotStart]);
                 exportLeaveBotRate.push([
@@ -371,7 +370,7 @@ function Report() {
                 ]);
                 exportCV.push(['', '合計', '', totalConversion]);
                 exportClickThrough.push(['合計', totalBotStart, totalBotOpen]);
-                exportBotLeave.push(['', '合計', '', '', totalBotStart, totalBotOpen]);
+                exportBotLeave.push(['', '合計', '', '', totalBotStart, totalBotLeave]);
                 setConversionExport(exportCV);
                 setClickThroughExport(exportClickThrough);
                 setLeaveBotExport(exportBotLeave);
@@ -401,11 +400,11 @@ function Report() {
   var optionsCVR = {
     series: [
       {
-        name: CVRCTR === false ? 'コンバージョン' : 'BOT開始',
+        name: CVRCTR === false ? 'コンバージョン' : 'BOT起動',
         data: [CVRCTR === false ? conversionCVRCTR : numOfOpenBot],
       },
       {
-        name: CVRCTR === false ? 'BOT起動' : 'BOT開始数',
+        name: CVRCTR === false ? 'BOT起動' : 'BOT開始',
         data: [CVRCTR === false ? numOfOpenBot : numOfBotStart],
       },
     ],
@@ -454,12 +453,11 @@ function Report() {
       },
       xaxis: {
         categories: [
-          ` ${
-            CVRCTR === false
-              ? numOfOpenBot === 0
-                ? `CVR: 0`
-                : `CVR: ${Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)}`
-              : numOfBotStart === 0
+          ` ${CVRCTR === false
+            ? numOfOpenBot === 0
+              ? `CVR: 0`
+              : `CVR: ${Math.round((conversionCVRCTR * 100) / numOfOpenBot).toFixed(2)}`
+            : numOfBotStart === 0
               ? `CTR: 0`
               : `CTR: ${Math.round((numOfOpenBot * 100) / numOfBotStart).toFixed(2)}`
           }%`,
@@ -549,9 +547,8 @@ function Report() {
         floating: true,
       },
       subtitle: {
-        text: `離脱: ${
-          numOfBotStart === 0 ? 0 : Math.round((numOfCloseBot * 100) / numOfBotStart).toFixed(2)
-        }%`,
+        text: `離脱: ${numOfBotStart === 0 ? 0 : Math.round((numOfCloseBot * 100) / numOfBotStart).toFixed(2)
+          }%`,
         align: 'center',
       },
       tooltip: {
@@ -624,9 +621,8 @@ function Report() {
         floating: true,
       },
       subtitle: {
-        text: `CTR (BOT開始数/BOT起動数: ${
-          numOfBotStart === 0 ? 0 : Math.round((conversionCVRCTR * 100) / numOfBotStart).toFixed(2)
-        }%`,
+        text: `CTR (BOT開始数/BOT起動数: ${numOfBotStart === 0 ? 0 : Math.round((conversionCVRCTR * 100) / numOfBotStart).toFixed(2)
+          }%`,
         align: 'center',
       },
       tooltip: {
@@ -838,83 +834,83 @@ function Report() {
               searchVal.device == 'all'
                 ? [['集計期間', 'CV PC', 'CV タブレット', 'CV スマートフォン']]
                 : searchVal.device == 'computer'
-                ? [['集計期間', 'CV PC']]
-                : searchVal.device == 'tablet'
-                ? [['集計期間', 'CV タブレット']]
-                : [['集計期間', 'CV スマートフォン']];
+                  ? [['集計期間', 'CV PC']]
+                  : searchVal.device == 'tablet'
+                    ? [['集計期間', 'CV タブレット']]
+                    : [['集計期間', 'CV スマートフォン']];
 
             let exportCVR = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
             exportCVR.push(
               searchVal.device == 'all'
-                ? ['CV PC', 'CV タブレット', 'CV スマートフォン', 'CV合計数', 'BOT開始']
+                ? ['CV PC', 'CV タブレット', 'CV スマートフォン', 'CV合計数', 'BOT起動']
                 : searchVal.device == 'computer'
-                ? ['CV PC', 'CV合計数', 'BOT開始']
-                : searchVal.device == 'tablet'
-                ? ['CV タブレット', 'CV合計数', 'BOT開始']
-                : ['CV スマートフォン', 'CV合計数', 'BOT開始']
+                  ? ['CV PC', 'CV合計数', 'BOT起動']
+                  : searchVal.device == 'tablet'
+                    ? ['CV タブレット', 'CV合計数', 'BOT起動']
+                    : ['CV スマートフォン', 'CV合計数', 'BOT起動']
             );
             let exportCTR = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
             let exportClickThrough = [['集計期間', 'BOT開始', 'BOT起動']];
             let exportBotLeave = [
               searchVal.device == 'all'
                 ? [
-                    '集計期間',
-                    'PC離脱',
-                    'タブレット離脱',
-                    'スマートフォン離脱',
-                    'BOT開始',
-                    'BOT離脱',
-                  ]
+                  '集計期間',
+                  'PC離脱',
+                  'タブレット離脱',
+                  'スマートフォン離脱',
+                  'BOT開始',
+                  'BOT離脱',
+                ]
                 : searchVal.device == 'computer'
-                ? ['集計期間', 'PC離脱', 'BOT開始', 'BOT離脱']
-                : searchVal.device == 'tablet'
-                ? ['集計期間', 'タブレット離脱', 'BOT開始', 'BOT離脱']
-                : ['集計期間', 'スマートフォン離脱', 'BOT開始', 'BOT離脱'],
+                  ? ['集計期間', 'PC離脱', 'BOT開始', 'BOT離脱']
+                  : searchVal.device == 'tablet'
+                    ? ['集計期間', 'タブレット離脱', 'BOT開始', 'BOT離脱']
+                    : ['集計期間', 'スマートフォン離脱', 'BOT開始', 'BOT離脱'],
             ];
             exportCTR.push(
               searchVal.device == 'all'
-                ? ['CT PC', 'CT タブレット', 'CT スマートフォン', 'CT合計数', 'BOT開始']
+                ? ['CT PC', 'CT タブレット', 'CT スマートフォン', 'BOT開始', 'BOT起動']
                 : searchVal.device == 'computer'
-                ? ['CT PC', 'CT合計数', 'BOT開始']
-                : searchVal.device == 'tablet'
-                ? ['CT タブレット', 'CT合計数', 'BOT開始']
-                : ['CT スマートフォン', 'CT合計数', 'BOT開始']
+                  ? ['CT PC', 'BOT開始', 'BOT起動']
+                  : searchVal.device == 'tablet'
+                    ? ['CT タブレット', 'BOT開始', 'BOT起動']
+                    : ['CT スマートフォン', 'BOT開始', 'BOT起動']
             );
             let exportLeaveBotRate = [['集計期間', `${searchVal.startDate}~${searchVal.endDate}`]];
             exportLeaveBotRate.push(
               searchVal.device == 'all'
                 ? ['PC', 'タブレット', 'スマートフォン', '合計', 'BOT開始']
                 : searchVal.device == 'computer'
-                ? ['PC', '合計', 'BOT開始']
-                : searchVal.device == 'tablet'
-                ? ['タブレット', '合計', 'BOT開始']
-                : ['スマートフォン', '合計', 'BOT開始']
+                  ? ['PC', '合計', 'BOT開始']
+                  : searchVal.device == 'tablet'
+                    ? ['タブレット', '合計', 'BOT開始']
+                    : ['スマートフォン', '合計', 'BOT開始']
             );
             exportData.forEach((index) => {
               exportCV.push(
                 searchVal.device == 'all'
                   ? [
-                      index.log_date,
-                      index.pc_conversion_count,
-                      index.tablet_conversion_count,
-                      index.smartphone_conversion_count,
-                    ]
+                    index.log_date,
+                    index.pc_conversion_count,
+                    index.tablet_conversion_count,
+                    index.smartphone_conversion_count,
+                  ]
                   : searchVal.device == 'computer'
-                  ? [index.log_date, index.pc_conversion_count]
-                  : searchVal.device == 'tablet'
-                  ? [index.log_date, index.tablet_conversion_count]
-                  : [index.log_date, index.smartphone_conversion_count]
+                    ? [index.log_date, index.pc_conversion_count]
+                    : searchVal.device == 'tablet'
+                      ? [index.log_date, index.tablet_conversion_count]
+                      : [index.log_date, index.smartphone_conversion_count]
               );
               totalConversion +=
                 searchVal.device == 'all'
                   ? index.pc_conversion_count +
-                    index.tablet_conversion_count +
-                    index.smartphone_conversion_count
+                  index.tablet_conversion_count +
+                  index.smartphone_conversion_count
                   : searchVal.device == 'computer'
-                  ? index.pc_conversion_count
-                  : searchVal.device == 'tablet'
-                  ? index.tablet_conversion_count
-                  : index.smartphone_conversion_count;
+                    ? index.pc_conversion_count
+                    : searchVal.device == 'tablet'
+                      ? index.tablet_conversion_count
+                      : index.smartphone_conversion_count;
 
               cvrPC += index.pc_conversion_count;
               cvrTB += index.tablet_conversion_count;
@@ -923,87 +919,87 @@ function Report() {
                 index.log_date,
                 searchVal.device == 'all'
                   ? index.pc_open_chatbot_window_count +
-                    index.smartphone_open_chatbot_window_count +
-                    index.tablet_open_chatbot_window_count
+                  index.smartphone_open_chatbot_window_count +
+                  index.tablet_open_chatbot_window_count
                   : searchVal.device == 'computer'
-                  ? index.pc_open_chatbot_window_count
-                  : searchVal.device == 'tablet'
-                  ? index.tablet_open_chatbot_window_count
-                  : index.smartphone_open_chatbot_window_count,
+                    ? index.pc_open_chatbot_window_count
+                    : searchVal.device == 'tablet'
+                      ? index.tablet_open_chatbot_window_count
+                      : index.smartphone_open_chatbot_window_count,
                 searchVal.device == 'all'
                   ? index.pc_count + index.smartphone_count + index.tablet_count
                   : searchVal.device == 'computer'
-                  ? index.pc_count
-                  : searchVal == 'tablet'
-                  ? index.tablet_count
-                  : index.smartphone_count,
+                    ? index.pc_count
+                    : searchVal == 'tablet'
+                      ? index.tablet_count
+                      : index.smartphone_count,
               ]);
               totalBotStart +=
                 searchVal.device == 'all'
                   ? index.pc_open_chatbot_window_count +
-                    index.smartphone_open_chatbot_window_count +
-                    index.tablet_open_chatbot_window_count
+                  index.smartphone_open_chatbot_window_count +
+                  index.tablet_open_chatbot_window_count
                   : searchVal.device == 'computer'
-                  ? index.pc_open_chatbot_window_count
-                  : searchVal.device == 'tablet'
-                  ? index.tablet_open_chatbot_window_count
-                  : index.smartphone_open_chatbot_window_count;
+                    ? index.pc_open_chatbot_window_count
+                    : searchVal.device == 'tablet'
+                      ? index.tablet_open_chatbot_window_count
+                      : index.smartphone_open_chatbot_window_count;
               totalBotOpen +=
                 searchVal.device == 'all'
                   ? index.pc_count + index.smartphone_count + index.tablet_count
-                  : searchVal.device == 'computer'
-                  ? index.pc_count
-                  : searchVal.device == 'tablet'
-                  ? index.tablet_count
-                  : index.smartphone_count;
+                  : (searchVal.device == 'computer'
+                    ? index.pc_count
+                    : searchVal.device == 'tablet'
+                      ? index.tablet_count
+                      : index.smartphone_count)
               ctrPC += index.pc_open_chatbot_window_count;
               ctrTB += index.tablet_open_chatbot_window_count;
               ctrSP += index.smartphone_open_chatbot_window_count;
               exportBotLeave.push(
                 searchVal.device == 'all'
                   ? [
-                      index.log_date,
-                      index.pc_close_chatbot_window_count,
-                      index.tablet_close_chatbot_window_count,
-                      index.smartphone_close_chatbot_window_count,
-                      index.pc_open_chatbot_window_count +
-                        index.smartphone_open_chatbot_window_count +
-                        index.tablet_open_chatbot_window_count,
-                      index.pc_close_chatbot_window_count +
-                        index.tablet_close_chatbot_window_count +
-                        index.smartphone_close_chatbot_window_count,
-                    ]
+                    index.log_date,
+                    index.pc_close_chatbot_window_count,
+                    index.tablet_close_chatbot_window_count,
+                    index.smartphone_close_chatbot_window_count,
+                    index.pc_open_chatbot_window_count +
+                    index.smartphone_open_chatbot_window_count +
+                    index.tablet_open_chatbot_window_count,
+                    index.pc_close_chatbot_window_count +
+                    index.tablet_close_chatbot_window_count +
+                    index.smartphone_close_chatbot_window_count,
+                  ]
                   : searchVal.device == 'computer'
-                  ? [
+                    ? [
                       index.log_date,
                       index.pc_close_chatbot_window_count,
                       index.pc_open_chatbot_window_count,
                       index.pc_close_chatbot_window_count,
                     ]
-                  : searchVal.device == 'tablet'
-                  ? [
-                      index.log_date,
-                      index.tablet_close_chatbot_window_count,
-                      index.tablet_open_chatbot_window_count,
-                      index.smartphone_close_chatbot_window_count,
-                    ]
-                  : [
-                      index.log_date,
-                      index.smartphone_close_chatbot_window_count,
-                      index.smartphone_open_chatbot_window_count,
-                      index.smartphone_close_chatbot_window_count,
-                    ]
+                    : searchVal.device == 'tablet'
+                      ? [
+                        index.log_date,
+                        index.tablet_close_chatbot_window_count,
+                        index.tablet_open_chatbot_window_count,
+                        index.smartphone_close_chatbot_window_count,
+                      ]
+                      : [
+                        index.log_date,
+                        index.smartphone_close_chatbot_window_count,
+                        index.smartphone_open_chatbot_window_count,
+                        index.smartphone_close_chatbot_window_count,
+                      ]
               );
               totalBotLeave +=
                 searchVal.device == 'all'
                   ? index.pc_close_chatbot_window_count +
-                    index.tablet_close_chatbot_window_count +
-                    index.smartphone_close_chatbot_window_count
+                  index.tablet_close_chatbot_window_count +
+                  index.smartphone_close_chatbot_window_count
                   : searchVal.device == 'computer'
-                  ? index.pc_close_chatbot_window_count
-                  : searchVal.device == 'tablet'
-                  ? index.tablet_close_chatbot_window_count
-                  : index.smartphone_close_chatbot_window_count;
+                    ? index.pc_close_chatbot_window_count
+                    : searchVal.device == 'tablet'
+                      ? index.tablet_close_chatbot_window_count
+                      : index.smartphone_close_chatbot_window_count;
               lBPC += index.pc_close_chatbot_window_count;
               lBTB += index.tablet_close_chatbot_window_count;
               lBSP += index.smartphone_close_chatbot_window_count;
@@ -1012,10 +1008,10 @@ function Report() {
               searchVal.device == 'all'
                 ? [cvrPC, cvrTB, cvrSP, totalConversion, totalBotOpen]
                 : searchVal.device == 'computer'
-                ? [cvrPC, totalConversion, totalBotOpen]
-                : searchVal.device == 'tablet'
-                ? [cvrTB, totalConversion, totalBotOpen]
-                : [cvrSP, totalConversion, totalBotOpen]
+                  ? [cvrPC, totalConversion, totalBotOpen]
+                  : searchVal.device == 'tablet'
+                    ? [cvrTB, totalConversion, totalBotOpen]
+                    : [cvrSP, totalConversion, totalBotOpen]
             );
             exportCVR.push([
               '',
@@ -1030,10 +1026,10 @@ function Report() {
               searchVal.device == 'all'
                 ? [ctrPC, ctrTB, ctrSP, totalBotStart, totalBotOpen]
                 : searchVal.device == 'computer'
-                ? [ctrPC, totalBotStart, totalBotOpen]
-                : searchVal.device == 'tablet'
-                ? [ctrTB, totalBotStart, totalBotOpen]
-                : [ctrSP, totalBotStart, totalBotOpen]
+                  ? [ctrPC, totalBotStart, totalBotOpen]
+                  : searchVal.device == 'tablet'
+                    ? [ctrTB, totalBotStart, totalBotOpen]
+                    : [ctrSP, totalBotStart, totalBotOpen]
             );
             exportCTR.push([
               '',
@@ -1048,10 +1044,10 @@ function Report() {
               searchVal.device == 'all'
                 ? [lBPC, lBTB, lBSP, totalBotLeave, totalBotStart]
                 : searchVal.device == 'computer'
-                ? [lBPC, totalBotLeave, totalBotStart]
-                : searchVal.device == 'tablet'
-                ? [lBTB, totalBotLeave, totalBotStart]
-                : [lBSP, totalBotLeave, totalBotStart]
+                  ? [lBPC, totalBotLeave, totalBotStart]
+                  : searchVal.device == 'tablet'
+                    ? [lBTB, totalBotLeave, totalBotStart]
+                    : [lBSP, totalBotLeave, totalBotStart]
             );
             exportLeaveBotRate.push([
               '',
@@ -1064,7 +1060,7 @@ function Report() {
             ]);
             exportCV.push(['', '合計', totalConversion, '']);
             exportClickThrough.push(['合計', totalBotStart, totalBotOpen]);
-            exportBotLeave.push(['', '合計', totalBotStart, totalBotOpen, '', '']);
+            exportBotLeave.push(['', '合計', totalBotStart, totalBotLeave, '', '']);
             setConversionExport(exportCV);
             setClickThroughExport(exportClickThrough);
             setLeaveBotExport(exportBotLeave);
@@ -1096,9 +1092,9 @@ function Report() {
   }
 
   const [startPage, setStartPage] = useState(true);
-  function startPageContent() {}
+  function startPageContent() { }
 
-  function cvPageContent() {}
+  function cvPageContent() { }
 
   // handle export
   const handleExport = async () => {
@@ -1380,23 +1376,23 @@ function Report() {
                             {/* <tr>sdsssd</tr> */}
                             {startPage
                               ? listContent?.map((item, index) => (
+                                <tr key={index}>
+                                  <td>{item.num_of_start}</td>
+                                  <td>{item.num_of_cv}</td>
+                                  <td>{item.url}</td>
+                                </tr>
+                              ))
+                              : listContent?.map((item, index) =>
+                                item.num_of_cv > 0 ? (
                                   <tr key={index}>
                                     <td>{item.num_of_start}</td>
                                     <td>{item.num_of_cv}</td>
                                     <td>{item.url}</td>
                                   </tr>
-                                ))
-                              : listContent?.map((item, index) =>
-                                  item.num_of_cv > 0 ? (
-                                    <tr key={index}>
-                                      <td>{item.num_of_start}</td>
-                                      <td>{item.num_of_cv}</td>
-                                      <td>{item.url}</td>
-                                    </tr>
-                                  ) : (
-                                    <tr key={index}></tr>
-                                  )
-                                )}
+                                ) : (
+                                  <tr key={index}></tr>
+                                )
+                              )}
                           </tbody>
                         </Table>
                       </div>
