@@ -45,9 +45,9 @@ function PushMessage() {
     let listExcludedTimeAltExText = [];
     for (var i = 0; i < 24; i++) {
       listExcludedTimeAltEx.push(i);
-      if (i<10){
+      if (i < 10) {
         listExcludedTimeAltExText.push(`0${i}`)
-      }else{
+      } else {
         listExcludedTimeAltExText.push(i);
       }
     }
@@ -152,20 +152,20 @@ function PushMessage() {
         }
 
         //////////////Display err msg///////////////
-        console.log('res.data?.data: ',res.data?.data)
-        if(res.data?.data.length ==0){
-          if(document.getElementById('push_message_email')!= null){
+        console.log('res.data?.data: ', res.data?.data)
+        if (res.data?.data.length == 0) {
+          if (document.getElementById('push_message_email') != null) {
             document.getElementById('push_message_email').style.display = 'none'
-          document.getElementById('EmailErr').style.display = 'block'
-        }else{
-          if(document.getElementById('push_message_email')!= null){
-            document.getElementById('push_message_email').style.display = 'block'
-          document.getElementById('EmailErr').style.display = 'none'
+            document.getElementById('EmailErr').style.display = 'block'
+          } else {
+            if (document.getElementById('push_message_email') != null) {
+              document.getElementById('push_message_email').style.display = 'block'
+              document.getElementById('EmailErr').style.display = 'none'
+            }
           }
-          }
-          
-         
-          
+
+
+
         }
         // setEmailDetailId(res?.data?.data[0].id)
         // set1stEmailDetailId()
@@ -597,6 +597,30 @@ function PushMessage() {
     }
   }
 
+  function checkAltTime() {
+    var from = document.getElementById('excluded_time_from').value
+    var to = document.getElementById('excluded_time_to').value
+    var expectTime = document.getElementById('alternate_send_time').value
+    // var range = document.getElementById('alternate_send_time').value
+    console.log(from)
+    console.log(to)
+    console.log(expectTime)
+    if(parseInt(from) >= parseInt(to)){
+      document.getElementById('altTimeFTErr').style.display = 'block'
+    }else {
+      document.getElementById('altTimeFTErr').style.display = 'none'
+    }
+    if (parseInt(from) <= parseInt(expectTime) &&
+      parseInt(expectTime) <= parseInt(to) &&
+      parseInt(from) < parseInt(expectTime)) {
+      document.getElementById('timeZoneErr').style.display = 'block'
+      
+    } else {
+      document.getElementById('timeZoneErr').style.display = 'none'
+    }
+    // console.log(range)
+  }
+
   return (
     <>
       <div className="content">
@@ -659,9 +683,8 @@ function PushMessage() {
                                   width: '32.33%',
                                   margin: '0px 1%',
                                   borderRadius: '5px',
-                                  backgroundColor: `${
-                                    item.subscribe_status === 'subscribe' ? '#F39C12' : '#9B59B6'
-                                  }`,
+                                  backgroundColor: `${item.subscribe_status === 'subscribe' ? '#F39C12' : '#9B59B6'
+                                    }`,
                                   border: 'none',
                                   color: 'white',
                                 }}
@@ -745,11 +768,11 @@ function PushMessage() {
                         dateFormat="yyyy-MM-dd"
                         locale='ja'
                         value={endDate}
-                        // value={
-                        //   endDatePreview
-                        //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-                        //     : 'yyyy/mm/dd'
-                        // }
+                      // value={
+                      //   endDatePreview
+                      //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+                      //     : 'yyyy/mm/dd'
+                      // }
                       />
                     </div>
                     まで &emsp;<button className="push-message-btn-search">検索</button>
@@ -843,7 +866,7 @@ function PushMessage() {
                 </span>
                 <select id="push_message_email" name="email_id" className="push-message-input-form">
                   {/* <option value="">Please select email</option> */}
-                  
+
                 </select>
                 <span id="EmailErr" style={{ color: 'red', display: 'none' }}>データがありません。</span>
               </div>
@@ -895,7 +918,7 @@ function PushMessage() {
                     type="checkbox"
                     checked={isChecked}
                     style={{ marginTop: '15px' }}
-                    // onLoad={()=>checkTZ(itemUpdate?.has_timezone_exclusion)}
+                  // onLoad={()=>checkTZ(itemUpdate?.has_timezone_exclusion)}
                   />
                 </span>
               </div>
@@ -904,9 +927,8 @@ function PushMessage() {
                 id="excludedTime"
                 style={{
                   width: '100%',
-                  display: `${
-                    update == true && itemUpdate.has_timezone_exclusion === 'yes' ? 'block' : 'none'
-                  }`,
+                  display: `${update == true && itemUpdate.has_timezone_exclusion === 'yes' ? 'block' : 'none'
+                    }`,
                 }}
               >
                 <div className="push-message-add-form">
@@ -917,6 +939,7 @@ function PushMessage() {
                   <span style={{ display: 'flex', width: '80%' }}>
                     <select
                       id="excluded_time_from"
+                      onChange={() => checkAltTime()}
                       name="excluded_time_from"
                       defaultValue={update == true ? itemUpdate.excluded_time_from : ''}
                       className="push-message-input-form"
@@ -931,6 +954,7 @@ function PushMessage() {
                     &ensp; <span>~</span> &ensp;
                     <select
                       id="excluded_time_to"
+                      onChange={() => checkAltTime()}
                       name="excluded_time_to"
                       defaultValue={update == true ? itemUpdate.excluded_time_to : ''}
                       className="push-message-input-form"
@@ -944,6 +968,11 @@ function PushMessage() {
                     </select>
                   </span>
                 </div>
+                <div className="push-message-add-form">
+                <span className="push-message-span-form">
+                  </span>
+                  <span id="altTimeFTErr" style={{ display: 'none', width: '80%', color: 'red' }}>開始時間は、終了時間より前です。</span>
+                </div>
                 <br />
                 <div className="push-message-add-form">
                   <span className="push-message-span-form">
@@ -952,7 +981,8 @@ function PushMessage() {
                   </span>
                   <span style={{ display: 'flex', width: '80%' }}>
                     <select
-                      id="alternate_send_time   "
+                      id="alternate_send_time"
+                      onChange={() => checkAltTime()}
                       name="alternate_send_time"
                       defaultValue={update == true ? itemUpdate.alternate_send_time : ''}
                       className="push-message-input-form"
@@ -968,7 +998,7 @@ function PushMessage() {
                 </div>
                 <div className="push-message-add-form">
                   <span className="push-message-span-form"></span>
-                  <span id="timeZoneErr" style={{ width: '80%' }}></span>
+                  <span id="timeZoneErr" style={{ display: 'none', width: '80%', color: 'red' }}>代替送信時間を除外時間以外と設定してください。</span>
                 </div>
               </div>
               <div
