@@ -25,7 +25,7 @@ import jcb from '../../../assets/img/payment-method/jcb.png';
 import master_card from '../../../assets/img/payment-method/master_card.png';
 import visa from '../../../assets/img/payment-method/visa.png';
 import {
-  SHORTEN_URL
+  SHORTEN_URL, EC_CHATBOT_URL
 } from '../../../variables/constants';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
@@ -2124,7 +2124,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color, backgroundImage: `linear-gradient(to right, ${botInfor?.gardient_color}, ${botInfor?.main_color})` }} className="sp-header">
             <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
               <div className="sp-header-left-avatar sp-avatar">
-                <img src={botInfor?.icon?.url && ("https://ec-chatbot-test1.com/" + botInfor?.icon?.url)} />
+                <img src={botInfor?.icon?.url && (EC_CHATBOT_URL + "/" + botInfor?.icon?.url)} />
               </div>
               <div className="sp-header-left-label">
                 <div className="sp-header-left-label-sub-title">{botInfor?.subtitle}</div>
@@ -2219,7 +2219,7 @@ const BotMessage = ({ content, index, botInfor }) => {
     <div key={index} className="sp-body-bot-side slideRight">
       {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay') && (
         <div className="sp-body-bot-side-avatar sp-avatar">
-          <img src={"https://ec-chatbot-test1.com/" + botInfor?.icon?.url} />
+          <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} />
         </div>
       )}
       <div className="sp-body-bot-side-messages">

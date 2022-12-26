@@ -25,11 +25,11 @@ import jcb from '../../../assets/img/payment-method/jcb.png';
 import master_card from '../../../assets/img/payment-method/master_card.png';
 import visa from '../../../assets/img/payment-method/visa.png';
 import {
-  SHORTEN_URL
+  SHORTEN_URL, EC_CHATBOT_URL
 } from '../../../variables/constants';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
-
+import { rgbToHex } from '@material-ui/core';
 
 const _ = require('lodash');
 
@@ -153,7 +153,6 @@ let dataPaymentMethod = [
 
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
-
 function Preview() {
 
   const [isOpen, setIsOpen] = useState(false)
@@ -161,7 +160,7 @@ function Preview() {
   const [urlReceive, setUrlReceive] = useState()
   const [deviceReceive, setDeviceReceive] = useState()
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
-  const [scenarioId, setScenarioId] = useState(Cookies.get('scenario_id'));
+  const [scenarioId, setScenarioId] = useState( Cookies.get('scenario_id'));
   const [botInfor, setBotInfor] = useState();
   const [dataMessages, setDataMessages] = useState([]);
   const [urlThanksPage, setUrlThanksPage] = useState();
@@ -173,7 +172,8 @@ function Preview() {
   const [variables, setVariables] = useState([]);
   const [isDisplayButtonNext, setIsDisplayButtonNext] = useState(false);
   const [captcha, setCaptcha] = useState([]);
-  // const [withdrawal, setWithdrawal] = useState({});
+  const [withdrawal, setWithdrawal] = useState({});
+  const isFromScenario = false
 
   const [dataPrefectures, setDataPrefectures] = useState([]);
   const [dataCities, setDataCities] = useState([]);
@@ -205,8 +205,6 @@ function Preview() {
     });
     return dataObj;
   });
-
-  
 
   function getAllUrlParams(url) {
     var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
@@ -244,34 +242,35 @@ function Preview() {
 
     return obj;
   }
-
   function onOpenPreview() {
     if (isOpen) {
       Cookies.set('openPre', true)
       if (window && window.parent) {
         window.parent.postMessage(true, urlReceive);
       }
-      
-      // body.postMessage(message, domain);
-      document.getElementById('sp-container').style.height = "610px";
-      document.getElementById('sp-header').style.position = "static";
-      document.getElementById('sp-header').style.borderBottomLeftRadius = "0px";
-      document.getElementById('sp-header').style.borderBottomRightRadius = "0px";
-      document.getElementById('sp-process-bar').style.display = "block";
-      document.getElementById('sp-body').style.display = "block";
+      document.getElementById('sp-container').style.height = '610px';
+            document.getElementById('sp-header').style.position = 'static';
+            document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
+            document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
+            document.getElementById('sp-header').style.borderTopLeftRadius = "2px";
+            document.getElementById('sp-header').style.borderTopRightRadius = "2px";
+            document.getElementById('sp-process-bar').style.display = 'block';
+            document.getElementById('sp-body').style.display = 'block';
     }
     else {
       Cookies.set('openPre', false)
       if (window && window.parent) {
         window.parent.postMessage(false, urlReceive);
       }
-      document.getElementById('sp-container').style.height = "0px";
-      document.getElementById('sp-process-bar').style.display = "none";
-      document.getElementById('sp-body').style.display = "none";
-      document.getElementById('sp-header').style.borderBottomLeftRadius = "25px";
-      document.getElementById('sp-header').style.borderBottomRightRadius = "25px";
-      document.getElementById('sp-header').style.position = "absolute";
-      document.getElementById('sp-header').style.bottom = "13px";
+      document.getElementById('sp-container').style.height = '0px';
+      document.getElementById('sp-process-bar').style.display = 'none';
+      document.getElementById('sp-body').style.display = 'none';
+      document.getElementById('sp-header').style.borderBottomLeftRadius = '25px';
+      document.getElementById('sp-header').style.borderBottomRightRadius = '25px';
+      document.getElementById('sp-header').style.borderTopLeftRadius = "25px";
+      document.getElementById('sp-header').style.borderTopRightRadius = "25px";
+      document.getElementById('sp-header').style.position = 'absolute';
+      document.getElementById('sp-header').style.bottom = '13px';
 
     }
     setIsOpen(!isOpen);
@@ -282,20 +281,6 @@ function Preview() {
   //       setBotInfor(res.data.data);
   //     }
   //   }).catch(err => console.log(err));
-  // }, [])
-
-  // useEffect(() => {
-  //   api.get(`/api/v1/chatbot_settings/withdrawal_preventions/${botId}`).then(res => {
-  //     console.log(res, 'cehckkkk withdraw');
-  //     if (res.data.code === 1) {
-  //       setWithdrawal(res.data.data);
-  //     }
-  //   }).catch((error) => {
-  //     console.log(error);
-  //     if (error.response?.data.code === 0) {
-  //       tokenExpired()
-  //     }
-  //   })
   // }, [])
 
   useEffect(() => {
@@ -310,6 +295,7 @@ function Preview() {
   }, [])
 
   useEffect(() => {
+    let delayRender;
     var url = new URL(window.location.href)
     console.log(url)
     let params = new URLSearchParams(url.search);
@@ -326,17 +312,80 @@ function Preview() {
     console.log('deviceRe: ', deviceRe)
     setBotId(botIdGet)
     setScenarioId(scenarioIdGet)
-      api.get(`/api/v1/managements/chatbots/${botIdGet}/scenarios/${scenarioIdGet}/preview`).then(async res => {
+    api.get(`/api/v1/managements/chatbots/${botIdGet}/scenarios/${scenarioIdGet}/preview`).then(async res => {
+        console.log(res, 'cehckkkk bugs')
         if (res.data.code == 1) {
-          let messageArr = [...res.data.data?.conversation?.messages];
-          let urlThanks = res.data.data?.conversation?.urlThanksPage || ''
+          let messageArr = [];
+          if (res.data.data?.conversation?.messages?.length > 0) {
+            messageArr = [...res.data.data?.conversation?.messages];
+          }
+          let urlThanks = res.data.data?.conversation?.urlThanksPage || '';
+          console.log(messageArr);
+          console.log(res.data.chatbot);
+
           setDataMessages(messageArr);
           setUrlThanksPage(urlThanks);
-          setVariables([...res.data.variables]);
+          if (res.data.chatbot) {
+            let opacity_color, message_color, gardient_color, font_color;
+            console.log(res.data.chatbot.main_color)
+            if (res.data.chatbot.main_color === 'blue') {
+              opacity_color = '#D6E0EF';
+              message_color = '#3CACEF';
+              gardient_color = '#36D0DC';
+              font_color = '#fff'
+            } else if (res.data.chatbot.main_color === 'green') {
+              opacity_color = '#DEEADB';
+              message_color = '#9DDB7C';
+              gardient_color = '#F8C03F';
+              font_color = '#fff'
+            } else if (res.data.chatbot.main_color === 'orange') {
+              opacity_color = '#F4E5DA';
+              message_color = '#EF8D2F';
+              gardient_color = '#D6DB4B';
+              font_color = '#fff'
+            } else if (res.data.chatbot.main_color === 'yellow') {
+              opacity_color = '#F0EFEB';
+              message_color = '#F3AA2D';
+              gardient_color = '#FF8402';
+              res.data.chatbot.main_color = "#F6CA21";
+              font_color = '#fff'
+            } else if (res.data.chatbot.main_color === 'pink') {
+              opacity_color = '#EBDDE3';
+              message_color = '#E65B83';
+              gardient_color = '#94C1EC';
+              res.data.chatbot.main_color = "#F170AA";
+              font_color = '#fff'
+            } else if (res.data.chatbot.main_color === 'purple') {
+              opacity_color = '#E9E8F1';
+              message_color = '#AF82D5';
+              gardient_color = '#FAAA88';
+              res.data.chatbot.main_color = "#8C66D9";
+              font_color = '#fff'
+            } else if (res.data.chatbot.main_color === 'black') {
+              opacity_color = '#333333';
+              message_color = '#fff';
+              gardient_color = '#333333';
+              font_color = '#333333'
+            } else if (res.data.chatbot.main_color === 'white') {
+              opacity_color = '#fff';
+              message_color = '#F5F5F5';
+              gardient_color = '#fff';
+              font_color = '#000'
+            }
+            res.data.chatbot.opacity_color = opacity_color;
+            res.data.chatbot.message_color = message_color;
+            res.data.chatbot.gardient_color = gardient_color;
+            res.data.chatbot.font_color = font_color;
+          }
+
           setBotInfor(res.data.chatbot);
-          res.data.variables.forEach(item => {
-            objParam[item.variable_name] = item.default_value;
-          });
+          if (res.data.variables) {
+            setVariables([...res.data.variables]);
+            res.data.variables.forEach(item => {
+              objParam[item.variable_name] = item.default_value;
+            });
+          }
+
           setObjParam({ ...objParam });
           console.log(objParam, 'ceghckkkkkkkkkkkkkkk objParam')
           let variables = [...res.data.variables];
@@ -344,7 +393,6 @@ function Preview() {
           setMessageUser([...messageUserVar]);
           let renderMessage = [];
           let index;
-          let delayRender;
           let isPauseScroll = false;
           for (let i = 0; i < messageArr.length; i++) {
             if (messageArr[i].hidden !== true) {
@@ -386,6 +434,7 @@ function Preview() {
                   }
                 }
                 if (checked === false) {
+                  console.log('setIndex_User1')
                   if (messageArr[i].belong_to === 'user') setIndexUser(prev => prev + 1);
                   continue;
                 }
@@ -507,19 +556,22 @@ function Preview() {
                   }).then(data => {
                     renderMessage.push(data);
                     console.log(renderMessage);
+                    setIndexMessageRender(i);
                     setRenderMessageArr([
                       ...renderMessage
                     ]);
-                    setIndexMessageRender(i);
                     if (isPauseScroll === false) {
                       scrollToBottom();
                     }
+                  }).then(() => {
+                    // document.getElementById(`sp-body-user-side-${i}`).style.animation = 'moveRight 2s linear';
                   }).catch((error) => {
                     console.log(error);
                     if (error.response?.data.code === 0) {
                       tokenExpired();
                     }
                   });
+                  console.log('setIndex_User2')
                   setIndexUser(prev => prev + 1);
                   index = i;
                   break;
@@ -544,12 +596,12 @@ function Preview() {
                       resolve({ ...messageArr[i] });
                     }, 1000);
                   }).then(data => {
+                    setIndexMessageRender(i);
                     renderMessage.push(data);
                     console.log(data);
                     setRenderMessageArr([
                       ...renderMessage
                     ])
-                    setIndexMessageRender(i);
                     if (isPauseScroll === false) {
                       scrollToBottom();
                     }
@@ -623,15 +675,16 @@ function Preview() {
                     resolve({ ...messageArr[i] });
                   }, 1000);
                 }).then(data => {
+                  setIndexMessageRender(i);
                   renderMessage.push(data);
                   setRenderMessageArr([
                     ...renderMessage
                   ]);
-                  setIndexMessageRender(i);
                   if (isPauseScroll === false) {
                     scrollToBottom();
                   }
                 })
+                console.log('setIndex_User3')
                 setIndexUser(prev => prev + 1);
                 index = i;
                 break;
@@ -641,9 +694,7 @@ function Preview() {
           }
           // setIndexMessageRender(index);
           // setRenderMessageArr(renderMessage);
-          return () => {
-            clearTimeout(delayRender);
-          }
+
         }
       }).catch((error) => {
         console.log(error);
@@ -652,7 +703,17 @@ function Preview() {
         }
       });
     
-  },[])
+    return () => {
+      console.log('chcekkkkkkkk quitttt')
+      clearTimeout(delayRender);
+    }
+  }, [])
+
+  // useEffect(() => {
+  //   return () => {
+  //     setIsContinuePromise(false);
+  //   }
+  // }, [])
 
   const scrollToBottom = () => {
     if (document.getElementById('sp-body')) {
@@ -675,34 +736,38 @@ function Preview() {
 
     let messageError = "この項目は必須です。"
     for (let i = 0; i < contentArr.length; i++) {
-
       let contentType = contentArr[i][contentArr[i].type];
-      let limitFrom = contentType[contentType.type]?.character_limit_from;
+      let limitFrom = contentType[contentType.type]?.character_limit_from || 0;
       let limitTo = contentType[contentType.type]?.character_limit_to || Number.MAX_SAFE_INTEGER;
       if (contentType.require) {
         console.log(contentType.type, contentType.date_select)
         if (contentType.type === 'text' || contentType.type === 'password') {
+          console.log(contentType[contentType.type].value, 'checklkkkk')
           if (contentType[contentType.type].isSplitInput) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
               errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
-            } else if (contentType[contentType.type].valueLeft.length < limitFrom
-              || contentType[contentType.type].valueLeft.length > limitTo
-              || contentType[contentType.type].valueRight.length < limitFrom
-              || contentType[contentType.type].valueRight.length > limitTo) {
-              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
-              isValid = false;
             }
+            // else if (contentType[contentType.type].valueLeft?.length < limitFrom
+            //   || contentType[contentType.type].valueLeft?.length > limitTo
+            //   || contentType[contentType.type].valueRight?.length < limitFrom
+            //   || contentType[contentType.type].valueRight?.length > limitTo) {
+            //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+            //   isValid = false;
+            // }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
-          } else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
-            isValid = false;
           }
+          //  else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
+          //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          //   isValid = false;
+          // }
         } else if (contentType.type === 'phone_number') {
           if (contentType[contentType.type].withHyphen) {
-            if (stringNullOrEmpty(contentType[contentType.type].value1) || stringNullOrEmpty(contentType[contentType.type].value2)) {
+            if (stringNullOrEmpty(contentType[contentType.type].value1)
+              || stringNullOrEmpty(contentType[contentType.type].value2)
+              || stringNullOrEmpty(contentType[contentType.type].value3)) {
               errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
               isValid = false;
             }
@@ -711,19 +776,18 @@ function Preview() {
             isValid = false;
           }
         } else if (contentType.type === 'email_confirmation' || contentType.type === 'password_confirmation') {
-          let limitFrom = contentType[contentType.type]?.character_limit_from;
-          let limitTo = contentType[contentType.type]?.character_limit_to;
           if (stringNullOrEmpty(contentType[contentType.type].value) || stringNullOrEmpty(contentType[contentType.type].valueConfirm)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
-          } else if (contentType.type === 'password_confirmation' &&
-            (contentType[contentType.type].value.length < limitFrom
-              || contentType[contentType.type].value.length > limitTo
-              || contentType[contentType.type].valueConfirm.length < limitFrom
-              || contentType[contentType.type].valueConfirm.length > limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
-            isValid = false;
           }
+          //  else if (contentType.type === 'password_confirmation' &&
+          //   (contentType[contentType.type].value.length < limitFrom
+          //     || contentType[contentType.type].value.length > limitTo
+          //     || contentType[contentType.type].valueConfirm.length < limitFrom
+          //     || contentType[contentType.type].valueConfirm.length > limitTo)) {
+          //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          //   isValid = false;
+          // }
         } else if (contentType.type === 'customization') {
           if (contentType[contentType.type].is_comment) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
@@ -817,15 +881,29 @@ function Preview() {
             isValid = false;
           }
         } else if (contentArr[i].type === 'checkbox') {
-          if (contentType.checkedValue && contentType.checkedValue.length === 0) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
-            isValid = false;
-          } else if (contentType.selection_limit_from && contentType.checkedValue.length < parseInt(contentType.selection_limit_from)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_from || 0}個以上選択してください。`;
-            isValid = false;
-          } else if (contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
-            isValid = false;
+          console.log(contentType.type, contentType)
+          if (contentType.type !== 'checkbox_img') {
+            if (contentType.checkedValue && contentType.checkedValue.length === 0) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+              isValid = false;
+            } else if (contentType.selection_limit_from && contentType.checkedValue.length < parseInt(contentType.selection_limit_from)) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
+              isValid = false;
+            } else if (contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+              isValid = false;
+            }
+          } else {
+            if (contentType.initial_selection_picture && contentType.initial_selection_picture.length === 0) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+              isValid = false;
+            } else if (contentType.selection_limit_from && contentType.initial_selection_picture.length < parseInt(contentType.selection_limit_from)) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
+              isValid = false;
+            } else if (contentType.selection_limit_to && contentType.initial_selection_picture.length > parseInt(contentType.selection_limit_to)) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+              isValid = false;
+            }
           }
         } else if (contentArr[i].type === 'carousel') {
           if (stringNullOrEmpty(contentType.initial_selection)) {
@@ -872,45 +950,30 @@ function Preview() {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
-        } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+        } else if (contentArr[i].type !== 'credit_card_payment' && stringNullOrEmpty(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
           isValid = false;
         } else if ((limitFrom || limitTo) && (contentType[contentType.type]?.value?.length < limitFrom || contentType[contentType.type]?.value?.length > limitTo)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
           isValid = false;
         }
       } else {
-        if (contentType.type === 'text' || contentType.type === 'password') {
-          if (contentType[contentType.type].isSplitInput
-            && (!stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))
-            && (contentType[contentType.type].valueLeft.length >= limitTo || contentType[contentType.type].valueRight.length >= limitTo)) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
-            isValid = false;
-          } else if (!stringNullOrEmpty(contentType[contentType.type].value)
-            && contentType[contentType.type].value.length >= limitTo) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom} ~ ${limitTo}文字で入力してください。`;
-            isValid = false;
-          }
-        } else if (contentArr[i].type === 'credit_card_payment') {
-          if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
-            || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
-            || (contentType.separate_type === true && (stringNullOrEmpty(contentType.card_number1) || stringNullOrEmpty(contentType.card_number2) || stringNullOrEmpty(contentType.card_number3) || stringNullOrEmpty(contentType.card_number4)))
-            || (contentType.separate_type === false && stringNullOrEmpty(contentType.card_number))
-            || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
-            || (stringNullOrEmpty(contentType.year))
-            || (stringNullOrEmpty(contentType.month))
-          ) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
-            isValid = false;
-          } else if ((contentType.card_number && (contentType.card_number + "").length !== 16) ||
-            ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
-              ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
-            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "クレジットカード番号は無効です。";
-            isValid = false;
-          }
-        } else if (contentArr[i].type === 'checkbox') {
-          if (contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
+        if (contentArr[i].type === 'checkbox') {
+          if (contentType.type !== 'checkbox_img' && contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+            isValid = false;
+          } else if (contentType.type === 'checkbox_img' && contentType.selection_limit_to && contentType.initial_selection_picture.length > parseInt(contentType.selection_limit_to)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+            isValid = false;
+          }
+        } else if (contentType.type === 'phone_number' && contentType[contentType.type].withHyphen) {
+          if ((!stringNullOrEmpty(contentType[contentType.type].value1)
+            || !stringNullOrEmpty(contentType[contentType.type].value2)
+            || !stringNullOrEmpty(contentType[contentType.type].value3))
+            && (stringNullOrEmpty(contentType[contentType.type].value1)
+              || stringNullOrEmpty(contentType[contentType.type].value2)
+              || stringNullOrEmpty(contentType[contentType.type].value3))) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
             isValid = false;
           }
         } else if (contentType.type === 'time_hm') {
@@ -995,7 +1058,71 @@ function Preview() {
           }
         }
       }
-      if (contentArr[i].type === 'textarea') {
+      let REGEX_EMAIL = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+      let REGEX_PASSWORD = /^[A-Za-z0-9 ]+$/;
+
+      if (contentType.type === 'text' || contentType.type === 'password') {
+        if (contentType[contentType.type].isSplitInput) {
+          if ((!stringNullOrEmpty(contentType[contentType.type].valueLeft)
+            || !stringNullOrEmpty(contentType[contentType.type].valueRight))
+            && (contentType[contentType.type].valueLeft?.length < limitFrom
+              || contentType[contentType.type].valueRight?.length < limitFrom)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上入力してください。`;
+            isValid = false;
+          } else if ((!stringNullOrEmpty(contentType[contentType.type].valueLeft)
+            || !stringNullOrEmpty(contentType[contentType.type].valueRight))
+            && (contentType[contentType.type].valueLeft?.length > limitTo
+              || contentType[contentType.type].valueRight?.length > limitTo)) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitTo}文字以下入力してください。`;
+            isValid = false;
+          }
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value)
+          && contentType[contentType.type].value?.length < limitFrom) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上入力してください。`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value)
+          && contentType[contentType.type].value?.length > limitTo) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitTo}文字以下入力してください。`;
+          isValid = false;
+        } else if (contentType.type === 'password' && !stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
+          isValid = false;
+        }
+      } else if (contentArr[i].type === 'product_purchase' && contentType.initial_selection.length !== 0) {
+        console.log(contentType);
+        contentType.initial_selection.forEach((item, index) => {
+          contentType.products.forEach((itemProduct, indexProduct) => {
+            console.log(itemProduct.quantity_select)
+            if (item === itemProduct.id && !itemProduct.quantity_select) {
+              errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${indexProduct}`] = messageError;
+              isValid = false;
+            }
+          })
+        })
+      } else if (contentType.type === 'password_confirmation') {
+        if ((!stringNullOrEmpty(contentType[contentType.type].value)
+          || !stringNullOrEmpty(contentType[contentType.type].valueConfirm))
+          && (contentType[contentType.type].value?.length < limitFrom
+            || contentType[contentType.type].valueConfirm?.length < limitFrom)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上入力してください。`;
+          isValid = false;
+        } else if ((!stringNullOrEmpty(contentType[contentType.type].value)
+          || !stringNullOrEmpty(contentType[contentType.type].valueConfirm))
+          && (contentType[contentType.type].value?.length > limitTo
+            || contentType[contentType.type].valueConfirm?.length > limitTo)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitTo}文字以下入力してください。`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].valueConfirm) && !REGEX_PASSWORD.test(contentType[contentType.type].valueConfirm)) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
+          isValid = false;
+        } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !stringNullOrEmpty(contentType[contentType.type].valueConfirm) && contentType[contentType.type].value !== contentType[contentType.type].valueConfirm) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "パスワードとパスワード確認が一致しません。";
+          isValid = false;
+        }
+      } else if (contentArr[i].type === 'textarea') {
         console.log(contentType[contentType.type].value, 'cecjlllll')
         if (!stringNullOrEmpty(contentType[contentType.type].value) && contentType[contentType.type].value.length < limitFrom) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `${limitFrom}文字以上入力してください。`;
@@ -1004,45 +1131,50 @@ function Preview() {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `${limitTo}文字以下入力してください。`;
           isValid = false;
         }
-      }
-      if (contentArr[i].type === 'zip_code_address') {
-        if (contentType.isCheckRequire === "require") {
-          if (contentType.post_code !== undefined) {
-            if (contentType.split_postal_code) {
-              if (stringNullOrEmpty(contentType.value_post_code_left)
-                || stringNullOrEmpty(contentType.value_post_code_right)) {
-                isValid = false;
+      } else if (contentArr[i].type === 'zip_code_address') {
+        if (errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] !== messageError) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`];
+          isValid = false;
+        } else {
+          let isValidZipCode = true;
+          if (contentType.isCheckRequire === "require") {
+            if (contentType.post_code !== undefined) {
+              if (contentType.split_postal_code) {
+                if (stringNullOrEmpty(contentType.value_post_code_left)
+                  || stringNullOrEmpty(contentType.value_post_code_right)) {
+                  isValidZipCode = false;
+                }
+              } else if (stringNullOrEmpty(contentType.value_post_code)) {
+                isValidZipCode = false;
               }
-            } else if (stringNullOrEmpty(contentType.value_post_code)) {
-              isValid = false;
+            }
+          } else if (contentType.isCheckRequire === "all_items_require") {
+            if (contentType.post_code !== undefined) {
+              if (contentType.split_postal_code) {
+                if (stringNullOrEmpty(contentType.value_post_code_left)
+                  || stringNullOrEmpty(contentType.value_post_code_right)) {
+                  isValidZipCode = false;
+                }
+              } else if (stringNullOrEmpty(contentType.value_post_code)) {
+                isValidZipCode = false;
+              }
+            }
+            if (contentType.prefecture !== undefined && stringNullOrEmpty(contentType.value_prefecture)) {
+              isValidZipCode = false;
+            }
+            if (contentType.municipality !== undefined && stringNullOrEmpty(contentType.value_municipality)) {
+              isValidZipCode = false;
+            }
+            if (contentType.address !== undefined && stringNullOrEmpty(contentType.value_address)) {
+              isValidZipCode = false;
             }
           }
-        } else if (contentType.isCheckRequire === "all_items_require") {
-          if (contentType.post_code !== undefined) {
-            if (contentType.split_postal_code) {
-              if (stringNullOrEmpty(contentType.value_post_code_left)
-                || stringNullOrEmpty(contentType.value_post_code_right)) {
-                isValid = false;
-              }
-            } else if (stringNullOrEmpty(contentType.value_post_code)) {
-              isValid = false;
-            }
-          }
-          if (contentType.prefecture !== undefined && stringNullOrEmpty(contentType.value_prefecture)) {
-            isValid = false;
-          }
-          if (contentType.municipality !== undefined && stringNullOrEmpty(contentType.value_municipality)) {
-            isValid = false;
-          }
-          if (contentType.address !== undefined && stringNullOrEmpty(contentType.value_address)) {
+          if (isValidZipCode === false) {
+            errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         }
-        if (isValid === false) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
-        }
-      }
-      if (contentType.type === 'phone_number') {
+      } else if (contentType.type === 'phone_number' && !errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`]) {
         let REGEX_PHONE = /^0\d{9}$|^0\d{10}$/;
         if (contentType[contentType.type].withHyphen) {
           if (!stringNullOrEmpty(contentType[contentType.type].value1)
@@ -1056,41 +1188,20 @@ function Preview() {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "形式が正しくない。";
           isValid = false;
         }
-      }
-      if (contentType.type === 'urls' && !stringNullOrEmpty(contentType[contentType.type].value)) {
+      } else if (contentType.type === 'urls' && !stringNullOrEmpty(contentType[contentType.type].value)) {
         let REGEX_URLS = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
         console.log(REGEX_URLS.test(contentType[contentType.type].value));
         if (!REGEX_URLS.test(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なURL形式で指定してください。`;
           isValid = false;
         }
-      }
-      let REGEX_EMAIL = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-      if (contentType.type === 'email_address' && !stringNullOrEmpty(contentType[contentType.type].value)) {
+      } else if (contentType.type === 'email_address' && !stringNullOrEmpty(contentType[contentType.type].value)) {
         console.log(REGEX_EMAIL.test(contentType[contentType.type].value));
         if (!REGEX_EMAIL.test(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
         }
-      }
-      let REGEX_PASSWORD = /^[A-Za-z0-9 ]+$/;
-      if (contentType.type === 'password' && !stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
-        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
-        isValid = false;
-      }
-      if (contentType.type === 'password_confirmation') {
-        if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PASSWORD.test(contentType[contentType.type].value)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
-          isValid = false;
-        } else if (!stringNullOrEmpty(contentType[contentType.type].valueConfirm) && !REGEX_PASSWORD.test(contentType[contentType.type].valueConfirm)) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `英数字('A-Z','a-z','0-9')が使用できます。`;
-          isValid = false;
-        } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !stringNullOrEmpty(contentType[contentType.type].valueConfirm) && contentType[contentType.type].value !== contentType[contentType.type].valueConfirm) {
-          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "パスワードとパスワード確認が一致しません。";
-          isValid = false;
-        }
-      }
-      if (contentType.type === 'email_confirmation') {
+      } else if (contentType.type === 'email_confirmation') {
         if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_EMAIL.test(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
@@ -1101,16 +1212,52 @@ function Preview() {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `メールアドレスとメールアドレス確認が一致しません。`;
           isValid = false;
         }
-      }
-      if (contentArr[i].type === 'attaching_file' && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
+      } else if (contentArr[i].type === 'attaching_file' && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
         errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`];
         isValid = false;
-      }
-      console.log(errors);
-      if (contentArr[i].type === 'zip_code_address' && errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]) {
-        console.log(errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`])
-        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`];
-        isValid = false;
+      } else if (contentArr[i].type === 'credit_card_payment') {
+        if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
+          || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
+          || (contentType.separate_type === true && (stringNullOrEmpty(contentType.card_number1) || stringNullOrEmpty(contentType.card_number2) || stringNullOrEmpty(contentType.card_number3) || stringNullOrEmpty(contentType.card_number4)))
+          || (contentType.separate_type === false && stringNullOrEmpty(contentType.card_number))
+          || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
+          || (stringNullOrEmpty(contentType.year))
+          || (stringNullOrEmpty(contentType.month))
+        ) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+          isValid = false;
+        } else if ((contentType.card_number && ((contentType.card_number + "").length !== 16 || /[^0-9]+/.test(contentType.card_number))) ||
+          ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
+            ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "クレジットカード番号は無効です。";
+          isValid = false;
+        } else if (moment(`${contentType.year}-${contentType.month}}`, "YYYY-MM").isBefore(moment().format("YYYY-MM"))) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "有効期限に誤りがあるために、決済を完了できませんでした。";
+          isValid = false;
+        }
+      } else if (contentArr[i].type === 'card_payment_radio_button'
+        && errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] !== messageError
+        && ((contentType?.initial_selection || contentType?.card_linked_setting) && contentType?.initial_selection === contentType?.card_linked_setting
+          || (contentType?.initial_selection_picture || contentType?.card_linked_setting_picture) && contentType?.initial_selection_picture === contentType?.card_linked_setting_picture)) {
+        if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
+          || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
+          || (contentType.separate_type === true && (stringNullOrEmpty(contentType.card_number1) || stringNullOrEmpty(contentType.card_number2) || stringNullOrEmpty(contentType.card_number3) || stringNullOrEmpty(contentType.card_number4)))
+          || (contentType.separate_type === false && stringNullOrEmpty(contentType.card_number))
+          || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
+          || (stringNullOrEmpty(contentType.year))
+          || (stringNullOrEmpty(contentType.month))
+        ) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
+          isValid = false;
+        } else if ((contentType.card_number && ((contentType.card_number + "").length !== 16 || /[^0-9]+/.test(contentType.card_number))) ||
+          ((!stringNullOrEmpty(contentType.card_number1) && !stringNullOrEmpty(contentType.card_number2) && !stringNullOrEmpty(contentType.card_number3) && !stringNullOrEmpty(contentType.card_number4)) &&
+            ((contentType.card_number1 + "").length !== 4 || (contentType.card_number2 + "").length !== 4 || (contentType.card_number3 + "").length !== 4 || (contentType.card_number4 + "").length !== 4))) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "クレジットカード番号は無効です。";
+          isValid = false;
+        } else if (moment(`${contentType.year}-${contentType.month}}`, "YYYY-MM").isBefore(moment().format("YYYY-MM"))) {
+          errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = "有効期限に誤りがあるために、決済を完了できませんでした。";
+          isValid = false;
+        }
       }
       if (contentArr[i].type === 'text_input' && contentType[contentType.type].range && contentType[contentType.type].range !== 'no_input'
         && (!stringNullOrEmpty(contentType[contentType.type].value) || !stringNullOrEmpty(contentType[contentType.type].valueLeft) || !stringNullOrEmpty(contentType[contentType.type].valueRight))) {
@@ -1156,37 +1303,10 @@ function Preview() {
             isValid = false;
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
           } else if (REGEX_CHECK.test(contentType[contentType.type].value)) {
-            console.log(REGEX_CHECK)
             isValid = false;
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
           }
         }
-        //  else if (REGEX_CHECK === "" && !contentType[contentType.type].isSplitInput) {
-        //   if (contentType[contentType.type].range === 'double_byte' && !isDoubleByte(contentType[contentType.type].value)) {
-        //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "全角文字を入力してください。";
-        //   } else if (contentType[contentType.type].range === 'full_width_katakana' && mbStrWidth(contentType[contentType.type].value) === 2) {
-        //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in full-width katakana characters.";
-        //   } else if (contentType[contentType.type].range === 'double_byte_hiragana' && !isDoubleByte(contentType[contentType.type].value)) {
-        //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please enter in double-byte hiragana characters.";
-        //   }
-        // } else if (REGEX_CHECK === "" && contentType[contentType.type].isSplitInput) {
-        //   if (contentType[contentType.type].range === 'double_byte'
-        //     && (!isDoubleByte(contentType[contentType.type].valueLeft) || !isDoubleByte(contentType[contentType.type].valueRight))) {
-        //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "全角文字を入力してください。";
-        //   } else if (contentType[contentType.type].range === 'full_width_katakana' &&
-        //     (mbStrWidth(contentType[contentType.type].valueLeft) === 2 || mbStrWidth(contentType[contentType.type].valueRight) === 2)) {
-        //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please input katakana type.";
-        //   } else if (contentType[contentType.type].range === 'double_byte_hiragana' &&
-        //     (!isDoubleByte(contentType[contentType.type].valueLeft) || !isDoubleByte(contentType[contentType.type].valueRight))) {
-        //     isValid = false;
-        //     errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "Please input hiragana type.";
-        //   }
-        // }
       }
     }
 
@@ -1240,6 +1360,7 @@ function Preview() {
     let index;
     let isPauseScroll = false;
     let delayRender;
+    console.log('setIndex_User4')
     setIndexUser(prev => prev + 1);
     console.log(dataMessages.length, indexMessageRender);
     if (dataMessages.length - 1 === indexMessageRender && urlThanksPage) {
@@ -1291,7 +1412,9 @@ function Preview() {
                 }
               }
             }
+            console.log(checked, 'cehckkkk')
             if (checked === false) {
+              console.log('setIndex_User5')
               if (dataMessages[i].belong_to === 'user') setIndexUser(prev => prev + 1);
               continue;
             }
@@ -1313,6 +1436,7 @@ function Preview() {
                     }, (dataMessages[i]?.message_content[0].delay.content * 1000));
                   });
                 }).then(() => {
+                  setIndexMessageRender(i)
                   renderMessage.pop();
                   setRenderMessageArr([
                     ...renderMessage
@@ -1345,7 +1469,6 @@ function Preview() {
                   }
                 });
               }
-              index = i;
               // promise.then(data => {
               //   renderMessage.push(data);
               //   setRenderMessageArr([
@@ -1410,6 +1533,7 @@ function Preview() {
                   resolve({ ...dataMessages[i] });
                 }, 1000);
               }).then(data => {
+                setIndexMessageRender(i);
                 renderMessage.push(data);
                 console.log(data)
                 setRenderMessageArr([
@@ -1458,6 +1582,7 @@ function Preview() {
                 resolve({ ...dataMessages[i] });
               }, 1000);
             }).then(data => {
+              setIndexMessageRender(i);
               renderMessage.push(data);
               setRenderMessageArr([
                 ...renderMessage
@@ -1471,10 +1596,10 @@ function Preview() {
           }
         }
       }
-      setIndexMessageRender(index);
-      setRenderMessageArr([
-        ...renderMessage
-      ]);
+      // setIndexMessageRender(index);
+      // setRenderMessageArr([
+      //   ...renderMessage
+      // ]);
     } else {
       // handle check message_content for user 
       //if message_content.length !== 0 => show message
@@ -1502,6 +1627,7 @@ function Preview() {
             resolve({ ...dataMessages[indexMessageRender + 1] });
           }, 1000);
         }).then(data => {
+          setIndexMessageRender(indexMessageRender + 1);
           renderMessage.push(data);
           console.log(data)
           setRenderMessageArr([
@@ -1511,7 +1637,7 @@ function Preview() {
             scrollToBottom();
           }
         });
-        index = indexMessageRender + 1;
+        // index = indexMessageRender + 1;
       }
       //if message_content.length === 0 => loop until meet message have message_content.length !== 0 => show message
       else {
@@ -1541,6 +1667,7 @@ function Preview() {
                   resolve({ ...dataMessages[i] });
                 }, 1000);
               }).then(data => {
+                setIndexMessageRender(i);
                 renderMessage.push(data);
                 console.log(data)
                 setRenderMessageArr([
@@ -1568,6 +1695,7 @@ function Preview() {
                       }, (dataMessages[i]?.message_content[0].delay.content * 1000));
                     });
                   }).then(() => {
+                    setIndexMessageRender(i);
                     renderMessage.pop();
                     setRenderMessageArr([
                       ...renderMessage
@@ -1638,6 +1766,7 @@ function Preview() {
                     resolve({ ...dataMessages[i] });
                   }, 1000);
                 }).then(data => {
+                  setIndexMessageRender(i);
                   renderMessage.push(data);
                   console.log(data)
                   setRenderMessageArr([
@@ -1652,8 +1781,6 @@ function Preview() {
           }
         }
       }
-      setIndexMessageRender(index);
-      // setIndexUser(prev => prev );
     }
 
     // clearTimeout(delayRender);
@@ -1662,7 +1789,7 @@ function Preview() {
   }
 
   const onChangeValue = (indexContent, contentType, value, field, subFiled, name) => {
-    console.log(dataMessages[indexMessageRender].message_content[indexContent], indexContent, contentType, value, field, subFiled, name);
+    console.log(dataMessages[indexMessageRender].message_content[indexContent], indexMessageRender, indexContent, contentType, value, field, subFiled, name);
     if (name) {
       if (dataMessages[indexMessageRender].message_content[indexContent][contentType][field][subFiled] === undefined) {
         dataMessages[indexMessageRender].message_content[indexContent][contentType][field][subFiled] = {}
@@ -1680,14 +1807,14 @@ function Preview() {
       dataMessages[indexMessageRender].message_content[indexContent][contentType][field] = value;
     }
 
-    if (contentType === 'product_purchase') {
+    if (contentType === 'product_purchase' && field === 'initial_selection' && value.length > 0) {
       let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
 
       let arrayCode = [];
       let arrayName = [];
       let arrayPrice = [];
 
-      for (let i = 0; i < dataContentType.products.length; i++) {
+      for (let i = 0; i < dataContentType.products?.length; i++) {
         for (let j = 0; j < value.length; j++) {
           if (dataContentType.products[i].id === value[j]) {
             arrayCode.push(dataContentType.products[i].item_number);
@@ -1707,34 +1834,73 @@ function Preview() {
           default_value: arrayName.join(',')
         },
         {
-          variable_name: 'product_price',
+          variable_name: 'product_unit_price',
           default_value: arrayPrice.join(',')
         }
       )
       setVariables([...variables]);
       objParam.product_code = arrayCode.join(',');
       objParam.product_name = arrayName.join(',');
-      objParam.product_price = arrayPrice.join(',');
+      objParam.product_unit_price = arrayPrice.join(',');
+      setObjParam({ ...objParam });
+    } else if (contentType === 'product_purchase_radio_button' && field === 'initial_selection') {
+      let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
+
+      let valueCode;
+      let valueName;
+      let valuePrice;
+
+      for (let i = 0; i < dataContentType.products?.length; i++) {
+        if (dataContentType.products[i].id === value) {
+          valueCode = dataContentType.products[i].item_number;
+          valueName = dataContentType.products[i].title;
+          valuePrice = dataContentType.products[i].item_price;
+        }
+      }
+
+      variables.push(
+        {
+          variable_name: 'product_code',
+          default_value: valueCode
+        },
+        {
+          variable_name: 'product_name',
+          default_value: valueName
+        },
+        {
+          variable_name: 'product_unit_price',
+          default_value: valuePrice
+        }
+      )
+      setVariables([...variables]);
+      objParam.product_code = valueCode;
+      objParam.product_name = valueName;
+      objParam.product_unit_price = valuePrice;
       setObjParam({ ...objParam });
     }
+
+
     if (dataMessages[indexMessageRender].message_content[indexContent][contentType].is_save_input_content) {
       variables.forEach(item => {
         console.log(item);
         if (dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content === item.variable_name) {
           let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
+          console.log(dataContentType);
           if (contentType === 'zip_code_address') {
-            item.default_value = `〒 ${dataContentType?.value_post_code} ${dataContentType?.value_prefecture}${dataContentType?.value_municipality} ${dataContentType?.value_address}${dataContentType?.value_building_name}`;
+            let dataPostCode = !dataContentType.split_postal_code ? dataContentType?.value_post_code : `${dataContentType.value_post_code_left}${dataContentType.value_post_code_right}`
+            item.default_value = `〒 ${dataPostCode} ${dataContentType?.value_prefecture || ""}${dataContentType?.value_municipality || ""} ${dataContentType?.value_address || ""}${dataContentType?.value_building_name || ""}`;
           } else if (field === 'start_date_select' || field === 'end_date_select') {
             item.default_value = `${dataContentType?.start_date_select || "start date"} ~ ${dataContentType?.end_date_select || "end date"}`;
           } else if (contentType === 'radio_button') {
-            item.default_value = dataContentType[dataContentType.type].find(item => item.id === value).text || item.default_value;
+            item.default_value = dataContentType[dataContentType.type].find(item => item.id === value)?.text || item.default_value;
           } else if (contentType === 'checkbox') {
             let dataTextChecked;
-            if (field === 'checkedValue') {
+            if (field === 'checkedValue' && dataContentType.checkedValue.length > 0) {
+              console.log(dataContentType.checkedValue)
               dataTextChecked = dataContentType.checkedValue.map(itemChecked => {
-                return dataContentType[dataContentType.type].find(item => itemChecked === item.id).text;
+                return dataContentType[dataContentType.type].find(item => itemChecked === item.id)?.text;
               })
-            } else if (field === 'initial_selection_picture') {
+            } else if (field === 'initial_selection_picture' && dataContentType.initial_selection_picture.length > 0) {
               dataTextChecked = dataContentType.initial_selection_picture.map(itemChecked => {
                 let dataReturn;
                 dataContentType[dataContentType.type].forEach(item => {
@@ -1746,8 +1912,11 @@ function Preview() {
                 })
                 return dataReturn;
               });
+            } else {
+              dataTextChecked = [];
             }
-            item.default_value = dataTextChecked.join(',') || item.default_value;
+            console.log(item.variable_name, item.default_value, dataTextChecked);
+            item.default_value = dataTextChecked.join(',') ?? item.default_value;
           } else if (contentType === 'card_payment_radio_button') {
             let dataTextChecked;
             if (field === 'initial_selection') {
@@ -1767,10 +1936,23 @@ function Preview() {
               item.default_value = value;
             } else if (field === 'up_to_municipality') {
               item.default_value = `${dataContentType[field].prefecture}${dataContentType[field].city}`
+            } else if (field === 'timezone_from_to') {
+              item.default_value = `${dataContentType[field]?.valueHour1}:${dataContentType[field]?.valueMinute1}-${dataContentType[field]?.valueHour2}:${dataContentType[field]?.valueMinute2}`;
+            } else if (field === 'date_ym') {
+              item.default_value = `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}`;
+            } else if (field === 'period_from_to') {
+              item.default_value = `${dataContentType[field]?.valueYear1}-${dataContentType[field]?.valueMonth1}-${dataContentType[field]?.valueDay1} ~ ${dataContentType[field]?.valueYear2}-${dataContentType[field]?.valueMonth2}-${dataContentType[field]?.valueDay2}`;
             } else {
               item.default_value = `${(dataContentType[field]?.valueYear || dataContentType[field]?.valueMonth || dataContentType[field]?.valueDay) ? `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}-${dataContentType[field]?.valueDay}` : ""} ${(dataContentType[field]?.valueHour || dataContentType[field]?.valueMinute) ? `${dataContentType[field]?.valueHour}:${dataContentType[field]?.valueMinute}` : ""}`;
             }
-          } else {
+          } else if (dataContentType.type === 'embedded') {
+            item.default_value = `${moment(value).format("YYYY-MM-DD")}`
+          } else if (field === 'phone_number') {
+            item.default_value = `${dataContentType[field]?.value1}-${dataContentType[field]?.value2}-${dataContentType[field]?.value3}`
+          } else if (contentType === 'carousel') {
+            console.log(dataContentType)
+            item.default_value = dataContentType[dataContentType.type].contents.find(item => item.id === value).title;
+          } else if (contentType !== 'credit_card_payment') {
             item.default_value = value;
           }
         }
@@ -1782,12 +1964,12 @@ function Preview() {
   }
 
   const handleOpenWithDrawal = () => {
-    if (botInfor.withdrawal_prevention_status === "invalid") {
-      // console.log('out lun');
+    if (botInfor && botInfor.withdrawal_prevention_status === "invalid") {
+      console.log('setIndex_User6')
       setIndexUser(0);
-      setScenarioId(null);
+      if (!isFromScenario) setScenarioId(null);
       setTimeout(() => {
-        setScenarioId(Cookies.get('scenario_id'));
+        if (!isFromScenario) setScenarioId(Cookies.get('scenario_id'));
         if (document.getElementById("action-bd")) {
           document.getElementById("action-bd").click();
         } else {
@@ -1800,10 +1982,9 @@ function Preview() {
                       console.log(err)
                     })
       }, 10);
-    } else if (botInfor.withdrawal_prevention_status === "standard_exit_popup" || botInfor.withdrawal_prevention_status === "image_popup") {
+    } else if (botInfor?.withdrawal_prevention_status === "standard_exit_popup" || botInfor?.withdrawal_prevention_status === "image_popup") {
       document.getElementById("sp-withdrawal-container").style.display = "block";
       document.getElementById("sp-withdrawal-content").style.display = "block";
-      // console.log('binh tinh da');
     }
   }
 
@@ -1833,9 +2014,9 @@ function Preview() {
   }
 
   return (
-    scenarioId ?
+    scenarioId && botInfor ?
       <React.Fragment>
-        <div id="sp-container" className="sp-container">
+        <div id="sp-container" className="sp-container slideUp">
           <div id="sp-withdrawal-container" className="sp-withdrawal-container">
           </div>
           <div id="sp-withdrawal-content" className="sp-withdrawal-content">
@@ -1844,8 +2025,8 @@ function Preview() {
                 <div>ウィンドウを閉じますか。</div>
               }
               {botInfor && botInfor.withdrawal_prevention_status === "image_popup" &&
-                <a href={botInfor && botInfor.withdrawal_prevention_link_url || ""} target="_blank">
-                  <img src={botInfor && botInfor.withdrawal_prevention_image_url} style={{ maxHeight: '217px', width: '100%' }} />
+                <a href={botInfor.withdrawal_prevention_link_url || ""} target="_blank">
+                  <img src={botInfor.withdrawal_prevention_image_url} style={{ maxHeight: '217px', width: '100%' }} />
                 </a>
               }
             </div>
@@ -1859,6 +2040,7 @@ function Preview() {
               <div className="sp-withdrawal-content-footer-button sp-withdrawal-content-footer-button-exit" onClick={() => {
                 document.getElementById("sp-withdrawal-container").style.display = "none";
                 document.getElementById("sp-withdrawal-content").style.display = "none";
+                console.log('setIndex_User7')
                 setIndexUser(0);
                 setScenarioId(null);
                 setTimeout(() => {
@@ -1986,6 +2168,7 @@ function Preview() {
                   キャンセル
                 </div>
                 <div className="sp-popup-zip-code-address-body-button-selection"
+                  style={zipcode ? {} : { opacity: '0.5' }}
                   onClick={() => {
                     console.log(dataMessages[indexMessageRender].message_content[indexContentZipcode], indexContentZipcode)
                     if (zipcode && indexContentZipcode !== undefined && !dataMessages[indexMessageRender].message_content[indexContentZipcode].zip_code_address.split_postal_code) {
@@ -2006,35 +2189,38 @@ function Preview() {
                       document.getElementById("sp-withdrawal-container").style.display = "none";
                       document.getElementById("sp-popup-zip-code-address").style.display = "none";
                     }
+                    document.getElementById("ss-user-input-address").focus();
+                    document.getElementById("ss-user-input-address").select();
 
                   }}>
-                  Selection
+                  選択
                 </div>
               </div>
             </div>
           </div>
-          <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header">
+          <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color, backgroundImage: `linear-gradient(to right, ${botInfor?.gardient_color}, ${botInfor?.main_color})` }} className="sp-header">
             <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
               <div className="sp-header-left-avatar sp-avatar">
-                <img src={botInfor?.icon?.url && ("https://ec-chatbot-test1.com/" + botInfor?.icon?.url)} />
+                <img src={botInfor?.icon?.url && (EC_CHATBOT_URL + "/" + botInfor?.icon?.url)} />
               </div>
               <div className="sp-header-left-label">
                 <div className="sp-header-left-label-sub-title">{botInfor?.subtitle}</div>
                 <div className="sp-header-left-label-title">{botInfor?.title}</div>
               </div>
             </div>
-            <div className="sp-header-right" onClick={() => { isOpen ? onOpenPreview(true) : handleOpenWithDrawal() }}>
+            <div className="sp-header-right" onClick={() => { isOpen ?onOpenPreview(true) : handleOpenWithDrawal() }}>
               <div className="sp-header-right-arrow">
-                {isOpen ? <MDBIcon fas icon="chevron-up"/> : <MDBIcon fas icon="chevron-down" />}
+                {isOpen ? <MDBIcon fas icon="chevron-circle-up" /> : <MDBIcon fas icon="chevron-circle-down" />}
               </div>
             </div>
           </div>
-          <div id="sp-process-bar" className="sp-process-bar">
-            <div className="sp-process-bar-color" style={{ width: `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` }}>
-              {messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。"}
+          <div id="sp-process-bar" className="sp-process-bar" style={{ backgroundColor: botInfor?.opacity_color }}>
+            <div className="sp-process-bar-color animation" style={{ width: indexUser ? `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` : '100%', ...botInfor?.main_color && { backgroundColor: botInfor?.main_color, backgroundImage: `linear-gradient(to right, ${botInfor?.gardient_color}, ${botInfor?.main_color})` } }}>
+              {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。") : `あと${messageUser.length}間`}
             </div>
           </div>
-          <div id="sp-body" className="sp-body">
+          {console.log(botInfor?.opacity_color)}
+          <div id="sp-body" className="sp-body" style={{ backgroundColor: botInfor?.opacity_color }}>
             {
               renderMessageArr.map((message, indexMessage) => {
                 return (
@@ -2050,7 +2236,9 @@ function Preview() {
                       })
                     }
                     {message.belong_to === 'user' &&
-                      <div className="sp-body-user-side">
+                      <div
+                        // id={`sp-body-user-side-${indexMessage}`} 
+                        className="sp-body-user-side slideLeft">
                         <div className="sp-body-user-side-messages">
                           <UserMessage
                             captcha={captcha}
@@ -2065,12 +2253,13 @@ function Preview() {
                               dataMessages[indexMessage].is_display_button_next = value;
                               setDataMessages([...dataMessages]);
                             }}
+                            dataPrefectures={[...dataPrefectures]}
                             isPopUpZipCode={(isOpen, indexContent) => isPopUpZipCode(isOpen, indexContent)}
                             onChangeErrors={(field, value) => onChangeErrors(field, value)}
                           />
                           {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
-                            && <div className="ss-user-message__action-wrapper">
-                              <Button disabled={message.disabled} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
+                            && <div className="sp-user-message-button-action">
+                              <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
                                 {message.buttonName || "次へ"}
                               </Button>
                             </div>
@@ -2104,10 +2293,10 @@ const BotMessage = ({ content, index, botInfor }) => {
   }
 
   return (
-    <div key={index} className="sp-body-bot-side">
+    <div key={index} className="sp-body-bot-side slideRight">
       {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay') && (
         <div className="sp-body-bot-side-avatar sp-avatar">
-          <img src={"https://ec-chatbot-test1.com/" + botInfor?.icon?.url} />
+          <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} />
         </div>
       )}
       <div className="sp-body-bot-side-messages">
@@ -2118,7 +2307,14 @@ const BotMessage = ({ content, index, botInfor }) => {
             {content.type === 'text_input' && (
               <div
                 className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                style={{ overflowWrap: 'break-word', backgroundColor: 'white', height: 'auto', overflowY: 'hidden' }}
+                style={{
+                  overflowWrap: 'break-word',
+                  backgroundColor: botInfor?.message_color,
+                  color: botInfor?.font_color, height: 'auto',
+                  overflowY: 'hidden',
+                  border: 'none',
+                  borderRadius: '20px'
+                }}
               // value={content[content.type]?.content || ''}
               // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
               >
@@ -2132,7 +2328,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                     <img
                       src={content[content.type]?.content}
                       alt=""
-                      style={{ width: '100%', marginLeft: '8px' }} />
+                      style={{ width: '100%' }} />
                   }
                   {content[content.type]?.content.includes('pdf') &&
                     <span
@@ -2143,7 +2339,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                   {content[content.type]?.content.includes('mp4') &&
                     <div>
                       <video
-                        style={{ width: '100%', height: '100%', borderRadius: '5px' }}
+                        style={{ width: '100%', height: '100%', borderRadius: '2px' }}
                         src={content[content.type]?.content}
                         autoPlay
                         controls
@@ -2156,6 +2352,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                   className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                   value={''}
                   readOnly
+                  style={{ backgroundColor: botInfor?.message_color, border: 'none', borderRadius: '20px', color: botInfor?.font_color }}
                 ></textarea>
             )}
             {content.type === 'delay' && (
@@ -2167,11 +2364,11 @@ const BotMessage = ({ content, index, botInfor }) => {
   )
 }
 
-const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors }) => {
+const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors, dataPrefectures }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
   const [dataCity, setDataCity] = useState([]);
-  const [dataPrefectures, setDataPrefectures] = useState([]);
+  // const [dataPrefectures, setDataPrefectures] = useState([...dataPrefectures]);
   const [startDate, setStartDate] = useState(new Date());
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
@@ -2180,6 +2377,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState('');
 
+  console.log(indexMessageRender, 'checkekkkk indexMessageRender')
+
   function loadCaptcha(indexContent) {
     console.log('load captcha');
     console.log(captcha, indexMessage, indexMessageRender, captcha.filter(item => item.index === indexMessage))
@@ -2187,13 +2386,19 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
       document.getElementById(`captcha-${indexMessage}-${indexContent}`).innerHTML = captcha.filter(item => item.index === indexMessage && item.indexContent === indexContent)?.[0]?.data || "";
   }
 
+  const stringNullOrEmpty = (string) => {
+    if (string === undefined || string === null || (string && (string + "")?.trim() === "") || string === "") return true
+    return false
+  }
+
   useEffect(() => {
     if (messageContent.length === 1) {
       let message = messageContent[0];
-      if ((message.type === 'card_payment_radio_button' && !message[message.type].initial_selection)
+      console.log(message?.[message.type], message.type === 'card_payment_radio_button' && stringNullOrEmpty(message?.[message.type]?.initial_selection) && stringNullOrEmpty(message?.[message.type]?.initial_selection_picture), 'checkk message[message.type].initial_selection')
+      if ((message.type === 'card_payment_radio_button' && (stringNullOrEmpty(message?.[message.type]?.initial_selection) && stringNullOrEmpty(message?.[message.type]?.initial_selection_picture)))
         || message.type === 'product_purchase_radio_button'
-        || (message?.[message.type].type === "picture_radio" ? (message?.[message.type]?.card_linked_setting || message?.[message.type]?.card_linked_setting === message?.[message.type]?.initial_selection)
-          : (message?.[message.type]?.card_linked_setting_picture && message?.[message.type]?.card_linked_setting_picture === message?.[message.type]?.initial_selection_picture))
+        || (message?.[message.type].type !== "picture_radio" ? ( stringNullOrEmpty(message?.[message.type]?.initial_selection) && message?.[message.type]?.card_linked_setting !== message?.[message.type]?.initial_selection)
+          : (stringNullOrEmpty(message?.[message.type]?.initial_selection_picture) && message?.[message.type]?.card_linked_setting_picture !== message?.[message.type]?.initial_selection_picture))
         || (message.type === 'carousel' && message?.[message.type].require)
         || (message.type === 'radio_button' && !message[message.type].initial_selection)) {
         displayButtonNext(false);
@@ -2214,17 +2419,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   }, [messageContentProps])
 
   useEffect(() => {
-    api.get(`/api/v1/prefectures`).then((res) => {
-      setDataPrefectures(res.data.data);
-    }).catch((error) => {
-      console.log(error);
-      if (error.response?.data.code === 0) {
-        tokenExpired()
-      }
-    });
-  }, [])
-
-  useEffect(() => {
+    console.log(indexMessage);
     messageContent.forEach((content, indexContent) => {
       console.log(content)
       if (content.type === "calendar") {
@@ -2242,7 +2437,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
             date_select = moment().add(i + 1, 'days').format("YYYY-MM-DD");
             i++;
           }
-          calendar.date_select = date_select;
+          // calendar.date_select = date_select;
+          onChangeValue(indexContent, content.type, date_select, 'date_select')
         } else if (calendar.initial_selection && calendar.type === "start_end_date") {
           let i = 0;
           calendar.start_date_select = moment();
@@ -2260,13 +2456,35 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
         }
       } else if (content.type === "checkbox") {
         let checkbox = content.checkbox;
-        if (checkbox.all_item_checked) {
+        if (checkbox.all_item_checked && checkbox.type !== 'checkbox_img') {
           checkbox[checkbox.type].forEach(item => {
             checkbox.checkedValue.push(item.id);
           })
           onChangeValue(indexContent, content.type, checkbox.checkedValue, 'checkedValue');
-          console.log(checkbox.checkedValue)
+        } else if (checkbox.all_item_checked && checkbox.type === 'checkbox_img') {
+          checkbox[checkbox.type].forEach(item => {
+            item.contents.forEach(itemContent => {
+              checkbox.initial_selection_picture.push(`${item.id}-${itemContent.id}`);
+            })
+          });
+          onChangeValue(indexContent, content.type, checkbox.initial_selection_picture, 'initial_selection_picture');
         }
+      } else if (content.type === "radio_button") {
+        let radioButton = content.radio_button;
+        if (radioButton.initial_selection) {
+          onChangeValue(indexContent, content.type, radioButton.initial_selection, 'initial_selection');
+        }
+      } else if (content.type === "card_payment_radio_button") {
+        let cardPaymentRadioButton = content.card_payment_radio_button;
+        if (cardPaymentRadioButton.type !== "picture_radio" && cardPaymentRadioButton.initial_selection) {
+          onChangeValue(indexContent, content.type, cardPaymentRadioButton.initial_selection, 'initial_selection');
+        } else if (cardPaymentRadioButton.initial_selection_picture) {
+          onChangeValue(indexContent, content.type, cardPaymentRadioButton.initial_selection_picture, 'initial_selection_picture');
+        }
+      } else if (content.type === 'product_purchase') {
+        let productPurchase = content.product_purchase;
+        console.log(productPurchase);
+        onChangeValue(indexContent, content.type, productPurchase.initial_selection, 'initial_selection');
       }
     })
   }, [])
@@ -2278,12 +2496,11 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   function getBaseUrl(event, indexContent) {
     var file = event.target.files[0];
     const type = file.name.slice(file.name.lastIndexOf('.') + 1);
-    let messsageError = "";
-    if (messageContent[indexContent].attaching_file.file_type.length > 0 && !messageContent[indexContent].attaching_file.file_type.includes(type)) {
+    if (messageContent[indexContent].attaching_file.file_type.length > 0 && !messageContent[indexContent].attaching_file.file_type.includes(type.toLowerCase())) {
       console.log(messageContent[indexContent].attaching_file.file_type, type);
       onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, `ファイルには${messageContent[indexContent].attaching_file.file_type.join(", ")}タイプのファイルを指定してください。`)
       return;
-    } else if (file.size / 1024 / 1024 > 2) {
+    } else if (file.size / 1024 / 1024 >= 2) {
       onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "ファイルサイズは2MB以下です。");
       return;
     } else {
@@ -3353,6 +3570,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     tokenExpired();
                                   }
                                 });
+                              } else {
+                                onChangeValue(indexContent, content.type, null, pullDown.type, 'city');
+                                setDataCity([]);
                               }
                             }}
                             value={pullDown[pullDown.type].prefecture}
@@ -3385,8 +3605,10 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
             {
               content.type === 'zip_code_address' && (
                 <div style={{ marginBottom: '10px' }}>
-                  <div style={{ marginBottom: '10px', textDecoration: 'underline', color: '#2c76f0', textAlign: 'right' }}>
-                    <span style={{ cursor: 'pointer' }} onClick={() => isPopUpZipCode(true, indexContent)}>〒検索はこちら</span>
+                  <div style={{ marginBottom: '10px', textDecoration: 'underline', ...!disabled ? { color: '#2c76f0' } : { color: 'gray' }, textAlign: 'right' }}>
+                    <span style={!disabled ? { cursor: 'pointer' } : {}} onClick={() => {
+                      if (disabled !== true) isPopUpZipCode(true, indexContent)
+                    }}>〒検索はこちら</span>
                   </div>
                   {(zipCodeAddress.title_require || zipCodeAddress.isCheckRequire) &&
                     <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
@@ -3686,8 +3908,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     </React.Fragment>
                   )}
                   {/* calendar: type = 'embedded' */}
-                  {console.log(calendar.date_select, 'checkkkk calendar.date_select')}
-                  {/* {console.log(locale)} */}
                   {calendar.type === 'embedded' && (
                     <React.Fragment>
                       <div className="ss-message__content--user-calender-embedded" style={{ marginTop: '5px' }}>
@@ -3704,7 +3924,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             const start = 0;
                             const end = 12;
                             const monthOptions = [];
-                            console.log(value)
                             value = value ? value : moment();
                             let current = value.clone();
                             const localeData = value.localeData();
@@ -3736,16 +3955,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               <div style={{ padding: 8 }}>
                                 <Row gutter={8}>
                                   <Col>
-                                    <Radio.Group
-                                      size="small"
-                                      onChange={(e) => onTypeChange(e.target.value)}
-                                      value={type}
-                                    >
-                                      <Radio.Button value="month">月</Radio.Button>
-                                      <Radio.Button value="year">年</Radio.Button>
-                                    </Radio.Group>
-                                  </Col>
-                                  <Col>
                                     <Select
                                       size="small"
                                       dropdownMatchSelectWidth={false}
@@ -3772,6 +3981,16 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                       {monthOptions}
                                     </Select>
                                   </Col>
+                                  <Col>
+                                    <Radio.Group
+                                      size="small"
+                                      onChange={(e) => onTypeChange(e.target.value)}
+                                      value={type}
+                                    >
+                                      <Radio.Button value="month">月</Radio.Button>
+                                      <Radio.Button value="year">年</Radio.Button>
+                                    </Radio.Group>
+                                  </Col>
                                 </Row>
                               </div>
                             );
@@ -3785,7 +4004,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     </React.Fragment>
                   )}
                   {/* calendar: type = 'start_end_date' */}
-                  {console.log(calendar.start_date_select, 'chekckkkk calendar.start_date_select')}
                   {calendar.type === 'start_end_date' && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <DatePickerCustom
@@ -3835,7 +4053,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         <textarea
                           name="ss-message__content--user-agree_to_term-detail_content"
                           id=""
-                          rows="5"
+                          rows={agreeTerm[agreeTerm.type].content?.length > 200 ? 8 : 5}
                           value={agreeTerm[agreeTerm.type].content}
                           className="ss-input-value"
                           readOnly
@@ -3897,7 +4115,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {carousel.type === 'default' && (
                     <div className="sp-carousel-container-preivew">
                       {carousel[carousel.type].contents && carousel[carousel.type].contents.map((itemCarousel, indexCarousel) => {
-                        console.log(itemCarousel);
                         return <div className="sp-carousel-container-block-item" key={indexCarousel}>
                           <div className="sp-carousel-container-block-item-infor" onClick={() => handleClickCarousel(itemCarousel.urls, carousel.use_shortened_urls)}>
                             <div className="sp-carousel-preview-img">
@@ -3966,6 +4183,16 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         controls={false}
                         max={Number.MAX_SAFE_INTEGER}
                         maxLength={16}
+                        onPaste={e => {
+                          // Get the pasted value and remove all white space
+                          const value = e.clipboardData.getData('text').replace(/\s/g, '');
+                          console.log(value)
+                          // Set the value of the input to the pasted value
+                          onChangeValue(indexContent, content.type, value, 'card_number')
+                          e.target.value = value;
+                        }}
+                        formatter={(value) => value.replace(/\s/g, "")}
+                        parser={(value) => value.replace(/\s/g, "")}
                         disabled={disabled}
                         style={{ width: '100%', marginLeft: '0px' }}
                         value={creditCardPayment.card_number}
@@ -4109,7 +4336,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         maxLength={4}
                         disabled={disabled}
                         controls={false}
-                        label={<span style={{ fontWeight: '400' }}>CVC非表示 <img style={{ width: '8%' }} src={cvcIcon} /></span>}
+                        label={<span style={{ fontWeight: '400' }}>CVC <img style={{ width: '8%' }} src={cvcIcon} /></span>}
                         value={creditCardPayment.cvc}
                         placeholder={creditCardPayment.cvc_placeholder}
                         onChange={value => onChangeValue(indexContent, content.type, value, 'cvc')}
@@ -4225,55 +4452,71 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                             値段: {itemProduct.item_price} 円
                                           </div>
                                         }
-                                        {itemProduct.quantity_limit &&
+                                        {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                           <div className="ss-user-overview-product-purchase-infor-price">
                                             数量：最大{itemProduct.quantity_limit}個まで
-                                          </div>
+                                          </div> :
+                                          ""
                                         }
-                                        {/* {productPurchase.multiple_item_purchase &&
-                                        <div className="ss-user-overview-product-purchase-infor-price">
-                                          Multiple item purchase
-                                        </div>
-                                      } */}
                                       </div>
                                     }
                                   </div>
                                 </Checkbox>
                                 {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
-                                  <InputNum
-                                    style={{ width: '60%', marginLeft: '27px' }}
-                                    value={itemProduct.quantity_select}
-                                    onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
-                                    controls={false}
-                                    min={1}
-                                    max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
-                                    addonAfter={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                        }
+                                  <div>
+                                    <InputNum
+                                      className="sp-product-purchase-custom-input-quantity"
+                                      style={{ width: '46%', marginLeft: '137px' }}
+                                      value={itemProduct.quantity_select}
+                                      onChange={value => {
                                         let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
+                                        if (!selectArr.includes(itemProduct.id) && value) {
                                           selectArr.push(itemProduct.id);
                                           onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
                                         }
+                                        onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')
                                       }}
-                                    >+</div>}
-                                    addonBefore={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (itemProduct.quantity_select > 1) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
-                                        }
-                                        let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
-                                          selectArr.push(itemProduct.id);
-                                          onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
-                                        }
-                                      }}
-                                    >-</div>}
-                                  />
+                                      controls={false}
+                                      min={1}
+                                      disabled={disabled}
+                                      max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
+                                      addonAfter={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              selectArr.push(itemProduct.id);
+                                              onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                            }
+                                          }
+                                        }}
+                                      >+</div>}
+                                      addonBefore={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select > 1) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              selectArr.push(itemProduct.id);
+                                              onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                            }
+                                          }
+                                        }}
+                                      >-</div>}
+                                    />
+                                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
+                                      <div style={{ color: '#FF7E00', fontSize: '11px', width: '46%', marginLeft: '137px' }}>
+                                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
+                                      </div>
+                                    }
+                                  </div>
                                 }
                               </div>
                             })}
@@ -4328,10 +4571,11 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                             値段: {itemProduct.item_price} 円
                                           </div>
                                         }
-                                        {itemProduct.quantity_limit &&
+                                        {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                           <div className="ss-user-overview-product-purchase-infor-price">
                                             数量：最大{itemProduct.quantity_limit}個まで
-                                          </div>
+                                          </div> :
+                                          ""
                                         }
                                         {/* {productPurchase.multiple_item_purchase &&
                                         <div className="ss-user-overview-product-purchase-infor-price">
@@ -4344,38 +4588,57 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                 </Radio>
                                 {
                                   (productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
-                                  <InputNum
-                                    style={{ width: '60%', marginLeft: '27px' }}
-                                    value={itemProduct.quantity_select}
-                                    onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
-                                    controls={false}
-                                    min={1}
-                                    max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
-                                    addonAfter={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                        }
+                                  <div>
+                                    <InputNum
+                                      className="sp-product-purchase-custom-input-quantity"
+                                      style={{ width: '46%', marginLeft: '137px' }}
+                                      value={itemProduct.quantity_select}
+                                      onChange={value => {
                                         let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
+                                        if (!selectArr.includes(itemProduct.id) && value) {
                                           onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
                                         }
+                                        onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')
                                       }}
-                                    >+</div>}
-                                    addonBefore={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (itemProduct.quantity_select > 1) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
-                                        }
-                                        let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
-                                          onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
-                                        }
-                                      }}
-                                    >-</div>}
-                                  />
+                                      controls={false}
+                                      disabled={disabled}
+                                      min={1}
+                                      max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
+                                      addonAfter={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                            }
+                                          }
+                                        }}
+                                      >+</div>}
+                                      addonBefore={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select > 1) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                            }
+                                          }
+                                        }}
+                                      >-</div>}
+                                    />
+                                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
+                                      <div style={{ color: '#FF7E00', fontSize: '11px', width: '46%', marginLeft: '137px' }}>
+                                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
+                                      </div>
+                                    }
+                                  </div>
                                 }
                               </div>
                             })}
@@ -4400,7 +4663,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     let selectArr = [...productPurchase.initial_selection];
                                     if (selectArr.includes(itemProduct.id)) {
                                       selectArr = [...selectArr.filter(item => item !== itemProduct.id)];
-                                      console.log(selectArr, itemProduct.id, 'cehckkkkk');
                                     } else {
                                       selectArr.push(itemProduct.id);
                                     }
@@ -4416,48 +4678,69 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                         {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
                                       </div>
                                     }
-                                    {itemProduct.quantity_limit &&
+                                    {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                       <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                         数量：最大{itemProduct.quantity_limit}個まで
-                                      </div>
+                                      </div> :
+                                      ""
                                     }
                                   </div>
                                 </Checkbox>
                                 {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
-                                  <InputNum
-                                    value={itemProduct.quantity_select}
-                                    onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
-                                    controls={false}
-                                    min={1}
-                                    style={{ width: '60%' }}
-                                    max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
-                                    addonAfter={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                        }
+                                  <div>
+                                    <InputNum
+                                      className="sp-product-purchase-custom-input-quantity"
+                                      value={itemProduct.quantity_select}
+                                      onChange={value => {
                                         let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
+                                        if (!selectArr.includes(itemProduct.id) && value) {
                                           selectArr.push(itemProduct.id);
                                           onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
                                         }
+                                        onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')
                                       }}
-                                    >+</div>}
-                                    addonBefore={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (itemProduct.quantity_select > 1) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
-                                        }
-                                        let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
-                                          selectArr.push(itemProduct.id);
-                                          onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
-                                        }
-                                      }}
-                                    >-</div>}
-                                  />
+                                      controls={false}
+                                      min={1}
+                                      disabled={disabled}
+                                      style={{ width: '60%' }}
+                                      max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
+                                      addonAfter={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              selectArr.push(itemProduct.id);
+                                              onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                            }
+                                          }
+                                        }}
+                                      >+</div>}
+                                      addonBefore={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select > 1) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              selectArr.push(itemProduct.id);
+                                              onChangeValue(indexContent, content.type, selectArr, 'initial_selection');
+                                            }
+                                          }
+                                        }}
+                                      >-</div>}
+                                    />
+                                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
+                                      <div style={{ color: '#FF7E00', fontSize: '11px' }}>
+                                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
+                                      </div>
+                                    }
+                                  </div>
                                 }
                               </div>
                             })}
@@ -4472,7 +4755,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             onChange={(e) => {
                               let selectArr = [...productPurchase.initial_selection];
                               let dataValue;
-                              console.log(selectArr, e.target.value, selectArr.includes(e.target.value))
                               if (selectArr.includes(e.target.value)) {
                                 dataValue = [];
                               } else {
@@ -4494,46 +4776,66 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                         {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
                                       </div>
                                     }
-                                    {itemProduct.quantity_limit &&
+                                    {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                       <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                         数量：最大{itemProduct.quantity_limit}個まで
-                                      </div>
+                                      </div> :
+                                      ""
                                     }
                                   </div>
                                 </Radio>
                                 {(productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) &&
-                                  <InputNum
-                                    style={{ width: '60%' }}
-                                    value={itemProduct.quantity_select}
-                                    onChange={value => onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')}
-                                    controls={false}
-                                    min={1}
-                                    max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
-                                    addonAfter={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
-                                        }
+                                  <div>
+                                    <InputNum
+                                      className="sp-product-purchase-custom-input-quantity"
+                                      style={{ width: '60%' }}
+                                      disabled={disabled}
+                                      value={itemProduct.quantity_select}
+                                      onChange={value => {
                                         let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
+                                        if (!selectArr.includes(itemProduct.id) && value) {
                                           onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
                                         }
+                                        onChangeValue(indexContent, content.type, value, 'products', indexProduct, 'quantity_select')
                                       }}
-                                    >+</div>}
-                                    addonBefore={<div
-                                      style={{ padding: '4px 11px', cursor: 'pointer' }}
-                                      onClick={() => {
-                                        if (itemProduct.quantity_select > 1) {
-                                          onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
-                                        }
-                                        let selectArr = [...productPurchase.initial_selection];
-                                        if (!selectArr.includes(itemProduct.id)) {
-                                          onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
-                                        }
-                                      }}
-                                    >-</div>}
-                                  />
+                                      controls={false}
+                                      min={1}
+                                      max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
+                                      addonAfter={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select < (itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER)) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select + 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                            }
+                                          }
+                                        }}
+                                      >+</div>}
+                                      addonBefore={<div
+                                        style={{ padding: '4px 11px', cursor: 'pointer' }}
+                                        onClick={() => {
+                                          if (!disabled) {
+                                            if (itemProduct.quantity_select > 1) {
+                                              onChangeValue(indexContent, content.type, itemProduct.quantity_select - 1, 'products', indexProduct, 'quantity_select')
+                                            }
+                                            let selectArr = [...productPurchase.initial_selection];
+                                            if (!selectArr.includes(itemProduct.id)) {
+                                              onChangeValue(indexContent, content.type, [itemProduct.id], 'initial_selection');
+                                            }
+                                          }
+                                        }}
+                                      >-</div>}
+                                    />
+                                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
+                                      <div style={{ color: '#FF7E00', fontSize: '11px' }}>
+                                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
+                                      </div>
+                                    }
+                                  </div>
                                 }
                               </div>
                             })}
@@ -4582,7 +4884,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           onChange={value => {
                             console.log(value)
                             onChangeValue(indexContent, content.type, value.target.value, 'initial_selection');
-                            if(messageContent.length === 1) onClickNext();
+                            if (messageContent.length === 1) onClickNext();
                           }}
                           value={productPurchaseRadioButton.initial_selection}
                         >
@@ -4647,7 +4949,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           value={productPurchaseRadioButton.initial_selection}
                           onChange={value => {
                             onChangeValue(indexContent, content.type, value.target.value, 'initial_selection');
-                            if(messageContent.length === 1) onClickNext();
+                            if (messageContent.length === 1) onClickNext();
                           }}
                         >
                           {productPurchaseRadioButton.products.map((itemProduct, indexProduct) => {
@@ -4786,7 +5088,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             } else {
                               displayButtonNext(false);
                               onChangeValue(indexContent, content.type, false, 'is_display_card_payment');
-                              if(messageContent.length === 1) onClickNext();
+                              if (messageContent.length === 1) onClickNext();
                             }
                           }}>
                           {itemPayment.text}
@@ -4815,8 +5117,16 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             console.log(cardPaymentRadioButton.card_linked_setting, itemPayment.id)
                             onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
 
-                            if (cardPaymentRadioButton.card_linked_setting !== dataValue && messageContent.length === 1) {
-                              onClickNext();
+                            // if (cardPaymentRadioButton.card_linked_setting !== dataValue && messageContent.length === 1) {
+                            //   onClickNext();
+                            // }
+                            if (cardPaymentRadioButton.card_linked_setting === dataValue) {
+                              onChangeValue(indexContent, content.type, true, 'is_display_card_payment');
+                              displayButtonNext(true);
+                            } else {
+                              displayButtonNext(false);
+                              onChangeValue(indexContent, content.type, false, 'is_display_card_payment');
+                              if (messageContent.length === 1) onClickNext();
                             }
                           }}>
                           {itemPayment.text}
@@ -4844,9 +5154,17 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                   dataValue = "";
                                 }
                                 onChangeValue(indexContent, content.type, dataValue, 'initial_selection_picture');
-                                if (cardPaymentRadioButton.card_linked_setting_picture !== dataValue && messageContent.length === 1) {
-                                  console.log(cardPaymentRadioButton.card_linked_setting_picture !== dataValue, cardPaymentRadioButton.card_linked_setting_picture, dataValue)
-                                  onClickNext();
+                                // if (cardPaymentRadioButton.card_linked_setting_picture !== dataValue && messageContent.length === 1) {
+                                //   console.log(cardPaymentRadioButton.card_linked_setting_picture !== dataValue, cardPaymentRadioButton.card_linked_setting_picture, dataValue)
+                                //   onClickNext();
+                                // }
+                                if (cardPaymentRadioButton.card_linked_setting_picture === dataValue) {
+                                  onChangeValue(indexContent, content.type, true, 'is_display_card_payment');
+                                  displayButtonNext(true);
+                                } else {
+                                  displayButtonNext(false);
+                                  onChangeValue(indexContent, content.type, false, 'is_display_card_payment');
+                                  if (messageContent.length === 1) onClickNext();
                                 }
                               }}>
                               <img src={itemPaymentContent.file_url}></img>
@@ -4878,6 +5196,16 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             controls={false}
                             max={Number.MAX_SAFE_INTEGER}
                             maxLength={16}
+                            onPaste={e => {
+                              // Get the pasted value and remove all white space
+                              const value = e.clipboardData.getData('text').replace(/\s/g, '');
+                              console.log(value)
+                              // Set the value of the input to the pasted value
+                              onChangeValue(indexContent, content.type, value, 'card_number');
+                              e.target.value = value;
+                            }}
+                            formatter={(value) => value.replace(/\s/g, "")}
+                            parser={(value) => value.replace(/\s/g, "")}
                             disabled={disabled}
                             style={{ width: '100%', marginLeft: '0px' }}
                             value={cardPaymentRadioButton.card_number}
@@ -5014,16 +5342,18 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         }
                       </div>
                       {cardPaymentRadioButton.is_hide_cvc === false &&
-                        <div className="ss-user-setting__item-bottom">
-                          <InputCustom
-                            className="ss-user-setting-input-overview"
-                            styleLabel={{ width: '100%' }}
-                            label="CVC非表示"
-                            inline={false}
+                        <div className="ss-user-setting__item-bottom" style={{ display: 'block' }}>
+                          <InputNum
+                            style={{ marginLeft: '0px', width: '33%' }}
+                            className="ss-user-setting-input-limit-character"
+                            max={9999}
+                            maxLength={4}
                             disabled={disabled}
+                            controls={false}
+                            label={<span style={{ fontWeight: '400' }}>CVC <img style={{ width: '8%' }} src={cvcIcon} /></span>}
                             value={cardPaymentRadioButton.cvc}
-                            onChange={value => onChangeValue(indexContent, content.type, value, 'cvc')}
                             placeholder={cardPaymentRadioButton.cvc_placeholder}
+                            onChange={value => onChangeValue(indexContent, content.type, value, 'cvc')}
                           />
                         </div>
                       }

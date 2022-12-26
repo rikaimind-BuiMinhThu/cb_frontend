@@ -81,13 +81,13 @@ function Release() {
         api.get(`/api/v1/message_managements/message_groups?page=1`).then(ress => {
           console.log('res FB: ', res)
           // })
-          setIdInstaSetting(res?.data?.data[0].id);
+          setIdInstaSetting(res?.data?.data[0]?.id);
           if (res.data.data[0]?.post_comment_group_id == null) {
             setPostGroupId(ress.data.data[0]?.id);
             setPostGroupName(ress.data.data[0]?.group_name);
           } else {
             setPostGroupId(res.data.data[0]?.post_comment_group_id);
-            setPostGroupName(res.data.data[0].post_comment_group_name);
+            setPostGroupName(res.data.data[0]?.post_comment_group_name);
           }
 
           if (res.data.data[0]?.story_comment_group_id == null) {
@@ -95,7 +95,7 @@ function Release() {
             setLiveGroupName(ress.data.data[0]?.group_name);
           } else {
             setStoryGroupId(res.data.data[0]?.story_comment_group_id);
-            setLiveGroupName(res.data.data[0].live_comment_group_name);
+            setLiveGroupName(res.data.data[0]?.live_comment_group_name);
           }
 
           if (res.data.data[0]?.live_comment_group_id == null) {
