@@ -605,16 +605,15 @@ function PushMessage() {
     console.log(from)
     console.log(to)
     console.log(expectTime)
-    if(parseInt(from) >= parseInt(to)){
+    if (parseInt(from) >= parseInt(to)) {
       document.getElementById('altTimeFTErr').style.display = 'block'
-    }else {
+    } else {
       document.getElementById('altTimeFTErr').style.display = 'none'
     }
-    if (parseInt(from) <= parseInt(expectTime) &&
-      parseInt(expectTime) <= parseInt(to) &&
-      parseInt(from) < parseInt(expectTime)) {
+    if ((parseInt(from) <= parseInt(expectTime)) &&
+      (parseInt(expectTime) <= parseInt(to))) {
       document.getElementById('timeZoneErr').style.display = 'block'
-      
+
     } else {
       document.getElementById('timeZoneErr').style.display = 'none'
     }
@@ -969,7 +968,7 @@ function PushMessage() {
                   </span>
                 </div>
                 <div className="push-message-add-form">
-                <span className="push-message-span-form">
+                  <span className="push-message-span-form">
                   </span>
                   <span id="altTimeFTErr" style={{ display: 'none', width: '80%', color: 'red' }}>開始時間は、終了時間より前です。</span>
                 </div>
