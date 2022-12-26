@@ -1032,25 +1032,26 @@ function PushMessage() {
                     name="1stOperator"
                     defaultValue={'of'}
                     id="operator"
-                    style={{ width: '15%', margin: '1% 1%' }}
+                    style={{ width: '13%', margin: '1% 1%' }}
                   >
                     <option value="of">の</option>
                   </select>
                   <select
                     name="last_message_datetime_since"
                     id="last_message_datetime_since"
-                    style={{ width: '15%', margin: '1% 1%' }}
+                    style={{ width: '13%', margin: '1% 1%' }}
                   >
                     {alternateSendTime.map((time, i) => (
                       <option key={i} value={time}>
                         {time}
                       </option>
                     ))}
-                  </select>
+                  </select><span style={{width:"55px", margin: '1% 0%'}}>時間後</span>
                   <div style={{ width: '15%', margin: '1% 1.25%' }}></div>
                 </div>
                 {customDiv.map((item, i) => (
                   <div id={`newCDiv${i}`} style={{ width: '100%', display: 'flex' }} key={i}>
+                    <span style={{width:"10px", margin: '1% 0%'}}></span>
                     <select
                       name={`newAnd${i}`}
                       id={`newAnd${i}`}
@@ -1100,7 +1101,7 @@ function PushMessage() {
                       name={`operator${i}`}
                       defaultValue={update == true ? itemUpdate?.variables[i]?.operator : 'is'}
                       id={`operator${i}`}
-                      style={{ width: '15%', margin: '1% 1%' }}
+                      style={{ width: '13%', margin: '1% 1%' }}
                     >
                       <option value="is">
                         is
@@ -1112,8 +1113,8 @@ function PushMessage() {
                       name={`value${i}`}
                       id={`value${i}`}
                       defaultValue={update == true ? itemUpdate?.variables[i]?.value : ''}
-                      style={{ width: '15%', margin: '1% 1%' }}
-                    />
+                      style={{ width: '13%', margin: '1% 1%' }}
+                    /><span style={{width:"55px", margin: '1% 0%'}}></span>
                     {/* {alternateSendTime?.map((time, i) => (
                         <option key={i} value={time}>
                           {time}
@@ -1121,7 +1122,8 @@ function PushMessage() {
                       ))}
                     </select> */}
                     <button
-                      style={{ width: '15%', margin: '1% 1%' }}
+                      style={{ width: '15%', margin: '1% 0% 1% 2%', border:'none',
+                    borderRadius:'5px', backgroundColor:"#ff3333", color:"white" }}
                       onClick={(e) => deleteCDiv(e, i)}
                     >
                       削除
@@ -1131,7 +1133,7 @@ function PushMessage() {
                 <button
                   style={{
                     float: 'right',
-                    width: '130px',
+                    width: '100px',
                     padding: '7.5px 15px',
                     textAlign: 'center',
                     borderRadius: '5px',
@@ -1149,7 +1151,7 @@ function PushMessage() {
               <button
                 style={{
                   float: 'left',
-                  width: 'auto',
+                  width: '150px',
                   padding: '7.5px 35px',
                   textAlign: 'center',
                   border: 'none',
@@ -1164,7 +1166,7 @@ function PushMessage() {
               <button
                 style={{
                   float: 'right',
-                  width: '110px',
+                  width: '100px',
                   padding: '7.5px 35px',
                   textAlign: 'center',
                   borderRadius: '5px',
