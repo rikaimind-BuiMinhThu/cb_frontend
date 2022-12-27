@@ -200,7 +200,7 @@ var routes = [
   },
   {
     path: '/reply-mail-management',
-    name: 'Reply Mail Management',
+    name: '送信メール管理',
     // icon: "nc-icon nc-single-02",
     component: ReplyMailManagement,
     layout: '/admin',

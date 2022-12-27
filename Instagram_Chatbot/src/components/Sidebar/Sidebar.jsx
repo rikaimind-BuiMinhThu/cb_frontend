@@ -180,7 +180,7 @@ function Sidebar(props) {
               >
                 {/* <i className="nc-icon nc-bank" style={{ color: 'black' }} /> */}
                 {/* <MDBIcon fab icon="instagram" style={{ color: "black" }} /> */}
-                <i class="fab fa-instagram"  style={{ color: 'black', fontWeight:"800" }}></i>
+                <i className="fab fa-instagram" style={{ color: 'black', fontWeight: '800' }}></i>
                 <p>Instagram Chatbot</p>
               </NavLink>
               <ul id="instaDropdown" style={{ display: 'none', marginLeft: '-30px' }}>
@@ -195,7 +195,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-atom" style={{ color: 'black' }} /> */}
-                    <i class="fas fa-atom"  style={{ color: 'black' }}></i>
+                    <i className="fas fa-atom" style={{ color: 'black' }}></i>
                     <p style={{ color: 'black' }}>チャットボット作成</p>
                   </NavLink>
                 </li>
@@ -210,7 +210,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-key-25" style={{ color: 'black' }} /> */}
-                    <i class="fas fa-key"  style={{ color: 'black' }}></i>
+                    <i className="fas fa-key" style={{ color: 'black' }}></i>
                     <p style={{ color: 'black' }}>キーワード設定</p>
                   </NavLink>
                 </li>
@@ -225,7 +225,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-air-baloon" style={{ color: 'black' }} /> */}
-                    <i class="fab fa-fly"  style={{ color: 'black' }}></i>
+                    <i className="fab fa-fly" style={{ color: 'black' }}></i>
                     <p style={{ color: 'black' }}>リリース</p>
                   </NavLink>
                 </li>
@@ -238,7 +238,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-single-02" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="chart-pie" style={{ color: "black" }} />
+                    <MDBIcon fas icon="chart-pie" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>データ分析</p>
                   </NavLink>
                   <ul id="userDropdown" style={{ display: 'none', marginLeft: '-30px' }}>
@@ -252,7 +252,10 @@ function Sidebar(props) {
                         activeClassName="active"
                         activeStyle={{ color: 'black' }}
                       >
-                        <i className="nc-icon nc-bulb-63" style={{ color: 'black', fontWeight:"800" }} />
+                        <i
+                          className="nc-icon nc-bulb-63"
+                          style={{ color: 'black', fontWeight: '800' }}
+                        />
                         <p style={{ color: 'black' }}>サマリー</p>
                       </NavLink>
                     </li>
@@ -266,7 +269,10 @@ function Sidebar(props) {
                         activeClassName="active"
                         activeStyle={{ color: 'black' }}
                       >
-                        <i className="nc-icon nc-bullet-list-67" style={{ color: 'black', fontWeight:'800' }} />
+                        <i
+                          className="nc-icon nc-bullet-list-67"
+                          style={{ color: 'black', fontWeight: '800' }}
+                        />
                         <p style={{ color: 'black' }}>ユーザー一覧</p>
                       </NavLink>
                     </li>
@@ -281,7 +287,7 @@ function Sidebar(props) {
                         activeStyle={{ color: 'black' }}
                       >
                         {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                        <MDBIcon fas icon="user-check" style={{ color: "black" }} />
+                        <MDBIcon fas icon="user-check" style={{ color: 'black' }} />
                         <p style={{ color: 'black' }}>集客</p>
                       </NavLink>
                     </li>
@@ -296,8 +302,8 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-bulb-63" style={{ color: 'black' }} /> */}
-                    {/* <i class="fas fa-chalkboard-teacher"></i> */}
-                    <MDBIcon fas icon="chalkboard-teacher" style={{ color: "black" }} />
+                    {/* <i className="fas fa-chalkboard-teacher"></i> */}
+                    <MDBIcon fas icon="chalkboard-teacher" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>CRM</p>
                   </NavLink>
                 </li>
@@ -316,7 +322,7 @@ function Sidebar(props) {
                 activeStyle={{ color: 'black' }}
               >
                 {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                <MDBIcon fas icon="cogs" style={{ color: "black" }} />
+                <MDBIcon fas icon="cogs" style={{ color: 'black' }} />
                 <p style={{ color: 'black' }}>Web Chatbot</p>
               </NavLink>
               <ul id="webChatDrop" style={{ display: 'none', marginLeft: '-30px' }}>
@@ -331,7 +337,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="address-book" style={{ color: "black" }} />
+                    <MDBIcon fas icon="address-book" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>アカウント情報</p>
                   </NavLink>
                 </li>
@@ -346,7 +352,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="briefcase" style={{ color: "black" }} />
+                    <MDBIcon fas icon="briefcase" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>基本設定</p>
                   </NavLink>
                 </li>
@@ -361,7 +367,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="envelope" style={{ color: "black" }} />
+                    <MDBIcon fas icon="envelope" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>送信メール管理</p>
                   </NavLink>
                 </li>
@@ -377,7 +383,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="user-tie" style={{ color: "black" }} />
+                    <MDBIcon fas icon="user-tie" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>クライアント管理</p>
                   </NavLink>
                 </li>
@@ -393,7 +399,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-circle-10" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="user" style={{ color: "black" }} />
+                    <MDBIcon fas icon="user" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>ユーザー管理</p>
                   </NavLink>
                 </li>
@@ -406,8 +412,8 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-bulb-63" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="list" style={{ color: "black" }} />
-                    
+                    <MDBIcon fas icon="list" style={{ color: 'black' }} />
+
                     <p style={{ color: 'black' }}>ボット一覧</p>
                   </NavLink>
                 </li>
@@ -446,7 +452,7 @@ function Sidebar(props) {
                 activeStyle={{ color: 'black' }}
               >
                 {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                <MDBIcon fas icon="user-cog" style={{ color: "black" }} />
+                <MDBIcon fas icon="user-cog" style={{ color: 'black' }} />
                 <p style={{ color: 'black' }}>ボット設定</p>
               </NavLink>
               <ul
@@ -466,7 +472,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="swatchbook" style={{ color: "black" }} />
+                    <MDBIcon fas icon="swatchbook" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>シナリオ設定</p>
                   </NavLink>
                   <ul
@@ -489,7 +495,7 @@ function Sidebar(props) {
                         activeStyle={{ color: 'black' }}
                       >
                         {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                        <MDBIcon fas icon="th-list" style={{ color: "black" }} />
+                        <MDBIcon fas icon="th-list" style={{ color: 'black' }} />
                         <p style={{ color: 'black' }}>シナリオ一覧</p>
                       </NavLink>
                     </li>
@@ -568,7 +574,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="mail-bulk" style={{ color: "black" }} />
+                    <MDBIcon fas icon="mail-bulk" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>メール設定</p>
                   </NavLink>
                   <ul
@@ -591,7 +597,7 @@ function Sidebar(props) {
                         activeStyle={{ color: 'black' }}
                       >
                         {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                        <MDBIcon fas icon="file-signature" style={{ color: "black" }} />
+                        <MDBIcon fas icon="file-signature" style={{ color: 'black' }} />
                         <p style={{ color: 'black' }}>メール作成</p>
                       </NavLink>
                     </li>
@@ -606,7 +612,7 @@ function Sidebar(props) {
                         activeStyle={{ color: 'black' }}
                       >
                         {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                        <MDBIcon fas icon="mail-bulk" style={{ color: "black" }} />
+                        <MDBIcon fas icon="mail-bulk" style={{ color: 'black' }} />
                         <p style={{ color: 'black' }}>メール一覧</p>
                       </NavLink>
                     </li>
@@ -623,7 +629,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="file-alt" style={{ color: "black" }} />
+                    <MDBIcon fas icon="file-alt" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>メディアファイル管理</p>
                   </NavLink>
                 </li>
@@ -638,7 +644,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="user-check" style={{ color: "black" }} />
+                    <MDBIcon fas icon="user-check" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>サブユーザ管理</p>
                   </NavLink>
                 </li>
@@ -703,7 +709,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="envelope-square" style={{ color: "black" }} />
+                    <MDBIcon fas icon="envelope-square" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>プッシュメッセージ</p>
                   </NavLink>
                 </li>
@@ -740,7 +746,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="chart-bar" style={{ color: "black" }} />
+                    <MDBIcon fas icon="chart-bar" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>変数管理</p>
                   </NavLink>
                 </li>
@@ -755,7 +761,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="download" style={{ color: "black" }} />
+                    <MDBIcon fas icon="download" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>設定タグ＆デモ</p>
                   </NavLink>
                 </li>
@@ -789,7 +795,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="chart-line" style={{ color: "black" }} />
+                    <MDBIcon fas icon="chart-line" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>レポート</p>
                   </NavLink>
                   {/* <ul
@@ -843,7 +849,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="money-check" style={{ color: "black" }} />
+                    <MDBIcon fas icon="money-check" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>決済管理</p>
                   </NavLink>
                 </li>
@@ -858,7 +864,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} />server */}
-                    <MDBIcon fas icon="server" style={{ color: "black" }} />
+                    <MDBIcon fas icon="server" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>ペイメントゲートウェイ</p>
                   </NavLink>
                 </li>
@@ -887,7 +893,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="window-restore" style={{ color: "black" }} />
+                    <MDBIcon fas icon="window-restore" style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>離脱防止</p>
                   </NavLink>
                 </li>
