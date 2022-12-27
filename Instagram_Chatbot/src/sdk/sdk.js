@@ -16,7 +16,8 @@ async function displayPopup() {
     iframe.id = 'previewSdk'; iframe.style.position = "fixed"; iframe.style.bottom = "0"; iframe.style.right = "0";
     iframe.width = '400px'; iframe.height = '620px';
     iframe.style.border = 'none'; iframe.style.padding = '0'; iframe.style.margin = '0'; iframe.style.borderRadius = '0px'
-    iframe.src = `https://localhost:3000/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}`;
+    iframe.src = `https://localhost:3001/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}`;
+    //https://ec-chatbot1.com
     body.appendChild(iframe)
 
     window.addEventListener('message', function (e) {
