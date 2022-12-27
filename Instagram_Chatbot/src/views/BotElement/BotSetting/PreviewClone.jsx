@@ -153,6 +153,10 @@ let dataPaymentMethod = [
 
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
+var url = new URL(window.location.href)
+console.log(url)
+let params = new URLSearchParams(url.search);
+
 function Preview() {
 
   const [isOpen, setIsOpen] = useState(false)
@@ -160,7 +164,7 @@ function Preview() {
   const [urlReceive, setUrlReceive] = useState()
   const [deviceReceive, setDeviceReceive] = useState()
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
-  const [scenarioId, setScenarioId] = useState( Cookies.get('scenario_id'));
+  const [scenarioId, setScenarioId] = useState(params.get('scenario_id'));
   const [botInfor, setBotInfor] = useState();
   const [dataMessages, setDataMessages] = useState([]);
   const [urlThanksPage, setUrlThanksPage] = useState();
@@ -173,6 +177,7 @@ function Preview() {
   const [isDisplayButtonNext, setIsDisplayButtonNext] = useState(false);
   const [captcha, setCaptcha] = useState([]);
   const [withdrawal, setWithdrawal] = useState({});
+  const [dataVariables, setDataVariables] = useState([]);
   const isFromScenario = false
 
   const [dataPrefectures, setDataPrefectures] = useState([]);
@@ -243,35 +248,37 @@ function Preview() {
     return obj;
   }
   function onOpenPreview() {
-    if (isOpen) {
-      Cookies.set('openPre', true)
-      if (window && window.parent) {
-        window.parent.postMessage(true, urlReceive);
+    if (document.getElementById('sp-container')) {
+      if (isOpen) {
+        Cookies.set('openPre', true)
+        if (window && window.parent) {
+          window.parent.postMessage(true, urlReceive);
+        }
+        document.getElementById('sp-container').style.height = '610px';
+        document.getElementById('sp-header').style.position = 'static';
+        document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
+        document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
+        document.getElementById('sp-header').style.borderTopLeftRadius = "2px";
+        document.getElementById('sp-header').style.borderTopRightRadius = "2px";
+        document.getElementById('sp-process-bar').style.display = 'block';
+        document.getElementById('sp-body').style.display = 'block';
       }
-      document.getElementById('sp-container').style.height = '610px';
-            document.getElementById('sp-header').style.position = 'static';
-            document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
-            document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
-            document.getElementById('sp-header').style.borderTopLeftRadius = "2px";
-            document.getElementById('sp-header').style.borderTopRightRadius = "2px";
-            document.getElementById('sp-process-bar').style.display = 'block';
-            document.getElementById('sp-body').style.display = 'block';
-    }
-    else {
-      Cookies.set('openPre', false)
-      if (window && window.parent) {
-        window.parent.postMessage(false, urlReceive);
-      }
-      document.getElementById('sp-container').style.height = '0px';
-      document.getElementById('sp-process-bar').style.display = 'none';
-      document.getElementById('sp-body').style.display = 'none';
-      document.getElementById('sp-header').style.borderBottomLeftRadius = '25px';
-      document.getElementById('sp-header').style.borderBottomRightRadius = '25px';
-      document.getElementById('sp-header').style.borderTopLeftRadius = "25px";
-      document.getElementById('sp-header').style.borderTopRightRadius = "25px";
-      document.getElementById('sp-header').style.position = 'absolute';
-      document.getElementById('sp-header').style.bottom = '13px';
+      else {
+        Cookies.set('openPre', false)
+        if (window && window.parent) {
+          window.parent.postMessage(false, urlReceive);
+        }
+        document.getElementById('sp-container').style.height = '0px';
+        document.getElementById('sp-process-bar').style.display = 'none';
+        document.getElementById('sp-body').style.display = 'none';
+        document.getElementById('sp-header').style.borderBottomLeftRadius = '25px';
+        document.getElementById('sp-header').style.borderBottomRightRadius = '25px';
+        document.getElementById('sp-header').style.borderTopLeftRadius = "25px";
+        document.getElementById('sp-header').style.borderTopRightRadius = "25px";
+        document.getElementById('sp-header').style.position = 'absolute';
+        document.getElementById('sp-header').style.bottom = '13px';
 
+      }
     }
     setIsOpen(!isOpen);
   }
@@ -296,23 +303,24 @@ function Preview() {
 
   useEffect(() => {
     let delayRender;
-    var url = new URL(window.location.href)
-    console.log(url)
-    let params = new URLSearchParams(url.search);
-    let botIdGet = params.get('bot_id') // 'chrome-instant'
-    let urlRe = params.get('urlReceive') // 'chrome-instant'
-    let deviceRe = params.get('deviceReceive') // 'chrome-instant'
-    let scenarioIdGet = params.get('scenario_id') // 'mdn query string'
-    console.log('url ne: ', urlRe)
-    setUrlSend(url.href)
-    setUrlReceive(urlRe)
-    setDeviceReceive(deviceRe)
-    // console.log('botIdGet: ', botIdGet)
-    // console.log('scenarioIdGet: ', scenarioIdGet)
-    console.log('deviceRe: ', deviceRe)
-    setBotId(botIdGet)
-    setScenarioId(scenarioIdGet)
-    api.get(`/api/v1/managements/chatbots/${botIdGet}/scenarios/${scenarioIdGet}/preview`).then(async res => {
+    if (scenarioId) {
+      // var url = new URL(window.location.href)
+      // console.log(url)
+      // let params = new URLSearchParams(url.search);
+      let botIdGet = params.get('bot_id') // 'chrome-instant'
+      let urlRe = params.get('urlReceive') // 'chrome-instant'
+      let deviceRe = params.get('deviceReceive') // 'chrome-instant'
+      let scenarioIdGet = params.get('scenario_id') // 'mdn query string'
+      console.log('url ne: ', urlRe)
+      setUrlSend(url.href)
+      setUrlReceive(urlRe)
+      setDeviceReceive(deviceRe)
+      // console.log('botIdGet: ', botIdGet)
+      // console.log('scenarioIdGet: ', scenarioIdGet)
+      console.log('deviceRe: ', deviceRe)
+      setBotId(botIdGet)
+      // setScenarioId(scenarioIdGet)
+      api.get(`/api/v1/managements/chatbots/${botIdGet}/scenarios/${scenarioIdGet}/preview`).then(async res => {
         console.log(res, 'cehckkkk bugs')
         if (res.data.code == 1) {
           let messageArr = [];
@@ -323,58 +331,52 @@ function Preview() {
           console.log(messageArr);
           console.log(res.data.chatbot);
 
+          let variablesAll = res.data?.all_variables || [];
+          setDataVariables(variablesAll);
+
           setDataMessages(messageArr);
           setUrlThanksPage(urlThanks);
           if (res.data.chatbot) {
-            let opacity_color, message_color, gardient_color, font_color;
+            let opacity_color, message_color, font_color;
             console.log(res.data.chatbot.main_color)
             if (res.data.chatbot.main_color === 'blue') {
               opacity_color = '#D6E0EF';
               message_color = '#3CACEF';
-              gardient_color = '#36D0DC';
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'green') {
               opacity_color = '#DEEADB';
               message_color = '#9DDB7C';
-              gardient_color = '#F8C03F';
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'orange') {
               opacity_color = '#F4E5DA';
               message_color = '#EF8D2F';
-              gardient_color = '#D6DB4B';
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'yellow') {
               opacity_color = '#F0EFEB';
               message_color = '#F3AA2D';
-              gardient_color = '#FF8402';
               res.data.chatbot.main_color = "#F6CA21";
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'pink') {
               opacity_color = '#EBDDE3';
               message_color = '#E65B83';
-              gardient_color = '#94C1EC';
               res.data.chatbot.main_color = "#F170AA";
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'purple') {
               opacity_color = '#E9E8F1';
               message_color = '#AF82D5';
-              gardient_color = '#FAAA88';
               res.data.chatbot.main_color = "#8C66D9";
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'black') {
-              opacity_color = '#333333';
+              opacity_color = '#ECEDE8';
               message_color = '#fff';
-              gardient_color = '#333333';
               font_color = '#333333'
             } else if (res.data.chatbot.main_color === 'white') {
               opacity_color = '#fff';
               message_color = '#F5F5F5';
-              gardient_color = '#fff';
               font_color = '#000'
             }
             res.data.chatbot.opacity_color = opacity_color;
             res.data.chatbot.message_color = message_color;
-            res.data.chatbot.gardient_color = gardient_color;
             res.data.chatbot.font_color = font_color;
           }
 
@@ -491,6 +493,32 @@ function Preview() {
                       }
                     });
                   }
+                  index = i;
+                } else if (messageArr[i]?.message_content[0]?.type === 'email') {
+                  let emailId = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].contentId;
+                  let variablesData = {};
+                  variablesAll.forEach(item => {
+                    variablesData[item.variable_name] = item.default_value;
+                  });
+
+                  variables.forEach(item => {
+                    variablesData[item.variable_name] = item.default_value;
+                  });
+
+                  let data = {
+                    variables: variablesData
+                  }
+                  console.log(variablesData, 'checkkkk variables')
+
+                  api.post(`/api/v1/managements/emails/${emailId}/send_email`, data).then(res => {
+                    console.log(res);
+                  }).catch((error) => {
+                    console.log(error);
+                    if (error.response?.data.code === 0) {
+                      tokenExpired();
+                    }
+                  });
+                  setIndexMessageRender(i);
                   index = i;
                 } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
                   // console.log(dataVariables, 'checkkkk variables')                
@@ -702,12 +730,12 @@ function Preview() {
           tokenExpired()
         }
       });
-    
+    }
     return () => {
       console.log('chcekkkkkkkk quitttt')
       clearTimeout(delayRender);
     }
-  }, [])
+  }, [scenarioId])
 
   // useEffect(() => {
   //   return () => {
@@ -1320,37 +1348,6 @@ function Preview() {
     return isValid;
   }
 
-  function mbStrWidth(input) {
-    let len = 0;
-    for (let i = 0; i < input.length; i++) {
-      let code = input.charCodeAt(i);
-      if ((code >= 0x0020 && code <= 0x1FFF) || (code >= 0xFF61 && code <= 0xFF9F)) {
-        len += 1;
-      } else if ((code >= 0x2000 && code <= 0xFF60) || (code >= 0xFFA0)) {
-        len += 2;
-      } else {
-        len += 0;
-      }
-    }
-    return len;
-  }
-
-  function isDoubleByte(str) {
-    for (var i = 0, n = str.length; i < n; i++) {
-      if (str.charCodeAt(i) > 255) { return true; }
-    }
-    return false;
-  }
-
-  function ucs2ToBinaryString(str) {
-    var escstr = encodeURIComponent(str)
-    var binstr = escstr.replace(/%([0-9A-F]{2})/ig, function (match, hex) {
-      var i = parseInt(hex, 16)
-      return String.fromCharCode(i)
-    })
-    return binstr
-  }
-
   const onClickNext = async (indexMessage) => {
     if (!handleValidateField()) {
       return;
@@ -1475,6 +1472,27 @@ function Preview() {
               //     ...renderMessage
               //   ]);
               // })
+            } else if (dataMessages[i]?.message_content[0]?.type === 'email') {
+              let emailId = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].contentId;
+              let variablesData = {};
+              dataVariables.forEach(item => {
+                variablesData[item.variable_name] = item.default_value;
+              });
+
+              variables.forEach(item => {
+                variablesData[item.variable_name] = item.default_value;
+              });
+
+              let data = {
+                variables: variablesData
+              }
+              console.log(variablesData, 'checkkkk variables')
+
+              api.post(`/api/v1/managements/emails/${emailId}/send_email`, data).then(res => {
+                console.log(res);
+              })
+              setIndexMessageRender(i);
+              index = i;
             } else if (dataMessages[i]?.message_content[0]?.type === 'variable_set') {
               // console.log(dataVariables, 'checkkkk variables')                
               if (variables.length !== 0) {
@@ -1813,6 +1831,7 @@ function Preview() {
       let arrayCode = [];
       let arrayName = [];
       let arrayPrice = [];
+      let arrayOrderQuantity = [];
 
       for (let i = 0; i < dataContentType.products?.length; i++) {
         for (let j = 0; j < value.length; j++) {
@@ -1820,6 +1839,7 @@ function Preview() {
             arrayCode.push(dataContentType.products[i].item_number);
             arrayName.push(dataContentType.products[i].title);
             arrayPrice.push(dataContentType.products[i].item_price);
+            arrayOrderQuantity.push(dataContentType.products[i]?.quantity_select);
           }
         }
       }
@@ -1836,12 +1856,17 @@ function Preview() {
         {
           variable_name: 'product_unit_price',
           default_value: arrayPrice.join(',')
+        },
+        {
+          variable_name: 'order_quantity',
+          default_value: arrayOrderQuantity.join(',')
         }
       )
       setVariables([...variables]);
       objParam.product_code = arrayCode.join(',');
       objParam.product_name = arrayName.join(',');
       objParam.product_unit_price = arrayPrice.join(',');
+      objParam.order_quantity = arrayOrderQuantity.join(',');
       setObjParam({ ...objParam });
     } else if (contentType === 'product_purchase_radio_button' && field === 'initial_selection') {
       let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
@@ -1888,7 +1913,7 @@ function Preview() {
           console.log(dataContentType);
           if (contentType === 'zip_code_address') {
             let dataPostCode = !dataContentType.split_postal_code ? dataContentType?.value_post_code : `${dataContentType.value_post_code_left}${dataContentType.value_post_code_right}`
-            item.default_value = `〒 ${dataPostCode} ${dataContentType?.value_prefecture || ""}${dataContentType?.value_municipality || ""} ${dataContentType?.value_address || ""}${dataContentType?.value_building_name || ""}`;
+            item.default_value = `〒${dataPostCode} ${dataContentType?.value_prefecture || ""}${dataContentType?.value_municipality || ""} ${dataContentType?.value_address || ""}${dataContentType?.value_building_name || ""}`;
           } else if (field === 'start_date_select' || field === 'end_date_select') {
             item.default_value = `${dataContentType?.start_date_select || "start date"} ~ ${dataContentType?.end_date_select || "end date"}`;
           } else if (contentType === 'radio_button') {
@@ -1947,8 +1972,8 @@ function Preview() {
             }
           } else if (dataContentType.type === 'embedded') {
             item.default_value = `${moment(value).format("YYYY-MM-DD")}`
-          } else if (field === 'phone_number') {
-            item.default_value = `${dataContentType[field]?.value1}-${dataContentType[field]?.value2}-${dataContentType[field]?.value3}`
+          } else if (field === 'phone_number' && dataContentType[field].withHyphen) {
+            item.default_value = `${dataContentType[field]?.value1}-${dataContentType[field]?.value2}-${dataContentType[field]?.value3}`;
           } else if (contentType === 'carousel') {
             console.log(dataContentType)
             item.default_value = dataContentType[dataContentType.type].contents.find(item => item.id === value).title;
@@ -1967,21 +1992,30 @@ function Preview() {
     if (botInfor && botInfor.withdrawal_prevention_status === "invalid") {
       console.log('setIndex_User6')
       setIndexUser(0);
+      let indexTiming = 0;
+      let i;
+      for (i = indexMessageRender; i < dataMessages.length; i++) {
+        if (dataMessages[i].belong_to === 'user' || i === (dataMessages.length - 1)) break;
+        if (dataMessages[i].belong_to === 'bot' && dataMessages[i].message_content[0].type === 'delay') {
+          indexTiming += dataMessages[i].message_content[0].delay.content;
+        }
+      }
       if (!isFromScenario) setScenarioId(null);
       setTimeout(() => {
-        if (!isFromScenario) setScenarioId(Cookies.get('scenario_id'));
+        setRenderMessageArr([]);
+        if (!isFromScenario) setScenarioId(params.get('scenario_id'));
         if (document.getElementById("action-bd")) {
           document.getElementById("action-bd").click();
         } else {
           onOpenPreview(false);
         }
-        let withdrawal = {scenario_data: `${deviceReceive}_close_chatbot_window`} 
-                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`,withdrawal).then(res=>{
-                      console.log(res)
-                    }).catch(err=>{
-                      console.log(err)
-                    })
-      }, 10);
+        let withdrawal = { scenario_data: `${deviceReceive}_close_chatbot_window` }
+        api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+          console.log(res)
+        }).catch(err => {
+          console.log(err)
+        })
+      }, (indexTiming + i - indexMessageRender - 1) * 1000);
     } else if (botInfor?.withdrawal_prevention_status === "standard_exit_popup" || botInfor?.withdrawal_prevention_status === "image_popup") {
       document.getElementById("sp-withdrawal-container").style.display = "block";
       document.getElementById("sp-withdrawal-content").style.display = "block";
@@ -2042,27 +2076,32 @@ function Preview() {
                 document.getElementById("sp-withdrawal-content").style.display = "none";
                 console.log('setIndex_User7')
                 setIndexUser(0);
+                let i;
+                for (i = indexMessageRender; i < dataMessages.length; i++) {
+                  if (dataMessages[i].belong_to === 'user' || i === (dataMessages.length - 1)) break;
+                }
                 setScenarioId(null);
                 setTimeout(() => {
-                  setScenarioId(Cookies.get('scenario_id'));
+                  setScenarioId(params.get('scenario_id'));
+                  setRenderMessageArr([]);
                   if (document.getElementById("action-bd")) {
                     document.getElementById("action-bd").click();
-                    let withdrawal = {scenario_data: `${deviceReceive}_close_chatbot_window`} 
-                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`,withdrawal).then(res=>{
+                    let withdrawal = { scenario_data: `${deviceReceive}_close_chatbot_window` }
+                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
                       console.log(res)
-                    }).catch(err=>{
+                    }).catch(err => {
                       console.log(err)
                     })
                   } else {
-                    let withdrawal = {scenario_data: `${deviceReceive}_close_chatbot_window`} 
-                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`,withdrawal).then(res=>{
+                    let withdrawal = { scenario_data: `${deviceReceive}_close_chatbot_window` }
+                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
                       console.log(res)
-                    }).catch(err=>{
+                    }).catch(err => {
                       console.log(err)
                     })
                     onOpenPreview(false);
                   }
-                }, 10);
+                }, (i - indexMessageRender) * 1000);
               }}>
                 閉じる
               </div>
@@ -2198,7 +2237,7 @@ function Preview() {
               </div>
             </div>
           </div>
-          <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color, backgroundImage: `linear-gradient(to right, ${botInfor?.gardient_color}, ${botInfor?.main_color})` }} className="sp-header">
+          <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header">
             <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
               <div className="sp-header-left-avatar sp-avatar">
                 <img src={botInfor?.icon?.url && (EC_CHATBOT_URL + "/" + botInfor?.icon?.url)} />
@@ -2208,14 +2247,14 @@ function Preview() {
                 <div className="sp-header-left-label-title">{botInfor?.title}</div>
               </div>
             </div>
-            <div className="sp-header-right" onClick={() => { isOpen ?onOpenPreview(true) : handleOpenWithDrawal() }}>
+            <div className="sp-header-right" onClick={() => { isOpen ? onOpenPreview(true) : handleOpenWithDrawal() }}>
               <div className="sp-header-right-arrow">
                 {isOpen ? <MDBIcon fas icon="chevron-circle-up" /> : <MDBIcon fas icon="chevron-circle-down" />}
               </div>
             </div>
           </div>
           <div id="sp-process-bar" className="sp-process-bar" style={{ backgroundColor: botInfor?.opacity_color }}>
-            <div className="sp-process-bar-color animation" style={{ width: indexUser ? `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` : '100%', ...botInfor?.main_color && { backgroundColor: botInfor?.main_color, backgroundImage: `linear-gradient(to right, ${botInfor?.gardient_color}, ${botInfor?.main_color})` } }}>
+          <div className="sp-process-bar-color animation" style={{ width: indexUser ? `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` : '100%', ...botInfor?.main_color && { backgroundColor: botInfor?.main_color } }}>
               {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。") : `あと${messageUser.length}間`}
             </div>
           </div>
@@ -2259,7 +2298,7 @@ function Preview() {
                           />
                           {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
                             && <div className="sp-user-message-button-action">
-                              <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
+                              <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color, borderRadius: '25px' }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
                                 {message.buttonName || "次へ"}
                               </Button>
                             </div>
@@ -2397,8 +2436,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
       console.log(message?.[message.type], message.type === 'card_payment_radio_button' && stringNullOrEmpty(message?.[message.type]?.initial_selection) && stringNullOrEmpty(message?.[message.type]?.initial_selection_picture), 'checkk message[message.type].initial_selection')
       if ((message.type === 'card_payment_radio_button' && (stringNullOrEmpty(message?.[message.type]?.initial_selection) && stringNullOrEmpty(message?.[message.type]?.initial_selection_picture)))
         || message.type === 'product_purchase_radio_button'
-        || (message?.[message.type].type !== "picture_radio" ? ( stringNullOrEmpty(message?.[message.type]?.initial_selection) && message?.[message.type]?.card_linked_setting !== message?.[message.type]?.initial_selection)
-          : (stringNullOrEmpty(message?.[message.type]?.initial_selection_picture) && message?.[message.type]?.card_linked_setting_picture !== message?.[message.type]?.initial_selection_picture))
+        || (message.type === 'card_payment_radio_button' && (message?.[message.type].type !== "picture_radio" ? (stringNullOrEmpty(message?.[message.type]?.initial_selection) && message?.[message.type]?.card_linked_setting !== message?.[message.type]?.initial_selection)
+          : (stringNullOrEmpty(message?.[message.type]?.initial_selection_picture) && message?.[message.type]?.card_linked_setting_picture !== message?.[message.type]?.initial_selection_picture)))
         || (message.type === 'carousel' && message?.[message.type].require)
         || (message.type === 'radio_button' && !message[message.type].initial_selection)) {
         displayButtonNext(false);
@@ -3062,7 +3101,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                     </div>
                   }
-                  <div className="ss-message__content--user-checkbox-wrapper">
+                  <div>
                     {checkbox.type === 'default' && (
                       <Checkbox.Group
                         style={{ width: "100%" }}

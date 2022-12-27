@@ -168,6 +168,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
   const [isDisplayButtonNext, setIsDisplayButtonNext] = useState(false);
   const [captcha, setCaptcha] = useState([]);
   const [withdrawal, setWithdrawal] = useState({});
+  const [dataVariables, setDataVariables] = useState([]);
   // const
 
   const [dataPrefectures, setDataPrefectures] = useState([]);
@@ -262,7 +263,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
 
     if (scenarioId) {
       api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/preview`).then(async res => {
-        console.log(res, 'cehckkkk bugs')
         if (res.data.code == 1) {
           let messageArr = [];
           if (res.data.data?.conversation?.messages?.length > 0) {
@@ -271,59 +271,51 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           let urlThanks = res.data.data?.conversation?.urlThanksPage || '';
           console.log(messageArr);
           console.log(res.data.chatbot);
-
+          let variablesAll = res.data?.all_variables || [];
+          setDataVariables(variablesAll);
           setDataMessages(messageArr);
           setUrlThanksPage(urlThanks);
           if (res.data.chatbot) {
-            let opacity_color, message_color, gardient_color, font_color;
+            let opacity_color, message_color, font_color;
             console.log(res.data.chatbot.main_color)
             if (res.data.chatbot.main_color === 'blue') {
               opacity_color = '#D6E0EF';
               message_color = '#3CACEF';
-              gardient_color = '#36D0DC';
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'green') {
               opacity_color = '#DEEADB';
               message_color = '#9DDB7C';
-              gardient_color = '#F8C03F';
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'orange') {
               opacity_color = '#F4E5DA';
               message_color = '#EF8D2F';
-              gardient_color = '#D6DB4B';
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'yellow') {
               opacity_color = '#F0EFEB';
               message_color = '#F3AA2D';
-              gardient_color = '#FF8402';
               res.data.chatbot.main_color = "#F6CA21";
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'pink') {
               opacity_color = '#EBDDE3';
               message_color = '#E65B83';
-              gardient_color = '#94C1EC';
               res.data.chatbot.main_color = "#F170AA";
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'purple') {
               opacity_color = '#E9E8F1';
               message_color = '#AF82D5';
-              gardient_color = '#FAAA88';
               res.data.chatbot.main_color = "#8C66D9";
               font_color = '#fff'
             } else if (res.data.chatbot.main_color === 'black') {
-              opacity_color = '#333333';
+              opacity_color = '#ECEDE8';
               message_color = '#fff';
-              gardient_color = '#333333';
               font_color = '#333333'
             } else if (res.data.chatbot.main_color === 'white') {
               opacity_color = '#fff';
               message_color = '#F5F5F5';
-              gardient_color = '#fff';
               font_color = '#000'
             }
             res.data.chatbot.opacity_color = opacity_color;
             res.data.chatbot.message_color = message_color;
-            res.data.chatbot.gardient_color = gardient_color;
             res.data.chatbot.font_color = font_color;
           }
 
@@ -334,9 +326,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
               objParam[item.variable_name] = item.default_value;
             });
           }
-
+          console.log(objParam);
           setObjParam({ ...objParam });
-          console.log(objParam, 'ceghckkkkkkkkkkkkkkk objParam')
           let variables = [...res.data.variables];
           let messageUserVar = messageArr.filter(item => item.belong_to === 'user' && item.message_content.length > 0);
           setMessageUser([...messageUserVar]);
@@ -344,6 +335,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           let index;
           let isPauseScroll = false;
           for (let i = 0; i < messageArr.length; i++) {
+            console.log(messageArr[i].message_content)
             if (messageArr[i].hidden !== true) {
               if (messageArr[i].conditions?.length > 0) {
                 var checked = true;
@@ -439,6 +431,32 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                       }
                     });
                   }
+                  index = i;
+                } else if (messageArr[i]?.message_content[0]?.type === 'email') {
+                  let emailId = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].contentId;
+                  let variablesData = {};
+                  variablesAll.forEach(item => {
+                    variablesData[item.variable_name] = item.default_value;
+                  });
+
+                  variables.forEach(item => {
+                    variablesData[item.variable_name] = item.default_value;
+                  });
+
+                  let data = {
+                    variables: variablesData
+                  }
+                  console.log(variablesData, 'checkkkk variables')
+
+                  api.post(`/api/v1/managements/emails/${emailId}/send_email`, data).then(res => {
+                    console.log(res);
+                  }).catch((error) => {
+                    console.log(error);
+                    if (error.response?.data.code === 0) {
+                      tokenExpired();
+                    }
+                  });
+                  setIndexMessageRender(i);
                   index = i;
                 } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
                   // console.log(dataVariables, 'checkkkk variables')                
@@ -1266,37 +1284,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     return isValid;
   }
 
-  function mbStrWidth(input) {
-    let len = 0;
-    for (let i = 0; i < input.length; i++) {
-      let code = input.charCodeAt(i);
-      if ((code >= 0x0020 && code <= 0x1FFF) || (code >= 0xFF61 && code <= 0xFF9F)) {
-        len += 1;
-      } else if ((code >= 0x2000 && code <= 0xFF60) || (code >= 0xFFA0)) {
-        len += 2;
-      } else {
-        len += 0;
-      }
-    }
-    return len;
-  }
-
-  function isDoubleByte(str) {
-    for (var i = 0, n = str.length; i < n; i++) {
-      if (str.charCodeAt(i) > 255) { return true; }
-    }
-    return false;
-  }
-
-  function ucs2ToBinaryString(str) {
-    var escstr = encodeURIComponent(str)
-    var binstr = escstr.replace(/%([0-9A-F]{2})/ig, function (match, hex) {
-      var i = parseInt(hex, 16)
-      return String.fromCharCode(i)
-    })
-    return binstr
-  }
-
   const onClickNext = async (indexMessage) => {
     if (!handleValidateField()) {
       return;
@@ -1419,6 +1406,27 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
               //     ...renderMessage
               //   ]);
               // })
+            } else if (dataMessages[i]?.message_content[0]?.type === 'email') {
+              let emailId = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].contentId;
+              let variablesData = {};
+              dataVariables.forEach(item => {
+                variablesData[item.variable_name] = item.default_value;
+              });
+
+              variables.forEach(item => {
+                variablesData[item.variable_name] = item.default_value;
+              });
+
+              let data = {
+                variables: variablesData
+              }
+              console.log(variablesData, 'checkkkk variables')
+
+              api.post(`/api/v1/managements/emails/${emailId}/send_email`, data).then(res => {
+                console.log(res);
+              })
+              setIndexMessageRender(i);
+              index = i;
             } else if (dataMessages[i]?.message_content[0]?.type === 'variable_set') {
               // console.log(dataVariables, 'checkkkk variables')                
               if (variables.length !== 0) {
@@ -1753,10 +1761,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
 
     if (contentType === 'product_purchase' && field === 'initial_selection' && value.length > 0) {
       let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
-
+      console.log(dataContentType);
       let arrayCode = [];
       let arrayName = [];
       let arrayPrice = [];
+      let arrayOrderQuantity = [];
 
       for (let i = 0; i < dataContentType.products?.length; i++) {
         for (let j = 0; j < value.length; j++) {
@@ -1764,6 +1773,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             arrayCode.push(dataContentType.products[i].item_number);
             arrayName.push(dataContentType.products[i].title);
             arrayPrice.push(dataContentType.products[i].item_price);
+            arrayOrderQuantity.push(dataContentType.products[i]?.quantity_select);
           }
         }
       }
@@ -1780,12 +1790,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
         {
           variable_name: 'product_unit_price',
           default_value: arrayPrice.join(',')
+        },
+        {
+          variable_name: 'order_quantity',
+          default_value: arrayOrderQuantity.join(',')
         }
       )
       setVariables([...variables]);
       objParam.product_code = arrayCode.join(',');
       objParam.product_name = arrayName.join(',');
       objParam.product_unit_price = arrayPrice.join(',');
+      objParam.order_quantity = arrayOrderQuantity.join(',');
       setObjParam({ ...objParam });
     } else if (contentType === 'product_purchase_radio_button' && field === 'initial_selection') {
       let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
@@ -1832,7 +1847,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           console.log(dataContentType);
           if (contentType === 'zip_code_address') {
             let dataPostCode = !dataContentType.split_postal_code ? dataContentType?.value_post_code : `${dataContentType.value_post_code_left}${dataContentType.value_post_code_right}`
-            item.default_value = `〒 ${dataPostCode} ${dataContentType?.value_prefecture || ""}${dataContentType?.value_municipality || ""} ${dataContentType?.value_address || ""}${dataContentType?.value_building_name || ""}`;
+            item.default_value = `〒${dataPostCode} ${dataContentType?.value_prefecture || ""}${dataContentType?.value_municipality || ""} ${dataContentType?.value_address || ""}${dataContentType?.value_building_name || ""}`;
           } else if (field === 'start_date_select' || field === 'end_date_select') {
             item.default_value = `${dataContentType?.start_date_select || "start date"} ~ ${dataContentType?.end_date_select || "end date"}`;
           } else if (contentType === 'radio_button') {
@@ -1891,8 +1906,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             }
           } else if (dataContentType.type === 'embedded') {
             item.default_value = `${moment(value).format("YYYY-MM-DD")}`
-          } else if (field === 'phone_number') {
-            item.default_value = `${dataContentType[field]?.value1}-${dataContentType[field]?.value2}-${dataContentType[field]?.value3}`
+          } else if (field === 'phone_number' && dataContentType[field].withHyphen) {
+            item.default_value = `${dataContentType[field]?.value1}-${dataContentType[field]?.value2}-${dataContentType[field]?.value3}`;
           } else if (contentType === 'carousel') {
             console.log(dataContentType)
             item.default_value = dataContentType[dataContentType.type].contents.find(item => item.id === value).title;
@@ -1910,15 +1925,25 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
   const handleOpenWithDrawal = () => {
     if (botInfor && botInfor.withdrawal_prevention_status === "invalid") {
       setIndexUser(0);
+      let indexTiming = 0;
+      let i;
+      for (i = indexMessageRender; i < dataMessages.length; i++) {
+        if (dataMessages[i].belong_to === 'user' || i === (dataMessages.length - 1)) break;
+        if (dataMessages[i].belong_to === 'bot' && dataMessages[i].message_content[0].type === 'delay') {
+          indexTiming += dataMessages[i].message_content[0].delay.content;
+        }
+      }
+      console.log(indexMessageRender, indexTiming, i, 'checkkkk indexMessageRender');
       if (!isFromScenario) setScenarioId(null);
       setTimeout(() => {
+        setRenderMessageArr([]);
         if (!isFromScenario) setScenarioId(Cookies.get('scenario_id'));
         if (document.getElementById("action-bd")) {
           document.getElementById("action-bd").click();
         } else {
           onOpenPreview(false);
         }
-      }, 10);
+      }, (indexTiming + i - indexMessageRender - 1) * 1000);
     } else if (botInfor?.withdrawal_prevention_status === "standard_exit_popup" || botInfor?.withdrawal_prevention_status === "image_popup") {
       document.getElementById("sp-withdrawal-container").style.display = "block";
       document.getElementById("sp-withdrawal-content").style.display = "block";
@@ -1978,15 +2003,21 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 document.getElementById("sp-withdrawal-container").style.display = "none";
                 document.getElementById("sp-withdrawal-content").style.display = "none";
                 setIndexUser(0);
+                let i;
+                for (i = indexMessageRender; i < dataMessages.length; i++) {
+                  if (dataMessages[i].belong_to === 'user' || i === (dataMessages.length - 1)) break;
+                }
+                console.log(indexMessageRender, i, 'checkkkk indexMessageRender');
                 setScenarioId(null);
                 setTimeout(() => {
                   setScenarioId(Cookies.get('scenario_id'));
+                  setRenderMessageArr([]);
                   if (document.getElementById("action-bd")) {
                     document.getElementById("action-bd").click();
                   } else {
                     onOpenPreview(false);
                   }
-                }, 10);
+                }, (i - indexMessageRender) * 1000);
               }}>
                 閉じる
               </div>
@@ -2121,7 +2152,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
               </div>
             </div>
           </div>
-          <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color, backgroundImage: `linear-gradient(to right, ${botInfor?.gardient_color}, ${botInfor?.main_color})` }} className="sp-header">
+          <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header">
             <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
               <div className="sp-header-left-avatar sp-avatar">
                 <img src={botInfor?.icon?.url && (EC_CHATBOT_URL + "/" + botInfor?.icon?.url)} />
@@ -2138,7 +2169,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             </div>
           </div>
           <div id="sp-process-bar" className="sp-process-bar" style={{ backgroundColor: botInfor?.opacity_color }}>
-            <div className="sp-process-bar-color animation" style={{ width: indexUser ? `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` : '100%', ...botInfor?.main_color && { backgroundColor: botInfor?.main_color, backgroundImage: `linear-gradient(to right, ${botInfor?.gardient_color}, ${botInfor?.main_color})` } }}>
+            <div className="sp-process-bar-color animation" style={{ width: indexUser ? `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` : '100%', ...botInfor?.main_color && { backgroundColor: botInfor?.main_color } }}>
               {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。") : `あと${messageUser.length}間`}
             </div>
           </div>
@@ -2182,7 +2213,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                           />
                           {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
                             && <div className="sp-user-message-button-action">
-                              <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
+                              <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color, borderRadius: '25px' }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
                                 {message.buttonName || "次へ"}
                               </Button>
                             </div>
@@ -2320,8 +2351,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
       console.log(message?.[message.type], message.type === 'card_payment_radio_button' && stringNullOrEmpty(message?.[message.type]?.initial_selection) && stringNullOrEmpty(message?.[message.type]?.initial_selection_picture), 'checkk message[message.type].initial_selection')
       if ((message.type === 'card_payment_radio_button' && (stringNullOrEmpty(message?.[message.type]?.initial_selection) && stringNullOrEmpty(message?.[message.type]?.initial_selection_picture)))
         || message.type === 'product_purchase_radio_button'
-        || (message?.[message.type].type !== "picture_radio" ? ( stringNullOrEmpty(message?.[message.type]?.initial_selection) && message?.[message.type]?.card_linked_setting !== message?.[message.type]?.initial_selection)
-          : (stringNullOrEmpty(message?.[message.type]?.initial_selection_picture) && message?.[message.type]?.card_linked_setting_picture !== message?.[message.type]?.initial_selection_picture))
+        || (message.type === 'card_payment_radio_button' && (message?.[message.type].type !== "picture_radio" ? (stringNullOrEmpty(message?.[message.type]?.initial_selection) && message?.[message.type]?.card_linked_setting !== message?.[message.type]?.initial_selection)
+          : (stringNullOrEmpty(message?.[message.type]?.initial_selection_picture) && message?.[message.type]?.card_linked_setting_picture !== message?.[message.type]?.initial_selection_picture)))
         || (message.type === 'carousel' && message?.[message.type].require)
         || (message.type === 'radio_button' && !message[message.type].initial_selection)) {
         displayButtonNext(false);
@@ -2985,7 +3016,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                     </div>
                   }
-                  <div className="ss-message__content--user-checkbox-wrapper">
+                  <div>
                     {checkbox.type === 'default' && (
                       <Checkbox.Group
                         style={{ width: "100%" }}

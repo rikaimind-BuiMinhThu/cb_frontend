@@ -4523,10 +4523,13 @@ const Scenario = () => {
                                       style={{ width: '100%' }}
                                       id="title"
                                       data={dataEmail}
-                                      keyValue={"email_template_name"}
+                                      keyValue={"id"}
                                       nameValue={"email_template_name"}
-                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
-                                      onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content')}
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.contentId || ''}
+                                      onChange={(value) => {
+                                        onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'contentId');
+                                        onChangeValueMessageContent(indexMessageSelect, 0, messageType, dataEmail.find(item => item.id === value)?.email_template_name || '', 'content');
+                                    }}
                                     />
                                   </div>
                                 </div>
