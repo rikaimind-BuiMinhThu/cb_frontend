@@ -59,7 +59,7 @@ function CreateEmail() {
               cc.appendChild(newCc);
               document.getElementById(`deleteCc${i}`).addEventListener('click', () => {
                 var ele = document.getElementById(`cc${i}`);
-                ele.parentNode.removeChild(ele);
+                ele?.parentNode?.removeChild(ele);
                 var listcc = ccList;
                 listcc.splice(i, 1);
                 // console.log('listcc detail: ', listcc);
@@ -84,7 +84,7 @@ function CreateEmail() {
               bcc.appendChild(newBcc);
               document.getElementById(`deleteBCc${i}`).addEventListener('click', () => {
                 var ele = document.getElementById(`bcc${i}`);
-                ele.parentNode.removeChild(ele);
+                ele?.parentNode?.removeChild(ele);
                 var listbcc = bccList;
                 listbcc.splice(i, 1);
                 setBccAll(listbcc);
@@ -124,7 +124,7 @@ function CreateEmail() {
         cc.appendChild(newCc);
         document.getElementById(`deleteCc${ccNum}FI`).addEventListener('click', () => {
           var ele = document.getElementById(`cc${ccNum}`);
-          ele.parentNode.removeChild(ele);
+          ele?.parentNode?.removeChild(ele);
           listcc.splice(ccNum, 1);
           setCcAll(listcc);
           setListCcDetail(listcc);
@@ -166,7 +166,7 @@ function CreateEmail() {
         document.getElementById(`deleteBCc${bccNum}FI`).addEventListener('click', () => {
           // console.log('clicked delete bcc');
           var ele = document.getElementById(`bcc${bccNum}`);
-          ele.parentNode.removeChild(ele);
+          ele?.parentNode?.removeChild(ele);
           listbcc.splice(bccNum, 1);
           setBccAll(listbcc);
           setListBccDetail(listbcc);
