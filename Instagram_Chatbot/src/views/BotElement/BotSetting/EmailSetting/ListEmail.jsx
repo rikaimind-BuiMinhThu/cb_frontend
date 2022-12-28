@@ -13,6 +13,7 @@ import { tokenExpired } from 'api/tokenExpired';
 
 function ListEmail() {
   const [emailList, setEmailList] = useState([]);
+  const [clientEmail, setClientEmail] = useState(null);
   const [isOpenDuplicate, setIsOpenDuplicate] = useState(false);
   const [idEmail, setIdEmail] = useState();
   const [isOpenNoti, setIsOpenNoti] = useState(false);
@@ -24,22 +25,31 @@ function ListEmail() {
 
   useEffect(() => {
     var bot_id = Cookies.get('bot_id');
-    api
-      .get(`/api/v1/managements/emails?page=1&chatbot_id=${bot_id}`)
-      .then((res) => {
-        console.log(res.data);
-        var totalPage = Math.ceil(res.data.total_count / 25);
-        setTotalPage(totalPage);
-        if (res.data.code == 1) {
-          setEmailList(res.data.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        if (err.response?.data.code === 0) {
-          tokenExpired();
-        }
-      });
+    if (bot_id) {
+      api
+        .get(`/api/v1/managements/emails?page=1&chatbot_id=${bot_id}`)
+        .then((res) => {
+          console.log(res.data);
+          if (res.data?.code === 1) {
+            setEmailList(res.data?.data);
+            var totalPage = Math.ceil(res.data.total / 25);
+            setTotalPage(totalPage);
+            setClientEmail(res?.data?.client_email);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err.response?.data.code === 0) {
+            tokenExpired();
+          }
+        });
+    }
+
+    return () => {
+      setEmailList([]);
+      setTotalPage(1);
+      setClientEmail([]);
+    };
   }, []);
 
   function reLoad(pgIndex) {
@@ -47,7 +57,7 @@ function ListEmail() {
     api
       .get(`/api/v1/managements/emails?page=${pgIndex}&chatbot_id=${bot_id}`)
       .then((res) => {
-        var totalPage = Math.ceil(res.data.total_count / 25);
+        var totalPage = Math.ceil(res.data?.total / 25);
         if (pgIndex > totalPage) {
           api
             .get(`/api/v1/managements/emails?page=${totalPage}&chatbot_id=${bot_id}`)
@@ -86,7 +96,7 @@ function ListEmail() {
           setIsOpenDuplicate(false);
           setIsOpenNoti(true);
           setMsgNoti(`正常に複製されました！`);
-          reLoad();
+          reLoad(pageIndex);
           setTimeout(() => {
             setIsOpenNoti(false);
             setMsgNoti(``);
@@ -122,7 +132,7 @@ function ListEmail() {
           setIsOpenDelete(false);
           setIsOpenNoti(true);
           setMsgNoti(`正常に削除されました！`);
-          reLoad();
+          reLoad(pageIndex);
           setTimeout(() => {
             setIsOpenNoti(false);
             setMsgNoti(``);
@@ -145,10 +155,13 @@ function ListEmail() {
       });
   }
   function handleChange(event, value) {
-    setPage(parseInt(value));
-    setPageIndex(value);
-    reLoad(value);
-    document.querySelector('.main-panel').scrollTop = 0;
+    console.log(value);
+    if (totalPage > 1) {
+      setPage(parseInt(value));
+      setPageIndex(value);
+      reLoad(value);
+      document.querySelector('.main-panel').scrollTop = 0;
+    }
   }
 
   return (
@@ -177,18 +190,20 @@ function ListEmail() {
                           <tbody>
                             <tr>
                               <th>差出人</th>
-                              <td>{item.sender_name} (no-reply@ec-chatbot.com)</td>
+                              <td>{item?.sender_name}</td>
                             </tr>
                             <tr>
                               <th>宛先</th>
-                              <td>{item.to}</td>
+                              <td>
+                                {item?.to} {clientEmail != null ? `(${clientEmail})` : ''}
+                              </td>
                             </tr>
                             <tr>
                               <th>CC</th>
                               <td>
-                                {item.cc?.map((cc, ic) => (
+                                {item?.cc?.map((cc, ic) => (
                                   <span key={ic} style={{ fontWeight: '400' }}>
-                                    {cc.to} <br />
+                                    {cc?.to} <br />
                                   </span>
                                 ))}
                               </td>
@@ -197,16 +212,16 @@ function ListEmail() {
                             <tr>
                               <th>BCC</th>
                               <td>
-                                {item.bcc?.map((bcc, ib) => (
+                                {item?.bcc?.map((bcc, ib) => (
                                   <span key={ib} style={{ fontWeight: '400' }}>
-                                    {bcc.to} <br />
+                                    {bcc?.to} <br />
                                   </span>
                                 ))}
                               </td>
                             </tr>
                             <tr>
                               <th>Reply-To</th>
-                              <td>{item.reply_to}</td>
+                              <td>{item?.reply_to}</td>
                             </tr>
                           </tbody>
                         </table>
@@ -214,15 +229,15 @@ function ListEmail() {
                         <div className="mail-detail">
                           <div className="email-detail--subject" type="text">
                             <span>件名 </span>
-                            {item.email_template_name}
+                            {item?.email_template_name}
                             <br />
                             <span>テンプレート名 </span>
-                            {item.subject}
+                            {item?.subject}
                           </div>
 
                           <div className="mail-detail--text">
                             <span>メール内容 </span>
-                            <p>{item.content}</p>
+                            <p>{item?.content}</p>
                           </div>
                         </div>
 

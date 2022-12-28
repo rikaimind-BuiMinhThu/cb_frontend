@@ -19,6 +19,15 @@ function CreateEmail() {
   const [detailEmail, setDetailEmail] = useState();
   const [listCcDetail, setListCcDetail] = useState([]);
   const [listBccDetail, setListBccDetail] = useState([]);
+  const [isAdminDeel, setIsAdminDeel] = useState(false);
+
+  useEffect(() => {
+    if (Cookies.get('user_role') === 'admin_deel') {
+      setIsAdminDeel(true);
+    } else {
+      setIsAdminDeel(false);
+    }
+  }, []);
 
   useEffect(() => {
     const url = window.location.pathname;
@@ -50,7 +59,7 @@ function CreateEmail() {
               cc.appendChild(newCc);
               document.getElementById(`deleteCc${i}`).addEventListener('click', () => {
                 var ele = document.getElementById(`cc${i}`);
-                ele.parentNode.removeChild(ele);
+                ele?.parentNode?.removeChild(ele);
                 var listcc = ccList;
                 listcc.splice(i, 1);
                 // console.log('listcc detail: ', listcc);
@@ -75,7 +84,7 @@ function CreateEmail() {
               bcc.appendChild(newBcc);
               document.getElementById(`deleteBCc${i}`).addEventListener('click', () => {
                 var ele = document.getElementById(`bcc${i}`);
-                ele.parentNode.removeChild(ele);
+                ele?.parentNode?.removeChild(ele);
                 var listbcc = bccList;
                 listbcc.splice(i, 1);
                 setBccAll(listbcc);
@@ -115,7 +124,7 @@ function CreateEmail() {
         cc.appendChild(newCc);
         document.getElementById(`deleteCc${ccNum}FI`).addEventListener('click', () => {
           var ele = document.getElementById(`cc${ccNum}`);
-          ele.parentNode.removeChild(ele);
+          ele?.parentNode?.removeChild(ele);
           listcc.splice(ccNum, 1);
           setCcAll(listcc);
           setListCcDetail(listcc);
@@ -157,7 +166,7 @@ function CreateEmail() {
         document.getElementById(`deleteBCc${bccNum}FI`).addEventListener('click', () => {
           // console.log('clicked delete bcc');
           var ele = document.getElementById(`bcc${bccNum}`);
-          ele.parentNode.removeChild(ele);
+          ele?.parentNode?.removeChild(ele);
           listbcc.splice(bccNum, 1);
           setBccAll(listbcc);
           setListBccDetail(listbcc);
@@ -311,18 +320,6 @@ function CreateEmail() {
   }
 
   const field = document.getElementById.bind(document);
-  function checkEmail(emailId, errEmail, lable) {
-    var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
-    if (!regex.test(field(emailId).value)) {
-      field(errEmail).style.display = 'block';
-      field(errEmail).innerHTML = `メールフォーマットが正しくありません`;
-      return false;
-    } else {
-      field(errEmail).style.display = 'none';
-      field(errEmail).innerHTML = ``;
-      return true;
-    }
-  }
 
   function checkRequired(emailId, errEmail, lable) {
     if (field(emailId).value === '') {
@@ -336,7 +333,38 @@ function CreateEmail() {
     }
   }
 
+  function checkEmail(emailId, errEmail, lable) {
+    var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+    let value = field(emailId).value;
+    if (emailId == 'to' && value.slice(0, 2) == '{{' && value.slice(-2) == '}}') {
+      console.log(value.slice(2, value.length - 2), ': nenen')
+      if (value.slice(2, value.length - 2).replace(/\s/g, '') == '') {
+        field(errEmail).style.display = 'block';
+        field(errEmail).innerHTML = `メールの変数を指定してください`;
+        return false;
+      }else{
+        field(errEmail).style.display = 'none';
+        field(errEmail).innerHTML = ``;
+        return true;
+      }
+
+    } else if (emailId == 'to' && !regex.test(field(emailId).value)) {
+      field(errEmail).style.display = 'block';
+      field(errEmail).innerHTML = `メールフォーマットが正しくありません`;
+      return false;
+    } else if (emailId != 'to' && !regex.test(field(emailId).value)) {
+      field(errEmail).style.display = 'block';
+      field(errEmail).innerHTML = `メールフォーマットが正しくありません`;
+      return false;
+    } else {
+      field(errEmail).style.display = 'none';
+      field(errEmail).innerHTML = ``;
+      return true;
+    }
+  }
+
   function checkTo(emailId, errEmail, lable) {
+    console.log(checkEmail(emailId, errEmail, lable));
     checkEmail(emailId, errEmail, lable);
     checkRequired(emailId, errEmail, lable);
     if (checkRequired(emailId, errEmail, lable) && checkEmail(emailId, errEmail, lable))
