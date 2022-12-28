@@ -29,8 +29,10 @@ function ClientManagement() {
   var [isOpenDeleteClient, setIsOpenDeleteClient] = useState(false);
 
   var [contract, setContract] = useState();
-  var [inputEndDate, setInputEndDate] = useState('');
-  var [inputStartDate, setInputStartDate] = useState('');
+  var [inputEndDate, setInputEndDate] = useState();
+  var [inputEndDateAdd, setInputEndDateAdd] = useState('');
+  var [inputStartDate, setInputStartDate] = useState();
+  var [inputStartDateAdd, setInputStartDateAdd] = useState('');
   var [inputImage, setInputImage] = useState('');
 
   //Update, Detail
@@ -299,20 +301,21 @@ function ClientManagement() {
       .get(`/api/v1/managements/clients/${item.id}`)
       .then((res) => {
         var data = res.data.data;
-        // console.log(data);
+        console.log('detail: ', data);
         setUpdateId(data.id);
         setDetailUpdateTitle('詳細');
         setContract(data.status);
         setPlan(data.plan);
         setPrice(data.price);
-        if (data.subscription_start_at != null) {
-          setInputStartDate(data.subscription_start_at.slice(0, 10));
+        if (data.subscription_start_at != null ) {
+          console.log(data.subscription_start_at)
+          setInputStartDate(new Date(data.subscription_start_at));
         } else {
           // setInputStartDate(data.subscription_start_at)
           setInputStartDate('');
         }
         if (data.subscription_end_at != null) {
-          setInputEndDate(data.subscription_end_at.slice(0, 10));
+          setInputEndDate(new Date(data.subscription_end_at));
         } else {
           // setInputEndDate(data.subscription_end_at)
           setInputEndDate('');
@@ -391,14 +394,14 @@ function ClientManagement() {
         setContract(data.status);
         setPlan(data.plan);
         setPrice(data.price);
-        if (data.subscription_start_at != null || data.subscription_start_at != '') {
+        if (data.subscription_start_at != null ) {
           console.log(data.subscription_start_at)
           setInputStartDate(new Date(data.subscription_start_at));
         } else {
           // setInputStartDate(data.subscription_start_at)
           setInputStartDate('');
         }
-        if (data.subscription_end_at != null || data.subscription_end_at != '') {
+        if (data.subscription_end_at != null) {
           setInputEndDate(new Date(data.subscription_end_at));
         } else {
           // setInputEndDate(data.subscription_end_at)
@@ -742,9 +745,13 @@ function ClientManagement() {
     var cfPass;
     var emailCheck;
     let dateCheck = false;
-    if (utils.checkDateEndIn(inputEndDate.toISOString().slice(0, 10), inputStartDate.toISOString().slice(0, 10)) === true) {
-      dateCheck = true;
+    console.log(inputEndDateAdd)
+    if (inputEndDateAdd != '' && inputStartDateAdd != '') {
+      if (utils.checkDateEndIn(inputEndDateAdd.toISOString().slice(0, 10), inputStartDateAdd.toISOString().slice(0, 10)) === true) {
+        dateCheck = true;
+      }
     }
+
 
     var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
     if (email.length > 35) {
@@ -838,7 +845,7 @@ function ClientManagement() {
       managerKata == true &&
       passwdLengthCheck == true &&
       emailCheck == true &&
-      dateCheck === true &&
+      // dateCheck === true &&
       price > 0 &&
       zipCode > 0 &&
       cfPass === true
@@ -933,9 +940,12 @@ function ClientManagement() {
       if (utils.checkPhoneNumber(phone, '電話番号') !== true) {
         utils.checkPhoneNumber(phone, '電話番号');
       }
-      if (dateCheck === false) {
-        utils.checkDateEndIn(inputEndDate.toISOString().slice(0, 10), inputStartDate.toISOString().slice(0, 10));
+      if(inputEndDateAdd != '' && inputStartDateAdd != ''){
+        if (dateCheck === false) {
+        utils.checkDateEndIn(inputEndDateAdd.toISOString().slice(0, 10), inputStartDateAdd.toISOString().slice(0, 10));
       }
+      }
+      
       if (getBaseUrlAdd() === false) {
         getBaseUrlAdd();
       }
@@ -1086,8 +1096,26 @@ function ClientManagement() {
     //   // setInputEndDate(inputdate)
     //   setInputStartDate(inputdate)
     // }
-    if(inputEndDate != ''){
+    if (inputEndDate != '') {
       utils.checkDateEndIn(inputEndDate.toISOString().slice(0, 10), inputdate.toISOString().slice(0, 10));
+    }
+    setInputStartDate(inputdate);
+    if (document.getElementById('startDate').value.toString() === '') {
+      document.getElementById(`newClientStartErrMsg`).style.display = 'block';
+      document.getElementById(`newClientStartErrMsg`).innerHTML = `開始日を入力してください。`;
+    } else {
+      document.getElementById(`newClientStartErrMsg`).style.display = 'none';
+      document.getElementById(`newClientStartErrMsg`).innerHTML = ``;
+    }
+  }
+  function checkInputDateAdd(inputdate) {
+    // utils.checkDateToday(inputdate)
+    // if (utils.checkDateToday(inputdate) === true) {
+    //   // setInputEndDate(inputdate)
+    //   setInputStartDate(inputdate)
+    // }
+    if (inputEndDateAdd != '') {
+      utils.checkDateEndIn(inputEndDateAdd.toISOString().slice(0, 10), inputdate.toISOString().slice(0, 10));
     }
     setInputStartDate(inputdate);
     if (document.getElementById('startDate').value.toString() === '') {
@@ -1108,6 +1136,14 @@ function ClientManagement() {
     setInputEndDate(endDateIn);
   }
 
+  function checkEndDateAdd(endDateIn) {
+    console.log('check end date: ', endDateIn)
+    utils.checkDateEndIn(endDateIn.toISOString().slice(0, 10), inputStartDateAdd.toISOString().slice(0, 10));
+    if (utils.checkDateEndIn(endDateIn.toISOString().slice(0, 10), inputStartDateAdd.toISOString().slice(0, 10)) === true) {
+      setInputEndDateAdd(endDateIn);
+    }
+    setInputEndDateAdd(endDateIn);
+  }
   function setContractInput(data) {
     setContract(data);
   }
@@ -1523,7 +1559,7 @@ function ClientManagement() {
                             <td>{item.last_sign_in_at?.replaceAll('/', '-')}</td>
                             <td className="actionListClient">
                               <div style={{ display: 'flex' }}>
-                                <div onClick={() => getUserDetail(item)}>
+                                <div onClick={(e) => getUserDetail(item)}>
                                   <i
                                     className="nc-icon nc-badge nc-3x"
                                     style={{
@@ -1646,7 +1682,7 @@ function ClientManagement() {
                 <label
                   id="newClientStatusErrMsg"
                   className="input-field"
-                  style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                  style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                 ></label>
                 <br />
                 <label className="label-input">
@@ -1685,7 +1721,7 @@ function ClientManagement() {
                   <label
                     id="newClientプラン価格ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>
                 <br />
@@ -1712,7 +1748,7 @@ function ClientManagement() {
                     onChange={(e) => checkInputDate(e.target.value)}
                     className="input-field"
                   /> */}
-                  <div style={{marginTop:"-24px"}}>
+                  <div style={{ marginTop: "-24px" }}>
                     <DatePicker
                       id='startDate'
                       className="input-field"
@@ -1722,16 +1758,17 @@ function ClientManagement() {
                       name="subscription_start_at"
                       locale='ja'
                       value={
-                        inputStartDate !== ''
-                          ? inputStartDate.toISOString().slice(0, 10).replaceAll('-', '/')
-                          : 'yyyy/mm/dd'
+                        (inputStartDate == '' || inputStartDate == null)
+                        ? 'yyyy/mm/dd'
+                          : inputStartDate.toISOString().slice(0, 10).replaceAll('-', '/')
+                          
                       }
                     />
                   </div>
                   <label
                     id="newClientStartErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </div>
                 <br />
@@ -1766,16 +1803,16 @@ function ClientManagement() {
                       name="subscription_end_at"
                       locale='ja'
                       value={
-                        inputEndDate !== ''
-                          ? inputEndDate.toISOString().slice(0, 10).replaceAll('-', '/')
-                          : 'yyyy/mm/dd'
+                        (inputEndDate == '' || inputEndDate == null)
+                        ? 'yyyy/mm/dd'
+                        :inputEndDate.toISOString().slice(0, 10).replaceAll('-', '/')
                       }
                     />
                   </div>
                   <label
                     id="newClientEndErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </div>
                 <br />
@@ -1797,7 +1834,7 @@ function ClientManagement() {
                   <label
                     id="newClientInstagramCreateErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>
                 <br />
@@ -1819,7 +1856,7 @@ function ClientManagement() {
                   <label
                     id="newClientLINECreateErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>
                 <br />
@@ -1841,7 +1878,7 @@ function ClientManagement() {
                   <label
                     id="newClientTikTokCreateErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>
                 <br />
@@ -1863,7 +1900,7 @@ function ClientManagement() {
                   <label
                     id="newClientWEBCreateErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>
                 <br />
@@ -1883,7 +1920,7 @@ function ClientManagement() {
                   <label
                     id="newClientNoteErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>
                 <br />
@@ -1903,7 +1940,7 @@ function ClientManagement() {
                   <label
                     id="newClient名称ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -1923,7 +1960,7 @@ function ClientManagement() {
                   <label
                     id="newClient名称カナErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2043,7 +2080,7 @@ function ClientManagement() {
                   <label
                     id="newClientCompanyTypeErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2075,7 +2112,7 @@ function ClientManagement() {
                   <label
                     id="newClientCompanyType2ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2095,7 +2132,7 @@ function ClientManagement() {
                   <label
                     id="newClient部署名ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2115,7 +2152,7 @@ function ClientManagement() {
                   <label
                     id="newClientタイトルErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2135,7 +2172,7 @@ function ClientManagement() {
                   <label
                     id="newClient担当者ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2155,7 +2192,7 @@ function ClientManagement() {
                   <label
                     id="newClient担当者カナErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2174,7 +2211,7 @@ function ClientManagement() {
                     className="input-field"
                     type="file"
                     id="avatar"
-                    style={{ display: disableInput == true ? 'none' : 'block', padding:'2px' }}
+                    style={{ display: disableInput == true ? 'none' : 'block', padding: '2px' }}
                     onChange={(e) => {
                       getBaseUrl(e);
                       setUpdateImageChange(true);
@@ -2207,7 +2244,7 @@ function ClientManagement() {
                   <label
                     id="newClientImgLogoErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2227,7 +2264,7 @@ function ClientManagement() {
                   <label
                     id="newClientURLErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2247,7 +2284,7 @@ function ClientManagement() {
                   <label
                     id="newClient郵便番号ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2411,7 +2448,7 @@ function ClientManagement() {
                   <label
                     id="newClientPrefecturesErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2431,7 +2468,7 @@ function ClientManagement() {
                   <label
                     id="newClient都道府県ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2451,7 +2488,7 @@ function ClientManagement() {
                   <label
                     id="newClient住所ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2471,7 +2508,7 @@ function ClientManagement() {
                   <label
                     id="newClient建物名ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2491,7 +2528,7 @@ function ClientManagement() {
                   <label
                     id="newClientメールアドレスErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2511,7 +2548,7 @@ function ClientManagement() {
                   <label
                     id="newClient電話番号ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2588,7 +2625,7 @@ function ClientManagement() {
                 <label
                   id="newClientStatusErrMsg"
                   className="input-field"
-                  style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                  style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                 ></label>
                 <br />
                 <label className="label-input">
@@ -2623,7 +2660,7 @@ function ClientManagement() {
                   <label
                     id="newClientプラン価格ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>
                 <br />
@@ -2645,18 +2682,18 @@ function ClientManagement() {
                     onChange={(e) => checkInputDate(e.target.value)}
                     className="input-field"
                   /> */}
-                  <div style={{marginTop:"-24px"}}>
+                  <div style={{ marginTop: "-24px" }}>
                     <DatePicker
                       id='startDate'
                       className="input-field"
-                      selected={inputStartDate && inputStartDate}
-                      onChange={(date) => checkInputDate(date)}
+                      selected={inputStartDateAdd && inputStartDateAdd}
+                      onChange={(date) => checkInputDateAdd(date)}
                       dateFormat="yyyy/MM/dd"
                       name="subscription_start_at"
                       locale='ja'
                       value={
-                        inputStartDate
-                          ? inputStartDate.toISOString().slice(0, 10).replaceAll('-', '/')
+                        (inputStartDateAdd != '')
+                          ? inputStartDateAdd.toISOString().slice(0, 10).replaceAll('-', '/')
                           : 'yyyy/mm/dd'
                       }
                     />
@@ -2664,7 +2701,7 @@ function ClientManagement() {
                   <label
                     id="newClientStartErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </div>
                 <br />
@@ -2675,14 +2712,14 @@ function ClientManagement() {
                     <DatePicker
                       id='endDate'
                       className="input-field"
-                      selected={inputEndDate && inputEndDate}
-                      onChange={(date) => checkEndDate(date)}
+                      selected={inputEndDateAdd && inputEndDateAdd}
+                      onChange={(date) => checkEndDateAdd(date)}
                       dateFormat="yyyy/MM/dd"
                       name="subscription_end_at"
                       locale='ja'
                       value={
-                        inputEndDate
-                          ? inputEndDate.toISOString().slice(0, 10).replaceAll('-', '/')
+                        (inputEndDateAdd != '')
+                          ? inputEndDateAdd.toISOString().slice(0, 10).replaceAll('-', '/')
                           : 'yyyy/mm/dd'
                       }
                     />
@@ -2690,7 +2727,7 @@ function ClientManagement() {
                   <label
                     id="newClientEndErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </div>
                 <br />
@@ -2711,7 +2748,7 @@ function ClientManagement() {
                   <label
                     id="newClientInstagramCreateErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>
                 <br />
@@ -2732,7 +2769,7 @@ function ClientManagement() {
                   <label
                     id="newClientLINECreateErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>
                 <br />
@@ -2753,7 +2790,7 @@ function ClientManagement() {
                   <label
                     id="newClientTikTokCreateErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>
                 <br />
@@ -2774,7 +2811,7 @@ function ClientManagement() {
                   <label
                     id="newClientWEBCreateErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>
                 <br />
@@ -2785,7 +2822,7 @@ function ClientManagement() {
                   <label
                     id="newClientNoteErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>
                 <br />
@@ -2802,7 +2839,7 @@ function ClientManagement() {
                   <label
                     id="newClient名称ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2819,7 +2856,7 @@ function ClientManagement() {
                   <label
                     id="newClient名称カナErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2938,7 +2975,7 @@ function ClientManagement() {
                   <label
                     id="newClientCompanyTypeErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2969,7 +3006,7 @@ function ClientManagement() {
                   <label
                     id="newClientCompanyType2ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -2986,7 +3023,7 @@ function ClientManagement() {
                   <label
                     id="newClient部署名ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3003,7 +3040,7 @@ function ClientManagement() {
                   <label
                     id="newClientタイトルErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3020,7 +3057,7 @@ function ClientManagement() {
                   <label
                     id="newClient担当者ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3038,7 +3075,7 @@ function ClientManagement() {
                   <label
                     id="newClient担当者カナErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3056,7 +3093,7 @@ function ClientManagement() {
                   <label
                     id="newClientパスワードErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3074,7 +3111,7 @@ function ClientManagement() {
                   <label
                     id="newClientパスワード(確認用)ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3092,7 +3129,7 @@ function ClientManagement() {
                   <label
                     id="newClientImgLogoErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3109,7 +3146,7 @@ function ClientManagement() {
                   <label
                     id="newClientURLErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3126,7 +3163,7 @@ function ClientManagement() {
                   <label
                     id="newClient郵便番号ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3289,7 +3326,7 @@ function ClientManagement() {
                   <label
                     id="newClientPrefecturesErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3306,7 +3343,7 @@ function ClientManagement() {
                   <label
                     id="newClient都道府県ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3323,7 +3360,7 @@ function ClientManagement() {
                   <label
                     id="newClient住所ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3340,7 +3377,7 @@ function ClientManagement() {
                   <label
                     id="newClient建物名ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3357,7 +3394,7 @@ function ClientManagement() {
                   <label
                     id="newClientメールアドレスErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />
@@ -3374,7 +3411,7 @@ function ClientManagement() {
                   <label
                     id="newClient電話番号ErrMsg"
                     className="input-field"
-                    style={{ display: 'none', color: 'red', border:'none', padding:'2px' }}
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
                 </label>{' '}
                 <br />

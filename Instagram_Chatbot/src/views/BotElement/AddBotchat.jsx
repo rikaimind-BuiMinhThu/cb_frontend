@@ -189,7 +189,7 @@ function AddBotchat() {
         .then((res) => {
           if (res.data.code === 1 || res.data.code === '1') {
             Cookies.set('bot_id', res.data.data.id);
-            setMsgNoti('Add new bot chat successfully!');
+            setMsgNoti('ボットを正常に作成されました！');
             setIsOpenNoti(true);
             setTimeout(() => {
               setMsgNoti('');
