@@ -571,7 +571,7 @@ function UserManagement() {
                   </thead>
                   <tbody>
                     {items &&
-                      items.map((item) => (
+                      items?.map((item) => (
                         <tr key={item.id}>
                           <td>{item.id}</td>
                           <td>{item.full_name}</td>

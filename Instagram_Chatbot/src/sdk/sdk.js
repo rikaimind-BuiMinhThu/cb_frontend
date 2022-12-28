@@ -15,15 +15,16 @@ async function displayPopup() {
     var body = document.getElementsByTagName("BODY")[0]; var iframe = document.createElement('iframe');
     iframe.id = 'previewSdk'; iframe.style.position = "fixed"; iframe.style.bottom = "0"; iframe.style.right = "0";
     iframe.width = '400px'; iframe.height = '620px';
-    iframe.style.border = 'none'; iframe.style.padding = '0'; iframe.style.margin = '0'; iframe.style.borderRadius = '30px'
+    iframe.style.border = 'none'; iframe.style.padding = '0'; iframe.style.margin = '0'; iframe.style.borderRadius = '0px'
     iframe.src = `https://ec-chatbot1.com/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}`;
+    //https://ec-chatbot1.com
     body.appendChild(iframe)
 
     window.addEventListener('message', function (e) {
         let firstOpen = false
         if (e.data === '') { firstOpen = true } else { firstOpen = false }
         if (firstOpen == true) { iframe.width = '400px'; iframe.height = '620px'; } else if (e.data == true && firstOpen == false) {
-            console.log('open')
+            console.log('open after clicked')
             iframe.width = '400px'; iframe.height = '620px';
             let add = { scenario_data: device }
             // submitForm(url, add)

@@ -862,7 +862,7 @@ function Keyword() {
                     </div>
                   </div>
                   <div id="addKeywordContent" style={{ width: '100%' }}>
-                    {listKeyword.map((cdiv, i) => (
+                    {listKeyword?.map((cdiv, i) => (
                       <form key={cdiv.id} id={`l-fixed-menu-${i}`}>
                         <div
                           onLoad={getBagSelected(cdiv.message_group_id, cdiv.message_bag_id, i)}

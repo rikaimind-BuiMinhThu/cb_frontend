@@ -139,10 +139,17 @@ for (let i = 1935; i <= 2072; i++) {
 
 let dataMonthFixed = [];
 for (let i = 1; i <= 12; i++) {
-  dataMonthFixed.push({
-    key: i + '',
-    value: i + ''
-  });
+  if (i < 10) {
+    dataMonthFixed.push({
+      key: `0${i}` + '',
+      value: `0${i}` + ''
+    });
+  } else {
+    dataMonthFixed.push({
+      key: i + '',
+      value: i + ''
+    });
+  }
 }
 
 let dataMaxRangSlider = [];
@@ -2058,21 +2065,6 @@ const Scenario = () => {
     setIsOpenPreview(!isOpenPreview);
   }
 
-  const SampleNextArrow = props => {
-    const { className, style, onClick } = props
-    return (
-      <RightOutlined
-        className={className}
-        style={{
-          ...style,
-          color: 'black',
-          fontSize: '15px',
-          lineHeight: '1.5715'
-        }}
-        onClick={onClick} />
-    )
-  }
-
   function isColor(strColor) {
     var s = new Option().style;
     s.color = strColor;
@@ -2083,21 +2075,6 @@ const Scenario = () => {
     } else {
       return false;
     }
-  }
-
-  const SamplePrevArrow = props => {
-    const { className, style, onClick } = props
-    return (
-      <LeftOutlined
-        className={className}
-        style={{
-          ...style,
-          color: 'black',
-          fontSize: '15px',
-          lineHeight: '1.5715'
-        }}
-        onClick={onClick} />
-    )
   }
 
   const handleDisableDateCalendar = (current, calendar) => {
@@ -2187,6 +2164,36 @@ const Scenario = () => {
           }
         }))
     }
+  }
+
+  const SampleNextArrow = props => {
+    const { className, style, onClick } = props
+    return (
+      <RightOutlined
+        className={className}
+        style={{
+          ...style,
+          color: 'black',
+          fontSize: '15px',
+          lineHeight: '1.5715'
+        }}
+        onClick={onClick} />
+    )
+  }
+
+  const SamplePrevArrow = props => {
+    const { className, style, onClick } = props
+    return (
+      <LeftOutlined
+        className={className}
+        style={{
+          ...style,
+          color: 'black',
+          fontSize: '15px',
+          lineHeight: '1.5715'
+        }}
+        onClick={onClick} />
+    )
   }
 
   const settingsCarousel = {
@@ -3823,7 +3830,7 @@ const Scenario = () => {
                                                                                   }
                                                                                   {productPurchase.product_number_display && itemProduct.item_number &&
                                                                                     <div className="ss-user-overview-product-purchase-infor-item-number">
-                                                                                      Item number: {itemProduct.item_number}
+                                                                                      商品番号: {itemProduct.item_number}
                                                                                     </div>
                                                                                   }
                                                                                   {itemProduct.price_display_custom ?
@@ -3832,13 +3839,14 @@ const Scenario = () => {
                                                                                     </div> :
                                                                                     productPurchase.price_display && itemProduct.item_price &&
                                                                                     <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                      Price: {itemProduct.item_price} 円
+                                                                                      値段: {itemProduct.item_price} 円
                                                                                     </div>
                                                                                   }
-                                                                                  {itemProduct.quantity_limit &&
+                                                                                  {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                                                                     <div className="ss-user-overview-product-purchase-infor-price">
                                                                                       数量：最大{itemProduct.quantity_limit}個まで
-                                                                                    </div>
+                                                                                    </div> :
+                                                                                    ""
                                                                                   }
                                                                                 </div>
                                                                               }
@@ -3870,7 +3878,7 @@ const Scenario = () => {
                                                                                   }
                                                                                   {productPurchase.product_number_display && itemProduct.item_number &&
                                                                                     <div className="ss-user-overview-product-purchase-infor-item-number">
-                                                                                      Item number: {itemProduct.item_number}
+                                                                                      商品番号: {itemProduct.item_number}
                                                                                     </div>
                                                                                   }
                                                                                   {itemProduct.price_display_custom ?
@@ -3879,13 +3887,14 @@ const Scenario = () => {
                                                                                     </div> :
                                                                                     productPurchase.price_display && itemProduct.item_price &&
                                                                                     <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                      Price: {itemProduct.item_price} 円
+                                                                                      値段: {itemProduct.item_price} 円
                                                                                     </div>
                                                                                   }
-                                                                                  {itemProduct.quantity_limit &&
+                                                                                  {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                                                                     <div className="ss-user-overview-product-purchase-infor-price">
                                                                                       数量：最大{itemProduct.quantity_limit}個まで
-                                                                                    </div>
+                                                                                    </div> :
+                                                                                    ""
                                                                                   }
                                                                                   {/* {productPurchase.multiple_item_purchase &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-price">
@@ -3921,10 +3930,11 @@ const Scenario = () => {
                                                                                   {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
                                                                                 </div>
                                                                               }
-                                                                              {itemProduct.quantity_limit &&
+                                                                              {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                                                                 <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                                                                   数量：最大{itemProduct.quantity_limit}個まで
-                                                                                </div>
+                                                                                </div> :
+                                                                                ""
                                                                               }
                                                                             </div>
                                                                           </Checkbox>
@@ -3949,11 +3959,12 @@ const Scenario = () => {
                                                                                 <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                                                                   {productPurchase.product_name_display && itemProduct.title ? itemProduct.title : ""} {productPurchase.product_number_display && itemProduct.item_number ? itemProduct.item_number : ""} {itemProduct.price_display_custom ? itemProduct.price_display_custom : (productPurchase.price_display && itemProduct.item_price ? `${itemProduct.item_price} 円` : "")}
                                                                                 </div>
-                                                                              }
-                                                                              {itemProduct.quantity_limit &&
+                                                                              }                                                                              
+                                                                              {((productPurchase.quantity_designation_all || itemProduct.is_quantity_designation) && itemProduct.quantity_limit) ?
                                                                                 <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                                                                   数量：最大{itemProduct.quantity_limit}個まで
-                                                                                </div>
+                                                                                </div> :
+                                                                                ""
                                                                               }
                                                                             </div>
                                                                           </Radio>
@@ -4011,7 +4022,7 @@ const Scenario = () => {
                                                                                 }
                                                                                 {productPurchaseRadioButton.product_number_display && itemProduct.item_number &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-item-number">
-                                                                                    Item No.: {itemProduct.item_number}
+                                                                                    商品番号: {itemProduct.item_number}
                                                                                   </div>
                                                                                 }
                                                                                 {itemProduct.price_display_custom ?
@@ -4020,7 +4031,7 @@ const Scenario = () => {
                                                                                   </div> :
                                                                                   productPurchaseRadioButton.price_display && itemProduct.item_price &&
                                                                                   <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                    Price: {itemProduct.item_price} 円
+                                                                                    値段: {itemProduct.item_price} 円
                                                                                   </div>
                                                                                 }
                                                                               </div>
@@ -4512,10 +4523,13 @@ const Scenario = () => {
                                       style={{ width: '100%' }}
                                       id="title"
                                       data={dataEmail}
-                                      keyValue={"email_template_name"}
+                                      keyValue={"id"}
                                       nameValue={"email_template_name"}
-                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
-                                      onChange={(value) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'content')}
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.contentId || ''}
+                                      onChange={(value) => {
+                                        onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'contentId');
+                                        onChangeValueMessageContent(indexMessageSelect, 0, messageType, dataEmail.find(item => item.id === value)?.email_template_name || '', 'content');
+                                    }}
                                     />
                                   </div>
                                 </div>
@@ -4817,7 +4831,7 @@ const Scenario = () => {
                                         if (content.type === 'checkbox') {
                                           if (checkbox.type === 'default') {
                                             numberMaxLength = checkbox?.[checkbox.type]?.length;
-                                          } else if(checkbox.type === 'checkbox_img') {
+                                          } else if (checkbox.type === 'checkbox_img') {
                                             checkbox?.[checkbox.type].forEach(item => {
                                               numberMaxLength += item.contents.length;
                                             });
@@ -6390,8 +6404,9 @@ const Scenario = () => {
                                                           disabled
                                                           label={
                                                             <InputCustom
+                                                              maxLength={Number.MAX_SAFE_INTEGER}
                                                               placeholder="テキスト"
-                                                              style={{ width: '100%' }}
+                                                              style={{ width: '100%', color: '#252422' }}
                                                               value={agreeTerm.term}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'term')}
                                                             />
@@ -7330,7 +7345,7 @@ const Scenario = () => {
                                                             </Carousel>
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom" style={{ marginTop: '20px' }}>
-                                                            <span style={{ fontWeight: '400', width: '90%' }}>※JPEGまたはPNG/縦横比1:91:1の横向き画像または縦横比1:1の正方形画像</span>
+                                                            <span style={{ fontWeight: '400', width: '90%' }}>※JPEGまたはPNG/縦横比1.91:1の横向き画像または縦横比1:1の正方形画像</span>
                                                           </div>
                                                           <div className="ss-user-setting__item-bottom">
                                                             <div className="ss-file-upload-wrapper" style={{ width: '90%' }}>
@@ -7770,7 +7785,7 @@ const Scenario = () => {
                                                                                         <div style={{ width: '50%' }}>
                                                                                           <InputCustom
                                                                                             className="ss-mg-bottom-5"
-                                                                                            label="Price display contents (customized)"
+                                                                                            label="値段表示内容（カスタマイズ）"
                                                                                             value={itemProduct.price_display_custom}
                                                                                             onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')}
                                                                                           />
@@ -8002,7 +8017,7 @@ const Scenario = () => {
                                                                                         <div style={{ width: '50%' }}>
                                                                                           <InputCustom
                                                                                             className="ss-mg-bottom-5"
-                                                                                            label="Price display contents (customized)"
+                                                                                            label="値段表示内容（カスタマイズ）"
                                                                                             value={itemProduct.price_display_custom}
                                                                                             onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')}
                                                                                           />
@@ -8252,7 +8267,7 @@ const Scenario = () => {
                                                           <div style={{ width: '95px', height: '36px', backgroundColor: slider.color || '#2C75F0', marginLeft: '13px' }}></div>
                                                         </div>
                                                         {(slider.color && !isColor(slider.color)) &&
-                                                          <div style={{ width: '90%', color: '#b94a48', marginLeft: '21%' }}>Specify a valid regular expression for color.</div>
+                                                          <div style={{ width: '90%', color: '#b94a48', marginLeft: '21%' }}>カラーには、有効な正規表現を指定してください。</div>
                                                         }
                                                       </div>
                                                     </React.Fragment>
@@ -8958,7 +8973,7 @@ const Scenario = () => {
           />
         </div>
       </ModalShort>
-      {isOpenPreview && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} />}
+      {isOpenPreview && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} isFromScenario={true} />}
     </div >
   );
 };
