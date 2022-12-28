@@ -24,7 +24,7 @@ function UserManagement() {
   var [detailUpdateTitle, setDetailUpdateTitle] = useState();
   var [disableInput, setDisableInput] = useState();
   var [inputValueFullName, setInputValueFullName] = useState();
-
+  var [clientIdUpdate, setClientIdUpdate] = useState()
   //Update
   var [name, setName] = useState('');
   var [email, setEmail] = useState('');
@@ -199,13 +199,14 @@ function UserManagement() {
   }
 
   function updateClientUser(item) {
-    // console.log(item);
+    console.log(item);
     setDisableInput(false);
     setDetailUpdateTitle('ユーザー編集');
     setDetailData(item);
     // setInputValueFullName(item.full_name)
     setName(item.full_name);
     setUpdateId(item.id);
+    setClientIdUpdate(item.client_id)
     // setEnglishName(item.english_name)
     setEmail(item.email);
     setRole(item.role);
@@ -243,6 +244,7 @@ function UserManagement() {
     var nameUpdate = document.getElementById('nameUpdate').value;
     const emailUpdate = document.getElementById('updateEmail').value;
     const passwordUpdate = document.getElementById('updatePassword').value;
+    const client_id_update = document.getElementById('client_id_update').value;
     const confirmPasswordUpdate = document.getElementById('updateConfirmPassword').value;
 
     let passCheck = false;
@@ -301,6 +303,7 @@ function UserManagement() {
         var item = elements.item(i);
         obj[item.name] = item.value;
       }
+      obj.client_id = client_id_update
       if (passwordUpdate === '' && confirmPasswordUpdate === '') {
         delete obj.password;
         delete obj.password_confirmation;
@@ -821,11 +824,13 @@ function UserManagement() {
                 <label className="label-input">
                   クライアント<span className="span-require">*必須</span>
                   <select
+                  id='client_id_update'
                     style={{ padding: '3px 0px 3px 0px' }}
-                    value={clientName}
+                    // value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
                     className="input-field"
                     name="client_id"
+                    defaultValue={clientIdUpdate}
                   >
                     {listClient?.clients?.map((client, i) => {
                       return (
@@ -1053,3 +1058,4 @@ function UserManagement() {
 }
 
 export default UserManagement;
+
