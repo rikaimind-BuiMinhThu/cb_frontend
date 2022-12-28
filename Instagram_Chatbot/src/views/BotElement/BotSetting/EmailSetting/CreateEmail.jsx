@@ -337,9 +337,17 @@ function CreateEmail() {
     var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
     let value = field(emailId).value;
     if (emailId == 'to' && value.slice(0, 2) == '{{' && value.slice(-2) == '}}') {
-      field(errEmail).style.display = 'none';
-      field(errEmail).innerHTML = ``;
-      return true;
+      console.log(value.slice(2, value.length - 2), ': nenen')
+      if (value.slice(2, value.length - 2).replace(/\s/g, '') == '') {
+        field(errEmail).style.display = 'block';
+        field(errEmail).innerHTML = `メールの変数を指定してください`;
+        return false;
+      }else{
+        field(errEmail).style.display = 'none';
+        field(errEmail).innerHTML = ``;
+        return true;
+      }
+
     } else if (emailId == 'to' && !regex.test(field(emailId).value)) {
       field(errEmail).style.display = 'block';
       field(errEmail).innerHTML = `メールフォーマットが正しくありません`;
