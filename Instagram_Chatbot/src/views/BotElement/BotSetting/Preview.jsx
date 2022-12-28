@@ -10,7 +10,7 @@ import {
   Button
 } from 'reactstrap';
 import ModalNoti from '../../../views/Popup/ModalNoti';
-import { Checkbox, Radio, Slider, Calendar, Row, Select, Typography, Col } from 'antd';
+import { Checkbox, Radio, Slider, Calendar, Row, Select, Typography, Col, Input } from 'antd';
 import moment from 'moment';
 import cvcIcon from '../../../assets/img/cvc-icon.png';
 import messageTypingGif from '../../../assets/img/icons8-dots-loading.gif';
@@ -29,7 +29,7 @@ import {
 } from '../../../variables/constants';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
-import { rgbToHex } from '@material-ui/core';
+// import { Input, rgbToHex } from '@material-ui/core';
 
 const _ = require('lodash');
 
@@ -321,7 +321,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
 
           setBotInfor(res.data.chatbot);
           if (res.data.variables) {
-            setVariables([...res.data.variables]);
+            setVariables([...res.data.variables, ...variablesAll]);
             res.data.variables.forEach(item => {
               objParam[item.variable_name] = item.default_value;
             });
@@ -1412,6 +1412,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
               dataVariables.forEach(item => {
                 variablesData[item.variable_name] = item.default_value;
               });
+              console.log(variables);
 
               variables.forEach(item => {
                 variablesData[item.variable_name] = item.default_value;
@@ -1498,7 +1499,10 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                   isPauseScroll = true;
                 }
               }).then(() => {
+                console.log('cehckkkkkk', urlThanksPage, i, dataMessages.length)
                 if (dataMessages.length - 1 === i && urlThanksPage) {
+                  console.log('cehckkkkkk', urlThanksPage, i, dataMessages.length)
+
                   let aTag = document.createElement('a');
                   aTag.href = urlThanksPage;
                   aTag.target = '_blank';
@@ -1916,6 +1920,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           }
         }
       });
+      console.log(variables, 'checkkkk variables');
+      setVariables([...variables]);
       objParam[dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content] = value;
       setObjParam({ ...objParam });
     }
@@ -2336,8 +2342,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   function loadCaptcha(indexContent) {
     console.log('load captcha');
     console.log(captcha, indexMessage, indexMessageRender, captcha.filter(item => item.index === indexMessage))
-    if (document.getElementById(`captcha-${indexMessage}-${indexContent}`) && captcha.length !== 0)
-      document.getElementById(`captcha-${indexMessage}-${indexContent}`).innerHTML = captcha.filter(item => item.index === indexMessage && item.indexContent === indexContent)?.[0]?.data || "";
+    if (document.getElementById(`captcha-${indexMessageRender}-${indexContent}`) && captcha.length !== 0)
+      document.getElementById(`captcha-${indexMessageRender}-${indexContent}`).innerHTML = captcha.filter(item => item.index === indexMessageRender && item.indexContent === indexContent)?.[0]?.data || "";
   }
 
   const stringNullOrEmpty = (string) => {
@@ -4130,24 +4136,25 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   }
                   {creditCardPayment.separate_type === false ?
                     <div className="ss-user-setting__item-bottom">
-                      <InputNum
+                      <InputCustom
                         styleLabel={{ width: '100%' }}
-                        className="ss-user-setting-input-limit-character"
+                        id="sp_credit_card_payment"
                         label="カード番号"
-                        controls={false}
-                        max={Number.MAX_SAFE_INTEGER}
-                        maxLength={16}
+                        type="number"
+                        onKeyPress={(e) => { if (e.target.value.length >= 16) e.preventDefault() }}
+                        disabled={disabled}
                         onPaste={e => {
                           // Get the pasted value and remove all white space
-                          const value = e.clipboardData.getData('text').replace(/\s/g, '');
-                          console.log(value)
+                          const value = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 16);
+                          console.log(value, 'chek valueuuee')
+                          setTimeout(() => {
+                            document.getElementById('sp_credit_card_payment').value = value;
+                            onChangeValue(indexContent, content.type, value, 'card_number');
+                          }, 10)
                           // Set the value of the input to the pasted value
-                          onChangeValue(indexContent, content.type, value, 'card_number')
-                          e.target.value = value;
+                          // return value;
                         }}
-                        formatter={(value) => value.replace(/\s/g, "")}
-                        parser={(value) => value.replace(/\s/g, "")}
-                        disabled={disabled}
+                        // max={9999999999999999}
                         style={{ width: '100%', marginLeft: '0px' }}
                         value={creditCardPayment.card_number}
                         placeholder={creditCardPayment.card_number_placeholder}
@@ -4326,9 +4333,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       value={capture.value}
                       onChange={value => onChangeValue(indexContent, content.type, value, 'value')}
                     />
-                    {console.log(capture)}
-                    {new DOMParser().parseFromString(capture.img, "text/xml").innerHTML}
-                    <div id={`captcha-${indexMessage}-${indexContent}`} style={{ width: '50%' }} onLoad={loadCaptcha(indexContent)}></div>
+                    {/* {console.log(capture)} */}
+                    {/* {new DOMParser().parseFromString(capture.img, "text/xml").innerHTML} */}
+                    <div id={`captcha-${indexMessageRender}-${indexContent}`} style={{ width: '50%' }} onLoad={loadCaptcha(indexContent)}></div>
                   </div>
                   {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
@@ -5143,7 +5150,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                       {cardPaymentRadioButton.separate_type === false ?
                         <div className="ss-user-setting__item-bottom">
-                          <InputNum
+                          {/* <InputNum
                             styleLabel={{ width: '100%' }}
                             className="ss-user-setting-input-limit-character"
                             label="カード番号"
@@ -5161,6 +5168,30 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             formatter={(value) => value.replace(/\s/g, "")}
                             parser={(value) => value.replace(/\s/g, "")}
                             disabled={disabled}
+                            style={{ width: '100%', marginLeft: '0px' }}
+                            value={cardPaymentRadioButton.card_number}
+                            placeholder={cardPaymentRadioButton.card_number_placeholder}
+                            onChange={value => onChangeValue(indexContent, content.type, value, 'card_number')}
+                          /> */}
+                          <InputCustom
+                            styleLabel={{ width: '100%' }}
+                            id="sp_credit_card_payment"
+                            label="カード番号"
+                            type="number"
+                            onKeyPress={(e) => { if (e.target.value.length >= 16) e.preventDefault() }}
+                            disabled={disabled}
+                            onPaste={e => {
+                              // Get the pasted value and remove all white space
+                              const value = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 16);
+                              console.log(value, 'chek valueuuee')
+                              setTimeout(() => {
+                                document.getElementById('sp_credit_card_payment').value = value;
+                                onChangeValue(indexContent, content.type, value, 'card_number');
+                              }, 10)
+                              // Set the value of the input to the pasted value
+                              // return value;
+                            }}
+                            // max={9999999999999999}
                             style={{ width: '100%', marginLeft: '0px' }}
                             value={cardPaymentRadioButton.card_number}
                             placeholder={cardPaymentRadioButton.card_number_placeholder}
