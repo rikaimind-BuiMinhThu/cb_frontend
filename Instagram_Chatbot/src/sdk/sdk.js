@@ -2,7 +2,7 @@ var botId = sessionStorage.getItem('bot_id'); var scenarioId = ''; var head = do
 script.src = "https://code.jquery.com/jquery-3.6.0.min.js"; head.appendChild(script);
 async function displayPopup() {
     var device = (tabletCheck() == false && mobileCheck() == false) ? 'pc' : (tabletCheck() == true ? 'tablet' : 'smartphone')
-    const response = await fetch(`https://ec-chatbot-test1.com/api/v1/managements/chatbots/${botId}/get_scenario_selected`, {
+    const response = await fetch(`https://ec-chatbot-test.com/api/v1/managements/chatbots/${botId}/get_scenario_selected`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -16,6 +16,7 @@ async function displayPopup() {
     iframe.id = 'previewSdk'; iframe.style.position = "fixed"; iframe.style.bottom = "0"; iframe.style.right = "0";
     iframe.width = '400px'; iframe.height = '620px';
     iframe.style.border = 'none'; iframe.style.padding = '0'; iframe.style.margin = '0'; iframe.style.borderRadius = '0px'
+    //Change iframe url to production
     iframe.src = `https://ec-chatbot1.com/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}`;
     //https://ec-chatbot1.com
     body.appendChild(iframe)
@@ -28,14 +29,14 @@ async function displayPopup() {
             iframe.width = '400px'; iframe.height = '620px';
             let add = { scenario_data: device }
             // submitForm(url, add)
-            getUser(`https://ec-chatbot-test1.com/api/v1/analytics/scenario_counts/${scenarioId}`, add)
+            getUser(`https://ec-chatbot-test.com/api/v1/analytics/scenario_counts/${scenarioId}`, add)
         } else if (e.data == false && firstOpen == false) { iframe.width = '400px'; iframe.height = '90px'; console.log('close') }
     }, false);
     console.log('device: ', device)
     setTimeout(() => {
         let checkDevice = { scenario_data: `${device}_open_chatbot_window` }
         // submitForm(url, checkDevice)
-        getUser(`https://ec-chatbot-test1.com/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
+        getUser(`https://ec-chatbot-test.com/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
     }, 1000)
 
 }
