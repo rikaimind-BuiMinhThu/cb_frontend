@@ -320,18 +320,6 @@ function CreateEmail() {
   }
 
   const field = document.getElementById.bind(document);
-  function checkEmail(emailId, errEmail, lable) {
-    var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
-    if (!regex.test(field(emailId).value)) {
-      field(errEmail).style.display = 'block';
-      field(errEmail).innerHTML = `メールフォーマットが正しくありません`;
-      return false;
-    } else {
-      field(errEmail).style.display = 'none';
-      field(errEmail).innerHTML = ``;
-      return true;
-    }
-  }
 
   function checkRequired(emailId, errEmail, lable) {
     if (field(emailId).value === '') {
@@ -345,7 +333,30 @@ function CreateEmail() {
     }
   }
 
+  function checkEmail(emailId, errEmail, lable) {
+    var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
+    let value = field(emailId).value;
+    if (emailId == 'to' && value.slice(0, 2) == '{{' && value.slice(-2) == '}}') {
+      field(errEmail).style.display = 'none';
+      field(errEmail).innerHTML = ``;
+      return true;
+    } else if (emailId == 'to' && !regex.test(field(emailId).value)) {
+      field(errEmail).style.display = 'block';
+      field(errEmail).innerHTML = `メールフォーマットが正しくありません`;
+      return false;
+    } else if (emailId != 'to' && !regex.test(field(emailId).value)) {
+      field(errEmail).style.display = 'block';
+      field(errEmail).innerHTML = `メールフォーマットが正しくありません`;
+      return false;
+    } else {
+      field(errEmail).style.display = 'none';
+      field(errEmail).innerHTML = ``;
+      return true;
+    }
+  }
+
   function checkTo(emailId, errEmail, lable) {
+    console.log(checkEmail(emailId, errEmail, lable));
     checkEmail(emailId, errEmail, lable);
     checkRequired(emailId, errEmail, lable);
     if (checkRequired(emailId, errEmail, lable) && checkEmail(emailId, errEmail, lable))
