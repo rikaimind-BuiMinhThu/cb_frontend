@@ -190,13 +190,13 @@ function ListEmail() {
                           <tbody>
                             <tr>
                               <th>差出人</th>
-                              <td>
-                                {item?.sender_name} {clientEmail != null ? `(${clientEmail})` : ''}
-                              </td>
+                              <td>{item?.sender_name}</td>
                             </tr>
                             <tr>
                               <th>宛先</th>
-                              <td>{item?.to}</td>
+                              <td>
+                                {item?.to} {clientEmail != null ? `(${clientEmail})` : ''}
+                              </td>
                             </tr>
                             <tr>
                               <th>CC</th>
