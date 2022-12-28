@@ -85,13 +85,13 @@
 }
 
 /* table */
-.table {
+table.bl-table {
   text-align: center;
   table-layout: fixed;
   overflow: hidden;
   border: 1px solid;
 }
-table.table thead tr th {
+table.bl-table thead tr th {
   border: 1px solid #7186a0;
 }
 

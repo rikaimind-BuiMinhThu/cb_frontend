@@ -248,7 +248,7 @@ function VariableManagement() {
                     <input
                       className="var-form-input"
                       type="text"
-                      placeholder="Search variable ..."
+                      placeholder="変数検索..."
                       onChange={(e) => setSearch(e.target.value)}
                     />
                     <Button style={{ width: "100px" }} onClick={() => handleSearch()}>検索</Button>

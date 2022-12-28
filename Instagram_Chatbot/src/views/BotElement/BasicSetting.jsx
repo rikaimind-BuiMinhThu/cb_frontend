@@ -18,6 +18,17 @@ function BasicSetting() {
   const [language, setLanguage] = useState('');
   const [division, setDivision] = useState('');
 
+  // authorization
+  const [isAdminDeel, setIsAdminDeel] = useState(false);
+
+  useEffect(() => {
+    if (Cookies.get('user_role') === 'admin_deel') {
+      setIsAdminDeel(true);
+    } else {
+      setIsAdminDeel(false);
+    }
+  }, []);
+
   useEffect(() => {
     setUsreIdEC(Cookies.get('user_id'));
   }, []);
@@ -103,7 +114,7 @@ function BasicSetting() {
                 <form id="form-basic-setting">
                   <div className="bs-field-container">
                     <span className="bs-field-lable">
-                    氏名 <span style={{ color: 'red' }}>*</span>
+                      氏名 <span style={{ color: 'red' }}>*</span>
                     </span>
                     <div className="bs-field-input">
                       <input
@@ -136,7 +147,7 @@ function BasicSetting() {
 
                   <div className="bs-field-container">
                     <span className="bs-field-lable">
-                    企業名<span style={{ color: 'red' }}>*</span>
+                      企業名<span style={{ color: 'red' }}>*</span>
                     </span>
                     <div className="bs-field-input">
                       <input
@@ -146,9 +157,7 @@ function BasicSetting() {
                         placeholder="必ず入力してください ..."
                         name="company_name"
                         defaultValue={userDetail.company_name}
-                        onChange={() =>
-                          utils.checkInput('companyName', 'errCompanyname', '企業名')
-                        }
+                        onChange={() => utils.checkInput('companyName', 'errCompanyname', '企業名')}
                       ></input>
                       <span id="errCompanyname" className="bs-err-format"></span>
                     </div>
@@ -192,7 +201,7 @@ function BasicSetting() {
 
                   <div className="bs-field-container">
                     <span className="bs-field-lable">
-                    メールアドレス<span style={{ color: 'red' }}>*</span>
+                      メールアドレス {isAdminDeel && <span style={{ color: 'red' }}>*</span>}
                     </span>
                     <div className="bs-field-input">
                       <input
@@ -209,14 +218,21 @@ function BasicSetting() {
                             'メールアドレス'
                           )
                         }
+                        readOnly={isAdminDeel ? false : true}
+                        style={{ color: isAdminDeel ? 'inherit' : '#aaa' }}
                       ></input>
                       <span id="errEmailAddress" className="bs-err-format"></span>
+                      {!isAdminDeel && (
+                        <span className="bs-err-format">
+                          登録したメールアドレスを編集権限がありません。管理者へ連絡してください！
+                        </span>
+                      )}
                     </div>
                   </div>
 
                   <div className="bs-field-container">
                     <span className="bs-field-lable">
-                    電話番号<span style={{ color: 'red' }}>*</span>
+                      電話番号<span style={{ color: 'red' }}>*</span>
                     </span>
                     <div className="bs-field-input">
                       <input
@@ -249,7 +265,7 @@ function BasicSetting() {
 
                   <div className="bs-field-container">
                     <span className="bs-field-lable">
-                    住所<span style={{ color: 'red' }}>*</span>
+                      住所<span style={{ color: 'red' }}>*</span>
                     </span>
                     <div className="bs-field-input">
                       <input
@@ -299,7 +315,7 @@ function BasicSetting() {
 
                 <div className="bs-field-btn">
                   <button className="btn btn-primary" onClick={() => onSave()}>
-                  保存
+                    保存
                   </button>
                 </div>
               </CardBody>

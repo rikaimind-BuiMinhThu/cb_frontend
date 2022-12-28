@@ -632,7 +632,7 @@ function CRM() {
                   <thead className="text-primary">
                     <tr>
                       <th>ユーザー名</th>
-                      <th>クライアント名</th>
+                      {userRole && <th>クライアント名</th>}
                       <th>名前</th>
                       <th>フォローしている</th>
                       <th>フォローされている</th>

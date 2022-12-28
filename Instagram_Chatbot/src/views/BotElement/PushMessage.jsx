@@ -29,6 +29,7 @@ function PushMessage() {
   const [numHotTemp, setNumHotTemp] = useState(0);
   const [alternateSendTime, setAlternateSendTime] = useState([]);
   const [listExcludedTimeAlt, setListExcluedTimeAlt] = useState([]);
+  const [listExcludedTimeAltText, setListExcluedTimeAltText] = useState([]);
   const [update, setUpdate] = useState(false);
   const [itemUpdate, setItemUpdate] = useState();
   const [isChecked, setIsChecked] = useState(false);
@@ -41,10 +42,17 @@ function PushMessage() {
     setAlternateSendTime(listAlternateTime);
 
     let listExcludedTimeAltEx = [];
+    let listExcludedTimeAltExText = [];
     for (var i = 0; i < 24; i++) {
       listExcludedTimeAltEx.push(i);
+      if (i < 10) {
+        listExcludedTimeAltExText.push(`0${i}`)
+      } else {
+        listExcludedTimeAltExText.push(i);
+      }
     }
     setListExcluedTimeAlt(listExcludedTimeAltEx);
+    setListExcluedTimeAltText(listExcludedTimeAltExText)
   }, []);
   useEffect(() => {
     var bot_id = Cookies.get('bot_id');
@@ -110,6 +118,13 @@ function PushMessage() {
     setCustomDiv(cDivs);
     setNumHotTemp(numHotTemp + 1);
   }
+  function removeOptions(selectElement) {
+    var i,
+      L = selectElement.options.length - 1;
+    for (i = L; i >= 0; i--) {
+      selectElement.remove(i);
+    }
+  }
   function getEmailList() {
     var bot_id = Cookies.get('bot_id');
     api
@@ -119,12 +134,38 @@ function PushMessage() {
           console.log(res.data.data);
           // setEmailList(res.data.data);
           var group = document.getElementById(`push_message_email`);
+          removeOptions(group)
           for (let i = 0; i < res.data?.data.length; i++) {
             let option = document.createElement('option');
             option.value = res.data.data[i].id;
             option.text = res.data.data[i].email_template_name;
             group?.add(option);
           }
+        }
+        for (var i = 0; i < group?.length; i++) {
+          if (i > 0) {
+            if (group[i].value == group[i - 1].value) {
+              // alert('same')
+              group.remove(i);
+            }
+          }
+        }
+
+        //////////////Display err msg///////////////
+        console.log('res.data?.data: ', res.data?.data)
+        if (res.data?.data.length == 0) {
+          if (document.getElementById('push_message_email') != null) {
+            document.getElementById('push_message_email').style.display = 'none'
+            document.getElementById('EmailErr').style.display = 'block'
+          } else {
+            if (document.getElementById('push_message_email') != null) {
+              document.getElementById('push_message_email').style.display = 'block'
+              document.getElementById('EmailErr').style.display = 'none'
+            }
+          }
+
+
+
         }
         // setEmailDetailId(res?.data?.data[0].id)
         // set1stEmailDetailId()
@@ -556,6 +597,29 @@ function PushMessage() {
     }
   }
 
+  function checkAltTime() {
+    var from = document.getElementById('excluded_time_from').value
+    var to = document.getElementById('excluded_time_to').value
+    var expectTime = document.getElementById('alternate_send_time').value
+    // var range = document.getElementById('alternate_send_time').value
+    console.log(from)
+    console.log(to)
+    console.log(expectTime)
+    if (parseInt(from) >= parseInt(to)) {
+      document.getElementById('altTimeFTErr').style.display = 'block'
+    } else {
+      document.getElementById('altTimeFTErr').style.display = 'none'
+    }
+    if ((parseInt(from) <= parseInt(expectTime)) &&
+      (parseInt(expectTime) <= parseInt(to))) {
+      document.getElementById('timeZoneErr').style.display = 'block'
+
+    } else {
+      document.getElementById('timeZoneErr').style.display = 'none'
+    }
+    // console.log(range)
+  }
+
   return (
     <>
       <div className="content">
@@ -618,9 +682,8 @@ function PushMessage() {
                                   width: '32.33%',
                                   margin: '0px 1%',
                                   borderRadius: '5px',
-                                  backgroundColor: `${
-                                    item.subscribe_status === 'subscribe' ? '#F39C12' : '#9B59B6'
-                                  }`,
+                                  backgroundColor: `${item.subscribe_status === 'subscribe' ? '#F39C12' : '#9B59B6'
+                                    }`,
                                   border: 'none',
                                   color: 'white',
                                 }}
@@ -704,11 +767,11 @@ function PushMessage() {
                         dateFormat="yyyy-MM-dd"
                         locale='ja'
                         value={endDate}
-                        // value={
-                        //   endDatePreview
-                        //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-                        //     : 'yyyy/mm/dd'
-                        // }
+                      // value={
+                      //   endDatePreview
+                      //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+                      //     : 'yyyy/mm/dd'
+                      // }
                       />
                     </div>
                     まで &emsp;<button className="push-message-btn-search">検索</button>
@@ -802,7 +865,9 @@ function PushMessage() {
                 </span>
                 <select id="push_message_email" name="email_id" className="push-message-input-form">
                   {/* <option value="">Please select email</option> */}
+
                 </select>
+                <span id="EmailErr" style={{ color: 'red', display: 'none' }}>データがありません。</span>
               </div>
               <br />
               <div className="push-message-add-form">
@@ -852,7 +917,7 @@ function PushMessage() {
                     type="checkbox"
                     checked={isChecked}
                     style={{ marginTop: '15px' }}
-                    // onLoad={()=>checkTZ(itemUpdate?.has_timezone_exclusion)}
+                  // onLoad={()=>checkTZ(itemUpdate?.has_timezone_exclusion)}
                   />
                 </span>
               </div>
@@ -861,9 +926,8 @@ function PushMessage() {
                 id="excludedTime"
                 style={{
                   width: '100%',
-                  display: `${
-                    update == true && itemUpdate.has_timezone_exclusion === 'yes' ? 'block' : 'none'
-                  }`,
+                  display: `${update == true && itemUpdate.has_timezone_exclusion === 'yes' ? 'block' : 'none'
+                    }`,
                 }}
               >
                 <div className="push-message-add-form">
@@ -874,6 +938,7 @@ function PushMessage() {
                   <span style={{ display: 'flex', width: '80%' }}>
                     <select
                       id="excluded_time_from"
+                      onChange={() => checkAltTime()}
                       name="excluded_time_from"
                       defaultValue={update == true ? itemUpdate.excluded_time_from : ''}
                       className="push-message-input-form"
@@ -881,13 +946,14 @@ function PushMessage() {
                     >
                       {listExcludedTimeAlt.map((item, i) => (
                         <option key={i} value={item}>
-                          {item}
+                          {listExcludedTimeAltText[i]}
                         </option>
                       ))}
                     </select>
                     &ensp; <span>~</span> &ensp;
                     <select
                       id="excluded_time_to"
+                      onChange={() => checkAltTime()}
                       name="excluded_time_to"
                       defaultValue={update == true ? itemUpdate.excluded_time_to : ''}
                       className="push-message-input-form"
@@ -895,11 +961,16 @@ function PushMessage() {
                     >
                       {listExcludedTimeAlt.map((item, i) => (
                         <option key={i} value={item}>
-                          {item}
+                          {listExcludedTimeAltText[i]}
                         </option>
                       ))}
                     </select>
                   </span>
+                </div>
+                <div className="push-message-add-form">
+                  <span className="push-message-span-form">
+                  </span>
+                  <span id="altTimeFTErr" style={{ display: 'none', width: '80%', color: 'red' }}>開始時間は、終了時間より前です。</span>
                 </div>
                 <br />
                 <div className="push-message-add-form">
@@ -909,7 +980,8 @@ function PushMessage() {
                   </span>
                   <span style={{ display: 'flex', width: '80%' }}>
                     <select
-                      id="alternate_send_time   "
+                      id="alternate_send_time"
+                      onChange={() => checkAltTime()}
                       name="alternate_send_time"
                       defaultValue={update == true ? itemUpdate.alternate_send_time : ''}
                       className="push-message-input-form"
@@ -917,7 +989,7 @@ function PushMessage() {
                     >
                       {listExcludedTimeAlt.map((item, i) => (
                         <option key={i} value={item}>
-                          {item}
+                          {listExcludedTimeAltText[i]}
                         </option>
                       ))}
                     </select>
@@ -925,7 +997,7 @@ function PushMessage() {
                 </div>
                 <div className="push-message-add-form">
                   <span className="push-message-span-form"></span>
-                  <span id="timeZoneErr" style={{ width: '80%' }}></span>
+                  <span id="timeZoneErr" style={{ display: 'none', width: '80%', color: 'red' }}>代替送信時間を除外時間以外と設定してください。</span>
                 </div>
               </div>
               <div
@@ -960,25 +1032,26 @@ function PushMessage() {
                     name="1stOperator"
                     defaultValue={'of'}
                     id="operator"
-                    style={{ width: '15%', margin: '1% 1%' }}
+                    style={{ width: '13%', margin: '1% 1%' }}
                   >
                     <option value="of">の</option>
                   </select>
                   <select
                     name="last_message_datetime_since"
                     id="last_message_datetime_since"
-                    style={{ width: '15%', margin: '1% 1%' }}
+                    style={{ width: '13%', margin: '1% 1%' }}
                   >
                     {alternateSendTime.map((time, i) => (
                       <option key={i} value={time}>
                         {time}
                       </option>
                     ))}
-                  </select>
+                  </select><span style={{width:"55px", margin: '1% 0%'}}>時間後</span>
                   <div style={{ width: '15%', margin: '1% 1.25%' }}></div>
                 </div>
                 {customDiv.map((item, i) => (
                   <div id={`newCDiv${i}`} style={{ width: '100%', display: 'flex' }} key={i}>
+                    <span style={{width:"10px", margin: '1% 0%'}}></span>
                     <select
                       name={`newAnd${i}`}
                       id={`newAnd${i}`}
@@ -1028,7 +1101,7 @@ function PushMessage() {
                       name={`operator${i}`}
                       defaultValue={update == true ? itemUpdate?.variables[i]?.operator : 'is'}
                       id={`operator${i}`}
-                      style={{ width: '15%', margin: '1% 1%' }}
+                      style={{ width: '13%', margin: '1% 1%' }}
                     >
                       <option value="is">
                         is
@@ -1040,8 +1113,8 @@ function PushMessage() {
                       name={`value${i}`}
                       id={`value${i}`}
                       defaultValue={update == true ? itemUpdate?.variables[i]?.value : ''}
-                      style={{ width: '15%', margin: '1% 1%' }}
-                    />
+                      style={{ width: '13%', margin: '1% 1%' }}
+                    /><span style={{width:"55px", margin: '1% 0%'}}></span>
                     {/* {alternateSendTime?.map((time, i) => (
                         <option key={i} value={time}>
                           {time}
@@ -1049,7 +1122,8 @@ function PushMessage() {
                       ))}
                     </select> */}
                     <button
-                      style={{ width: '15%', margin: '1% 1%' }}
+                      style={{ width: '15%', margin: '1% 0% 1% 2%', border:'none',
+                    borderRadius:'5px', backgroundColor:"#ff3333", color:"white" }}
                       onClick={(e) => deleteCDiv(e, i)}
                     >
                       削除
@@ -1059,7 +1133,7 @@ function PushMessage() {
                 <button
                   style={{
                     float: 'right',
-                    width: '130px',
+                    width: '100px',
                     padding: '7.5px 15px',
                     textAlign: 'center',
                     borderRadius: '5px',
@@ -1077,7 +1151,7 @@ function PushMessage() {
               <button
                 style={{
                   float: 'left',
-                  width: 'auto',
+                  width: '150px',
                   padding: '7.5px 35px',
                   textAlign: 'center',
                   border: 'none',
@@ -1092,7 +1166,7 @@ function PushMessage() {
               <button
                 style={{
                   float: 'right',
-                  width: '110px',
+                  width: '100px',
                   padding: '7.5px 35px',
                   textAlign: 'center',
                   borderRadius: '5px',

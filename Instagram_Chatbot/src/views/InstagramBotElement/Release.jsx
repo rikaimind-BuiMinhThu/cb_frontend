@@ -7,13 +7,7 @@ import Cookies from 'js-cookie';
 import {
   Button,
   Card,
-  CardHeader,
   CardBody,
-  CardFooter,
-  CardTitle,
-  FormGroup,
-  Form,
-  Input,
   Row,
   Col,
 } from 'reactstrap';
@@ -23,7 +17,6 @@ import ModalNoti from './../Popup/ModalNoti';
 import axios from 'axios';
 import { useEffect } from 'react';
 import ModalShort from './../Popup/ModalShort';
-import { tokenExpired } from 'api/tokenExpired';
 
 function Release() {
   const [listGroup, setListGroup] = useState([]);
@@ -84,24 +77,48 @@ function Release() {
     api
       .get(`/api/v1/instagram_settings`)
       .then((res) => {
-        // console.log('setIdInstaSetting: ', res.data.data[0].id);
-        setIdInstaSetting(res.data.data[0].id);
-        setPostGroupName(res.data.data[0].post_comment_group_name);
-        setStoryGroupName(res.data.data[0].story_comment_group_name);
-        setLiveGroupName(res.data.data[0].live_comment_group_name);
-        setPostGroupId(res.data.data[0]?.post_comment_group_id);
-        setStoryGroupId(res.data.data[0]?.story_comment_group_id);
-        setLiveGroupId(res.data.data[0]?.live_comment_group_id);
-        setPostGroupBagId(res.data.data[0]?.post_comment_bag_id);
-        setStoryGroupBagId(res.data.data[0]?.story_comment_bag_id);
-        setLiveGroupBagId(res.data.data[0]?.live_comment_bag_id);
-        // console.log(res.data);
+        console.log('setIdInstaSetting: ', res.data.data);
+        api.get(`/api/v1/message_managements/message_groups?page=1`).then(ress => {
+          console.log('res FB: ', res)
+          // })
+          setIdInstaSetting(res?.data?.data[0]?.id);
+          if (res.data.data[0]?.post_comment_group_id == null) {
+            setPostGroupId(ress.data.data[0]?.id);
+            setPostGroupName(ress.data.data[0]?.group_name);
+          } else {
+            setPostGroupId(res.data.data[0]?.post_comment_group_id);
+            setPostGroupName(res.data.data[0]?.post_comment_group_name);
+          }
+
+          if (res.data.data[0]?.story_comment_group_id == null) {
+            setStoryGroupId(ress.data.data[0]?.id);
+            setLiveGroupName(ress.data.data[0]?.group_name);
+          } else {
+            setStoryGroupId(res.data.data[0]?.story_comment_group_id);
+            setLiveGroupName(res.data.data[0]?.live_comment_group_name);
+          }
+
+          if (res.data.data[0]?.live_comment_group_id == null) {
+            setLiveGroupId(ress.data.data[0]?.id);
+            setStoryGroupName(ress.data.data[0]?.group_name);
+          } else {
+            setLiveGroupId(res.data.data[0]?.live_comment_group_id);
+            setStoryGroupName(res.data.data[0].story_comment_group_name);
+          }
+
+
+
+
+
+
+          setPostGroupBagId(res.data.data[0]?.post_comment_bag_id);
+          setStoryGroupBagId(res.data.data[0]?.story_comment_bag_id);
+          setLiveGroupBagId(res.data.data[0]?.live_comment_bag_id);
+          // console.log(res.data);
+        })
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }, []);
 
@@ -130,8 +147,8 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
+        if (error.response.data.code === 3) {
+          requestNewToken(path);
         }
       });
   }, []);
@@ -150,9 +167,6 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     }
   }, []);
@@ -166,9 +180,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }, []);
 
@@ -184,9 +195,6 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     }
   }
@@ -199,9 +207,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }
 
@@ -241,9 +246,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //     requestNewToken(path)
+        // }
       });
   }, []);
 
@@ -280,9 +285,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //     requestNewToken(path)
+        // }
       });
   }
 
@@ -311,9 +316,6 @@ function Release() {
             })
             .catch((error) => {
               console.log(error);
-              if (error.response?.data.code === 0) {
-                tokenExpired()
-              }
             });
         }
         // setTimeout(() => {
@@ -331,9 +333,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }, []);
 
@@ -353,9 +352,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }, []);
   function getPMAL() {
@@ -374,9 +370,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }
 
@@ -394,9 +387,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }, []);
 
@@ -414,9 +404,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }
 
@@ -442,9 +429,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }
 
@@ -470,9 +454,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }
 
@@ -558,9 +539,6 @@ function Release() {
                     })
                     .catch((error) => {
                       console.log(error);
-                      if (error.response?.data.code === 0) {
-                        tokenExpired()
-                      }
                     });
                 }
                 for (var i = 0; i < listkey.length; i++) {
@@ -596,9 +574,6 @@ function Release() {
                     })
                     .catch((error) => {
                       console.log(error);
-                      if (error.response?.data.code === 0) {
-                        tokenExpired()
-                      }
                     });
                 }
                 for (var i = 0; i < listkey.length; i++) {
@@ -634,17 +609,11 @@ function Release() {
                     })
                     .catch((error) => {
                       console.log(error);
-                      if (error.response?.data.code === 0) {
-                        tokenExpired()
-                      }
                     });
                 }
               })
               .catch((error) => {
                 console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
               });
 
             setDmOnOff(res.data.data.dm_bag_status);
@@ -653,43 +622,38 @@ function Release() {
             // } else {
             //   trueConfigDM()
             // }
+            console.log('res.data.data.story_comment_bag_id: ', res.data)
 
-            api
-              .get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`)
-              .then((res) => {
-                // console.log("story_comment_bag_id: ", res.data)
-                setStoryCommentBagName(res.data.data.message_bag.bag_name);
-              })
-              .catch((error) => {
-                console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
-              });
-            api
-              .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
-              .then((res) => {
-                // console.log("post_comment_bag_id: ", res.data)
-                setPostCommentBagName(res.data.data.message_bag.bag_name);
-              })
-              .catch((error) => {
-                console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
-              });
-            api
-              .get(`/api/v1/message_managements/message_bags/${res.data.data.live_comment_bag_id}`)
-              .then((res) => {
-                // console.log("live_comment_bag_id: ", res.data)
-                setLiveCommentBagName(res.data.data.message_bag.bag_name);
-              })
-              .catch((error) => {
-                console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
-              });
+            //Fix bug 15/11/2022
+            // api
+            //   .get(`/api/v1/message_managements/message_bags/${res.data.data.story_comment_bag_id}`)
+            //   .then((res) => {
+            //     // console.log("story_comment_bag_id: ", res.data)
+            //     setStoryCommentBagName(res.data.data.message_bag.bag_name);
+            //   })
+            //   .catch((error) => {
+            //     console.log(error);
+            //   });
+            // api
+            //   .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
+            //   .then((res) => {
+            //     // console.log("post_comment_bag_id: ", res.data)
+            //     setPostCommentBagName(res.data.data.message_bag.bag_name);
+            //   })
+            //   .catch((error) => {
+            //     console.log(error);
+            //   });
+            // api
+            //   .get(`/api/v1/message_managements/message_bags/${res.data.data.live_comment_bag_id}`)
+            //   .then((res) => {
+            //     // console.log("live_comment_bag_id: ", res.data)
+            //     setLiveCommentBagName(res.data.data.message_bag.bag_name);
+            //   })
+            //   .catch((error) => {
+            //     console.log(error);
+            //   });
+            //End fix bug 15/11/2022
+
             // api.get(`/api/v1/message_managements/message_bags/${res.data.data.dm_bag_id}`).then(res => {
             //   // setLiveCommentBagName(res.data.data.message_bag.bag_name)
             //   console.log("dm_bag_id: ", res.data)
@@ -701,9 +665,6 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
             // if (error.response.data.code === 3) {
             //   requestNewToken(path)
             // }
@@ -711,9 +672,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }, []);
 
@@ -786,9 +744,6 @@ function Release() {
                 })
                 .catch((error) => {
                   console.log(error);
-                  if (error.response?.data.code === 0) {
-                    tokenExpired()
-                  }
                 });
             }
             for (var i = 0; i < listkey.length; i++) {
@@ -824,9 +779,6 @@ function Release() {
                 })
                 .catch((error) => {
                   console.log(error);
-                  if (error.response?.data.code === 0) {
-                    tokenExpired()
-                  }
                 });
             }
             for (var i = 0; i < listkey.length; i++) {
@@ -862,17 +814,11 @@ function Release() {
                 })
                 .catch((error) => {
                   console.log(error);
-                  if (error.response?.data.code === 0) {
-                    tokenExpired()
-                  }
                 });
             }
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
 
         setDmOnOff(res.data.data.dm_bag_status);
@@ -890,9 +836,6 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
@@ -902,9 +845,6 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.live_comment_bag_id}`)
@@ -914,9 +854,6 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
         // api.get(`/api/v1/message_managements/message_bags/${res.data.data.dm_bag_id}`).then(res => {
         //   // setLiveCommentBagName(res.data.data.message_bag.bag_name)
@@ -929,9 +866,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -1172,9 +1109,6 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
         api
           .get(`/api/v1/message_managements/message_bags/${res.data.data.post_comment_bag_id}`)
@@ -1184,16 +1118,13 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -1223,9 +1154,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }
 
@@ -1282,9 +1210,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }, []);
 
@@ -1318,6 +1246,8 @@ function Release() {
         .then((res) => {
           document.getElementById('listReplyGroup').value = storyGroupId;
           let group = document.getElementById(`listReplyBag`);
+          console.log("storyGroupId: ", storyGroupId)
+          console.log("storyGroupId res: ", res)
           removeOptions(group);
           for (let i = 0; i < res.data?.data?.message_bags?.length; i++) {
             let option = document.createElement('option');
@@ -1325,13 +1255,15 @@ function Release() {
             option.text = res.data.data.message_bags[i].bag_name;
             group.add(option);
           }
-          group.value = storyGroupBagId;
+          if (storyGroupBagId == null) {
+            group.value = res.data?.data?.message_bags[0].id
+          } else {
+            group.value = storyGroupBagId;
+          }
+
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     }
   }, [storyGroupId, storyGroupBagId]);
@@ -1345,19 +1277,21 @@ function Release() {
           document.getElementById('listLiveGroup').value = liveGroupId;
           let group = document.getElementById(`listLiveBag`);
           removeOptions(group);
+          console.log("liveGroupId: ", liveGroupId)
           for (let i = 0; i < res.data?.data?.message_bags?.length; i++) {
             let option = document.createElement('option');
             option.value = res.data.data.message_bags[i].id;
             option.text = res.data.data.message_bags[i].bag_name;
             group.add(option);
           }
-          group.value = liveGroupBagId;
+          if (liveGroupBagId == null) {
+            group.value = res.data?.data?.message_bags[0].id
+          } else {
+            group.value = liveGroupBagId;
+          }
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     }
   }, [liveGroupId, liveGroupBagId]);
@@ -1377,13 +1311,14 @@ function Release() {
             option.text = res.data.data.message_bags[i].bag_name;
             group.add(option);
           }
-          group.value = postGroupBagId;
+          if (postGroupBagId == null) {
+            group.value = res.data?.data?.message_bags[0].id
+          } else {
+            group.value = postGroupBagId;
+          }
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     }
   }, [postGroupId, postGroupBagId]);
@@ -1406,9 +1341,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   };
 
@@ -1430,9 +1362,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   };
 
@@ -1455,9 +1384,6 @@ function Release() {
             })
             .catch((error) => {
               console.log(error);
-              if (error.response?.data.code === 0) {
-                tokenExpired()
-              }
             });
         }
         setTimeout(() => {
@@ -1476,8 +1402,8 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
+        if (error.response.data.code === 3) {
+          requestNewToken(path);
         }
       });
   }
@@ -1527,9 +1453,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -1617,9 +1543,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -1651,9 +1577,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -1686,9 +1612,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
   function selectedLiveGroup(value, key) {
@@ -1720,9 +1646,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -1755,9 +1681,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -1790,9 +1716,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -1825,9 +1751,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
   function selectedGroupFMUP(value, key) {
@@ -1859,9 +1785,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -1975,9 +1901,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }
   function selectedBagLive(value) {
@@ -2010,9 +1933,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }
 
@@ -2042,9 +1962,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }
 
@@ -2109,9 +2026,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -2148,9 +2065,6 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
       });
   }
 
@@ -2187,9 +2101,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -2224,9 +2138,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
   function changeFAQOnOff() {
@@ -2248,9 +2162,6 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     } else {
       api
@@ -2266,9 +2177,6 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     }
   }
@@ -2298,9 +2206,6 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     } else {
       api
@@ -2323,9 +2228,6 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     }
   }
@@ -2502,9 +2404,6 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
         // setMsgNoti('FAQを修正しました。');
         // setIsOpenNoti(true);
@@ -2516,9 +2415,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -2621,17 +2520,11 @@ function Release() {
             })
             .catch((error) => {
               console.log(error);
-              if (error.response?.data.code === 0) {
-                tokenExpired()
-              }
             });
           reloadFixedMenu();
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     }
   }
@@ -2720,9 +2613,6 @@ function Release() {
             })
             .catch((error) => {
               console.log(error);
-              if (error.response?.data.code === 0) {
-                tokenExpired()
-              }
             });
           setMsgNoti(' FAQを追加しました。');
           setIsOpenNoti(true);
@@ -2733,9 +2623,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
+          // if (error.response.data.code === 3) {
+          //   requestNewToken(path)
+          // }
         });
     }
   }
@@ -2843,18 +2733,12 @@ function Release() {
             })
             .catch((error) => {
               console.log(error);
-              if (error.response?.data.code === 0) {
-                tokenExpired()
-              }
             });
           reloadFixedMenu();
           cancelFixed();
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     }
   }
@@ -2975,9 +2859,6 @@ function Release() {
         .then((res) => { })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
       api
         .patch(`/api/v1/instagram_settings/${instaSettingId}`, update)
@@ -2992,9 +2873,6 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     } else if (reply == 'keyword') {
       for (var i = 0; i < story_actived.length; i++) {
@@ -3030,16 +2908,10 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
               });
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
       }
 
@@ -3050,9 +2922,6 @@ function Release() {
           .then((res) => { })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
         api
           .patch(
@@ -3066,9 +2935,6 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
             // }
           });
       }, 1500);
@@ -3099,9 +2965,6 @@ function Release() {
         .then((res) => { })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
       api
         .patch(`/api/v1/instagram_settings/${instaSettingId}`, update)
@@ -3118,9 +2981,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
+          // if (error.response.data.code === 3) {
+          //   requestNewToken(path)
+          // }
         });
     } else {
       for (var i = 0; i < live_actived.length; i++) {
@@ -3157,16 +3020,10 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
               });
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
       }
       setTimeout(function () {
@@ -3178,9 +3035,6 @@ function Release() {
           .then((res) => { })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
         api
           .patch(`/api/v1/message_managements/keyword_settings/${new_live_kw_id}`, live_kw_setting)
@@ -3191,9 +3045,7 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
+            // }
           });
       }, 1500);
     }
@@ -3225,9 +3077,6 @@ function Release() {
         .then((res) => { })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
       api
         .patch(`/api/v1/instagram_settings/${instaSettingId}`, update)
@@ -3244,9 +3093,9 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
+          // if (error.response.data.code === 3) {
+          //   requestNewToken(path)
+          // }
         });
     } else {
       for (var i = 0; i < cm_actived.length; i++) {
@@ -3285,16 +3134,10 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
               });
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
       }
       setTimeout(function () {
@@ -3306,9 +3149,6 @@ function Release() {
           .then((res) => { })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
         // console.log(cm_kw_setting)
         api
@@ -3320,9 +3160,7 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
+            // }
           });
       }, 1500);
     }
@@ -3361,9 +3199,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
   }
 
@@ -3444,9 +3282,9 @@ function Release() {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired()
-        }
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
       });
     // console.log("getPastPost: ", getPastPost)
     var past_post = [];
@@ -3461,9 +3299,6 @@ function Release() {
         })
         .catch((error) => {
           console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired()
-          }
         });
     }
     console.log(past_post);
@@ -3493,9 +3328,6 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
               });
             setMsgNoti('固定メッセージを削除しました。');
             setIsOpenNoti(true);
@@ -3507,9 +3339,6 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
           });
       }
     }
@@ -3533,9 +3362,6 @@ function Release() {
               })
               .catch((error) => {
                 console.log(error);
-                if (error.response?.data.code === 0) {
-                  tokenExpired()
-                }
               });
             setMsgNoti('削除しました。');
             setIsOpenNoti(true);
@@ -3547,9 +3373,9 @@ function Release() {
           })
           .catch((error) => {
             console.log(error);
-            if (error.response?.data.code === 0) {
-              tokenExpired()
-            }
+            // if (error.response.data.code === 3) {
+            //   requestNewToken(path)
+            // }
           });
       }
     }
@@ -4222,7 +4048,7 @@ function Release() {
 
                     <div id="addFixedMenuContent" style={{ width: '100%' }}>
                       {listFixedMenu != undefined
-                        ? listFixedMenu.map((item) => (
+                        ? listFixedMenu?.map((item) => (
                           <form key={item.id} id={`fixed-menu-${item.id}`}>
                             <div
                               className="div-add-aq"

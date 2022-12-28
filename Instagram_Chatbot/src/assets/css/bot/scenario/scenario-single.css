@@ -1075,7 +1075,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 } */
 
 .ss-user-setting__select-btn-add {
-  background-color: #78a8f3;
+  background-color: rgb(50, 122, 237);
   margin-left: 10px;
   word-break: keep-all;
 }
