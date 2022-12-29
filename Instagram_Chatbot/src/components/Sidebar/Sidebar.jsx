@@ -180,7 +180,7 @@ function Sidebar(props) {
               >
                 {/* <i className="nc-icon nc-bank" style={{ color: 'black' }} /> */}
                 {/* <MDBIcon fab icon="instagram" style={{ color: "black" }} /> */}
-                <i class="fab fa-instagram" style={{ color: 'black', fontWeight: "800" }}></i>
+                <i className="fab fa-instagram" style={{ color: 'black', fontWeight: "800" }}></i>
                 <p>Instagram Chatbot</p>
               </NavLink>
               <ul id="instaDropdown" style={{ display: 'none', marginLeft: '-30px' }}>
@@ -195,7 +195,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-atom" style={{ color: 'black' }} /> */}
-                    <i class="fas fa-atom" style={{ color: 'black' }}></i>
+                    <i className="fas fa-atom" style={{ color: 'black' }}></i>
                     <p style={{ color: 'black' }}>チャットボット作成</p>
                   </NavLink>
                 </li>
@@ -210,7 +210,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-key-25" style={{ color: 'black' }} /> */}
-                    <i class="fas fa-key" style={{ color: 'black' }}></i>
+                    <i className="fas fa-key" style={{ color: 'black' }}></i>
                     <p style={{ color: 'black' }}>キーワード設定</p>
                   </NavLink>
                 </li>
@@ -225,7 +225,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-air-baloon" style={{ color: 'black' }} /> */}
-                    <i class="fab fa-fly" style={{ color: 'black' }}></i>
+                    <i className="fab fa-fly" style={{ color: 'black' }}></i>
                     <p style={{ color: 'black' }}>リリース</p>
                   </NavLink>
                 </li>
