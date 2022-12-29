@@ -6,7 +6,7 @@ table.rm-table {
   border: 1px solid;
 }
 table.rm-table thead tr th,
-td {
+table.rm-table td {
   border: 1px solid #7186a0;
 }
 
