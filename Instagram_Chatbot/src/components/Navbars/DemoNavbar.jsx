@@ -107,6 +107,7 @@ function Header(props) {
     Cookies.remove('scenario_id')
     Cookies.remove('refreshToken')
     Cookies.remove('bot_type')
+    Cookies.remove('bot_id')
     
     window.location.href ='/'
     // window.location.href ='/'
