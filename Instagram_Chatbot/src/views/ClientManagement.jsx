@@ -1117,7 +1117,7 @@ function ClientManagement() {
     if (inputEndDateAdd != '') {
       utils.checkDateEndIn(inputEndDateAdd.toISOString().slice(0, 10), inputdate.toISOString().slice(0, 10));
     }
-    setInputStartDate(inputdate);
+   
     if (document.getElementById('startDate').value.toString() === '') {
       document.getElementById(`newClientStartErrMsg`).style.display = 'block';
       document.getElementById(`newClientStartErrMsg`).innerHTML = `開始日を入力してください。`;
@@ -1125,6 +1125,7 @@ function ClientManagement() {
       document.getElementById(`newClientStartErrMsg`).style.display = 'none';
       document.getElementById(`newClientStartErrMsg`).innerHTML = ``;
     }
+    setInputStartDateAdd(inputdate);
   }
 
   function checkEndDate(endDateIn) {
@@ -1138,10 +1139,14 @@ function ClientManagement() {
 
   function checkEndDateAdd(endDateIn) {
     console.log('check end date: ', endDateIn)
-    utils.checkDateEndIn(endDateIn.toISOString().slice(0, 10), inputStartDateAdd.toISOString().slice(0, 10));
-    if (utils.checkDateEndIn(endDateIn.toISOString().slice(0, 10), inputStartDateAdd.toISOString().slice(0, 10)) === true) {
-      setInputEndDateAdd(endDateIn);
+    if(inputStartDateAdd != ''){
+      utils.checkDateEndIn(endDateIn.toISOString().slice(0, 10), inputStartDateAdd.toISOString().slice(0, 10));
+      if (utils.checkDateEndIn(endDateIn.toISOString().slice(0, 10), inputStartDateAdd.toISOString().slice(0, 10)) === true) {
+        setInputEndDateAdd(endDateIn);
+      }
     }
+    
+    
     setInputEndDateAdd(endDateIn);
   }
   function setContractInput(data) {
