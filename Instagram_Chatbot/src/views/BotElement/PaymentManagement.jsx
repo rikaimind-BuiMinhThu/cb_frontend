@@ -154,7 +154,37 @@ function PaymentManagement() {
   }, []);
 
   useEffect(() => {
-    reload();
+    api
+      .get(`/api/v1/payment_managements/payment_managements/${botId}`)
+      .then((res) => {
+        console.log(res.data.data);
+        setPayment(res.data.data);
+        if (res.data?.data?.include_tax === 'internal_tax') setOpenTax(true);
+        else setOpenTax(false);
+        if (res.data?.data?.can_specify_payment === 'no') setNoCan(true);
+        else setNoCan(false);
+        if (res.data?.data?.need_paid_settlement_fee === 'free') setNoPaid(true);
+        else setNoPaid(false);
+        if (res.data?.data?.need_paid_shipping_fee === 'free') setNoShip(true);
+        else setNoShip(false);
+        if (res.data?.data?.need_np_deferred_payment === 'no') setNoNP(true);
+        else setNoNP(false);
+        if (res.data?.data?.specify_payment_variables[0].id !== null) {
+          setCustomDivSpecifyPaymentGW(res.data?.data?.specify_payment_variables);
+        }
+        if (res.data?.data?.settlement_fee_variables[0].id !== null) {
+          setCustomDivSettlementPaymentGW(res.data?.data?.settlement_fee_variables);
+        }
+        if (res.data?.data?.np_value_settlements[0].id !== null) {
+          setCustomDivSettlementFee(res.data?.data?.np_value_settlements);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err?.response?.data?.code == 0) {
+          tokenExpired();
+        }
+      });
   }, [botId]);
 
   function reload() {
@@ -266,8 +296,8 @@ function PaymentManagement() {
         elements2 == false && elements3 == false
           ? ''
           : elements2 == true
-            ? 'truncation'
-            : 'rounded_up',
+          ? 'truncation'
+          : 'rounded_up',
     };
     let res = {
       consumption_tax: elements == true ? objDefault : obj,
@@ -475,7 +505,7 @@ function PaymentManagement() {
         checkVal = true;
         if (document.getElementById(`err_settpgw_commission${i}`))
           document.getElementById(`err_settpgw_commission${i}`).innerHTML =
-            'Please input comission';
+            '手数料を入力してください。';
       } else {
         if (document.getElementById(`err_settpgw_commission${i}`))
           document.getElementById(`err_settpgw_commission${i}`).innerHTML = '';
@@ -761,19 +791,35 @@ function PaymentManagement() {
 
   function deleteCdivSpecifyPGW(id) {
     var ele = document.getElementById(`specifyPGW${id}`);
-    document.getElementById(`customSPGW`).removeChild(ele);
+    const customSPGW = document.getElementById(`customSPGW`);
+    if (ele?.parentNode === customSPGW) {
+      setCustomDivSpecifyPaymentGW(customDivSpecifyPaymentGW.filter((item, index) => index !== id));
+    }
+    // document.getElementById(`customSPGW`).removeChild(ele);
     // ele.remove();
   }
 
   function deleteCdivSettlementPGW(id) {
     var ele = document.getElementById(`settlementPGW${id}`);
-    document.getElementById(`settlement_PMGW`).removeChild(ele);
+    const settlement_PMGW = document.getElementById(`settlement_PMGW`);
+    if (ele?.parentNode === settlement_PMGW) {
+      setCustomDivSettlementPaymentGW(
+        customDivSettlementPaymentGW.filter((item, index) => index !== id)
+      );
+    }
+    // document.getElementById(`settlement_PMGW`).removeChild(ele);
     // ele.remove();
   }
 
   function deleteCdivSettlementFee(id) {
+    console.log(customDivSettlementFee);
     var ele = document.getElementById(`settlementFee${id}`);
-    document.getElementById(`customNP`).removeChild(ele);
+    const customNPElement = document.getElementById(`customNP`);
+    if (ele?.parentNode === customNPElement) {
+      // customNPElement?.removeChild(ele);
+      setCustomDivSettlementFee(customDivSettlementFee.filter((item, index) => index !== id));
+    }
+    // document.getElementById(`customNP`).removeChild(ele);
     // ele.remove();
   }
 
@@ -783,15 +829,18 @@ function PaymentManagement() {
       setCurrentClientId(value);
     } else {
       setCurrentClientId(value);
-      api.get(`/api/v1/managements/get_list_chatbot_by_client?client_id=${value}`).then(res => {
-        console.log(res?.data?.data)
-        setAllBot(res?.data?.data)
-      }).catch(err => {
-        console.log(err)
-        if (err?.response?.data?.code == 0) {
-          tokenExpired()
-        }
-      })
+      api
+        .get(`/api/v1/managements/get_list_chatbot_by_client?client_id=${value}`)
+        .then((res) => {
+          console.log(res?.data?.data);
+          setAllBot(res?.data?.data);
+        })
+        .catch((err) => {
+          console.log(err);
+          if (err?.response?.data?.code == 0) {
+            tokenExpired();
+          }
+        });
     }
   };
 
@@ -842,11 +891,11 @@ function PaymentManagement() {
                           dateFormat="yyyy-MM-dd"
                           locale="ja"
                           value={startDate}
-                        // value={
-                        //   startDatePreview
-                        //     ? startDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-                        //     : 'yyyy/mm/dd'
-                        // }
+                          // value={
+                          //   startDatePreview
+                          //     ? startDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+                          //     : 'yyyy/mm/dd'
+                          // }
                         />
                       </div>
                       <h4
@@ -866,11 +915,11 @@ function PaymentManagement() {
                           dateFormat="yyyy-MM-dd"
                           locale="ja"
                           value={endDate}
-                        // value={
-                        //   endDatePreview
-                        //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
-                        //     : 'yyyy/mm/dd'
-                        // }
+                          // value={
+                          //   endDatePreview
+                          //     ? endDatePreview.toISOString().slice(0, 10).replaceAll('-', '/')
+                          //     : 'yyyy/mm/dd'
+                          // }
                         />
                       </div>
                       <h4
@@ -1125,7 +1174,7 @@ function PaymentManagement() {
                                       defaultValue={
                                         payment?.specify_payment_variables.length > 0
                                           ? payment?.specify_payment_variables[i]
-                                            ?.payment_gateway_name
+                                              ?.payment_gateway_name
                                           : null
                                       }
                                     >
@@ -1517,7 +1566,7 @@ function PaymentManagement() {
                                       defaultValue={
                                         payment?.np_value_settlements.length > 0
                                           ? payment?.np_value_settlements[i]
-                                            ?.np_settlement_fee_value
+                                              ?.np_settlement_fee_value
                                           : null
                                       }
                                     />
@@ -1536,7 +1585,7 @@ function PaymentManagement() {
                                       defaultValue={
                                         payment?.np_value_settlements.length > 0
                                           ? payment?.np_value_settlements[i]
-                                            ?.np_settlement_max_value
+                                              ?.np_settlement_max_value
                                           : null
                                       }
                                     />
@@ -1556,7 +1605,7 @@ function PaymentManagement() {
                                       defaultValue={
                                         payment?.np_value_settlements.length > 0
                                           ? payment?.np_value_settlements[i]
-                                            ?.np_settlement_min_value
+                                              ?.np_settlement_min_value
                                           : null
                                       }
                                     />
