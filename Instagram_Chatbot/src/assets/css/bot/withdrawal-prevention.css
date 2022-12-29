@@ -1,0 +1,27 @@
+.wp-input-radio {
+  display: inline-block;
+  width: auto;
+  margin-right: 5px;
+}
+.wp-lable {
+  margin-right: 30px;
+}
+.wp-image-item {
+  margin: 10px 0;
+}
+.wp-image-input {
+  width: 50%;
+  display: inline-block;
+  border: 1px solid grey;
+  border-radius: 5px;
+  padding: 5px 15px
+}
+.wp-image-label {
+  width: 100px;
+}
+.wp-image-err {
+  display: block;
+  color: red;
+  font-weight: 400;
+  margin-left: 100px;
+}

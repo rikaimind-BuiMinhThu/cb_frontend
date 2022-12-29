@@ -9,11 +9,13 @@ import Cookies from 'js-cookie';
 import { setToken } from "api/auth";
 import logo from '../../assets/img/logoEC.jpg'
 import LoginFacebook from "./LoginFacebook";
+import {EC_CHATBOT_URL} from '../../variables/constants'
 class Login extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = { token: '', navigator: 'false', msgNoti: '', isOpenNoti: false }
+    Cookies.remove('bot_type')
   }
 
   handleLogin = (props) => {
@@ -42,21 +44,22 @@ class Login extends React.Component {
       document.getElementById('passwordMessage').innerHTML = ""
       // const loginInfo = { username: nameValue, password: password };
       const loginInfo = { user: { email: nameValue, password: password } }
-      axios.post(`https://ec-chatbot-test.com/api/v1/sign_in`, loginInfo)
+      axios.post(`${EC_CHATBOT_URL}/api/v1/sign_in`, loginInfo)
         .then(res => {
-          document.getElementById("loginErrorMsg").style.display= "none"
+          document.getElementById("loginErrorMsg").style.display = "none"
           const persons = res.data;
           if (persons.code === 1 || persons.code === "1") {
             setToken(persons.token)
             Cookies.set('refreshToken', persons.refresh_token); // {path: '/'}
             Cookies.set('user_role', persons.user.role); // {path: '/'}
+            Cookies.set('user_id', persons.user.id); // {path: '/'}
             Cookies.set('is_auth', 'true');
             // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
             axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
             getToDashboard();
           } else {
             this.setState({ msgNoti: "ユーザー名またはパスワードが間違っています。" })
-            document.getElementById("loginErrorMsg").style.display= "block"
+            document.getElementById("loginErrorMsg").style.display = "block"
             // this.setState({ isOpenNoti: true })
           }
         })
@@ -68,7 +71,7 @@ class Login extends React.Component {
     }
   }
 
-  handleSubmit = (event) =>{
+  handleSubmit = (event) => {
     event.preventDefault()
     var nameValue = document.getElementById("email").value;
     var password = document.getElementById("password").value;
@@ -95,22 +98,23 @@ class Login extends React.Component {
       document.getElementById('passwordMessage').innerHTML = ""
       // const loginInfo = { username: nameValue, password: password };
       const loginInfo = { user: { email: nameValue, password: password } }
-      axios.post(`https://ec-chatbot-test.com/api/v1/sign_in`, loginInfo)
+      axios.post(`${EC_CHATBOT_URL}/api/v1/sign_in`, loginInfo)
         .then(res => {
-          document.getElementById("loginErrorMsg").style.display= "none"
+          document.getElementById("loginErrorMsg").style.display = "none"
           console.log(res)
           const persons = res.data;
           if (persons.code === 1 || persons.code === "1") {
             setToken(persons.token)
             Cookies.set('refreshToken', persons.refresh_token); // {path: '/'}
             Cookies.set('user_role', persons.user.role);
+            Cookies.set('user_id', persons.user.id); // {path: '/'}
             Cookies.set('is_auth', 'true');
             // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
             axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
             getToDashboard();
           } else {
             this.setState({ msgNoti: "ユーザー名またはパスワードが間違っています。" })
-            document.getElementById("loginErrorMsg").style.display= "block"
+            document.getElementById("loginErrorMsg").style.display = "block"
             // this.setState({ isOpenNoti: true })
           }
         })
@@ -155,8 +159,8 @@ class Login extends React.Component {
                 </div>
                 <input type="submit" hidden value="Submit"></input>
               </form>
-                <br />
-                <div style={{width:"100%", textAlign:"center"}}><span id="loginErrorMsg" style={{ color: 'red', display:"none" }}>{this.state.msgNoti}</span></div>
+              <br />
+              <div style={{ width: "100%", textAlign: "center" }}><span id="loginErrorMsg" style={{ color: 'red', display: "none" }}>{this.state.msgNoti}</span></div>
               <div style={{ textAlign: "center" }} className="d-grid">
                 <button
                   onClick={this.handleLogin}

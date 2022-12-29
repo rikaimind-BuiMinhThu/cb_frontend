@@ -6,6 +6,7 @@ import { margin } from '@mui/system';
 import api from '../../api/api-management'
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import { event } from 'jquery';
 
 function LoginFacebook({ checkLogin }) {
 
@@ -18,7 +19,7 @@ function LoginFacebook({ checkLogin }) {
   const [userName, setUserName] = useState();
   const [urlImg, setUrlImg] = useState();
   const [username, setUsername] = useState();
-
+  const [accessToken2, setAccessToken2] = useState()
 
   function logoutFB() {
     window.FB.logout(function (response) {   // See the onlogin handler
@@ -37,7 +38,6 @@ function LoginFacebook({ checkLogin }) {
   }
 
   function checkIsExisted() {
-
     // window.FB.init({
     //   appId: '1733245763691008',
     //   cookie: true,
@@ -80,13 +80,15 @@ function LoginFacebook({ checkLogin }) {
 
   function checkLoginState() {
     window.FB.getLoginStatus(function (response) {
+      console.log(response.authResponse.accessToken)
+      setAccessToken2(response.authResponse.accessToken)
       statusChangeCallback(response);
     });
   }
 
   window.fbAsyncInit = function () {
     window.FB.init({
-      appId: '1733245763691008',
+      appId: '921432582592605',
       cookie: true,
       xfbml: true,
       version: 'v14.0'
@@ -163,14 +165,21 @@ function LoginFacebook({ checkLogin }) {
               console.log(ig_id, ig_name)
               var fb_AuthResponse = window.FB.getAuthResponse();
               var data = { "fb_AuthResponse": fb_AuthResponse, "page_id": value, "ig_id": res.id }
+              console.log("data post insta connect", data)
               api.post(`/api/v1/instagram_connect`, data).then(res => {
                 if (res.data.code == 2) {
-                  alert("Code = 2")//Didn't link to insta
+                  alert("This account didn't link to instagram")//Didn't link to insta
                 } else if (res.data.code == 1) {
                   //
                   console.log(res.data)
+                  var page_access_token
+                console.log("get page access token first come to release: ", Cookies.get("page_access_token") )
+                if (Cookies.get("page_access_token") != undefined) {
+                  page_access_token = Cookies.get("page_access_token")
+                }else if(Cookies.get("page_access_token") == undefined){
+                  page_access_token = accessToken2
                 }
-                var page_access_token = Cookies.get("page_access_token");
+
                 //change this to come to releases move to code = 1
                 checkLogin(true, ig_id)
                 axios.get(`https://graph.facebook.com/v14.0/${ig_id}?fields=id,username,ig_id,name,profile_picture_url&access_token=${page_access_token}`).then(res => {
@@ -183,6 +192,8 @@ function LoginFacebook({ checkLogin }) {
                 }).catch(error => {
                   console.log(error)
                 })
+                }
+                
               }).catch(error => {
                 console.log(error)
 
@@ -232,7 +243,7 @@ function LoginFacebook({ checkLogin }) {
             <div style={{ width: "70%", textAlign: "right" }}><Button onClick={() => selectPage(item.id)}>Select</Button></div>
           </div>
         )
-        )) :""}
+        )) : ""}
       </div>
       <div id='logoutFB' style={{ width: "100%", margin: "auto", textAlign: "center", display: "none" }}>
         <Button onClick={() => logoutFB()}>インスタグラムログアウト</Button>
