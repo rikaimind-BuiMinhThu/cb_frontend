@@ -412,7 +412,17 @@ function PushMessage() {
       push_message.variables = varList;
       // var pmAdd = {push_message: {user}}
       console.log({ push_message });
-      if (update == false) {
+      let checkAltTimeAdd = true
+      if (push_message.alternate_send_time == 0 && push_message.excluded_time_to ==0  && push_message.excluded_time_from == 0) {
+        checkAltTimeAdd = false
+        document.getElementById('timeZoneErrNo').style.display = 'block'
+      } else {
+        document.getElementById('timeZoneErrNo').style.display = 'none'
+        checkAltTimeAdd = true
+      }
+      console.log(push_message.alternate_send_time);
+      console.log(push_message.excluded_time_to);
+      if (update == false && checkAltTimeAdd == true) {
         api
           .post(`/api/v1/managements/push_messages?chatbot_id=${bot_id}`, { push_message })
           .then((res) => {
@@ -423,6 +433,7 @@ function PushMessage() {
                 setIsOpenNoti(false);
                 setMsgNoti('');
                 reloadListPM();
+                setIsChecked(false);
               }, 1500);
               setIsOpenAddPM(false);
             } else if (res.data.code == 2) {
@@ -435,27 +446,29 @@ function PushMessage() {
             }
           });
       } else {
-        api
-          .patch(`/api/v1/managements/push_messages/${idPMUpdate}`, { push_message })
-          .then((res) => {
-            if (res.data.code == 1) {
-              setMsgNoti('正常にブッシュメッセージを追加されました！');
-              setIsOpenNoti(true);
-              setTimeout(() => {
-                setIsOpenNoti(false);
-                setMsgNoti('');
-                reloadListPM();
-              }, 1500);
-              setIsOpenAddPM(false);
-            } else if (res.data.code == 2) {
-              console.log(res.data.message);
-            }
-          })
-          .catch((error) => {
-            if (error?.response.data.code == 0) {
-              tokenExpired();
-            }
-          });
+        if (checkAltTimeAdd == true) {
+          api
+            .patch(`/api/v1/managements/push_messages/${idPMUpdate}`, { push_message })
+            .then((res) => {
+              if (res.data.code == 1) {
+                setMsgNoti('正常にブッシュメッセージを追加されました！');
+                setIsOpenNoti(true);
+                setTimeout(() => {
+                  setIsOpenNoti(false);
+                  setMsgNoti('');
+                  reloadListPM();
+                }, 1500);
+                setIsOpenAddPM(false);
+              } else if (res.data.code == 2) {
+                console.log(res.data.message);
+              }
+            })
+            .catch((error) => {
+              if (error?.response.data.code == 0) {
+                tokenExpired();
+              }
+            });
+        }
       }
       // } else {
       //   console.log('empty');
@@ -605,6 +618,9 @@ function PushMessage() {
     console.log(from)
     console.log(to)
     console.log(expectTime)
+    if(parseInt(from) !=0 || parseInt(to) !=0 || parseInt(expectTime) !=0){
+      document.getElementById('timeZoneErrNo').style.display = 'none'
+    }
     if (parseInt(from) >= parseInt(to)) {
       document.getElementById('altTimeFTErr').style.display = 'block'
     } else {
@@ -998,6 +1014,7 @@ function PushMessage() {
                 <div className="push-message-add-form">
                   <span className="push-message-span-form"></span>
                   <span id="timeZoneErr" style={{ display: 'none', width: '80%', color: 'red' }}>代替送信時間を除外時間以外と設定してください。</span>
+                  <span id="timeZoneErrNo" style={{ display: 'none', width: '80%', color: 'red' }}>自動送信プッシュの時間帯除外を入力してください</span>
                 </div>
               </div>
               <div
@@ -1046,12 +1063,12 @@ function PushMessage() {
                         {time}
                       </option>
                     ))}
-                  </select><span style={{width:"55px", margin: '1% 0%'}}>時間後</span>
+                  </select><span style={{ width: "55px", margin: '1% 0%' }}>時間後</span>
                   <div style={{ width: '15%', margin: '1% 1.25%' }}></div>
                 </div>
                 {customDiv.map((item, i) => (
                   <div id={`newCDiv${i}`} style={{ width: '100%', display: 'flex' }} key={i}>
-                    <span style={{width:"10px", margin: '1% 0%'}}></span>
+                    <span style={{ width: "10px", margin: '1% 0%' }}></span>
                     <select
                       name={`newAnd${i}`}
                       id={`newAnd${i}`}
@@ -1114,7 +1131,7 @@ function PushMessage() {
                       id={`value${i}`}
                       defaultValue={update == true ? itemUpdate?.variables[i]?.value : ''}
                       style={{ width: '13%', margin: '1% 1%' }}
-                    /><span style={{width:"55px", margin: '1% 0%'}}></span>
+                    /><span style={{ width: "55px", margin: '1% 0%' }}></span>
                     {/* {alternateSendTime?.map((time, i) => (
                         <option key={i} value={time}>
                           {time}
@@ -1122,8 +1139,10 @@ function PushMessage() {
                       ))}
                     </select> */}
                     <button
-                      style={{ width: '15%', margin: '1% 0% 1% 2%', border:'none',
-                    borderRadius:'5px', backgroundColor:"#ff3333", color:"white" }}
+                      style={{
+                        width: '15%', margin: '1% 0% 1% 2%', border: 'none',
+                        borderRadius: '5px', backgroundColor: "#ff3333", color: "white"
+                      }}
                       onClick={(e) => deleteCDiv(e, i)}
                     >
                       削除
