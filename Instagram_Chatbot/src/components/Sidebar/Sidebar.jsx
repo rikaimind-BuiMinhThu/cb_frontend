@@ -309,7 +309,7 @@ function Sidebar(props) {
               key={'account-information'}
             >
               <NavLink
-                to="/admin/dashboard"
+                to="/admin/bot"
                 onClick={() => hideWebChatList()}
                 className="nav-link"
                 activeClassName="active"
