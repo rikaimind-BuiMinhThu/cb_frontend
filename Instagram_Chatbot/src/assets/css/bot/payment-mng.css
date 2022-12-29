@@ -172,3 +172,14 @@
   padding: 5px 10px;
   margin-left: 10px;
 }
+/* table */
+table.payment-gateway__table {
+  text-align: center;
+  table-layout: fixed;
+  overflow: hidden;
+  border: 1px solid;
+}
+table.payment-gateway__table thead tr th,
+table.payment-gateway__table td {
+  border: 1px solid #7186a0;
+}

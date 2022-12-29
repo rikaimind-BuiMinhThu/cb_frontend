@@ -100,8 +100,8 @@ function PaymentGateway() {
               <CardHeader>決済ゲートウェイ名</CardHeader>
               <CardBody>
                 <h6>決済ゲートウェイ一覧</h6>
-                <Table>
-                  <thead>
+                <Table className="payment-gateway__table">
+                  <thead className="text-primary">
                     <tr>
                       <th style={{ width: '5%' }}>No.</th>
                       <th style={{ width: '12.5%' }}>決済ゲートウェイ名</th>
