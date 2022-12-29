@@ -16,7 +16,6 @@ import ModalShort from './Popup/ModalShort';
 import $ from 'jquery';
 import { tokenExpired } from 'api/tokenExpired';
 
-
 function UserManagement() {
   var [dataList, setDataList] = useState([]);
   var [detailData, setDetailData] = useState({});
@@ -24,7 +23,7 @@ function UserManagement() {
   var [detailUpdateTitle, setDetailUpdateTitle] = useState();
   var [disableInput, setDisableInput] = useState();
   var [inputValueFullName, setInputValueFullName] = useState();
-  var [clientIdUpdate, setClientIdUpdate] = useState()
+  var [clientIdUpdate, setClientIdUpdate] = useState();
   //Update
   var [name, setName] = useState('');
   var [email, setEmail] = useState('');
@@ -100,7 +99,7 @@ function UserManagement() {
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }, []);
@@ -125,7 +124,7 @@ function UserManagement() {
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }, []);
@@ -153,7 +152,7 @@ function UserManagement() {
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }
@@ -180,7 +179,7 @@ function UserManagement() {
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }
@@ -199,14 +198,14 @@ function UserManagement() {
   }
 
   function updateClientUser(item) {
-    console.log(item);
+    // console.log(item);
     setDisableInput(false);
     setDetailUpdateTitle('ユーザー編集');
     setDetailData(item);
     // setInputValueFullName(item.full_name)
     setName(item.full_name);
     setUpdateId(item.id);
-    setClientIdUpdate(item.client_id)
+    setClientIdUpdate(item.client_id);
     // setEnglishName(item.english_name)
     setEmail(item.email);
     setRole(item.role);
@@ -234,7 +233,7 @@ function UserManagement() {
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
-          tokenExpired()
+          tokenExpired();
         }
       });
   }
@@ -303,7 +302,7 @@ function UserManagement() {
         var item = elements.item(i);
         obj[item.name] = item.value;
       }
-      obj.client_id = client_id_update
+      obj.client_id = client_id_update;
       if (passwordUpdate === '' && confirmPasswordUpdate === '') {
         delete obj.password;
         delete obj.password_confirmation;
@@ -321,7 +320,7 @@ function UserManagement() {
         .catch((error) => {
           console.log(error);
           if (error.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     } else {
@@ -448,7 +447,7 @@ function UserManagement() {
         .catch((error) => {
           console.log(error);
           if (error.response?.data.code === 0) {
-            tokenExpired()
+            tokenExpired();
           }
         });
     } else {
@@ -790,12 +789,11 @@ function UserManagement() {
                     id="nameUpdate"
                     name="full_name"
                   />
-                  <label
-                    id="名称ErrMsg"
-                    className="input-field"
-                    style={{ display: 'none', color: 'red' }}
-                  ></label>
                 </label>
+                <span
+                  id="名称ErrMsg"
+                  style={{ display: 'none', color: 'red', float: 'right', width: '70%' }}
+                ></span>
                 <br />
                 <br />
                 <label className="label-input">
@@ -812,19 +810,18 @@ function UserManagement() {
                     id="updateEmail"
                     name="email"
                   />
-                  <label
-                    id="newUserメールアドレスErrMsg"
-                    className="input-field"
-                    style={{ display: 'none', color: 'red' }}
-                  ></label>
                 </label>
+                <span
+                  id="newUserメールアドレスErrMsg"
+                  style={{ display: 'none', color: 'red', float: 'right', width: '70%' }}
+                ></span>
                 <br />
                 <br />
 
                 <label className="label-input">
                   クライアント<span className="span-require">*必須</span>
                   <select
-                  id='client_id_update'
+                    id="client_id_update"
                     style={{ padding: '3px 0px 3px 0px' }}
                     // value={clientName}
                     onChange={(e) => setClientName(e.target.value)}
@@ -859,12 +856,11 @@ function UserManagement() {
                     <option value="admin_client">クライアント</option>
                     <option value="client">ユーザー</option>
                   </select>
-                  <label
-                    id="newClientTikTokCreateErrMsg"
-                    className="input-field"
-                    style={{ display: 'none', color: 'red' }}
-                  ></label>
                 </label>
+                <span
+                  id="newClientTikTokCreateErrMsg"
+                  style={{ display: 'none', color: 'red', float: 'right', width: '70%' }}
+                ></span>
                 <br />
                 <br />
 
@@ -882,12 +878,11 @@ function UserManagement() {
                     id="updatePassword"
                     name="password"
                   />
-                  <label
-                    id="パスワードErrMsg"
-                    className="input-field"
-                    style={{ display: 'none', color: 'red' }}
-                  ></label>
                 </label>
+                <span
+                  id="パスワードErrMsg"
+                  style={{ display: 'none', color: 'red', float: 'right', width: '70%' }}
+                ></span>
                 <br />
                 <br />
 
@@ -901,12 +896,11 @@ function UserManagement() {
                     id="updateConfirmPassword"
                     name="password_confirmation"
                   />
-                  <label
-                    id="パスワード(確認用)ErrMsg"
-                    className="input-field"
-                    style={{ display: 'none', color: 'red' }}
-                  ></label>
                 </label>
+                <span
+                  id="パスワード(確認用)ErrMsg"
+                  style={{ display: 'none', color: 'red', float: 'right', width: '70%' }}
+                ></span>
                 <br />
                 <br />
 
@@ -932,12 +926,11 @@ function UserManagement() {
                     id="newName"
                     name="full_name"
                   />
-                  <label
-                    id="newUser名称ErrMsg"
-                    className="input-field"
-                    style={{ display: 'none', color: 'red' }}
-                  ></label>
                 </label>
+                <span
+                  id="newUser名称ErrMsg"
+                  style={{ display: 'none', color: 'red', float: 'right', width: '70%' }}
+                ></span>
                 <br />
                 <br />
                 <label className="label-input">
@@ -949,12 +942,11 @@ function UserManagement() {
                     id="newEmail"
                     name="email"
                   />
-                  <label
-                    id="newUserメールアドレスErrMsg"
-                    className="input-field"
-                    style={{ display: 'none', color: 'red' }}
-                  ></label>
                 </label>
+                <span
+                  id="newUserメールアドレスErrMsg"
+                  style={{ display: 'none', color: 'red', float: 'right', width: '70%' }}
+                ></span>
                 <br />
                 <br />
 
@@ -967,12 +959,11 @@ function UserManagement() {
                     id="newPassword"
                     name="password"
                   />
-                  <label
-                    id="newUserパスワードErrMsg"
-                    className="input-field"
-                    style={{ display: 'none', color: 'red' }}
-                  ></label>
                 </label>
+                <span
+                  id="newUserパスワードErrMsg"
+                  style={{ display: 'none', color: 'red', float: 'right', width: '70%' }}
+                ></span>
                 <br />
                 <br />
                 <label className="label-input">
@@ -986,12 +977,11 @@ function UserManagement() {
                     id="newConfirmPassword"
                     name="confirm_password"
                   />
-                  <label
-                    id="newUserパスワード(確認用)ErrMsg"
-                    className="input-field"
-                    style={{ display: 'none', color: 'red' }}
-                  ></label>
                 </label>
+                <span
+                  id="newUserパスワード(確認用)ErrMsg"
+                  style={{ display: 'none', color: 'red', float: 'right', width: '70%' }}
+                ></span>
                 <br />
                 <br />
                 <label className="label-input">
@@ -1025,12 +1015,11 @@ function UserManagement() {
                     <option value="admin_client">クライアント</option>
                     <option value="client">ユーザー</option>
                   </select>
-                  <label
-                    id="newClientTikTokCreateErrMsg"
-                    className="input-field"
-                    style={{ display: 'none', color: 'red' }}
-                  ></label>
                 </label>
+                <span
+                  id="newClientTikTokCreateErrMsg"
+                  style={{ display: 'none', color: 'red', float: 'right', width: '70%' }}
+                ></span>
                 <br />
                 <br />
                 <Button id="btnSubmit" onClick={addClient}>
@@ -1058,4 +1047,3 @@ function UserManagement() {
 }
 
 export default UserManagement;
-

@@ -278,7 +278,7 @@ function AddPaymentGateway() {
                     id="pm_gw_name"
                     className="add-payment-gateway-input-form"
                     onChange={(e) => checkPmGWName(e.target.value)}
-                    defaultValue={`${detailGw == undefined ? '' : detailGw.gateway_name}`}
+                    defaultValue={detailGw ? detailGw.gateway_name : ''}
                   ></input>
                 </div>
                 <div
@@ -320,14 +320,22 @@ function AddPaymentGateway() {
                   </span>
                   <select
                     id="pm_gw_mode"
-                    defaultValue={`${detailGw == undefined ? 'test' : detailGw.mode}`}
+                    defaultValue={!detailGw ? 'test' : detailGw.mode}
                     className="add-payment-gateway-input-form"
                   >
                     <option value="test">テスト</option>
                     <option value="production">本番</option>
                   </select>
                 </div>
-                <div id="GMO_pay">
+                <div
+                  id="GMO_pay"
+                  style={{
+                    display:
+                      detailGw?.payment_agency && detailGw?.payment_agency === 'np_payment'
+                        ? 'none'
+                        : 'block',
+                  }}
+                >
                   <div className="add-payment-gateway-add-form">
                     <span className="add-payment-gateway-span-form">
                       ショップID
@@ -336,7 +344,7 @@ function AddPaymentGateway() {
                     <input
                       id="pm_gw_shop_id"
                       onChange={(e) => checkPMGWShopId(e.target.value)}
-                      defaultValue={`${detailGw == undefined ? '' : detailGw.shop_id}`}
+                      defaultValue={!detailGw ? '' : detailGw.shop_id}
                       className="add-payment-gateway-input-form"
                     ></input>
                   </div>
@@ -364,7 +372,15 @@ function AddPaymentGateway() {
                     ></input>
                   </div>
                 </div>
-                <div id="NP_pay" style={{ display: 'none' }}>
+                <div
+                  id="NP_pay"
+                  style={{
+                    display:
+                      detailGw?.payment_agency && detailGw?.payment_agency === 'np_payment'
+                        ? 'block'
+                        : 'none',
+                  }}
+                >
                   <div className="add-payment-gateway-add-form">
                     <span className="add-payment-gateway-span-form">
                       加盟店コード
@@ -372,7 +388,7 @@ function AddPaymentGateway() {
                     </span>
                     <input
                       id="pm_gw_merchant_code"
-                      defaultValue={`${detailGw == undefined ? '' : detailGw.merchant_code}`}
+                      defaultValue={!detailGw ? '' : detailGw.merchant_code}
                       className="add-payment-gateway-input-form"
                       onChange={() => {
                         document.getElementById('merchant_code_err').style.display = 'none';
@@ -399,7 +415,7 @@ function AddPaymentGateway() {
                     </span>
                     <input
                       id="pm_gw_sp_code"
-                      defaultValue={`${detailGw == undefined ? '' : detailGw.sp_code}`}
+                      defaultValue={!detailGw ? '' : detailGw.sp_code}
                       className="add-payment-gateway-input-form"
                       onChange={() => {
                         document.getElementById('sp_code_err').style.display = 'none';
@@ -426,7 +442,7 @@ function AddPaymentGateway() {
                     </span>
                     <input
                       id="pm_gw_terminal_id"
-                      defaultValue={`${detailGw == undefined ? '' : detailGw.terminal_id}`}
+                      defaultValue={!detailGw ? '' : detailGw.terminal_id}
                       className="add-payment-gateway-input-form"
                       onChange={() => {
                         document.getElementById('terminal_id_err').style.display = 'none';

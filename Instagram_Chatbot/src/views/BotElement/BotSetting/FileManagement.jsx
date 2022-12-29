@@ -296,7 +296,7 @@ function FileManagement() {
                 </div>
               </CardHeader>
               <CardBody>
-                <Table>
+                <Table className='file-mng__table'>
                   <thead className="text-primary">
                     <tr>
                       <th style={{ width: '10%' }}>No.</th>
