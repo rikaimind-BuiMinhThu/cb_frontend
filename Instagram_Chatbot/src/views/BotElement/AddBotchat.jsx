@@ -189,11 +189,13 @@ function AddBotchat() {
         .then((res) => {
           if (res.data.code === 1 || res.data.code === '1') {
             Cookies.set('bot_id', res.data.data.id);
+            Cookies.set('bot_type', 'bot');
             setMsgNoti('ボットを正常に作成されました！');
             setIsOpenNoti(true);
             setTimeout(() => {
               setMsgNoti('');
               setIsOpenNoti(false);
+              
               window.location.href = '/admin/scenario-list';
             }, 1500);
           } else if (res.data?.code === 2 || res.data?.code === '2') {
