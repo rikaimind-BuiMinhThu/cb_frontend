@@ -15,6 +15,7 @@ class Login extends React.Component {
   constructor(props) {
     super(props);
     this.state = { token: '', navigator: 'false', msgNoti: '', isOpenNoti: false }
+    Cookies.remove('bot_type')
   }
 
   handleLogin = (props) => {

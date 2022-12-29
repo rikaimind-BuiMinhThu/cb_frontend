@@ -180,7 +180,7 @@ function Sidebar(props) {
               >
                 {/* <i className="nc-icon nc-bank" style={{ color: 'black' }} /> */}
                 {/* <MDBIcon fab icon="instagram" style={{ color: "black" }} /> */}
-                <i class="fab fa-instagram"  style={{ color: 'black', fontWeight:"800" }}></i>
+                <i class="fab fa-instagram" style={{ color: 'black', fontWeight: "800" }}></i>
                 <p>Instagram Chatbot</p>
               </NavLink>
               <ul id="instaDropdown" style={{ display: 'none', marginLeft: '-30px' }}>
@@ -195,7 +195,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-atom" style={{ color: 'black' }} /> */}
-                    <i class="fas fa-atom"  style={{ color: 'black' }}></i>
+                    <i class="fas fa-atom" style={{ color: 'black' }}></i>
                     <p style={{ color: 'black' }}>チャットボット作成</p>
                   </NavLink>
                 </li>
@@ -210,7 +210,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-key-25" style={{ color: 'black' }} /> */}
-                    <i class="fas fa-key"  style={{ color: 'black' }}></i>
+                    <i class="fas fa-key" style={{ color: 'black' }}></i>
                     <p style={{ color: 'black' }}>キーワード設定</p>
                   </NavLink>
                 </li>
@@ -225,7 +225,7 @@ function Sidebar(props) {
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-air-baloon" style={{ color: 'black' }} /> */}
-                    <i class="fab fa-fly"  style={{ color: 'black' }}></i>
+                    <i class="fab fa-fly" style={{ color: 'black' }}></i>
                     <p style={{ color: 'black' }}>リリース</p>
                   </NavLink>
                 </li>
@@ -252,7 +252,7 @@ function Sidebar(props) {
                         activeClassName="active"
                         activeStyle={{ color: 'black' }}
                       >
-                        <i className="nc-icon nc-bulb-63" style={{ color: 'black', fontWeight:"800" }} />
+                        <i className="nc-icon nc-bulb-63" style={{ color: 'black', fontWeight: "800" }} />
                         <p style={{ color: 'black' }}>サマリー</p>
                       </NavLink>
                     </li>
@@ -266,7 +266,7 @@ function Sidebar(props) {
                         activeClassName="active"
                         activeStyle={{ color: 'black' }}
                       >
-                        <i className="nc-icon nc-bullet-list-67" style={{ color: 'black', fontWeight:'800' }} />
+                        <i className="nc-icon nc-bullet-list-67" style={{ color: 'black', fontWeight: '800' }} />
                         <p style={{ color: 'black' }}>ユーザー一覧</p>
                       </NavLink>
                     </li>
@@ -374,7 +374,7 @@ function Sidebar(props) {
                   >
                     {/* <i className="nc-icon nc-bulb-63" style={{ color: 'black' }} /> */}
                     <MDBIcon fas icon="list" style={{ color: "black" }} />
-                    
+
                     <p style={{ color: 'black' }}>ボット一覧</p>
                   </NavLink>
                 </li>
@@ -398,39 +398,39 @@ function Sidebar(props) {
                 </li> */}
               </ul>
             </li>
-            <li  style={{ listStyleType: 'none', marginLeft: '-50px' }}
-                  id="sidebarClient"
-                  className={activeRoute('client-management') + (true ? ' active-pro' : '')}
-                  key={'client-management'}
-                >
-                  <NavLink
-                    to="/admin/client-management"
-                    className="nav-link"
-                    activeClassName="active"
-                    activeStyle={{ color: 'black' }}
-                  >
-                    {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="user-tie" style={{ color: "black" }} />
-                    <p style={{ color: 'black' }}>クライアント管理</p>
-                  </NavLink>
-                </li>
-                <li
-                 style={{ listStyleType: 'none', marginLeft: '-50px' }}
-                  id="sidebarUser"
-                  className={activeRoute('user-management') + (true ? ' active-pro' : '')}
-                  key={'user-management'}
-                >
-                  <NavLink
-                    to="/admin/user-management"
-                    className="nav-link"
-                    activeClassName="active"
-                    activeStyle={{ color: 'black' }}
-                  >
-                    {/* <i className="nc-icon nc-circle-10" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="user" style={{ color: "black" }} />
-                    <p style={{ color: 'black' }}>ユーザー管理</p>
-                  </NavLink>
-                </li>
+            <li style={{ listStyleType: 'none', marginLeft: '-50px' }}
+              id="sidebarClient"
+              className={activeRoute('client-management') + (true ? ' active-pro' : '')}
+              key={'client-management'}
+            >
+              <NavLink
+                to="/admin/client-management"
+                className="nav-link"
+                activeClassName="active"
+                activeStyle={{ color: 'black' }}
+              >
+                {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
+                <MDBIcon fas icon="user-tie" style={{ color: "black" }} />
+                <p style={{ color: 'black' }}>クライアント管理</p>
+              </NavLink>
+            </li>
+            <li
+              style={{ listStyleType: 'none', marginLeft: '-50px' }}
+              id="sidebarUser"
+              className={activeRoute('user-management') + (true ? ' active-pro' : '')}
+              key={'user-management'}
+            >
+              <NavLink
+                to="/admin/user-management"
+                className="nav-link"
+                activeClassName="active"
+                activeStyle={{ color: 'black' }}
+              >
+                {/* <i className="nc-icon nc-circle-10" style={{ color: 'black' }} /> */}
+                <MDBIcon fas icon="user" style={{ color: "black" }} />
+                <p style={{ color: 'black' }}>ユーザー管理</p>
+              </NavLink>
+            </li>
           </ul>
           <ul id="side_bar_bot">
             <li
