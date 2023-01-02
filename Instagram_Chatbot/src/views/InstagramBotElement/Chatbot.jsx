@@ -120,7 +120,8 @@ function Chatbot() {
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups?page=1`).then(res => {
       console.log("message_groups: ", res.data.data.length)
-      var idli = []
+      if(res.data.data !== [] && res.data.total!== 0){
+        var idli = []
       for (var i = 0; i < res.data.data.length; i++) {
         idli.push(res.data.data[i].id)
         // 
@@ -138,6 +139,8 @@ function Chatbot() {
 
         }
       }, 1000)
+      }
+
     }).catch(error => {
       console.log(error);
       if (error.response?.data.code === 0) {

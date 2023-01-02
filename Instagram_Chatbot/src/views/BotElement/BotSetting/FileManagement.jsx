@@ -36,8 +36,10 @@ function FileManagement() {
       .get(`/api/v1/managements/file?page=1`)
       .then((res) => {
         // console.log('file management: ', res.data);
-        setFiles(res.data?.data);
+        if(res.data.data !== [] && res.data.total !== 0){
+          setFiles(res.data?.data);
         setTotalPage(Math.ceil(res.data?.total / 25));
+        }
       })
       .catch((err) => {
         console.log(err);

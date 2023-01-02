@@ -38,9 +38,11 @@ function VariableManagement() {
     api
       .get(`/api/v1/managements/chatbots/${bot_id}/variables?page=1`)
       .then((res) => {
-        console.log(res.data.data);
-        setListVariable(res.data.data);
-        setTotalPage(Math.ceil(res.data.total / 25));
+        if (res.data.data !== [] && res.data.total !== 0) {
+          console.log(res?.data);
+          setListVariable(res?.data?.data);
+          setTotalPage(Math.ceil(res?.data?.total / 25));
+        }
       })
       .catch((err) => {
         console.log(err);

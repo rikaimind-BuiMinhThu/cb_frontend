@@ -31,10 +31,13 @@ function ListEmail() {
         .then((res) => {
           console.log(res.data);
           if (res.data?.code === 1) {
-            setEmailList(res.data?.data);
-            var totalPage = Math.ceil(res.data.total / 25);
-            setTotalPage(totalPage);
-            setClientEmail(res?.data?.client_email);
+            if (res.data.data !== [] && res.data.total !== 0) {
+              setEmailList(res.data?.data);
+              var totalPage = Math.ceil(res.data.total / 25);
+              setTotalPage(totalPage);
+              setClientEmail(res?.data?.client_email);
+            }
+
           }
         })
         .catch((err) => {

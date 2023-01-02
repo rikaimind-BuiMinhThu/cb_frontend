@@ -27,9 +27,12 @@ function ReplyMailManagement() {
       .then((res) => {
         console.log('client_emails: ', res.data);
         if (res.data?.code === 1) {
-          setReplyMails(res.data?.data);
+          if(res.data.data !==[] && res.data.total !==0){
+            setReplyMails(res.data?.data);
           var totalPage = Math.ceil(res.data?.total / 25);
           setTotalPage(totalPage);
+          }
+
         }
       })
       .catch((error) => {
