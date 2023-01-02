@@ -119,7 +119,7 @@ function VariableManagement() {
               setMsgNoti(``);
             }, 2000);
             const list = document.getElementById(`new_var_add_${index}`);
-            if (list.hasChildNodes()) {
+            while (list.hasChildNodes()) {
               list.removeChild(list.firstChild);
             }
             document.getElementById('add_new_var').removeAttribute('disabled');
@@ -137,7 +137,7 @@ function VariableManagement() {
   function cancelSaveNewVakr(index) {
     const list = document.getElementById(`new_var_add_${index}`);
     // console.log(list)
-    if (list.hasChildNodes()) {
+    while (list.hasChildNodes()) {
       list.removeChild(list.firstChild);
     }
     document.getElementById('add_new_var').removeAttribute('disabled');
