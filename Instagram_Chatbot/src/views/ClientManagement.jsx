@@ -118,18 +118,21 @@ function ClientManagement() {
       .get(`/api/v1/managements/clients`, paramSearch)
       .then((res) => {
         console.log('list client: ', res.data.data);
-        var totalPage = Math.ceil(res.data.data.total / 25);
-        setTotalPage(totalPage);
-        setDataList(res.data.data);
-        document.getElementById('searchUser').addEventListener('keypress', (e) => {
-          // e.preventDefault()
-          if (e.key === 'Enter') {
-            // Cancel the default action, if needed
-            e.preventDefault();
-            // Trigger the button element with a click
-            search();
-          }
-        });
+        if (res.data.data.total !== 0) {
+          var totalPage = Math.ceil(res.data.data.total / 25);
+          setTotalPage(totalPage);
+          setDataList(res.data.data);
+          document.getElementById('searchUser').addEventListener('keypress', (e) => {
+            // e.preventDefault()
+            if (e.key === 'Enter') {
+              // Cancel the default action, if needed
+              e.preventDefault();
+              // Trigger the button element with a click
+              search();
+            }
+          });
+        }
+
       })
       .catch((error) => {
         console.log(error);
@@ -307,7 +310,7 @@ function ClientManagement() {
         setContract(data.status);
         setPlan(data.plan);
         setPrice(data.price);
-        if (data.subscription_start_at != null ) {
+        if (data.subscription_start_at != null) {
           console.log(data.subscription_start_at)
           setInputStartDate(new Date(data.subscription_start_at));
         } else {
@@ -394,7 +397,7 @@ function ClientManagement() {
         setContract(data.status);
         setPlan(data.plan);
         setPrice(data.price);
-        if (data.subscription_start_at != null ) {
+        if (data.subscription_start_at != null) {
           console.log(data.subscription_start_at)
           setInputStartDate(new Date(data.subscription_start_at));
         } else {
@@ -940,12 +943,12 @@ function ClientManagement() {
       if (utils.checkPhoneNumber(phone, '電話番号') !== true) {
         utils.checkPhoneNumber(phone, '電話番号');
       }
-      if(inputEndDateAdd != '' && inputStartDateAdd != ''){
+      if (inputEndDateAdd != '' && inputStartDateAdd != '') {
         if (dateCheck === false) {
-        utils.checkDateEndIn(inputEndDateAdd.toISOString().slice(0, 10), inputStartDateAdd.toISOString().slice(0, 10));
+          utils.checkDateEndIn(inputEndDateAdd.toISOString().slice(0, 10), inputStartDateAdd.toISOString().slice(0, 10));
+        }
       }
-      }
-      
+
       if (getBaseUrlAdd() === false) {
         getBaseUrlAdd();
       }
@@ -1117,7 +1120,7 @@ function ClientManagement() {
     if (inputEndDateAdd != '') {
       utils.checkDateEndIn(inputEndDateAdd.toISOString().slice(0, 10), inputdate.toISOString().slice(0, 10));
     }
-   
+
     if (document.getElementById('startDate').value.toString() === '') {
       document.getElementById(`newClientStartErrMsg`).style.display = 'block';
       document.getElementById(`newClientStartErrMsg`).innerHTML = `開始日を入力してください。`;
@@ -1139,14 +1142,14 @@ function ClientManagement() {
 
   function checkEndDateAdd(endDateIn) {
     console.log('check end date: ', endDateIn)
-    if(inputStartDateAdd != ''){
+    if (inputStartDateAdd != '') {
       utils.checkDateEndIn(endDateIn.toISOString().slice(0, 10), inputStartDateAdd.toISOString().slice(0, 10));
       if (utils.checkDateEndIn(endDateIn.toISOString().slice(0, 10), inputStartDateAdd.toISOString().slice(0, 10)) === true) {
         setInputEndDateAdd(endDateIn);
       }
     }
-    
-    
+
+
     setInputEndDateAdd(endDateIn);
   }
   function setContractInput(data) {
@@ -1764,9 +1767,9 @@ function ClientManagement() {
                       locale='ja'
                       value={
                         (inputStartDate == '' || inputStartDate == null)
-                        ? 'yyyy/mm/dd'
+                          ? 'yyyy/mm/dd'
                           : inputStartDate.toISOString().slice(0, 10).replaceAll('-', '/')
-                          
+
                       }
                     />
                   </div>
@@ -1809,8 +1812,8 @@ function ClientManagement() {
                       locale='ja'
                       value={
                         (inputEndDate == '' || inputEndDate == null)
-                        ? 'yyyy/mm/dd'
-                        :inputEndDate.toISOString().slice(0, 10).replaceAll('-', '/')
+                          ? 'yyyy/mm/dd'
+                          : inputEndDate.toISOString().slice(0, 10).replaceAll('-', '/')
                       }
                     />
                   </div>

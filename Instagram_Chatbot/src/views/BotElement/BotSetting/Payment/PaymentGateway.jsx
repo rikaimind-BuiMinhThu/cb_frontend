@@ -40,8 +40,10 @@ function PaymentGateway() {
       .then((res) => {
         console.log(res.data.data);
         if (res?.data?.code == 1) {
-          setGateway(res.data.data);
+          if(res.data.data !== [] && res.data.total !==0){
+            setGateway(res.data.data);
           setTotalPage(Math.ceil(res.data?.total / 25));
+          }
         }
       })
       .catch((error) => {

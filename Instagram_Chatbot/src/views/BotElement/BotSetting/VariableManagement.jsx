@@ -38,9 +38,12 @@ function VariableManagement() {
     api
       .get(`/api/v1/managements/chatbots/${bot_id}/variables?page=1`)
       .then((res) => {
-        console.log(res.data.data);
-        setListVariable(res.data.data);
-        setTotalPage(Math.ceil(res.data.total / 25));
+        if (res.data.data !== [] && res.data.total !== 0) {
+          console.log(res?.data);
+          setListVariable(res?.data?.data);
+          setTotalPage(Math.ceil(res?.data?.total / 25));
+        }
+
       })
       .catch((err) => {
         console.log(err);
@@ -116,7 +119,7 @@ function VariableManagement() {
               setMsgNoti(``);
             }, 2000);
             const list = document.getElementById(`new_var_add_${index}`);
-            while (list.hasChildNodes()) {
+            if (list.hasChildNodes()) {
               list.removeChild(list.firstChild);
             }
             document.getElementById('add_new_var').removeAttribute('disabled');
@@ -134,7 +137,7 @@ function VariableManagement() {
   function cancelSaveNewVakr(index) {
     const list = document.getElementById(`new_var_add_${index}`);
     // console.log(list)
-    while (list.hasChildNodes()) {
+    if (list.hasChildNodes()) {
       list.removeChild(list.firstChild);
     }
     document.getElementById('add_new_var').removeAttribute('disabled');
