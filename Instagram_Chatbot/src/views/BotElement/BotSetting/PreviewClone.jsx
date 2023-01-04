@@ -445,6 +445,7 @@ function Preview() {
                     }).then(() => {
                       setIndexMessageRender(i);
                       renderMessage.pop();
+                      renderMessage.push({});
                       setRenderMessageArr([
                         ...renderMessage
                       ]);
@@ -501,6 +502,10 @@ function Preview() {
                       tokenExpired();
                     }
                   });
+                  renderMessage.push({});
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
                   setIndexMessageRender(i);
                   index = i;
                 } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
@@ -515,6 +520,10 @@ function Preview() {
                     });
                     setVariables([...variables]);
                   }
+                  renderMessage.push({});
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
                   setIndexMessageRender(i);
                   index = i;
                 } else if (messageArr[i]?.message_content[0]?.type === 'clear_variable') {
@@ -529,9 +538,17 @@ function Preview() {
                     });
                     setVariables([...variables]);
                   }
+                  renderMessage.push({});
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
                   setIndexMessageRender(i);
                   index = i;
                 } else if (messageArr[i]?.message_content[0]?.type === 'pause') {
+                  renderMessage.push({});
+                  setRenderMessageArr([
+                    ...renderMessage
+                  ]);
                   setIndexMessageRender(i);
                   index = i;
                   break;
@@ -1385,6 +1402,7 @@ function Preview() {
                 }).then(() => {
                   setIndexMessageRender(i)
                   renderMessage.pop();
+                  renderMessage.push({});
                   setRenderMessageArr([
                     ...renderMessage
                   ]);
@@ -1436,6 +1454,10 @@ function Preview() {
               let data = {
                 variables: variablesData
               }
+              renderMessage.push({});
+              setRenderMessageArr([
+                ...renderMessage
+              ]);
 
               api.post(`/api/v1/managements/emails/${emailId}/send_email`, data).then(res => {
               }).catch((error) => {
@@ -1458,6 +1480,10 @@ function Preview() {
                 });
                 setVariables([...variables]);
               }
+              renderMessage.push({});
+              setRenderMessageArr([
+                ...renderMessage
+              ]);
               setIndexMessageRender(i);
               index = i;
             } else if (dataMessages[i]?.message_content[0]?.type === 'clear_variable') {
@@ -1472,9 +1498,17 @@ function Preview() {
                 });
                 setVariables([...variables]);
               }
+              renderMessage.push({});
+              setRenderMessageArr([
+                ...renderMessage
+              ]);
               setIndexMessageRender(i);
               index = i;
             } else if (dataMessages[i]?.message_content[0]?.type === 'pause') {
+              renderMessage.push({});
+              setRenderMessageArr([
+                ...renderMessage
+              ]);
               setIndexMessageRender(i);
               index = i;
               break;
@@ -1657,6 +1691,7 @@ function Preview() {
                   }).then(() => {
                     setIndexMessageRender(i);
                     renderMessage.pop();
+                    renderMessage.push({});
                     setRenderMessageArr([
                       ...renderMessage
                     ]);
@@ -1668,6 +1703,34 @@ function Preview() {
                     }, dataMessages[i]?.message_content[0]?.delay?.content * 1000);
                   })
                 }
+                index = i;
+              } else if (dataMessages[i]?.message_content[0]?.type === 'email') {
+                let emailId = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].contentId;
+                let variablesData = {};
+                dataVariables.forEach(item => {
+                  variablesData[item.variable_name] = item.default_value;
+                });
+
+                variables.forEach(item => {
+                  variablesData[item.variable_name] = item.default_value;
+                });
+
+                let data = {
+                  variables: variablesData
+                }
+                renderMessage.push({});
+                setRenderMessageArr([
+                  ...renderMessage
+                ]);
+
+                api.post(`/api/v1/managements/emails/${emailId}/send_email`, data).then(res => {
+                }).catch((error) => {
+                  console.log(error);
+                  if (error.response?.data.code === 0) {
+                    tokenExpired()
+                  }
+                });
+                setIndexMessageRender(i);
                 index = i;
               } else if (dataMessages[i]?.message_content[0]?.type === 'variable_set') {
                 if (variables.length !== 0) {
@@ -1681,6 +1744,10 @@ function Preview() {
                   });
                   setVariables([...variables]);
                 }
+                renderMessage.push({});
+                setRenderMessageArr([
+                  ...renderMessage
+                ]);
                 setIndexMessageRender(i);
                 index = i;
               } else if (dataMessages[i]?.message_content[0]?.type === 'clear_variable') {
@@ -1695,9 +1762,17 @@ function Preview() {
                   });
                   setVariables([...variables]);
                 }
+                renderMessage.push({});
+                setRenderMessageArr([
+                  ...renderMessage
+                ]);
                 setIndexMessageRender(i);
                 index = i;
               } else if (dataMessages[i]?.message_content[0]?.type === 'pause') {
+                renderMessage.push({});
+                setRenderMessageArr([
+                  ...renderMessage
+                ]);
                 setIndexMessageRender(i);
                 index = i;
                 break;
@@ -1733,6 +1808,11 @@ function Preview() {
                 });
               }
             }
+          } else {
+            renderMessage.push({});
+            setRenderMessageArr([
+              ...renderMessage
+            ]);
           }
         }
       }
@@ -2338,8 +2418,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   const [messageNoti, setMessageNoti] = useState('');
 
   function loadCaptcha(indexContent) {
-    if (document.getElementById(`captcha-${indexMessageRender}-${indexContent}`) && captcha.length !== 0)
-      document.getElementById(`captcha-${indexMessageRender}-${indexContent}`).innerHTML = captcha.filter(item => item.index === indexMessageRender && item.indexContent === indexContent)?.[0]?.data || "";
+    if (document.getElementById(`captcha-${indexMessage}-${indexContent}`) && captcha.length !== 0)
+      document.getElementById(`captcha-${indexMessage}-${indexContent}`).innerHTML = captcha.filter(item => item.index === indexMessage && item.indexContent === indexContent)?.[0]?.data || "";
   }
 
   const stringNullOrEmpty = (string) => {
@@ -2814,9 +2894,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       />
                     </>
                     )}
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${textInput.type}`] &&
+                  {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${textInput.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${textInput.type}`]}
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${textInput.type}`]}
                     </div>
                   }
                 </div>
@@ -2868,9 +2948,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         value={textarea?.type === 'invalid_input' ? textarea[textarea.type]?.content : textarea[textarea.type]?.value}
                       ></textarea>
                     )}
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                  {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -2982,9 +3062,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       })
                     )}
                   </div>
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                  {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -3092,9 +3172,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       </>
                     )}
                   </div>
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                  {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -3536,9 +3616,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       </div>
                     )}
                   </div>
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${pullDown.type}`] &&
+                  {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${pullDown.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${pullDown.type}`]}
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${pullDown.type}`]}
                     </div>
                   }
                 </div>
@@ -3756,9 +3836,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       />
                     </div>
                   }
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                  {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -3804,9 +3884,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       ファイルを選択
                     </Button>
                   </div>
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                  {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -3959,9 +4039,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       />
                     </div>
                   )}
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                  {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -4022,9 +4102,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       />
                     </div>
                   )}
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                  {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -4076,9 +4156,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       })}
                     </div>
                   )}
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                  {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -4280,9 +4360,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       />
                     </div>
                   }
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                  {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -4312,9 +4392,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     {/* {new DOMParser().parseFromString(capture.img, "text/xml").innerHTML} */}
                     <div id={`captcha-${indexMessageRender}-${indexContent}`} style={{ width: '50%' }} onLoad={loadCaptcha(indexContent)}></div>
                   </div>
-                  {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                  {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                     <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                     </div>
                   }
                 </div>
@@ -4446,9 +4526,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                         }}
                                       >-</div>}
                                     />
-                                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
+                                    {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`] &&
                                       <div style={{ color: '#FF7E00', fontSize: '11px', width: '46%', marginLeft: '137px' }}>
-                                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
+                                        {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`]}
                                       </div>
                                     }
                                   </div>
@@ -4567,9 +4647,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                         }}
                                       >-</div>}
                                     />
-                                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
+                                    {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`] &&
                                       <div style={{ color: '#FF7E00', fontSize: '11px', width: '46%', marginLeft: '137px' }}>
-                                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
+                                        {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`]}
                                       </div>
                                     }
                                   </div>
@@ -4668,9 +4748,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                         }}
                                       >-</div>}
                                     />
-                                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
+                                    {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`] &&
                                       <div style={{ color: '#FF7E00', fontSize: '11px' }}>
-                                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
+                                        {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`]}
                                       </div>
                                     }
                                   </div>
@@ -4763,9 +4843,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                         }}
                                       >-</div>}
                                     />
-                                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`] &&
+                                    {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`] &&
                                       <div style={{ color: '#FF7E00', fontSize: '11px' }}>
-                                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}_${indexProduct}`]}
+                                        {errors?.[`message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`]}
                                       </div>
                                     }
                                   </div>
@@ -4780,9 +4860,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       <>
                       </>
                     )}
-                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                    {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                       <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                        {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                       </div>
                     }
                   </div>
@@ -4917,9 +4997,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       <>
                       </>
                     )}
-                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                    {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                       <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                        {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                       </div>
                     }
                   </div>
@@ -4966,9 +5046,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           }
                       }
                     />
-                    {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                    {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                       <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                        {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                        {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                       </div>
                     }
                   </div>
@@ -5301,9 +5381,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           />
                         </div>
                       }
-                      {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`] &&
+                      {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                         <div style={{ color: '#FF7E00', fontSize: '12px' }}>
-                          {errors?.[`message${indexMessageRender}_content${indexContent}_${content.type}`]}
+                          {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
                         </div>
                       }
                     </React.Fragment>
