@@ -190,7 +190,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
       bot_id: Cookies.get('bot_id')
     };
     $.getJSON('https://api.ipregistry.co/?key=tryout', function (data) {
-      console.log(data);
       dataObj.user_ip_address = data.ip;
       dataObj.user_country = data.location.country.name;
       dataObj.user_city = data.location.city;
@@ -269,15 +268,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             messageArr = [...res.data.data?.conversation?.messages];
           }
           let urlThanks = res.data.data?.conversation?.urlThanksPage || '';
-          console.log(messageArr);
-          console.log(res.data.chatbot);
           let variablesAll = res.data?.all_variables || [];
           setDataVariables(variablesAll);
           setDataMessages(messageArr);
           setUrlThanksPage(urlThanks);
           if (res.data.chatbot) {
             let opacity_color, message_color, font_color;
-            console.log(res.data.chatbot.main_color)
             if (res.data.chatbot.main_color === 'blue') {
               opacity_color = '#D6E0EF';
               message_color = '#3CACEF';
@@ -326,7 +322,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
               objParam[item.variable_name] = item.default_value;
             });
           }
-          console.log(objParam);
           setObjParam({ ...objParam });
           let variables = [...res.data.variables];
           let messageUserVar = messageArr.filter(item => item.belong_to === 'user' && item.message_content.length > 0);
@@ -335,11 +330,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           let index;
           let isPauseScroll = false;
           for (let i = 0; i < messageArr.length; i++) {
-            console.log(messageArr[i].message_content)
             if (messageArr[i].hidden !== true) {
               if (messageArr[i].conditions?.length > 0) {
                 var checked = true;
-                console.log(messageArr[i].conditions, 'check conditions')
                 for (let j = 0; j < messageArr[i].conditions.length; j++) {
                   let conditionItem = messageArr[i].conditions[j];
                   if (j === 0) {
@@ -380,7 +373,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 }
               }
               if (messageArr[0].belong_to === 'bot' && messageArr[i].message_content.length > 0) {
-                console.log(i, 'check index message')
                 if (messageArr[i]?.message_content[0]?.type === 'delay') {
                   if (messageArr[i]?.message_content[0]?.delay.typing_on) {
                     await new Promise((resolve) => {
@@ -446,10 +438,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                   let data = {
                     variables: variablesData
                   }
-                  console.log(variablesData, 'checkkkk variables')
 
                   api.post(`/api/v1/managements/emails/${emailId}/send_email`, data).then(res => {
-                    console.log(res);
                   }).catch((error) => {
                     console.log(error);
                     if (error.response?.data.code === 0) {
@@ -459,7 +449,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                   setIndexMessageRender(i);
                   index = i;
                 } else if (messageArr[i]?.message_content[0]?.type === 'variable_set') {
-                  // console.log(dataVariables, 'checkkkk variables')                
                   if (variables.length !== 0) {
                     let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
                     variables.forEach(item => {
@@ -469,13 +458,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         }
                       }
                     });
-                    console.log(variables, 'checkkkk variables');
                     setVariables([...variables]);
                   }
                   setIndexMessageRender(i);
                   index = i;
                 } else if (messageArr[i]?.message_content[0]?.type === 'clear_variable') {
-                  // console.log(dataVariables, 'checkkkk variables')                
                   if (variables.length !== 0) {
                     let dataVarExist = messageArr[i]?.message_content[0][messageArr[i]?.message_content[0].type].variables;
                     variables.forEach(item => {
@@ -485,13 +472,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         }
                       }
                     });
-                    console.log(variables, 'checkkkk variables');
                     setVariables([...variables]);
                   }
                   setIndexMessageRender(i);
                   index = i;
                 } else if (messageArr[i]?.message_content[0]?.type === 'pause') {
-                  // console.log(dataVariables, 'checkkkk variables')                
                   setIndexMessageRender(i);
                   index = i;
                   break;
@@ -501,7 +486,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                       for (let j = 0; j < messageArr[i].message_content.length; j++) {
                         if (messageArr[i].message_content[j].type === 'capture') {
                           api.get(`https://svg-captcha-nodejs.vercel.app/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
-                            console.log(res);
                             captcha.push({
                               index: i,
                               indexContent: j,
@@ -521,7 +505,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     }, 1000);
                   }).then(data => {
                     renderMessage.push(data);
-                    console.log(renderMessage);
                     setIndexMessageRender(i);
                     setRenderMessageArr([
                       ...renderMessage
@@ -563,7 +546,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                   }).then(data => {
                     setIndexMessageRender(i);
                     renderMessage.push(data);
-                    console.log(data);
                     setRenderMessageArr([
                       ...renderMessage
                     ])
@@ -594,7 +576,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 //         messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
                 //           for (let j = 0; j < variables.length; j++) {
                 //             if (variables[j].variable_name === variable) {
-                //               console.log(variables[j].variable_name, 'cehckkkkk')
                 //               return variables[j].default_value;
                 //             }
                 //           }
@@ -622,7 +603,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     for (let j = 0; j < messageArr[i].message_content.length; j++) {
                       if (messageArr[i].message_content[j].type === 'capture') {
                         api.get(`https://svg-captcha-nodejs.vercel.app/captcha?size=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].length}${messageArr[i].message_content[j][messageArr[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${messageArr[i].message_content[j][messageArr[i].message_content[j].type].type}`).then(res => {
-                          console.log(res);
                           captcha.push({
                             index: i,
                             indexContent: j,
@@ -668,7 +648,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
       });
     }
     return () => {
-      console.log('chcekkkkkkkk quitttt')
       clearTimeout(delayRender);
     }
   }, [scenarioId])
@@ -704,9 +683,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
       let limitFrom = contentType[contentType.type]?.character_limit_from || 0;
       let limitTo = contentType[contentType.type]?.character_limit_to || Number.MAX_SAFE_INTEGER;
       if (contentType.require) {
-        console.log(contentType.type, contentType.date_select)
         if (contentType.type === 'text' || contentType.type === 'password') {
-          console.log(contentType[contentType.type].value, 'checklkkkk')
           if (contentType[contentType.type].isSplitInput) {
             if (stringNullOrEmpty(contentType[contentType.type].valueLeft) || stringNullOrEmpty(contentType[contentType.type].valueRight)) {
               errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageError;
@@ -825,7 +802,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           }
         } else if (contentType.type === 'date_selection' || contentType.type === 'embedded') {
           if (stringNullOrEmpty(contentType.date_select)) {
-            console.log(contentType.date_select, 'checckkkk')
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
@@ -845,7 +821,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             isValid = false;
           }
         } else if (contentArr[i].type === 'checkbox') {
-          console.log(contentType.type, contentType)
           if (contentType.type !== 'checkbox_img') {
             if (contentType.checkedValue && contentType.checkedValue.length === 0) {
               errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
@@ -875,7 +850,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             isValid = false;
           }
         } else if (contentArr[i].type === 'capture') {
-          console.log(contentArr[i].type, contentType, 'chechkkkkk');
           if (stringNullOrEmpty(contentType.value)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
@@ -884,7 +858,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             isValid = false;
           }
         } else if (contentArr[i].type === 'product_purchase') {
-          console.log(contentType.initial_selection)
           if (contentType.initial_selection.length === 0) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
@@ -895,13 +868,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             isValid = false;
           }
         } else if (contentArr[i].type === 'product_purchase_radio_button') {
-          console.log(contentType.initial_selection)
           if (contentType.initial_selection.length === 0) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === 'card_payment_radio_button') {
-          console.log(contentType.initial_selection)
           if (contentType.type !== 'picture_radio' && stringNullOrEmpty(contentType.initial_selection)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
@@ -910,7 +881,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             isValid = false;
           }
         } else if (contentArr[i].type === 'textarea') {
-          if (stringNullOrEmpty(contentType[contentType.type].value)) {
+          if (contentType.type === 'text_input' && stringNullOrEmpty(contentType[contentType.type].value)) {
             errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = messageError;
             isValid = false;
           }
@@ -1053,10 +1024,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           isValid = false;
         }
       } else if (contentArr[i].type === 'product_purchase' && contentType.initial_selection.length !== 0) {
-        console.log(contentType);
         contentType.initial_selection.forEach((item, index) => {
           contentType.products.forEach((itemProduct, indexProduct) => {
-            console.log(itemProduct.quantity_select)
             if (item === itemProduct.id && !itemProduct.quantity_select) {
               errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${indexProduct}`] = messageError;
               isValid = false;
@@ -1086,8 +1055,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "パスワードとパスワード確認が一致しません。";
           isValid = false;
         }
-      } else if (contentArr[i].type === 'textarea') {
-        console.log(contentType[contentType.type].value, 'cecjlllll')
+      } else if (contentArr[i].type === 'textarea' && contentType.type === 'text_input') {
         if (!stringNullOrEmpty(contentType[contentType.type].value) && contentType[contentType.type].value.length < limitFrom) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] = `${limitFrom}文字以上入力してください。`;
           isValid = false;
@@ -1154,13 +1122,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
         }
       } else if (contentType.type === 'urls' && !stringNullOrEmpty(contentType[contentType.type].value)) {
         let REGEX_URLS = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
-        console.log(REGEX_URLS.test(contentType[contentType.type].value));
         if (!REGEX_URLS.test(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なURL形式で指定してください。`;
           isValid = false;
         }
       } else if (contentType.type === 'email_address' && !stringNullOrEmpty(contentType[contentType.type].value)) {
-        console.log(REGEX_EMAIL.test(contentType[contentType.type].value));
         if (!REGEX_EMAIL.test(contentType[contentType.type].value)) {
           errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
@@ -1260,7 +1226,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             REGEX_CHECK = "";
             break;
         }
-        console.log(contentType[contentType.type].range, REGEX_CHECK);
         if (REGEX_CHECK !== "") {
           if (contentType[contentType.type].isSplitInput && (REGEX_CHECK.test(contentType[contentType.type].valueLeft)
             || REGEX_CHECK.test(contentType[contentType.type].valueRight))) {
@@ -1277,7 +1242,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     if (isValid) {
       errorsMess = {};
     }
-    console.log(errorsMess);
     setErrors({
       ...errorsMess
     });
@@ -1294,7 +1258,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     let isPauseScroll = false;
     let delayRender;
     setIndexUser(prev => prev + 1);
-    console.log(dataMessages.length, indexMessageRender);
     if (dataMessages.length - 1 === indexMessageRender && urlThanksPage) {
       let aTag = document.createElement('a');
       aTag.href = urlThanksPage;
@@ -1344,13 +1307,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 }
               }
             }
-            console.log(checked, 'cehckkkk')
             if (checked === false) {
               if (dataMessages[i].belong_to === 'user') setIndexUser(prev => prev + 1);
               continue;
             }
           }
-          console.log(dataMessages[i])
           if (dataMessages[i].belong_to === 'bot') {
             if (dataMessages[i]?.message_content[0].type === 'delay') {
               if (dataMessages[i]?.message_content[0]?.delay.typing_on) {
@@ -1412,7 +1373,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
               dataVariables.forEach(item => {
                 variablesData[item.variable_name] = item.default_value;
               });
-              console.log(variables);
 
               variables.forEach(item => {
                 variablesData[item.variable_name] = item.default_value;
@@ -1421,15 +1381,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
               let data = {
                 variables: variablesData
               }
-              console.log(variablesData, 'checkkkk variables')
 
               api.post(`/api/v1/managements/emails/${emailId}/send_email`, data).then(res => {
-                console.log(res);
-              })
+              }).catch((error) => {
+                console.log(error);
+                if (error.response?.data.code === 0) {
+                  tokenExpired()
+                }
+              });
               setIndexMessageRender(i);
               index = i;
             } else if (dataMessages[i]?.message_content[0]?.type === 'variable_set') {
-              // console.log(dataVariables, 'checkkkk variables')                
               if (variables.length !== 0) {
                 let dataVarExist = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].variables;
                 variables.forEach(item => {
@@ -1439,13 +1401,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     }
                   }
                 });
-                console.log(variables, 'checkkkk variables');
                 setVariables([...variables]);
               }
               setIndexMessageRender(i);
               index = i;
             } else if (dataMessages[i]?.message_content[0]?.type === 'clear_variable') {
-              // console.log(dataVariables, 'checkkkk variables')                
               if (variables.length !== 0) {
                 let dataVarExist = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].variables;
                 variables.forEach(item => {
@@ -1455,13 +1415,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     }
                   }
                 });
-                console.log(variables, 'checkkkk variables');
                 setVariables([...variables]);
               }
               setIndexMessageRender(i);
               index = i;
             } else if (dataMessages[i]?.message_content[0]?.type === 'pause') {
-              // console.log(dataVariables, 'checkkkk variables')                
               setIndexMessageRender(i);
               index = i;
               break;
@@ -1488,7 +1446,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
               }).then(data => {
                 setIndexMessageRender(i);
                 renderMessage.push(data);
-                console.log(data)
                 setRenderMessageArr([
                   ...renderMessage
                 ]);
@@ -1499,10 +1456,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                   isPauseScroll = true;
                 }
               }).then(() => {
-                console.log('cehckkkkkk', urlThanksPage, i, dataMessages.length)
                 if (dataMessages.length - 1 === i && urlThanksPage) {
-                  console.log('cehckkkkkk', urlThanksPage, i, dataMessages.length)
-
                   let aTag = document.createElement('a');
                   aTag.href = urlThanksPage;
                   aTag.target = '_blank';
@@ -1520,7 +1474,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 for (let j = 0; j < dataMessages[i].message_content.length; j++) {
                   if (dataMessages[i].message_content[j].type === 'capture') {
                     api.get(`https://svg-captcha-nodejs.vercel.app/captcha?size=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].length}${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].type}`).then(res => {
-                      console.log(res);
                       captcha.push({
                         index: i,
                         indexContent: j,
@@ -1565,7 +1518,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             for (let j = 0; j < dataMessages[indexMessageRender + 1].message_content.length; j++) {
               if (dataMessages[indexMessageRender + 1].message_content[j].type === 'capture') {
                 api.get(`https://svg-captcha-nodejs.vercel.app/captcha?size=${dataMessages[indexMessageRender + 1].message_content[j][dataMessages[indexMessageRender + 1].message_content[j].type].length}${dataMessages[indexMessageRender + 1].message_content[j][dataMessages[indexMessageRender + 1].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[indexMessageRender + 1].message_content[j][dataMessages[indexMessageRender + 1].message_content[j].type].type}`).then(res => {
-                  console.log(res);
                   captcha.push({
                     index: indexMessageRender + 1,
                     indexContent: j,
@@ -1585,7 +1537,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
         }).then(data => {
           setIndexMessageRender(indexMessageRender + 1);
           renderMessage.push(data);
-          console.log(data)
           setRenderMessageArr([
             ...renderMessage
           ]);
@@ -1605,7 +1556,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                   for (let j = 0; j < dataMessages[i].message_content.length; j++) {
                     if (dataMessages[i].message_content[j].type === 'capture') {
                       api.get(`https://svg-captcha-nodejs.vercel.app/captcha?size=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].length}${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].type}`).then(res => {
-                        console.log(res);
                         captcha.push({
                           index: i,
                           indexContent: j,
@@ -1625,7 +1575,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
               }).then(data => {
                 setIndexMessageRender(i);
                 renderMessage.push(data);
-                console.log(data)
                 setRenderMessageArr([
                   ...renderMessage
                 ]);
@@ -1675,13 +1624,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                       }
                     }
                   });
-                  console.log(variables, 'checkkkk variables');
                   setVariables([...variables]);
                 }
                 setIndexMessageRender(i);
                 index = i;
               } else if (dataMessages[i]?.message_content[0]?.type === 'clear_variable') {
-                // console.log(dataVariables, 'checkkkk variables')                
                 if (variables.length !== 0) {
                   let dataVarExist = dataMessages[i]?.message_content[0][dataMessages[i]?.message_content[0].type].variables;
                   variables.forEach(item => {
@@ -1691,13 +1638,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                       }
                     }
                   });
-                  console.log(variables, 'checkkkk variables');
                   setVariables([...variables]);
                 }
                 setIndexMessageRender(i);
                 index = i;
               } else if (dataMessages[i]?.message_content[0]?.type === 'pause') {
-                // console.log(dataVariables, 'checkkkk variables')                
                 setIndexMessageRender(i);
                 index = i;
                 break;
@@ -1724,7 +1669,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 }).then(data => {
                   setIndexMessageRender(i);
                   renderMessage.push(data);
-                  console.log(data)
                   setRenderMessageArr([
                     ...renderMessage
                   ]);
@@ -1745,7 +1689,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
   }
 
   const onChangeValue = (indexContent, contentType, value, field, subFiled, name) => {
-    console.log(dataMessages[indexMessageRender].message_content[indexContent], indexMessageRender, indexContent, contentType, value, field, subFiled, name);
     if (name) {
       if (dataMessages[indexMessageRender].message_content[indexContent][contentType][field][subFiled] === undefined) {
         dataMessages[indexMessageRender].message_content[indexContent][contentType][field][subFiled] = {}
@@ -1765,7 +1708,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
 
     if (contentType === 'product_purchase' && field === 'initial_selection' && value.length > 0) {
       let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
-      console.log(dataContentType);
       let arrayCode = [];
       let arrayName = [];
       let arrayPrice = [];
@@ -1845,10 +1787,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
 
     if (dataMessages[indexMessageRender].message_content[indexContent][contentType].is_save_input_content) {
       variables.forEach(item => {
-        console.log(item);
         if (dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content === item.variable_name) {
           let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
-          console.log(dataContentType);
           if (contentType === 'zip_code_address') {
             let dataPostCode = !dataContentType.split_postal_code ? dataContentType?.value_post_code : `${dataContentType.value_post_code_left}${dataContentType.value_post_code_right}`
             item.default_value = `〒${dataPostCode} ${dataContentType?.value_prefecture || ""}${dataContentType?.value_municipality || ""} ${dataContentType?.value_address || ""}${dataContentType?.value_building_name || ""}`;
@@ -1859,7 +1799,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           } else if (contentType === 'checkbox') {
             let dataTextChecked;
             if (field === 'checkedValue' && dataContentType.checkedValue.length > 0) {
-              console.log(dataContentType.checkedValue)
               dataTextChecked = dataContentType.checkedValue.map(itemChecked => {
                 return dataContentType[dataContentType.type].find(item => itemChecked === item.id)?.text;
               })
@@ -1878,7 +1817,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             } else {
               dataTextChecked = [];
             }
-            console.log(item.variable_name, item.default_value, dataTextChecked);
             item.default_value = dataTextChecked.join(',') ?? item.default_value;
           } else if (contentType === 'card_payment_radio_button') {
             let dataTextChecked;
@@ -1913,14 +1851,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           } else if (field === 'phone_number' && dataContentType[field].withHyphen) {
             item.default_value = `${dataContentType[field]?.value1}-${dataContentType[field]?.value2}-${dataContentType[field]?.value3}`;
           } else if (contentType === 'carousel') {
-            console.log(dataContentType)
             item.default_value = dataContentType[dataContentType.type].contents.find(item => item.id === value).title;
           } else if (contentType !== 'credit_card_payment') {
             item.default_value = value;
           }
         }
       });
-      console.log(variables, 'checkkkk variables');
       setVariables([...variables]);
       objParam[dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content] = value;
       setObjParam({ ...objParam });
@@ -1939,7 +1875,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           indexTiming += dataMessages[i].message_content[0].delay.content;
         }
       }
-      console.log(indexMessageRender, indexTiming, i, 'checkkkk indexMessageRender');
       if (!isFromScenario) setScenarioId(null);
       setTimeout(() => {
         setRenderMessageArr([]);
@@ -1968,7 +1903,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
       document.getElementById("sp-withdrawal-container").style.display = "none";
       document.getElementById("sp-popup-zip-code-address").style.display = "none";
     }
-    console.log(indexContent, 'checkkkk indexContent');
     if (indexContent !== undefined) {
       setContentZipcode(indexContent);
     }
@@ -2013,7 +1947,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 for (i = indexMessageRender; i < dataMessages.length; i++) {
                   if (dataMessages[i].belong_to === 'user' || i === (dataMessages.length - 1)) break;
                 }
-                console.log(indexMessageRender, i, 'checkkkk indexMessageRender');
                 setScenarioId(null);
                 setTimeout(() => {
                   setScenarioId(Cookies.get('scenario_id'));
@@ -2058,7 +1991,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     if (value) {
                       let prefecture_jis_code = dataPrefectures.find(item => item.name === value).prefecture_jis_code;
                       api.get(`/api/v1/cities?prefecture_jis_code=${prefecture_jis_code}`).then(res => {
-                        console.log(res);
                         if (res.data.code === 1) {
                           setDataCities(res.data.data);
                         }
@@ -2085,7 +2017,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     if (value) {
                       let city_jis_code = dataCities.find(item => item.city_name === value).city_jis_code;
                       api.get(`/api/v1/towns?city_jis_code=${city_jis_code}`).then(res => {
-                        console.log(res);
                         if (res.data.code === 1) {
                           setDataTowns(res.data.data);
                         }
@@ -2130,7 +2061,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 <div className="sp-popup-zip-code-address-body-button-selection"
                   style={zipcode ? {} : { opacity: '0.5' }}
                   onClick={() => {
-                    console.log(dataMessages[indexMessageRender].message_content[indexContentZipcode], indexContentZipcode)
                     if (zipcode && indexContentZipcode !== undefined && !dataMessages[indexMessageRender].message_content[indexContentZipcode].zip_code_address.split_postal_code) {
                       onChangeValue(indexContentZipcode, 'zip_code_address', zipcode, 'value_post_code');
                       onChangeValue(indexContentZipcode, 'zip_code_address', prefectures, 'value_prefecture');
@@ -2179,7 +2109,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
               {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。") : `あと${messageUser.length}間`}
             </div>
           </div>
-          {console.log(botInfor?.opacity_color)}
           <div id="sp-body" className="sp-body" style={{ backgroundColor: botInfor?.opacity_color }}>
             {
               renderMessageArr.map((message, indexMessage) => {
@@ -2337,11 +2266,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState('');
 
-  console.log(indexMessageRender, 'checkekkkk indexMessageRender')
-
   function loadCaptcha(indexContent) {
-    console.log('load captcha');
-    console.log(captcha, indexMessage, indexMessageRender, captcha.filter(item => item.index === indexMessage))
     if (document.getElementById(`captcha-${indexMessageRender}-${indexContent}`) && captcha.length !== 0)
       document.getElementById(`captcha-${indexMessageRender}-${indexContent}`).innerHTML = captcha.filter(item => item.index === indexMessageRender && item.indexContent === indexContent)?.[0]?.data || "";
   }
@@ -2354,7 +2279,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   useEffect(() => {
     if (messageContent.length === 1) {
       let message = messageContent[0];
-      console.log(message?.[message.type], message.type === 'card_payment_radio_button' && stringNullOrEmpty(message?.[message.type]?.initial_selection) && stringNullOrEmpty(message?.[message.type]?.initial_selection_picture), 'checkk message[message.type].initial_selection')
       if ((message.type === 'card_payment_radio_button' && (stringNullOrEmpty(message?.[message.type]?.initial_selection) && stringNullOrEmpty(message?.[message.type]?.initial_selection_picture)))
         || message.type === 'product_purchase_radio_button'
         || (message.type === 'card_payment_radio_button' && (message?.[message.type].type !== "picture_radio" ? (stringNullOrEmpty(message?.[message.type]?.initial_selection) && message?.[message.type]?.card_linked_setting !== message?.[message.type]?.initial_selection)
@@ -2379,9 +2303,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   }, [messageContentProps])
 
   useEffect(() => {
-    console.log(indexMessage);
     messageContent.forEach((content, indexContent) => {
-      console.log(content)
       if (content.type === "calendar") {
         let calendar = content.calendar;
         if (calendar.initial_selection && calendar.type !== "start_end_date") {
@@ -2443,7 +2365,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
         }
       } else if (content.type === 'product_purchase') {
         let productPurchase = content.product_purchase;
-        console.log(productPurchase);
         onChangeValue(indexContent, content.type, productPurchase.initial_selection, 'initial_selection');
       }
     })
@@ -2457,14 +2378,12 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
     var file = event.target.files[0];
     const type = file.name.slice(file.name.lastIndexOf('.') + 1);
     if (messageContent[indexContent].attaching_file.file_type.length > 0 && !messageContent[indexContent].attaching_file.file_type.includes(type.toLowerCase())) {
-      console.log(messageContent[indexContent].attaching_file.file_type, type);
       onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, `ファイルには${messageContent[indexContent].attaching_file.file_type.join(", ")}タイプのファイルを指定してください。`)
       return;
     } else if (file.size / 1024 / 1024 >= 2) {
       onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "ファイルサイズは2MB以下です。");
       return;
     } else {
-      console.log('asdasdasd', messageContent[indexContent].type)
       onChangeErrors(`message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`, "")
     }
     // if (file?.type === 'image/png' || file?.type === 'image/jpeg') {
@@ -2472,7 +2391,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
 
     // messageContent[indexContent].attaching_file.value = file.name;
     let urlFile = URL.createObjectURL(file);
-    console.log(urlFile, 'checkkkk');
     onChangeValue(indexContent, 'attaching_file', file.name, "value");
     onChangeValue(indexContent, 'attaching_file', urlFile, "linkFile");
     // var baseString;
@@ -2546,7 +2464,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
   }
 
   const handleDisableEndDateCalendar = (current, calendar) => {
-    console.log(calendar.end_date, 'checkkkkk end date')
     if (calendar.end_date || calendar.start_date
       || calendar?.fixed_date?.length !== 0 || calendar?.non_select_date_time?.length !== 0
       || calendar.start_date_select || calendar.specified_period_from
@@ -2597,7 +2514,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
       }
     }
     api.post(`/api/v1/managements/history_click_urls?chatbot_id=${bot_id}`, data).then((response) => {
-      console.log(response);
       if (response.data.code === 1) {
         let message = response.data.message;
         let link = document.createElement('a');
@@ -2622,7 +2538,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
 
   function checkLoadCalendar() {
     // if (document.getElementsByClassName('ant-picker-calendar-year-select')) {
-    //   console.log('loaded');
     //   const divs = document.querySelectorAll('.ant-picker-calendar-year-select');
 
     //   divs.forEach(el => el.addEventListener('click', event => {
@@ -3031,7 +2946,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         value={checkbox.checkedValue}
                       >
                         {checkbox[checkbox.type].map((item, index) => {
-                          console.log(checkbox.checkedValue, 'checkkkk box')
                           return <div key={index} className="ss-message__content--user-checkbox">
                             <Checkbox
                               value={item.id}
@@ -3193,7 +3107,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                     )}
                     {(pullDown.type === 'time_hm') && (
                       <React.Fragment>
-                        {console.log(dataHour, pullDown[pullDown.type].start_at, pullDown[pullDown.type].end_at)}
                         <div className="ss-message__content--user-pull_down--time_hm">
                           <div className="" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <SelectCustom
@@ -3521,7 +3434,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                 let prefecture_jis_code = dataPrefectures.find(item => item.name === value).prefecture_jis_code;
                                 api.get(`/api/v1/cities?prefecture_jis_code=${prefecture_jis_code}`).then(res => {
                                   if (res.data.code === 1) {
-                                    console.log(res.data.data);
                                     setDataCity(res.data.data);
                                   }
                                 }).catch((error) => {
@@ -3604,7 +3516,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             onChangeValue(indexContent, content.type, value, 'value_post_code');
                             if ((value + "").length === 7) {
                               api.get(`/api/v1/get_address_from_zip_code?zip_code=${value}`).then(res => {
-                                console.log(res);
                                 if (res.data && res.data.code === 1) {
                                   onChangeValue(indexContent, content.type, res.data.data.prefecture_name, 'value_prefecture');
                                   onChangeValue(indexContent, content.type, `${res.data.data.city_name}${res.data.data.town_name}`, 'value_municipality');
@@ -3644,7 +3555,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               onChangeValue(indexContent, content.type, value, 'value_post_code_left');
                               if ((value + "").length === 3 && zipCodeAddress.value_post_code_right && (zipCodeAddress.value_post_code_right + "").length === 4) {
                                 api.get(`/api/v1/get_address_from_zip_code?zip_code=${value}${zipCodeAddress.value_post_code_right}`).then(res => {
-                                  console.log(res);
                                   if (res.data && res.data.code === 1) {
                                     onChangeValue(indexContent, content.type, res.data.data.prefecture_name, 'value_prefecture');
                                     onChangeValue(indexContent, content.type, `${res.data.data.city_name}${res.data.data.town_name}`, 'value_municipality');
@@ -3680,7 +3590,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                               onChangeValue(indexContent, content.type, value, 'value_post_code_right');
                               if ((value + "").length === 4 && zipCodeAddress.value_post_code_left && (zipCodeAddress.value_post_code_left + "").length === 3) {
                                 api.get(`/api/v1/get_address_from_zip_code?zip_code=${zipCodeAddress.value_post_code_left}${value}`).then(res => {
-                                  console.log(res);
                                   if (res.data && res.data.code === 1) {
                                     onChangeValue(indexContent, content.type, res.data.data.prefecture_name, 'value_prefecture');
                                     onChangeValue(indexContent, content.type, `${res.data.data.city_name}${res.data.data.town_name}`, 'value_municipality');
@@ -4146,7 +4055,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         onPaste={e => {
                           // Get the pasted value and remove all white space
                           const value = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 16);
-                          console.log(value, 'chek valueuuee')
                           setTimeout(() => {
                             document.getElementById('sp_credit_card_payment').value = value;
                             onChangeValue(indexContent, content.type, value, 'card_number');
@@ -4333,7 +4241,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       value={capture.value}
                       onChange={value => onChangeValue(indexContent, content.type, value, 'value')}
                     />
-                    {/* {console.log(capture)} */}
                     {/* {new DOMParser().parseFromString(capture.img, "text/xml").innerHTML} */}
                     <div id={`captcha-${indexMessageRender}-${indexContent}`} style={{ width: '50%' }} onLoad={loadCaptcha(indexContent)}></div>
                   </div>
@@ -4371,7 +4278,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             className="ss-user-preivew-product-purchase-checkbox-group ss-user-preivew-product-purchase-style-width"
                             style={{ width: "100%" }}
                             disabled={disabled}
-                            onChange={(value) => console.log(value)}
                             value={productPurchase.initial_selection}
                           >
                             {productPurchase.products.map((itemProduct, indexProduct) => {
@@ -4427,7 +4333,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                   <div>
                                     <InputNum
                                       className="sp-product-purchase-custom-input-quantity"
-                                      style={{ width: '46%', marginLeft: '137px' }}
+                                      style={{ width: '46%', marginLeft: '177px' }}
                                       value={itemProduct.quantity_select}
                                       onChange={value => {
                                         let selectArr = [...productPurchase.initial_selection];
@@ -4489,7 +4395,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             className="ss-user-preivew-product-purchase-radio-group ss-user-preivew-product-purchase-style-width"
                             style={{ width: "100%" }}
                             disabled={disabled}
-                            onChange={(value) => console.log(value)}
                             value={productPurchase.initial_selection[0]}
                           >
                             {productPurchase.products.map((itemProduct, indexProduct) => {
@@ -4552,7 +4457,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                   <div>
                                     <InputNum
                                       className="sp-product-purchase-custom-input-quantity"
-                                      style={{ width: '46%', marginLeft: '137px' }}
+                                      style={{ width: '46%', marginLeft: '177px' }}
                                       value={itemProduct.quantity_select}
                                       onChange={value => {
                                         let selectArr = [...productPurchase.initial_selection];
@@ -4614,7 +4519,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             className="ss-user-preview-product-purchase-checkbox-group-type-text_image ss-user-preivew-product-purchase-style-width"
                             style={{ width: "100%" }}
                             disabled={disabled}
-                            onChange={(value) => console.log(value)}
                             value={productPurchase.initial_selection}
                           >
                             {productPurchase.products.map((itemProduct, indexProduct) => {
@@ -4663,7 +4567,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                       controls={false}
                                       min={1}
                                       disabled={disabled}
-                                      style={{ width: '60%' }}
+                                      style={{ width: '46%' }}
                                       max={itemProduct.quantity_limit || Number.MAX_SAFE_INTEGER}
                                       addonAfter={<div
                                         style={{ padding: '4px 11px', cursor: 'pointer' }}
@@ -4749,7 +4653,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                   <div>
                                     <InputNum
                                       className="sp-product-purchase-custom-input-quantity"
-                                      style={{ width: '60%' }}
+                                      style={{ width: '46%' }}
                                       disabled={disabled}
                                       value={itemProduct.quantity_select}
                                       onChange={value => {
@@ -4843,7 +4747,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           style={{ width: "100%" }}
                           disabled={disabled}
                           onChange={value => {
-                            console.log(value)
                             onChangeValue(indexContent, content.type, value.target.value, 'initial_selection');
                             if (messageContent.length === 1) onClickNext();
                           }}
@@ -5022,16 +4925,13 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       }
                     </div>
                   }
-                  {console.log(cardPaymentRadioButton, 'checkkkkk')}
                   {cardPaymentRadioButton.type === 'default' &&
                     <Radio.Group
                       style={{ width: "100%", fontSize: '14px' }}
-                      onChange={(value) => console.log(value)}
                       disabled={disabled}
                       value={cardPaymentRadioButton.initial_selection}
                     >
                       {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
-                        console.log(itemPayment)
                         return <Radio value={itemPayment.id} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%' }}
                           onChange={() => {
                             let dataValue;
@@ -5040,7 +4940,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             } else {
                               dataValue = "";
                             }
-                            console.log(cardPaymentRadioButton.card_linked_setting, itemPayment.id)
                             onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
 
                             if (cardPaymentRadioButton.card_linked_setting === dataValue) {
@@ -5060,13 +4959,11 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                   {cardPaymentRadioButton.type === 'customized_style' &&
                     <Radio.Group
                       style={{ width: "100%", fontSize: '14px' }}
-                      onChange={(value) => console.log(value)}
                       disabled={disabled}
                       value={cardPaymentRadioButton.initial_selection}
                       buttonStyle="solid"
                     >
                       {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
-                        console.log(itemPayment)
                         return <Radio.Button value={itemPayment.id} key={indexPayment} style={{ marginBottom: '5px', padding: '5px', width: '100%', textAlign: 'center', lineHeight: '22px' }}
                           onChange={() => {
                             let dataValue;
@@ -5075,7 +4972,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             } else {
                               dataValue = "";
                             }
-                            console.log(cardPaymentRadioButton.card_linked_setting, itemPayment.id)
                             onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
 
                             // if (cardPaymentRadioButton.card_linked_setting !== dataValue && messageContent.length === 1) {
@@ -5102,7 +4998,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           disabled={disabled}
                           style={{ width: "100%", fontSize: '14px', display: 'flex' }}
                           className="ss-user-preview-product-purchase-radio-group-type-text_image ss-user-overview-product-purchase-style-width"
-                          onChange={(value) => console.log(value)}
                           value={cardPaymentRadioButton.initial_selection_picture}
                         >
                           {itemPaymentImg.contents && itemPaymentImg.contents.map((itemPaymentContent, indexPaymentContent) => {
@@ -5116,7 +5011,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                 }
                                 onChangeValue(indexContent, content.type, dataValue, 'initial_selection_picture');
                                 // if (cardPaymentRadioButton.card_linked_setting_picture !== dataValue && messageContent.length === 1) {
-                                //   console.log(cardPaymentRadioButton.card_linked_setting_picture !== dataValue, cardPaymentRadioButton.card_linked_setting_picture, dataValue)
                                 //   onClickNext();
                                 // }
                                 if (cardPaymentRadioButton.card_linked_setting_picture === dataValue) {
@@ -5136,7 +5030,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       </div>
                     })
                   }
-                  {console.log(cardPaymentRadioButton.card_linked_setting, cardPaymentRadioButton.initial_selection, cardPaymentRadioButton.card_linked_setting_picture, cardPaymentRadioButton.initial_selection_picture)}
                   {(cardPaymentRadioButton.type !== "picture_radio" ? (cardPaymentRadioButton.card_linked_setting && cardPaymentRadioButton.card_linked_setting === cardPaymentRadioButton.initial_selection) : (cardPaymentRadioButton.card_linked_setting_picture && cardPaymentRadioButton.card_linked_setting_picture === cardPaymentRadioButton.initial_selection_picture)) &&
                     <React.Fragment>
                       {cardPaymentRadioButton.payment_method.length !== 0 &&
@@ -5160,7 +5053,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             onPaste={e => {
                               // Get the pasted value and remove all white space
                               const value = e.clipboardData.getData('text').replace(/\s/g, '');
-                              console.log(value)
                               // Set the value of the input to the pasted value
                               onChangeValue(indexContent, content.type, value, 'card_number');
                               e.target.value = value;
@@ -5183,7 +5075,6 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             onPaste={e => {
                               // Get the pasted value and remove all white space
                               const value = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 16);
-                              console.log(value, 'chek valueuuee')
                               setTimeout(() => {
                                 document.getElementById('sp_credit_card_payment').value = value;
                                 onChangeValue(indexContent, content.type, value, 'card_number');
