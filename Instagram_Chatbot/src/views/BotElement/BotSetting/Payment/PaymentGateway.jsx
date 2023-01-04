@@ -40,9 +40,9 @@ function PaymentGateway() {
       .then((res) => {
         console.log(res.data.data);
         if (res?.data?.code == 1) {
-          if(res.data.data !== [] && res.data.total !==0){
+          if (res.data.data !== [] && res.data.total !== 0) {
             setGateway(res.data.data);
-          setTotalPage(Math.ceil(res.data?.total / 25));
+            setTotalPage(Math.ceil(res.data?.total / 25));
           }
         }
       })
@@ -93,6 +93,32 @@ function PaymentGateway() {
       });
   }
 
+  // handle set payment gateway default
+  const handleSetDefault = (id) => {
+    api
+      .patch(`/api/v1/payment_managements/payment_gateways/${id}`, {
+        payment: {
+          is_default: 'yes',
+        },
+      })
+      .then((res) => {
+        if (res.data?.code === 1) {
+          setIsOpenNoti(true);
+          setMsgNoti('デフォルト決済ゲートウェイを更新しました。');
+          setTimeout(() => {
+            setIsOpenNoti(false);
+            setMsgNoti('');
+          }, 1500);
+          reloadListPMGW(pageIndex);
+        } else if (res.data?.code !== 1) {
+          console.log(res.data);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <>
       <div className="content">
@@ -119,9 +145,30 @@ function PaymentGateway() {
                   <tbody>
                     {gateway?.map((item, i) => (
                       <tr key={i}>
-                        <td style={{ width: '5%', border: '1px solid #7186a1' }}>{i}</td>
+                        <td style={{ width: '5%', border: '1px solid #7186a1' }}>
+                          {i + 1 + 25 * (pageIndex - 1)}
+                        </td>
                         <td style={{ width: '12.5%', border: '1px solid #7186a1' }}>
                           {item.gateway_name}
+                          {item?.is_default === 'yes' && (
+                            <span
+                              style={{
+                                display: 'block',
+                                padding: '4px 8px',
+                                color: 'white',
+                                backgroundColor: '#1890ff',
+                                border: 'none',
+                                borderRadius: '5px',
+                                maxWidth: '100px',
+                                position: 'relative',
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                fontWeight: '400',
+                              }}
+                            >
+                              デフォルト
+                            </span>
+                          )}
                         </td>
                         <td style={{ width: '12.5%', border: '1px solid #7186a1' }}>
                           {item.payment_agency}
@@ -140,11 +187,20 @@ function PaymentGateway() {
                           {item.store_id}
                         </td>
                         <td style={{ width: '100px', border: '1px solid #7186a1' }}>
+                          {item?.is_default !== 'yes' && (
+                            <button
+                              type="button"
+                              className="payment-gateway-btn-default"
+                              onClick={() => handleSetDefault(item?.id)}
+                            >
+                              デフォルト
+                            </button>
+                          )}
                           <Link to={`/admin/edit-payment-gateway/${item?.id}`}>
-                            <button className="payment-gatway-btn-edit">編集</button>
+                            <button className="payment-gateway-btn-edit">編集</button>
                           </Link>
                           <button
-                            className="payment-gatway-btn-delete"
+                            className="payment-gateway-btn-delete"
                             onClick={() => cnfDeleteGW(item?.id)}
                           >
                             削除
@@ -186,8 +242,8 @@ function PaymentGateway() {
           </div>
         </ModalShort>
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
-          <div>
-            <h6>{msgNoti}</h6>
+          <div style={{ width: '300px', textAlign: 'center', color: '#51cbce' }}>
+            <span style={{ fontSize: '16px' }}>{msgNoti}</span>
           </div>
         </ModalNoti>
       </div>

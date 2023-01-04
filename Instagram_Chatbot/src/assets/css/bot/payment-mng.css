@@ -86,8 +86,8 @@
   border: none;
   border-radius: 10px;
 }
-.payment-gatway-btn-edit {
-  margin-right: 15px;
+.payment-gateway-btn-edit {
+  /* margin-right: 15px; */
   width: 70px;
   border: none;
   background-color: #57c8f0;
@@ -95,11 +95,20 @@
   color: white;
   padding: 10px 10px;
 }
-.payment-gatway-btn-delete {
+.payment-gateway-btn-delete {
   margin-left: 15px;
   width: 70px;
   border: none;
   background-color: #f48564;
+  border-radius: 5px;
+  color: white;
+  padding: 10px 10px;
+}
+.payment-gateway-btn-default {
+  margin-right: 15px;
+  width: 100px;
+  border: none;
+  background-color: #1890ff;
   border-radius: 5px;
   color: white;
   padding: 10px 10px;
