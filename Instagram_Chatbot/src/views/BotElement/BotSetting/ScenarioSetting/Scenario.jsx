@@ -1363,7 +1363,7 @@ const Scenario = () => {
             require: true,
             type: '0123456789', //type: numbers, alphanumeric, alphabet_only,
             length: 6,
-            colour: 'can_be', //type: can_be, none
+            colour: true, //type: true, false
           }
         }
       );
