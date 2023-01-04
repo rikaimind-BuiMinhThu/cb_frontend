@@ -3784,7 +3784,7 @@ const Scenario = () => {
                                                         {/* type == 'capture' */}
                                                         {
                                                           content.type === 'capture' && (
-                                                            <div style={{ color: '#6989A6', fontSize: '14px' }}>capture</div>
+                                                            <div style={{ color: '#6989A6', fontSize: '14px' }}>キャプチャ</div>
                                                           )
                                                         }
                                                         {/* type == 'product_purchase' */}
@@ -7598,7 +7598,7 @@ const Scenario = () => {
                                                             />
                                                           </div>
                                                           <div style={{ width: '32%' }}>
-                                                            <div>Length</div>
+                                                            <div>長さ</div>
                                                             <InputNum
                                                               className="ss-user-setting-input-limit-character"
                                                               style={{ width: '100%', marginLeft: '0px' }}
@@ -7609,9 +7609,9 @@ const Scenario = () => {
                                                             />
                                                           </div>
                                                           <div style={{ width: '32%' }}>
-                                                            <div>Colour</div>
+                                                            <div>色</div>
                                                             <SelectCustom
-                                                              placeholder="colour"
+                                                              placeholder="色"
                                                               style={{ width: '100%' }}
                                                               value={capture.colour}
                                                               data={[{ key: true, value: 'あり' }, { key: false, value: '無し' }]}
