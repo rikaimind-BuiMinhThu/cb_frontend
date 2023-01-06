@@ -40,8 +40,6 @@ import PaymentHistory from 'views/BotElement/PaymentHistory';
 import IPAddressSetting from 'views/BotElement/IPAddressSetting';
 import ScenarioList from 'views/BotElement/BotSetting/ScenarioSetting/ScenarioList';
 import MediaFileManagement from 'views/BotElement/BotSetting/ScenarioSetting/MediaFileManagement';
-import StartButton from 'views/BotElement/BotSetting/DesignSetting/StartButton';
-import ChatBody from 'views/BotElement/BotSetting/DesignSetting/ChatBody';
 import CreateEmail from 'views/BotElement/BotSetting/EmailSetting/CreateEmail';
 import ListEmail from 'views/BotElement/BotSetting/EmailSetting/ListEmail';
 import BotDemo from 'views/BotElement/BotDemo';
@@ -70,6 +68,7 @@ import Payment from 'views/BotElement/BotSetting/Payment/Payment';
 import PaymentGateway from 'views/BotElement/BotSetting/Payment/PaymentGateway';
 import AddPaymentGateway from 'views/BotElement/BotSetting/Payment/AddPaymentGateway';
 import ReplyMailManagement from 'views/BotElement/ReplyMailManagement';
+import DesignChatbot from 'views/BotElement/BotSetting/DesignSetting/DesignChatbot';
 
 var routes = [
   {
@@ -281,27 +280,14 @@ var routes = [
     component: ScenarioList,
     layout: '/admin',
   },
-  // {
-  //   path: "/media-management",
-  //   name: "Media management",
-  //   // icon: "nc-icon nc-single-02",
-  //   component: MediaFileManagement,
-  //   layout: "/admin",
-  // },
-  // {
-  //   path: "/start-button",
-  //   name: "Start Button",
-  //   // icon: "nc-icon nc-single-02",
-  //   component: StartButton,
-  //   layout: "/admin",
-  // },
-  // {
-  //   path: "/chat-body",
-  //   name: "Chat Body",
-  //   // icon: "nc-icon nc-single-02",
-  //   component: ChatBody,
-  //   layout: "/admin",
-  // },
+  {
+    path: '/design-setting',
+    name: 'Design Setting',
+    // icon: "nc-icon nc-single-02",
+    component: DesignChatbot,
+    layout: '/admin',
+  },
+
   {
     path: '/create-email',
     name: 'メール定定',

@@ -759,6 +759,21 @@ function Sidebar(props) {
                     <p style={{ color: 'black' }}>設定タグ＆デモ</p>
                   </NavLink>
                 </li>
+                <li
+                  className={activeRoute('design-setting') + (true ? ' active-pro' : '')}
+                  key={'design-setting'}
+                >
+                  <NavLink
+                    to="/admin/design-setting"
+                    className="nav-link"
+                    activeClassName="active"
+                    activeStyle={{ color: 'black' }}
+                  >
+                    {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
+                    <MDBIcon fas icon="paint-brush" style={{ color: "black" }} />
+                    <p style={{ color: 'black' }}>Design Setting</p>
+                  </NavLink>
+                </li>
                 {/* <li
                   className={activeRoute('conversion') + (true ? ' active-pro' : '')}
                   key={'conversion'}
