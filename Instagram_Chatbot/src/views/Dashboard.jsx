@@ -134,7 +134,7 @@ function Dashboard() {
     api
       .get(
         `/api/v1/analytics/users?begin_date=${dateStart.slice(0, 5)}${
-          month - 6
+          Math.abs(month - 6)
         }-15&end_date=${dateEnd}`
       )
       .then((res) => {
