@@ -1275,14 +1275,45 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     let isPauseScroll = false;
     let delayRender;
     setIndexUser(prev => prev + 1);
-    if (dataMessages.length - 1 === indexMessageRender && urlThanksPage) {
-      let aTag = document.createElement('a');
-      aTag.href = urlThanksPage;
-      aTag.target = '_blank';
-
-      setTimeout(() => {
-        aTag.click();
-      }, 2000)
+    let data_submit = {
+      scenario_id: scenarioId,
+      message: renderMessageArr[indexMessage]
+    }
+    if (dataMessages.length - 1 === indexMessageRender) {
+      await new Promise((resolve) => {
+        api.post(`/api/v1/scenario_users/scenario_user_responses`, data_submit).then(res => {
+          resolve()
+        }).catch((error) => {
+          console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
+        });
+      }).then(() => {
+        api.post(`/api/v1/scenario_users/scenario_user_responses/create_order`, data_submit).then(res => {
+        }).catch((error) => {
+          console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
+        });
+      });
+      if (urlThanksPage) {
+        let aTag = document.createElement('a');
+        aTag.href = urlThanksPage;
+        aTag.target = '_blank';
+        setTimeout(() => {
+          aTag.click();
+        }, 2000)
+      }
+    } else {
+      api.post(`/api/v1/scenario_users/scenario_user_responses`, data_submit).then(res => {
+      }).catch((error) => {
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
+      });
     }
     if (!dataMessages[indexMessageRender + 1]) return;
     if (dataMessages[indexMessageRender + 1].belong_to === 'bot') {
@@ -1491,13 +1522,22 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 }
               }).then(() => {
                 if (dataMessages.length - 1 === i && urlThanksPage) {
-                  let aTag = document.createElement('a');
-                  aTag.href = urlThanksPage;
-                  aTag.target = '_blank';
+                  api.post(`/api/v1/scenario_users/scenario_user_responses`, data_submit).then(res => {
+                  }).catch((error) => {
+                    console.log(error);
+                    if (error.response?.data.code === 0) {
+                      tokenExpired()
+                    }
+                  });
+                  if (urlThanksPage) {
+                    let aTag = document.createElement('a');
+                    aTag.href = urlThanksPage;
+                    aTag.target = '_blank';
 
-                  setTimeout(() => {
-                    aTag.click();
-                  }, 2000)
+                    setTimeout(() => {
+                      aTag.click();
+                    }, 2000)
+                  }
                 }
               });
               index = i;
