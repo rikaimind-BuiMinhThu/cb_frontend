@@ -67,6 +67,7 @@ function ClientManagement() {
   var [namesearch, setNamesearch] = useState('');
   var [pageIndex, setPageIndex] = useState(1);
   var [totalPage, setTotalPage] = useState();
+  var [cartSystem, setCartSystem] = useState();
 
   // var [dateStart, setDateStart] = useState();
   // var [inputValueName, setInputValueName] = useState();
@@ -334,6 +335,7 @@ function ClientManagement() {
         setNameKata(data.name_katakana);
         setCompanyType(data.enterprise_type);
         setCompanyType2(data.enterprise_type_2);
+        setCartSystem(data.cart_system);
         setDepartmentName(data.department_name);
         setTitle(data.title);
         setManager(data.responsible_person);
@@ -421,6 +423,7 @@ function ClientManagement() {
         setNameKata(data.name_katakana);
         setCompanyType(data.enterprise_type);
         setCompanyType2(data.enterprise_type_2);
+        setCartSystem(data.cart_system);
         setDepartmentName(data.department_name);
         setTitle(data.title);
         setManager(data.responsible_person);
@@ -516,6 +519,7 @@ function ClientManagement() {
 
     var managerkatabytes = encodeURI(managerKata).split(/%..|./).length - 1;
     var namekatabytes = encodeURI(nameKata).split(/%..|./).length - 1;
+    var cartSystem = document.getElementById('newCartSystem').value;
 
     var nameKata;
     var managerKata;
@@ -568,6 +572,7 @@ function ClientManagement() {
     checkNameAdd(nameKata, '名称カナ');
     checkFieldAdd(companyType, 'CompanyType');
     checkFieldAdd(companyType2, 'CompanyType2');
+    checkFieldAdd(cartSystem, 'CartSystem');
     checkFieldAdd(department, '部署名');
     checkFieldAdd(title, 'タイトル');
     checkNameAdd(manager, '担当者');
@@ -584,7 +589,8 @@ function ClientManagement() {
       checkNameAdd(name, '名称') === true &&
       checkNameAdd(nameKata, '名称カナ') === true &&
       checkFieldAdd(companyType, 'CompanyType') === true &&
-      checkFieldAdd(companyType2, 'CompanyType2') === true &&
+      checkFieldAdd(companyType2, 'CartSystem') === true &&
+      checkFieldAdd(cartSystem, 'CompanyType2') === true &&
       checkFieldAdd(department, '部署名') === true &&
       checkFieldAdd(title, 'タイトル') === true &&
       checkNameAdd(manager, '担当者') === true &&
@@ -724,6 +730,7 @@ function ClientManagement() {
     var nameKata = document.getElementById('newNameKata').value;
     var companyType = document.getElementById('newCompanyType').value;
     var companyType2 = document.getElementById('newCompanyType2').value;
+    var cartSystem = document.getElementById('newCartSystem').value;
     var department = document.getElementById('newDepartmentName').value;
     var title = document.getElementById('newTitle').value;
     var manager = document.getElementById('newManager').value;
@@ -807,6 +814,7 @@ function ClientManagement() {
     checkNameAdd(nameKata, '名称カナ');
     checkFieldAdd(companyType, 'CompanyType');
     checkFieldAdd(companyType2, 'CompanyType2');
+    checkFieldAdd(cartSystem, 'CartSystem');
     checkFieldAdd(department, '部署名');
     checkFieldAdd(title, 'タイトル');
     checkNameAdd(manager, '担当者');
@@ -828,6 +836,7 @@ function ClientManagement() {
       checkNameAdd(nameKata, '名称カナ') === true &&
       checkFieldAdd(companyType, 'CompanyType') === true &&
       checkFieldAdd(companyType2, 'CompanyType2') === true &&
+      checkFieldAdd(cartSystem, 'CartSystem') === true &&
       checkFieldAdd(department, '部署名') === true &&
       checkFieldAdd(title, 'タイトル') === true &&
       checkNameAdd(manager, '担当者') === true &&
@@ -1053,6 +1062,9 @@ function ClientManagement() {
   function setSizeAfterSelectCom2() {
     document.getElementById('newCompanyType2').size = '1';
   }
+  function setSizeAfterSelectCartSystem() {
+    document.getElementById('newCartSystem').size = '1';
+  }
   function closeSizeSelect() {
     document.getElementById('newPrefectures').size = '1';
   }
@@ -1061,6 +1073,9 @@ function ClientManagement() {
   }
   function closeSizeSelectCom2() {
     document.getElementById('newCompanyType2').size = '1';
+  }
+  function closeSizeSelectCartSystem() {
+    document.getElementById('newCartSystem').size = '1';
   }
 
   function checkInputNumber(value, field) {
@@ -2561,6 +2576,33 @@ function ClientManagement() {
                 </label>{' '}
                 <br />
                 <br />
+                <label className="label-input">
+                  カートシステム <span className="span-require">*必須</span>
+                  <select
+                    style={{ padding: '3px 0px 3px 0px', maxHeight: '50%!important%' }}
+                    disabled={disableInput == true ? true : false}
+                    onMouseLeave={() => closeSizeSelectCartSystem()}
+                    onMouseDown={() => setSizeAfterSelectCartSystem()}
+                    className="input-field"
+                    defaultValue={cartSystem}
+                    name="cart_system"
+                    id="newCartSystem"
+                  >
+                    <option onClick={() => setSizeAfterSelectCartSystem()} value="cart_system_none">
+                      なし
+                    </option>
+                    <option onClick={() => setSizeAfterSelectCartSystem()} value="tamago_repeat">
+                      Tamago
+                    </option>
+                  </select>
+                  <label
+                    id="newClientCartSystemErrMsg"
+                    className="input-field"
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
+                  ></label>
+                </label>{' '}
+                <br />
+                <br />
                 <Button id="btnUpdate" hidden={disableInput} onClick={updateClient}>
                   {' '}
                   更新
@@ -3418,6 +3460,33 @@ function ClientManagement() {
                   />
                   <label
                     id="newClient電話番号ErrMsg"
+                    className="input-field"
+                    style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
+                  ></label>
+                </label>{' '}
+                <br />
+                <br />
+                <label className="label-input">
+                  カートシステム <span className="span-require">*必須</span>
+                  <select
+                    style={{ padding: '3px 0px 3px 0px', maxHeight: '50%!important%' }}
+                    disabled={disableInput == true ? true : false}
+                    onMouseLeave={() => closeSizeSelectCartSystem()}
+                    onMouseDown={() => setSizeAfterSelectCartSystem()}
+                    className="input-field"
+                    defaultValue={'cart_system_none'}
+                    name="cart_system"
+                    id="newCartSystem"
+                  >
+                    <option onClick={() => setSizeAfterSelectCartSystem()} value="cart_system_none">
+                      なし
+                    </option>
+                    <option onClick={() => setSizeAfterSelectCartSystem()} value="tamago_repeat">
+                      Tamago
+                    </option>
+                  </select>
+                  <label
+                    id="newClientCartSystemErrMsg"
                     className="input-field"
                     style={{ display: 'none', color: 'red', border: 'none', padding: '2px' }}
                   ></label>
