@@ -17,7 +17,7 @@ async function displayPopup() {
     iframe.id = 'previewSdk'; iframe.style.position = "fixed"; iframe.style.bottom = "0"; iframe.style.right = "0";
     iframe.width = '400px'; iframe.height = '620px';
     iframe.style.border = 'none'; iframe.style.padding = '0'; iframe.style.margin = '0'; iframe.style.borderRadius = '0px'
-    iframe.src = `https://ec-chatbot1.com/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}`;
+    iframe.src = `https://ec-chatbot1.com/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}&uuid=${uuid}`;
     //https://ec-chatbot1.com
     body.appendChild(iframe)
 
