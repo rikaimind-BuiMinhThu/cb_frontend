@@ -1521,8 +1521,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                   isPauseScroll = true;
                 }
               }).then(() => {
-                if (dataMessages.length - 1 === i && urlThanksPage) {
-                  api.post(`/api/v1/scenario_users/scenario_user_responses`, data_submit).then(res => {
+                if (dataMessages.length - 1 === i) {
+                  api.post(`/api/v1/scenario_users/scenario_user_responses/create_order`, data_submit).then(res => {
                   }).catch((error) => {
                     console.log(error);
                     if (error.response?.data.code === 0) {
