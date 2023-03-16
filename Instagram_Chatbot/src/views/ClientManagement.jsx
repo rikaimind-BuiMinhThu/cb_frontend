@@ -2592,7 +2592,7 @@ function ClientManagement() {
                       なし
                     </option>
                     <option onClick={() => setSizeAfterSelectCartSystem()} value="tamago_repeat">
-                      Tamago
+                      たまごリピート
                     </option>
                   </select>
                   <label
@@ -3482,7 +3482,7 @@ function ClientManagement() {
                       なし
                     </option>
                     <option onClick={() => setSizeAfterSelectCartSystem()} value="tamago_repeat">
-                      Tamago
+                      たまごリピート
                     </option>
                   </select>
                   <label
