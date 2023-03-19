@@ -790,6 +790,7 @@ const Scenario = () => {
   const [fileVideo, setFileVideo] = useState('');
   const [scenarioName, setScenarioName] = useState('');
   const [urlThanks, setUrlThanks] = useState('');
+  const [tamagoLandingPageUrl, setTamagoLandingPageUrl] = useState('');
   const [errorScenarioName, setErrorScenarioName] = useState('');
 
   const [belongTo, setBelongTo] = useState('bot');
@@ -905,8 +906,10 @@ const Scenario = () => {
   const handleGetMessage = () => {
     api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`).then((res) => {
       setDataMessages(res.data.data?.conversation?.messages || []);
+      
       setScenarioName(res.data.data?.scenario_name || '');
       setUrlThanks(res.data.data?.conversation?.urlThanksPage || '');
+      setTamagoLandingPageUrl(res.data.data?.tamagoLandingPageUrl || '');
     }).catch((error) => {
       console.log(error);
       if (error.response?.data.code === 0) {
@@ -1824,7 +1827,8 @@ const Scenario = () => {
         messages: [...dataMessages],
         urlThanksPage: urlThanks
       },
-      scenario_name: scenarioName
+      scenario_name: scenarioName,
+      tamago_landing_page_url: tamagoLandingPageUrl
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       console.log(res.data);
@@ -1865,7 +1869,8 @@ const Scenario = () => {
         messages: [...dataMessages],
         urlThanksPage: urlThanks
       },
-      scenario_name: scenarioName
+      scenario_name: scenarioName,
+      tamago_landing_page_url: tamagoLandingPageUrl
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       console.log(res.data);
@@ -2230,6 +2235,14 @@ const Scenario = () => {
                       value={urlThanks}
                       onChange={value => setUrlThanks(value)}
                       placeholder="サンクスページのURL"
+                    />
+                  </div>
+                  <div>
+                    <InputCustom
+                      style={{ width: '100%', marginTop: '5px' }}
+                      value={tamagoLandingPageUrl}
+                      onChange={value => setTamagoLandingPageUrl(value)}
+                      placeholder="商品購入のURL"
                     />
                   </div>
                   {/* Overview scenario */}

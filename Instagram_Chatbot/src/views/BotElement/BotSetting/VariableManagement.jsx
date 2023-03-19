@@ -43,7 +43,6 @@ function VariableManagement() {
           setListVariable(res?.data?.data);
           setTotalPage(Math.ceil(res?.data?.total / 25));
         }
-
       })
       .catch((err) => {
         console.log(err);

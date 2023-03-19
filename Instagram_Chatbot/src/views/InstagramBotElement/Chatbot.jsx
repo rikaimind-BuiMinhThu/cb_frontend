@@ -119,28 +119,26 @@ function Chatbot() {
     // var paramSearch = { page: pageIndex }
     var path = window.location.pathname;
     api.get(`/api/v1/message_managements/message_groups?page=1`).then(res => {
-      console.log("message_groups: ", res.data.data.length)
-      if(res.data.data !== [] && res.data.total!== 0){
-        var idli = []
-      for (var i = 0; i < res.data.data.length; i++) {
-        idli.push(res.data.data[i].id)
-        // 
-      }
-      setIdList(idli)
-      // console.log("total ne: ", res.data.total)
-      var totalPage = Math.ceil(res.data.total / 25);
-      setTotalPage(totalPage);
-      setGroupList(res.data.data)
-      setTimeout(() => {
-        for (var i = 0; i < idli.length; i++) {
-          if (document.getElementById('liMesBag') !== null) {
-            document.getElementById('liMesBag').id = `liMesBag${idli[i]}`
-          }
-
+      console.log("message_groups: ", res.data.data.length);
+      if(res.data.data !== [] && res.data.total!== 0) {
+        var idli = [];
+        for (var i = 0; i < res.data.data.length; i++) {
+          idli.push(res.data.data[i].id)
+          // 
         }
-      }, 1000)
+        setIdList(idli)
+        // console.log("total ne: ", res.data.total)
+        var totalPage = Math.ceil(res.data.total / 25);
+        setTotalPage(totalPage);
+        setGroupList(res.data.data)
+        setTimeout(() => {
+          for (var i = 0; i < idli.length; i++) {
+            if (document.getElementById('liMesBag') !== null) {
+              document.getElementById('liMesBag').id = `liMesBag${idli[i]}`;
+            }
+          }
+        }, 1000);
       }
-      
     }).catch(error => {
       console.log(error);
       if (error.response?.data.code === 0) {

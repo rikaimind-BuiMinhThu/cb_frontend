@@ -162,6 +162,7 @@ function Preview() {
   const [urlSend, setUrlSend] = useState()
   const [urlReceive, setUrlReceive] = useState()
   const [deviceReceive, setDeviceReceive] = useState()
+  const [uuid, setUuid] = useState(params.get('uuid'))
   const [botId, setBotId] = useState(Cookies.get('bot_id'));
   const [scenarioId, setScenarioId] = useState(params.get('scenario_id'));
   const [botInfor, setBotInfor] = useState();
@@ -1330,6 +1331,12 @@ function Preview() {
     let isPauseScroll = false;
     let delayRender;
     setIndexUser(prev => prev + 1);
+    let data_submit = {
+      scenario_id: scenarioId,
+      message: renderMessageArr[indexMessage],
+      user_id: uuid
+    }
+
     if (dataMessages.length - 1 === indexMessageRender && urlThanksPage) {
       let aTag = document.createElement('a');
       aTag.href = urlThanksPage;
@@ -1339,6 +1346,46 @@ function Preview() {
         aTag.click();
       }, 2000)
     }
+
+    console.log(dataMessages.length)
+    console.log(indexMessageRender)
+    if (dataMessages.length - 1 === indexMessageRender) {
+      await new Promise((resolve) => {
+        api.post(`/api/v1/scenario_users/scenario_user_responses`, data_submit).then(res => {
+          resolve()
+        }).catch((error) => {
+          console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
+        });
+      }).then(() => {
+        api.post(`/api/v1/scenario_users/scenario_user_responses/create_order`, data_submit).then(res => {
+        }).catch((error) => {
+          console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired()
+          }
+        });
+      });
+      if (urlThanksPage) {
+        let aTag = document.createElement('a');
+        aTag.href = urlThanksPage;
+        aTag.target = '_blank';
+        setTimeout(() => {
+          aTag.click();
+        }, 2000)
+      }
+    } else {
+      api.post(`/api/v1/scenario_users/scenario_user_responses`, data_submit).then(res => {
+      }).catch((error) => {
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
+      });
+    }
+
     if (!dataMessages[indexMessageRender + 1]) return;
     if (dataMessages[indexMessageRender + 1].belong_to === 'bot') {
       for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
@@ -1545,14 +1592,28 @@ function Preview() {
                   isPauseScroll = true;
                 }
               }).then(() => {
-                if (dataMessages.length - 1 === i && urlThanksPage) {
-                  let aTag = document.createElement('a');
-                  aTag.href = urlThanksPage;
-                  aTag.target = '_blank';
+                if (dataMessages.length - 1 === i) {
+                  data_submit = {
+                    scenario_id: scenarioId,
+                    user_id: uuid
+                  }
+                  api.post(`/api/v1/scenario_users/scenario_user_responses/create_order`, data_submit).then(res => {
+                  }).catch((error) => {
+                    console.log(error);
+                    if (error.response?.data.code === 0) {
+                      tokenExpired()
+                    }
+                  });
 
-                  setTimeout(() => {
-                    aTag.click();
-                  }, 2000)
+                  if (urlThanksPage) {
+                    let aTag = document.createElement('a');
+                    aTag.href = urlThanksPage;
+                    aTag.target = '_blank';
+
+                    setTimeout(() => {
+                      aTag.click();
+                    }, 2000)
+                  }
                 }
               });
               index = i;

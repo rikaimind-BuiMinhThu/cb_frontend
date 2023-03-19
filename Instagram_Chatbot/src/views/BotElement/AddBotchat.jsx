@@ -195,6 +195,7 @@ function AddBotchat() {
             setTimeout(() => {
               setMsgNoti('');
               setIsOpenNoti(false);
+              
               window.location.href = '/admin/scenario-list';
             }, 1500);
           } else if (res.data?.code === 2 || res.data?.code === '2') {

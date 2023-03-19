@@ -100,7 +100,7 @@ function Header(props) {
     // removeCookie('token', '/admin/user-management')
     // removeCookie('token', '/admin/keyword')
     // removeCookie('token', '/admin/dashboard')
-    // removeCookie('token', '/admin/admin/chatbot')
+    // removeCookie('token', '/admin/ad`min/chatbot')
     Cookies.remove('user_role')
     Cookies.remove('user_id')
     Cookies.remove('page_access_token')

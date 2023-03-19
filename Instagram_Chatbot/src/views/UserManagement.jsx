@@ -117,10 +117,10 @@ function UserManagement() {
       .get(`/api/v1/managements/users`, paramSearch)
       .then((res) => {
         // console.log(res.data)
-        if(res.data.total !==0){
+        if (res.data.total !== 0) {
           var totalPage = Math.ceil(res.data.total / 25);
-        setTotalPage(totalPage);
-        setDataList(res.data);
+          setTotalPage(totalPage);
+          setDataList(res.data);
         }
       })
       .catch((error) => {
