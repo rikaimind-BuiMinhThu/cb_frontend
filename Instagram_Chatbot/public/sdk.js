@@ -35,9 +35,9 @@ function getEcChatBotApiServerBaseUrl() {
     switch (environment) {
         case "staging":
         case "test": 
-            return "https://ec-chatbot1.com";
+            return "https://ec-chatbot-test1.com";
         case "production":
-            return "https://ec-chatbot.com";
+            return "https://ec-chatbot-test.com";
         default: 
             return "http://localhost:3000";
     }
