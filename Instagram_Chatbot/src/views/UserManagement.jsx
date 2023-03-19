@@ -122,7 +122,6 @@ function UserManagement() {
           setTotalPage(totalPage);
           setDataList(res.data);
         }
-
       })
       .catch((error) => {
         console.log(error);

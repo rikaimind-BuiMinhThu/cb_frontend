@@ -32,7 +32,6 @@ function ReplyMailManagement() {
           var totalPage = Math.ceil(res.data?.total / 25);
           setTotalPage(totalPage);
           }
-
         }
       })
       .catch((error) => {

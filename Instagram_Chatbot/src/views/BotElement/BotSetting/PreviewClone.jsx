@@ -1336,6 +1336,17 @@ function Preview() {
       message: renderMessageArr[indexMessage],
       user_id: uuid
     }
+
+    if (dataMessages.length - 1 === indexMessageRender && urlThanksPage) {
+      let aTag = document.createElement('a');
+      aTag.href = urlThanksPage;
+      aTag.target = '_blank';
+
+      setTimeout(() => {
+        aTag.click();
+      }, 2000)
+    }
+
     console.log(dataMessages.length)
     console.log(indexMessageRender)
     if (dataMessages.length - 1 === indexMessageRender) {

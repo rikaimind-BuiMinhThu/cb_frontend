@@ -7,19 +7,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thank you</title>
     <script>
+        function getEnvironment() {
+            return localStorage.getItem("env") || "production";
+        }
+
+        function getDebugFlag() {
+            return localStorage.getItem("debug") || true;
+        }
+
+        function log(message) {
+            let debugFlag = getDebugFlag();
+
+            if (debugFlag) {
+                console.log(message);
+            }
+        }
+
+        function getEcChatBotApiServerBaseUrl() {
+            const environment = getEnvironment();
+
+            switch (environment) {
+                case "staging":
+                case "test": 
+                    return "https://ec-chatbot1.com";
+                case "production":
+                    return "https://ec-chatbot.com";
+                default: 
+                    return "http://localhost:3000";
+            }
+        }
         var purchase = { instagram_user_id: 1, message_bag_id: 407 }
-        fetch('https://ec-chatbot-test1.com/api/v1/instagram_users/conversions', {
+
+        fetch(`${getEcChatBotApiServerBaseUrl()}/api/v1/instagram_users/conversions`, {
             method: "POST",
             cache: 'no-cache',
             headers: {
                 'Content-Type': 'application/json'
-                // 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: JSON.stringify(purchase)
+        }).then(response => {
+            log(response);
         })
-            .then(response => {
-                console.log(response);
-            })
     </script>
 </head>
 
