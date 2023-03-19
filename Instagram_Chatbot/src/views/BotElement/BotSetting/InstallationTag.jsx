@@ -4,25 +4,28 @@ import { Card, CardHeader, CardBody, Table, Row, Col } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import api from '../../../api/api-management'
 import { tokenExpired } from 'api/tokenExpired';
-function InstallationTag() {
+import { getEcChatBotFrontEndBaseUrl } from 'variables/constants';
 
-  const [urlDemo, setUrlDemo] = useState('')
-  const [botId, setBotId] = useState(Cookies.get('bot_id'))
-  const [scenarioIdSelected, setScenarioSelected] = useState()
+function InstallationTag() {
+  const [urlDemo, setUrlDemo] = useState('');
+  const [botId] = useState(Cookies.get('bot_id'));
+  const [setScenarioSelected] = useState();
 
   useEffect(() => {
-    let url = '/admin/demo-bot/' + botId
-    setUrlDemo(url)
+    const url = '/admin/demo-bot/' + botId;
+
+    setUrlDemo(url);
+
     api.get(`/api/v1/managements/chatbots/${botId}/get_scenario_selected`).then(res => {
       console.log('res: ', res.data);
-      setScenarioSelected(res?.data?.data?.id)
+      setScenarioSelected(res?.data?.data?.id);
     }).catch(err => {
       console.log(err);
       if (err.response?.data.code === 0) {
         tokenExpired();
       }
     })
-  }, [])
+  }, []);
 
   return (
     <>
@@ -39,7 +42,7 @@ function InstallationTag() {
                 <div style={{ width: "90%", border: '1px solid grey', color: '#767676', padding: '5px', borderRadius: '5px' }}>
                   &lt;script&gt; sessionStorage.setItem("bot_id", "{botId}");&lt;/script&gt; <br />
                   {/* change script to production URL */}
-                  &lt;script src="https://ec-chatbot-test.com/sdk.js" defer&gt;&lt;/script&gt;
+                  &lt;script src="{getEcChatBotFrontEndBaseUrl()}/sdk.js" defer&gt;&lt;/script&gt;
                   {/* End here */}
                 </div>
                 <br />

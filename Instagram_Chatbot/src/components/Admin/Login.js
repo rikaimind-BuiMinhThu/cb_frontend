@@ -14,8 +14,27 @@ class Login extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { token: '', navigator: 'false', msgNoti: '', isOpenNoti: false }
-    Cookies.remove('bot_type')
+    this.state = { token: '', navigator: 'false', msgNoti: '', isOpenNoti: false };
+    Cookies.remove('bot_type');
+
+    localStorage.setItem("env", this.getEnvironment());
+    localStorage.setItem("debug", this.getDebugFlag());
+  }
+
+  getEnvironment() {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+
+    return params.env || "production";
+  }
+
+  getDebugFlag(){
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+
+    return params.debug === "true" || true;
   }
 
   handleLogin = (props) => {
