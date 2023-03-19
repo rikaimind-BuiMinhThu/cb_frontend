@@ -23,9 +23,9 @@ export const getEcChatBotApiServerBaseUrl = () => {
     switch (environment) {
         case "staging":
         case "test": 
-            return "http://ec-chatbot1.com";
+            return "https://ec-chatbot1.com";
         case "production":
-            return "http://ec-chatbot.com";
+            return "https://ec-chatbot.com";
         default: 
             return "http://localhost:3000";
     }
@@ -37,9 +37,9 @@ export const getEcChatBotFrontEndBaseUrl = () => {
     switch (environment) {
         case "staging":
         case "test": 
-            return "http://ec-chatbot1.com";
+            return "https://ec-chatbot1.com";
         case "production":
-            return "http://ec-chatbot.com";
+            return "https://ec-chatbot.com";
         default: 
             return "http://localhost:3001";
     }
