@@ -23,7 +23,7 @@ export const getEcChatBotApiServerBaseUrl = () => {
     switch (environment) {
         case "staging":
         case "test": 
-            return "https://ec-chatbot-test.com";
+            return "https://ec-chatbot-test1.com";
         case "production":
             return "https://ec-chatbot-test.com";
         default: 
