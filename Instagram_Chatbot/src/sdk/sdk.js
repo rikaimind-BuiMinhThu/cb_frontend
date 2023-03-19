@@ -12,11 +12,12 @@ async function displayPopup() {
     const data = await response.json();
     console.log('datane: ', data)
     scenarioId = data.data.id
+    var uuid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
     var body = document.getElementsByTagName("BODY")[0]; var iframe = document.createElement('iframe');
     iframe.id = 'previewSdk'; iframe.style.position = "fixed"; iframe.style.bottom = "0"; iframe.style.right = "0";
     iframe.width = '400px'; iframe.height = '620px';
     iframe.style.border = 'none'; iframe.style.padding = '0'; iframe.style.margin = '0'; iframe.style.borderRadius = '0px'
-    iframe.src = `https://ec-chatbot1.com/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}`;
+    iframe.src = `https://ec-chatbot1.com/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}&uuid=${uuid}`;
     //https://ec-chatbot1.com
     body.appendChild(iframe)
 
