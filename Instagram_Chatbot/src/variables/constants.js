@@ -1,19 +1,27 @@
 export const ADD_TOKEN="ADD_TOKEN";
 
 export const getEnvironment = () => {
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop),
-    });
-
-    return params.env || "production";
+    try {
+        return localStorage.getItem("env") || "production";
+    } catch (e) {
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        });
+    
+        return params.env || "production";
+    }
 };
 
 export const getDebugFlag = () =>  {
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-        get: (searchParams, prop) => searchParams.get(prop),
-    });
-
-    return params.debug || true;
+    try {
+        return localStorage.getItem("debug") || true;
+    } catch (e) {
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+            get: (searchParams, prop) => searchParams.get(prop),
+        });
+    
+        return params.debug || true;
+    }
 };
 
 export const log = (message) => {

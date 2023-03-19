@@ -791,13 +791,12 @@ const Scenario = () => {
   const [scenarioName, setScenarioName] = useState('');
   const [urlThanks, setUrlThanks] = useState('');
   const [tamagoLandingPageUrl, setTamagoLandingPageUrl] = useState('');
+  const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
   const [errorScenarioName, setErrorScenarioName] = useState('');
 
   const [belongTo, setBelongTo] = useState('bot');
   const [messageType, setMessageType] = useState('text_input');
   const [indexMessageSelect, setIndexMessageSelect] = useState('');
-  const [startDate, setStartDate] = useState(new Date());
-  const [indexMessageContentSelect, setIndexMessageContentSelect] = useState('');
   const [dataInputVar, setDataInputVar] = useState([]);
   const [isOpenPreview, setIsOpenPreview] = useState(false);
 
@@ -910,6 +909,7 @@ const Scenario = () => {
       setScenarioName(res.data.data?.scenario_name || '');
       setUrlThanks(res.data.data?.conversation?.urlThanksPage || '');
       setTamagoLandingPageUrl(res.data.data?.tamagoLandingPageUrl || '');
+      setIsUseOnlyRegularOrder(res.data.data?.isUseOnlyRegularOrder || false);
     }).catch((error) => {
       console.log(error);
       if (error.response?.data.code === 0) {
@@ -1828,7 +1828,8 @@ const Scenario = () => {
         urlThanksPage: urlThanks
       },
       scenario_name: scenarioName,
-      tamago_landing_page_url: tamagoLandingPageUrl
+      tamago_landing_page_url: tamagoLandingPageUrl,
+      is_use_only_regular_order: isUseOnlyRegularOrder,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       console.log(res.data);
@@ -1870,7 +1871,8 @@ const Scenario = () => {
         urlThanksPage: urlThanks
       },
       scenario_name: scenarioName,
-      tamago_landing_page_url: tamagoLandingPageUrl
+      tamago_landing_page_url: tamagoLandingPageUrl,
+      is_use_only_regular_order: isUseOnlyRegularOrder,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       console.log(res.data);
@@ -2244,6 +2246,15 @@ const Scenario = () => {
                       onChange={value => setTamagoLandingPageUrl(value)}
                       placeholder="商品購入のURL"
                     />
+                  </div>
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={(value) => setIsUseOnlyRegularOrder(!isUseOnlyRegularOrder)}
+                      checked={isUseOnlyRegularOrder}
+                    />
+                    <label>定期注文のみ</label>
                   </div>
                   {/* Overview scenario */}
                   <div style={{ ...errorScenarioName ? { height: 'calc(100% - 109px)' } : { height: 'calc(100% - 87px)' }, backgroundColor: '#f6fbff' }}>

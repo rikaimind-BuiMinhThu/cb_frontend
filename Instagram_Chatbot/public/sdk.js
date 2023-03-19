@@ -101,7 +101,7 @@ async function displayPopup() {
             iframe.width = '400px'; iframe.height = '620px';
             let add = { scenario_data: device }
             // submitForm(url, add)
-            getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
+            // getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
         } else if (!e.data && !firstOpen) {
             iframe.width = '400px';
             iframe.height = '90px';
@@ -113,7 +113,7 @@ async function displayPopup() {
     setTimeout(() => {
         let checkDevice = { scenario_data: `${device}_open_chatbot_window` }
         // submitForm(url, checkDevice)
-        getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
+        // getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
     }, 1000)
 }
 

@@ -1626,7 +1626,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
           if (dataMessages[i].message_content.length > 0 && dataMessages[i].hidden !== true) {
             if (dataMessages[i].belong_to === 'user') {
               await new Promise((resolve) => {
-                return delayRender = setTimeout(() => {
+                return setTimeout(() => {
                   for (let j = 0; j < dataMessages[i].message_content.length; j++) {
                     if (dataMessages[i].message_content[j].type === 'capture') {
                       api.get(`https://svg-captcha-nodejs.vercel.app/captcha?size=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].length}${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].colour ? '&color=true' : ''}&charPreset=${dataMessages[i].message_content[j][dataMessages[i].message_content[j].type].type}`).then(res => {
@@ -1669,7 +1669,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     resolve();
                   }).then(async () => {
                     await new Promise((resolve) => {
-                      delayRender = setTimeout(() => {
+                      setTimeout(() => {
                         resolve();
                       }, (dataMessages[i]?.message_content[0].delay.content * 1000));
                     });
@@ -1683,7 +1683,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                   });
                 } else {
                   await new Promise((resolve) => {
-                    return delayRender = setTimeout(() => {
+                    return setTimeout(() => {
                       resolve();
                     }, dataMessages[i]?.message_content[0]?.delay?.content * 1000);
                   })
@@ -1763,7 +1763,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 break;
               } else {
                 await new Promise((resolve) => {
-                  return delayRender = setTimeout(() => {
+                  return setTimeout(() => {
                     if (dataMessages[i].message_content[0].type === 'text_input' && dataMessages[i].message_content[0].text_input.content) {
                       dataMessages[i].message_content[0].text_input.content = dataMessages[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
                         if (variables.length !== 0) {
@@ -2023,10 +2023,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
       document.getElementById("sp-withdrawal-container").style.display = "none";
       document.getElementById("sp-popup-zip-code-address").style.display = "none";
     }
-    if (indexContent !== undefined) {
+    if (indexContent) {
       setContentZipcode(indexContent);
     }
   }
+
+  console.log("fhdakjfhdsakjlfhdsakjlhfdksjahfdkjsalhfdjksalhfjkdsahfkjhsdal");
 
   const onChangeErrors = (field, value) => {
     errors[field] = value;
@@ -2035,257 +2037,274 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     });
   }
 
+  if (!scenarioId || !botInfor) {
+    return <React.Fragment />;
+  }
+
+  const renderImagePopup = () => {
+    if (!botInfor.withdrawal_prevention_status === "image_popup") return;
+
+    return (
+      <a href={botInfor.withdrawal_prevention_link_url || ""} target="_blank" rel="noreferrer">
+        <img alt='withdrawal_prevention_link_url'
+          src={botInfor.withdrawal_prevention_image_url}
+          style={{ maxHeight: '217px', width: '100%' }}
+        />
+      </a>
+    );
+  };
+
+  const onClickBackBtn = () => {
+    document.getElementById("sp-withdrawal-container").style.display = "none";
+    document.getElementById("sp-withdrawal-content").style.display = "none";
+  };
+
+  const onClickExitBtn = () => {
+    document.getElementById("sp-withdrawal-container").style.display = "none";
+    document.getElementById("sp-withdrawal-content").style.display = "none";
+    setIndexUser(0);
+    let i;
+    for (i = indexMessageRender; i < dataMessages.length; i++) {
+      if (dataMessages[i].belong_to === 'user' || i === (dataMessages.length - 1)) break;
+    }
+    setScenarioId(null);
+    setTimeout(() => {
+      setScenarioId(Cookies.get('scenario_id'));
+      setRenderMessageArr([]);
+      if (document.getElementById("action-bd")) {
+        document.getElementById("action-bd").click();
+      } else {
+        onOpenPreview(false);
+      }
+    }, (i - indexMessageRender) * 1000);
+  };
+
   return (
-    scenarioId && botInfor ?
-      <React.Fragment>
-        <div id="sp-container" className="sp-container slideUp">
-          <div id="sp-withdrawal-container" className="sp-withdrawal-container">
-          </div>
-          <div id="sp-withdrawal-content" className="sp-withdrawal-content">
-            <div className="sp-withdrawal-content-body">
-              {botInfor && botInfor.withdrawal_prevention_status === "standard_exit_popup" &&
-                <div>ウィンドウを閉じますか。</div>
-              }
-              {botInfor && botInfor.withdrawal_prevention_status === "image_popup" &&
-                <a href={botInfor.withdrawal_prevention_link_url || ""} target="_blank">
-                  <img src={botInfor.withdrawal_prevention_image_url} style={{ maxHeight: '217px', width: '100%' }} />
-                </a>
-              }
-            </div>
-            <div className="sp-withdrawal-content-footer">
-              <div className="sp-withdrawal-content-footer-button sp-withdrawal-content-footer-button-back" onClick={() => {
-                document.getElementById("sp-withdrawal-container").style.display = "none";
-                document.getElementById("sp-withdrawal-content").style.display = "none";
-              }}>
-                チャットに戻る
-              </div>
-              <div className="sp-withdrawal-content-footer-button sp-withdrawal-content-footer-button-exit" onClick={() => {
-                document.getElementById("sp-withdrawal-container").style.display = "none";
-                document.getElementById("sp-withdrawal-content").style.display = "none";
-                setIndexUser(0);
-                let i;
-                for (i = indexMessageRender; i < dataMessages.length; i++) {
-                  if (dataMessages[i].belong_to === 'user' || i === (dataMessages.length - 1)) break;
-                }
-                setScenarioId(null);
-                setTimeout(() => {
-                  setScenarioId(Cookies.get('scenario_id'));
-                  setRenderMessageArr([]);
-                  if (document.getElementById("action-bd")) {
-                    document.getElementById("action-bd").click();
-                  } else {
-                    onOpenPreview(false);
-                  }
-                }, (i - indexMessageRender) * 1000);
-              }}>
-                閉じる
-              </div>
-            </div>
-          </div>
-          <div id="sp-popup-zip-code-address" className="sp-popup-zip-code-address">
-            <div className="sp-popup-zip-code-address-header">
-              <div className="sp-popup-zip-code-address-header-left">住所で郵便番号を検索する</div>
-              <div className="sp-popup-zip-code-address-header-right">
-                <MDBIcon
-                  style={{ width: '5%', marginLeft: '3px', cursor: 'pointer' }}
-                  fas
-                  onClick={() => isPopUpZipCode(false)}
-                  icon="times"
-                  className={"sp-plus-circle-option-icon-times-custom"}
-                />
-              </div>
-            </div>
-            <div className="sp-popup-zip-code-address-body">
-              <div className="sp-popup-zip-code-address-body-form">
-                <SelectCustom
-                  style={{ width: '100%', marginBottom: '7px' }}
-                  keyValue="name"
-                  nameValue="name"
-                  placeholder="都道府県を選択してください"
-                  data={dataPrefectures}
-                  onChange={async value => {
-                    setPrefectures(value);
-                    setCities(null);
-                    setTowns(null);
-                    setZipcode(null);
-                    if (value) {
-                      let prefecture_jis_code = dataPrefectures.find(item => item.name === value).prefecture_jis_code;
-                      api.get(`/api/v1/cities?prefecture_jis_code=${prefecture_jis_code}`).then(res => {
-                        if (res.data.code === 1) {
-                          setDataCities(res.data.data);
-                        }
-                      }).catch((error) => {
-                        console.log(error);
-                        if (error.response?.data.code === 0) {
-                          tokenExpired();
-                        }
-                      });
-                    }
-                  }}
-                  value={prefectures}
-                />
-                <SelectCustom
-                  style={{ width: '100%', marginBottom: '7px' }}
-                  keyValue="city_name"
-                  nameValue="city_name"
-                  placeholder="市区を選択してください"
-                  data={dataCities || []}
-                  onChange={async value => {
-                    setCities(value);
-                    setTowns(null);
-                    setZipcode(null);
-                    if (value) {
-                      let city_jis_code = dataCities.find(item => item.city_name === value).city_jis_code;
-                      api.get(`/api/v1/towns?city_jis_code=${city_jis_code}`).then(res => {
-                        if (res.data.code === 1) {
-                          setDataTowns(res.data.data);
-                        }
-                      }).catch((error) => {
-                        console.log(error);
-                        if (error.response?.data.code === 0) {
-                          tokenExpired();
-                        }
-                      })
-                    }
-                  }}
-                  value={cities}
-                />
-                <SelectCustom
-                  style={{ width: '100%', marginBottom: '7px' }}
-                  keyValue="town_name"
-                  nameValue="town_name"
-                  placeholder="町村を選択してください"
-                  data={dataTowns || []}
-                  onChange={value => {
-                    setTowns(value);
-                    if (value) {
-                      let zipcode = dataTowns.find(item => item.town_name === value).zip_code;
-                      setZipcode(zipcode);
-                    } else {
-                      setZipcode(null);
-                    }
-                  }}
-                  value={towns}
-                />
-                {zipcode &&
-                  <div className="sp-popup-zip-code-address-body-form-content">
-                    〒{zipcode}
-                  </div>
-                }
-              </div>
-              <div className="sp-popup-zip-code-address-body-button">
-                <div className="sp-popup-zip-code-address-body-button-cancel"
-                  onClick={() => isPopUpZipCode(false)}>
-                  キャンセル
-                </div>
-                <div className="sp-popup-zip-code-address-body-button-selection"
-                  style={zipcode ? {} : { opacity: '0.5' }}
-                  onClick={() => {
-                    if (zipcode && indexContentZipcode !== undefined && !dataMessages[indexMessageRender].message_content[indexContentZipcode].zip_code_address.split_postal_code) {
-                      onChangeValue(indexContentZipcode, 'zip_code_address', zipcode, 'value_post_code');
-                      onChangeValue(indexContentZipcode, 'zip_code_address', prefectures, 'value_prefecture');
-                      onChangeValue(indexContentZipcode, 'zip_code_address', `${cities}${towns}`, 'value_municipality');
-                      errors[`message${indexMessageRender}_content${indexContentZipcode}_zip_code_address`] = "";
-                      setErrors({ ...errors });
-                      document.getElementById("sp-withdrawal-container").style.display = "none";
-                      document.getElementById("sp-popup-zip-code-address").style.display = "none";
-                    } else if (zipcode && indexContentZipcode !== undefined && dataMessages[indexMessageRender].message_content[indexContentZipcode].zip_code_address.split_postal_code) {
-                      onChangeValue(indexContentZipcode, 'zip_code_address', zipcode.slice(0, 3), 'value_post_code_left');
-                      onChangeValue(indexContentZipcode, 'zip_code_address', zipcode.slice(3), 'value_post_code_right');
-                      onChangeValue(indexContentZipcode, 'zip_code_address', prefectures, 'value_prefecture');
-                      onChangeValue(indexContentZipcode, 'zip_code_address', `${cities}${towns}`, 'value_municipality');
-                      errors[`message${indexMessageRender}_content${indexContentZipcode}_zip_code_address`] = "";
-                      setErrors({ ...errors });
-                      document.getElementById("sp-withdrawal-container").style.display = "none";
-                      document.getElementById("sp-popup-zip-code-address").style.display = "none";
-                    }
-                    document.getElementById("ss-user-input-address").focus();
-                    document.getElementById("ss-user-input-address").select();
-
-                  }}>
-                  選択
-                </div>
-              </div>
-            </div>
-          </div>
-          <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header">
-            <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
-              <div className="sp-header-left-avatar sp-avatar">
-                <img src={botInfor?.icon?.url && (EC_CHATBOT_URL + "/" + botInfor?.icon?.url)} />
-              </div>
-              <div className="sp-header-left-label">
-                <div className="sp-header-left-label-sub-title">{botInfor?.subtitle}</div>
-                <div className="sp-header-left-label-title">{botInfor?.title}</div>
-              </div>
-            </div>
-            <div className="sp-header-right" onClick={() => { isOpen ? handleOpenWithDrawal() : onOpenPreview(true) }}>
-              <div className="sp-header-right-arrow">
-                {isOpen ? <MDBIcon fas icon="chevron-circle-down" /> : <MDBIcon fas icon="chevron-circle-up" />}
-              </div>
-            </div>
-          </div>
-          <div id="sp-process-bar" className="sp-process-bar" style={{ backgroundColor: botInfor?.opacity_color }}>
-            <div className="sp-process-bar-color animation" style={{ width: indexUser ? `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` : '100%', ...botInfor?.main_color && { backgroundColor: botInfor?.main_color } }}>
-              {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。") : `あと${messageUser.length}間`}
-            </div>
-          </div>
-          <div id="sp-body" className="sp-body" style={{ backgroundColor: botInfor?.opacity_color }}>
-            {
-              renderMessageArr.map((message, indexMessage) => {
-                return (
-                  <React.Fragment key={indexMessage}>
-                    {message.belong_to === 'bot' &&
-                      message?.message_content.map((content, index) => {
-                        return <BotMessage
-                          key={index}
-                          content={content}
-                          index={index}
-                          botInfor={botInfor}
-                        />
-                      })
-                    }
-                    {message.belong_to === 'user' &&
-                      <div
-                        // id={`sp-body-user-side-${indexMessage}`} 
-                        className="sp-body-user-side slideLeft">
-                        <div className="sp-body-user-side-messages">
-                          <UserMessage
-                            captcha={captcha}
-                            messageContentProps={message.message_content}
-                            disabled={message.disabled}
-                            onChangeValue={(indexContent, contentType, value, field, subFiled, name) => onChangeValue(indexContent, contentType, value, field, subFiled, name)}
-                            indexMessageRender={indexMessageRender}
-                            onClickNext={() => onClickNext(indexMessage)}
-                            indexMessage={indexMessage}
-                            errorsProps={errors}
-                            displayButtonNext={(value) => {
-                              dataMessages[indexMessage].is_display_button_next = value;
-                              setDataMessages([...dataMessages]);
-                            }}
-                            dataPrefectures={[...dataPrefectures]}
-                            isPopUpZipCode={(isOpen, indexContent) => isPopUpZipCode(isOpen, indexContent)}
-                            onChangeErrors={(field, value) => onChangeErrors(field, value)}
-                          />
-                          {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
-                            && <div className="sp-user-message-button-action">
-                              <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color, borderRadius: '25px' }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
-                                {message.buttonName || "次へ"}
-                              </Button>
-                            </div>
-                          }
-                        </div>
-                      </div>
-                    }
-                  </React.Fragment>
-                )
-
-              })
+    <React.Fragment>
+      <div id="sp-container" className="sp-container slideUp">
+        <div id="sp-withdrawal-container" className="sp-withdrawal-container">
+        </div>
+        <div id="sp-withdrawal-content" className="sp-withdrawal-content">
+          <div className="sp-withdrawal-content-body">
+            {botInfor && botInfor.withdrawal_prevention_status === "standard_exit_popup" &&
+              <div>ウィンドウを閉じますか。</div>
             }
+            { renderImagePopup() }
+          </div>
+          <div className="sp-withdrawal-content-footer">
+            <div className="sp-withdrawal-content-footer-button sp-withdrawal-content-footer-button-back"
+              onClick={onClickBackBtn}>
+              チャットに戻る
+            </div>
+            <div className="sp-withdrawal-content-footer-button sp-withdrawal-content-footer-button-exit"
+              onClick={onClickExitBtn}>
+              閉じる
+            </div>
           </div>
         </div>
-      </React.Fragment> :
-      <React.Fragment />
-  )
+        <div id="sp-popup-zip-code-address" className="sp-popup-zip-code-address">
+          <div className="sp-popup-zip-code-address-header">
+            <div className="sp-popup-zip-code-address-header-left">住所で郵便番号を検索する</div>
+            <div className="sp-popup-zip-code-address-header-right">
+              <MDBIcon
+                style={{ width: '5%', marginLeft: '3px', cursor: 'pointer' }}
+                fas
+                onClick={() => isPopUpZipCode(false)}
+                icon="times"
+                className={"sp-plus-circle-option-icon-times-custom"}
+              />
+            </div>
+          </div>
+          <div className="sp-popup-zip-code-address-body">
+            <div className="sp-popup-zip-code-address-body-form">
+              <SelectCustom
+                style={{ width: '100%', marginBottom: '7px' }}
+                keyValue="name"
+                nameValue="name"
+                placeholder="都道府県を選択してください"
+                data={dataPrefectures}
+                onChange={async value => {
+                  setPrefectures(value);
+                  setCities(null);
+                  setTowns(null);
+                  setZipcode(null);
+                  if (value) {
+                    let prefecture_jis_code = dataPrefectures.find(item => item.name === value).prefecture_jis_code;
+                    api.get(`/api/v1/cities?prefecture_jis_code=${prefecture_jis_code}`).then(res => {
+                      if (res.data.code === 1) {
+                        setDataCities(res.data.data);
+                      }
+                    }).catch((error) => {
+                      console.log(error);
+                      if (error.response?.data.code === 0) {
+                        tokenExpired();
+                      }
+                    });
+                  }
+                }}
+                value={prefectures}
+              />
+              <SelectCustom
+                style={{ width: '100%', marginBottom: '7px' }}
+                keyValue="city_name"
+                nameValue="city_name"
+                placeholder="市区を選択してください"
+                data={dataCities || []}
+                onChange={async value => {
+                  setCities(value);
+                  setTowns(null);
+                  setZipcode(null);
+                  if (value) {
+                    let city_jis_code = dataCities.find(item => item.city_name === value).city_jis_code;
+                    api.get(`/api/v1/towns?city_jis_code=${city_jis_code}`).then(res => {
+                      if (res.data.code === 1) {
+                        setDataTowns(res.data.data);
+                      }
+                    }).catch((error) => {
+                      console.log(error);
+                      if (error.response?.data.code === 0) {
+                        tokenExpired();
+                      }
+                    })
+                  }
+                }}
+                value={cities}
+              />
+              <SelectCustom
+                style={{ width: '100%', marginBottom: '7px' }}
+                keyValue="town_name"
+                nameValue="town_name"
+                placeholder="町村を選択してください"
+                data={dataTowns || []}
+                onChange={value => {
+                  setTowns(value);
+                  if (value) {
+                    let zipcode = dataTowns.find(item => item.town_name === value).zip_code;
+                    setZipcode(zipcode);
+                  } else {
+                    setZipcode(null);
+                  }
+                }}
+                value={towns}
+              />
+              {zipcode &&
+                <div className="sp-popup-zip-code-address-body-form-content">
+                  〒{zipcode}
+                </div>
+              }
+            </div>
+            <div className="sp-popup-zip-code-address-body-button">
+              <div className="sp-popup-zip-code-address-body-button-cancel"
+                onClick={() => isPopUpZipCode(false)}>
+                キャンセル
+              </div>
+              <div className="sp-popup-zip-code-address-body-button-selection"
+                style={zipcode ? {} : { opacity: '0.5' }}
+                onClick={() => {
+                  if (zipcode && indexContentZipcode !== undefined && !dataMessages[indexMessageRender].message_content[indexContentZipcode].zip_code_address.split_postal_code) {
+                    onChangeValue(indexContentZipcode, 'zip_code_address', zipcode, 'value_post_code');
+                    onChangeValue(indexContentZipcode, 'zip_code_address', prefectures, 'value_prefecture');
+                    onChangeValue(indexContentZipcode, 'zip_code_address', `${cities}${towns}`, 'value_municipality');
+                    errors[`message${indexMessageRender}_content${indexContentZipcode}_zip_code_address`] = "";
+                    setErrors({ ...errors });
+                    document.getElementById("sp-withdrawal-container").style.display = "none";
+                    document.getElementById("sp-popup-zip-code-address").style.display = "none";
+                  } else if (zipcode && indexContentZipcode !== undefined && dataMessages[indexMessageRender].message_content[indexContentZipcode].zip_code_address.split_postal_code) {
+                    onChangeValue(indexContentZipcode, 'zip_code_address', zipcode.slice(0, 3), 'value_post_code_left');
+                    onChangeValue(indexContentZipcode, 'zip_code_address', zipcode.slice(3), 'value_post_code_right');
+                    onChangeValue(indexContentZipcode, 'zip_code_address', prefectures, 'value_prefecture');
+                    onChangeValue(indexContentZipcode, 'zip_code_address', `${cities}${towns}`, 'value_municipality');
+                    errors[`message${indexMessageRender}_content${indexContentZipcode}_zip_code_address`] = "";
+                    setErrors({ ...errors });
+                    document.getElementById("sp-withdrawal-container").style.display = "none";
+                    document.getElementById("sp-popup-zip-code-address").style.display = "none";
+                  }
+                  document.getElementById("ss-user-input-address").focus();
+                  document.getElementById("ss-user-input-address").select();
+
+                }}>
+                選択
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header">
+          <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
+            <div className="sp-header-left-avatar sp-avatar">
+              <img src={botInfor?.icon?.url && (EC_CHATBOT_URL + "/" + botInfor?.icon?.url)} />
+            </div>
+            <div className="sp-header-left-label">
+              <div className="sp-header-left-label-sub-title">{botInfor?.subtitle}</div>
+              <div className="sp-header-left-label-title">{botInfor?.title}</div>
+            </div>
+          </div>
+          <div className="sp-header-right" onClick={() => { isOpen ? handleOpenWithDrawal() : onOpenPreview(true) }}>
+            <div className="sp-header-right-arrow">
+              {isOpen ? <MDBIcon fas icon="chevron-circle-down" /> : <MDBIcon fas icon="chevron-circle-up" />}
+            </div>
+          </div>
+        </div>
+        <div id="sp-process-bar" className="sp-process-bar" style={{ backgroundColor: botInfor?.opacity_color }}>
+          <div className="sp-process-bar-color animation" style={{ width: indexUser ? `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` : '100%', ...botInfor?.main_color && { backgroundColor: botInfor?.main_color } }}>
+            {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。") : `あと${messageUser.length}間`}
+          </div>
+        </div>
+        <div id="sp-body" className="sp-body" style={{ backgroundColor: botInfor?.opacity_color }}>
+          {
+            renderMessageArr.map((message, indexMessage) => {
+              return (
+                <React.Fragment key={indexMessage}>
+                  {message.belong_to === 'bot' &&
+                    message?.message_content.map((content, index) => {
+                      return <BotMessage
+                        key={index}
+                        content={content}
+                        index={index}
+                        botInfor={botInfor}
+                      />
+                    })
+                  }
+                  {message.belong_to === 'user' &&
+                    <div
+                      // id={`sp-body-user-side-${indexMessage}`} 
+                      className="sp-body-user-side slideLeft">
+                      <div className="sp-body-user-side-messages">
+                        <UserMessage
+                          captcha={captcha}
+                          messageContentProps={message.message_content}
+                          disabled={message.disabled}
+                          onChangeValue={(indexContent, contentType, value, field, subFiled, name) => onChangeValue(indexContent, contentType, value, field, subFiled, name)}
+                          indexMessageRender={indexMessageRender}
+                          onClickNext={() => onClickNext(indexMessage)}
+                          indexMessage={indexMessage}
+                          errorsProps={errors}
+                          displayButtonNext={(value) => {
+                            dataMessages[indexMessage].is_display_button_next = value;
+                            setDataMessages([...dataMessages]);
+                          }}
+                          dataPrefectures={[...dataPrefectures]}
+                          isPopUpZipCode={(isOpen, indexContent) => isPopUpZipCode(isOpen, indexContent)}
+                          onChangeErrors={(field, value) => onChangeErrors(field, value)}
+                        />
+                        {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
+                          && <div className="sp-user-message-button-action">
+                            <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color, borderRadius: '25px' }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage)}>
+                              {message.buttonName || "次へ"}
+                            </Button>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                </React.Fragment>
+              )
+
+            })
+          }
+        </div>
+      </div>
+    </React.Fragment>
+  );
 }
 
 const BotMessage = ({ content, index, botInfor }) => {
@@ -2305,7 +2324,7 @@ const BotMessage = ({ content, index, botInfor }) => {
     <div key={index} className="sp-body-bot-side slideRight">
       {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay') && (
         <div className="sp-body-bot-side-avatar sp-avatar">
-          <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} />
+          <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} alt="sp-avarta"/>
         </div>
       )}
       <div className="sp-body-bot-side-messages">
