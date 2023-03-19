@@ -29,14 +29,14 @@ async function displayPopup() {
             iframe.width = '400px'; iframe.height = '620px';
             let add = { scenario_data: device }
             // submitForm(url, add)
-            getUser(`https://ec-chatbot-test1.com/api/v1/analytics/scenario_counts/${scenarioId}`, add)
+            // getUser(`https://ec-chatbot-test1.com/api/v1/analytics/scenario_counts/${scenarioId}`, add)
         } else if (e.data == false && firstOpen == false) { iframe.width = '400px'; iframe.height = '90px'; console.log('close') }
     }, false);
     console.log('device: ', device)
     setTimeout(() => {
         let checkDevice = { scenario_data: `${device}_open_chatbot_window` }
         // submitForm(url, checkDevice)
-        getUser(`https://ec-chatbot-test1.com/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
+        // getUser(`https://ec-chatbot-test1.com/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
     }, 1000)
 
 }

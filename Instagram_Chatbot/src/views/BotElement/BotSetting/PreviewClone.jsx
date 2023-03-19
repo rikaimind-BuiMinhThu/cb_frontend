@@ -2081,10 +2081,10 @@ function Preview() {
           onOpenPreview(false);
         }
         let withdrawal = { scenario_data: `${deviceReceive}_close_chatbot_window` }
-        api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
-        }).catch(err => {
-          console.log(err)
-        })
+        // api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+        // }).catch(err => {
+        //   console.log(err)
+        // })
       }, (indexTiming + i - indexMessageRender - 1) * 1000);
     } else if (botInfor?.withdrawal_prevention_status === "standard_exit_popup" || botInfor?.withdrawal_prevention_status === "image_popup") {
       document.getElementById("sp-withdrawal-container").style.display = "block";
@@ -2155,16 +2155,16 @@ function Preview() {
                   if (document.getElementById("action-bd")) {
                     document.getElementById("action-bd").click();
                     let withdrawal = { scenario_data: `${deviceReceive}_close_chatbot_window` }
-                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
-                    }).catch(err => {
-                      console.log(err)
-                    })
+                    // api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+                    // }).catch(err => {
+                    //   console.log(err)
+                    // })
                   } else {
                     let withdrawal = { scenario_data: `${deviceReceive}_close_chatbot_window` }
-                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
-                    }).catch(err => {
-                      console.log(err)
-                    })
+                    // api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+                    // }).catch(err => {
+                    //   console.log(err)
+                    // })
                     onOpenPreview(false);
                   }
                 }, (i - indexMessageRender) * 1000);
