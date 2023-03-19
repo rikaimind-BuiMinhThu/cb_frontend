@@ -2079,55 +2079,7 @@ function Chatbot() {
                 }
               })
             }
-            // var upd = {
-            //   message: { message_value: "", message_type: "img", img_value: document.getElementById(`imgDataNumSaved${item.id}`).value }
-            // }
-
-
-
-
-
-
-
-            // api.patch(`/api/v1/message_managements/messages/${item.id}`, upd).then(res => {
-            //   // alert("Delete Successfully")
-            //   console.log(res)
-            //   setTimeout(() => {
-            //     setIsOpenNoti(true)
-            //     setMsgNoti("更新しました。")
-            //   }, 1500)
-
-            //   setTimeout(function () {
-            //     setIsOpenNoti(false)
-            //   }, 2000);
-            //   getBagMsg(group, id)
-            // }).catch(error => {
-            //   console.log(error)
-            // })
           })
-
-
-          // console.log('value ne: ',document.getElementById(`output${item.id}`))
-          // document.getElementById(`imgNum${item.id}`).value = item.img_value.src
-
-          // getBaseUrlDis(item.id, item.img_value.url)
-
-
-
-          // const toDataURL = url => fetch(url)
-          //   .then(response => response.blob())
-          //   .then(blob => new Promise((resolve, reject) => {
-          //     const reader = new FileReader()
-          //     reader.onloadend = () => resolve(reader.result)
-          //     reader.onerror = reject
-          //     reader.readAsDataURL(blob)
-          //   }))
-
-
-          // toDataURL(`https://ec-chatbot-test.com/${item.img_value.url}`)
-          //   .then(dataUrl => {
-          //     console.log('RESULT:', dataUrl)
-          //   })
 
           var src = document.getElementById(`output${item.id}`).src
 
@@ -2146,71 +2098,6 @@ function Chatbot() {
             var b64 = canvas.toDataURL('image/png').replace(/^data:image.+;base64,/, '');
             return b64;
           };
-          // document.getElementById(`output${item.id}`).setAttribute('crossOrigin', 'anonymous')
-
-          // console.log(getEmergencyFoundImg(src))
-
-          // document.getElementById(`output${item.id}`).setAttribute('crossOrigin', 'anonymous')
-          //           var c = document.createElement('canvas');
-          //           var img = document.getElementById(`output${item.id}`);
-          //           c.height = img.naturalHeight;
-          //           c.width = img.naturalWidth;
-          //           var ctx = c.getContext('2d');
-
-          //           ctx.drawImage(img, 0, 0, c.width, c.height);
-          //           var base64String = c.toDataURL('image/jpeg');
-          // console.log('base: ',base64String)
-
-
-          // function toDataURL(src, callback){
-          //   var image = new Image();
-
-          //   image.onload = function(){
-          //     var canvas = document.createElement('canvas');
-          //     var context = canvas.getContext('2d');
-          //     canvas.height = this.naturalHeight;
-          //     canvas.width = this.naturalWidth;
-          //     context.drawImage(this, 0, 0);
-          //     var dataURL = canvas.toDataURL('image/jpeg');
-          //     callback(dataURL);
-          //   };
-          //   image.src = src;
-          // }
-          //     toDataURL(`https://ec-chatbot-test.com/${item.img_value.url}`, function(dataURL){
-          //       alert(dataURL);      
-          //   })
-
-
-          // function toDataURL(url, callback) {
-          //   var httpRequest = new XMLHttpRequest();
-
-          //   httpRequest.onload = function () {
-          //     var fileReader = new FileReader();
-          //     fileReader.onloadend = function () {
-          //       callback(fileReader.result);
-          //     }
-          //     fileReader.readAsDataURL(httpRequest.response);
-          //   };
-          //   httpRequest.open('GET', url);
-          //   httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencode');
-          //   httpRequest.setRequestHeader( 'Access-Control-Allow-Origin', '*');
-          //   httpRequest.responseType = 'blob';
-          //   httpRequest.send();
-          // }
-          // toDataURL(`https://ec-chatbot-test.com/${item.img_value.url}`, function (dataUrl) {
-          //   console.log('Result in string:', dataUrl)
-          // })
-
-
-
-
-
-          // console.log(encrypt(item.img_value.url))
-
-          // console.log(document.getElementById(`imgDataNum${item.id}`).value)
-          // document.getElementById(`imgDataNum${item.id}`).value = encrypt(item.img_value.url)
-          // document.getElementById(`imgNum${item.id}`).addEventListener('change', (e) => loadFile(e))
-          // document.getElementById(`btnDelImg${item.id}`).addEventListener('click', () => deleteImgCB(item.id))
 
           var element1 = document.getElementById(`outputOV${item.id}`)
           if (typeof (element1) != 'undefined' && element1 != null) {
@@ -2225,13 +2112,9 @@ function Chatbot() {
               <img id="outputOV${item.id}" style="max-height: 200px; display: block; margin:5px; max-width: 65%; float:right" src="${`${EC_CHATBOT_URL}${item.img_value.url}`}">
                </div> 
               `
-            // document.getElementById(`msgOVI${item.id}`).value = item.message_value
-
           }
 
         } else if (item.message_type == "img_msg") {
-
-
           var updateItem = ""
           var choiceHTML = ""
           if (typeof item.free_input !== "undefined" && item.free_input !== null) {
@@ -3176,64 +3059,13 @@ function Chatbot() {
           setIdDrop(item.id)
           setIsOpenChangeIndexMsg(true);
         }
-
-
-
-        // document.getElementById(`msgIdIs${item.id}`).ondragend = (event) => {
-        //   event.preventDefault();
-        //   document.getElementById(`msgIdIs${item.id}`).ondrop = (event) => {
-        //     event.preventDefault();
-        //     console.log("drop id ne ", item.id);
-        //   }
-        // }
-
-        // document.getElementById(`msgIdIs${item.id}`).ondrop = (event)=>{
-        //   event.preventDefault();
-        //   console.log("drop id ne ", item.id);
-        // }
-
-        // document.getElementById(`msgIdIs${item.id}`).ondragover = (event)=>{
-        //   event.preventDefault();
-        //   // console.log("idd after below ne: ", item.id);
-        // }
-
-
-        // document.getElementById(`outputImgMsgSaved${item.id}`).src = `https://ec-chatbot-test.com/${item.img_value.url}`
-
-
-        // bagMsg.forEach((item) => {
-
-        // })
       })
-      // var bagItem = []
-      // for (var i = 0; i < bagMsg.length; i++) {
-      //   bagItem.push(res.data.data[i].id)
-      //   // 
-      // }
-      // console.log(bagMsg)
     }).catch(error => {
       console.log(error);
       if (error.response?.data.code === 0) {
         tokenExpired()
       }
     })
-
-    // Sortable.create(document.getElementById("div_custom"), {
-    //   // animation: 350 ,
-    //   onChoose: function (e) {
-    //     e.preventDefault()
-    //     // Snapshot the list before dragging starts
-    //     // console.log("idd ne: ", id);
-    //   },
-    //   onDragOver: function (e) {
-    //     e.preventDefault()
-    //   },
-    //   onUpdate: function (e) {
-    //     e.preventDefault()
-    //     // Add undo state
-    //     // console.log("idd after ne: ", id);
-    //   }
-    // });
 
   }
   const [idDrag, setIdDrag] = useState()
