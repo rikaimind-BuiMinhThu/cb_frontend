@@ -17,7 +17,10 @@ class Login extends React.Component {
     this.state = { token: '', navigator: 'false', msgNoti: '', isOpenNoti: false };
     Cookies.remove('bot_type');
 
-    localStorage.setItem("env", this.getEnvironment());
+    if (!localStorage.getItem("env")) {
+      localStorage.setItem("env", this.getEnvironment());
+    }
+
     localStorage.setItem("debug", this.getDebugFlag());
   }
 
