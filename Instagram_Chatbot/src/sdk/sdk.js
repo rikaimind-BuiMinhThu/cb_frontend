@@ -15,7 +15,7 @@ async function displayPopup() {
     var uuid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
     var body = document.getElementsByTagName("BODY")[0]; var iframe = document.createElement('iframe');
     iframe.id = 'previewSdk'; iframe.style.position = "fixed"; iframe.style.bottom = "0"; iframe.style.right = "0";
-    iframe.width = '400px'; iframe.height = '620px';
+    iframe.width = '380px'; iframe.height = '620px';
     iframe.style.border = 'none'; iframe.style.padding = '0'; iframe.style.margin = '0'; iframe.style.borderRadius = '0px'
     iframe.src = `https://ec-chatbot1.com/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}&uuid=${uuid}`;
     //https://ec-chatbot1.com
@@ -24,13 +24,14 @@ async function displayPopup() {
     window.addEventListener('message', function (e) {
         let firstOpen = false
         if (e.data === '') { firstOpen = true } else { firstOpen = false }
-        if (firstOpen == true) { iframe.width = '400px'; iframe.height = '620px'; } else if (e.data == true && firstOpen == false) {
+        if (firstOpen == true) { iframe.width = '380px'; iframe.height = '620px'; } else if (e.data == true && firstOpen == false) {
             console.log('open after clicked')
-            iframe.width = '400px'; iframe.height = '620px';
+            iframe.width = '380px'; iframe.height = '620px';iframe.style.backgroundColor = 'transparent';
+
             let add = { scenario_data: device }
             // submitForm(url, add)
             // getUser(`https://ec-chatbot-test1.com/api/v1/analytics/scenario_counts/${scenarioId}`, add)
-        } else if (e.data == false && firstOpen == false) { iframe.width = '400px'; iframe.height = '90px'; console.log('close') }
+        } else if (e.data == false && firstOpen == false) { iframe.width = '380px'; iframe.height = '90px';iframe.style.backgroundColor = 'transparent';console.log('close') }
     }, false);
     console.log('device: ', device)
     setTimeout(() => {

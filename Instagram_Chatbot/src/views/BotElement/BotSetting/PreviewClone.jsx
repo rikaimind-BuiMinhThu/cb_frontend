@@ -253,7 +253,7 @@ function Preview() {
         if (window && window.parent) {
           window.parent.postMessage(true, urlReceive);
         }
-        document.getElementById('sp-container').style.height = '610px';
+        document.getElementById('sp-container').style.height = '620px';
         document.getElementById('sp-header').style.position = 'static';
         document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
         document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
@@ -262,7 +262,7 @@ function Preview() {
         document.getElementById('sp-process-bar').style.display = 'block';
         document.getElementById('sp-body').style.display = 'block';
       }
-      else {
+       else {
         Cookies.set('openPre', false)
         if (window && window.parent) {
           window.parent.postMessage(false, urlReceive);
@@ -275,8 +275,7 @@ function Preview() {
         document.getElementById('sp-header').style.borderTopLeftRadius = "25px";
         document.getElementById('sp-header').style.borderTopRightRadius = "25px";
         document.getElementById('sp-header').style.position = 'absolute';
-        document.getElementById('sp-header').style.bottom = '13px';
-
+        document.getElementById('sp-header').style.bottom = '0px';
       }
     }
     setIsOpen(!isOpen);
@@ -2303,7 +2302,7 @@ function Preview() {
           <div id="sp-header" style={botInfor?.main_color && { backgroundColor: botInfor?.main_color }} className="sp-header">
             <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
               <div className="sp-header-left-avatar sp-avatar">
-                <img src={botInfor?.icon?.url && (EC_CHATBOT_URL + "/" + botInfor?.icon?.url)} />
+                <img src={botInfor?.icon?.url && (EC_CHATBOT_URL + "" + botInfor?.icon?.url)} />
               </div>
               <div className="sp-header-left-label">
                 <div className="sp-header-left-label-sub-title">{botInfor?.subtitle}</div>
@@ -2419,7 +2418,8 @@ const BotMessage = ({ content, index, botInfor }) => {
               // value={content[content.type]?.content || ''}
               // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
               >
-                {content[content.type]?.content || ''}
+                 {/* {content[content.type]?.content || ''} */}
+                <div dangerouslySetInnerHTML={{ __html: content[content.type]?.content }} />
               </div>
             )}
             {content.type === 'file' && (

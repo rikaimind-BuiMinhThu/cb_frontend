@@ -46,7 +46,7 @@ function ScenarioList() {
 
     const handleOpenPreview = (isOpen) => {
         if (isOpen) {
-            document.getElementById('sp-container').style.height = '610px';
+            document.getElementById('sp-container').style.height = '620px';
             document.getElementById('sp-header').style.position = 'static';
             document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
             document.getElementById('sp-header').style.borderBottomRightRadius = '0px';

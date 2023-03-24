@@ -852,6 +852,8 @@ const Scenario = () => {
   const carouselSlide = useRef(null);
   // side effects
 
+
+
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
     setScenarioId(Cookies.get('scenario_id'));
@@ -1068,6 +1070,7 @@ const Scenario = () => {
     } else if (belongTo === 'user' && document.querySelector('.ss-user-setting__main')) {
       document.querySelector('.ss-user-setting__main').style.height = '57%';
     }
+    // {parse(dataMessages)}
 
     //Change border color for last ele message content
     document.querySelector(`.ss-user-setting__item-${indexLastEle}`) && document.querySelector(`.ss-user-setting__item-${indexLastEle}`).classList.add('ss-user-setting__item--active');
@@ -1712,8 +1715,12 @@ const Scenario = () => {
     }
     console.log(dataMessages, 'checkkk message onCHange')
     setDataMessages([...dataMessages]);
+   
   }
 
+
+
+  
   const onChangeFixedDate = (indexMessage, indexContent, type, value, name) => {
     console.log(value);
     if (value) {
@@ -2049,7 +2056,7 @@ const Scenario = () => {
   const handleOpenPreview = (isOpen) => {
     if (!isOpenPreview) return;
     if (isOpen) {
-      document.getElementById('sp-container').style.height = "610px";
+      document.getElementById('sp-container').style.height = "620px";
       document.getElementById('sp-header').style.position = "static";
       document.getElementById('sp-header').style.borderBottomLeftRadius = "0px";
       document.getElementById('sp-header').style.borderBottomRightRadius = "0px";
@@ -2066,7 +2073,7 @@ const Scenario = () => {
       document.getElementById('sp-header').style.borderTopLeftRadius = "25px";
       document.getElementById('sp-header').style.borderTopRightRadius = "25px";
       document.getElementById('sp-header').style.position = "absolute";
-      document.getElementById('sp-header').style.bottom = "13px";
+      document.getElementById('sp-header').style.bottom = "0px";
     }
     // Cookies.set('scenario_id', null);
     setIsOpenPreview(!isOpenPreview);
@@ -2333,12 +2340,25 @@ const Scenario = () => {
                                                   </div>
                                                   {/* bot: type == 'text_input' */}
                                                   {content.type === 'text_input' && (
-                                                    <textarea
+                                                    // <textarea
+                                                    //   className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
+                                                    //   value={content[content.type]?.content || ''}
+                                                    //   style={message.hidden === true ? { opacity: '0.4' } : {}}
+                                                    //   readOnly
+                                                    // ></textarea>
+                                                    <div
                                                       className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                                      value={content[content.type]?.content || ''}
                                                       style={message.hidden === true ? { opacity: '0.4' } : {}}
-                                                      readOnly
-                                                    ></textarea>
+                                                      contentEditable={false}
+                                                      suppressContentEditableWarning={true}
+                                                      dangerouslySetInnerHTML={{ __html: content[content.type]?.content }}
+                                                      onClick={(event) => {
+                                                        if ((event.target.tagName.toLowerCase() === 'a') || (event.target.tagName.toLowerCase() === 'img')) {
+                                                          event.preventDefault(); // Ngăn chặn hành động mặc định của trình duyệt
+                                                          // Thực hiện hành động khác ở đây, ví dụ như mở một cửa sổ popup
+                                                        }
+                                                      }}
+                                                    />
                                                   )}
                                                   {/* bot: type == 'file' */}
                                                   {content.type === 'file' && (
@@ -4479,7 +4499,8 @@ const Scenario = () => {
                                       placeholder="入力"
                                       value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['content'] || ''}
                                       onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'content')}
-                                    ></textarea>
+                                    >
+                                    </textarea>
                                   </div>
                                   <div className="ss-bot-checkbox-scroll-auto">
                                     <CheckboxCustom

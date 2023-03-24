@@ -231,7 +231,7 @@ function AddBotchat() {
   // handle preview
   const handlePreview = () => {
     if (title && subtitle) {
-      document.getElementById('sp-container').style.height = '610px';
+      document.getElementById('sp-container').style.height = '620px';
       document.getElementById('sp-header').style.position = 'static';
       document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
       document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
@@ -254,7 +254,7 @@ function AddBotchat() {
   // handle toggle preview
   const handleTogglePreview = () => {
     if (document.getElementById('sp-body').style.display === 'none') {
-      document.getElementById('sp-container').style.height = '610px';
+      document.getElementById('sp-container').style.height = '620px';
       document.getElementById('sp-header').style.position = 'static';
       document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
       document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
