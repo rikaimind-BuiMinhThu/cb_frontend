@@ -5,6 +5,7 @@ let script = document.createElement('script');
 script.type = 'text/javascript';
 script.src = "https://code.jquery.com/jquery-3.6.0.min.js"; head.appendChild(script);
 
+
 function getEnvironment() {
     const params = new Proxy(new URLSearchParams(window.location.search), {
         get: (searchParams, prop) => searchParams.get(prop),
@@ -75,39 +76,69 @@ async function displayPopup() {
     let body = document.getElementsByTagName("BODY")[0];
     let iframe = document.createElement('iframe');
 
+
+
+    if(mobileCheck() === true){
+        iframe.width = '100%';
+        iframe.style.maxWidth = '100%';  
+        iframe.style.right = '0';
+    } else {
+        iframe.width = '380px';
+        iframe.style.right = '10px';
+    }
+    
     iframe.id = 'previewSdk';
     iframe.style.position = 'fixed';
     iframe.style.bottom = '0';
-    iframe.style.right = '0';
-    iframe.width = '400px';
-    iframe.height = '620px';
+    iframe.height = "620px";
     iframe.style.border = 'none';
     iframe.style.padding = '0';
     iframe.style.margin = '0';
     iframe.style.borderRadius = '0px';
-
+    iframe.style.display = "none";
     iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}`;
 
     body.appendChild(iframe);
-
-    window.addEventListener('message', function (e) {
+    
+    window.addEventListener(
+      "message",
+      function (e) {
         let firstOpen = false;
-        if (e.data === '') { firstOpen = true } else { firstOpen = false }
-        if (firstOpen) {
-            iframe.width = '400px';
-            iframe.height = '620px';
-        } else if (e.data && !firstOpen) {
-            log('open after clicked')
-            iframe.width = '400px'; iframe.height = '620px';
-            let add = { scenario_data: device }
-            // submitForm(url, add)
-            // getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
-        } else if (!e.data && !firstOpen) {
-            iframe.width = '400px';
-            iframe.height = '90px';
-            log('close')
+        if (e.data === "") {
+          firstOpen = true;
+        } else {
+          firstOpen = false;
         }
-    }, false);
+        if ((firstOpen && mobileCheck() === true) ||  (e.data && !firstOpen && mobileCheck() === true)) {
+          iframe.width = "100%";
+          iframe.height = "620px";
+          iframe.style.bottom = "0px";
+          iframe.style.right = "0px";
+        } else if( (firstOpen) ||  (e.data && !firstOpen) ) {
+          iframe.width = "380px";
+          iframe.height = "620px";
+          iframe.style.bottom = "0px";
+          iframe.style.right = "10px";
+          let add = { scenario_data: device };
+          // submitForm(url, add)
+          // getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
+        } else if (!e.data && !firstOpen && mobileCheck() === true) {
+          iframe.width = "300px";
+          iframe.style.bottom = "13px";
+          iframe.height = "65px";
+          iframe.style.transformStyle = "revert";
+          iframe.style.right = "5px";
+          log("close");
+        } else if (!e.data && !firstOpen) {
+          iframe.width = "380px";
+          iframe.style.bottom = "13px";
+          iframe.height = "65px";
+          iframe.style.right = "5px";
+          log("close");
+        }
+      },
+      false
+    );
 
     log('device: ', device)
     setTimeout(() => {

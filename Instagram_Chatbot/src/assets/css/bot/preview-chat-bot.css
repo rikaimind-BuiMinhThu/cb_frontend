@@ -5,8 +5,8 @@
     width: 380px;
     height: 620px;
     background-color: #EBF7FF;
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
     z-index: 900;
 }
 
@@ -14,8 +14,8 @@
     /* background-color: #546DA7; */
     width: 380px;
     height: 65px;
-    border-top-left-radius: 2px;
-    border-top-right-radius: 2px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
     display: flex;
     align-items: center;
     /* padding: 15px; */
@@ -602,3 +602,49 @@ slideUp
         opacity: 1;
     }
 }
+
+/* CSS cho màn hình mobile */
+@media (max-width: 767px) {
+    .sp-container {
+      position: fixed;
+      bottom: 0;
+      right: 0px;
+      width: 100%; /* full-width cho màn hình mobile */
+      max-width: 100%;
+      height: 620px;
+      background-color: transparent;
+      border-top-left-radius: 2px;
+      border-top-right-radius: 2px;
+      z-index: 900;
+
+      
+    }
+
+    .sp-header {
+        /* background-color: #546DA7; */
+        width: 100%;
+        max-width: 100%;
+        height: 65px;
+        border-top-left-radius: 2px;
+        border-top-right-radius: 2px;
+        display: flex;
+        align-items: center;
+        background-color: transparent;
+        /* padding: 15px; */
+    }
+    
+    .sp-header-left {
+        width: 82%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding: 15px;
+    }
+    .sp-avatar img {
+        border-radius: 50%;
+        width: 30px;
+    }
+
+
+  }
+  

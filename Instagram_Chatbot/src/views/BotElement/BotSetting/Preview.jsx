@@ -2346,7 +2346,9 @@ const BotMessage = ({ content, index, botInfor }) => {
               // value={content[content.type]?.content || ''}
               // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
               >
-                {content[content.type]?.content || ''}
+                {/* {content[content.type]?.content || ''} */}
+                <div dangerouslySetInnerHTML={{ __html: content[content.type]?.content }} />
+
               </div>
             )}
             {content.type === 'file' && (
