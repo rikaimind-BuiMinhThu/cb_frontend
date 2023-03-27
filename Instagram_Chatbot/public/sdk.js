@@ -3,8 +3,8 @@ let scenarioId = '';
 let head = document.getElementsByTagName('head')[0];
 let script = document.createElement('script');
 script.type = 'text/javascript';
-script.src = "https://code.jquery.com/jquery-3.6.0.min.js"; head.appendChild(script);
-
+script.src = "https://code.jquery.com/jquery-3.6.0.min.js";
+head.appendChild(script);
 
 function getEnvironment() {
     const params = new Proxy(new URLSearchParams(window.location.search), {
@@ -76,11 +76,9 @@ async function displayPopup() {
     let body = document.getElementsByTagName("BODY")[0];
     let iframe = document.createElement('iframe');
 
-
-
-    if(mobileCheck() === true){
+    if (mobileCheck()){
         iframe.width = '100%';
-        iframe.style.maxWidth = '100%';  
+        iframe.style.maxWidth = '100%';
         iframe.style.right = '0';
     } else {
         iframe.width = '380px';
