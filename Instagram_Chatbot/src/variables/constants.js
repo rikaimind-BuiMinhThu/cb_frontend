@@ -2,25 +2,25 @@ export const ADD_TOKEN="ADD_TOKEN";
 
 export const getEnvironment = () => {
     try {
-        return localStorage.getItem("env") || "production";
+        return localStorage.getItem("env") || getParamFromUrl("env") || "production";
     } catch (e) {
-        const params = new Proxy(new URLSearchParams(window.location.search), {
-            get: (searchParams, prop) => searchParams.get(prop),
-        });
-    
-        return params.env || "production";
+        return getParamFromUrl("env") || "production";
     }
 };
 
+export const getParamFromUrl = (paramName) => {
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+
+    return params[paramName];
+}
+
 export const getDebugFlag = () =>  {
     try {
-        return localStorage.getItem("debug") || true;
+        return localStorage.getItem("debug") || getParamFromUrl("debug") || true;
     } catch (e) {
-        const params = new Proxy(new URLSearchParams(window.location.search), {
-            get: (searchParams, prop) => searchParams.get(prop),
-        });
-    
-        return params.debug || true;
+        return getParamFromUrl("debug") || true;
     }
 };
 
