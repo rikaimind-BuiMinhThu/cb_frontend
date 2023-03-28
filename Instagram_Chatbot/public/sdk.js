@@ -125,7 +125,6 @@ async function displayPopup() {
           iframe.width = "300px";
           iframe.style.bottom = "13px";
           iframe.height = "65px";
-          iframe.style.transformStyle = "revert";
           iframe.style.right = "5px";
           log("close");
         } else if (!e.data && !firstOpen) {
