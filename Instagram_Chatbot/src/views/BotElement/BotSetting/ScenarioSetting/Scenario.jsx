@@ -2867,7 +2867,7 @@ const Scenario = () => {
                                                                         name="ss-message__content--user-radio_button"
                                                                         id="ss-message__content--user-radio_button"
                                                                         disabled
-                                                                        checked={radioButton.initial_selection === item.value}
+                                                                        checked={radioButton.initial_selection === item.id}
                                                                       />
                                                                       {item.text &&
                                                                         <label htmlFor="ss-message__content--user-radio_button">
@@ -2885,7 +2885,7 @@ const Scenario = () => {
                                                                         name="ss-message__content--user-radio_button--radio_button_img"
                                                                         id="ss-message__content--user-radio_button--radio_button_img"
                                                                         disabled
-                                                                        checked={radioButton.initial_selection === item.value}
+                                                                        checked={radioButton.initial_selection === item.id}
                                                                       />
                                                                       <img
                                                                         src={item.img}
@@ -5416,13 +5416,13 @@ const Scenario = () => {
                                                                                         <CheckboxCustom
                                                                                           label="初期選択設定"
                                                                                           onChange={() => {
-                                                                                            if (radioButton.initial_selection !== itemRadio.value) {
-                                                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.value, 'initial_selection');
+                                                                                            if (radioButton.initial_selection !== itemRadio.id) {
+                                                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.id, 'initial_selection');
                                                                                             } else {
                                                                                               onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection');
                                                                                             }
                                                                                           }}
-                                                                                          value={radioButton.initial_selection === itemRadio.value}
+                                                                                          value={radioButton.initial_selection === itemRadio.id}
                                                                                           isOnChange={false}
                                                                                         />
                                                                                       </React.Fragment>
@@ -5445,13 +5445,13 @@ const Scenario = () => {
                                                                                         <CheckboxCustom
                                                                                           label="初期選択設定"
                                                                                           onChange={() => {
-                                                                                            if (radioButton.initial_selection !== itemRadio.value) {
-                                                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.value, 'initial_selection');
+                                                                                            if (radioButton.initial_selection !== itemRadio.id) {
+                                                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.id, 'initial_selection');
                                                                                             } else {
                                                                                               onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection');
                                                                                             }
                                                                                           }}
-                                                                                          value={radioButton.initial_selection === itemRadio.value}
+                                                                                          value={radioButton.initial_selection === itemRadio.id}
                                                                                           isOnChange={false}
                                                                                         />
                                                                                       </React.Fragment>
@@ -5474,13 +5474,13 @@ const Scenario = () => {
                                                                                         <CheckboxCustom
                                                                                           label="初期選択設定"
                                                                                           onChange={() => {
-                                                                                            if (radioButton.initial_selection !== itemRadio.value) {
-                                                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.value, 'initial_selection');
+                                                                                            if (radioButton.initial_selection !== itemRadio.id) {
+                                                                                              onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemRadio.id, 'initial_selection');
                                                                                             } else {
                                                                                               onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection');
                                                                                             }
                                                                                           }}
-                                                                                          value={radioButton.initial_selection === itemRadio.value}
+                                                                                          value={radioButton.initial_selection === itemRadio.id}
                                                                                           isOnChange={false}
                                                                                         />
                                                                                       </React.Fragment>
@@ -8418,10 +8418,10 @@ const Scenario = () => {
                                                                                     <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                                                       <CheckboxCustom
                                                                                         label="初期選択設定"
-                                                                                        value={cardPaymentRadioButton.initial_selection === itemPaymentRadio.value}
+                                                                                        value={cardPaymentRadioButton.initial_selection === itemPaymentRadio.id}
                                                                                         onChange={() => {
-                                                                                          if (cardPaymentRadioButton.initial_selection !== itemPaymentRadio.value) {
-                                                                                            onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'initial_selection');
+                                                                                          if (cardPaymentRadioButton.initial_selection !== itemPaymentRadio.id) {
+                                                                                            onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.id, 'initial_selection');
                                                                                           } else {
                                                                                             onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection');
                                                                                           }
@@ -8429,10 +8429,10 @@ const Scenario = () => {
                                                                                       />
                                                                                       <CheckboxCustom
                                                                                         label="カード決済連動設定"
-                                                                                        value={cardPaymentRadioButton.card_linked_setting === itemPaymentRadio.value}
+                                                                                        value={cardPaymentRadioButton.card_linked_setting === itemPaymentRadio.id}
                                                                                         onChange={() => {
-                                                                                          if (cardPaymentRadioButton.card_linked_setting !== itemPaymentRadio.value) {
-                                                                                            onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'card_linked_setting');
+                                                                                          if (cardPaymentRadioButton.card_linked_setting !== itemPaymentRadio.id) {
+                                                                                            onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.id, 'card_linked_setting');
                                                                                           } else {
                                                                                             onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'card_linked_setting');
                                                                                           }
