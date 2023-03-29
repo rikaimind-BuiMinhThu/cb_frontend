@@ -2972,9 +2972,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             disabled={disabled}
                             type="radio"
                             id="ss-message__content--user-radio_button"
-                            checked={radioButton.initial_selection === item.id}
+                            checked={radioButton.initial_selection === item.value}
                             onChange={() => {
-                              onChangeValue(indexContent, content.type, item.id, 'initial_selection');
+                              onChangeValue(indexContent, content.type, item.value, 'initial_selection');
                               if (messageContent.length === 1) onClickNext();
                             }}
                           />
