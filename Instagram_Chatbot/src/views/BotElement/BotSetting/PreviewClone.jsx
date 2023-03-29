@@ -267,7 +267,7 @@ function Preview() {
         if (window && window.parent) {
           window.parent.postMessage(false, urlReceive);
         }
-        document.getElementById('sp-container').style.height = '0px';
+        document.getElementById('sp-container').style.height = '65px';
         document.getElementById('sp-process-bar').style.display = 'none';
         document.getElementById('sp-body').style.display = 'none';
         document.getElementById('sp-header').style.borderBottomLeftRadius = '25px';
