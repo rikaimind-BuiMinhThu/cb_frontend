@@ -1970,15 +1970,15 @@ function Preview() {
 
     if (dataMessages[indexMessageRender].message_content[indexContent][contentType].is_save_input_content) {
       variables.forEach(item => {
+        let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
         if (dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content === item.variable_name) {
-          let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
           if (contentType === 'zip_code_address') {
             let dataPostCode = !dataContentType.split_postal_code ? dataContentType?.value_post_code : `${dataContentType.value_post_code_left}${dataContentType.value_post_code_right}`
             item.default_value = `〒${dataPostCode} ${dataContentType?.value_prefecture || ""}${dataContentType?.value_municipality || ""} ${dataContentType?.value_address || ""}${dataContentType?.value_building_name || ""}`;
           } else if (field === 'start_date_select' || field === 'end_date_select') {
             item.default_value = `${dataContentType?.start_date_select || "start date"} ~ ${dataContentType?.end_date_select || "end date"}`;
           } else if (contentType === 'radio_button') {
-            item.default_value = dataContentType[dataContentType.type].find(item => item.id === value)?.text || item.default_value;
+            item.default_value = dataContentType[dataContentType.type].find(item => item.value === value)?.text || item.default_value;
           } else if (contentType === 'checkbox') {
             let dataTextChecked;
             if (field === 'checkedValue' && dataContentType.checkedValue.length > 0) {
@@ -2004,7 +2004,7 @@ function Preview() {
           } else if (contentType === 'card_payment_radio_button') {
             let dataTextChecked;
             if (field === 'initial_selection') {
-              dataTextChecked = dataContentType.radio_contents.find(item => value === item.id).text;
+              dataTextChecked = dataContentType.radio_contents.find(item => value === item.value).text;
             } else {
               dataContentType.radio_contents_img.forEach(item => {
                 item.contents.forEach(subItem => {
@@ -3030,9 +3030,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             disabled={disabled}
                             type="radio"
                             id="ss-message__content--user-radio_button"
-                            checked={radioButton.initial_selection === item.id}
+                            checked={radioButton.initial_selection === item.value}
                             onChange={() => {
-                              onChangeValue(indexContent, content.type, item.id, 'initial_selection');
+                              onChangeValue(indexContent, content.type, item.value, 'initial_selection');
                               if (messageContent.length === 1) onClickNext();
                             }}
                           />
@@ -3052,9 +3052,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             type="radio"
                             name="ss-message__content--user-radio_button--radio_button_img"
                             id="ss-message__content--user-radio_button--radio_button_img"
-                            checked={radioButton.initial_selection === item.id}
+                            checked={radioButton.initial_selection === item.value}
                             onChange={() => {
-                              onChangeValue(indexContent, content.type, item.id, 'initial_selection');
+                              onChangeValue(indexContent, content.type, item.value, 'initial_selection');
                               if (messageContent.length === 1) onClickNext();
                             }}
                           />
@@ -5128,11 +5128,11 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       value={cardPaymentRadioButton.initial_selection}
                     >
                       {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
-                        return <Radio value={itemPayment.id} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%' }}
+                        return <Radio value={itemPayment.value} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%' }}
                           onChange={() => {
                             let dataValue;
-                            if (cardPaymentRadioButton.initial_selection !== itemPayment.id) {
-                              dataValue = itemPayment.id;
+                            if (cardPaymentRadioButton.initial_selection !== itemPayment.value) {
+                              dataValue = itemPayment.value;
                             } else {
                               dataValue = "";
                             }
