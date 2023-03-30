@@ -77,8 +77,8 @@
     "yarn": "^1.22.19"
   },
   "scripts": {
-    "start": "set PORT=3001 && react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts --openssl-legacy-provider build && gulp licenses",
+    "start": "set PORT=3001 && react-scripts start --openssl-legacy-provider",
+    "build": "react-scripts build --openssl-legacy-provider && gulp licenses",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
