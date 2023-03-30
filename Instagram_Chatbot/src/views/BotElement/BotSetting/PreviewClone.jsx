@@ -1336,16 +1336,6 @@ function Preview() {
       user_id: uuid
     }
 
-    if (dataMessages.length - 1 === indexMessageRender && urlThanksPage) {
-      let aTag = document.createElement('a');
-      aTag.href = urlThanksPage;
-      aTag.target = '_blank';
-
-      setTimeout(() => {
-        aTag.click();
-      }, 2000)
-    }
-
     console.log(dataMessages.length)
     console.log(indexMessageRender)
     if (dataMessages.length - 1 === indexMessageRender) {
@@ -1368,11 +1358,8 @@ function Preview() {
         });
       });
       if (urlThanksPage) {
-        let aTag = document.createElement('a');
-        aTag.href = urlThanksPage;
-        aTag.target = '_blank';
         setTimeout(() => {
-          aTag.click();
+          window.parent.location.href = urlThanksPage
         }, 2000)
       }
     } else {
