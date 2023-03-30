@@ -2004,7 +2004,7 @@ function Preview() {
           } else if (contentType === 'card_payment_radio_button') {
             let dataTextChecked;
             if (field === 'initial_selection') {
-              dataTextChecked = dataContentType.radio_contents.find(item => value === item.id).text;
+              dataTextChecked = dataContentType.radio_contents.find(item => value === item.value).text;
             } else {
               dataContentType.radio_contents_img.forEach(item => {
                 item.contents.forEach(subItem => {
