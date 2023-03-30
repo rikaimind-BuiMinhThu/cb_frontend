@@ -5132,7 +5132,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           onChange={() => {
                             let dataValue;
                             if (cardPaymentRadioButton.initial_selection !== itemPayment.id) {
-                              dataValue = itemPayment.id;
+                              dataValue = itemPayment.id.toString();
                             } else {
                               dataValue = "";
                             }
@@ -5164,7 +5164,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           onChange={() => {
                             let dataValue;
                             if (cardPaymentRadioButton.initial_selection !== itemPayment.id) {
-                              dataValue = itemPayment.id;
+                              dataValue = itemPayment.id.toString();
                             } else {
                               dataValue = "";
                             }
