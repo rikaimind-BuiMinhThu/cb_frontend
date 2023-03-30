@@ -5149,10 +5149,10 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       value={cardPaymentRadioButton.initial_selection}
                     >
                       {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
-                        return <Radio value={itemPayment.id} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%' }}
+                        return <Radio value={itemPayment.value} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%' }}
                           onChange={() => {
                             let dataValue;
-                            if (cardPaymentRadioButton.initial_selection !== itemPayment.id) {
+                            if (cardPaymentRadioButton.initial_selection !== itemPayment.value) {
                               dataValue = itemPayment.value;
                             } else {
                               dataValue = "";
@@ -5181,10 +5181,10 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                       buttonStyle="solid"
                     >
                       {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
-                        return <Radio.Button value={itemPayment.id} key={indexPayment} style={{ marginBottom: '5px', padding: '5px', width: '100%', textAlign: 'center', lineHeight: '22px' }}
+                        return <Radio.Button value={itemPayment.value} key={indexPayment} style={{ marginBottom: '5px', padding: '5px', width: '100%', textAlign: 'center', lineHeight: '22px' }}
                           onChange={() => {
                             let dataValue;
-                            if (cardPaymentRadioButton.initial_selection !== itemPayment.id) {
+                            if (cardPaymentRadioButton.initial_selection !== itemPayment.value) {
                               dataValue = itemPayment.value;
                             } else {
                               dataValue = "";
