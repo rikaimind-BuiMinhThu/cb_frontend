@@ -2,7 +2,7 @@ export const ADD_TOKEN="ADD_TOKEN";
 
 export const getEnvironment = () => {
     try {
-        return localStorage.getItem("env") || getParamFromUrl("env") || "production";
+        return getParamFromUrl("env") || "production";
     } catch (e) {
         return getParamFromUrl("env") || "production";
     }
@@ -18,7 +18,7 @@ export const getParamFromUrl = (paramName) => {
 
 export const getDebugFlag = () =>  {
     try {
-        return localStorage.getItem("debug") || getParamFromUrl("debug") || true;
+        return getParamFromUrl("debug") || true;
     } catch (e) {
         return getParamFromUrl("debug") || true;
     }
@@ -33,18 +33,10 @@ export const log = (message) => {
 };
 
 export const getEcChatBotApiServerBaseUrl = () => {
-    const environment = getEnvironment();
+    const environment = process.env.CHATBOT_ENV
     log("Environment: " + environment);
 
-    switch (environment) {
-        case "staging":
-        case "test": 
-            return "https://ec-chatbot-test1.com";
-        case "production":
-            return "https://ec-chatbot-test.com";
-        default: 
-            return "http://localhost:3000";
-    }
+    return process.env.API_CHATBOT_URL;
 };
 
 export const getEcChatBotFrontEndBaseUrl = () => {
