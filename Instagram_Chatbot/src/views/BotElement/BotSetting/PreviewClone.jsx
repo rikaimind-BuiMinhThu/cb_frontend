@@ -1969,80 +1969,101 @@ function Preview() {
 
 
     if (dataMessages[indexMessageRender].message_content[indexContent][contentType].is_save_input_content) {
+      let isSaveParam = false;
       variables.forEach(item => {
-        if (dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content === item.variable_name) {
           let dataContentType = { ...dataMessages[indexMessageRender].message_content[indexContent][contentType] };
-          if (contentType === 'zip_code_address') {
-            let dataPostCode = !dataContentType.split_postal_code ? dataContentType?.value_post_code : `${dataContentType.value_post_code_left}${dataContentType.value_post_code_right}`
-            item.default_value = `〒${dataPostCode} ${dataContentType?.value_prefecture || ""}${dataContentType?.value_municipality || ""} ${dataContentType?.value_address || ""}${dataContentType?.value_building_name || ""}`;
-          } else if (field === 'start_date_select' || field === 'end_date_select') {
-            item.default_value = `${dataContentType?.start_date_select || "start date"} ~ ${dataContentType?.end_date_select || "end date"}`;
-          } else if (contentType === 'radio_button') {
-            item.default_value = dataContentType[dataContentType.type].find(item => item.id === value)?.text || item.default_value;
-          } else if (contentType === 'checkbox') {
-            let dataTextChecked;
-            if (field === 'checkedValue' && dataContentType.checkedValue.length > 0) {
-              dataTextChecked = dataContentType.checkedValue.map(itemChecked => {
-                return dataContentType[dataContentType.type].find(item => itemChecked === item.id)?.text;
-              })
-            } else if (field === 'initial_selection_picture' && dataContentType.initial_selection_picture.length > 0) {
-              dataTextChecked = dataContentType.initial_selection_picture.map(itemChecked => {
-                let dataReturn;
-                dataContentType[dataContentType.type].forEach(item => {
-                  item.contents.forEach(subItem => {
-                    if (itemChecked === `${item.id}-${subItem.id}`) {
-                      dataReturn = subItem.text;
-                    }
-                  });
-                })
-                return dataReturn;
-              });
-            } else {
-              dataTextChecked = [];
-            }
-            item.default_value = dataTextChecked.join(',') ?? item.default_value;
-          } else if (contentType === 'card_payment_radio_button') {
-            let dataTextChecked;
-            if (field === 'initial_selection') {
-              dataTextChecked = dataContentType.radio_contents.find(item => value === item.id).text;
-            } else {
-              dataContentType.radio_contents_img.forEach(item => {
-                item.contents.forEach(subItem => {
-                  if (value === `${item.id}-${subItem.id}`) {
-                    dataTextChecked = subItem.text;
+          if (dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content === item.variable_name) {
+              if (contentType === 'zip_code_address') {
+                  let dataPostCode = !dataContentType.split_postal_code ? dataContentType?.value_post_code : `${dataContentType.value_post_code_left}${dataContentType.value_post_code_right}`
+                  item.default_value = `〒${dataPostCode} ${dataContentType?.value_prefecture || ""}${dataContentType?.value_municipality || ""} ${dataContentType?.value_address || ""}${dataContentType?.value_building_name || ""}`;
+                  isSaveParam = true;
+              } else if (field === 'start_date_select' || field === 'end_date_select') {
+                  item.default_value = `${dataContentType?.start_date_select || "start date"} ~ ${dataContentType?.end_date_select || "end date"}`;
+                  isSaveParam = true;
+              } else if (contentType === 'radio_button') {
+                  item.default_value = dataContentType[dataContentType.type].find(item => item.value === value)?.text || item.default_value;
+                  isSaveParam = true;
+              } else if (contentType === 'checkbox') {
+                  let dataTextChecked;
+                  if (field === 'checkedValue' && dataContentType.checkedValue.length > 0) {
+                      dataTextChecked = dataContentType.checkedValue.map(itemChecked => {
+                          return dataContentType[dataContentType.type].find(item => itemChecked === item.id)?.text;
+                      })
+                      isSaveParam = true;
+                  } else if (field === 'initial_selection_picture' && dataContentType.initial_selection_picture.length > 0) {
+                      dataTextChecked = dataContentType.initial_selection_picture.map(itemChecked => {
+                          let dataReturn;
+                          dataContentType[dataContentType.type].forEach(item => {
+                              item.contents.forEach(subItem => {
+                                  if (itemChecked === `${item.id}-${subItem.id}`) {
+                                      dataReturn = subItem.text;
+                                  }
+                              });
+                          })
+                          return dataReturn;
+                      });
+                      isSaveParam = true;
+                  } else {
+                      dataTextChecked = [];
                   }
-                });
-              })
-            }
-            item.default_value = dataTextChecked || item.default_value;
-          } else if (contentType === 'pull_down') {
-            if (field === 'customization' || field === 'prefectures') {
-              item.default_value = value;
-            } else if (field === 'up_to_municipality') {
-              item.default_value = `${dataContentType[field].prefecture}${dataContentType[field].city}`
-            } else if (field === 'timezone_from_to') {
-              item.default_value = `${dataContentType[field]?.valueHour1}:${dataContentType[field]?.valueMinute1}-${dataContentType[field]?.valueHour2}:${dataContentType[field]?.valueMinute2}`;
-            } else if (field === 'date_ym') {
-              item.default_value = `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}`;
-            } else if (field === 'period_from_to') {
-              item.default_value = `${dataContentType[field]?.valueYear1}-${dataContentType[field]?.valueMonth1}-${dataContentType[field]?.valueDay1} ~ ${dataContentType[field]?.valueYear2}-${dataContentType[field]?.valueMonth2}-${dataContentType[field]?.valueDay2}`;
-            } else {
-              item.default_value = `${(dataContentType[field]?.valueYear || dataContentType[field]?.valueMonth || dataContentType[field]?.valueDay) ? `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}-${dataContentType[field]?.valueDay}` : ""} ${(dataContentType[field]?.valueHour || dataContentType[field]?.valueMinute) ? `${dataContentType[field]?.valueHour}:${dataContentType[field]?.valueMinute}` : ""}`;
-            }
-          } else if (dataContentType.type === 'embedded') {
-            item.default_value = `${moment(value).format("YYYY-MM-DD")}`
-          } else if (field === 'phone_number' && dataContentType[field].withHyphen) {
-            item.default_value = `${dataContentType[field]?.value1}-${dataContentType[field]?.value2}-${dataContentType[field]?.value3}`;
-          } else if (contentType === 'carousel') {
-            item.default_value = dataContentType[dataContentType.type].contents.find(item => item.id === value).title;
-          } else if (contentType !== 'credit_card_payment') {
-            item.default_value = value;
+                  item.default_value = dataTextChecked.join(',') ?? item.default_value;
+              } else if (contentType === 'card_payment_radio_button') {
+                  let dataTextChecked;
+                  if (field === 'initial_selection') {
+                      dataTextChecked = dataContentType.radio_contents.find(item => value === item.value).text;
+                      isSaveParam = true;
+                  } else if (field === 'initial_selection_picture') {
+                      dataContentType.radio_contents_img.forEach(item => {
+                          item.contents.forEach(subItem => {
+                              if (value === `${item.id}-${subItem.id}`) {
+                                  dataTextChecked = subItem.text;
+                              }
+                          });
+                      })
+                      isSaveParam = true;
+                  }
+                  item.default_value = dataTextChecked || item.default_value;
+              } else if (contentType === 'pull_down') {
+                  if (field === 'customization' || field === 'prefectures') {
+                      item.default_value = value;
+                      isSaveParam = true;
+                  } else if (field === 'up_to_municipality') {
+                      item.default_value = `${dataContentType[field].prefecture}${dataContentType[field].city}`
+                      isSaveParam = true;
+                  } else if (field === 'timezone_from_to') {
+                      item.default_value = `${dataContentType[field]?.valueHour1}:${dataContentType[field]?.valueMinute1}-${dataContentType[field]?.valueHour2}:${dataContentType[field]?.valueMinute2}`;
+                      isSaveParam = true;
+                  } else if (field === 'date_ym') {
+                      item.default_value = `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}`;
+                      isSaveParam = true;
+                  } else if (field === 'period_from_to') {
+                      item.default_value = `${dataContentType[field]?.valueYear1}-${dataContentType[field]?.valueMonth1}-${dataContentType[field]?.valueDay1} ~ ${dataContentType[field]?.valueYear2}-${dataContentType[field]?.valueMonth2}-${dataContentType[field]?.valueDay2}`;
+                      isSaveParam = true;
+                  } else {
+                      item.default_value = `${(dataContentType[field]?.valueYear || dataContentType[field]?.valueMonth || dataContentType[field]?.valueDay) ? `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}-${dataContentType[field]?.valueDay}` : ""} ${(dataContentType[field]?.valueHour || dataContentType[field]?.valueMinute) ? `${dataContentType[field]?.valueHour}:${dataContentType[field]?.valueMinute}` : ""}`;
+                      isSaveParam = true;
+                  }
+              } else if (dataContentType.type === 'embedded') {
+                  item.default_value = `${moment(value).format("YYYY-MM-DD")}`
+                  isSaveParam = true;
+              } else if (field === 'phone_number' && dataContentType[field].withHyphen) {
+                  item.default_value = `${dataContentType[field]?.value1}-${dataContentType[field]?.value2}-${dataContentType[field]?.value3}`;
+                  isSaveParam = true;
+              } else if (contentType === 'carousel') {
+                  item.default_value = dataContentType[dataContentType.type].contents.find(item => item.id === value).title;
+                  isSaveParam = true;
+              } else if (contentType !== 'credit_card_payment') {
+                  item.default_value = value;
+                  isSaveParam = true;
+              }
           }
-        }
       });
-      objParam[dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content] = value;
-      setObjParam({ ...objParam });
-    }
+      setVariables([...variables]);
+      if (isSaveParam) {
+          objParam[dataMessages[indexMessageRender].message_content[indexContent][contentType].save_input_content] = value;
+          setObjParam({ ...objParam });
+      }
+  }
     setDataMessages([...dataMessages]);
   }
 
