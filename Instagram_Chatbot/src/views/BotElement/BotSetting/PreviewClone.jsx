@@ -2010,7 +2010,7 @@ function Preview() {
               } else if (contentType === 'card_payment_radio_button') {
                   let dataTextChecked;
                   if (field === 'initial_selection') {
-                      dataTextChecked = dataContentType.radio_contents.find(item => value === item.value).text;
+                      dataTextChecked = dataContentType.radio_contents.find(item => value === item.value)?.text;
                       isSaveParam = true;
                   } else if (field === 'initial_selection_picture') {
                       dataContentType.radio_contents_img.forEach(item => {
@@ -5153,7 +5153,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           onChange={() => {
                             let dataValue;
                             if (cardPaymentRadioButton.initial_selection !== itemPayment.id) {
-                              dataValue = itemPayment.id.toString();
+                              dataValue = itemPayment.value;
                             } else {
                               dataValue = "";
                             }
@@ -5185,7 +5185,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                           onChange={() => {
                             let dataValue;
                             if (cardPaymentRadioButton.initial_selection !== itemPayment.id) {
-                              dataValue = itemPayment.id.toString();
+                              dataValue = itemPayment.value;
                             } else {
                               dataValue = "";
                             }

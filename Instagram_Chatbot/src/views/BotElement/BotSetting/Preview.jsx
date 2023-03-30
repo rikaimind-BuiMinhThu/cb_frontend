@@ -1946,7 +1946,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     } else if (contentType === 'card_payment_radio_button') {
                         let dataTextChecked;
                         if (field === 'initial_selection') {
-                            dataTextChecked = dataContentType.radio_contents.find(item => value === item.value).text;
+                            dataTextChecked = dataContentType.radio_contents.find(item => value === item.value)?.text;
                             isSaveParam = true;
                         } else if (field === 'initial_selection_picture') {
                             dataContentType.radio_contents_img.forEach(item => {
