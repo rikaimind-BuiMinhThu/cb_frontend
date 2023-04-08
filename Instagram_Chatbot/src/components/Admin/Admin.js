@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import Login from './Login';
 import Admin from '../../layouts/Admin';
-import { BrowserRouter, Route, Switch, Redirect, Link } from "react-router-dom";
-import HtmlScreen from 'views/HtmlScreen';
+import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Index from 'views/Public/Index';
 import Plan from 'views/Public/Plan';
 import PrivacyPolicy from 'views/Public/PrivacyPolicy';
@@ -13,19 +12,12 @@ import Contact from 'views/Public/Contact';
 import ShortUrl from 'views/Public/ShortUrl';
 import PreviewClone from 'views/BotElement/BotSetting/PreviewClone';
 import News from 'views/Public/News';
+
 class App extends Component {
   render() {
     return (
-      // <div>
-      //   <Login />
-      // </div>
       <BrowserRouter>
         <div>
-          {/* <div>
-            <Link to="/">Sign-in</Link>
-            <Link to="/sign-in">Sign-in</Link>
-            <Link to="/admin/dashboard">Dashboard</Link>
-          </div> */}
           <Switch>
             <Route exact path="/" component={Login} />
             <Route exact path="/payment" component={Index} />
@@ -41,7 +33,6 @@ class App extends Component {
             <Route path="/sign-in" component={Login} />
             <Route path="/admin" render={(props) => <Admin {...props} />} />
             <Route component={ShortUrl}></Route>
-            {/* <Redirect to="/admin/dashboard" /> */}
           </Switch>
         </div>
       </BrowserRouter>
