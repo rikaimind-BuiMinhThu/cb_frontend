@@ -7,9 +7,9 @@ import api from '../../api/api-management'
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { event } from 'jquery';
+import {FACEBOOK_APP_ID} from '../../variables/constants';
 
 function LoginFacebook({ checkLogin }) {
-
 
   const [login, setLogin] = useState(false);
   const [data, setData] = useState({});
@@ -67,7 +67,7 @@ function LoginFacebook({ checkLogin }) {
 
   window.fbAsyncInit = function () {
     window.FB.init({
-      appId: '1733245763691008',
+      appId: FACEBOOK_APP_ID,
       cookie: true,
       xfbml: true,
       version: 'v14.0'
