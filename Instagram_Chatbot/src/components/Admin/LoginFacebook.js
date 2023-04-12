@@ -53,7 +53,21 @@ function LoginFacebook({ checkLogin }) {
       // });
       // console.log("chua login fb dau ne")
     } else {
-
+      axios.get(`https://graph.facebook.com/v14.0/${ig_id}?fields=id,username,ig_id,name,profile_picture_url&access_token=${page_access_token}`).then(res => {
+        checkLogin(true, ig_id)
+        document.getElementById("btnLoginFB").style.display = "none"
+        document.getElementById("listPage").style.display = "none"
+        document.getElementById("profileFB").style.display = "block"
+        document.getElementById("logoutFB").style.display = 'block'
+        setUrlImg(res.data.profile_picture_url)
+        setUsername(res.data.username)
+        // window.location.reload()
+      }).catch(error => {
+        console.log(error)
+        // if (error.response.data.code === 3) {
+        //   requestNewToken(path)
+        // }
+      })
     }
   }
 
