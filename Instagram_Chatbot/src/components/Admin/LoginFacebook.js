@@ -206,7 +206,7 @@ function LoginFacebook({ checkLogin }) {
       <div id="loginToFB" style={{ width: "100%", textAlign: "center", margin: "auto" }}>
         <div id='btnLoginFB'>
           <FacebookLogin
-            scope="public_profile,email,instagram_basic,pages_show_list,ads_management,pages_read_engagement,business_management"
+            scope="public_profile,email,instagram_basic,pages_show_list,ads_management,pages_read_engagement,pages_manage_metadata,business_management,instagram_manage_messages,instagram_manage_comments,pages_messaging"
             callback={() => checkLoginState()}>
           </FacebookLogin>
         </div>
