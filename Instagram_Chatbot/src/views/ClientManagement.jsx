@@ -3470,6 +3470,9 @@ function ClientManagement() {
                     <option onClick={() => setSizeAfterSelectCartSystem()} value="tamago_repeat">
                       たまごリピート
                     </option>
+                    <option onClick={() => setSizeAfterSelectCartSystem()} value="subsc_store">
+                      サブスクストア
+                    </option>
                     <option onClick={() => setSizeAfterSelectCartSystem()} value="shopify">
                       Shopify
                     </option>
