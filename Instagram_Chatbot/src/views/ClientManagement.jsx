@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import api from '../api/api-management';
-import requestNewToken from 'api/request-new-token';
 import Modal from './Popup/Modal';
 import ModalNoti from './Popup/ModalNoti';
 import './Popup/modal.css';
 import * as utils from './../JS/client.js';
 import '../assets/css/general.css';
-import { Card, CardHeader, CardBody, CardTitle, Table, Row, Col } from 'reactstrap';
+import { Card, CardHeader, CardBody, Table, Row, Col } from 'reactstrap';
 import { Button } from 'react-bootstrap';
-import { Title } from 'chart.js';
 import { Pagination } from '@material-ui/lab';
 import ModalShort from './Popup/ModalShort';
 import $ from 'jquery';
@@ -68,12 +66,6 @@ function ClientManagement() {
   var [pageIndex, setPageIndex] = useState(1);
   var [totalPage, setTotalPage] = useState();
   var [cartSystem, setCartSystem] = useState();
-
-  // var [dateStart, setDateStart] = useState();
-  // var [inputValueName, setInputValueName] = useState();
-  // var [inputValueAddress, setInputValueAddress] = useState();
-  // var [inputValuePhone, setInputValuePhone] = useState();
-
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [isOpenAddUser, setIsOpenAddUser] = useState(false);
@@ -82,21 +74,26 @@ function ClientManagement() {
   const [startDatePreview, setStartDatePreview] = useState(null);
   const [endDatePreview, setEndDatePreview] = useState(null);
 
-  React.useEffect(() => {
-    var cook = Cookies.get('user_role');
-    if (cook == 'admin_deel') {
-    } else if (cook == 'admin_client') {
-      window.location.href = '/admin/dashboard';
-      // var elem = document.getElementById('sidebarClient');
-      // elem.parentNode.removeChild(elem);
-    } else if (cook == 'client') {
+  /**
+   * Check the user permissions
+   */
+  useEffect(() => {
+    const userRole = Cookies.get('user_role');
+    if (!userRole) {
+      window.location.href = '/';
+    }
+    if (userRole === 'admin_client') {
       window.location.href = '/admin/dashboard';
     }
-  });
+    if (userRole === 'client') {
+      window.location.href = '/admin/dashboard';
+    }
+  }, []);
 
-  React.useEffect(() => {
-    // console.log('token in dashboard', Cookies.get('token'));
-    console.log('is_auth', Cookies.get('is_auth'));
+  /**
+   * Check the user permissions
+   */
+  useEffect(() => {
     if (
       Cookies.get('token') == undefined ||
       Cookies.get('token') == null ||
@@ -108,13 +105,9 @@ function ClientManagement() {
       window.location.href = '/';
     }
   }, []);
-  React.useEffect(() => {
-    Cookies.get('token');
-    // console.log(Cookies.get('token'));
-  });
+
   React.useEffect(() => {
     var paramSearch = { page: pageIndex };
-    var path = window.location.pathname;
     api
       .get(`/api/v1/managements/clients`, paramSearch)
       .then((res) => {
@@ -141,7 +134,7 @@ function ClientManagement() {
           tokenExpired()
         }
       });
-  }, []);
+  }, [pageIndex]);
 
   React.useEffect(() => {
     const datePickerInputs = document.querySelectorAll(
@@ -300,7 +293,6 @@ function ClientManagement() {
   }
 
   function getUserDetail(item) {
-    var path = window.location.pathname;
     api
       .get(`/api/v1/managements/clients/${item.id}`)
       .then((res) => {
@@ -386,9 +378,6 @@ function ClientManagement() {
     }
   });
   function updateClientUser(item) {
-    // document.getElementById("screenAll").disabled = true;
-
-    var path = window.location.pathname;
     api
       .get(`/api/v1/managements/clients/${item.id}`)
       .then((res) => {
@@ -495,11 +484,7 @@ function ClientManagement() {
   }
 
   function updateClient() {
-    var path = window.location.pathname;
-
     var price = document.getElementById('newPlanPrice').value;
-    var startDate = document.getElementById('startDate').value;
-    var endDate = document.getElementById('endDate').value;
     var name = document.getElementById('newName').value;
     var nameKata = document.getElementById('newNameKata').value;
     var companyType = document.getElementById('newCompanyType').value;
@@ -2263,6 +2248,7 @@ function ClientManagement() {
                     id="imgUpdatesrc"
                     src={urlLogo}
                     style={{ maxHeight: '200px', marginLeft: '30%', marginTop: '5px' }}
+                    alt=""
                   ></img>
                   <label
                     id="newClientImgLogoErrMsg"
@@ -3483,6 +3469,12 @@ function ClientManagement() {
                     </option>
                     <option onClick={() => setSizeAfterSelectCartSystem()} value="tamago_repeat">
                       たまごリピート
+                    </option>
+                    <option onClick={() => setSizeAfterSelectCartSystem()} value="subsc_store">
+                      サブスクストア
+                    </option>
+                    <option onClick={() => setSizeAfterSelectCartSystem()} value="shopify">
+                      Shopify
                     </option>
                   </select>
                   <label

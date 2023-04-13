@@ -1,23 +1,4 @@
-/*!
-
-=========================================================
-* Paper Dashboard React - v1.3.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/paper-dashboard-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com)
-
-* Licensed under MIT (https://github.com/creativetimofficial/paper-dashboard-react/blob/main/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React from "react";
-// javascript plugin used to create scrollbars on windows
 import PerfectScrollbar from "perfect-scrollbar";
 import { Route, Switch, useLocation } from "react-router-dom";
 
@@ -30,10 +11,9 @@ import routes from "routes.js";
 var ps;
 
 function Dashboard(props) {
-  const [backgroundColor, setBackgroundColor] = React.useState("white");
-  const [activeColor, setActiveColor] = React.useState("info");
   const mainPanel = React.useRef();
   const location = useLocation();
+
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
       ps = new PerfectScrollbar(mainPanel.current);
@@ -46,6 +26,7 @@ function Dashboard(props) {
       }
     };
   });
+
   React.useEffect(() => {
     mainPanel.current.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -56,17 +37,17 @@ function Dashboard(props) {
       <Sidebar
         {...props}
         routes={routes}
-        bgColor={backgroundColor}
-        activeColor={activeColor}
+        bgColor={"white"}
+        activeColor={"info"}
       />
       <div className="main-panel" ref={mainPanel}>
         <DemoNavbar {...props} />
         <Switch>
-          {routes.map((prop, key) => {
+          {routes.map((route, key) => {
             return (
               <Route
-                path={prop.layout + prop.path}
-                component={prop.component}
+                path={route.layout + route.path}
+                component={route.component}
                 key={key}
               />
             );
