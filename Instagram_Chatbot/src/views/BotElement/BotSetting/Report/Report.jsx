@@ -1155,7 +1155,7 @@ function Report() {
   };
 
   return (
-    <>
+    <> 
       <div className="content">
         <Row id="screenAll">
           <Col md="12">

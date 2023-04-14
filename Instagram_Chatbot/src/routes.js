@@ -282,7 +282,7 @@ var routes = [
   },
   {
     path: '/design-setting',
-    name: 'Design Setting',
+    name: 'デザイン設定',
     // icon: "nc-icon nc-single-02",
     component: DesignChatbot,
     layout: '/admin',

@@ -937,7 +937,7 @@ function PaymentManagement() {
                             className="pm-select"
                             value={currentClientId}
                             onChange={(e) => handleSelectClient(e.target.value)}
-                          >
+                          > 
                             <option value={'deel'}>Deel</option>
                             {allClient.map((client, index) => (
                               <option key={index} value={client.id}>

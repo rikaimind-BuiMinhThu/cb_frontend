@@ -771,7 +771,7 @@ function Sidebar(props) {
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
                     <MDBIcon fas icon="paint-brush" style={{ color: "black" }} />
-                    <p style={{ color: 'black' }}>Design Setting</p>
+                    <p style={{ color: 'black' }}>デザイン設定</p>
                   </NavLink>
                 </li>
                 {/* <li
