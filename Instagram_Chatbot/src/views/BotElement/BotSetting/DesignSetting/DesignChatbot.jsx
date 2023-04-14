@@ -57,12 +57,14 @@ function DesignChatbot() {
   const [positionPc, setPositionPc] = useState(1);
   const [widthPc, setWidthPc] = useState("");
   const [heightPc, setHeightPc] = useState("");
+  const [botId, setBotId] = useState(Cookies.get('bot_id'));
   const [rightPcTitle, setRightPcTitle] = useState("");
   const [positionSp, setPositionSp] = useState("");
   const [buttonTypeSp, setButtonTypeSp] = useState("");
-  
-
-
+  console.log(botId);
+  useEffect(() => {
+    setBotId(Cookies.get('bot_id'));
+  }, [])
   function closeSizeSelectCom() {
     document.getElementById("newCompanyType").size = "1";
   }
@@ -174,7 +176,7 @@ function DesignChatbot() {
       );
 
   // add new bot chat
-  const addNewBotChat = () => {
+  const addUpdateBotChat = () => {
     if (title && subtitle && botName) {
       let iconBot = "";
       if (botImage === "") {
@@ -213,7 +215,7 @@ function DesignChatbot() {
       // console.log('bot info: ', bot)
 
       api
-        .post(`api/v1/managements/chatbots`, bot)
+        .put(`api/v1/managements/chatbots/${botId}`, bot)
         .then((res) => {
           if (res.data.code === 1 || res.data.code === "1") {
             Cookies.set("bot_id", res.data.data.id);
@@ -514,7 +516,7 @@ function DesignChatbot() {
                             <button
                               type="button"
                               className="btn btn-new-bot"
-                              onClick={addNewBotChat}
+                              onClick={addUpdateBotChat}
                             >
                               保存
                             </button>
@@ -536,8 +538,6 @@ function DesignChatbot() {
                         padding: "0 40px",
                       }}
                     >
-
-
                       {/* Pc */}
                       <div
                         style={{ width: "50%", borderRight: "1px solid #ddd" }}
@@ -885,7 +885,7 @@ function DesignChatbot() {
                               className="btn btn-preview"
                               onClick={()=>{}}
                             >
-                              保存
+                              保存2
                             </button>
                           </div>
                     </div>
