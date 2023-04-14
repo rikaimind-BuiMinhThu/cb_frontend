@@ -1,12 +1,11 @@
 import '../../../../assets/css/bot/scenario/scenario-single.css';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Col, Row, Card, CardBody, Button
 } from 'reactstrap';
 import icon from '../../../../assets/img/bot-icon/man1_new.png';
 import { MDBIcon } from 'mdbreact';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Link } from 'react-router-dom';
 import SelectCustom from './scenarioComon/SelectCustom';
 import CheckboxCustom from './scenarioComon/CheckboxCustom';
 import InputNum from './scenarioComon/InputNum';
@@ -41,27 +40,6 @@ import 'moment/locale/zh-cn';
 
 const _ = require('lodash');
 
-let data = [
-  {
-    belong_to: 'bot',
-    id: '1',
-    message_content: [
-      {
-        name: '',
-
-      }
-    ]
-  },
-  {
-    belong_to: 'user',
-    id: '2',
-    type: 'text_input',
-    message_detail: {
-      type: 'text',
-    },
-  },
-];
-
 let dataPaymentMethod = [
   {
     key: 'visa',
@@ -88,30 +66,6 @@ let dataPaymentMethod = [
     value: <img src={discover} />
   }
 ]
-
-let dataProductPurchase = [
-  {
-    key: 'quantity_designation',
-    value: '数量指定'
-  },
-  {
-    key: 'product_number_display',
-    value: '商品番号表示'
-  },
-  {
-    key: 'price_display',
-    value: '値段表示'
-  },
-  {
-    key: 'product_name_display',
-    value: '商品名表示'
-  },
-  {
-    key: 'multiple_item_purchase',
-    value: '複数商品購入'
-  }
-]
-
 
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
@@ -787,10 +741,9 @@ let dataApiLinkage = [
 
 const Scenario = () => {
   // states
-  const [fileVideo, setFileVideo] = useState('');
   const [scenarioName, setScenarioName] = useState('');
   const [urlThanks, setUrlThanks] = useState('');
-  const [tamagoLandingPageUrl, setTamagoLandingPageUrl] = useState('');
+  const [lpProductUrl, setLpProductUrl] = useState('');
   const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
   const [errorScenarioName, setErrorScenarioName] = useState('');
 
@@ -807,15 +760,8 @@ const Scenario = () => {
   // bot setting values
   const [botTextValue, setBotTextValue] = useState('');
   const [isOpenAddVariable, setIsOpenAddVariable] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const toggle = () => setDropdownOpen((prevState) => !prevState);
-
-  const [isClickPlus, setIsClickPlus] = useState(false);
-
   const [fileError, setFileError] = useState('');
   const [fileErrorCarousel, setFileErrorCarousel] = useState('');
-  const [endDate, setEndDate] = useState(new Date());
-
   // user setting values
   const [dataMessages, setDataMessages] = useState([]);
 
@@ -849,11 +795,6 @@ const Scenario = () => {
 
   const [dataCondition, setDataCondition] = useState([]);
 
-  const carouselSlide = useRef(null);
-  // side effects
-
-
-
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
     setScenarioId(Cookies.get('scenario_id'));
@@ -877,10 +818,6 @@ const Scenario = () => {
       }
     })
   }, [])
-
-  // useEffect(() => {
-  //   setDataMessages(dataClone.messages);
-  // }, [])
 
   useEffect(() => {
     api.get(`/api/v1/prefectures`).then((res) => {
@@ -910,7 +847,7 @@ const Scenario = () => {
       
       setScenarioName(res.data.data?.scenario_name || '');
       setUrlThanks(res.data.data?.conversation?.urlThanksPage || '');
-      setTamagoLandingPageUrl(res.data.data?.tamagoLandingPageUrl || '');
+      setLpProductUrl(res.data.data?.tamagoLandingPageUrl || '');
       setIsUseOnlyRegularOrder(res.data.data?.isUseOnlyRegularOrder || false);
     }).catch((error) => {
       console.log(error);
@@ -1821,7 +1758,6 @@ const Scenario = () => {
   }
 
   const onClickSavePreview = () => {
-    console.log(scenarioName);
     if (!scenarioName) {
       setErrorScenarioName("入力してください。");
       return;
@@ -1829,13 +1765,13 @@ const Scenario = () => {
       setErrorScenarioName("");
     }
 
-    let data = {
+    const data = {
       conversation: {
         messages: [...dataMessages],
         urlThanksPage: urlThanks
       },
       scenario_name: scenarioName,
-      tamago_landing_page_url: tamagoLandingPageUrl,
+      landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
@@ -1864,25 +1800,24 @@ const Scenario = () => {
     })
   }
 
-  const onClickSaveScenario = () => {
-    console.log(scenarioName);
+  const onClickSaveScenario = async () => {
     if (!scenarioName) {
       setErrorScenarioName("入力してください。");
       return;
     } else {
       setErrorScenarioName("");
     }
-    let data = {
+    const data = {
       conversation: {
         messages: [...dataMessages],
         urlThanksPage: urlThanks
       },
       scenario_name: scenarioName,
-      tamago_landing_page_url: tamagoLandingPageUrl,
+      landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
     }
-    api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
-      console.log(res.data);
+    try {
+      const res = await api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data);
       setIsOpenNoti(true);
       if (res.data.code === 1) {
         setMessageNoti('シナリオを保存しました。');
@@ -1894,12 +1829,11 @@ const Scenario = () => {
         setIsOpenNoti(false);
         setMessageNoti('');
       }, 2000);
-    }).catch((error) => {
-      console.log(error);
+    } catch (error) {
       if (error.response?.data.code === 0) {
         tokenExpired()
       }
-    })
+    }
   }
 
   const onClickCreateStatement = async (belongTo, indexMessage) => {
@@ -2249,8 +2183,8 @@ const Scenario = () => {
                   <div>
                     <InputCustom
                       style={{ width: '100%', marginTop: '5px' }}
-                      value={tamagoLandingPageUrl}
-                      onChange={value => setTamagoLandingPageUrl(value)}
+                      value={lpProductUrl}
+                      onChange={value => setLpProductUrl(value)}
                       placeholder="商品購入のURL"
                     />
                   </div>

@@ -39,6 +39,8 @@ function getEcChatBotApiServerBaseUrl() {
             return "https://ec-chatbot-test1.com";
         case "production":
             return "https://ec-chatbot-test.com";
+        case "local":
+            return "http://localhost:3000";
         default: 
             return "http://localhost:3000";
     }
@@ -53,6 +55,8 @@ function getEcChatBotFrontEndBaseUrl() {
             return "https://ec-chatbot1.com";
         case "production":
             return "https://ec-chatbot.com";
+        case "local":
+                return "http://localhost:3001";
         default: 
             return "http://localhost:3001";
     }

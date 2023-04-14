@@ -7,9 +7,9 @@ import api from '../../api/api-management'
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { event } from 'jquery';
+import {FACEBOOK_APP_ID} from '../../variables/constants';
 
 function LoginFacebook({ checkLogin }) {
-
 
   const [login, setLogin] = useState(false);
   const [data, setData] = useState({});
@@ -53,13 +53,6 @@ function LoginFacebook({ checkLogin }) {
       // });
       // console.log("chua login fb dau ne")
     } else {
-      console.log("login roi ne")
-      // window.FB.api(`/${ig_id}?fields=id,username,ig_id,name,profile_picture_url,accessToken=${page_access_token},appId=1733245763691008`,
-      //   function (response) {
-      //     // Insert your code here
-      //     console.log("ig_response: ", response)
-      //   }
-      // );
       axios.get(`https://graph.facebook.com/v14.0/${ig_id}?fields=id,username,ig_id,name,profile_picture_url&access_token=${page_access_token}`).then(res => {
         checkLogin(true, ig_id)
         document.getElementById("btnLoginFB").style.display = "none"
@@ -88,7 +81,7 @@ function LoginFacebook({ checkLogin }) {
 
   window.fbAsyncInit = function () {
     window.FB.init({
-      appId: '1733245763691008',
+      appId: FACEBOOK_APP_ID,
       cookie: true,
       xfbml: true,
       version: 'v14.0'
@@ -165,38 +158,27 @@ function LoginFacebook({ checkLogin }) {
               console.log(ig_id, ig_name)
               var fb_AuthResponse = window.FB.getAuthResponse();
               var data = { "fb_AuthResponse": fb_AuthResponse, "page_id": value, "ig_id": res.id }
+              Cookies.set("ig_id", ig_id);
+              Cookies.set("page_access_token", fb_AuthResponse.accessToken);
               console.log("data post insta connect", data)
               api.post(`/api/v1/instagram_connect`, data).then(res => {
                 if (res.data.code == 2) {
                   alert("This account didn't link to instagram")//Didn't link to insta
                 } else if (res.data.code == 1) {
-                  //
-                  console.log(res.data)
-                  var page_access_token
-                console.log("get page access token first come to release: ", Cookies.get("page_access_token") )
-                if (Cookies.get("page_access_token") != undefined) {
-                  page_access_token = Cookies.get("page_access_token")
-                }else if(Cookies.get("page_access_token") == undefined){
-                  page_access_token = accessToken2
-                }
-
                 //change this to come to releases move to code = 1
                 checkLogin(true, ig_id)
-                axios.get(`https://graph.facebook.com/v14.0/${ig_id}?fields=id,username,ig_id,name,profile_picture_url&access_token=${page_access_token}`).then(res => {
+                window.FB.api(`/${ig_id}?fields=id,username,ig_id,name,profile_picture_url`, function(res) {
                   checkLogin(true, ig_id)
                   document.getElementById("btnLoginFB").style.display = "none"
                   document.getElementById("listPage").style.display = "none"
                   document.getElementById("profileFB").style.display = "block"
-                  setUrlImg(res.data.profile_picture_url)
-                  setUsername(res.data.username)
-                }).catch(error => {
-                  console.log(error)
+                  setUrlImg(res.profile_picture_url)
+                  setUsername(res.username)
                 })
                 }
                 
               }).catch(error => {
                 console.log(error)
-
               })
 
             }
@@ -224,7 +206,7 @@ function LoginFacebook({ checkLogin }) {
       <div id="loginToFB" style={{ width: "100%", textAlign: "center", margin: "auto" }}>
         <div id='btnLoginFB'>
           <FacebookLogin
-            scope="public_profile,email"
+            scope="public_profile,email,instagram_basic,pages_show_list,ads_management,pages_read_engagement,pages_manage_metadata,business_management,instagram_manage_messages,instagram_manage_comments,pages_messaging"
             callback={() => checkLoginState()}>
           </FacebookLogin>
         </div>

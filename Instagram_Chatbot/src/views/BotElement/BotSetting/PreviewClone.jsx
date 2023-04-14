@@ -1864,10 +1864,6 @@ function Preview() {
         }
       }
     }
-
-    // clearTimeout(delayRender);
-
-    // renderMessageArr
   }
 
   const onChangeValue = (indexContent, contentType, value, field, subFiled, name) => {
