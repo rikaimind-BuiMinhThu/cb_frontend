@@ -169,12 +169,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     const [captcha, setCaptcha] = useState([]);
     const [withdrawal, setWithdrawal] = useState({});
     const [dataVariables, setDataVariables] = useState([]);
-    // const
-
     const [dataPrefectures, setDataPrefectures] = useState([]);
     const [dataCities, setDataCities] = useState([]);
     const [dataTowns, setDataTowns] = useState([]);
-
     const [prefectures, setPrefectures] = useState();
     const [cities, setCities] = useState();
     const [towns, setTowns] = useState();
@@ -1308,6 +1305,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             }
         } else {
             api.post(`/api/v1/scenario_users/scenario_user_responses`, data_submit).then(res => {
+                console.log(data_submit.scenario_id);
+                console.log(data_submit.message);
             }).catch((error) => {
                 console.log(error);
                 if (error.response?.data.code === 0) {
@@ -1523,6 +1522,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                             }).then(() => {
                                 if (dataMessages.length - 1 === i) {
                                     api.post(`/api/v1/scenario_users/scenario_user_responses/create_order`, data_submit).then(res => {
+                                        
                                     }).catch((error) => {
                                         console.log(error);
                                         if (error.response?.data.code === 0) {

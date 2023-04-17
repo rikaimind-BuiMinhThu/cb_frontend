@@ -4,7 +4,7 @@ import './../../../assets/css/bot/variable.css';
 import { MDBIcon } from 'mdbreact';
 import Cookies from 'js-cookie';
 import { useEffect } from 'react';
-import api from './../../../api/api-management';
+import api from './../../../api/api-management'; 
 import ModalNoti from 'views/Popup/ModalNoti';
 import ModalShort from 'views/Popup/ModalShort';
 import { Button } from 'react-bootstrap';

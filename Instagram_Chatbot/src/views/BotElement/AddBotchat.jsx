@@ -175,7 +175,6 @@ function AddBotchat() {
           subtitle: subtitle,
           design_type: designType,
           main_color: color,
-          // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
           icon: iconBot,
           bot_name: botName,
         },

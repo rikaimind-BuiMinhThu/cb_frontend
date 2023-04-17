@@ -2,7 +2,7 @@ import React from 'react'
 
 function StartButton() {
   return (
-    <div>StartButton</div>
+    <div>StartsButton</div>
   )
 }
 
