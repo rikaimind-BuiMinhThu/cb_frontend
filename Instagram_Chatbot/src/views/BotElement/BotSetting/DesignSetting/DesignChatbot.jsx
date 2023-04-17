@@ -21,7 +21,6 @@ import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import { any } from "prop-types";
 
-
 const colors = [
   "#327AED",
   "#26B197",
@@ -70,18 +69,10 @@ function DesignChatbot() {
   const [rightSpTitle, setRightSpTitle] = useState("");
   const [rightMarginSp, setRightMarginSp] = useState(10);
   const [bottomMarginSp, setBottomMarginSp] = useState(10);
+  const [a, setA] = useState("");
+  const [c, setC] = useState("");
 
-  useEffect(() => {
-    setBotId(Cookies.get("bot_id"));
-  }, []);
 
-  // side effects
-  useEffect(() => {
-    document
-      .querySelector(".main-colors .color.color-0")
-      .classList.add("active");
-    document.querySelector(".icons .icon.icon-0").classList.add("active");
-  }, []);
 
   // design type: handle click
   const designTypeClick = (e) => {
@@ -112,11 +103,7 @@ function DesignChatbot() {
       .querySelector(`.main-colors .color.color-${index}`)
       .classList.add("active");
   };
-useEffect(()=>{
-  toDataURL(botImage).then((dataUrl) => {
-    
-  });
-}, [botImage])
+
   // icon: handle click
   const handleIconClick = (index, imageDefault) => {
     document.querySelector(".icons .icon.active").classList.remove("active");
@@ -164,7 +151,6 @@ useEffect(()=>{
 
   const [defaultIcon, setDefaultIcon] = useState("");
 
-
   const toDataURL = (url) =>
     fetch(url)
       .then((response) => response.blob())
@@ -181,25 +167,19 @@ useEffect(()=>{
 
   //set main color
   useEffect(() => {
-    // const index = colors.findIndex((e) => e === mainColor);
-    let index = -1;
-    if (mainColor === "blue") {
-      index = 0;
-    } else if (mainColor === "green") {
-      index = 1;
-    } else if (mainColor === "orange") {
-      index = 2;
-    } else if (mainColor === "yellow") {
-      index = 3;
-    } else if (mainColor === "pink") {
-      index = 4;
-    } else if (mainColor === "purple") {
-      index = 5;
-    } else if (mainColor === "black") {
-      index = 6;
-    } else if (mainColor === "white") {
-      index = 7;
-    }
+    const mainColorsList = [
+      "blue",
+      "green",
+      "orange",
+      "yellow",
+      "pink",
+      "purple",
+      "black",
+      "white",
+    ];
+
+    const index = mainColorsList.indexOf(mainColor);
+
     if (index !== -1) {
       document
         .querySelector(".main-colors .color.active")
@@ -213,50 +193,29 @@ useEffect(()=>{
   useEffect(() => {
     api.get(`/api/v1/managements/chatbots/${botId}`).then((response) => {
       if (response.data.data) {
-        setDisplayType(
-          JSON.parse(response.data.data?.design_settings)?.display_type
-        );
-        setWidthPc(JSON.parse(response.data.data?.design_settings)?.width_pc);
-        setHeightPc(JSON.parse(response.data.data?.design_settings)?.height_pc);
-        setPositionPc(
-          JSON.parse(response.data.data?.design_settings)?.position_pc
-        );
-        setRightPcTitle(
-          JSON.parse(response.data.data?.design_settings)
-            ?.right_position_pc_title
-        );
-        setButtonTypePc(
-          JSON.parse(response.data.data?.design_settings)?.button_type_pc
-        );
-        setRightMarginPc(
-          JSON.parse(response.data.data?.design_settings)?.right_margin_pc
-        );
-        setBottomMarginPc(
-          JSON.parse(response.data.data?.design_settings)?.bottom_margin_pc
-        );
-        setPositionSp(
-          JSON.parse(response.data.data?.design_settings)?.position_sp
-        );
-        setButtonTypeSp(
-          JSON.parse(response.data.data?.design_settings)?.button_type_sp
-        );
+        const result = JSON.parse(response.data.data?.design_settings);
+        setDisplayType(result?.display_type);
+        setWidthPc(result?.width_pc);
+        setHeightPc(result?.height_pc);
+        setPositionPc(result?.position_pc);
+        setRightPcTitle(result?.right_position_pc_title);
+        setButtonTypePc(result?.button_type_pc);
+        setRightMarginPc(result?.right_margin_pc);
+        setBottomMarginPc(result?.bottom_margin_pc);
+        setPositionSp(result?.position_sp);
+        setButtonTypeSp(result?.button_type_sp);
         setRightSpTitle(
           JSON.parse(response.data.data?.design_settings)
             ?.right_position_sp_title
         );
-        setRightMarginSp(
-          JSON.parse(response.data.data?.design_settings)?.right_margin_sp
-        );
-        setBottomMarginSp(
-          JSON.parse(response.data.data?.design_settings)?.bottom_margin_sp
-        );
+        setRightMarginSp(result?.right_margin_sp);
+        setBottomMarginSp(result?.bottom_margin_sp);
         setBotName(response.data.data?.bot_name);
         setTitle(response.data.data?.title);
         setSubtitle(response.data.data?.subtitle);
         setDesignType(response.data.data?.design_type);
         setMainColor(response.data.data?.main_color);
         setBotImage(response.data.data?.icon?.url);
-
       } else {
         setIsOpenNoti(true);
         // setMessageNoti('シナリオがありません。');
@@ -266,6 +225,11 @@ useEffect(()=>{
         }, 2000);
       }
     });
+    document
+      .querySelector(".main-colors .color.color-0")
+      .classList.add("active");
+    document.querySelector(".icons .icon.icon-0").classList.add("active");
+    setBotId(Cookies.get("bot_id"));
   }, []);
   // update bot chat
   const addUpdateBotChat = () => {
@@ -304,8 +268,6 @@ useEffect(()=>{
         },
       };
 
-
-
       api
         .put(`api/v1/managements/chatbots/${botId}`, bot)
         .then((res) => {
@@ -324,7 +286,6 @@ useEffect(()=>{
           }
         })
         .catch((error) => {
-
           if (error.response?.data.code === 0) {
             tokenExpired();
           }
@@ -415,7 +376,6 @@ useEffect(()=>{
           }
         });
     } else {
-
     }
   };
   // handle preview
@@ -557,19 +517,31 @@ useEffect(()=>{
                               </span>
                               <div className="design-types">
                                 <div
-                                  className={designType==='pop'?"type active" : "type"}
+                                  className={
+                                    designType === "pop"
+                                      ? "type active"
+                                      : "type"
+                                  }
                                   onClick={(e) => designTypeClick(e)}
                                 >
                                   <span>ポップ</span>
                                 </div>
                                 <div
-                                  className={designType==='flat'?"type active" : "type"}
+                                  className={
+                                    designType === "flat"
+                                      ? "type active"
+                                      : "type"
+                                  }
                                   onClick={(e) => designTypeClick(e)}
                                 >
                                   <span>フラット</span>
                                 </div>
                                 <div
-                                  className={designType==='material' ? 'type active':'type'}
+                                  className={
+                                    designType === "material"
+                                      ? "type active"
+                                      : "type"
+                                  }
                                   onClick={(e) => designTypeClick(e)}
                                 >
                                   <span>マテリアル</span>
@@ -613,16 +585,18 @@ useEffect(()=>{
                           <div>
                             <div className="field-add-bot">
                               <div className="add-bot_field-container">
-                                <span className={ "label-field"}>アイコン</span>
+                                <span className={"label-field"}>アイコン</span>
                                 <div className="icons">
                                   {images.map((icon, index) => (
                                     <div
                                       key={index}
                                       className={`icon icon-${index}`}
-                                      onClick={() =>{
-                                        handleIconClick(index, icon)
-                                      }
-                                      }
+                                      onClick={() => {
+                                        toDataURL(icon).then((dataUrl) => {
+                                          console.log(dataUrl);
+                                        });
+                                        handleIconClick(index, icon);
+                                      }}
                                     >
                                       <img src={icon} alt="" />
                                     </div>
