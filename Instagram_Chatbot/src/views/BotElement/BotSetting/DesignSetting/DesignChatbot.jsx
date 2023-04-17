@@ -19,6 +19,8 @@ import { Link } from "react-router-dom";
 import { tokenExpired } from "api/tokenExpired";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
+import { any } from "prop-types";
+
 
 const colors = [
   "#327AED",
@@ -30,6 +32,7 @@ const colors = [
   "#7C8290",
   "#D8E2EF",
 ];
+
 const images = [
   IconManDefault,
   IconWomenDefault,
@@ -53,24 +56,25 @@ function DesignChatbot() {
   const [msgNoti, setMsgNoti] = useState("");
   const [isOpenPreview, setIsOpenPreview] = useState(false);
   const [mainColor, setMainColor] = useState("#327AED");
+  const [botId, setBotId] = useState(Cookies.get("bot_id"));
   const [buttonTypePc, setButtonTypePc] = useState(1);
   const [positionPc, setPositionPc] = useState(1);
-  const [widthPc, setWidthPc] = useState("");
-  const [heightPc, setHeightPc] = useState("");
-  const [botId, setBotId] = useState(Cookies.get('bot_id'));
+  const [widthPc, setWidthPc] = useState(460);
+  const [heightPc, setHeightPc] = useState(700);
   const [rightPcTitle, setRightPcTitle] = useState("");
-  const [positionSp, setPositionSp] = useState("");
-  const [buttonTypeSp, setButtonTypeSp] = useState("");
-  console.log(botId);
+  const [positionSp, setPositionSp] = useState(1);
+  const [buttonTypeSp, setButtonTypeSp] = useState(1);
+  const [rightMarginPc, setRightMarginPc] = useState(10);
+  const [bottomMarginPc, setBottomMarginPc] = useState(10);
+  const [displayType, setDisplayType] = useState(1);
+  const [rightSpTitle, setRightSpTitle] = useState("");
+  const [rightMarginSp, setRightMarginSp] = useState(10);
+  const [bottomMarginSp, setBottomMarginSp] = useState(10);
+
   useEffect(() => {
-    setBotId(Cookies.get('bot_id'));
-  }, [])
-  function closeSizeSelectCom() {
-    document.getElementById("newCompanyType").size = "1";
-  }
-  function setSizeSlectCom() {
-    document.getElementById("newCompanyType").size = "10";
-  }
+    setBotId(Cookies.get("bot_id"));
+  }, []);
+
   // side effects
   useEffect(() => {
     document
@@ -82,11 +86,11 @@ function DesignChatbot() {
   // design type: handle click
   const designTypeClick = (e) => {
     let value = "";
-    if (e.target.innerText == "ポップ") {
+    if (e.target.innerText === "ポップ") {
       value = "pop";
-    } else if (e.target.innerText == "フラット") {
+    } else if (e.target.innerText === "フラット") {
       value = "flat";
-    } else if (e.target.innerText == "マテリアル") {
+    } else if (e.target.innerText === "マテリアル") {
       value = "material";
     }
     setDesignType(value);
@@ -98,7 +102,6 @@ function DesignChatbot() {
       e.target.classList.add("active");
     }
   };
-
   // color: handle click
   const handleColorClick = (index, color) => {
     setMainColor(color);
@@ -109,20 +112,19 @@ function DesignChatbot() {
       .querySelector(`.main-colors .color.color-${index}`)
       .classList.add("active");
   };
-
+useEffect(()=>{
+  toDataURL(botImage).then((dataUrl) => {
+    
+  });
+}, [botImage])
   // icon: handle click
   const handleIconClick = (index, imageDefault) => {
     document.querySelector(".icons .icon.active").classList.remove("active");
     document
       .querySelector(`.icons .icon.icon-${index}`)
       .classList.add("active");
-    // console.log('imageDefault: ', imageDefault);
-
-    // console.log('imageDefault: ', imageDefault);
     if (!imageDefault.includes("image/png;base64")) {
       toDataURL(imageDefault).then((dataUrl) => {
-        console.log("RESULT:");
-        // setDefaultIcon(dataUrl)
         setBotImage(dataUrl);
       });
     } else {
@@ -162,6 +164,7 @@ function DesignChatbot() {
 
   const [defaultIcon, setDefaultIcon] = useState("");
 
+
   const toDataURL = (url) =>
     fetch(url)
       .then((response) => response.blob())
@@ -174,8 +177,97 @@ function DesignChatbot() {
             reader.readAsDataURL(blob);
           })
       );
+  // set defal icon
 
-  // add new bot chat
+  //set main color
+  useEffect(() => {
+    // const index = colors.findIndex((e) => e === mainColor);
+    let index = -1;
+    if (mainColor === "blue") {
+      index = 0;
+    } else if (mainColor === "green") {
+      index = 1;
+    } else if (mainColor === "orange") {
+      index = 2;
+    } else if (mainColor === "yellow") {
+      index = 3;
+    } else if (mainColor === "pink") {
+      index = 4;
+    } else if (mainColor === "purple") {
+      index = 5;
+    } else if (mainColor === "black") {
+      index = 6;
+    } else if (mainColor === "white") {
+      index = 7;
+    }
+    if (index !== -1) {
+      document
+        .querySelector(".main-colors .color.active")
+        .classList.remove("active");
+      document
+        .querySelector(`.main-colors .color.color-${index}`)
+        .classList.add("active");
+    }
+  }, [mainColor]);
+  //get chat bot information
+  useEffect(() => {
+    api.get(`/api/v1/managements/chatbots/${botId}`).then((response) => {
+      if (response.data.data) {
+        setDisplayType(
+          JSON.parse(response.data.data?.design_settings)?.display_type
+        );
+        setWidthPc(JSON.parse(response.data.data?.design_settings)?.width_pc);
+        setHeightPc(JSON.parse(response.data.data?.design_settings)?.height_pc);
+        setPositionPc(
+          JSON.parse(response.data.data?.design_settings)?.position_pc
+        );
+        setRightPcTitle(
+          JSON.parse(response.data.data?.design_settings)
+            ?.right_position_pc_title
+        );
+        setButtonTypePc(
+          JSON.parse(response.data.data?.design_settings)?.button_type_pc
+        );
+        setRightMarginPc(
+          JSON.parse(response.data.data?.design_settings)?.right_margin_pc
+        );
+        setBottomMarginPc(
+          JSON.parse(response.data.data?.design_settings)?.bottom_margin_pc
+        );
+        setPositionSp(
+          JSON.parse(response.data.data?.design_settings)?.position_sp
+        );
+        setButtonTypeSp(
+          JSON.parse(response.data.data?.design_settings)?.button_type_sp
+        );
+        setRightSpTitle(
+          JSON.parse(response.data.data?.design_settings)
+            ?.right_position_sp_title
+        );
+        setRightMarginSp(
+          JSON.parse(response.data.data?.design_settings)?.right_margin_sp
+        );
+        setBottomMarginSp(
+          JSON.parse(response.data.data?.design_settings)?.bottom_margin_sp
+        );
+        setBotName(response.data.data?.bot_name);
+        setTitle(response.data.data?.title);
+        setSubtitle(response.data.data?.subtitle);
+        setDesignType(response.data.data?.design_type);
+        setMainColor(response.data.data?.main_color);
+        setBotImage(response.data.data?.icon?.url);
+
+      } else {
+        setIsOpenNoti(true);
+        // setMessageNoti('シナリオがありません。');
+        setTimeout(() => {
+          setIsOpenNoti(false);
+          // setMessageNoti('');
+        }, 2000);
+      }
+    });
+  }, []);
+  // update bot chat
   const addUpdateBotChat = () => {
     if (title && subtitle && botName) {
       let iconBot = "";
@@ -212,7 +304,7 @@ function DesignChatbot() {
         },
       };
 
-      // console.log('bot info: ', bot)
+
 
       api
         .put(`api/v1/managements/chatbots/${botId}`, bot)
@@ -225,8 +317,6 @@ function DesignChatbot() {
             setTimeout(() => {
               setMsgNoti("");
               setIsOpenNoti(false);
-
-              window.location.href = "/admin/scenario-list";
             }, 1500);
           } else if (res.data?.code === 2 || res.data?.code === "2") {
             setMsgNoti(res.data.message);
@@ -234,7 +324,7 @@ function DesignChatbot() {
           }
         })
         .catch((error) => {
-          console.log(error);
+
           if (error.response?.data.code === 0) {
             tokenExpired();
           }
@@ -259,7 +349,75 @@ function DesignChatbot() {
       }
     }
   };
+  //update design setting
+  const updateDesignSetting = () => {
+    if (widthPc) {
+      let iconBot = "";
+      if (botImage === "") {
+        iconBot = IconManDefault;
+      } else {
+        iconBot = botImage;
+      }
+      let main_color = {
+        blue: "#327AED",
+        green: "#26B197",
+        orange: "#fC7E02",
+        yellow: "#F6CA21",
+        pink: "#F16FAA",
+        purple: "#8C66D9",
+        black: "#7C8290",
+        white: "#D8E2EF",
+      };
+      var color;
+      Object.entries(main_color).forEach(([key, val]) => {
+        if (mainColor === val) {
+          color = key;
+        }
+      });
+      var settings = {
+        design_settings: {
+          display_type: displayType,
+          width_pc: widthPc,
+          height_pc: heightPc,
+          position_pc: positionPc,
+          button_type_pc: buttonTypePc,
+          right_position_pc_title: rightPcTitle,
+          right_margin_pc: rightMarginPc,
+          bottom_margin_pc: bottomMarginPc,
+          position_sp: positionSp,
+          button_type_sp: buttonTypeSp,
+          right_position_sp_title: rightSpTitle,
+          right_margin_sp: rightMarginSp,
+          bottom_margin_sp: bottomMarginSp,
+        },
+      };
 
+      api
+        .post(`api/v1/managements/chatbots/${botId}/design_settings`, settings)
+        .then((res) => {
+          if (res.data.code === 1 || res.data.code === "1") {
+            setMsgNoti("ボットを正常に保存されました！");
+            setIsOpenNoti(true);
+            setTimeout(() => {
+              setMsgNoti("");
+              setIsOpenNoti(false);
+
+              // window.location.href = "/admin/design-setting";
+            }, 1500);
+          } else if (res.data?.code === 2 || res.data?.code === "2") {
+            setMsgNoti(res.data.message);
+            setIsOpenNoti(true);
+          }
+        })
+        .catch((error) => {
+          if (error.response?.data.code === 0) {
+            tokenExpired();
+          }
+        });
+    } else {
+
+    }
+  };
   // handle preview
   const handlePreview = () => {
     if (title && subtitle) {
@@ -359,6 +517,7 @@ function DesignChatbot() {
                                 type="text"
                                 name="title"
                                 className="input-field"
+                                defaultValue={title}
                                 placeholder="Service name, etc. (e.g. BOTCHAN)"
                                 onChange={(e) => {
                                   setTitle(e.target.value);
@@ -379,6 +538,7 @@ function DesignChatbot() {
                               <input
                                 type="text"
                                 className="input-field"
+                                defaultValue={subtitle}
                                 placeholder="Purpose of the form (e.g. information request form)"
                                 onChange={(e) => {
                                   setSubtitle(e.target.value);
@@ -397,19 +557,19 @@ function DesignChatbot() {
                               </span>
                               <div className="design-types">
                                 <div
-                                  className="type"
+                                  className={designType==='pop'?"type active" : "type"}
                                   onClick={(e) => designTypeClick(e)}
                                 >
                                   <span>ポップ</span>
                                 </div>
                                 <div
-                                  className="type active"
+                                  className={designType==='flat'?"type active" : "type"}
                                   onClick={(e) => designTypeClick(e)}
                                 >
                                   <span>フラット</span>
                                 </div>
                                 <div
-                                  className="type"
+                                  className={designType==='material' ? 'type active':'type'}
                                   onClick={(e) => designTypeClick(e)}
                                 >
                                   <span>マテリアル</span>
@@ -453,14 +613,15 @@ function DesignChatbot() {
                           <div>
                             <div className="field-add-bot">
                               <div className="add-bot_field-container">
-                                <span className="label-field">アイコン</span>
+                                <span className={ "label-field"}>アイコン</span>
                                 <div className="icons">
                                   {images.map((icon, index) => (
                                     <div
                                       key={index}
                                       className={`icon icon-${index}`}
-                                      onClick={() =>
+                                      onClick={() =>{
                                         handleIconClick(index, icon)
+                                      }
                                       }
                                     >
                                       <img src={icon} alt="" />
@@ -496,6 +657,7 @@ function DesignChatbot() {
                                 <input
                                   type="text"
                                   name="title"
+                                  defaultValue={botName}
                                   className="input-field"
                                   placeholder="サンプルボット..."
                                   onChange={(e) => {
@@ -530,68 +692,253 @@ function DesignChatbot() {
               {tabmenu === 2 && (
                 <div>
                   <form action="POST">
-                    <div style={{width:'100%'}}>
-                    <div
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        padding: "0 40px",
-                      }}
-                    >
-                      {/* Pc */}
+                    <div style={{ width: "100%" }}>
                       <div
-                        style={{ width: "50%", borderRight: "1px solid #ddd" }}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          padding: "0 40px",
+                        }}
                       >
-                        <CardHeader>
-                          <h4 style={{ margin: "10px 0" }}>PC</h4>
-                        </CardHeader>
-                        <CardBody style={{}}>
-                          <div className="add-bot-container">
-                            <div className="bot-haft">
-                              <div className="field-add-bot">
-                                <div className="add-bot_field-container">
-                                  <span className="label-field">サイズ </span>
-                                  <div
-                                    style={{
-                                      display: "flex",
-                                      width: "100%",
-                                      justifyContent: "space-between",
-                                    }}
-                                  >
-                                    
-                                    <input
-                                      type="number"
-                                      name="width_pc"
-                                      className="input-setting2"
-                                      placeholder="幅"
-                                      onChange={(e) => {
-                                        setWidthPc(e.target.value);
-                                        // document.querySelector(
-                                        //   ".error-message.widthPc"
-                                        // ).style.display = "none";
+                        {/* Pc */}
+                        <div
+                          style={{
+                            width: "50%",
+                            borderRight: "1px solid #ddd",
+                          }}
+                        >
+                          <CardHeader>
+                            <h4 style={{ margin: "10px 0" }}>PC</h4>
+                          </CardHeader>
+                          <CardBody style={{}}>
+                            <div className="add-bot-container">
+                              <div className="bot-haft">
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      表示タイプ{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <select
+                                        style={{
+                                          height: "40px",
+                                          width: "100%",
+                                          border: "1px solid #333",
+                                          borderRadius: "5px",
+                                          padding: "0 15px",
+                                        }}
+                                        value={displayType}
+                                        onChange={(e) =>
+                                          setDisplayType(e.target.value)
+                                        }
+                                      >
+                                        <option value={1}>リロード</option>
+                                        <option value={2}>非表示</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">サイズ </span>
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        width: "100%",
+                                        justifyContent: "space-between",
                                       }}
-                                    />
-                                    <input
-                                      type="number"
-                                      name="height_pc"
-                                      className="input-setting2"
-                                      placeholder="高さ"
-                                      onChange={(e) => {
-                                        setHeightPc(e.target.value);
-                                        // document.querySelector(
-                                        //   ".error-message.title"
-                                        // ).style.display = "none";
-                                      }}
-                                    />
+                                    >
+                                      <input
+                                        type="number"
+                                        name="width_pc"
+                                        className="input-setting2"
+                                        defaultValue={widthPc}
+                                        placeholder="幅"
+                                        onChange={(e) => {
+                                          setWidthPc(e.target.value);
+                                          // document.querySelector(
+                                          //   ".error-message.widthPc"
+                                          // ).style.display = "none";
+                                        }}
+                                      />
+                                      <input
+                                        type="number"
+                                        name="height_pc"
+                                        className="input-setting2"
+                                        placeholder="高さ"
+                                        defaultValue={heightPc}
+                                        onChange={(e) => {
+                                          setHeightPc(e.target.value);
+                                          // document.querySelector(
+                                          //   ".error-message.title"
+                                          // ).style.display = "none";
+                                        }}
+                                      />
+                                    </div>
                                   </div>
                                 </div>
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      設置場所{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <select
+                                        style={{
+                                          height: "40px",
+                                          width: "100%",
+                                          border: "1px solid #333",
+                                          borderRadius: "5px",
+                                          padding: "0 15px",
+                                        }}
+                                        value={positionPc}
+                                        onChange={(e) =>
+                                          setPositionPc(e.target.value)
+                                        }
+                                      >
+                                        <option value={1}>底辺に設置</option>
+                                        <option value={2}>右辺に設置</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+
+                                {positionPc === "2" && (
+                                  <div className="field-add-bot">
+                                    <div className="add-bot_field-container">
+                                      <span className="label-field">
+                                        右のタイトル{" "}
+                                      </span>
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          width: "100%",
+                                        }}
+                                      >
+                                        <input
+                                          type="text"
+                                          name="right_position_pc_title"
+                                          className="input-setting"
+                                          placeholder="タイトル"
+                                          defaultValue={rightPcTitle}
+                                          onChange={(e) => {
+                                            setRightPcTitle(e.target.value);
+                                            // document.querySelector(
+                                            //   ".error-message.title"
+                                            // ).style.display = "none";
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                    <span className="error-message subtile"></span>
+                                  </div>
+                                )}
+
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      ボタン内容{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <select
+                                        style={{
+                                          height: "40px",
+                                          width: "100%",
+                                          border: "1px solid #333",
+                                          borderRadius: "5px",
+                                          padding: "0 15px",
+                                        }}
+                                        value={buttonTypePc}
+                                        onChange={(e) =>
+                                          setButtonTypePc(e.target.value)
+                                        }
+                                      >
+                                        <option value={1}>
+                                          ボタンとタイトル
+                                        </option>
+                                        <option value={2}>ボタンのみ</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      右マージン{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <input
+                                        type="number"
+                                        name="right_margin_pc"
+                                        defaultValue={rightMarginPc}
+                                        className="input-setting"
+                                        placeholder="右マージン"
+                                        onChange={(e) => {
+                                          setRightMarginPc(e.target.value);
+                                          // document.querySelector(
+                                          //   ".error-message.title"
+                                          // ).style.display = "none";
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      下マージン{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <input
+                                        type="number"
+                                        name="bottom_margin_pc"
+                                        defaultValue={bottomMarginPc}
+                                        className="input-setting"
+                                        placeholder="下マージン"
+                                        onChange={(e) => {
+                                          setBottomMarginPc(e.target.value);
+                                          // document.querySelector(
+                                          //   ".error-message.title"
+                                          // ).style.display = "none";
+                                        }}
+                                      />
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
                               </div>
-                              <div className="field-add-bot">
+                            </div>
+                          </CardBody>
+                        </div>
+
+                        {/* SmartPhone */}
+                        <div style={{ width: "50%" }}>
+                          <CardHeader>
+                            <h4 style={{ margin: "10px 0" }}>スマートフォン</h4>
+                          </CardHeader>
+                          <CardBody>
+                            <div className="add-bot-container">
+                              <div className="bot-haft">
+                                {/* <div className="field-add-bot">
                                 <div className="add-bot_field-container">
-                                  <span className="label-field">設置場所 </span>
-                                  <div
+                                  <span className="label-field">表示タイプ </span>
+                                  <div 
                                     style={{ display: "flex", width: "100%" }}
-                                  >
+                                  > 
                                     <select
                                       style={{
                                         height: "40px",
@@ -602,33 +949,123 @@ function DesignChatbot() {
                                       }}
                                       value={positionPc}
                                       onChange={(e) =>
-                                        setPositionPc(e.target.value)
+                                        setDisplayTypeSp(e.target.value)
                                       }
                                     >
-                                      <option value={1}>底辺に設置</option>
-                                      <option value={2}>右辺に設置</option>
+                                      <option value={1}>リロード</option>
+                                      <option value={2}>非表示</option>
                                     </select>
                                   </div>
                                 </div>
                                 <span className="error-message subtile"></span>
-                              </div>
+                              </div>  */}
 
-                              {positionPc === "2" && (
                                 <div className="field-add-bot">
                                   <div className="add-bot_field-container">
                                     <span className="label-field">
-                                      右のタイトル{" "}
+                                      設置場所{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <select
+                                        style={{
+                                          height: "40px",
+                                          width: "100%",
+                                          border: "1px solid #333",
+                                          borderRadius: "5px",
+                                          padding: "0 15px",
+                                        }}
+                                        value={positionSp}
+                                        onChange={(e) =>
+                                          setPositionSp(e.target.value)
+                                        }
+                                      >
+                                        <option value={1}>底辺に設置</option>
+                                        <option value={2}>右辺に設置</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+
+                                {positionSp === "2" && (
+                                  <div className="field-add-bot">
+                                    <div className="add-bot_field-container">
+                                      <span className="label-field">
+                                        タイトル{" "}
+                                      </span>
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          width: "100%",
+                                        }}
+                                      >
+                                        <input
+                                          type="text"
+                                          name="right_position_sp_title"
+                                          className="input-setting"
+                                          defaultValue={rightSpTitle}
+                                          placeholder="タイトル"
+                                          onChange={(e) => {
+                                            setRightSpTitle(e.target.value);
+                                            // document.querySelector(
+                                            //   ".error-message.title"
+                                            // ).style.display = "none";
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                    <span className="error-message subtile"></span>
+                                  </div>
+                                )}
+
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      ボタン内容{" "}
+                                    </span>
+                                    <div
+                                      style={{ display: "flex", width: "100%" }}
+                                    >
+                                      <select
+                                        style={{
+                                          height: "40px",
+                                          width: "100%",
+                                          border: "1px solid #333",
+                                          borderRadius: "5px",
+                                          padding: "0 15px",
+                                        }}
+                                        value={buttonTypeSp}
+                                        onChange={(e) =>
+                                          setButtonTypeSp(e.target.value)
+                                        }
+                                      >
+                                        <option value={1}>
+                                          ボタンとタイトル
+                                        </option>
+                                        <option value={2}>ボタンのみ</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <span className="error-message subtile"></span>
+                                </div>
+                                <div className="field-add-bot">
+                                  <div className="add-bot_field-container">
+                                    <span className="label-field">
+                                      右マージン{" "}
                                     </span>
                                     <div
                                       style={{ display: "flex", width: "100%" }}
                                     >
                                       <input
-                                        type="text"
-                                        name="right_position_pc_title"
+                                        type="number"
+                                        name="right_margin_sp"
+                                        defaultValue={rightMarginSp}
                                         className="input-setting"
-                                        placeholder="タイトル"
+                                        placeholder="右マージン"
                                         onChange={(e) => {
-                                          setRightPcTitle(e.target.value);
+                                          setRightMarginSp(e.target.value);
                                           // document.querySelector(
                                           //   ".error-message.title"
                                           // ).style.display = "none";
@@ -638,147 +1075,22 @@ function DesignChatbot() {
                                   </div>
                                   <span className="error-message subtile"></span>
                                 </div>
-                              )}
-
-                              <div className="field-add-bot">
-                                <div className="add-bot_field-container">
-                                  <span className="label-field">
-                                    ボタン内容{" "}
-                                  </span>
-                                  <div
-                                    style={{ display: "flex", width: "100%" }}
-                                  >
-                                    <select
-                                      style={{
-                                        height: "40px",
-                                        width: "100%",
-                                        border: "1px solid #333",
-                                        borderRadius: "5px",
-                                        padding: "0 15px",
-                                      }}
-                                      value={buttonTypePc}
-                                      onChange={(e) =>
-                                        setButtonTypePc(e.target.value)
-                                      }
-                                    >
-                                      <option value={1}>
-                                        ボタンとタイトル
-                                      </option>
-                                      <option value={2}>ボタンのみ</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <span className="error-message subtile"></span>
-                              </div>
-                              <div className="field-add-bot">
-                                <div className="add-bot_field-container">
-                                  <span className="label-field">
-                                    右マージン{" "}
-                                  </span>
-                                  <div
-                                    style={{ display: "flex", width: "100%" }}
-                                  >
-                                    <input
-                                      type="number"
-                                      name="right_margin_pc"
-                                      defaultValue={10}
-                                      className="input-setting"
-                                      placeholder="右マージン"
-                                      onChange={(e) => {
-                                        setTitle(e.target.value);
-                                        // document.querySelector(
-                                        //   ".error-message.title"
-                                        // ).style.display = "none";
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                                <span className="error-message subtile"></span>
-                              </div>
-                              <div className="field-add-bot">
-                                <div className="add-bot_field-container">
-                                  <span className="label-field">
-                                    下マージン{" "}
-                                  </span>
-                                  <div
-                                    style={{ display: "flex", width: "100%" }}
-                                  >
-                                    <input
-                                      type="number"
-                                      name="bottom_margin_pc"
-                                      defaultValue={10}
-                                      className="input-setting"
-                                      placeholder="下マージン"
-                                      onChange={(e) => {
-                                        setTitle(e.target.value);
-                                        // document.querySelector(
-                                        //   ".error-message.title"
-                                        // ).style.display = "none";
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                                <span className="error-message subtile"></span>
-                              </div>
-
-                            
-                            </div>
-                          </div>
-                        </CardBody>
-                      </div>
-
-
-                      {/* SmartPhone */}
-                      <div style={{ width: "50%" }}>
-                        <CardHeader>
-                          <h4 style={{ margin: "10px 0" }}>スマートフォン</h4>
-                        </CardHeader>
-                        <CardBody>
-                        <div className="add-bot-container">
-                            <div className="bot-haft">
-                              <div className="field-add-bot">
-                                <div className="add-bot_field-container">
-                                  <span className="label-field">設置場所 </span>
-                                  <div
-                                    style={{ display: "flex", width: "100%" }}
-                                  >
-                                    <select
-                                      style={{
-                                        height: "40px",
-                                        width: "100%",
-                                        border: "1px solid #333",
-                                        borderRadius: "5px",
-                                        padding: "0 15px",
-                                      }}
-                                      value={positionSp}
-                                      onChange={(e) =>
-                                        setPositionSp(e.target.value)
-                                      }
-                                    >
-                                      <option value={1}>底辺に設置</option>
-                                      <option value={2}>右辺に設置</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <span className="error-message subtile"></span>
-                              </div>
-
-                              {positionSp === "2" && (
                                 <div className="field-add-bot">
                                   <div className="add-bot_field-container">
                                     <span className="label-field">
-                                      タイトル{" "}
+                                      下マージン{" "}
                                     </span>
                                     <div
                                       style={{ display: "flex", width: "100%" }}
                                     >
                                       <input
-                                        type="text"
-                                        name="right_position_sp_title"
+                                        type="number"
+                                        name="bottom_margin_sp"
+                                        defaultValue={bottomMarginSp}
                                         className="input-setting"
-                                        placeholder="タイトル"
+                                        placeholder="下マージン"
                                         onChange={(e) => {
-                                          setTitle(e.target.value);
+                                          setBottomMarginSp(e.target.value);
                                           // document.querySelector(
                                           //   ".error-message.title"
                                           // ).style.display = "none";
@@ -788,107 +1100,28 @@ function DesignChatbot() {
                                   </div>
                                   <span className="error-message subtile"></span>
                                 </div>
-                              )}
-
-                              <div className="field-add-bot">
-                                <div className="add-bot_field-container">
-                                  <span className="label-field">
-                                    ボタン内容{" "}
-                                  </span>
-                                  <div
-                                    style={{ display: "flex", width: "100%" }}
-                                  >
-                                    <select
-                                      style={{
-                                        height: "40px",
-                                        width: "100%",
-                                        border: "1px solid #333",
-                                        borderRadius: "5px",
-                                        padding: "0 15px",
-                                      }}
-                                      value={buttonTypeSp}
-                                      onChange={(e) =>
-                                        setButtonTypeSp(e.target.value)
-                                      }
-                                    >
-                                      <option value={1}>
-                                        ボタンとタイトル
-                                      </option>
-                                      <option value={2}>ボタンのみ</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <span className="error-message subtile"></span>
                               </div>
-                              <div className="field-add-bot">
-                                <div className="add-bot_field-container">
-                                  <span className="label-field">
-                                    右マージン{" "}
-                                  </span>
-                                  <div
-                                    style={{ display: "flex", width: "100%" }}
-                                  >
-                                    <input
-                                      type="number"
-                                      name="right_margin_sp"
-                                      defaultValue={10}
-                                      className="input-setting"
-                                      placeholder="右マージン"
-                                      onChange={(e) => {
-                                        setTitle(e.target.value);
-                                        // document.querySelector(
-                                        //   ".error-message.title"
-                                        // ).style.display = "none";
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                                <span className="error-message subtile"></span>
-                              </div>
-                              <div className="field-add-bot">
-                                <div className="add-bot_field-container">
-                                  <span className="label-field">
-                                    下マージン{" "}
-                                  </span>
-                                  <div
-                                    style={{ display: "flex", width: "100%" }}
-                                  >
-                                    <input
-                                      type="number"
-                                      name="bottom_margin_sp"
-                                      defaultValue={10}
-                                      className="input-setting"
-                                      placeholder="下マージン"
-                                      onChange={(e) => {
-                                        setTitle(e.target.value);
-                                        // document.querySelector(
-                                        //   ".error-message.title"
-                                        // ).style.display = "none";
-                                      }}
-                                    />
-                                  </div>
-                                </div>
-                                <span className="error-message subtile"></span>
-                              </div>
-
-                              
                             </div>
-                          </div>
-                        </CardBody>
+                          </CardBody>
+                        </div>
                       </div>
-                      
-                    </div>
-                    <div style={{width:'100%', marginTop:'40px', padding:'0 20px'}}>
-                    <div className="btn-wrapper">
-                            <button
-                              type="button"
-                              className="btn btn-preview"
-                              onClick={()=>{}}
-                            >
-                              保存2
-                            </button>
-                          </div>
-                    </div>
+                      <div
+                        style={{
+                          width: "100%",
+                          marginTop: "40px",
+                          padding: "0 20px",
+                        }}
+                      >
+                        <div className="btn-wrapper">
+                          <button
+                            type="button"
+                            className="btn btn-preview"
+                            onClick={updateDesignSetting}
+                          >
+                            保存2
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </form>
                 </div>
@@ -946,3 +1179,50 @@ function DesignChatbot() {
 }
 
 export default DesignChatbot;
+{
+  /* <div
+                      style={{
+                        width: "100%",
+                        padding: "0 50px",
+                      }}
+                    >
+                      <div className="field-add-bot">
+                                <div className="add-bot_field-container">
+                                  <span className="label-field">サイズ </span>
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      width: "100%",
+                                      justifyContent: "space-between",
+                                    }}
+                                  >
+                                    
+                                    <input
+                                      type="number"
+                                      name="width_pc"
+                                      className="input-setting2"
+                                      placeholder="幅"
+                                      onChange={(e) => {
+                                        setWidthPc(e.target.value);
+                                        // document.querySelector(
+                                        //   ".error-message.widthPc"
+                                        // ).style.display = "none";
+                                      }}
+                                    />
+                                    <input
+                                      type="number"
+                                      name="height_pc"
+                                      className="input-setting2"
+                                      placeholder="高さ"
+                                      onChange={(e) => {
+                                        setHeightPc(e.target.value);
+                                        // document.querySelector(
+                                        //   ".error-message.title"
+                                        // ).style.display = "none";
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                    </div> */
+}
