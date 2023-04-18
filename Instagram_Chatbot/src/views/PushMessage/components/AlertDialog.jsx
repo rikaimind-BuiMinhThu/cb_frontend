@@ -22,30 +22,30 @@ export default function AlertDialogSlide({
     resolver(itemDelete.id);
   };
   return (
-    <div>
-      <Dialog
-        open={openDialog}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={handleClose}
-        aria-describedby='alert-dialog-slide-description'
-      >
-        <DialogContent>
-          <DialogContentText id='alert-dialog-slide-description'>
-            {message}
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} style={{color: '#333'}}>いいえ</Button>
-          <Button
-            className='px-2'
-            style={{ backgroundColor: 'rgb(243 57 57)', color: '#fff' }}
-            onClick={handleAccept}
-          >
-            はい
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </div>
+    <Dialog
+      open={openDialog}
+      TransitionComponent={Transition}
+      keepMounted
+      onClose={handleClose}
+      aria-describedby='alert-dialog-slide-description'
+    >
+      <DialogContent>
+        <DialogContentText id='alert-dialog-slide-description'>
+          {message}
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} style={{ color: '#333' }}>
+          いいえ
+        </Button>
+        <Button
+          className='px-2'
+          style={{ backgroundColor: 'rgb(243 57 57)', color: '#fff' }}
+          onClick={handleAccept}
+        >
+          はい
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }
