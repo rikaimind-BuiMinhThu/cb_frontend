@@ -69,10 +69,6 @@ function DesignChatbot() {
   const [rightSpTitle, setRightSpTitle] = useState("");
   const [rightMarginSp, setRightMarginSp] = useState(10);
   const [bottomMarginSp, setBottomMarginSp] = useState(10);
-  const [a, setA] = useState("");
-  const [c, setC] = useState("");
-
-
 
   // design type: handle click
   const designTypeClick = (e) => {
@@ -150,7 +146,6 @@ function DesignChatbot() {
   };
 
   const [defaultIcon, setDefaultIcon] = useState("");
-
   const toDataURL = (url) =>
     fetch(url)
       .then((response) => response.blob())
@@ -215,7 +210,7 @@ function DesignChatbot() {
         setSubtitle(response.data.data?.subtitle);
         setDesignType(response.data.data?.design_type);
         setMainColor(response.data.data?.main_color);
-        setBotImage(response.data.data?.icon?.url);
+        setDefaultIcon(response.data.data?.icon?.url);
       } else {
         setIsOpenNoti(true);
         // setMessageNoti('シナリオがありません。');
@@ -381,8 +376,16 @@ function DesignChatbot() {
   // handle preview
   const handlePreview = () => {
     if (title && subtitle) {
-      document.getElementById("sp-container").style.height = "620px";
+      document.getElementById("sp-container").style.height = heightPc
+        ? `${heightPc}px`
+        : "620px";
       document.getElementById("sp-header").style.position = "static";
+      document.getElementById("sp-container").style.marginBottom =
+        bottomMarginPc ? `${bottomMarginPc}px` : "0px";
+      document.getElementById("sp-container").style.marginRight = rightMarginPc
+        ? `${rightMarginPc}px`
+        : "10px";
+
       document.getElementById("sp-header").style.borderBottomLeftRadius = "0px";
       document.getElementById("sp-header").style.borderBottomRightRadius =
         "0px";
@@ -406,13 +409,21 @@ function DesignChatbot() {
   // handle toggle preview
   const handleTogglePreview = () => {
     if (document.getElementById("sp-body").style.display === "none") {
-      document.getElementById("sp-container").style.height = "620px";
+      document.getElementById("sp-container").style.height = heightPc
+        ? `${heightPc}px`
+        : "620px";
+      document.getElementById("sp-container").style.marginBottom =
+        bottomMarginPc ? `${bottomMarginPc}px` : "0px";
+      document.getElementById("sp-container").style.marginRight = rightMarginPc
+        ? `${rightMarginPc}px`
+        : "10px";
       document.getElementById("sp-header").style.position = "static";
       document.getElementById("sp-header").style.borderBottomLeftRadius = "0px";
       document.getElementById("sp-header").style.borderBottomRightRadius =
         "0px";
       document.getElementById("sp-body").style.display = "block";
-    } else {
+    }
+    else {
       document.getElementById("sp-container").style.height = "0px";
       document.getElementById("sp-body").style.display = "none";
       document.getElementById("sp-header").style.borderBottomLeftRadius =
@@ -1107,11 +1118,13 @@ function DesignChatbot() {
         <div
           id="sp-container"
           className="sp-container"
-          style={{ display: !isOpenPreview && "none" }}
+          style={{ display:tabmenu && tabmenu ===2 ?"none" :!isOpenPreview && "none" }}
         >
           <div
             id="sp-header"
-            style={{ backgroundColor: mainColor }}
+            style={{
+              backgroundColor: mainColor
+            }}
             className="sp-header"
             onClick={handleTogglePreview}
           >
@@ -1134,8 +1147,10 @@ function DesignChatbot() {
               </div>
             </div>
           </div>
+          
           <div id="sp-body" className="sp-body"></div>
         </div>
+
         {/* end preview */}
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
           <div

@@ -190,6 +190,20 @@ function Preview() {
   const [zipcode, setZipcode] = useState();
   const [indexContentZipcode, setContentZipcode] = useState();
 
+  //new
+  const [buttonTypePc, setButtonTypePc] = useState(1);
+  const [positionPc, setPositionPc] = useState(1);
+  const [widthPc, setWidthPc] = useState(460);
+  const [heightPc, setHeightPc] = useState(700);
+  const [rightPcTitle, setRightPcTitle] = useState("");
+  const [positionSp, setPositionSp] = useState(1);
+  const [buttonTypeSp, setButtonTypeSp] = useState(1);
+  const [rightMarginPc, setRightMarginPc] = useState(10);
+  const [bottomMarginPc, setBottomMarginPc] = useState(10);
+  const [displayType, setDisplayType] = useState(1);
+  const [rightSpTitle, setRightSpTitle] = useState("");
+  const [rightMarginSp, setRightMarginSp] = useState(10);
+  const [bottomMarginSp, setBottomMarginSp] = useState(10);
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
       current_url: window.location.href,
@@ -209,7 +223,31 @@ function Preview() {
     });
     return dataObj;
   });
-
+ //get chat bot setting
+ useEffect(() => {
+  api.get(`/api/v1/managements/chatbots/${botId}`).then((response) => {
+    if (response.data.data) {
+      const result = JSON.parse(response.data.data?.design_settings);
+      setDisplayType(result?.display_type);
+      setWidthPc(result?.width_pc);
+      setHeightPc(result?.height_pc);
+      setPositionPc(result?.position_pc);
+      setRightPcTitle(result?.right_position_pc_title);
+      setButtonTypePc(result?.button_type_pc);
+      setRightMarginPc(result?.right_margin_pc);
+      setBottomMarginPc(result?.bottom_margin_pc);
+      setPositionSp(result?.position_sp);
+      setButtonTypeSp(result?.button_type_sp);
+      setRightSpTitle(
+        JSON.parse(response.data.data?.design_settings)
+          ?.right_position_sp_title
+      );
+      setRightMarginSp(result?.right_margin_sp);
+      setBottomMarginSp(result?.bottom_margin_sp);
+    } 
+  });
+ 
+}, []);
   function getAllUrlParams(url) {
     var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
     var obj = {};
@@ -253,7 +291,7 @@ function Preview() {
         if (window && window.parent) {
           window.parent.postMessage(true, urlReceive);
         }
-        document.getElementById('sp-container').style.height = '620px';
+        document.getElementById('sp-container').style.height = heightPc? `${heightPc}px`: '620px';
         document.getElementById('sp-header').style.position = 'static';
         document.getElementById('sp-header').style.borderBottomLeftRadius = '0px';
         document.getElementById('sp-header').style.borderBottomRightRadius = '0px';
@@ -280,6 +318,7 @@ function Preview() {
     }
     setIsOpen(!isOpen);
   }
+  
   // useEffect(() => {
   //   api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
   //     if (res.data.code == 1) {
@@ -2122,7 +2161,8 @@ function Preview() {
   return (
     scenarioId && botInfor ?
       <React.Fragment>
-        <div id="sp-container" className="sp-container slideUp">
+        
+        <div id="sp-container" className="sp-container slideUp" style={{ width:widthPc? `${widthPc}px`:'380px', height:heightPc? `${heightPc}px`:'620px'}}>
           <div id="sp-withdrawal-container" className="sp-withdrawal-container">
           </div>
           <div id="sp-withdrawal-content" className="sp-withdrawal-content">
@@ -2324,7 +2364,7 @@ function Preview() {
               {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。") : `あと${messageUser.length}間`}
             </div>
           </div>
-          <div id="sp-body" className="sp-body" style={{ backgroundColor: botInfor?.opacity_color }}>
+          <div id="sp-body" className="sp-body" style={{ backgroundColor: botInfor?.opacity_color}}>
             {
               renderMessageArr.map((message, indexMessage) => {
                 return (
@@ -2378,6 +2418,8 @@ function Preview() {
             }
           </div>
         </div>
+
+        
       </React.Fragment> :
       <React.Fragment />
   )

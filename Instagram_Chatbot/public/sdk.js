@@ -97,7 +97,7 @@ async function displayPopup() {
     iframe.style.padding = '0';
     iframe.style.margin = '0';
     iframe.style.borderRadius = '0px';
-    iframe.style.display = "none";
+    // iframe.style.display = "none";
     iframe.style.zIndex = "999999";
     iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin}&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}`;
 
