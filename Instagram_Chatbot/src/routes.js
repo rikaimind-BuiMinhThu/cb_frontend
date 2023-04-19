@@ -41,6 +41,7 @@ import IPAddressSetting from 'views/BotElement/IPAddressSetting';
 import ScenarioList from 'views/BotElement/BotSetting/ScenarioSetting/ScenarioList';
 import MediaFileManagement from 'views/BotElement/BotSetting/ScenarioSetting/MediaFileManagement';
 import CreateEmail from 'views/BotElement/BotSetting/EmailSetting/CreateEmail';
+import CreateSMS from 'views/BotElement/BotSetting/SMSSetting';
 import ListEmail from 'views/BotElement/BotSetting/EmailSetting/ListEmail';
 import BotDemo from 'views/BotElement/BotDemo';
 import CreateAPI from 'views/BotElement/BotSetting/APISetting/CreateAPI';
@@ -62,13 +63,14 @@ import FileManagement from 'views/BotElement/BotSetting/FileManagement';
 import AddSubUserMng from 'views/BotElement/AddSubUserMng';
 import HtmlScreen from 'views/HtmlScreen';
 import Report from 'views/BotElement/BotSetting/Report/Report';
-import PushMessage from 'views/BotElement/PushMessage';
+import PushMessage from 'views/PushMessage/index';
 import PaymentManagement from 'views/BotElement/PaymentManagement';
 import Payment from 'views/BotElement/BotSetting/Payment/Payment';
 import PaymentGateway from 'views/BotElement/BotSetting/Payment/PaymentGateway';
 import AddPaymentGateway from 'views/BotElement/BotSetting/Payment/AddPaymentGateway';
 import ReplyMailManagement from 'views/BotElement/ReplyMailManagement';
 import DesignChatbot from 'views/BotElement/BotSetting/DesignSetting/DesignChatbot';
+import ListSMSTemplate from 'views/BotElement/BotSetting/SMSSetting/ListSMSTemplate';
 
 var routes = [
   {
@@ -307,6 +309,20 @@ var routes = [
     name: 'メール一覧',
     // icon: "nc-icon nc-single-02",
     component: ListEmail,
+    layout: '/admin',
+  },
+  {
+    path: '/create-sms',
+    name: 'SMSメール定定',
+    // icon: "nc-icon nc-single-02",
+    component: CreateSMS,
+    layout: '/admin',
+  },
+  {
+    path: '/list-sms',
+    name: 'SMSメール編集',
+    // icon: "nc-icon nc-single-02",
+    component: ListSMSTemplate,
     layout: '/admin',
   },
   {
