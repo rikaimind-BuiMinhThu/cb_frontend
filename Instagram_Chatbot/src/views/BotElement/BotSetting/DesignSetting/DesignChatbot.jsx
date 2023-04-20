@@ -49,7 +49,7 @@ function DesignChatbot() {
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [designType, setDesignType] = useState("flat");
-  const [botImage, setBotImage] = useState(IconManDefault);
+  const [botImage, setBotImage] = useState("");
   const [botName, setBotName] = useState("");
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState("");
@@ -69,7 +69,8 @@ function DesignChatbot() {
   const [rightSpTitle, setRightSpTitle] = useState("");
   const [rightMarginSp, setRightMarginSp] = useState(10);
   const [bottomMarginSp, setBottomMarginSp] = useState(10);
-
+  const [cbImage, setCbImage]=useState('');
+  console.log('dkdk', botImage);
   // design type: handle click
   const designTypeClick = (e) => {
     let value = "";
@@ -94,7 +95,7 @@ function DesignChatbot() {
     setMainColor(color);
     document
       .querySelector(".main-colors .color.active")
-      .classList.remove("active");
+      ?.classList?.remove("active");
     document
       .querySelector(`.main-colors .color.color-${index}`)
       .classList.add("active");
@@ -102,7 +103,7 @@ function DesignChatbot() {
 
   // icon: handle click
   const handleIconClick = (index, imageDefault) => {
-    document.querySelector(".icons .icon.active").classList.remove("active");
+    document.querySelector(".icons .icon.active")?.classList?.remove("active");
     document
       .querySelector(`.icons .icon.icon-${index}`)
       .classList.add("active");
@@ -110,13 +111,14 @@ function DesignChatbot() {
       toDataURL(imageDefault).then((dataUrl) => {
         setBotImage(dataUrl);
       });
-    } else {
+    }  else {
       setBotImage(imageDefault);
     }
   };
 
   // get base url image add
   const getBaseUrlAdd = () => {
+
     const file = document.getElementById("bot_image")?.files[0];
     if (
       file?.type === "image/png" ||
@@ -125,14 +127,15 @@ function DesignChatbot() {
     ) {
       let reader = new FileReader();
       let baseString;
-      reader.onloadend = function () {
-        baseString = reader.result;
-        setBotImage(baseString);
-        if (baseString !== undefined || baseString !== "") {
-          document.querySelector(".error-message.bot-image").style.display =
-            "none";
-        }
-      };
+      setBotImage(process.env.REACT_APP_API_CHATBOT_URL/`${cbImage}`)
+      // reader.onloadend = function () {
+      //   baseString = reader.result;
+      //   setBotImage(baseString);
+      //   if (baseString !== undefined || baseString !== "") {
+      //     document.querySelector(".error-message.bot-image").style.display =
+      //       "none";
+      //   }
+      // };
       reader.readAsDataURL(file);
       return true;
     } else {
@@ -163,27 +166,25 @@ function DesignChatbot() {
   //set main color
   useEffect(() => {
     const mainColorsList = [
-      "blue",
-      "green",
-      "orange",
-      "yellow",
-      "pink",
-      "purple",
-      "black",
-      "white",
+      "#327AED",
+      "#26B197",
+      "#fC7E02",
+      "#F6CA21",
+      "#F16FAA",
+      "#8C66D9",
+      "#7C8290",
+      "D8E2EF",
     ];
-
     const index = mainColorsList.indexOf(mainColor);
-
-    if (index !== -1) {
+    if (index !== -1 && tabmenu) {
       document
         .querySelector(".main-colors .color.active")
-        .classList.remove("active");
+        ?.classList?.remove("active");
       document
         .querySelector(`.main-colors .color.color-${index}`)
-        .classList.add("active");
+        ?.classList?.add("active");
     }
-  }, [mainColor]);
+  }, [mainColor, tabmenu]);
   //get chat bot information
   useEffect(() => {
     api.get(`/api/v1/managements/chatbots/${botId}`).then((response) => {
@@ -209,8 +210,24 @@ function DesignChatbot() {
         setTitle(response.data.data?.title);
         setSubtitle(response.data.data?.subtitle);
         setDesignType(response.data.data?.design_type);
-        setMainColor(response.data.data?.main_color);
+        const colorMap = {
+          blue: '#327AED',
+          green: '#26B197',
+          orange: '#fC7E02',
+          yellow: '#F6CA21',
+          pink: '#F16FAA',
+          purple: '#8C66D9',
+          black: '#7C8290',
+          white: '#D8E2EF'
+        };
+        setBotImage(`${process.env.REACT_APP_API_CHATBOT_URL}${response.data.data?.icon?.url}`);
+        const mainColor = response?.data?.data?.main_color;
+        if (mainColor && colorMap[mainColor]) {
+          setMainColor(colorMap[mainColor]);
+        }
+        // setMainColor(response.data.data?.main_color);
         setDefaultIcon(response.data.data?.icon?.url);
+        setCbImage(response.data.data?.icon?.url);
       } else {
         setIsOpenNoti(true);
         // setMessageNoti('シナリオがありません。');
@@ -422,8 +439,7 @@ function DesignChatbot() {
       document.getElementById("sp-header").style.borderBottomRightRadius =
         "0px";
       document.getElementById("sp-body").style.display = "block";
-    }
-    else {
+    } else {
       document.getElementById("sp-container").style.height = "0px";
       document.getElementById("sp-body").style.display = "none";
       document.getElementById("sp-header").style.borderBottomLeftRadius =
@@ -615,18 +631,18 @@ function DesignChatbot() {
                                 </div>
                                 <div className="add-icon">
                                   <span>+</span>
-                                  <input
+                                  {/* <input
                                     type="file"
                                     id="bot_image"
                                     onChange={getBaseUrlAdd}
                                     name="bot_image"
                                     accept="image/png, image/jpeg"
-                                  />
+                                  /> */}
                                 </div>
                               </div>
                               <span className="error-message bot-image"></span>
                             </div>
-                            {botImage && (
+                            {(botImage )&& (
                               <div className="field-add-bot">
                                 <div className="image-show">
                                   <img src={botImage} alt="" />
@@ -1118,12 +1134,12 @@ function DesignChatbot() {
         <div
           id="sp-container"
           className="sp-container"
-          style={{ display:tabmenu && tabmenu ===2 ?"none" :!isOpenPreview && "none" }}
+          style={{ display: !isOpenPreview && "none" }}
         >
           <div
             id="sp-header"
             style={{
-              backgroundColor: mainColor
+              backgroundColor: mainColor,
             }}
             className="sp-header"
             onClick={handleTogglePreview}
@@ -1147,7 +1163,7 @@ function DesignChatbot() {
               </div>
             </div>
           </div>
-          
+
           <div id="sp-body" className="sp-body"></div>
         </div>
 
