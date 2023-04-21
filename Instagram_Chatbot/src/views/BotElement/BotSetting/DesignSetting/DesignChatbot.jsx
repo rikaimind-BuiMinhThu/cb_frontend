@@ -58,8 +58,10 @@ function DesignChatbot() {
   const [botId, setBotId] = useState(Cookies.get("bot_id"));
   const [buttonTypePc, setButtonTypePc] = useState(1);
   const [positionPc, setPositionPc] = useState(1);
-  const [widthPc, setWidthPc] = useState(460);
-  const [heightPc, setHeightPc] = useState(700);
+  const [widthPc, setWidthPc] = useState(380);
+  const [heightPc, setHeightPc] = useState(620);
+  const [widthSp, setWidthSp] = useState(350);
+  const [heightSp, setHeightSp] = useState(600);
   const [rightPcTitle, setRightPcTitle] = useState("");
   const [positionSp, setPositionSp] = useState(1);
   const [buttonTypeSp, setButtonTypeSp] = useState(1);
@@ -69,8 +71,8 @@ function DesignChatbot() {
   const [rightSpTitle, setRightSpTitle] = useState("");
   const [rightMarginSp, setRightMarginSp] = useState(10);
   const [bottomMarginSp, setBottomMarginSp] = useState(10);
-  const [cbImage, setCbImage]=useState('');
-  console.log('dkdk', botImage);
+  const [cbImage, setCbImage] = useState("");
+
   // design type: handle click
   const designTypeClick = (e) => {
     let value = "";
@@ -111,14 +113,13 @@ function DesignChatbot() {
       toDataURL(imageDefault).then((dataUrl) => {
         setBotImage(dataUrl);
       });
-    }  else {
+    } else {
       setBotImage(imageDefault);
     }
   };
 
   // get base url image add
   const getBaseUrlAdd = () => {
-
     const file = document.getElementById("bot_image")?.files[0];
     if (
       file?.type === "image/png" ||
@@ -127,7 +128,7 @@ function DesignChatbot() {
     ) {
       let reader = new FileReader();
       let baseString;
-      setBotImage(process.env.REACT_APP_API_CHATBOT_URL/`${cbImage}`)
+      setBotImage(process.env.REACT_APP_API_CHATBOT_URL / `${cbImage}`);
       // reader.onloadend = function () {
       //   baseString = reader.result;
       //   setBotImage(baseString);
@@ -193,6 +194,8 @@ function DesignChatbot() {
         setDisplayType(result?.display_type);
         setWidthPc(result?.width_pc);
         setHeightPc(result?.height_pc);
+        setWidthSp(result?.width_sp);
+        setHeightSp(result?.height_sp);
         setPositionPc(result?.position_pc);
         setRightPcTitle(result?.right_position_pc_title);
         setButtonTypePc(result?.button_type_pc);
@@ -211,16 +214,18 @@ function DesignChatbot() {
         setSubtitle(response.data.data?.subtitle);
         setDesignType(response.data.data?.design_type);
         const colorMap = {
-          blue: '#327AED',
-          green: '#26B197',
-          orange: '#fC7E02',
-          yellow: '#F6CA21',
-          pink: '#F16FAA',
-          purple: '#8C66D9',
-          black: '#7C8290',
-          white: '#D8E2EF'
+          blue: "#327AED",
+          green: "#26B197",
+          orange: "#fC7E02",
+          yellow: "#F6CA21",
+          pink: "#F16FAA",
+          purple: "#8C66D9",
+          black: "#7C8290",
+          white: "#D8E2EF",
         };
-        setBotImage(`${process.env.REACT_APP_API_CHATBOT_URL}${response.data.data?.icon?.url}`);
+        setBotImage(
+          `${process.env.REACT_APP_API_CHATBOT_URL}${response.data.data?.icon?.url}`
+        );
         const mainColor = response?.data?.data?.main_color;
         if (mainColor && colorMap[mainColor]) {
           setMainColor(colorMap[mainColor]);
@@ -324,71 +329,48 @@ function DesignChatbot() {
   };
   //update design setting
   const updateDesignSetting = () => {
-    if (widthPc) {
-      let iconBot = "";
-      if (botImage === "") {
-        iconBot = IconManDefault;
-      } else {
-        iconBot = botImage;
-      }
-      let main_color = {
-        blue: "#327AED",
-        green: "#26B197",
-        orange: "#fC7E02",
-        yellow: "#F6CA21",
-        pink: "#F16FAA",
-        purple: "#8C66D9",
-        black: "#7C8290",
-        white: "#D8E2EF",
-      };
-      var color;
-      Object.entries(main_color).forEach(([key, val]) => {
-        if (mainColor === val) {
-          color = key;
+    var settings = {
+      design_settings: {
+        display_type: displayType,
+        width_pc: widthPc,
+        height_pc: heightPc,
+        width_sp: widthSp,
+        height_sp: heightSp,
+        position_pc: positionPc,
+        button_type_pc: buttonTypePc,
+        right_position_pc_title: rightPcTitle,
+        right_margin_pc: rightMarginPc,
+        bottom_margin_pc: bottomMarginPc,
+        position_sp: positionSp,
+        button_type_sp: buttonTypeSp,
+        right_position_sp_title: rightSpTitle,
+        right_margin_sp: rightMarginSp,
+        bottom_margin_sp: bottomMarginSp,
+      },
+    };
+
+    api
+      .post(`api/v1/managements/chatbots/${botId}/design_settings`, settings)
+      .then((res) => {
+        if (res.data.code === 1 || res.data.code === "1") {
+          setMsgNoti("ボット設定を正常に保存されました！");
+          setIsOpenNoti(true);
+          setTimeout(() => {
+            setMsgNoti("");
+            setIsOpenNoti(false);
+
+            // window.location.href = "/admin/design-setting";
+          }, 1500);
+        } else if (res.data?.code === 2 || res.data?.code === "2") {
+          setMsgNoti(res.data.message);
+          setIsOpenNoti(true);
+        }
+      })
+      .catch((error) => {
+        if (error.response?.data.code === 0) {
+          tokenExpired();
         }
       });
-      var settings = {
-        design_settings: {
-          display_type: displayType,
-          width_pc: widthPc,
-          height_pc: heightPc,
-          position_pc: positionPc,
-          button_type_pc: buttonTypePc,
-          right_position_pc_title: rightPcTitle,
-          right_margin_pc: rightMarginPc,
-          bottom_margin_pc: bottomMarginPc,
-          position_sp: positionSp,
-          button_type_sp: buttonTypeSp,
-          right_position_sp_title: rightSpTitle,
-          right_margin_sp: rightMarginSp,
-          bottom_margin_sp: bottomMarginSp,
-        },
-      };
-
-      api
-        .post(`api/v1/managements/chatbots/${botId}/design_settings`, settings)
-        .then((res) => {
-          if (res.data.code === 1 || res.data.code === "1") {
-            setMsgNoti("ボットを正常に保存されました！");
-            setIsOpenNoti(true);
-            setTimeout(() => {
-              setMsgNoti("");
-              setIsOpenNoti(false);
-
-              // window.location.href = "/admin/design-setting";
-            }, 1500);
-          } else if (res.data?.code === 2 || res.data?.code === "2") {
-            setMsgNoti(res.data.message);
-            setIsOpenNoti(true);
-          }
-        })
-        .catch((error) => {
-          if (error.response?.data.code === 0) {
-            tokenExpired();
-          }
-        });
-    } else {
-    }
   };
   // handle preview
   const handlePreview = () => {
@@ -642,7 +624,7 @@ function DesignChatbot() {
                               </div>
                               <span className="error-message bot-image"></span>
                             </div>
-                            {(botImage )&& (
+                            {botImage && (
                               <div className="field-add-bot">
                                 <div className="image-show">
                                   <img src={botImage} alt="" />
@@ -961,6 +943,48 @@ function DesignChatbot() {
                                 <span className="error-message subtile"></span>
                               </div>  */}
 
+                                  <div className="field-add-bot">
+                                    <div className="add-bot_field-container">
+                                      <span className="label-field">
+                                        サイズ{" "}
+                                      </span>
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          width: "100%",
+                                          justifyContent: "space-between",
+                                        }}
+                                      >
+                                        <input
+                                          type="number"
+                                          name="width_sp"
+                                          className="input-setting2"
+                                          placeholder="幅"
+                                          defaultValue={widthSp}
+                                          onChange={(e) => {
+                                            setWidthSp(e.target.value);
+                                            // document.querySelector(
+                                            //   ".error-message.widthPc"
+                                            // ).style.display = "none";
+                                          }}
+                                        />
+                                        <input
+                                          type="number"
+                                          name="height_sp"
+                                          className="input-setting2"
+                                          defaultValue={heightSp}
+                                          placeholder="高さ"
+                                          onChange={(e) => {
+                                            setHeightSp(e.target.value);
+                                            // document.querySelector(
+                                            //   ".error-message.title"
+                                            // ).style.display = "none";
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+
                                 <div className="field-add-bot">
                                   <div className="add-bot_field-container">
                                     <span className="label-field">
@@ -1119,7 +1143,7 @@ function DesignChatbot() {
                             className="btn btn-preview"
                             onClick={updateDesignSetting}
                           >
-                            保存2
+                            設定保存
                           </button>
                         </div>
                       </div>
