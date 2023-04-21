@@ -49,7 +49,7 @@ function DesignChatbot() {
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [designType, setDesignType] = useState("flat");
-  const [botImage, setBotImage] = useState(IconManDefault);
+  const [botImage, setBotImage] = useState("");
   const [botName, setBotName] = useState("");
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState("");
@@ -58,8 +58,10 @@ function DesignChatbot() {
   const [botId, setBotId] = useState(Cookies.get("bot_id"));
   const [buttonTypePc, setButtonTypePc] = useState(1);
   const [positionPc, setPositionPc] = useState(1);
-  const [widthPc, setWidthPc] = useState(460);
-  const [heightPc, setHeightPc] = useState(700);
+  const [widthPc, setWidthPc] = useState(380);
+  const [heightPc, setHeightPc] = useState(620);
+  const [widthSp, setWidthSp] = useState(350);
+  const [heightSp, setHeightSp] = useState(600);
   const [rightPcTitle, setRightPcTitle] = useState("");
   const [positionSp, setPositionSp] = useState(1);
   const [buttonTypeSp, setButtonTypeSp] = useState(1);
@@ -69,10 +71,7 @@ function DesignChatbot() {
   const [rightSpTitle, setRightSpTitle] = useState("");
   const [rightMarginSp, setRightMarginSp] = useState(10);
   const [bottomMarginSp, setBottomMarginSp] = useState(10);
-  const [a, setA] = useState("");
-  const [c, setC] = useState("");
-
-
+  const [cbImage, setCbImage] = useState("");
 
   // design type: handle click
   const designTypeClick = (e) => {
@@ -98,7 +97,7 @@ function DesignChatbot() {
     setMainColor(color);
     document
       .querySelector(".main-colors .color.active")
-      .classList.remove("active");
+      ?.classList?.remove("active");
     document
       .querySelector(`.main-colors .color.color-${index}`)
       .classList.add("active");
@@ -106,7 +105,7 @@ function DesignChatbot() {
 
   // icon: handle click
   const handleIconClick = (index, imageDefault) => {
-    document.querySelector(".icons .icon.active").classList.remove("active");
+    document.querySelector(".icons .icon.active")?.classList?.remove("active");
     document
       .querySelector(`.icons .icon.icon-${index}`)
       .classList.add("active");
@@ -129,14 +128,15 @@ function DesignChatbot() {
     ) {
       let reader = new FileReader();
       let baseString;
-      reader.onloadend = function () {
-        baseString = reader.result;
-        setBotImage(baseString);
-        if (baseString !== undefined || baseString !== "") {
-          document.querySelector(".error-message.bot-image").style.display =
-            "none";
-        }
-      };
+      setBotImage(process.env.REACT_APP_API_CHATBOT_URL / `${cbImage}`);
+      // reader.onloadend = function () {
+      //   baseString = reader.result;
+      //   setBotImage(baseString);
+      //   if (baseString !== undefined || baseString !== "") {
+      //     document.querySelector(".error-message.bot-image").style.display =
+      //       "none";
+      //   }
+      // };
       reader.readAsDataURL(file);
       return true;
     } else {
@@ -150,7 +150,6 @@ function DesignChatbot() {
   };
 
   const [defaultIcon, setDefaultIcon] = useState("");
-
   const toDataURL = (url) =>
     fetch(url)
       .then((response) => response.blob())
@@ -168,27 +167,25 @@ function DesignChatbot() {
   //set main color
   useEffect(() => {
     const mainColorsList = [
-      "blue",
-      "green",
-      "orange",
-      "yellow",
-      "pink",
-      "purple",
-      "black",
-      "white",
+      "#327AED",
+      "#26B197",
+      "#fC7E02",
+      "#F6CA21",
+      "#F16FAA",
+      "#8C66D9",
+      "#7C8290",
+      "D8E2EF",
     ];
-
     const index = mainColorsList.indexOf(mainColor);
-
-    if (index !== -1) {
+    if (index !== -1 && tabmenu) {
       document
         .querySelector(".main-colors .color.active")
-        .classList.remove("active");
+        ?.classList?.remove("active");
       document
         .querySelector(`.main-colors .color.color-${index}`)
-        .classList.add("active");
+        ?.classList?.add("active");
     }
-  }, [mainColor]);
+  }, [mainColor, tabmenu]);
   //get chat bot information
   useEffect(() => {
     api.get(`/api/v1/managements/chatbots/${botId}`).then((response) => {
@@ -197,6 +194,8 @@ function DesignChatbot() {
         setDisplayType(result?.display_type);
         setWidthPc(result?.width_pc);
         setHeightPc(result?.height_pc);
+        setWidthSp(result?.width_sp);
+        setHeightSp(result?.height_sp);
         setPositionPc(result?.position_pc);
         setRightPcTitle(result?.right_position_pc_title);
         setButtonTypePc(result?.button_type_pc);
@@ -214,8 +213,26 @@ function DesignChatbot() {
         setTitle(response.data.data?.title);
         setSubtitle(response.data.data?.subtitle);
         setDesignType(response.data.data?.design_type);
-        setMainColor(response.data.data?.main_color);
-        setBotImage(response.data.data?.icon?.url);
+        const colorMap = {
+          blue: "#327AED",
+          green: "#26B197",
+          orange: "#fC7E02",
+          yellow: "#F6CA21",
+          pink: "#F16FAA",
+          purple: "#8C66D9",
+          black: "#7C8290",
+          white: "#D8E2EF",
+        };
+        setBotImage(
+          `${process.env.REACT_APP_API_CHATBOT_URL}${response.data.data?.icon?.url}`
+        );
+        const mainColor = response?.data?.data?.main_color;
+        if (mainColor && colorMap[mainColor]) {
+          setMainColor(colorMap[mainColor]);
+        }
+        // setMainColor(response.data.data?.main_color);
+        setDefaultIcon(response.data.data?.icon?.url);
+        setCbImage(response.data.data?.icon?.url);
       } else {
         setIsOpenNoti(true);
         // setMessageNoti('シナリオがありません。');
@@ -312,77 +329,62 @@ function DesignChatbot() {
   };
   //update design setting
   const updateDesignSetting = () => {
-    if (widthPc) {
-      let iconBot = "";
-      if (botImage === "") {
-        iconBot = IconManDefault;
-      } else {
-        iconBot = botImage;
-      }
-      let main_color = {
-        blue: "#327AED",
-        green: "#26B197",
-        orange: "#fC7E02",
-        yellow: "#F6CA21",
-        pink: "#F16FAA",
-        purple: "#8C66D9",
-        black: "#7C8290",
-        white: "#D8E2EF",
-      };
-      var color;
-      Object.entries(main_color).forEach(([key, val]) => {
-        if (mainColor === val) {
-          color = key;
+    var settings = {
+      design_settings: {
+        display_type: displayType,
+        width_pc: widthPc,
+        height_pc: heightPc,
+        width_sp: widthSp,
+        height_sp: heightSp,
+        position_pc: positionPc,
+        button_type_pc: buttonTypePc,
+        right_position_pc_title: rightPcTitle,
+        right_margin_pc: rightMarginPc,
+        bottom_margin_pc: bottomMarginPc,
+        position_sp: positionSp,
+        button_type_sp: buttonTypeSp,
+        right_position_sp_title: rightSpTitle,
+        right_margin_sp: rightMarginSp,
+        bottom_margin_sp: bottomMarginSp,
+      },
+    };
+
+    api
+      .post(`api/v1/managements/chatbots/${botId}/design_settings`, settings)
+      .then((res) => {
+        if (res.data.code === 1 || res.data.code === "1") {
+          setMsgNoti("ボット設定を正常に保存されました！");
+          setIsOpenNoti(true);
+          setTimeout(() => {
+            setMsgNoti("");
+            setIsOpenNoti(false);
+
+            // window.location.href = "/admin/design-setting";
+          }, 1500);
+        } else if (res.data?.code === 2 || res.data?.code === "2") {
+          setMsgNoti(res.data.message);
+          setIsOpenNoti(true);
+        }
+      })
+      .catch((error) => {
+        if (error.response?.data.code === 0) {
+          tokenExpired();
         }
       });
-      var settings = {
-        design_settings: {
-          display_type: displayType,
-          width_pc: widthPc,
-          height_pc: heightPc,
-          position_pc: positionPc,
-          button_type_pc: buttonTypePc,
-          right_position_pc_title: rightPcTitle,
-          right_margin_pc: rightMarginPc,
-          bottom_margin_pc: bottomMarginPc,
-          position_sp: positionSp,
-          button_type_sp: buttonTypeSp,
-          right_position_sp_title: rightSpTitle,
-          right_margin_sp: rightMarginSp,
-          bottom_margin_sp: bottomMarginSp,
-        },
-      };
-
-      api
-        .post(`api/v1/managements/chatbots/${botId}/design_settings`, settings)
-        .then((res) => {
-          if (res.data.code === 1 || res.data.code === "1") {
-            setMsgNoti("ボットを正常に保存されました！");
-            setIsOpenNoti(true);
-            setTimeout(() => {
-              setMsgNoti("");
-              setIsOpenNoti(false);
-
-              // window.location.href = "/admin/design-setting";
-            }, 1500);
-          } else if (res.data?.code === 2 || res.data?.code === "2") {
-            setMsgNoti(res.data.message);
-            setIsOpenNoti(true);
-          }
-        })
-        .catch((error) => {
-          if (error.response?.data.code === 0) {
-            tokenExpired();
-          }
-        });
-    } else {
-    }
   };
   // handle preview
   const handlePreview = () => {
     if (title && subtitle) {
-      document.getElementById("sp-container").style.height = "620px";
+      document.getElementById("sp-container").style.height = heightPc
+        ? `${heightPc}px`
+        : "620px";
       document.getElementById("sp-header").style.position = "static";
+      document.getElementById("sp-container").style.marginBottom =
+        bottomMarginPc ? `${bottomMarginPc}px` : "0px";
+      document.getElementById("sp-container").style.marginRight = rightMarginPc
+        ? `${rightMarginPc}px`
+        : "10px";
+
       document.getElementById("sp-header").style.borderBottomLeftRadius = "0px";
       document.getElementById("sp-header").style.borderBottomRightRadius =
         "0px";
@@ -406,7 +408,14 @@ function DesignChatbot() {
   // handle toggle preview
   const handleTogglePreview = () => {
     if (document.getElementById("sp-body").style.display === "none") {
-      document.getElementById("sp-container").style.height = "620px";
+      document.getElementById("sp-container").style.height = heightPc
+        ? `${heightPc}px`
+        : "620px";
+      document.getElementById("sp-container").style.marginBottom =
+        bottomMarginPc ? `${bottomMarginPc}px` : "0px";
+      document.getElementById("sp-container").style.marginRight = rightMarginPc
+        ? `${rightMarginPc}px`
+        : "10px";
       document.getElementById("sp-header").style.position = "static";
       document.getElementById("sp-header").style.borderBottomLeftRadius = "0px";
       document.getElementById("sp-header").style.borderBottomRightRadius =
@@ -604,13 +613,13 @@ function DesignChatbot() {
                                 </div>
                                 <div className="add-icon">
                                   <span>+</span>
-                                  <input
+                                  {/* <input
                                     type="file"
                                     id="bot_image"
                                     onChange={getBaseUrlAdd}
                                     name="bot_image"
                                     accept="image/png, image/jpeg"
-                                  />
+                                  /> */}
                                 </div>
                               </div>
                               <span className="error-message bot-image"></span>
@@ -934,6 +943,48 @@ function DesignChatbot() {
                                 <span className="error-message subtile"></span>
                               </div>  */}
 
+                                  <div className="field-add-bot">
+                                    <div className="add-bot_field-container">
+                                      <span className="label-field">
+                                        サイズ{" "}
+                                      </span>
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          width: "100%",
+                                          justifyContent: "space-between",
+                                        }}
+                                      >
+                                        <input
+                                          type="number"
+                                          name="width_sp"
+                                          className="input-setting2"
+                                          placeholder="幅"
+                                          defaultValue={widthSp}
+                                          onChange={(e) => {
+                                            setWidthSp(e.target.value);
+                                            // document.querySelector(
+                                            //   ".error-message.widthPc"
+                                            // ).style.display = "none";
+                                          }}
+                                        />
+                                        <input
+                                          type="number"
+                                          name="height_sp"
+                                          className="input-setting2"
+                                          defaultValue={heightSp}
+                                          placeholder="高さ"
+                                          onChange={(e) => {
+                                            setHeightSp(e.target.value);
+                                            // document.querySelector(
+                                            //   ".error-message.title"
+                                            // ).style.display = "none";
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+
                                 <div className="field-add-bot">
                                   <div className="add-bot_field-container">
                                     <span className="label-field">
@@ -1092,7 +1143,7 @@ function DesignChatbot() {
                             className="btn btn-preview"
                             onClick={updateDesignSetting}
                           >
-                            保存2
+                            設定保存
                           </button>
                         </div>
                       </div>
@@ -1111,7 +1162,9 @@ function DesignChatbot() {
         >
           <div
             id="sp-header"
-            style={{ backgroundColor: mainColor }}
+            style={{
+              backgroundColor: mainColor,
+            }}
             className="sp-header"
             onClick={handleTogglePreview}
           >
@@ -1134,8 +1187,10 @@ function DesignChatbot() {
               </div>
             </div>
           </div>
+
           <div id="sp-body" className="sp-body"></div>
         </div>
+
         {/* end preview */}
         <ModalNoti open={isOpenNoti} onClose={() => setIsOpenNoti(false)}>
           <div
