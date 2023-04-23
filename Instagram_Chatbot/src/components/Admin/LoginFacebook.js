@@ -22,8 +22,24 @@ function LoginFacebook({ checkLogin }) {
   const [accessToken2, setAccessToken2] = useState()
 
   function logoutFB() {
-    window.FB.logout(function (response) {   // See the onlogin handler
-      window.location.reload();
+    window.FB.getLoginStatus(function (response) {
+      var ig_id = Cookies.get("ig_id");
+      api.post(`/api/v1/logout_fb`, {ig_id: ig_id}).then(res => {
+        if (res.data.code == 1) {
+          setLogin(false);
+          Cookies.remove("ig_id");
+          Cookies.remove("page_access_token");
+        }
+        if (response.authResponse) {
+          window.FB.logout(function (response) {   // See the onlogin handler
+            window.location.reload();
+          });
+        } else {
+          window.location.reload();
+        }
+      }).catch(error => {
+        console.log(error)
+      })
     });
   }
 
