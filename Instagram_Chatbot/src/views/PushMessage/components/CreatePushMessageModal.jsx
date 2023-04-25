@@ -19,6 +19,7 @@ const CreatePushMessageModal = ({
   itemUpdate,
 }) => {
   const [emailList, setEmailList] = useState([]);
+  const [smsList, setSmsList] = useState([]);
   const [startDate, setStartDate] = useState(new Date());
   const [sendingMethodText, setSendingMethodText] = useState('email');
   const [isChecked, setIsChecked] = useState(false);
@@ -57,10 +58,12 @@ const CreatePushMessageModal = ({
     const { checkVar, newData } = resolveDataVariable(data);
     const result = {
       ...newData,
-      email_id: newData.email_id || emailList[0]?.id,
       last_message_datetime_since: newData.last_message_datetime_since || '1',
       variables: Object.values(checkVar),
     };
+    newData.sendingMethod === 'email'
+      ? delete result['sms_template_id']
+      : delete result['email_id'];
     saveForm({ push_message: result });
   };
 
@@ -103,6 +106,22 @@ const CreatePushMessageModal = ({
     }
   };
 
+  const getSmsList = async () => {
+    const bot_id = Cookies.get('bot_id');
+    try {
+      const res = await api.get(
+        `/api/v1/managements/sms_templates?page=all&chatbot_id=${bot_id}`
+      );
+      if (res.data.code === 1) {
+        setSmsList(res.data.data);
+      }
+    } catch (error) {
+      if (error?.response?.data.code === 0) {
+        tokenExpired();
+      }
+    }
+  };
+
   const handleChangeDate = (date) => {
     if (date == null) {
       if (date.getTime() > Date.now()) {
@@ -136,6 +155,7 @@ const CreatePushMessageModal = ({
 
   useEffect(() => {
     getEmailList();
+    getSmsList();
   }, []);
 
   useEffect(() => {
@@ -200,7 +220,7 @@ const CreatePushMessageModal = ({
               <option value='sms'>SMS</option>
             </select>
           </div>
-          {sendingMethodText === 'email' && (
+          {sendingMethodText === 'email' ? (
             <div className='w-100 d-flex justify-content-between align-items-center my-3'>
               <label className='push-message-span-form'>
                 {sendingMethodText === 'email' ? 'メール' : 'SMS'}
@@ -218,6 +238,30 @@ const CreatePushMessageModal = ({
                       selected={itemUpdate && itemUpdate.email_id === x.id}
                     >
                       {x.email_template_name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          ) : (
+            <div className='w-100 d-flex justify-content-between align-items-center my-3'>
+              <label className='push-message-span-form'>
+                {sendingMethodText === 'email' ? 'メール' : 'SMS'}
+                <span style={{ color: 'red' }}>*</span>
+              </label>
+              <select
+                className='push-message-input-form'
+                {...register('sms_template_id')}
+              >
+                {smsList?.length &&
+                  smsList.map((x, i) => (
+                    <option
+                      key={i}
+                      value={x.id}
+                      selected={
+                        itemUpdate && itemUpdate.sms_template_id === x.id
+                      }
+                    >
+                      {x.template_name}
                     </option>
                   ))}
               </select>
