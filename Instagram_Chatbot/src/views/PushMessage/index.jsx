@@ -9,7 +9,6 @@ import PushMessageTable from './components/PushMessageTable';
 import AlertDialogSlide from './components/AlertDialog';
 import SimpleDialog from './components/AlertSuccess';
 import ListDeliveryPM from './components/ListDeliveryPM';
-import './styles/PushMessage.scss';
 import { Link, useLocation } from 'react-router-dom';
 
 const PushMessageDashboard = () => {
@@ -64,7 +63,6 @@ const PushMessageDashboard = () => {
         }, 2000);
       }
     }
-    // const res = await api.patch(`/api/v1/managements/push_messages/${idPMUpdate}`, { push_message })
   };
 
   const handleChangeStatus = async (item) => {

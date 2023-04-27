@@ -1,26 +1,7 @@
-/*!
-
-=========================================================
-* Paper Dashboard React - v1.3.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/paper-dashboard-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com)
-
-* Licensed under MIT (https://github.com/creativetimofficial/paper-dashboard-react/blob/main/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import Dashboard from 'views/Dashboard.jsx';
 import Chatbot from 'views/InstagramBotElement/Chatbot';
 
 import ClientManagement from 'views/ClientManagement';
-import Policy from 'views/InstagramBotElement/Policy';
 import Release from 'views/InstagramBotElement/Release';
 import UserManagement from 'views/UserManagement';
 import Keyword from 'views/InstagramBotElement/Keyword';
@@ -41,7 +22,6 @@ import IPAddressSetting from 'views/BotElement/IPAddressSetting';
 import ScenarioList from 'views/BotElement/BotSetting/ScenarioSetting/ScenarioList';
 import MediaFileManagement from 'views/BotElement/BotSetting/ScenarioSetting/MediaFileManagement';
 import CreateEmail from 'views/BotElement/BotSetting/EmailSetting/CreateEmail';
-import CreateSMS from 'views/BotElement/BotSetting/SMSSetting';
 import ListEmail from 'views/BotElement/BotSetting/EmailSetting/ListEmail';
 import BotDemo from 'views/BotElement/BotDemo';
 import CreateAPI from 'views/BotElement/BotSetting/APISetting/CreateAPI';
@@ -70,7 +50,6 @@ import PaymentGateway from 'views/BotElement/BotSetting/Payment/PaymentGateway';
 import AddPaymentGateway from 'views/BotElement/BotSetting/Payment/AddPaymentGateway';
 import ReplyMailManagement from 'views/BotElement/ReplyMailManagement';
 import DesignChatbot from 'views/BotElement/BotSetting/DesignSetting/DesignChatbot';
-import ListSMSTemplate from 'views/BotElement/BotSetting/SMSSetting/ListSMSTemplate';
 
 var routes = [
   {
@@ -309,20 +288,6 @@ var routes = [
     name: 'メール一覧',
     // icon: "nc-icon nc-single-02",
     component: ListEmail,
-    layout: '/admin',
-  },
-  {
-    path: '/create-sms',
-    name: 'SMSメール定定',
-    // icon: "nc-icon nc-single-02",
-    component: CreateSMS,
-    layout: '/admin',
-  },
-  {
-    path: '/list-sms',
-    name: 'SMSメール編集',
-    // icon: "nc-icon nc-single-02",
-    component: ListSMSTemplate,
     layout: '/admin',
   },
   {

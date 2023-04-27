@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Nav, NavbarToggler } from 'reactstrap';
 // javascript plugin used to create scrollbars on windows
@@ -10,6 +10,13 @@ import { MDBIcon } from 'mdbreact';
 var ps;
 
 function Sidebar(props) {
+  const [botId, setBotId] = useState();
+
+  useEffect(() => {
+    const botId = Cookies.get('bot_id');
+    setBotId(botId);
+  }, []);
+
   React.useEffect(() => {
     var cook = Cookies.get('user_role');
     if (cook == 'admin_deel') {
@@ -606,121 +613,6 @@ function Sidebar(props) {
                     </li> */}
                   </ul>
                 </li>
-                {/* <li key={'media-management'}>
-                  <NavLink
-                    onClick={() => displayDesignSetting()}
-                    to="/admin/start-button"
-                    className="nav-link"
-                    activeClassName="active"
-                    activeStyle={{ color: 'black' }}
-                  >
-                    <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                    <p style={{ color: 'black' }}>Design Setting</p>
-                  </NavLink>
-                  <ul
-                    id="designSetting"
-                    style={{
-                      listStyleType: 'none',
-                      marginLeft: '-30px',
-                      textDecoration: 'underline',
-                      display: 'none',
-                    }}
-                  >
-                    <li
-                      className={activeRoute('start-button') + (true ? ' active-pro' : '')}
-                      key={'start-button'}
-                    >
-                      <NavLink
-                        to="/admin/start-button"
-                        className="nav-link"
-                        activeClassName="active"
-                        activeStyle={{ color: 'black' }}
-                      >
-                        <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                        <p style={{ color: 'black' }}>Start Button</p>
-                      </NavLink>
-                    </li>
-                    <li
-                      className={activeRoute('chat-body') + (true ? ' active-pro' : '')}
-                      key={'chat-body'}
-                    >
-                      <NavLink
-                        to="/admin/chat-body"
-                        className="nav-link"
-                        activeClassName="active"
-                        activeStyle={{ color: 'black' }}
-                      >
-                        <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                        <p style={{ color: 'black' }}>Chat Body</p>
-                      </NavLink>
-                    </li>
-                  </ul>
-                </li> */}
-                <li key={'create-sms'}>
-                  <NavLink
-                    onClick={() => displaySMSSetting()}
-                    to='/admin/create-sms'
-                    className='nav-link'
-                    activeClassName='active'
-                    activeStyle={{ color: 'black' }}
-                  >
-                    {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon='mail-bulk' style={{ color: 'black' }} />
-                    <p style={{ color: 'black' }}>SMSの設定</p>
-                  </NavLink>
-                  <ul
-                    id='smsSetting'
-                    style={{
-                      listStyleType: 'none',
-                      marginLeft: '-30px',
-                      textDecoration: 'underline',
-                      display: 'none',
-                    }}
-                  >
-                    <li
-                      className={
-                        activeRoute('create-sms') + (true ? ' active-pro' : '')
-                      }
-                      key={'create-email'}
-                    >
-                      <NavLink
-                        to='/admin/create-sms'
-                        className='nav-link'
-                        activeClassName='active'
-                        activeStyle={{ color: 'black' }}
-                      >
-                        {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                        <MDBIcon
-                          fas
-                          icon='file-signature'
-                          style={{ color: 'black' }}
-                        />
-                        <p style={{ color: 'black' }}>SMSを作成する</p>
-                      </NavLink>
-                    </li>
-                    <li
-                      className={
-                        activeRoute('list-sms') + (true ? ' active-pro' : '')
-                      }
-                      key={'list-sms'}
-                    >
-                      <NavLink
-                        to='/admin/list-sms'
-                        className='nav-link'
-                        activeClassName='active'
-                        activeStyle={{ color: 'black' }}
-                      >
-                        {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                        <MDBIcon
-                          fas
-                          icon='mail-bulk'
-                          style={{ color: 'black' }}
-                        />
-                        <p style={{ color: 'black' }}>SMSメール一覧</p>
-                      </NavLink>
-                    </li>
-                  </ul>
-                </li>
                 <li key={'create-email'}>
                   <NavLink
                     onClick={() => displayEmailSetting()}
@@ -786,6 +678,19 @@ function Sidebar(props) {
                       </NavLink>
                     </li>
                   </ul>
+                </li>
+                
+                {/** SMS Template */}
+                <li>
+                  <NavLink
+                    to={`/admin/bot-settings/${botId}/sms-template`}
+                    className='nav-link'
+                    activeClassName='active'
+                    activeStyle={{ color: 'black' }}
+                  >
+                    <MDBIcon fas icon='fa fa-comment' style={{ color: 'black' }} />
+                    <p style={{ color: 'black' }}>SMS</p>
+                  </NavLink>
                 </li>
                 <li
                   className={
