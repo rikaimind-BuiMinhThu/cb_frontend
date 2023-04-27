@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-import api from "../../../api/api-management";
+import api from "../../../../api/api-management";
 import { tokenExpired } from "api/tokenExpired";
 
 const PushMessageVariable = ({ item, i, register, handleRemoveDiv }) => {

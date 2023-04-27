@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, Row, Col, CardBody } from 'reactstrap';
-import api from '../../api/api-management';
+import api from '../../../api/api-management';
 import { tokenExpired } from 'api/tokenExpired';
 import Cookies from 'js-cookie';
 import CreatePushMessageModal from './components/CreatePushMessageModal';
-import '../../assets/css/bot/push-message.css';
+import '../../../assets/css/bot/push-message.css';
 import PushMessageTable from './components/PushMessageTable';
 import AlertDialogSlide from './components/AlertDialog';
 import SimpleDialog from './components/AlertSuccess';

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "antd";
 import { useForm, Controller } from "react-hook-form";
-import api from "../../../api/api-management";
+import api from "../../../../api/api-management";
 import { tokenExpired } from "api/tokenExpired";
 import Cookies from "js-cookie";
 import DatePicker from "react-datepicker";

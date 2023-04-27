@@ -43,7 +43,7 @@ import FileManagement from 'views/BotElement/BotSetting/FileManagement';
 import AddSubUserMng from 'views/BotElement/AddSubUserMng';
 import HtmlScreen from 'views/HtmlScreen';
 import Report from 'views/BotElement/BotSetting/Report/Report';
-import PushMessage from 'views/PushMessage/index';
+import PushMessage from 'views/BotSettings/PushMessage/index';
 import PaymentManagement from 'views/BotElement/PaymentManagement';
 import Payment from 'views/BotElement/BotSetting/Payment/Payment';
 import PaymentGateway from 'views/BotElement/BotSetting/Payment/PaymentGateway';

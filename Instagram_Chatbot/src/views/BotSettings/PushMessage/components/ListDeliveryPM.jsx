@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
-import api from "../../../api/api-management";
+import api from "../../../../api/api-management";
 import Cookies from "js-cookie";
 import PushMessageTable from "./PushMessageTable";
 
