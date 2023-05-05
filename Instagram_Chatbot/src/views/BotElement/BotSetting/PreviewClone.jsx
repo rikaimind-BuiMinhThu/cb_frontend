@@ -247,41 +247,40 @@ function Preview() {
   }
 
   //get chat bot setting
-  useEffect(() => {
-    let botId = params.get("bot_id");
-    api.get(`/api/v1/managements/chatbots/${botId}`).then((response) => {
-      if (response.data.data) {
-        const result = JSON.parse(response.data.data?.design_settings);
-        setDisplayType(result?.display_type);
-        setWidthPc(result?.width_pc);
-        setHeightPc(result?.height_pc);
-        setWidthSp(result?.width_sp);
-        setHeightSp(result?.height_sp);
-        setPositionPc(result?.position_pc);
-        if (result.display_type==='2'){
-          setIsOpen(false)
-        } else {
-          setIsOpen(true)
-        }
-        sessionStorage.setItem("chatbotH", result?.height_pc);
-        sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc);
-        sessionStorage.setItem("chatbotW", result?.width_pc);
-        sessionStorage.setItem("chatbotRight", result?.right_margin_pc);
-        setRightPcTitle(result?.right_position_pc_title);
-        setButtonTypePc(result?.button_type_pc);
-        setRightMarginPc(result?.right_margin_pc);
-        setBottomMarginPc(result?.bottom_margin_pc);
-        setPositionSp(result?.position_sp);
-        setButtonTypeSp(result?.button_type_sp);
-        setRightSpTitle(
-          JSON.parse(response.data.data?.design_settings)
-            ?.right_position_sp_title
-        );
-        setRightMarginSp(result?.right_margin_sp);
-        setBottomMarginSp(result?.bottom_margin_sp);
-      }
-    });
-  }, []);
+  // useEffect(() => {
+  //   api.get(`/api/v1/managements/chatbots/${botId}`).then((response) => {
+  //     if (response.data.data) {
+  //       const result = JSON.parse(response.data.data?.design_settings);
+  //       setDisplayType(result?.display_type);
+  //       setWidthPc(result?.width_pc);
+  //       setHeightPc(result?.height_pc);
+  //       setWidthSp(result?.width_sp);
+  //       setHeightSp(result?.height_sp);
+  //       setPositionPc(result?.position_pc);
+  //       if (result.display_type==='2'){
+  //         setIsOpen(false)
+  //       } else {
+  //         setIsOpen(true)
+  //       }
+  //       sessionStorage.setItem("chatbotH", result?.height_pc);
+  //       sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc);
+  //       sessionStorage.setItem("chatbotW", result?.width_pc);
+  //       sessionStorage.setItem("chatbotRight", result?.right_margin_pc);
+  //       setRightPcTitle(result?.right_position_pc_title);
+  //       setButtonTypePc(result?.button_type_pc);
+  //       setRightMarginPc(result?.right_margin_pc);
+  //       setBottomMarginPc(result?.bottom_margin_pc);
+  //       setPositionSp(result?.position_sp);
+  //       setButtonTypeSp(result?.button_type_sp);
+  //       setRightSpTitle(
+  //         JSON.parse(response.data.data?.design_settings)
+  //           ?.right_position_sp_title
+  //       );
+  //       setRightMarginSp(result?.right_margin_sp);
+  //       setBottomMarginSp(result?.bottom_margin_sp);
+  //     }
+  //   });
+  // }, []);
   function getAllUrlParams(url) {
     var queryString = url ? url.split("?")[1] : window.location.search.slice(1);
     var obj = {};
