@@ -12,6 +12,7 @@ import Contact from 'views/Public/Contact';
 import ShortUrl from 'views/Public/ShortUrl';
 import PreviewClone from 'views/BotElement/BotSetting/PreviewClone';
 import News from 'views/Public/News';
+import Instagram from 'views/Public/Instagram';
 
 class App extends Component {
   render() {
@@ -29,6 +30,7 @@ class App extends Component {
             <Route exact path="/contact" component={Contact} />
             <Route exact path="/preview-customer" component={PreviewClone} />
             <Route exact path="/news" component={News} />
+            <Route exact path="/instagram" component={Instagram} />
             <Route exact path="/" component={Login} />
             <Route path="/sign-in" component={Login} />
             <Route path="/admin" render={(props) => <Admin {...props} />} />
