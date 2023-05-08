@@ -32,6 +32,15 @@ function Dashboard(props) {
   React.useEffect(() => {
     mainPanel.current.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
+    const pathname = location.pathname;
+    const client = JSON.parse(sessionStorage.getItem('client'));
+    const isInstagram = client.is_instagram;
+    const isWeb = client.is_instagram;
+    const instagramRolesUrl = ['/admin/chatbot', '/admin/keyword', '/admin/release', '/admin/data', '/admin/data-analyst', '/admin/list-user', '/admin/attracted-customer', '/admin/crm'];
+    const webRolesUrl = ['/admin/bot', '/admin/account-information', '/admin/basic-setting', '/admin/reply-mail-management'];
+    if ((!isInstagram && instagramRolesUrl.includes(pathname)) || (!isWeb && webRolesUrl.includes(pathname))) {
+      window.location.href = '/admin/dashboard';
+    }
   }, [location]);
 
   return (
