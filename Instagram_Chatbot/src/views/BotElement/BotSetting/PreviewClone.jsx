@@ -248,6 +248,7 @@ function Preview() {
 
   //get chat bot setting
   useEffect(() => {
+    let botId = params.get("bot_id")
     api.get(`/api/v1/managements/chatbots/${botId}`, { is_chatbot: true }).then((response) => {
       if (response.data.data) {
         const result = JSON.parse(response.data.data?.design_settings);
