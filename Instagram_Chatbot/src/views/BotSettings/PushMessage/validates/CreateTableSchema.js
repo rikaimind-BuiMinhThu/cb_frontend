@@ -1,23 +1,22 @@
-import * as yup from 'yup';
-import { parse, isDate } from 'moment';
-
-const today = new Date();
-
-const parseDateString = (value, originalValue) => {
-  const parsedDate = isDate(originalValue)
-    ? originalValue
-    : parse(originalValue, 'yyyy-MM-dd', new Date());
-
-  return parsedDate;
-};
+import * as yup from "yup";
 
 const schema = yup.object({
-  title: yup.string().required().min(2).max(40),
+  name: yup
+    .string()
+    .required("プッシュメッセージ名は、必ず指定してください。")
+    .max(40),
+  sending_method: yup
+    .string()
+    .required("送信方法は、必ず指定してください。")
+    .oneOf(["email", "sms"])
+    .default("email"),
+  sending_template: yup.number().required("鋳型は、必ず指定してください。"),
+  start_time: yup.date().required("開始日時は、必ず指定してください。"),
+  is_exclude_time: yup.boolean(),
+  exclude_start_time: yup.number(),
+  exclude_end_time: yup.number(),
+  exclude_push_time: yup.number(),
   last_message_datetime_since: yup.number().required(),
-  excluded_time_from: yup.number(),
-  excluded_time_to: yup.number(),
-  alternate_send_time: yup.number(),
-  started_at: yup.date().transform(parseDateString).min(today),
 });
 
 export default schema;

@@ -681,7 +681,10 @@ function Sidebar(props) {
                 </li>
                 
                 {/** SMS Template */}
-                <li>
+                <li
+                  className={activeRoute("sms") + (true ? " active-pro" : "")}
+                  key={"sms"}
+                >
                   <NavLink
                     to={`/admin/bot-settings/${botId}/sms-template`}
                     className='nav-link'
@@ -776,19 +779,18 @@ function Sidebar(props) {
                     </li>
                   </ul>
                 </li> */}
-                <li
-                  className={
+                {/** SMS Template */}
+                <li className={
                     activeRoute('push-message') + (true ? ' active-pro' : '')
                   }
                   key={'push-message'}
                 >
                   <NavLink
-                    to='/admin/push-message'
+                    to={`/admin/bot-settings/${botId}/push-message`}
                     className='nav-link'
                     activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
-                    {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
                     <MDBIcon
                       fas
                       icon='envelope-square'

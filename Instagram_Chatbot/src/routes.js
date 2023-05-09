@@ -43,7 +43,6 @@ import FileManagement from 'views/BotElement/BotSetting/FileManagement';
 import AddSubUserMng from 'views/BotElement/AddSubUserMng';
 import HtmlScreen from 'views/HtmlScreen';
 import Report from 'views/BotElement/BotSetting/Report/Report';
-import PushMessage from 'views/BotSettings/PushMessage/index';
 import PaymentManagement from 'views/BotElement/PaymentManagement';
 import Payment from 'views/BotElement/BotSetting/Payment/Payment';
 import PaymentGateway from 'views/BotElement/BotSetting/Payment/PaymentGateway';
@@ -197,13 +196,6 @@ var routes = [
     name: 'サブユーザ管理',
     // icon: "nc-icon nc-single-02",
     component: SubUserManagement,
-    layout: '/admin',
-  },
-  {
-    path: '/push-message',
-    name: 'プッシュメッセージ',
-    // icon: "nc-icon nc-single-02",
-    component: PushMessage,
     layout: '/admin',
   },
   {

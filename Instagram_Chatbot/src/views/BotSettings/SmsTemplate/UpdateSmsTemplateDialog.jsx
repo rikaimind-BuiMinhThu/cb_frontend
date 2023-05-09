@@ -5,7 +5,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import schema from "./schema/createSmsTemplateFormSchema";
 import TextField from "@mui/material/TextField";
@@ -16,8 +16,7 @@ import MuiAlert from "@mui/material/Alert";
 import api from "api/api-management";
 import { tokenExpired } from "api/tokenExpired";
 
-export default function CreateSmsTemplateDialog({ botId, resolver }) {
-  const [open, setOpen] = React.useState(false);
+export default function UpdateSmsTemplateDialog({ botId, resolver, id, open }) {
   const [openToast, setOpenToast] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
 
@@ -26,51 +25,53 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
   };
 
   const handleCloseToast = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
     setOpenToast(false);
-    setErrorMessage('');
+    setErrorMessage("");
   };
 
   const descriptionElementRef = React.useRef(null);
 
   const {
-    register,
+    control,
     watch,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
-  } = useForm({ resolver: yupResolver(schema) });
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      name: "",
+      content: "",
+    },
+  });
 
   const watchContent = watch("content");
 
   const onSubmit = async (data) => {
     try {
-      const response = await api.post(`/api/v1/managements/sms_templates`, {
-        chatbot_id: botId,
-        sms_template: {
-          name: data.name,
-          content: data.content,
-        },
-      });
+      const response = await api.put(
+        `/api/v1/managements/sms_templates/${id}`,
+        {
+          chatbot_id: botId,
+          sms_template: {
+            name: data.name,
+            content: data.content,
+          },
+        }
+      );
       if (response?.data?.code === 2) {
         handleOpenToast();
         setErrorMessage(response?.data?.message);
       }
       if (response?.data?.code === 1) {
         handleOpenToast();
-        resolver()
-        handleClose();
+        resolver(response?.data?.data);
       }
     } catch (error) {
+      console.log(error);
       if (error.response?.data.code === 0) {
         tokenExpired();
       }
@@ -86,18 +87,36 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
     }
   }, [open]);
 
+  useEffect(() => {
+    if (open && id) {
+      api
+        .get(`/api/v1/managements/sms_templates/${id}`, {
+          params: {
+            chatbot_id: botId,
+          },
+        })
+        .then((res) => {
+          if (res?.data.code === 1) {
+            setValue("name", res?.data?.data?.name, true);
+            setValue("content", res?.data?.data?.content, true);
+          }
+          if (res?.data.code === 2) {
+            resolver();
+          }
+        })
+        .catch((error) => {
+          if (error.response?.data.code === 0) {
+            tokenExpired();
+          }
+        });
+    }
+  }, [open, id]);
+
   return (
     <div>
-      <Button
-        sx={{ minWidth: "100px" }}
-        variant="contained"
-        onClick={handleClickOpen}
-      >
-        追加
-      </Button>
       <Dialog
         open={open}
-        onClose={handleClose}
+        onClose={() => resolver()}
         scroll={"paper"}
         aria-labelledby="scroll-dialog-title"
         aria-describedby="scroll-dialog-description"
@@ -110,21 +129,33 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
             tabIndex={-1}
           >
             <Stack spacing={2} minWidth={{ xs: "200px", md: "500px" }}>
-              <TextField
-                required
-                label="テンプレート名"
-                error={errors?.name?.message}
-                helperText={errors?.name?.message}
-                {...register("name")}
+              <Controller
+                name="name"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    required
+                    label="テンプレート名"
+                    error={errors?.name?.message}
+                    helperText={errors?.name?.message}
+                    {...field}
+                  />
+                )}
               />
-              <TextField
-                required
-                label="メッセージ"
-                multiline
-                rows={4}
-                error={errors?.content?.message}
-                helperText={errors?.content?.message}
-                {...register("content")}
+              <Controller
+                name="content"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    required
+                    label="メッセージ"
+                    multiline
+                    rows={4}
+                    error={errors?.content?.message}
+                    helperText={errors?.content?.message}
+                    {...field}
+                  />
+                )}
               />
               {watchContent?.length || 0} 文字
             </Stack>
@@ -134,7 +165,7 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
           <Button
             sx={{ minWidth: "100px" }}
             variant="outlined"
-            onClick={handleClose}
+            onClick={() => resolver()}
           >
             閉じる
           </Button>
@@ -170,7 +201,7 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
             elevation={6}
             variant="filled"
           >
-            テンプレートが正常に作成されました。
+            SMSを正常に保存しました。
           </MuiAlert>
         )}
       </Snackbar>

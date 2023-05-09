@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 const schema = yup.object({
-  templateName: yup
+  name: yup
     .string()
     .required("テンプレート名は、必ず指定してください。")
     .max(50),
