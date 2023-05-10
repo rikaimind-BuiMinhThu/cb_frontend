@@ -67,7 +67,7 @@ export default function CreateSmsTemplateDialog({ botId, resolver }) {
       }
       if (response?.data?.code === 1) {
         handleOpenToast();
-        resolver()
+        resolver(response?.data?.data)
         handleClose();
       }
     } catch (error) {

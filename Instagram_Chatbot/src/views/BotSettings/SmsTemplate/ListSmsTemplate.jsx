@@ -47,7 +47,10 @@ const ListSmsTemplate = () => {
     setOpenToast(false);
   };
 
-  const handleCreateSuccess = () => {
+  const handleCreateSuccess = (item) => {
+    if (item) {
+      setList((pre) => [item, ...pre]);
+    }
     setPage(1);
   };
 

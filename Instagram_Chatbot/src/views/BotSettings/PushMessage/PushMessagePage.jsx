@@ -14,13 +14,14 @@ import PushMessageHistory from "./PushMessageHistory";
 const PushMessagePage = () => {
   const { botId } = useParams();
   const [tab, setTab] = React.useState("list");
+  const [tick, setTick] = React.useState(0);
 
   const handleChangeTab = (event, newValue) => {
     setTab(newValue);
   };
 
   const handleCreateSuccess = () => {
-    // setRefresh(true);
+    setTick((pre) => ++pre)
   };
 
   return (
@@ -45,7 +46,7 @@ const PushMessagePage = () => {
             </Tabs>
           </Box>
           <TabPanel value={"list"} selected={tab}>
-            <PushMessageList />
+            <PushMessageList tick={tick}/>
           </TabPanel>
           <TabPanel value={"history"} selected={tab}>
             <PushMessageHistory />

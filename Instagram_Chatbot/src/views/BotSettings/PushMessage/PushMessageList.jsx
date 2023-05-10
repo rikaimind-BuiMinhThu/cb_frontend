@@ -32,28 +32,10 @@ const columns = [
   },
 ];
 
-const PushMessageList = () => {
+const PushMessageList = ({ tick }) => {
   const { botId } = useParams();
   const [list, setList] = useState([]);
   const [notificationApi, contextHolder] = notification.useNotification();
-
-  const changeStatus = (id) => {
-    api
-      .patch(`/api/v1/managements/push_messages/${id}/unsubscribe`)
-      .catch((err) => {
-        if (err.response?.data.code === 0) {
-          tokenExpired();
-        }
-      });
-  };
-
-  const handleDelete = (id) => {
-    api.delete(`/api/v1/managements/push_messages/${id}`).catch((err) => {
-      if (err.response?.data.code === 0) {
-        tokenExpired();
-      }
-    });
-  };
 
   useEffect(() => {
     api
@@ -71,7 +53,7 @@ const PushMessageList = () => {
           tokenExpired();
         }
       });
-  }, []);
+  }, [tick]);
 
   const onDelete = (id) => {
     api
@@ -110,7 +92,6 @@ const PushMessageList = () => {
       .patch(url)
       .then((res) => {
         if (res.data.code == 1) {
-          debugger;
           openDeleteNotification(
             "success",
             "プッシュメッセージを正常に保存しました。"
