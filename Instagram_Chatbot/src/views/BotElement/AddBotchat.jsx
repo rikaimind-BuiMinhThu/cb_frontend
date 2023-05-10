@@ -55,7 +55,7 @@ function AddBotchat() {
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState('');
   const [isOpenPreview, setIsOpenPreview] = useState(false);
-
+console.log();
   // side effects
   useEffect(() => {
     document.querySelector('.main-colors .color.color-0').classList.add('active');
