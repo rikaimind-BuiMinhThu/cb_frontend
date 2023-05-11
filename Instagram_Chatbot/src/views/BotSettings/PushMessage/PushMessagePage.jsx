@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import TabPanel from "./TabPanel";
 import CardHeader from "@mui/material/CardHeader";
 import { useParams } from "react-router-dom";
-import CreatePushMessageDialog from "./CreatePushMessageDialog";
+import SavePushMessageDialog from "./SavePushMessageDialog";
 import PushMessageList from "./PushMessageList";
 import PushMessageHistory from "./PushMessageHistory";
 
@@ -31,7 +31,7 @@ const PushMessagePage = () => {
           title="ブッシュメッセージ"
           action={
             <div hidden={tab === "history"}>
-              <CreatePushMessageDialog
+              <SavePushMessageDialog
                 botId={botId}
                 resolver={handleCreateSuccess}
               />

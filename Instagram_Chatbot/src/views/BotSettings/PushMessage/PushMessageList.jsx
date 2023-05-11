@@ -4,6 +4,7 @@ import { ExclamationCircleFilled } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
 import api from "api/api-management";
 import { tokenExpired } from "api/tokenExpired";
+import SavePushMessageDialog from "./SavePushMessageDialog";
 
 const columns = [
   {
@@ -35,6 +36,7 @@ const columns = [
 const PushMessageList = ({ tick }) => {
   const { botId } = useParams();
   const [list, setList] = useState([]);
+  const [updateItem, setUpdateItem] = useState(null);
   const [notificationApi, contextHolder] = notification.useNotification();
 
   useEffect(() => {
@@ -79,8 +81,8 @@ const PushMessageList = ({ tick }) => {
   };
 
   const onChangeStatus = (item) => () => {
-    if(!item) {
-      return
+    if (!item) {
+      return;
     }
     const url =
       item.subscribe_status === "subscribe"
@@ -139,13 +141,16 @@ const PushMessageList = ({ tick }) => {
     });
   };
 
+  const onClickUpdate = (item) => () => {
+    setUpdateItem(item);
+  };
+
   const createRenderItem = (item, index) => {
     return {
       ...item,
       no: index + 1,
       started_at: item.started_at.substring(0, 19).replaceAll("T", " "),
-      status:
-        item.subscribe_status === "subscribe" ? "配信予約中" : "配信停止",
+      status: item.subscribe_status === "subscribe" ? "配信予約中" : "配信停止",
       sending_method: item.sending_method === "email" ? "メール" : "SMS",
       action: (
         <Space>
@@ -156,7 +161,9 @@ const PushMessageList = ({ tick }) => {
           ) : (
             <Button onClick={onChangeStatus(item)}>配信する</Button>
           )}
-          <Button type="primary">編集</Button>
+          <Button type="primary" onClick={onClickUpdate(item)}>
+            編集
+          </Button>
           <Button danger onClick={showDeleteConfirm(item.id)}>
             削除
           </Button>
@@ -165,10 +172,34 @@ const PushMessageList = ({ tick }) => {
     };
   };
 
+  const handleUpdateSuccess = (item) => {
+    item &&
+      setList((pre) =>
+        pre.map((each, index) =>
+          each.id === item.id
+            ? createRenderItem(item, index)
+            : createRenderItem(each, index)
+        )
+      );
+    setUpdateItem(null);
+  };
+
+  const handleCancelUpdate = () => {
+    setUpdateItem(null);
+  };
+
   return (
     <div>
       {contextHolder}
       <Table columns={columns} dataSource={list} />
+      {updateItem && (
+        <SavePushMessageDialog
+          botId={botId}
+          resolver={handleUpdateSuccess}
+          item={updateItem}
+          onCancel={handleCancelUpdate}
+        />
+      )}
     </div>
   );
 };
