@@ -2019,7 +2019,15 @@ console.log("chatbotRight", chatbotRight);
             `/api/v1/scenario_users/scenario_user_responses/create_order`,
             data_submit
           )
-          .then((res) => {})
+          .then((res) => {
+            const conversion = {
+              scenario_data: `${deviceReceive}_conversion`,
+            };
+            api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
+            }).catch(err => {
+              console.log(err)
+            })
+          })
           .catch((error) => {
             console.log(error);
             if (error.response?.data.code === 0) {
@@ -3097,10 +3105,10 @@ console.log("chatbotRight", chatbotRight);
         let withdrawal = {
           scenario_data: `${deviceReceive}_close_chatbot_window`,
         };
-        // api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
-        // }).catch(err => {
-        //   console.log(err)
-        // })
+        api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+        }).catch(err => {
+          console.log(err)
+        })
       }, (indexTiming + i - indexMessageRender - 1) * 1000);
     } else if (
       botInfor?.withdrawal_prevention_status === "standard_exit_popup" ||
@@ -3213,18 +3221,18 @@ if (scenarioId && botInfor && isOpen  ){
                   let withdrawal = {
                     scenario_data: `${deviceReceive}_close_chatbot_window`,
                   };
-                  // api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
-                  // }).catch(err => {
-                  //   console.log(err)
-                  // })
+                  api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+                  }).catch(err => {
+                    console.log(err)
+                  })
                 } else {
                   let withdrawal = {
                     scenario_data: `${deviceReceive}_close_chatbot_window`,
                   };
-                  // api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
-                  // }).catch(err => {
-                  //   console.log(err)
-                  // })
+                  api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+                  }).catch(err => {
+                    console.log(err)
+                  })
                   onOpenPreview(false);
                 }
               }, (i - indexMessageRender) * 1000);

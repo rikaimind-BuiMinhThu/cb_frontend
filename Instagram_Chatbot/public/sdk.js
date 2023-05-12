@@ -156,7 +156,7 @@ async function displayPopup() {
         iframe.style.right = "10px";
         let add = { scenario_data: device };
         // submitForm(url, add)
-        // getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
+        getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
       } else if (!e.data && !firstOpen && mobileCheck() === true) {
         iframe.width = "300px";
         iframe.style.bottom = "13px";
@@ -181,7 +181,7 @@ async function displayPopup() {
   setTimeout(() => {
     let checkDevice = { scenario_data: `${device}_open_chatbot_window` };
     // submitForm(url, checkDevice)
-    // getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
+    getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
   }, 1000);
 }
 
