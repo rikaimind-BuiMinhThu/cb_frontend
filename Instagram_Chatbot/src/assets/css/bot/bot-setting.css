@@ -26,12 +26,26 @@
 .bot-haft {
     width: 100%;
 }
+.ss-user-setting__item-bottom-flex-start {
+  display: flex;
+  align-items:flex-start;
+  justify-content: center;
+  background-color: aliceblue;
+  height: 40px;
+  width: 50%;
+  margin: 0px;
+}
+.ss-user-setting-input-delay {
+  flex: 1;
+}
   .input-setting2{
     padding: 0 10px;
     height: 40px;
     border-radius: 5px;
-    width: 48%;
+    width: 45%;
     border: 1px solid #333;
+    text-align: left;
+
   }
   .input-setting{
     padding: 0 10px;

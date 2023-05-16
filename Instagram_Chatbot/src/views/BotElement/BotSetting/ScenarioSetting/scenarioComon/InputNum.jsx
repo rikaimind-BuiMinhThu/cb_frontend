@@ -7,7 +7,7 @@ const InputNum = ({ id, addonAfter, maxLength, addonBefore, label, value, onChan
         <React.Fragment>
             {label && <div style={styleLabel ? { ...styleLabel } : {}}>{label}</div>}
             <InputNumber
-                style={{ ...style }}
+                style={{ ...style,  textAlign:'center', height:'40px' }}
                 id={id}
                 autoComplete={autoComplete}
                 max={max}

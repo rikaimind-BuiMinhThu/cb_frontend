@@ -269,10 +269,16 @@ function BotManagement() {
     setMsgConfirm('本当にボットを削除しますか。');
     setIdSelected(id);
   };
+  const loading = document.getElementById("loading");
 
+
+function hideLoading() {
+  loading.style.display = "none";
+}
   return (
     <>
       <div className="content">
+      
         <Row id="screenAll">
           <Col md="12">
             <Card>

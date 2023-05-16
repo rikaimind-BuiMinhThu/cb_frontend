@@ -197,7 +197,7 @@ function Preview() {
   const [positionPc, setPositionPc] = useState("1");
   const [widthPc, setWidthPc] = useState(380);
   const [heightPc, setHeightPc] = useState(620);
-  const [widthSp, setWidthSp] = useState(350);
+  const [widthSp, setWidthSp] = useState(100);
   const [heightSp, setHeightSp] = useState(600);
   const [rightPcTitle, setRightPcTitle] = useState("");
   const [positionSp, setPositionSp] = useState(1);
@@ -258,10 +258,10 @@ function Preview() {
         setWidthSp(result?.width_sp);
         setHeightSp(result?.height_sp);
         setPositionPc(result?.position_pc);
-        if (result.display_type==='2'){
-          setIsOpen(false)
-        } else {
+        if (result?.display_type && result?.display_type ==='1'){
           setIsOpen(true)
+        } else {
+          setIsOpen(false)
         }
         sessionStorage.setItem("chatbotH", result?.height_pc);
         sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc);
@@ -3081,7 +3081,7 @@ if (scenarioId && botInfor && isOpen  ){
         position:'fixed',
         bottom: mobileCheck()===true? `${bottomMarginSp}px`: bottomMarginPc ? `${bottomMarginPc}px` : "0px",
         right: mobileCheck()===true? `${rightMarginSp}px`:rightMarginPc ? `${rightMarginPc}px` : "10px",
-        width:mobileCheck()===true? `${widthSp}px` : widthPc ? `${widthPc}px` : "380px",
+        width:mobileCheck()===true? `${widthSp}%` : widthPc ? `${widthPc}px` : "360px",
         height:mobileCheck()===true? `${heightSp}px` :  heightPc ? `${heightPc}px` : "620px",
         zIndex: 999,
       }}
