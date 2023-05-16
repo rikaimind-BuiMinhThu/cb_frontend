@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardBody, Table, Row, Col } from "reactstrap";
 import "./../../../../assets/css/bot/bot-setting.css";
 // icons
+import InputNum from '../../BotSetting/ScenarioSetting/scenarioComon/InputNum';
 import IconManDefault from "./../../../../assets/img/bot-icon/man1_new.png";
 import IconWomenDefault from "./../../../../assets/img/bot-icon/women1_new.png";
 import IconWomen4 from "./../../../../assets/img/bot-icon/women4_new.png";
@@ -952,25 +953,55 @@ function DesignChatbot() {
                                         style={{
                                           display: "flex",
                                           width: "100%",
+                                          backgroundColor:'red',
+                                          padding:'0',
                                           justifyContent: "space-between",
                                         }}
                                       >
-                                        <input
+                                        <div className="ss-user-setting__item-bottom-flex-start">
+                                          <InputNum
+                                                              className="ss-user-setting-input-delay ss-user-setting-input-limit-character"
+                                                              name="width_sp"
+                                                             
+                                                              min={1}
+                                                              max={100}
+                                                              value={widthSp}
+                                                              onChange={e => setWidthSp(e)}
+                                                            />
+                                                            <p style={{textAlign:'center', margin:'auto 0'}}>%</p>
+                                                            </div>
+                                                            <div className="ss-user-setting__item-bottom-flex-start">
+                                          <InputNum
+                                                              className="ss-user-setting-input-delay ss-user-setting-input-limit-character"
+                                                              name="height_sp"
+                                                             
+                                                              min={1}
+                                                              value={heightSp}
+                                                              placeholder="高さ"
+                                                              onChange={e => setHeightSp(e)}
+                                                            />
+                                                            <p style={{textAlign:'center', margin:'auto 0'}}>px</p>
+                                                            </div>
+                                        
+                                        {/* <input
                                           type="number"
                                           name="width_sp"
                                           className="input-setting2"
                                           placeholder="幅"
                                           defaultValue={widthSp}
                                           onChange={(e) => {
-                                            setWidthSp(e.target.value);
+
+                                              setWidthSp(e.target.value);
+
                                             // document.querySelector(
                                             //   ".error-message.widthPc"
                                             // ).style.display = "none";
                                           }}
-                                        />
-                                        <input
+                                        /> */}
+
+                                        {/* <input
                                           type="number"
-                                          name="height_sp"
+                                          name="ss-user-setting-input-delay ss-user-setting-input-limit-character"
                                           className="input-setting2"
                                           defaultValue={heightSp}
                                           placeholder="高さ"
@@ -980,7 +1011,10 @@ function DesignChatbot() {
                                             //   ".error-message.title"
                                             // ).style.display = "none";
                                           }}
-                                        />
+                                        /> */}
+                                      
+                                        
+
                                       </div>
                                     </div>
                                   </div>

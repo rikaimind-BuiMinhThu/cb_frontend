@@ -3476,6 +3476,9 @@ function ClientManagement() {
                     <option onClick={() => setSizeAfterSelectCartSystem()} value="shopify">
                       Shopify
                     </option>
+                    <option onClick={() => setSizeAfterSelectCartSystem()} value="ec_force">
+                      Ec-Force
+                    </option>
                   </select>
                   <label
                     id="newClientCartSystemErrMsg"
