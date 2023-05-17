@@ -2,6 +2,8 @@ import Dashboard from 'views/Dashboard.jsx';
 import Chatbot from 'views/InstagramBotElement/Chatbot';
 
 import ClientManagement from 'views/ClientManagement';
+import PlanManagement from 'views/PlanManagement';
+import Policy from 'views/InstagramBotElement/Policy';
 import Release from 'views/InstagramBotElement/Release';
 import UserManagement from 'views/UserManagement';
 import Keyword from 'views/InstagramBotElement/Keyword';
@@ -434,6 +436,12 @@ var routes = [
     name: 'ボットAdmin',
     // icon: "nc-icon nc-single-02",
     component: BotAdmin,
+    layout: '/admin',
+  },
+  {
+    path: '/plan-management',
+    name: 'プラン管理',
+    component: PlanManagement,
     layout: '/admin',
   },
 ];

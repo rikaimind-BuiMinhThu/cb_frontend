@@ -528,7 +528,22 @@ function Sidebar(props) {
                   <MDBIcon fas icon='user' style={{ color: 'black' }} />
                   <p style={{ color: 'black' }}>ユーザー管理</p>
                 </NavLink>
-              </li>
+            </li>
+            <li
+              style={{ listStyleType: 'none', marginLeft: '-50px' }}
+              className={activeRoute('account-information') + (true ? ' active-pro' : '')}
+              key={'account-information'}
+            >
+              <NavLink
+                to="/admin/plan-management"
+                className="nav-link"
+                activeClassName="active"
+                activeStyle={{ color: 'black' }}
+              >
+                <MDBIcon fas icon="cogs" style={{ color: "black" }} />
+                <p style={{ color: 'black' }}>Plan Management</p>
+              </NavLink>
+            </li>
           </ul>
           <ul id='side_bar_bot'>
             <li
