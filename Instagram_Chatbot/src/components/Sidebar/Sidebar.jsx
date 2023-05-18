@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { Nav, NavbarToggler } from 'reactstrap';
 // javascript plugin used to create scrollbars on windows
@@ -10,6 +10,13 @@ import { MDBIcon } from 'mdbreact';
 var ps;
 
 function Sidebar(props) {
+  const [botId, setBotId] = useState();
+
+  useEffect(() => {
+    const botId = Cookies.get('bot_id');
+    setBotId(botId);
+  }, []);
+
   React.useEffect(() => {
     var cook = Cookies.get('user_role');
     if (cook == 'admin_deel') {
@@ -105,6 +112,14 @@ function Sidebar(props) {
     }
   }
 
+  function displaySMSSetting() {
+    if (document.getElementById('smsSetting').style.display === 'block') {
+      document.getElementById('smsSetting').style.display = 'none';
+    } else {
+      document.getElementById('smsSetting').style.display = 'block';
+    }
+  }
+
   function displayAPISetting() {
     if (document.getElementById('APISetting').style.display === 'block') {
       document.getElementById('APISetting').style.display = 'none';
@@ -157,147 +172,202 @@ function Sidebar(props) {
     };
   });
   return (
-    <div className="sidebar" data-color={props.bgColor} data-active-color={props.activeColor}>
-      <div className="logo" style={{ width: '100%' }} onClick={() => homePage()}>
-        <a href="/admin/dashboard">
-          <img src={logo} alt="react-logo" style={{ height: '60px', paddingLeft: '10px' }} />
+    <div
+      className='sidebar'
+      data-color={props.bgColor}
+      data-active-color={props.activeColor}
+    >
+      <div
+        className='logo'
+        style={{ width: '100%' }}
+        onClick={() => homePage()}
+      >
+        <a href='/admin/dashboard'>
+          <img
+            src={logo}
+            alt='react-logo'
+            style={{ height: '60px', paddingLeft: '10px' }}
+          />
         </a>
       </div>
-      <div className="sidebar-wrapper" ref={sidebar}>
+      <div className='sidebar-wrapper' ref={sidebar}>
         <Nav>
-          <ul id="sidebar_all">
+          <ul id='sidebar_all'>
             <li
               style={{ listStyleType: 'none', marginLeft: '-50px' }}
               className={activeRoute('instagram') + (true ? ' active-pro' : '')}
               key={'insta'}
             >
               <NavLink
-                to="/admin/dashboard"
+                to='/admin/dashboard'
                 onClick={() => hideInstaList()}
-                className="nav-link"
-                activeClassName="active"
+                className='nav-link'
+                activeClassName='active'
                 activeStyle={{ color: 'black' }}
               >
                 {/* <i className="nc-icon nc-bank" style={{ color: 'black' }} /> */}
                 {/* <MDBIcon fab icon="instagram" style={{ color: "black" }} /> */}
-                <i className="fab fa-instagram" style={{ color: 'black', fontWeight: "800" }}></i>
+                <i
+                  className='fab fa-instagram'
+                  style={{ color: 'black', fontWeight: '800' }}
+                ></i>
                 <p>Instagram Chatbot</p>
               </NavLink>
-              <ul id="instaDropdown" style={{ display: 'none', marginLeft: '-30px' }}>
+              <ul
+                id='instaDropdown'
+                style={{ display: 'none', marginLeft: '-30px' }}
+              >
                 <li
-                  className={activeRoute('chatbot') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('chatbot') + (true ? ' active-pro' : '')
+                  }
                   key={'notifications'}
                 >
                   <NavLink
-                    to="/admin/chatbot"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/chatbot'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-atom" style={{ color: 'black' }} /> */}
-                    <i className="fas fa-atom" style={{ color: 'black' }}></i>
+                    <i className='fas fa-atom' style={{ color: 'black' }}></i>
                     <p style={{ color: 'black' }}>チャットボット作成</p>
                   </NavLink>
                 </li>
                 <li
-                  className={activeRoute('keyword') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('keyword') + (true ? ' active-pro' : '')
+                  }
                   key={'keyword'}
                 >
                   <NavLink
-                    to="/admin/keyword"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/keyword'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-key-25" style={{ color: 'black' }} /> */}
-                    <i className="fas fa-key" style={{ color: 'black' }}></i>
+                    <i className='fas fa-key' style={{ color: 'black' }}></i>
                     <p style={{ color: 'black' }}>キーワード設定</p>
                   </NavLink>
                 </li>
                 <li
-                  className={activeRoute('release') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('release') + (true ? ' active-pro' : '')
+                  }
                   key={'release'}
                 >
                   <NavLink
-                    to="/admin/release"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/release'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-air-baloon" style={{ color: 'black' }} /> */}
-                    <i className="fab fa-fly" style={{ color: 'black' }}></i>
+                    <i className='fab fa-fly' style={{ color: 'black' }}></i>
                     <p style={{ color: 'black' }}>リリース</p>
                   </NavLink>
                 </li>
-                <li className={activeRoute('data') + (true ? ' active-pro' : '')} key={'data'}>
+                <li
+                  className={activeRoute('data') + (true ? ' active-pro' : '')}
+                  key={'data'}
+                >
                   <NavLink
-                    to="/admin/data"
+                    to='/admin/data'
                     onClick={hide}
-                    className="nav-link"
-                    activeClassName="active"
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-single-02" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="chart-pie" style={{ color: "black" }} />
+                    <MDBIcon fas icon='chart-pie' style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>データ分析</p>
                   </NavLink>
-                  <ul id="userDropdown" style={{ display: 'none', marginLeft: '-30px' }}>
+                  <ul
+                    id='userDropdown'
+                    style={{ display: 'none', marginLeft: '-30px' }}
+                  >
                     <li
-                      className={activeRoute('data-analyst') + (true ? ' active-pro' : '')}
+                      className={
+                        activeRoute('data-analyst') +
+                        (true ? ' active-pro' : '')
+                      }
                       key={'profile'}
                     >
                       <NavLink
-                        to="/admin/data-analyst"
-                        className="nav-link"
-                        activeClassName="active"
+                        to='/admin/data-analyst'
+                        className='nav-link'
+                        activeClassName='active'
                         activeStyle={{ color: 'black' }}
                       >
-                        <i className="nc-icon nc-bulb-63" style={{ color: 'black', fontWeight: "800" }} />
+                        <i
+                          className='nc-icon nc-bulb-63'
+                          style={{ color: 'black', fontWeight: '800' }}
+                        />
                         <p style={{ color: 'black' }}>サマリー</p>
                       </NavLink>
                     </li>
                     <li
-                      className={activeRoute('list-user') + (true ? ' active-pro' : '')}
+                      className={
+                        activeRoute('list-user') + (true ? ' active-pro' : '')
+                      }
                       key={'setting'}
                     >
                       <NavLink
-                        to="/admin/list-user"
-                        className="nav-link"
-                        activeClassName="active"
+                        to='/admin/list-user'
+                        className='nav-link'
+                        activeClassName='active'
                         activeStyle={{ color: 'black' }}
                       >
-                        <i className="nc-icon nc-bullet-list-67" style={{ color: 'black', fontWeight: '800' }} />
+                        <i
+                          className='nc-icon nc-bullet-list-67'
+                          style={{ color: 'black', fontWeight: '800' }}
+                        />
                         <p style={{ color: 'black' }}>ユーザー一覧</p>
                       </NavLink>
                     </li>
                     <li
-                      className={activeRoute('attracted-customer') + (true ? ' active-pro' : '')}
+                      className={
+                        activeRoute('attracted-customer') +
+                        (true ? ' active-pro' : '')
+                      }
                       key={'about'}
                     >
                       <NavLink
-                        to="/admin/attracted-customer"
-                        className="nav-link"
-                        activeClassName="active"
+                        to='/admin/attracted-customer'
+                        className='nav-link'
+                        activeClassName='active'
                         activeStyle={{ color: 'black' }}
                       >
                         {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                        <MDBIcon fas icon="user-check" style={{ color: "black" }} />
+                        <MDBIcon
+                          fas
+                          icon='user-check'
+                          style={{ color: 'black' }}
+                        />
                         <p style={{ color: 'black' }}>集客</p>
                       </NavLink>
                     </li>
                   </ul>
                 </li>
 
-                <li className={activeRoute('crm') + (true ? ' active-pro' : '')} key={'crm'}>
+                <li
+                  className={activeRoute('crm') + (true ? ' active-pro' : '')}
+                  key={'crm'}
+                >
                   <NavLink
-                    to="/admin/crm"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/crm'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-bulb-63" style={{ color: 'black' }} /> */}
                     {/* <i class="fas fa-chalkboard-teacher"></i> */}
-                    <MDBIcon fas icon="chalkboard-teacher" style={{ color: "black" }} />
+                    <MDBIcon
+                      fas
+                      icon='chalkboard-teacher'
+                      style={{ color: 'black' }}
+                    />
                     <p style={{ color: 'black' }}>CRM</p>
                   </NavLink>
                 </li>
@@ -305,75 +375,95 @@ function Sidebar(props) {
             </li>
             <li
               style={{ listStyleType: 'none', marginLeft: '-50px' }}
-              className={activeRoute('account-information') + (true ? ' active-pro' : '')}
+              className={
+                activeRoute('account-information') + (true ? ' active-pro' : '')
+              }
               key={'account-information'}
             >
               <NavLink
-                to="/admin/bot"
+                to='/admin/bot'
                 onClick={() => hideWebChatList()}
-                className="nav-link"
-                activeClassName="active"
+                className='nav-link'
+                activeClassName='active'
                 activeStyle={{ color: 'black' }}
               >
                 {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                <MDBIcon fas icon="cogs" style={{ color: "black" }} />
+                <MDBIcon fas icon='cogs' style={{ color: 'black' }} />
                 <p style={{ color: 'black' }}>Web Chatbot</p>
               </NavLink>
-              <ul id="webChatDrop" style={{ display: 'none', marginLeft: '-30px' }}>
+              <ul
+                id='webChatDrop'
+                style={{ display: 'none', marginLeft: '-30px' }}
+              >
                 <li
-                  className={activeRoute('account-information') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('account-information') +
+                    (true ? ' active-pro' : '')
+                  }
                   key={'account-information'}
                 >
                   <NavLink
-                    to="/admin/account-information"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/account-information'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="address-book" style={{ color: "black" }} />
+                    <MDBIcon
+                      fas
+                      icon='address-book'
+                      style={{ color: 'black' }}
+                    />
                     <p style={{ color: 'black' }}>アカウント情報</p>
                   </NavLink>
                 </li>
                 <li
-                  className={activeRoute('basic-setting') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('basic-setting') + (true ? ' active-pro' : '')
+                  }
                   key={'basic-setting'}
                 >
                   <NavLink
-                    to="/admin/basic-setting"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/basic-setting'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="briefcase" style={{ color: "black" }} />
+                    <MDBIcon fas icon='briefcase' style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>基本設定</p>
                   </NavLink>
                 </li>
                 <li
-                  className={activeRoute('reply-mail-management') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('reply-mail-management') +
+                    (true ? ' active-pro' : '')
+                  }
                   key={'reply-mail-management'}
                 >
                   <NavLink
-                    to="/admin/reply-mail-management"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/reply-mail-management'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="envelope" style={{ color: "black" }} />
+                    <MDBIcon fas icon='envelope' style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>送信メール管理</p>
                   </NavLink>
                 </li>
-                <li className={activeRoute('bot') + (true ? ' active-pro' : '')} key={'bot'}>
+                <li
+                  className={activeRoute('bot') + (true ? ' active-pro' : '')}
+                  key={'bot'}
+                >
                   <NavLink
-                    to="/admin/bot"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/bot'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-bulb-63" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="list" style={{ color: "black" }} />
+                    <MDBIcon fas icon='list' style={{ color: 'black' }} />
 
                     <p style={{ color: 'black' }}>ボット一覧</p>
                   </NavLink>
@@ -398,55 +488,62 @@ function Sidebar(props) {
                 </li> */}
               </ul>
             </li>
-            <li style={{ listStyleType: 'none', marginLeft: '-50px' }}
-              id="sidebarClient"
-              className={activeRoute('client-management') + (true ? ' active-pro' : '')}
+            <li
+              style={{ listStyleType: 'none', marginLeft: '-50px' }}
+              id='sidebarClient'
+              className={
+                activeRoute('client-management') + (true ? ' active-pro' : '')
+              }
               key={'client-management'}
             >
               <NavLink
-                to="/admin/client-management"
-                className="nav-link"
-                activeClassName="active"
+                to='/admin/client-management'
+                className='nav-link'
+                activeClassName='active'
                 activeStyle={{ color: 'black' }}
               >
                 {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                <MDBIcon fas icon="user-tie" style={{ color: "black" }} />
+                <MDBIcon fas icon='user-tie' style={{ color: 'black' }} />
                 <p style={{ color: 'black' }}>クライアント管理</p>
               </NavLink>
             </li>
             <li
               style={{ listStyleType: 'none', marginLeft: '-50px' }}
-              id="sidebarUser"
-              className={activeRoute('user-management') + (true ? ' active-pro' : '')}
+              id='sidebarUser'
+              className={
+                activeRoute('user-management') + (true ? ' active-pro' : '')
+              }
               key={'user-management'}
             >
               <NavLink
-                to="/admin/user-management"
-                className="nav-link"
-                activeClassName="active"
+                to='/admin/user-management'
+                className='nav-link'
+                activeClassName='active'
                 activeStyle={{ color: 'black' }}
               >
                 {/* <i className="nc-icon nc-circle-10" style={{ color: 'black' }} /> */}
-                <MDBIcon fas icon="user" style={{ color: "black" }} />
+                <MDBIcon fas icon='user' style={{ color: 'black' }} />
                 <p style={{ color: 'black' }}>ユーザー管理</p>
               </NavLink>
             </li>
           </ul>
-          <ul id="side_bar_bot">
+          <ul id='side_bar_bot'>
             <li
               style={{ listStyleType: 'none', marginLeft: '-50px' }}
-              className={activeRoute('bot-setting') + (true ? ' active-pro' : '')}
+              className={
+                activeRoute('bot-setting') + (true ? ' active-pro' : '')
+              }
               key={'scenario-setting'}
             >
               <NavLink
-                to="/admin/bot-setting"
+                to='/admin/bot-setting'
                 onClick={() => displayBotSetting()}
-                className="nav-link"
-                activeClassName="active"
+                className='nav-link'
+                activeClassName='active'
                 activeStyle={{ color: 'black' }}
               >
                 {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                <MDBIcon fas icon="user-cog" style={{ color: "black" }} />
+                <MDBIcon fas icon='user-cog' style={{ color: 'black' }} />
                 <p style={{ color: 'black' }}>ボット設定</p>
               </NavLink>
               <ul
@@ -461,16 +558,16 @@ function Sidebar(props) {
                 <li key={'scenario-setting'}>
                   <NavLink
                     onClick={() => displayScenarioSetting()}
-                    to="/admin/scenario-list"
-                    className="nav-link"
+                    to='/admin/scenario-list'
+                    className='nav-link'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="swatchbook" style={{ color: "black" }} />
+                    <MDBIcon fas icon='swatchbook' style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>シナリオ設定</p>
                   </NavLink>
                   <ul
-                    id="scenarioSetting"
+                    id='scenarioSetting'
                     style={{
                       listStyleType: 'none',
                       marginLeft: '-30px',
@@ -479,17 +576,24 @@ function Sidebar(props) {
                     }}
                   >
                     <li
-                      className={activeRoute('scenario-list') + (true ? ' active-pro' : '')}
+                      className={
+                        activeRoute('scenario-list') +
+                        (true ? ' active-pro' : '')
+                      }
                       key={'scenario-list'}
                     >
                       <NavLink
-                        to="/admin/scenario-list"
-                        className="nav-link"
-                        activeClassName="active"
+                        to='/admin/scenario-list'
+                        className='nav-link'
+                        activeClassName='active'
                         activeStyle={{ color: 'black' }}
                       >
                         {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                        <MDBIcon fas icon="th-list" style={{ color: "black" }} />
+                        <MDBIcon
+                          fas
+                          icon='th-list'
+                          style={{ color: 'black' }}
+                        />
                         <p style={{ color: 'black' }}>シナリオ一覧</p>
                       </NavLink>
                     </li>
@@ -509,70 +613,20 @@ function Sidebar(props) {
                     </li> */}
                   </ul>
                 </li>
-                {/* <li key={'media-management'}>
-                  <NavLink
-                    onClick={() => displayDesignSetting()}
-                    to="/admin/start-button"
-                    className="nav-link"
-                    activeClassName="active"
-                    activeStyle={{ color: 'black' }}
-                  >
-                    <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                    <p style={{ color: 'black' }}>Design Setting</p>
-                  </NavLink>
-                  <ul
-                    id="designSetting"
-                    style={{
-                      listStyleType: 'none',
-                      marginLeft: '-30px',
-                      textDecoration: 'underline',
-                      display: 'none',
-                    }}
-                  >
-                    <li
-                      className={activeRoute('start-button') + (true ? ' active-pro' : '')}
-                      key={'start-button'}
-                    >
-                      <NavLink
-                        to="/admin/start-button"
-                        className="nav-link"
-                        activeClassName="active"
-                        activeStyle={{ color: 'black' }}
-                      >
-                        <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                        <p style={{ color: 'black' }}>Start Button</p>
-                      </NavLink>
-                    </li>
-                    <li
-                      className={activeRoute('chat-body') + (true ? ' active-pro' : '')}
-                      key={'chat-body'}
-                    >
-                      <NavLink
-                        to="/admin/chat-body"
-                        className="nav-link"
-                        activeClassName="active"
-                        activeStyle={{ color: 'black' }}
-                      >
-                        <i className="nc-icon nc-badge" style={{ color: 'black' }} />
-                        <p style={{ color: 'black' }}>Chat Body</p>
-                      </NavLink>
-                    </li>
-                  </ul>
-                </li> */}
                 <li key={'create-email'}>
                   <NavLink
                     onClick={() => displayEmailSetting()}
-                    to="/admin/create-email"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/create-email'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="mail-bulk" style={{ color: "black" }} />
+                    <MDBIcon fas icon='mail-bulk' style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>メール設定</p>
                   </NavLink>
                   <ul
-                    id="emailSetting"
+                    id='emailSetting'
                     style={{
                       listStyleType: 'none',
                       marginLeft: '-30px',
@@ -581,64 +635,97 @@ function Sidebar(props) {
                     }}
                   >
                     <li
-                      className={activeRoute('create-email') + (true ? ' active-pro' : '')}
+                      className={
+                        activeRoute('create-email') +
+                        (true ? ' active-pro' : '')
+                      }
                       key={'create-email'}
                     >
                       <NavLink
-                        to="/admin/create-email"
-                        className="nav-link"
-                        activeClassName="active"
+                        to='/admin/create-email'
+                        className='nav-link'
+                        activeClassName='active'
                         activeStyle={{ color: 'black' }}
                       >
                         {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                        <MDBIcon fas icon="file-signature" style={{ color: "black" }} />
+                        <MDBIcon
+                          fas
+                          icon='file-signature'
+                          style={{ color: 'black' }}
+                        />
                         <p style={{ color: 'black' }}>メール作成</p>
                       </NavLink>
                     </li>
                     <li
-                      className={activeRoute('list-email') + (true ? ' active-pro' : '')}
+                      className={
+                        activeRoute('list-email') + (true ? ' active-pro' : '')
+                      }
                       key={'list-email'}
                     >
                       <NavLink
-                        to="/admin/list-email"
-                        className="nav-link"
-                        activeClassName="active"
+                        to='/admin/list-email'
+                        className='nav-link'
+                        activeClassName='active'
                         activeStyle={{ color: 'black' }}
                       >
                         {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                        <MDBIcon fas icon="mail-bulk" style={{ color: "black" }} />
+                        <MDBIcon
+                          fas
+                          icon='mail-bulk'
+                          style={{ color: 'black' }}
+                        />
                         <p style={{ color: 'black' }}>メール一覧</p>
                       </NavLink>
                     </li>
                   </ul>
                 </li>
+                
+                {/** SMS Template */}
                 <li
-                  className={activeRoute('file-management') + (true ? ' active-pro' : '')}
+                  className={activeRoute("sms") + (true ? " active-pro" : "")}
+                  key={"sms"}
+                >
+                  <NavLink
+                    to={`/admin/bot-settings/${botId}/sms-template`}
+                    className='nav-link'
+                    activeClassName='active'
+                    activeStyle={{ color: 'black' }}
+                  >
+                    <MDBIcon fas icon='fa fa-comment' style={{ color: 'black' }} />
+                    <p style={{ color: 'black' }}>SMS</p>
+                  </NavLink>
+                </li>
+                <li
+                  className={
+                    activeRoute('file-management') + (true ? ' active-pro' : '')
+                  }
                   key={'file-management'}
                 >
                   <NavLink
-                    to="/admin/file-management"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/file-management'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="file-alt" style={{ color: "black" }} />
+                    <MDBIcon fas icon='file-alt' style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>メディアファイル管理</p>
                   </NavLink>
                 </li>
                 <li
-                  className={activeRoute('sub-user') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('sub-user') + (true ? ' active-pro' : '')
+                  }
                   key={'sub-user'}
                 >
                   <NavLink
-                    to="/admin/sub-user"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/sub-user'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="user-check" style={{ color: "black" }} />
+                    <MDBIcon fas icon='user-check' style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>サブユーザ管理</p>
                   </NavLink>
                 </li>
@@ -692,18 +779,23 @@ function Sidebar(props) {
                     </li>
                   </ul>
                 </li> */}
-                <li
-                  className={activeRoute('push-message') + (true ? ' active-pro' : '')}
+                {/** SMS Template */}
+                <li className={
+                    activeRoute('push-message') + (true ? ' active-pro' : '')
+                  }
                   key={'push-message'}
                 >
                   <NavLink
-                    to="/admin/push-message"
-                    className="nav-link"
-                    activeClassName="active"
+                    to={`/admin/bot-settings/${botId}/push-message`}
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
-                    {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="envelope-square" style={{ color: "black" }} />
+                    <MDBIcon
+                      fas
+                      icon='envelope-square'
+                      style={{ color: 'black' }}
+                    />
                     <p style={{ color: 'black' }}>プッシュメッセージ</p>
                   </NavLink>
                 </li>
@@ -730,47 +822,59 @@ function Sidebar(props) {
                 </li> */}
 
                 <li
-                  className={activeRoute('variable-management') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('variable-management') +
+                    (true ? ' active-pro' : '')
+                  }
                   key={'variable-management'}
                 >
                   <NavLink
-                    to="/admin/variable-management"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/variable-management'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="chart-bar" style={{ color: "black" }} />
+                    <MDBIcon fas icon='chart-bar' style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>変数管理</p>
                   </NavLink>
                 </li>
                 <li
-                  className={activeRoute('installation-tag-demo') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('installation-tag-demo') +
+                    (true ? ' active-pro' : '')
+                  }
                   key={'installation-tag-demo'}
                 >
                   <NavLink
-                    to="/admin/installation-tag-demo"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/installation-tag-demo'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="download" style={{ color: "black" }} />
+                    <MDBIcon fas icon='download' style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>設定タグ＆デモ</p>
                   </NavLink>
                 </li>
                 <li
-                  className={activeRoute('design-setting') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('design-setting') + (true ? ' active-pro' : '')
+                  }
                   key={'design-setting'}
                 >
                   <NavLink
-                    to="/admin/design-setting"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/design-setting'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="paint-brush" style={{ color: "black" }} />
+                    <MDBIcon
+                      fas
+                      icon='paint-brush'
+                      style={{ color: 'black' }}
+                    />
                     <p style={{ color: 'black' }}>デザイン設定</p>
                   </NavLink>
                 </li>
@@ -798,13 +902,13 @@ function Sidebar(props) {
                 <li key={'report'}>
                   {/* <NavLink onClick={() => displayReportSetting()} to="/admin/report" className="nav-link" activeClassName="active" activeStyle={{ color: "black" }}> */}
                   <NavLink
-                    to="/admin/report"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/report'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="chart-line" style={{ color: "black" }} />
+                    <MDBIcon fas icon='chart-line' style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>レポート</p>
                   </NavLink>
                   {/* <ul
@@ -848,32 +952,41 @@ function Sidebar(props) {
                 </li>
 
                 <li
-                  className={activeRoute('payment-management') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('payment-management') +
+                    (true ? ' active-pro' : '')
+                  }
                   key={'payment'}
                 >
                   <NavLink
-                    to="/admin/payment-management"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/payment-management'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="money-check" style={{ color: "black" }} />
+                    <MDBIcon
+                      fas
+                      icon='money-check'
+                      style={{ color: 'black' }}
+                    />
                     <p style={{ color: 'black' }}>決済管理</p>
                   </NavLink>
                 </li>
                 <li
-                  className={activeRoute('payment-gateway') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('payment-gateway') + (true ? ' active-pro' : '')
+                  }
                   key={'payment-gateway'}
                 >
                   <NavLink
-                    to="/admin/payment-gateway"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/payment-gateway'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} />server */}
-                    <MDBIcon fas icon="server" style={{ color: "black" }} />
+                    <MDBIcon fas icon='server' style={{ color: 'black' }} />
                     <p style={{ color: 'black' }}>ペイメントゲートウェイ</p>
                   </NavLink>
                 </li>
@@ -892,17 +1005,24 @@ function Sidebar(props) {
                   </NavLink>
                 </li> */}
                 <li
-                  className={activeRoute('withdrawal-prevention') + (true ? ' active-pro' : '')}
+                  className={
+                    activeRoute('withdrawal-prevention') +
+                    (true ? ' active-pro' : '')
+                  }
                   key={'withdrawal-prevention'}
                 >
                   <NavLink
-                    to="/admin/withdrawal-prevention"
-                    className="nav-link"
-                    activeClassName="active"
+                    to='/admin/withdrawal-prevention'
+                    className='nav-link'
+                    activeClassName='active'
                     activeStyle={{ color: 'black' }}
                   >
                     {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
-                    <MDBIcon fas icon="window-restore" style={{ color: "black" }} />
+                    <MDBIcon
+                      fas
+                      icon='window-restore'
+                      style={{ color: 'black' }}
+                    />
                     <p style={{ color: 'black' }}>離脱防止</p>
                   </NavLink>
                 </li>
@@ -963,7 +1083,3 @@ function Sidebar(props) {
 }
 
 export default Sidebar;
-
-
-
-

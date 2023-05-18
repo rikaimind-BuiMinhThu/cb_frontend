@@ -1,26 +1,7 @@
-/*!
-
-=========================================================
-* Paper Dashboard React - v1.3.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/paper-dashboard-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com)
-
-* Licensed under MIT (https://github.com/creativetimofficial/paper-dashboard-react/blob/main/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import Dashboard from 'views/Dashboard.jsx';
 import Chatbot from 'views/InstagramBotElement/Chatbot';
 
 import ClientManagement from 'views/ClientManagement';
-import Policy from 'views/InstagramBotElement/Policy';
 import Release from 'views/InstagramBotElement/Release';
 import UserManagement from 'views/UserManagement';
 import Keyword from 'views/InstagramBotElement/Keyword';
@@ -62,7 +43,6 @@ import FileManagement from 'views/BotElement/BotSetting/FileManagement';
 import AddSubUserMng from 'views/BotElement/AddSubUserMng';
 import HtmlScreen from 'views/HtmlScreen';
 import Report from 'views/BotElement/BotSetting/Report/Report';
-import PushMessage from 'views/BotElement/PushMessage';
 import PaymentManagement from 'views/BotElement/PaymentManagement';
 import Payment from 'views/BotElement/BotSetting/Payment/Payment';
 import PaymentGateway from 'views/BotElement/BotSetting/Payment/PaymentGateway';
@@ -216,13 +196,6 @@ var routes = [
     name: 'サブユーザ管理',
     // icon: "nc-icon nc-single-02",
     component: SubUserManagement,
-    layout: '/admin',
-  },
-  {
-    path: '/push-message',
-    name: 'プッシュメッセージ',
-    // icon: "nc-icon nc-single-02",
-    component: PushMessage,
     layout: '/admin',
   },
   {

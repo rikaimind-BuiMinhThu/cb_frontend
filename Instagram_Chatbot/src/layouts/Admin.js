@@ -7,6 +7,8 @@ import Footer from "components/Footer/Footer.jsx";
 import Sidebar from "components/Sidebar/Sidebar.jsx";
 
 import routes from "routes.js";
+import PushMessage from 'views/BotSettings/PushMessage/PushMessagePage';
+import ListSmsTemplate from "views/BotSettings/SmsTemplate/ListSmsTemplate";
 
 var ps;
 
@@ -43,6 +45,7 @@ function Dashboard(props) {
       <div className="main-panel" ref={mainPanel}>
         <DemoNavbar {...props} />
         <Switch>
+          {/** avoid using this, it's difficult to handle and track */}
           {routes.map((route, key) => {
             return (
               <Route
@@ -52,6 +55,17 @@ function Dashboard(props) {
               />
             );
           })}
+          { /** use as below */}
+          <Route
+            path="/admin/bot-settings/:botId/sms-template"
+            component={ListSmsTemplate}
+            name="SMS一覧"
+          />
+          <Route
+            path="/admin/bot-settings/:botId/push-message"
+            component={PushMessage}
+            name="プッシュメッセージ"
+          />
         </Switch>
         <Footer fluid />
       </div>
