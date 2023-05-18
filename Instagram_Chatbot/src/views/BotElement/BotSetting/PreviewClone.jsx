@@ -193,15 +193,15 @@ function Preview() {
   const [zipcode, setZipcode] = useState();
   const [indexContentZipcode, setContentZipcode] = useState();
   //new
-  const [buttonTypePc, setButtonTypePc] = useState(1);
+  const [buttonTypePc, setButtonTypePc] = useState("1");
   const [positionPc, setPositionPc] = useState("1");
   const [widthPc, setWidthPc] = useState(380);
   const [heightPc, setHeightPc] = useState(620);
   const [widthSp, setWidthSp] = useState(100);
   const [heightSp, setHeightSp] = useState(600);
   const [rightPcTitle, setRightPcTitle] = useState("");
-  const [positionSp, setPositionSp] = useState(1);
-  const [buttonTypeSp, setButtonTypeSp] = useState(1);
+  const [positionSp, setPositionSp] = useState("1");
+  const [buttonTypeSp, setButtonTypeSp] = useState("1");
   const [rightMarginPc, setRightMarginPc] = useState(10);
   const [bottomMarginPc, setBottomMarginPc] = useState(10);
   const [displayType, setDisplayType] = useState(1);
@@ -228,7 +228,7 @@ function Preview() {
     return dataObj;
   });
   let chatbotRight = sessionStorage.getItem("chatbotRight");
-  let chatbotW = sessionStorage.getItem("chatbotH");
+console.log("chatbotRight", chatbotRight);
 
   function mobileCheck() {
     let check = false;
@@ -248,31 +248,31 @@ function Preview() {
 
   //get chat bot setting
   useEffect(() => {
-    let botId = params.get("bot_id")
-    api.get(`/api/v1/managements/chatbots/${botId}`, { is_chatbot: true }).then((response) => {
+    api.get(`/api/v1/managements/chatbots/${botId}`).then((response) => {
       if (response.data.data) {
         const result = JSON.parse(response.data.data?.design_settings);
         setDisplayType(result?.display_type);
-        setWidthPc(result?.width_pc);
-        setHeightPc(result?.height_pc);
-        setWidthSp(result?.width_sp);
-        setHeightSp(result?.height_sp);
-        setPositionPc(result?.position_pc);
+        setWidthPc(result?.width_pc? result?.width_pc: 380);
+        setHeightPc(result?.height_pc? result?.height_pc:600);
+        setWidthSp(result?.width_sp?result?.width_sp:80);
+        setHeightSp(result?.height_sp?result?.height_sp:580);
+       
+        setPositionPc(result?.position_pc ? result?.position_pc : "1");
         if (result?.display_type && result?.display_type ==='1'){
           setIsOpen(true)
         } else {
           setIsOpen(false)
         }
-        sessionStorage.setItem("chatbotH", result?.height_pc);
-        sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc);
-        sessionStorage.setItem("chatbotW", result?.width_pc);
-        sessionStorage.setItem("chatbotRight", result?.right_margin_pc);
+        sessionStorage.setItem("chatbotH", result?.height_pc? result?.height_pc: 600);
+        sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc? result?.bottom_margin_pc:0);
+        sessionStorage.setItem("chatbotW", result?.width_pc? result?.width_pc:380);
+        sessionStorage.setItem("chatbotRight", result?.right_margin_pc? result?.right_margin_pc : 20);
         setRightPcTitle(result?.right_position_pc_title);
-        setButtonTypePc(result?.button_type_pc);
+        setButtonTypePc(result?.button_type_pc? result?.button_type_pc: "1");
         setRightMarginPc(result?.right_margin_pc);
         setBottomMarginPc(result?.bottom_margin_pc);
-        setPositionSp(result?.position_sp);
-        setButtonTypeSp(result?.button_type_sp);
+        setPositionSp(result?.position_sp? result?.position_sp:"1");
+        setButtonTypeSp(result?.button_type_sp?result?.button_type_sp:"2");
         setRightSpTitle(
           JSON.parse(response.data.data?.design_settings)
             ?.right_position_sp_title
@@ -3525,7 +3525,7 @@ if (scenarioId && botInfor && isOpen  ){
         })}
       </div>
     </div>
-  ) } else if (isOpen===false &&mobileCheck()===false&& positionPc ==='1' && buttonTypePc==='2'){ return (
+  ) } else if (isOpen===false &&mobileCheck()===false && positionPc ==='1' && buttonTypePc==='2'){ return (
       <div
     onClick={() => onOpenPreview(!isOpen)}
     style={{
@@ -3555,7 +3555,7 @@ if (scenarioId && botInfor && isOpen  ){
     onClick={() => onOpenPreview(!isOpen)}
     style={{
       backgroundColor: botInfor?.main_color && botInfor?.main_color,
-      width: widthPc? `${widthPc}px`:'380px',
+      width: `${widthPc}px`,
       height: "65px",
       borderTopLeftRadius: "5px",
       borderTopRightRadius: "5px",
