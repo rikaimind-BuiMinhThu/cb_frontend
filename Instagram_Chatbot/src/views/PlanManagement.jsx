@@ -30,6 +30,7 @@ function PlanManagement() {
   var [msgNoti, setMsgNoti] = useState();
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
+  const [isOpenAddPlan, setIsOpenAddPlan] = useState(false);
 
   /**
    * Check the user permissions
@@ -159,33 +160,33 @@ function PlanManagement() {
       });
   }
 
-  // const [idDeleteClient, setIdDeleteClient] = useState();
+  const [idDeleteClient, setIdDeleteClient] = useState();
 
-  // function deleteClientPopup(id) {
-  //   setIsOpenDeletePlan(true);
-  //   setIdDeleteClient(id);
-  // }
+  function deleteClientPopup(id) {
+    setIsOpenDeletePlan(true);
+    setIdDeleteClient(id);
+  }
 
-  // function deleteClientUser() {
-  //   setIsOpenDeletePlan(false);
-  //   api
-  //     .delete(`/api/v1/managements/plans/${idDeleteClient}`)
-  //     .then((res) => {
-  //       reloadListClient(page);
-  //       showNotification("削除しました!");
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //       if (error.response?.data.code === 0) {
-  //         tokenExpired();
-  //       }
-  //     });
-  // }
+  function deleteClientUser() {
+    setIsOpenDeletePlan(false);
+    api
+      .delete(`/api/v1/managements/plans/${idDeleteClient}`)
+      .then((res) => {
+        reloadListClient(page);
+        showNotification("削除しました!");
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+  }
 
   function updatePlan() {
     var price = document.getElementById("price").value;
 
-    if (price >= 0) {
+    if (checkInputNumber(price) && price >= 0) {
       var elements = document.getElementById("updateForm").elements;
       var obj = {};
       for (var i = 0; i < elements.length; i++) {
@@ -215,80 +216,82 @@ function PlanManagement() {
     }
   }
 
-  // function addPlanPopup() {
-  //   setIsOpenAddPlan(true);
-  //   //detailUserClient
-  // }
-  // function addPlan() {
-  //   var price = document.getElementById("newPrice").value;
-  //   var name = document.getElementById("newName").value;
-  //   checkFieldAdd(name, "プラン名称", 50);
+  function addPlanPopup() {
+    setIsOpenAddPlan(true);
+    //detailUserClient
+  }
+  function addPlan() {
+    var price = document.getElementById("newPrice").value;
+    var name = document.getElementById("newName").value;
+    if (
+      checkFieldAdd(name, "プラン名称", 50) === true &&
+      checkInputNumber(price) === true &&
+      price >= 0
+    ) {
+      // if (checkFieldAdd(name, 'Name') === true && checkFieldAdd(address, "Address") === true && utils.checkInputNumber(phone, "Phone") === true) {
+      var elements = document.getElementById("addForm").elements;
+      var obj = {};
+      for (var i = 0; i < elements.length - 1; i++) {
+        var item = elements.item(i);
+        obj[item.name] = item.value;
+      }
+      api
+        .post(`/api/v1/managements/plans`, obj)
+        .then((res) => {
+          if (res.data.code === 1 || res.data.code === "1") {
+            reloadListClient();
+            showNotification("クライアント追加しました!");
+            setIsOpenAddPlan(false);
+          } else if (res.data?.code === 2 || res.data?.code === "2") {
+            showNotification(res.data.message);
+            setIsOpenAddPlan(false);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          if (error.response?.data.code === 0) {
+            tokenExpired();
+          }
+        });
 
-  //   if (checkFieldAdd(name, "プラン名称", 50) === true && price >= 0) {
-  //     // if (checkFieldAdd(name, 'Name') === true && checkFieldAdd(address, "Address") === true && utils.checkInputNumber(phone, "Phone") === true) {
-  //     var elements = document.getElementById("addForm").elements;
-  //     var obj = {};
-  //     for (var i = 0; i < elements.length - 1; i++) {
-  //       var item = elements.item(i);
-  //       obj[item.name] = item.value;
-  //     }
-  //     api
-  //       .post(`/api/v1/managements/plans`, obj)
-  //       .then((res) => {
-  //         if (res.data.code === 1 || res.data.code === "1") {
-  //           reloadListClient();
-  //           showNotification("クライアント追加しました!");
-  //           setIsOpenAddPlan(false);
-  //         } else if (res.data?.code === 2 || res.data?.code === "2") {
-  //           showNotification(res.data.message);
-  //           setIsOpenAddPlan(false);
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.log(error);
-  //         if (error.response?.data.code === 0) {
-  //           tokenExpired();
-  //         }
-  //       });
+      // }
+    } else {
+      if (price < 0) {
+        document.getElementById("newClientプラン価格ErrMsg").style.display =
+          "block";
+        document.getElementById("newClientプラン価格ErrMsg").innerHTML =
+          "正数を入力してください。";
+      }
+    }
+  }
 
-  //     // }
-  //   } else {
-  //     if (price < 0) {
-  //       document.getElementById("newClientプラン価格ErrMsg").style.display =
-  //         "block";
-  //       document.getElementById("newClientプラン価格ErrMsg").innerHTML =
-  //         "正数を入力してください。";
-  //     }
-  //   }
-  // }
+  function checkFieldAdd(value, field, length) {
+    if (value === "") {
+      document.getElementById(`newClient${field}ErrMsg`).style.display =
+        "block";
+      document.getElementById(
+        `newClient${field}ErrMsg`
+      ).innerHTML = `${field} 入力してください。`;
+    } else if (value && value.length > length) {
+      document.getElementById(`newClient${field}ErrMsg`).style.display =
+        "block";
+      document.getElementById(
+        `newClient${field}ErrMsg`
+      ).innerHTML = `${length}文字以下入力してください。`;
+    } else {
+      document.getElementById(`newClient${field}ErrMsg`).style.display = "none";
+      document.getElementById(`newClient${field}ErrMsg`).innerHTML = "";
+      return true;
+    }
+  }
 
-  // function checkFieldAdd(value, field, length) {
-  //   if (value === "") {
-  //     document.getElementById(`newClient${field}ErrMsg`).style.display =
-  //       "block";
-  //     document.getElementById(
-  //       `newClient${field}ErrMsg`
-  //     ).innerHTML = `${field} 入力してください。`;
-  //   } else if (value && value.length > length) {
-  //     document.getElementById(`newClient${field}ErrMsg`).style.display =
-  //       "block";
-  //     document.getElementById(
-  //       `newClient${field}ErrMsg`
-  //     ).innerHTML = `${length}文字以下入力してください。`;
-  //   } else {
-  //     document.getElementById(`newClient${field}ErrMsg`).style.display = "none";
-  //     document.getElementById(`newClient${field}ErrMsg`).innerHTML = "";
-  //     return true;
-  //   }
-  // }
-
-  // function handleChange(event, value) {
-  //   console.log("pageIndex: ", value);
-  //   setPage(parseInt(value));
-  //   reloadListClient(value);
-  //   // window.scrollTo({ top: 0, behavior: 'smooth' });
-  //   document.querySelector(".main-panel").scrollTop = 0;
-  // }
+  function handleChange(event, value) {
+    console.log("pageIndex: ", value);
+    setPage(parseInt(value));
+    reloadListClient(value);
+    // window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.querySelector(".main-panel").scrollTop = 0;
+  }
   function showNotification(message) {
     setMsgNoti(message);
     setIsOpenNoti(true);
@@ -297,7 +300,31 @@ function PlanManagement() {
       setIsOpenNoti(false);
     }, 2000);
   }
+  function checkInputNumber(value) {
+    var numRe = /^\d+$/;
+    if (value === "" || value === undefined) {
+      document.getElementById(`newClientプラン価格ErrMsg`).style.display = "block";
+      document.getElementById(`newClientプラン価格ErrMsg`).innerHTML = `プラン価格 を入力してください。`;
+      return false;
+    } else {
+      if (value < 0) {
+        document.getElementById("newClientプラン価格ErrMsg").style.display = "block";
+        document.getElementById("newClientプラン価格ErrMsg").innerHTML = "正数を入力してください。";
+        return false;
+      }
 
+      if (numRe.test(value) === false) {
+        document.getElementById(`newClientプラン価格ErrMsg`).style.display = "block";
+        document.getElementById(`newClientプラン価格ErrMsg`).innerHTML = `プラン価格 は整数の必要です。`;
+        return false;
+      } 
+      if (numRe.test(value) === true) {
+        document.getElementById(`newClientプラン価格ErrMsg`).style.display = "none";
+        document.getElementById(`newClientプラン価格ErrMsg`).innerHTML = "";
+        return true;
+      }
+    }
+  }
   return (
     <>
       <div className="content">
@@ -339,7 +366,7 @@ function PlanManagement() {
                       検索
                     </Button>
                   </div>
-                  {/* <div
+                  <div
                     className="div_right"
                     style={{ float: "right", width: "15%" }}
                   >
@@ -350,7 +377,7 @@ function PlanManagement() {
                     >
                       プラン追加
                     </Button>
-                  </div> */}
+                  </div>
                 </div>
               </CardHeader>
               <CardBody>
@@ -379,7 +406,7 @@ function PlanManagement() {
                             <td colSpan={1}>{item.id}</td>
                             <td colSpan={2}>{item.name}</td>
                             <td colSpan={2}>{item.price}</td>
-                            <td colSpan={5} style={{textAlign:"start"}}>{item.description}</td>
+                            <td colSpan={5}>{item.description}</td>
                             <td colSpan={2}>
                               <div style={{ display: "inline-flex" }}>
                                 <div onClick={() => updateClientUser(item)}>
@@ -388,12 +415,12 @@ function PlanManagement() {
                                     style={{
                                       fontSize: "30px",
                                       marginTop: "5px",
-                                      // marginRight: "30px",
+                                      marginRight: "30px",
                                     }}
                                   ></i>
                                 </div>
 
-                                {/* <div onClick={() => deleteClientPopup(item.id)}>
+                                <div onClick={() => deleteClientPopup(item.id)}>
                                   <i
                                     className="nc-icon nc-box nc-3x"
                                     style={{
@@ -402,7 +429,7 @@ function PlanManagement() {
                                       cursor: "pointer",
                                     }}
                                   ></i>
-                                </div> */}
+                                </div>
                               </div>
                             </td>
                           </tr>
@@ -411,16 +438,94 @@ function PlanManagement() {
                   </Table>
                 </div>
 
-                {/* <Pagination
+                <Pagination
                   count={totalPage}
                   variant="outlined"
                   page={page}
                   onChange={handleChange}
-                /> */}
+                />
               </CardBody>
             </Card>
           </Col>
         </Row>
+
+        <Modal open={isOpenAddPlan} onClose={() => setIsOpenAddPlan(false)}>
+          <div style={{ width: "100%" }}>
+            <div style={{ marginTop: "-30px" }}>
+              <h4>プラン追加</h4>
+              <div
+                style={{
+                  width: "100%",
+                  height: "2px",
+                  backgroundColor: "#bbb",
+                  marginBottom: "15px",
+                }}
+              ></div>
+              <form id="addForm" className="swap">
+                <label className="label-input">
+                  プラン名称 <span className="span-require">*必須</span>
+                  <input
+                    className="input-field"
+                    type="text"
+                    id="newName"
+                    name="name"
+                    onBlur={(e) =>
+                      checkFieldAdd(e.target.value, "プラン名称", 50)
+                    }
+                  />
+                  <label
+                    id="newClientプラン名称ErrMsg"
+                    className="input-field"
+                    style={{
+                      display: "none",
+                      color: "red",
+                      border: "none",
+                      padding: "2px",
+                    }}
+                  ></label>
+                </label>{" "}
+                <br />
+                <br />
+                <label className="label-input">
+                  プラン価格 <span className="span-require">*必須</span>
+                  <input
+                    className="input-field"
+                    onBlur={(e) => checkInputNumber(e.target.value)}
+                    type="number"
+                    id="newPrice"
+                    name="price"
+                  />
+                  <label
+                    id="newClientプラン価格ErrMsg"
+                    className="input-field"
+                    style={{
+                      display: "none",
+                      color: "red",
+                      border: "none",
+                      padding: "2px",
+                    }}
+                  ></label>
+                </label>
+                <br />
+                <br />
+                <label className="label-input">
+                  説明
+                  <textarea
+                    className="input-field"
+                    id="newDesc"
+                    name="description"
+                    rows={5}
+                  />
+                </label>
+                <br />
+                <br />
+                <Button id="btnSubmit" onClick={addPlan}>
+                  更新
+                </Button>
+              </form>
+            </div>
+          </div>
+        </Modal>
 
         <Modal open={isOpenUpdate} onClose={() => setIsOpenUpdate(false)}>
           <div style={{ width: "100%" }}>
@@ -462,9 +567,7 @@ function PlanManagement() {
                   プラン価格 <span className="span-require">*必須</span>
                   <input
                     className="input-field"
-                    onBlur={(e) =>
-                      utils.checkInputNumber(e.target.value, "プラン価格")
-                    }
+                    onBlur={(e) => checkInputNumber(e.target.value)}
                     type="number"
                     id="price"
                     name="price"
@@ -487,7 +590,6 @@ function PlanManagement() {
                   説明
                   <textarea
                     className="input-field"
-                    // onBlur={(e) => checkFieldAdd(e.target.value, "説明", 500)}
                     id="desc"
                     name="description"
                     defaultValue={description}
@@ -511,7 +613,7 @@ function PlanManagement() {
             <span style={{ fontSize: "16px" }}>{msgNoti}</span>
           </div>
         </ModalNoti>
-        {/* <ModalShort
+        <ModalShort
           open={isOpenDeletePlan}
           onClose={() => setIsOpenDeletePlan(false)}
         >
@@ -522,7 +624,7 @@ function PlanManagement() {
             <Button onClick={() => deleteClientUser()}>はい</Button>
             <Button onClick={() => setIsOpenDeletePlan(false)}>いいえ</Button>
           </div>
-        </ModalShort> */}
+        </ModalShort>
       </div>
     </>
   );
