@@ -102,7 +102,7 @@ async function displayPopup() {
     iframe.width =
       chatbotW && chatbotRight
         ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
-        : "380px";
+        : "400px";
     iframe.style.right = "10px";
   }
 
@@ -112,7 +112,7 @@ async function displayPopup() {
   iframe.height =
     chatbotH && chatbotBottom
       ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px`
-      : "620px";
+      : "630px";
 
   iframe.style.border = "none";
   iframe.style.padding = "0";
@@ -147,7 +147,7 @@ async function displayPopup() {
         iframe.width =
           chatbotW && chatbotRight
             ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
-            : "380px";
+            : "400px";
         iframe.height =
           chatbotH && chatbotBottom
             ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px`
@@ -167,7 +167,7 @@ async function displayPopup() {
         iframe.width =
           chatbotW && chatbotRight
             ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
-            : "380px";
+            : "400px";
         iframe.style.bottom = "13px";
         iframe.height = chatbotBottom ? `${parseInt(chatbotH) + 65}px` : "65px";
         iframe.style.right = "5px";

@@ -735,7 +735,23 @@ function DesignChatbot() {
                                         justifyContent: "space-between",
                                       }}
                                     >
-                                      <input
+                                      <div className="ss-user-setting__item-bottom-flex-start">
+                                          <InputNum
+                                                              style={{display:'flex', flex:1}}
+                                                              name="width_pc"
+                                                              min={1}
+                                                              max={1000}
+                                                              value={widthPc}
+                                                              placeholder={"幅"}
+                                                              onChange={e => {setWidthPc(e);
+                                                              // document.querySelector(
+                                          //   ".error-message.widthPc"
+                                          // ).style.display = "none";
+                                                              }}
+                                                            />
+                                                            <p style={{textAlign:'center', margin:'auto 0'}}>px</p>
+                                                            </div>
+                                      {/* <input
                                         type="number"
                                         name="width_pc"
                                         className="input-setting2"
@@ -747,8 +763,24 @@ function DesignChatbot() {
                                           //   ".error-message.widthPc"
                                           // ).style.display = "none";
                                         }}
-                                      />
-                                      <input
+                                      /> */}
+                                       <div className="ss-user-setting__item-bottom-flex-start">
+                                          <InputNum
+                                                              style={{display:'flex', flex:1}}
+                                                              name="height_pc"
+                                                              min={1}
+                                                              max={1000}
+                                                              value={heightPc}
+                                                              placeholder="高さ"
+                                                              onChange={e => {setHeightPc(e);
+                                                              // document.querySelector(
+                                          //   ".error-message.title"
+                                          // ).style.display = "none";
+                                                              }}
+                                                            />
+                                                            <p style={{textAlign:'center', margin:'auto 0'}}>px</p>
+                                                            </div>
+                                      {/* <input
                                         type="number"
                                         name="height_pc"
                                         className="input-setting2"
@@ -760,7 +792,7 @@ function DesignChatbot() {
                                           //   ".error-message.title"
                                           // ).style.display = "none";
                                         }}
-                                      />
+                                      /> */}
                                     </div>
                                   </div>
                                 </div>
@@ -953,26 +985,25 @@ function DesignChatbot() {
                                         style={{
                                           display: "flex",
                                           width: "100%",
-                                          backgroundColor:'red',
-                                          padding:'0',
+                                          padding:'0px',
                                           justifyContent: "space-between",
                                         }}
                                       >
                                         <div className="ss-user-setting__item-bottom-flex-start">
                                           <InputNum
-                                                              className="ss-user-setting-input-delay ss-user-setting-input-limit-character"
+                                                              style={{display:'flex', flex:1}}
                                                               name="width_sp"
-                                                             
                                                               min={1}
                                                               max={100}
                                                               value={widthSp}
+                                                              placeholder={"幅"}
                                                               onChange={e => setWidthSp(e)}
                                                             />
                                                             <p style={{textAlign:'center', margin:'auto 0'}}>%</p>
                                                             </div>
                                                             <div className="ss-user-setting__item-bottom-flex-start">
                                           <InputNum
-                                                              className="ss-user-setting-input-delay ss-user-setting-input-limit-character"
+                                                             style={{display:'flex', flex:1}}
                                                               name="height_sp"
                                                              
                                                               min={1}

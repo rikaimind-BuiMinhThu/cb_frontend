@@ -32,7 +32,7 @@ import discover from "../../../assets/img/payment-method/discover.png";
 import jcb from "../../../assets/img/payment-method/jcb.png";
 import master_card from "../../../assets/img/payment-method/master_card.png";
 import visa from "../../../assets/img/payment-method/visa.png";
-import { SHORTEN_URL, EC_CHATBOT_URL } from "../../../variables/constants";
+import { SHORTEN_URL, EC_CHATBOT_URL, log } from "../../../variables/constants";
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
 import { rgbToHex } from "@material-ui/core";
@@ -196,7 +196,7 @@ function Preview() {
   const [buttonTypePc, setButtonTypePc] = useState("1");
   const [positionPc, setPositionPc] = useState("1");
   const [widthPc, setWidthPc] = useState(380);
-  const [heightPc, setHeightPc] = useState(620);
+  const [heightPc, setHeightPc] = useState(600);
   const [widthSp, setWidthSp] = useState(100);
   const [heightSp, setHeightSp] = useState(600);
   const [rightPcTitle, setRightPcTitle] = useState("");
@@ -227,8 +227,7 @@ function Preview() {
     });
     return dataObj;
   });
-  let chatbotRight = sessionStorage.getItem("chatbotRight");
-console.log("chatbotRight", chatbotRight);
+
 
   function mobileCheck() {
     let check = false;
@@ -248,7 +247,8 @@ console.log("chatbotRight", chatbotRight);
 
   //get chat bot setting
   useEffect(() => {
-    api.get(`/api/v1/managements/chatbots/${botId}`).then((response) => {
+    let botIdGet = params.get("bot_id");
+    api.get(`/api/v1/managements/chatbots/${botIdGet}`).then((response) => {
       if (response.data.data) {
         const result = JSON.parse(response.data.data?.design_settings);
         setDisplayType(result?.display_type);
@@ -256,7 +256,6 @@ console.log("chatbotRight", chatbotRight);
         setHeightPc(result?.height_pc? result?.height_pc:600);
         setWidthSp(result?.width_sp?result?.width_sp:80);
         setHeightSp(result?.height_sp?result?.height_sp:580);
-       
         setPositionPc(result?.position_pc ? result?.position_pc : "1");
         if (result?.display_type && result?.display_type ==='1'){
           setIsOpen(true)
@@ -264,13 +263,13 @@ console.log("chatbotRight", chatbotRight);
           setIsOpen(false)
         }
         sessionStorage.setItem("chatbotH", result?.height_pc? result?.height_pc: 600);
-        sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc? result?.bottom_margin_pc:0);
+        sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc? result?.bottom_margin_pc:10);
         sessionStorage.setItem("chatbotW", result?.width_pc? result?.width_pc:380);
-        sessionStorage.setItem("chatbotRight", result?.right_margin_pc? result?.right_margin_pc : 20);
+        sessionStorage.setItem("chatbotRight", result?.right_margin_pc? result?.right_margin_pc : 30);
         setRightPcTitle(result?.right_position_pc_title);
         setButtonTypePc(result?.button_type_pc? result?.button_type_pc: "1");
-        setRightMarginPc(result?.right_margin_pc);
-        setBottomMarginPc(result?.bottom_margin_pc);
+        setRightMarginPc(result?.right_margin_pc?result?.right_margin_pc:10);
+        setBottomMarginPc(result?.bottom_margin_pc?result?.bottom_margin_pc:10);
         setPositionSp(result?.position_sp? result?.position_sp:"1");
         setButtonTypeSp(result?.button_type_sp?result?.button_type_sp:"2");
         setRightSpTitle(
@@ -328,7 +327,7 @@ console.log("chatbotRight", chatbotRight);
         }
         document.getElementById("sp-container1").style.height = heightPc
           ? `${heightPc}px`
-          : "620px";
+          : "600px";
         document.getElementById("sp-header").style.position = "static";
         document.getElementById("sp-header").style.borderBottomLeftRadius =
           "0px";
@@ -3079,10 +3078,10 @@ if (scenarioId && botInfor && isOpen  ){
       className="sp-container1 slideUp"
       style={{
         position:'fixed',
-        bottom: mobileCheck()===true? `${bottomMarginSp}px`: bottomMarginPc ? `${bottomMarginPc}px` : "0px",
-        right: mobileCheck()===true? `${rightMarginSp}px`:rightMarginPc ? `${rightMarginPc}px` : "10px",
-        width:mobileCheck()===true? `${widthSp}%` : widthPc ? `${widthPc}px` : "360px",
-        height:mobileCheck()===true? `${heightSp}px` :  heightPc ? `${heightPc}px` : "620px",
+        bottom: mobileCheck()===true? `${bottomMarginSp}px`:`${bottomMarginPc}px`,
+        right: mobileCheck()===true? `${rightMarginSp}px`: `${rightMarginPc}px`,
+        width:mobileCheck()===true? `${widthSp}%` : `${widthPc}px`,
+        height:mobileCheck()===true? `${heightSp}px` :  `${heightPc}px`,
         zIndex: 999,
       }}
     >
@@ -3537,8 +3536,8 @@ if (scenarioId && botInfor && isOpen  ){
       alignItems: "center",
       justifyContent: "center",
       position:'fixed',
-      bottom:bottomMarginPc? `${bottomMarginPc}px`: '20px',
-      right:rightMarginPc? `${rightMarginPc}px`: '20px',
+      bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
+      right:rightMarginPc? `${rightMarginPc}px`: '10px',
     }}
   >
     <img
@@ -3564,8 +3563,8 @@ if (scenarioId && botInfor && isOpen  ){
       display: "flex",
       justifyContent: "left",
       position:'fixed',
-      bottom:bottomMarginPc? `${bottomMarginPc}px`: '20px',
-      right:rightMarginPc? `${rightMarginPc}px`: '20px',
+      bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
+      right:rightMarginPc? `${rightMarginPc}px`: '10px',
     }}
   >
      <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
