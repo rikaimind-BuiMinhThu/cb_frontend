@@ -29,14 +29,19 @@
 .ss-user-setting__item-bottom-flex-start {
   display: flex;
   align-items:flex-start;
-  justify-content: center;
-  background-color: aliceblue;
+  justify-content: left;
   height: 40px;
   width: 50%;
   margin: 0px;
 }
 .ss-user-setting-input-delay {
   flex: 1;
+
+}
+.ss-user-setting-input-limit-character {
+  width: 20%;
+  padding: 3px 0px 0px;
+  height: 36px;
 }
   .input-setting2{
     padding: 0 10px;
