@@ -1627,7 +1627,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                             if (dataMessageType == 'label' && item.label && item.label.lbl_content) {
                                 item.label.lbl_content = replaceVariable(item.label.lbl_content);
                             }
-                            if (dataMessageType == 'textarea' && item.textarea && item.textarea.invalid_input.content) {
+                            if (dataMessageType == 'textarea' && item.textarea && item.textarea.invalid_input && item.textarea.invalid_input.content) {
                                 item.textarea.invalid_input.content = replaceVariable(item.textarea.invalid_input.content);
                             }
                             if (dataMessageType == 'text_input' && item.text_input && item.text_input.urls && item.text_input.urls.placeholder) {
@@ -2054,7 +2054,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         item.default_value = dataContentType[dataContentType.type].contents.find(item => item.id === value).title;
                         isSaveParam = true;
                     } else if (field === 'text' && contentType === 'text_input' && dataContentType[field].isSplitInput) {
-                        item.default_value = `${dataContentType[field]?.valueLeft}${dataContentType[field]?.valueRight}`
+                        item.default_value = `${dataContentType[field]?.valueLeft} ${dataContentType[field]?.valueRight}`
                         isSaveParam = true;
                     } else if (contentType !== 'credit_card_payment') {
                         item.default_value = value;
@@ -2370,6 +2370,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                                     dataPrefectures={[...dataPrefectures]}
                                                     isPopUpZipCode={(isOpen, indexContent) => isPopUpZipCode(isOpen, indexContent)}
                                                     onChangeErrors={(field, value) => onChangeErrors(field, value)}
+                                                    variables={variables}
                                                 />
                                                 {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
                                                     && <div className="sp-user-message-button-action">
@@ -2393,7 +2394,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
 }
 
 const BotMessage = ({ content, index, botInfor }) => {
-
     const handleDownloadFile = (file) => {
         let link = document.createElement('a');
         link.href = file;
@@ -2479,7 +2479,7 @@ const BotMessage = ({ content, index, botInfor }) => {
     )
 }
 
-const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors, dataPrefectures }) => {
+const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors, dataPrefectures, variables }) => {
     const [dataHour, setDataHour] = useState(dataHourFixed);
     const [dataYear, setDataYear] = useState(dataYearFixed);
     const [dataCity, setDataCity] = useState([]);
@@ -2772,6 +2772,23 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
         // }
     }
 
+    function replaceVariable(content) {
+        content = content.replaceAll(SCAN_REGEX, (text, variable) => {
+            if (variables.length !== 0) {
+                let valueVar = "";
+                for (let j = 0; j < variables.length; j++) {
+                    if (variables[j].variable_name === variable) {
+                        valueVar = variables[j].default_value;
+                    }
+                }
+                return valueVar;
+            } else {
+                return "";
+            }
+        })
+        return content;
+    }
+
 
     return (
         <div className="ss-user-message__content-wrapper">
@@ -2797,6 +2814,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                 let cardPaymentRadioButton = content.card_payment_radio_button;
                 let variableSet = content.variable_set;
                 let labelNoTransition = content.label_no_transition;
+                if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
+                    content.textarea.invalid_input.content = replaceVariable(content.textarea.invalid_input.content);
+                }
 
                 return (
                     <React.Fragment key={indexContent}>
