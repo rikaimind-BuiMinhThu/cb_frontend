@@ -1606,6 +1606,71 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                 })
                             }
                         }
+                        function replaceVariable(content) {
+                            content = content.replaceAll(SCAN_REGEX, (text, variable) => {
+                                if (variables.length !== 0) {
+                                    let valueVar = "";
+                                    for (let j = 0; j < variables.length; j++) {
+                                        if (variables[j].variable_name === variable) {
+                                            valueVar = variables[j].default_value;
+                                        }
+                                    }
+                                    return valueVar;
+                                } else {
+                                    return "";
+                                }
+                            })
+                            return content;
+                        }
+                        dataMessages[indexMessageRender + 1].message_content.forEach((item, index) => {
+                            const dataMessageType = item.type;
+                            if (dataMessageType == 'label' && item.label && item.label.lbl_content) {
+                                item.label.lbl_content = replaceVariable(item.label.lbl_content);
+                            }
+                            if (dataMessageType == 'textarea' && item.textarea && item.textarea.invalid_input.content) {
+                                item.textarea.invalid_input.content = replaceVariable(item.textarea.invalid_input.content);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.urls && item.text_input.urls.placeholder) {
+                                item.text_input.urls.placeholder = replaceVariable(item.text_input.urls.placeholder);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.text && item.text_input.text.placeholderLeft) {
+                                item.text_input.text.placeholderLeft = replaceVariable(item.text_input.text.placeholderLeft);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.text && item.text_input.text.placeholderRight) {
+                                item.text_input.text.placeholderRight = replaceVariable(item.text_input.text.placeholderRight);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_address && item.text_input.email_address.placeholder) {
+                                item.text_input.email_address.placeholder = replaceVariable(item.text_input.email_address.placeholder);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_confirmation && item.text_input.email_confirmation.cfEmlAdd_confirm_email) {
+                                item.text_input.email_confirmation.cfEmlAdd_confirm_email = replaceVariable(item.text_input.email_confirmation.cfEmlAdd_confirm_email);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_confirmation && item.text_input.email_confirmation.cfEmlAdd_email) {
+                                item.text_input.email_confirmation.cfEmlAdd_email = replaceVariable(item.text_input.email_confirmation.cfEmlAdd_email);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number) {
+                                item.text_input.phone_number.number = replaceVariable(item.text_input.phone_number.number);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number1) {
+                                item.text_input.phone_number.number1 = replaceVariable(item.text_input.phone_number.number1);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number2) {
+                                item.text_input.phone_number.number2 = replaceVariable(item.text_input.phone_number.number2);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number3) {
+                                item.text_input.phone_number.number3 = replaceVariable(item.text_input.phone_number.number3);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.password && item.text_input.password.password) {
+                                item.text_input.password.password = replaceVariable(item.text_input.password.password);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.password_confirmation && item.text_input.password_confirmation.password) {
+                                item.text_input.password_confirmation.password = replaceVariable(item.text_input.password_confirmation.password);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.password_confirmation && item.text_input.password_confirmation.confirm_password) {
+                                item.text_input.password_confirmation.confirm_password = replaceVariable(item.text_input.password_confirmation.confirm_password);
+                            }
+                            dataMessages[indexMessageRender + 1].message_content[index] = item;
+                        })
                         resolve({ ...dataMessages[indexMessageRender + 1] });
                     }, 1000);
                 }).then(data => {
@@ -1987,6 +2052,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         isSaveParam = true;
                     } else if (contentType === 'carousel') {
                         item.default_value = dataContentType[dataContentType.type].contents.find(item => item.id === value).title;
+                        isSaveParam = true;
+                    } else if (field === 'text' && contentType === 'text_input' && dataContentType[field].isSplitInput) {
+                        item.default_value = `${dataContentType[field]?.valueLeft}${dataContentType[field]?.valueRight}`
                         isSaveParam = true;
                     } else if (contentType !== 'credit_card_payment') {
                         item.default_value = value;

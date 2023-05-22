@@ -76,6 +76,7 @@ class Login extends React.Component {
             Cookies.set('user_role', persons.user.role); // {path: '/'}
             Cookies.set('user_id', persons.user.id); // {path: '/'}
             Cookies.set('is_auth', 'true');
+            sessionStorage.setItem("client", JSON.stringify(res.data.client));
             // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
             axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
             getToDashboard();
@@ -131,6 +132,7 @@ class Login extends React.Component {
             Cookies.set('user_role', persons.user.role);
             Cookies.set('user_id', persons.user.id); // {path: '/'}
             Cookies.set('is_auth', 'true');
+            sessionStorage.setItem("client", JSON.stringify(res.data.client));
             // Cookies.set('refreshToken', persons.refresh_token); /{path: '/admin/dashboard'}
             axios.defaults.headers.common['Authorization'] = `Bearer ${Cookies.get('token')}`;
             getToDashboard();
