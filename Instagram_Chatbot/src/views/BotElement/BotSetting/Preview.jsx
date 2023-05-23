@@ -1288,6 +1288,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 });
             }).then(() => {
                 api.post(`/api/v1/scenario_users/scenario_user_responses/create_order`, data_submit).then(res => {
+                    api.post(`/api/v1/managements/payment_histories`, data_submit).then((res)=>{}).catch((err) => {
+                        console.log(err);
+                    if (err.response?.data.code === 0) {
+                        tokenExpired();
+                    }
+                    })
                 }).catch((error) => {
                     console.log(error);
                     if (error.response?.data.code === 0) {
@@ -1523,6 +1529,12 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                 if (dataMessages.length - 1 === i) {
                                     api.post(`/api/v1/scenario_users/scenario_user_responses/create_order`, data_submit).then(res => {
                                         
+                                        api.post(`/api/v1/managements/payment_histories`, data_submit).then((res)=>{}).catch((err) => {
+                                            console.log(err);
+                                        if (err.response?.data.code === 0) {
+                                            tokenExpired();
+                                        }
+                                        })
                                     }).catch((error) => {
                                         console.log(error);
                                         if (error.response?.data.code === 0) {

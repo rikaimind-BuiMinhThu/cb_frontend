@@ -1378,6 +1378,9 @@ function ClientManagement() {
       }
     }
   }
+  function gotoPaymentDetail(item){
+    window.location.href = '/admin/client-payment-detail/'+item.id;
+  }
 
   const items = dataList.clients;
   return (
@@ -1590,7 +1593,16 @@ function ClientManagement() {
                             <td>{item.last_sign_in_at?.replaceAll('/', '-')}</td>
                             <td className="actionListClient">
                               <div style={{ display: 'flex' }}>
-                                <div onClick={(e) => getUserDetail(item)}>
+                                <div onClick={(e) => gotoPaymentDetail(item)}>
+                                  <i
+                                    className="nc-icon nc-money-coins nc-3x"
+                                    style={{
+                                      fontSize: '30px',
+                                      marginTop: '5px',
+                                      marginRight: '30px',
+                                    }}
+                                  ></i>
+                                </div><div onClick={(e) => getUserDetail(item)}>
                                   <i
                                     className="nc-icon nc-badge nc-3x"
                                     style={{
