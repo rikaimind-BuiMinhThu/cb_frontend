@@ -2052,7 +2052,7 @@ function Preview() {
     }
 
     if (!dataMessages[indexMessageRender + 1]) return;
-    if (dataMessages[indexMessageRender + 1].belong_to === "bot") {
+    if (dataMessages[indexMessageRender + 1].belong_to === "user") {
       for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
         if (dataMessages[i].hidden !== true) {
           if (dataMessages[i].conditions) {
