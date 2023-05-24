@@ -1999,7 +1999,7 @@ function Preview() {
     };
 
     var message = dataMessages[dataMessages.length - 2]
-    if (dataMessages.length - 1 === indexMessageRender || (dataMessages.length - 2 === indexMessageRender && message.conditions[0].inputCondition == 'paidy') ) {
+    if (dataMessages.length - 1 === indexMessageRender || (dataMessages.length - 2 === indexMessageRender && message.conditions.length > 0 && message.conditions[0].inputCondition == 'paidy') ) {
       await new Promise((resolve) => {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
@@ -2313,7 +2313,7 @@ function Preview() {
                 })
                 .then(() => {
                   var message = dataMessages[dataMessages.length - 2]
-                  if (dataMessages.length - 1 === i || (dataMessages.length - 2 === i && message.conditions[0].inputCondition == 'paidy') ) {
+                  if (dataMessages.length - 1 === i || (dataMessages.length - 2 === i && message.conditions.length > 0 && message.conditions[0].inputCondition == 'paidy') ) {
                     data_submit = {
                       scenario_id: scenarioId,
                       user_id: uuid,
