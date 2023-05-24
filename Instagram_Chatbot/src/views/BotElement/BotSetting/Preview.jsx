@@ -1315,7 +1315,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             });
         }
         if (!dataMessages[indexMessageRender + 1]) return;
-        if (dataMessages[indexMessageRender + 1].belong_to === 'user') {
+        if (dataMessages[indexMessageRender + 1].belong_to === 'user' || dataMessages[indexMessageRender + 1].belong_to === 'bot') {
             for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
                 if (dataMessages[i].hidden !== true) {
                     if (dataMessages[i].conditions) {
