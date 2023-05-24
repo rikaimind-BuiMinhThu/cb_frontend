@@ -1181,7 +1181,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 }
             } else if (contentArr[i].type === 'card_payment_radio_button'
                 && errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] !== messageError
-                && ((contentType?.initial_selection || contentType?.card_linked_setting) && contentType?.initial_selection === contentType?.card_linked_setting
+                && ((contentType?.initial_selection || contentType?.card_linked_setting.length > 0) && contentType?.card_linked_setting.includes(contentType?.initial_selection)
                     || (contentType?.initial_selection_picture || contentType?.card_linked_setting_picture) && contentType?.initial_selection_picture === contentType?.card_linked_setting_picture)) {
                 if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
                     || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
@@ -2507,7 +2507,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
             let message = messageContent[0];
             if ((message.type === 'card_payment_radio_button' && (stringNullOrEmpty(message?.[message.type]?.initial_selection) && stringNullOrEmpty(message?.[message.type]?.initial_selection_picture)))
                 || message.type === 'product_purchase_radio_button'
-                || (message.type === 'card_payment_radio_button' && (message?.[message.type].type !== "picture_radio" ? (stringNullOrEmpty(message?.[message.type]?.initial_selection) && message?.[message.type]?.card_linked_setting !== message?.[message.type]?.initial_selection)
+                || (message.type === 'card_payment_radio_button' && (message?.[message.type].type !== "picture_radio" ? (stringNullOrEmpty(message?.[message.type]?.initial_selection) && !message?.[message.type]?.card_linked_setting.includes(message?.[message.type]?.initial_selection))
                     : (stringNullOrEmpty(message?.[message.type]?.initial_selection_picture) && message?.[message.type]?.card_linked_setting_picture !== message?.[message.type]?.initial_selection_picture)))
                 || (message.type === 'carousel' && message?.[message.type].require)
                 || (message.type === 'radio_button' && !message[message.type].initial_selection)) {
@@ -5188,7 +5188,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                                         }
                                                         onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
 
-                                                        if (cardPaymentRadioButton.card_linked_setting === dataValue) {
+                                                        if (cardPaymentRadioButton.card_linked_setting.includes( dataValue)) {
                                                             onChangeValue(indexContent, content.type, true, 'is_display_card_payment');
                                                             displayButtonNext(true);
                                                         } else {
@@ -5223,7 +5223,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                                         // if (cardPaymentRadioButton.card_linked_setting !== dataValue && messageContent.length === 1) {
                                                         //   onClickNext();
                                                         // }
-                                                        if (cardPaymentRadioButton.card_linked_setting === dataValue) {
+                                                        if (cardPaymentRadioButton.card_linked_setting.includes(dataValue)) {
                                                             onChangeValue(indexContent, content.type, true, 'is_display_card_payment');
                                                             displayButtonNext(true);
                                                         } else {
@@ -5276,7 +5276,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                             </div>
                                         })
                                     }
-                                    {(cardPaymentRadioButton.type !== "picture_radio" ? (cardPaymentRadioButton.card_linked_setting && cardPaymentRadioButton.card_linked_setting === cardPaymentRadioButton.initial_selection) : (cardPaymentRadioButton.card_linked_setting_picture && cardPaymentRadioButton.card_linked_setting_picture === cardPaymentRadioButton.initial_selection_picture)) &&
+                                    {(cardPaymentRadioButton.type !== "picture_radio" ? (cardPaymentRadioButton.card_linked_setting.length > 0 && cardPaymentRadioButton.card_linked_setting.includes(cardPaymentRadioButton.initial_selection)) : (cardPaymentRadioButton.card_linked_setting_picture && cardPaymentRadioButton.card_linked_setting_picture === cardPaymentRadioButton.initial_selection_picture)) &&
                                         <React.Fragment>
                                             {cardPaymentRadioButton.payment_method.length !== 0 &&
                                                 <div style={{ display: 'flex', justifyContent: 'flex-start', margin: '5px 0px' }}>

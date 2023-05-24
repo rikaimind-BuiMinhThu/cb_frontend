@@ -1851,9 +1851,9 @@ function Preview() {
           `message${indexMessageRender}_content${i}_${contentArr[i].type}`
         ] !== messageError &&
         (((contentType?.initial_selection ||
-          contentType?.card_linked_setting) &&
-          contentType?.initial_selection ===
-            contentType?.card_linked_setting) ||
+          contentType?.card_linked_setting.length > 0) &&
+          contentType?.card_linked_setting.includes(contentType?.initial_selection)
+            ) ||
           ((contentType?.initial_selection_picture ||
             contentType?.card_linked_setting_picture) &&
             contentType?.initial_selection_picture ===
@@ -3980,8 +3980,7 @@ const UserMessage = ({
         (message.type === "card_payment_radio_button" &&
           (message?.[message.type].type !== "picture_radio"
             ? stringNullOrEmpty(message?.[message.type]?.initial_selection) &&
-              message?.[message.type]?.card_linked_setting !==
-                message?.[message.type]?.initial_selection
+              !message?.[message.type]?.card_linked_setting.includes(message?.[message.type]?.initial_selection)
             : stringNullOrEmpty(
                 message?.[message.type]?.initial_selection_picture
               ) &&
@@ -8725,8 +8724,7 @@ const UserMessage = ({
                                 );
 
                                 if (
-                                  cardPaymentRadioButton.card_linked_setting ===
-                                  dataValue
+                                  cardPaymentRadioButton.card_linked_setting.includes(dataValue)
                                 ) {
                                   onChangeValue(
                                     indexContent,
@@ -8797,8 +8795,7 @@ const UserMessage = ({
                                 //   onClickNext();
                                 // }
                                 if (
-                                  cardPaymentRadioButton.card_linked_setting ===
-                                  dataValue
+                                  cardPaymentRadioButton.card_linked_setting(dataValue)
                                 ) {
                                   onChangeValue(
                                     indexContent,
@@ -8919,9 +8916,8 @@ const UserMessage = ({
                     }
                   )}
                 {(cardPaymentRadioButton.type !== "picture_radio"
-                  ? cardPaymentRadioButton.card_linked_setting &&
-                    cardPaymentRadioButton.card_linked_setting ===
-                      cardPaymentRadioButton.initial_selection
+                  ? cardPaymentRadioButton.card_linked_setting.length > 0 &&
+                    cardPaymentRadioButton.card_linked_setting.includes(cardPaymentRadioButton.initial_selection)
                   : cardPaymentRadioButton.card_linked_setting_picture &&
                     cardPaymentRadioButton.card_linked_setting_picture ===
                       cardPaymentRadioButton.initial_selection_picture) && (

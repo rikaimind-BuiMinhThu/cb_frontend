@@ -1643,10 +1643,24 @@ const Scenario = () => {
       console.log(dataMessages[indexMessage].message_content[indexContent])
       dataMessages[indexMessage].message_content[indexContent][type][name][subField] = value;
     } else if (name !== undefined) {
-      if (dataMessages[indexMessage].message_content[indexContent][type] === undefined) {
-        dataMessages[indexMessage].message_content[indexContent][type] = {};
+      if (name === 'card_linked_setting') {
+        if (dataMessages[indexMessage].message_content[indexContent][type] === undefined) {
+          dataMessages[indexMessage].message_content[indexContent][type] = {};
+          dataMessages[indexMessage].message_content[indexContent][type][name] = [];
+        }
+        if (!Array.isArray(dataMessages[indexMessage].message_content[indexContent][type][name])) {
+          var check_box_value = dataMessages[indexMessage].message_content[indexContent][type][name]
+          dataMessages[indexMessage].message_content[indexContent][type][name] = []
+          dataMessages[indexMessage].message_content[indexContent][type][name].push(check_box_value)
+        }
+        console.log(dataMessages[indexMessage].message_content[indexContent][type][name])
+        dataMessages[indexMessage].message_content[indexContent][type][name].push(value);
+      } else {
+        if (dataMessages[indexMessage].message_content[indexContent][type] === undefined) {
+          dataMessages[indexMessage].message_content[indexContent][type] = {};
+        }
+        dataMessages[indexMessage].message_content[indexContent][type][name] = value;
       }
-      dataMessages[indexMessage].message_content[indexContent][type][name] = value;
     } else {
       dataMessages[indexMessage].message_content[indexContent][type] = value;
     }
@@ -8363,9 +8377,9 @@ const Scenario = () => {
                                                                                       />
                                                                                       <CheckboxCustom
                                                                                         label="カード決済連動設定"
-                                                                                        value={cardPaymentRadioButton.card_linked_setting === itemPaymentRadio.value}
+                                                                                        value={cardPaymentRadioButton.card_linked_setting.includes(itemPaymentRadio.value)}
                                                                                         onChange={() => {
-                                                                                          if (cardPaymentRadioButton.card_linked_setting !== itemPaymentRadio.value) {
+                                                                                          if (!cardPaymentRadioButton.card_linked_setting.includes(itemPaymentRadio.value)) {
                                                                                             onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'card_linked_setting');
                                                                                           } else {
                                                                                             onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'card_linked_setting');
