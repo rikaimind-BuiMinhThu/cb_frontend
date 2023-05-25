@@ -1997,9 +1997,43 @@ function Preview() {
       message: renderMessageArr[indexMessage],
       user_id: uuid,
     };
-
-    var message = dataMessages[dataMessages.length - 2]
-    if (dataMessages.length - 1 === indexMessageRender || (dataMessages.length - 2 === indexMessageRender && message.conditions.length > 0 && message.conditions[0].inputCondition == 'paidy') ) {
+    if (dataMessages[indexMessageRender].message_content[0]?.text_input?.save_input_content === "pin_code") {
+      await new Promise((resolve) => {
+        api
+          .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
+          .then((res) => {
+            resolve();
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired();
+            }
+          });
+      }).then(() => {
+        api
+          .post(
+            `/api/v1/scenario_users/scenario_user_responses/create_order`,
+            data_submit
+          )
+          .then((res) => {
+            const conversion = {
+              scenario_data: `${deviceReceive}_conversion`,
+            };
+            api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
+            }).catch(err => {
+              console.log(err)
+            })
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired();
+            }
+          });
+      });
+    }
+    if (dataMessages.length - 1 === indexMessageRender ) {
       await new Promise((resolve) => {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
@@ -2312,8 +2346,27 @@ function Preview() {
                   }
                 })
                 .then(() => {
-                  var message = dataMessages[dataMessages.length - 2]
-                  if (dataMessages.length - 1 === i || (dataMessages.length - 2 === i && message.conditions.length > 0 && message.conditions[0].inputCondition == 'paidy') ) {
+                  if (dataMessages[i].message_content[0]?.text_input?.save_input_content === "pin_code") {
+                    data_submit = {
+                      scenario_id: scenarioId,
+                      user_id: uuid,
+                    };
+
+                    api
+                      .post(
+                        `/api/v1/scenario_users/scenario_user_responses/create_order`,
+                        data_submit
+                      )
+                      .then((res) => {})
+                      .catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                      });
+
+                  }
+                  if (dataMessages.length - 1 === i) {
                     data_submit = {
                       scenario_id: scenarioId,
                       user_id: uuid,

@@ -1397,6 +1397,7 @@ const Scenario = () => {
             validity_check: false,
             type_date_of_expiry: 'ym',
             payment_method: [],
+            card_linked_setting: [],
             radio_contents: [
               { id: 1 }
             ],
