@@ -193,6 +193,7 @@ function Preview() {
   const [zipcode, setZipcode] = useState();
   const [indexContentZipcode, setContentZipcode] = useState();
   //new
+  const openBot = sessionStorage.getItem("openBot");
   const [buttonTypePc, setButtonTypePc] = useState("1");
   const [positionPc, setPositionPc] = useState("1");
   const [widthPc, setWidthPc] = useState(380);
@@ -228,7 +229,6 @@ function Preview() {
     return dataObj;
   });
 
-
   function mobileCheck() {
     let check = false;
     (function (a) {
@@ -244,7 +244,13 @@ function Preview() {
     })(navigator.userAgent || navigator.vendor || window.opera);
     return check;
   }
-
+  console.log(openBot);
+//set open from button
+useEffect(()=>{
+  if(openBot){
+    console.log("openBot",openBot);
+  }
+},[openBot])
   //get chat bot setting
   useEffect(() => {
     let botIdGet = params.get("bot_id");
@@ -1981,12 +1987,1048 @@ function Preview() {
     });
     return isValid;
   };
+  const rehandleValidateField = (indexMessage) => {
+    let contentArr = [...dataMessages[indexMessage].message_content];
+    let isValid = true;
+    let errorsMess = {};
 
+    let messageError = "この項目は必須です。";
+    for (let i = 0; i < contentArr.length; i++) {
+      let contentType = contentArr[i][contentArr[i].type];
+      let limitFrom = contentType[contentType.type]?.character_limit_from || 0;
+      let limitTo =
+        contentType[contentType.type]?.character_limit_to ||
+        Number.MAX_SAFE_INTEGER;
+      if (contentType.require) {
+        if (contentType.type === "text" || contentType.type === "password") {
+          if (contentType[contentType.type].isSplitInput) {
+            if (
+              stringNullOrEmpty(contentType[contentType.type].valueLeft) ||
+              stringNullOrEmpty(contentType[contentType.type].valueRight)
+            ) {
+              errorsMess[
+                `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+              ] = messageError;
+              isValid = false;
+            }
+            // else if (contentType[contentType.type].valueLeft?.length < limitFrom
+            //   || contentType[contentType.type].valueLeft?.length > limitTo
+            //   || contentType[contentType.type].valueRight?.length < limitFrom
+            //   || contentType[contentType.type].valueRight?.length > limitTo) {
+            //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+            //   isValid = false;
+            // }
+          } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+          //  else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
+          //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          //   isValid = false;
+          // }
+        } else if (contentType.type === "phone_number") {
+          if (contentType[contentType.type].withHyphen) {
+            if (
+              stringNullOrEmpty(contentType[contentType.type].value1) ||
+              stringNullOrEmpty(contentType[contentType.type].value2) ||
+              stringNullOrEmpty(contentType[contentType.type].value3)
+            ) {
+              errorsMess[
+                `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+              ] = messageError;
+              isValid = false;
+            }
+          } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (
+          contentType.type === "email_confirmation" ||
+          contentType.type === "password_confirmation"
+        ) {
+          if (
+            stringNullOrEmpty(contentType[contentType.type].value) ||
+            stringNullOrEmpty(contentType[contentType.type].valueConfirm)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+          //  else if (contentType.type === 'password_confirmation' &&
+          //   (contentType[contentType.type].value.length < limitFrom
+          //     || contentType[contentType.type].value.length > limitTo
+          //     || contentType[contentType.type].valueConfirm.length < limitFrom
+          //     || contentType[contentType.type].valueConfirm.length > limitTo)) {
+          //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          //   isValid = false;
+          // }
+        } else if (contentType.type === "customization") {
+          if (contentType[contentType.type].is_comment) {
+            if (
+              stringNullOrEmpty(contentType[contentType.type].valueLeft) ||
+              stringNullOrEmpty(contentType[contentType.type].valueRight)
+            ) {
+              errorsMess[
+                `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+              ] = messageError;
+              isValid = false;
+            }
+          } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "time_hm") {
+          if (
+            stringNullOrEmpty(contentType[contentType.type].valueHour) ||
+            stringNullOrEmpty(contentType[contentType.type].valueMinute)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (
+          contentType.type === "date_ymd" ||
+          contentType.type === "dob_ymd"
+        ) {
+          if (
+            stringNullOrEmpty(contentType[contentType.type].valueYear) ||
+            stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
+            stringNullOrEmpty(contentType[contentType.type].valueDay)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "date_md") {
+          if (
+            stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
+            stringNullOrEmpty(contentType[contentType.type].valueDay)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (
+          contentType.type === "date_ym" ||
+          contentType.type === "dob_ym"
+        ) {
+          if (
+            stringNullOrEmpty(contentType[contentType.type].valueYear) ||
+            stringNullOrEmpty(contentType[contentType.type].valueMonth)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "date_ymd_hm") {
+          if (
+            stringNullOrEmpty(contentType[contentType.type].valueYear) ||
+            stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
+            stringNullOrEmpty(contentType[contentType.type].valueDay) ||
+            stringNullOrEmpty(contentType[contentType.type].valueHour) ||
+            stringNullOrEmpty(contentType[contentType.type].valueMinute)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "timezone_from_to") {
+          if (
+            stringNullOrEmpty(contentType[contentType.type].valueHour1) ||
+            stringNullOrEmpty(contentType[contentType.type].valueMinute1) ||
+            stringNullOrEmpty(contentType[contentType.type].valueHour2) ||
+            stringNullOrEmpty(contentType[contentType.type].valueMinute2)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "period_from_to") {
+          if (
+            stringNullOrEmpty(contentType[contentType.type].valueYear1) ||
+            stringNullOrEmpty(contentType[contentType.type].valueMonth1) ||
+            stringNullOrEmpty(contentType[contentType.type].valueDay1) ||
+            stringNullOrEmpty(contentType[contentType.type].valueYear2) ||
+            stringNullOrEmpty(contentType[contentType.type].valueMonth2) ||
+            stringNullOrEmpty(contentType[contentType.type].valueDay2)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "up_to_municipality") {
+          if (
+            stringNullOrEmpty(contentType[contentType.type].prefecture) ||
+            stringNullOrEmpty(contentType[contentType.type].city)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === "attaching_file") {
+          if (stringNullOrEmpty(contentType.value)) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (
+          contentType.type === "date_selection" ||
+          contentType.type === "embedded"
+        ) {
+          if (stringNullOrEmpty(contentType.date_select)) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "start_end_date") {
+          if (
+            stringNullOrEmpty(contentType.start_date_select) ||
+            stringNullOrEmpty(contentType.end_date_select)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === "agree_term") {
+          if (
+            stringNullOrEmpty(contentType.isAgree) ||
+            contentType.isAgree === false
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === "radio_button") {
+          if (stringNullOrEmpty(contentType.initial_selection)) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === "checkbox") {
+          if (contentType.type !== "checkbox_img") {
+            if (
+              contentType.checkedValue &&
+              contentType.checkedValue.length === 0
+            ) {
+              errorsMess[
+                `message${indexMessage}_content${i}_${contentArr[i].type}`
+              ] = messageError;
+              isValid = false;
+            } else if (
+              contentType.selection_limit_from &&
+              contentType.checkedValue.length <
+                parseInt(contentType.selection_limit_from)
+            ) {
+              errorsMess[
+                `message${indexMessage}_content${i}_${contentArr[i].type}`
+              ] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
+              isValid = false;
+            } else if (
+              contentType.selection_limit_to &&
+              contentType.checkedValue.length >
+                parseInt(contentType.selection_limit_to)
+            ) {
+              errorsMess[
+                `message${indexMessage}_content${i}_${contentArr[i].type}`
+              ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+              isValid = false;
+            }
+          } else {
+            if (
+              contentType.initial_selection_picture &&
+              contentType.initial_selection_picture.length === 0
+            ) {
+              errorsMess[
+                `message${indexMessage}_content${i}_${contentArr[i].type}`
+              ] = messageError;
+              isValid = false;
+            } else if (
+              contentType.selection_limit_from &&
+              contentType.initial_selection_picture.length <
+                parseInt(contentType.selection_limit_from)
+            ) {
+              errorsMess[
+                `message${indexMessage}_content${i}_${contentArr[i].type}`
+              ] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
+              isValid = false;
+            } else if (
+              contentType.selection_limit_to &&
+              contentType.initial_selection_picture.length >
+                parseInt(contentType.selection_limit_to)
+            ) {
+              errorsMess[
+                `message${indexMessage}_content${i}_${contentArr[i].type}`
+              ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+              isValid = false;
+            }
+          }
+        } else if (contentArr[i].type === "carousel") {
+          if (stringNullOrEmpty(contentType.initial_selection)) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === "capture") {
+          if (stringNullOrEmpty(contentType.value)) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          } else if (
+            captcha
+              .filter(
+                (item) =>
+                  item.index === indexMessage && item.indexContent === i
+              )?.[0]
+              ?.text.toLowerCase() !== contentType.value.toLowerCase()
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = "認証コードが間違っています。";
+            isValid = false;
+          }
+        } else if (contentArr[i].type === "product_purchase") {
+          if (contentType.initial_selection.length === 0) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === "slider") {
+          if (stringNullOrEmpty(contentType.value)) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === "product_purchase_radio_button") {
+          if (contentType.initial_selection.length === 0) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === "card_payment_radio_button") {
+          if (
+            contentType.type !== "picture_radio" &&
+            stringNullOrEmpty(contentType.initial_selection)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          } else if (
+            contentType.type === "picture_radio" &&
+            stringNullOrEmpty(contentType.initial_selection_picture)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentArr[i].type === "textarea") {
+          if (
+            contentType.type === "text_input" &&
+            stringNullOrEmpty(contentType[contentType.type].value)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (
+          contentArr[i].type !== "credit_card_payment" &&
+          stringNullOrEmpty(contentType[contentType.type].value)
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = messageError;
+          isValid = false;
+        } else if (
+          (limitFrom || limitTo) &&
+          (contentType[contentType.type]?.value?.length < limitFrom ||
+            contentType[contentType.type]?.value?.length > limitTo)
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          isValid = false;
+        }
+      } else {
+        if (contentArr[i].type === "checkbox") {
+          if (
+            contentType.type !== "checkbox_img" &&
+            contentType.selection_limit_to &&
+            contentType.checkedValue.length >
+              parseInt(contentType.selection_limit_to)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+            isValid = false;
+          } else if (
+            contentType.type === "checkbox_img" &&
+            contentType.selection_limit_to &&
+            contentType.initial_selection_picture.length >
+              parseInt(contentType.selection_limit_to)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+            isValid = false;
+          }
+        } else if (
+          contentType.type === "phone_number" &&
+          contentType[contentType.type].withHyphen
+        ) {
+          if (
+            (!stringNullOrEmpty(contentType[contentType.type].value1) ||
+              !stringNullOrEmpty(contentType[contentType.type].value2) ||
+              !stringNullOrEmpty(contentType[contentType.type].value3)) &&
+            (stringNullOrEmpty(contentType[contentType.type].value1) ||
+              stringNullOrEmpty(contentType[contentType.type].value2) ||
+              stringNullOrEmpty(contentType[contentType.type].value3))
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "time_hm") {
+          if (
+            (!stringNullOrEmpty(contentType[contentType.type].valueHour) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueMinute)) &&
+            (stringNullOrEmpty(contentType[contentType.type].valueMinute) ||
+              stringNullOrEmpty(contentType[contentType.type].valueHour))
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (
+          contentType.type === "date_ymd" ||
+          contentType.type === "dob_ymd"
+        ) {
+          if (
+            (!stringNullOrEmpty(contentType[contentType.type].valueYear) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueDay)) &&
+            (stringNullOrEmpty(contentType[contentType.type].valueYear) ||
+              stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
+              stringNullOrEmpty(contentType[contentType.type].valueDay))
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "date_md") {
+          if (
+            (!stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueDay)) &&
+            (stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
+              stringNullOrEmpty(contentType[contentType.type].valueDay))
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (
+          contentType.type === "date_ym" ||
+          contentType.type === "dob_ym"
+        ) {
+          if (
+            (!stringNullOrEmpty(contentType[contentType.type].valueYear) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueMonth)) &&
+            (stringNullOrEmpty(contentType[contentType.type].valueYear) ||
+              stringNullOrEmpty(contentType[contentType.type].valueMonth))
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "date_ymd_hm") {
+          if (
+            (!stringNullOrEmpty(contentType[contentType.type].valueYear) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueDay) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueHour) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueMinute)) &&
+            (stringNullOrEmpty(contentType[contentType.type].valueYear) ||
+              stringNullOrEmpty(contentType[contentType.type].valueMonth) ||
+              stringNullOrEmpty(contentType[contentType.type].valueDay) ||
+              stringNullOrEmpty(contentType[contentType.type].valueHour) ||
+              stringNullOrEmpty(contentType[contentType.type].valueMinute))
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "timezone_from_to") {
+          if (
+            (!stringNullOrEmpty(contentType[contentType.type].valueHour1) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueMinute1) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueHour2) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueMinute2)) &&
+            (stringNullOrEmpty(contentType[contentType.type].valueHour1) ||
+              stringNullOrEmpty(contentType[contentType.type].valueMinute1) ||
+              stringNullOrEmpty(contentType[contentType.type].valueHour2) ||
+              stringNullOrEmpty(contentType[contentType.type].valueMinute2))
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "period_from_to") {
+          if (
+            (!stringNullOrEmpty(contentType[contentType.type].valueYear1) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueMonth1) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueDay1) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueYear2) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueMonth2) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueDay2)) &&
+            (stringNullOrEmpty(contentType[contentType.type].valueYear1) ||
+              stringNullOrEmpty(contentType[contentType.type].valueMonth1) ||
+              stringNullOrEmpty(contentType[contentType.type].valueDay1) ||
+              stringNullOrEmpty(contentType[contentType.type].valueYear2) ||
+              stringNullOrEmpty(contentType[contentType.type].valueMonth2) ||
+              stringNullOrEmpty(contentType[contentType.type].valueDay2))
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        } else if (contentType.type === "up_to_municipality") {
+          if (
+            (!stringNullOrEmpty(contentType[contentType.type].prefecture) ||
+              !stringNullOrEmpty(contentType[contentType.type].city)) &&
+            (stringNullOrEmpty(contentType[contentType.type].prefecture) ||
+              stringNullOrEmpty(contentType[contentType.type].city))
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageError;
+            isValid = false;
+          }
+        }
+      }
+      let REGEX_EMAIL = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+      let REGEX_PASSWORD = /^[A-Za-z0-9 ]+$/;
+
+      if (contentType.type === "text" || contentType.type === "password") {
+        if (contentType[contentType.type].isSplitInput) {
+          if (
+            (!stringNullOrEmpty(contentType[contentType.type].valueLeft) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueRight)) &&
+            (contentType[contentType.type].valueLeft?.length < limitFrom ||
+              contentType[contentType.type].valueRight?.length < limitFrom)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = `${limitFrom}文字以上入力してください。`;
+            isValid = false;
+          } else if (
+            (!stringNullOrEmpty(contentType[contentType.type].valueLeft) ||
+              !stringNullOrEmpty(contentType[contentType.type].valueRight)) &&
+            (contentType[contentType.type].valueLeft?.length > limitTo ||
+              contentType[contentType.type].valueRight?.length > limitTo)
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = `${limitTo}文字以下入力してください。`;
+            isValid = false;
+          }
+        } else if (
+          !stringNullOrEmpty(contentType[contentType.type].value) &&
+          contentType[contentType.type].value?.length < limitFrom
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `${limitFrom}文字以上入力してください。`;
+          isValid = false;
+        } else if (
+          !stringNullOrEmpty(contentType[contentType.type].value) &&
+          contentType[contentType.type].value?.length > limitTo
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `${limitTo}文字以下入力してください。`;
+          isValid = false;
+        } else if (
+          contentType.type === "password" &&
+          !stringNullOrEmpty(contentType[contentType.type].value) &&
+          !REGEX_PASSWORD.test(contentType[contentType.type].value)
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
+          isValid = false;
+        }
+      } else if (
+        contentArr[i].type === "product_purchase" &&
+        contentType.initial_selection.length !== 0
+      ) {
+        contentType.initial_selection.forEach((item, index) => {
+          contentType.products.forEach((itemProduct, indexProduct) => {
+            if (item === itemProduct.id && !itemProduct.quantity_select) {
+              errorsMess[
+                `message${indexMessage}_content${i}_${contentArr[i].type}_${indexProduct}`
+              ] = messageError;
+              isValid = false;
+            }
+          });
+        });
+      } else if (contentType.type === "password_confirmation") {
+        if (
+          (!stringNullOrEmpty(contentType[contentType.type].value) ||
+            !stringNullOrEmpty(contentType[contentType.type].valueConfirm)) &&
+          (contentType[contentType.type].value?.length < limitFrom ||
+            contentType[contentType.type].valueConfirm?.length < limitFrom)
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `${limitFrom}文字以上入力してください。`;
+          isValid = false;
+        } else if (
+          (!stringNullOrEmpty(contentType[contentType.type].value) ||
+            !stringNullOrEmpty(contentType[contentType.type].valueConfirm)) &&
+          (contentType[contentType.type].value?.length > limitTo ||
+            contentType[contentType.type].valueConfirm?.length > limitTo)
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `${limitTo}文字以下入力してください。`;
+          isValid = false;
+        } else if (
+          !stringNullOrEmpty(contentType[contentType.type].value) &&
+          !REGEX_PASSWORD.test(contentType[contentType.type].value)
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
+          isValid = false;
+        } else if (
+          !stringNullOrEmpty(contentType[contentType.type].valueConfirm) &&
+          !REGEX_PASSWORD.test(contentType[contentType.type].valueConfirm)
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
+          isValid = false;
+        } else if (
+          !stringNullOrEmpty(contentType[contentType.type].value) &&
+          !stringNullOrEmpty(contentType[contentType.type].valueConfirm) &&
+          contentType[contentType.type].value !==
+            contentType[contentType.type].valueConfirm
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = "パスワードとパスワード確認が一致しません。";
+          isValid = false;
+        }
+      } else if (
+        contentArr[i].type === "textarea" &&
+        contentType.type === "text_input"
+      ) {
+        if (
+          !stringNullOrEmpty(contentType[contentType.type].value) &&
+          contentType[contentType.type].value.length < limitFrom
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}`
+          ] = `${limitFrom}文字以上入力してください。`;
+          isValid = false;
+        } else if (
+          !stringNullOrEmpty(contentType[contentType.type].value) &&
+          contentType[contentType.type].value.length > limitTo
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}`
+          ] = `${limitTo}文字以下入力してください。`;
+          isValid = false;
+        }
+      } else if (contentArr[i].type === "zip_code_address") {
+        if (
+          errors[
+            `message${indexMessage}_content${i}_${contentArr[i].type}`
+          ] &&
+          errors[
+            `message${indexMessage}_content${i}_${contentArr[i].type}`
+          ] !== messageError
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}`
+          ] =
+            errors[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ];
+          isValid = false;
+        } else {
+          let isValidZipCode = true;
+          if (contentType.isCheckRequire === "require") {
+            if (contentType.post_code !== undefined) {
+              if (contentType.split_postal_code) {
+                if (
+                  stringNullOrEmpty(contentType.value_post_code_left) ||
+                  stringNullOrEmpty(contentType.value_post_code_right)
+                ) {
+                  isValidZipCode = false;
+                }
+              } else if (stringNullOrEmpty(contentType.value_post_code)) {
+                isValidZipCode = false;
+              }
+            }
+          } else if (contentType.isCheckRequire === "all_items_require") {
+            if (contentType.post_code !== undefined) {
+              if (contentType.split_postal_code) {
+                if (
+                  stringNullOrEmpty(contentType.value_post_code_left) ||
+                  stringNullOrEmpty(contentType.value_post_code_right)
+                ) {
+                  isValidZipCode = false;
+                }
+              } else if (stringNullOrEmpty(contentType.value_post_code)) {
+                isValidZipCode = false;
+              }
+            }
+            if (
+              contentType.prefecture !== undefined &&
+              stringNullOrEmpty(contentType.value_prefecture)
+            ) {
+              isValidZipCode = false;
+            }
+            if (
+              contentType.municipality !== undefined &&
+              stringNullOrEmpty(contentType.value_municipality)
+            ) {
+              isValidZipCode = false;
+            }
+            if (
+              contentType.address !== undefined &&
+              stringNullOrEmpty(contentType.value_address)
+            ) {
+              isValidZipCode = false;
+            }
+          }
+          if (isValidZipCode === false) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        }
+      } else if (
+        contentType.type === "phone_number" &&
+        !errorsMess[
+          `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+        ]
+      ) {
+        let REGEX_PHONE = /^0\d{9}$|^0\d{10}$/;
+        if (contentType[contentType.type].withHyphen) {
+          if (
+            !stringNullOrEmpty(contentType[contentType.type].value1) &&
+            !stringNullOrEmpty(contentType[contentType.type].value2) &&
+            !stringNullOrEmpty(contentType[contentType.type].value3) &&
+            !REGEX_PHONE.test(
+              `${contentType[contentType.type].value1}${
+                contentType[contentType.type].value2
+              }${contentType[contentType.type].value3}`
+            )
+          ) {
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = "形式が正しくない。";
+            isValid = false;
+          }
+        } else if (
+          !stringNullOrEmpty(contentType[contentType.type].value) &&
+          !REGEX_PHONE.test(contentType[contentType.type].value)
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = "形式が正しくない。";
+          isValid = false;
+        }
+      } else if (
+        contentType.type === "urls" &&
+        !stringNullOrEmpty(contentType[contentType.type].value)
+      ) {
+        let REGEX_URLS =
+          /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
+        if (!REGEX_URLS.test(contentType[contentType.type].value)) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `有効なURL形式で指定してください。`;
+          isValid = false;
+        }
+      } else if (
+        contentType.type === "email_address" &&
+        !stringNullOrEmpty(contentType[contentType.type].value)
+      ) {
+        if (!REGEX_EMAIL.test(contentType[contentType.type].value)) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `有効なメールアドレス形式で指定してください。`;
+          isValid = false;
+        }
+      } else if (contentType.type === "email_confirmation") {
+        if (
+          !stringNullOrEmpty(contentType[contentType.type].value) &&
+          !REGEX_EMAIL.test(contentType[contentType.type].value)
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `有効なメールアドレス形式で指定してください。`;
+          isValid = false;
+        } else if (
+          !stringNullOrEmpty(contentType[contentType.type].valueConfirm) &&
+          !REGEX_EMAIL.test(contentType[contentType.type].valueConfirm)
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `有効なメールアドレス形式で指定してください。`;
+          isValid = false;
+        } else if (
+          !stringNullOrEmpty(contentType[contentType.type].value) &&
+          !stringNullOrEmpty(contentType[contentType.type].valueConfirm) &&
+          contentType[contentType.type].value !==
+            contentType[contentType.type].valueConfirm
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+          ] = `メールアドレスとメールアドレス確認が一致しません。`;
+          isValid = false;
+        }
+      } else if (
+        contentArr[i].type === "attaching_file" &&
+        errors[`message${indexMessage}_content${i}_${contentArr[i].type}`]
+      ) {
+        errorsMess[
+          `message${indexMessage}_content${i}_${contentArr[i].type}`
+        ] =
+          errors[
+            `message${indexMessage}_content${i}_${contentArr[i].type}`
+          ];
+        isValid = false;
+      } else if (contentArr[i].type === "credit_card_payment") {
+        if (
+          (contentType.is_hide_card_name !== true &&
+            stringNullOrEmpty(contentType.card_holder)) ||
+          (contentType.is_hide_cvc !== true &&
+            stringNullOrEmpty(contentType.cvc)) ||
+          (contentType.separate_type === true &&
+            (stringNullOrEmpty(contentType.card_number1) ||
+              stringNullOrEmpty(contentType.card_number2) ||
+              stringNullOrEmpty(contentType.card_number3) ||
+              stringNullOrEmpty(contentType.card_number4))) ||
+          (contentType.separate_type === false &&
+            stringNullOrEmpty(contentType.card_number)) ||
+          (contentType.is_hide_cvc !== true &&
+            stringNullOrEmpty(contentType.cvc)) ||
+          stringNullOrEmpty(contentType.year) ||
+          stringNullOrEmpty(contentType.month)
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}`
+          ] = messageError;
+          isValid = false;
+        } else if (
+          (contentType.card_number &&
+            ((contentType.card_number + "").length !== 16 ||
+              /[^0-9]+/.test(contentType.card_number))) ||
+          (!stringNullOrEmpty(contentType.card_number1) &&
+            !stringNullOrEmpty(contentType.card_number2) &&
+            !stringNullOrEmpty(contentType.card_number3) &&
+            !stringNullOrEmpty(contentType.card_number4) &&
+            ((contentType.card_number1 + "").length !== 4 ||
+              (contentType.card_number2 + "").length !== 4 ||
+              (contentType.card_number3 + "").length !== 4 ||
+              (contentType.card_number4 + "").length !== 4))
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}`
+          ] = "クレジットカード番号は無効です。";
+          isValid = false;
+        } else if (
+          moment(
+            `${contentType.year}-${contentType.month}}`,
+            "YYYY-MM"
+          ).isBefore(moment().format("YYYY-MM"))
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}`
+          ] = "有効期限に誤りがあるために、決済を完了できませんでした。";
+          isValid = false;
+        }
+      } else if (
+        contentArr[i].type === "card_payment_radio_button" &&
+        errorsMess[
+          `message${indexMessage}_content${i}_${contentArr[i].type}`
+        ] !== messageError &&
+        (((contentType?.initial_selection ||
+          contentType?.card_linked_setting) &&
+          contentType?.initial_selection ===
+            contentType?.card_linked_setting) ||
+          ((contentType?.initial_selection_picture ||
+            contentType?.card_linked_setting_picture) &&
+            contentType?.initial_selection_picture ===
+              contentType?.card_linked_setting_picture))
+      ) {
+        if (
+          (contentType.is_hide_card_name !== true &&
+            stringNullOrEmpty(contentType.card_holder)) ||
+          (contentType.is_hide_cvc !== true &&
+            stringNullOrEmpty(contentType.cvc)) ||
+          (contentType.separate_type === true &&
+            (stringNullOrEmpty(contentType.card_number1) ||
+              stringNullOrEmpty(contentType.card_number2) ||
+              stringNullOrEmpty(contentType.card_number3) ||
+              stringNullOrEmpty(contentType.card_number4))) ||
+          (contentType.separate_type === false &&
+            stringNullOrEmpty(contentType.card_number)) ||
+          (contentType.is_hide_cvc !== true &&
+            stringNullOrEmpty(contentType.cvc)) ||
+          stringNullOrEmpty(contentType.year) ||
+          stringNullOrEmpty(contentType.month)
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}`
+          ] = messageError;
+          isValid = false;
+        } else if (
+          (contentType.card_number &&
+            ((contentType.card_number + "").length !== 16 ||
+              /[^0-9]+/.test(contentType.card_number))) ||
+          (!stringNullOrEmpty(contentType.card_number1) &&
+            !stringNullOrEmpty(contentType.card_number2) &&
+            !stringNullOrEmpty(contentType.card_number3) &&
+            !stringNullOrEmpty(contentType.card_number4) &&
+            ((contentType.card_number1 + "").length !== 4 ||
+              (contentType.card_number2 + "").length !== 4 ||
+              (contentType.card_number3 + "").length !== 4 ||
+              (contentType.card_number4 + "").length !== 4))
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}`
+          ] = "クレジットカード番号は無効です。";
+          isValid = false;
+        } else if (
+          moment(
+            `${contentType.year}-${contentType.month}}`,
+            "YYYY-MM"
+          ).isBefore(moment().format("YYYY-MM"))
+        ) {
+          errorsMess[
+            `message${indexMessage}_content${i}_${contentArr[i].type}`
+          ] = "有効期限に誤りがあるために、決済を完了できませんでした。";
+          isValid = false;
+        }
+      }
+      if (
+        contentArr[i].type === "text_input" &&
+        contentType[contentType.type].range &&
+        contentType[contentType.type].range !== "no_input" &&
+        (!stringNullOrEmpty(contentType[contentType.type].value) ||
+          !stringNullOrEmpty(contentType[contentType.type].valueLeft) ||
+          !stringNullOrEmpty(contentType[contentType.type].valueRight))
+      ) {
+        let REGEX_CHECK;
+        let messageLog = "";
+        switch (contentType[contentType.type].range) {
+          case "alphabet":
+            REGEX_CHECK = /[^A-Za-z ]+/;
+            messageLog = "アルファベッドのみ使用できます。";
+            break;
+          case "single_byte":
+            REGEX_CHECK = /[^0-9 ]+/;
+            messageLog = "数字を入力してください。";
+            break;
+          case "alphanumeric_hyphen":
+            REGEX_CHECK = /[^A-Za-z0-9-_ ]+/;
+            messageLog =
+              "英数字('A-Z','a-z','0-9')とハイフンと下線('-','_')が使用できます。";
+            break;
+          case "alphanumeric":
+            REGEX_CHECK = /[^A-Za-z0-9 ]+/;
+            messageLog = "英数字('A-Z','a-z','0-9')が使用できます。";
+            break;
+          case "double_byte_hiragana":
+            REGEX_CHECK = /[^ぁ-ん]+/;
+            messageLog = "全角ひらがなを入力してください。";
+            break;
+          case "full_width_katakana":
+            REGEX_CHECK = /[^ァ-ン]+/;
+            messageLog = "全角カタカナを入力してください。";
+            break;
+          case "double_byte":
+            REGEX_CHECK = /[^ァ-ンぁ-んｧ-ﾝﾞﾟ]+/;
+            messageLog = "全角文字を入力してください。";
+            break;
+          default:
+            REGEX_CHECK = "";
+            break;
+        }
+        if (REGEX_CHECK !== "") {
+          if (
+            contentType[contentType.type].isSplitInput &&
+            (REGEX_CHECK.test(contentType[contentType.type].valueLeft) ||
+              REGEX_CHECK.test(contentType[contentType.type].valueRight))
+          ) {
+            isValid = false;
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageLog;
+          } else if (REGEX_CHECK.test(contentType[contentType.type].value)) {
+            isValid = false;
+            errorsMess[
+              `message${indexMessage}_content${i}_${contentArr[i].type}_${contentType.type}`
+            ] = messageLog;
+          }
+        }
+      }
+    }
+
+    if (isValid) {
+      errorsMess = {};
+    }
+    setErrors({
+      ...errorsMess,
+    });
+    return isValid;
+  };
   const onClickNext = async (indexMessage) => {
+    setEditIndex(-1);
     if (!handleValidateField()) {
       return;
     }
-    renderMessageArr[indexMessage].disabled = true;
+    renderMessageArr[indexMessage].disabled = false;
     let renderMessage = [...renderMessageArr];
     let index;
     let isPauseScroll = false;
@@ -2692,8 +3734,39 @@ function Preview() {
       }
     }
   };
-
+  const [editIndex,setEditIndex]=useState(-1);
+  const onClickNext2 = async (indexMessage) => {
+    setEditIndex(-1);
+    if (!rehandleValidateField(indexMessage)) {
+      return;
+    }
+    renderMessageArr[indexMessage].disabled = false;
+    let renderMessage = [...renderMessageArr];
+    let index;
+    let isPauseScroll = false;
+    let delayRender;
+    let data_submit = {
+      scenario_id: scenarioId,
+      message: renderMessageArr[indexMessage],
+      user_id: uuid,
+    };
+      await new Promise((resolve) => {
+        api
+          .put(`/api/v1/scenario_users/scenario_user_responses/${scenarioId}`, data_submit)
+          .then((res) => {
+            resolve();
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired();
+            }
+          });
+      });
+    
+  };
   const onChangeValue = (
+    indexMessage,
     indexContent,
     contentType,
     value,
@@ -2716,28 +3789,28 @@ function Preview() {
       ][field][subFiled][name] = value;
     } else if (subFiled) {
       if (
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[indexMessage].message_content[indexContent][
           contentType
         ][field] === undefined
       ) {
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[indexMessage].message_content[indexContent][
           contentType
         ][field] = {};
       }
-      dataMessages[indexMessageRender].message_content[indexContent][
+      dataMessages[indexMessage].message_content[indexContent][
         contentType
       ][field][subFiled] = value;
     } else if (field) {
       if (
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[indexMessage].message_content[indexContent][
           contentType
         ] === undefined
       ) {
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[indexMessage].message_content[indexContent][
           contentType
         ] = {};
       }
-      dataMessages[indexMessageRender].message_content[indexContent][
+      dataMessages[indexMessage].message_content[indexContent][
         contentType
       ][field] = value;
     }
@@ -2748,7 +3821,7 @@ function Preview() {
       value.length > 0
     ) {
       let dataContentType = {
-        ...dataMessages[indexMessageRender].message_content[indexContent][
+        ...dataMessages[indexMessage].message_content[indexContent][
           contentType
         ],
       };
@@ -2800,7 +3873,7 @@ function Preview() {
       field === "initial_selection"
     ) {
       let dataContentType = {
-        ...dataMessages[indexMessageRender].message_content[indexContent][
+        ...dataMessages[indexMessage].message_content[indexContent][
           contentType
         ],
       };
@@ -2839,19 +3912,19 @@ function Preview() {
     }
 
     if (
-      dataMessages[indexMessageRender].message_content[indexContent][
+      dataMessages[indexMessage].message_content[indexContent][
         contentType
       ].is_save_input_content
     ) {
       let isSaveParam = false;
       variables.forEach((item) => {
         let dataContentType = {
-          ...dataMessages[indexMessageRender].message_content[indexContent][
+          ...dataMessages[indexMessage].message_content[indexContent][
             contentType
           ],
         };
         if (
-          dataMessages[indexMessageRender].message_content[indexContent][
+          dataMessages[indexMessage].message_content[indexContent][
             contentType
           ].save_input_content === item.variable_name
         ) {
@@ -2988,7 +4061,7 @@ function Preview() {
       setVariables([...variables]);
       if (isSaveParam) {
         objParam[
-          dataMessages[indexMessageRender].message_content[indexContent][
+          dataMessages[indexMessage].message_content[indexContent][
             contentType
           ].save_input_content
         ] = value;
@@ -3471,7 +4544,7 @@ if (scenarioId && botInfor && isOpen  ){
                         field,
                         subFiled,
                         name
-                      ) =>
+                      ) =>{
                         onChangeValue(
                           indexContent,
                           contentType,
@@ -3479,10 +4552,14 @@ if (scenarioId && botInfor && isOpen  ){
                           field,
                           subFiled,
                           name
-                        )
+                        );
+                        setEditIndex(indexContent)
+                      }
+                        
                       }
                       indexMessageRender={indexMessageRender}
                       onClickNext={() => onClickNext(indexMessage)}
+                      onClickNext2={() => onClickNext2(indexMessage)}
                       indexMessage={indexMessage}
                       errorsProps={errors}
                       displayButtonNext={(value) => {
@@ -3504,15 +4581,22 @@ if (scenarioId && botInfor && isOpen  ){
                       : true) && (
                       <div className="sp-user-message-button-action">
                         <Button
-                          disabled={message.disabled}
+                          disabled={message.disabled || (editIndex !== indexMessage && indexMessage !== indexMessageRender)}
+                          key={indexMessage}
                           style={{
                             backgroundColor: botInfor?.main_color,
                             borderRadius: "25px",
                           }}
                           className="ss-user-message__action-btn"
-                          onClick={() => onClickNext(indexMessage)}
+                          onClick={() => {
+                            if (indexMessage=== indexMessageRender){
+                              onClickNext(indexMessage)
+                            } else {
+                              onClickNext2(indexMessage)
+                            }
+                          }}
                         >
-                          {message.buttonName || "次へ"}
+                          {indexMessage=== indexMessageRender? message.buttonName || "次へ":(editIndex !== indexMessage && indexMessage !== indexMessageRender)?"OK" : "更新" }
                         </Button>
                       </div>
                     )}
@@ -3850,6 +4934,8 @@ const UserMessage = ({
   isPopUpZipCode,
   onChangeErrors,
   dataPrefectures,
+  onClickNext2,
+  onCheckIndex
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -3862,6 +4948,7 @@ const UserMessage = ({
   const [bot_id, setBotId] = useState(Cookies.get("bot_id"));
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
+
 
   function loadCaptcha(indexContent) {
     if (
@@ -3949,7 +5036,7 @@ const UserMessage = ({
             i++;
           }
           // calendar.date_select = date_select;
-          onChangeValue(indexContent, content.type, date_select, "date_select");
+          onChangeValue(indexMessage,indexContent, content.type, date_select, "date_select");
         } else if (
           calendar.initial_selection &&
           calendar.type === "start_end_date"
@@ -3975,6 +5062,7 @@ const UserMessage = ({
             checkbox.checkedValue.push(item.id);
           });
           onChangeValue(
+            indexMessage,
             indexContent,
             content.type,
             checkbox.checkedValue,
@@ -3992,6 +5080,7 @@ const UserMessage = ({
             });
           });
           onChangeValue(
+            indexMessage,
             indexContent,
             content.type,
             checkbox.initial_selection_picture,
@@ -4002,6 +5091,7 @@ const UserMessage = ({
         let radioButton = content.radio_button;
         if (radioButton.initial_selection) {
           onChangeValue(
+            indexMessage,
             indexContent,
             content.type,
             radioButton.initial_selection,
@@ -4015,6 +5105,7 @@ const UserMessage = ({
           cardPaymentRadioButton.initial_selection
         ) {
           onChangeValue(
+            indexMessage,
             indexContent,
             content.type,
             cardPaymentRadioButton.initial_selection,
@@ -4022,6 +5113,7 @@ const UserMessage = ({
           );
         } else if (cardPaymentRadioButton.initial_selection_picture) {
           onChangeValue(
+            indexMessage,
             indexContent,
             content.type,
             cardPaymentRadioButton.initial_selection_picture,
@@ -4031,6 +5123,7 @@ const UserMessage = ({
       } else if (content.type === "product_purchase") {
         let productPurchase = content.product_purchase;
         onChangeValue(
+          indexMessage,
           indexContent,
           content.type,
           productPurchase.initial_selection,
@@ -4385,6 +5478,7 @@ const UserMessage = ({
                         style={{ width: "49%", marginBottom: "0px" }}
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -4400,6 +5494,7 @@ const UserMessage = ({
                         style={{ width: "49%" }}
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -4418,6 +5513,7 @@ const UserMessage = ({
                         placeholder={textInput[textInput.type]?.placeholderLeft}
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -4451,6 +5547,7 @@ const UserMessage = ({
                         placeholder={textInput[textInput.type]?.number}
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -4487,6 +5584,7 @@ const UserMessage = ({
                                 .select();
                             }
                             onChangeValue(
+                              indexMessage,
                               indexContent,
                               content.type,
                               value,
@@ -4517,6 +5615,7 @@ const UserMessage = ({
                                 .select();
                             }
                             onChangeValue(
+                              indexMessage,
                               indexContent,
                               content.type,
                               value,
@@ -4535,6 +5634,7 @@ const UserMessage = ({
                           maxLength={4}
                           onChange={(value) =>
                             onChangeValue(
+                              indexMessage,
                               indexContent,
                               content.type,
                               value,
@@ -4558,6 +5658,7 @@ const UserMessage = ({
                       placeholder={textInput[textInput.type]?.password}
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -4578,13 +5679,18 @@ const UserMessage = ({
                       style={{ marginBottom: "0px" }}
                       placeholder={textInput[textInput.type].placeholder}
                       onChange={(value) =>
-                        onChangeValue(
-                          indexContent,
-                          content.type,
-                          value,
-                          textInput.type,
-                          "value"
-                        )
+                        {
+                          
+                          onChangeValue(
+                            indexMessage,
+                            indexContent,
+                            content.type,
+                            value,
+                            textInput.type,
+                            "value"
+                          )
+                        }
+                        
                       }
                       value={textInput[textInput.type]?.value}
                     ></InputCustom>
@@ -4598,6 +5704,7 @@ const UserMessage = ({
                       placeholder={textInput[textInput.type].cfEmlAdd_email}
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -4614,6 +5721,7 @@ const UserMessage = ({
                       }
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -4634,6 +5742,7 @@ const UserMessage = ({
                       placeholder={textInput[textInput.type].password}
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -4649,6 +5758,7 @@ const UserMessage = ({
                       placeholder={textInput[textInput.type].confirm_password}
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -4718,6 +5828,7 @@ const UserMessage = ({
                     rows={3}
                     onChange={(e) =>
                       onChangeValue(
+                        indexMessage,
                         indexContent,
                         content.type,
                         e.target.value,
@@ -4780,12 +5891,20 @@ const UserMessage = ({
                             checked={radioButton.initial_selection === item.id}
                             onChange={() => {
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 item.id,
                                 "initial_selection"
                               );
-                              if (messageContent.length === 1) onClickNext();
+                              if (messageContent.length === 1){
+                                if (indexMessage === indexMessageRender){
+                                  onClickNext()
+                                } else {
+                                  console.log("davao");
+                                  onClickNext2()
+                                }
+                                };
                             }}
                           />
                           {item.text && (
@@ -4811,6 +5930,7 @@ const UserMessage = ({
                             checked={radioButton.initial_selection === item.id}
                             onChange={() => {
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 item.id,
@@ -4877,6 +5997,7 @@ const UserMessage = ({
                             className="ss-message__content--user-radio_button--block_style"
                             onClick={() => {
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 item.id,
@@ -4931,6 +6052,7 @@ const UserMessage = ({
                       disabled={disabled}
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -4979,6 +6101,7 @@ const UserMessage = ({
                       className="ss-user-preview-product-purchase-checkbox-group-type-text_image ss-user-overview-product-purchase-style-width"
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -5111,6 +6234,7 @@ const UserMessage = ({
                                 nameValue="text"
                                 onChange={(value) =>
                                   onChangeValue(
+                                    indexMessage,
                                     indexContent,
                                     content.type,
                                     value,
@@ -5142,6 +6266,7 @@ const UserMessage = ({
                                 nameValue="text"
                                 onChange={(value) =>
                                   onChangeValue(
+                                    indexMessage,
                                     indexContent,
                                     content.type,
                                     value,
@@ -5164,6 +6289,7 @@ const UserMessage = ({
                                 nameValue="text2"
                                 onChange={(value) =>
                                   onChangeValue(
+                                    indexMessage,
                                     indexContent,
                                     content.type,
                                     value,
@@ -5210,6 +6336,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5226,6 +6353,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5273,6 +6401,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5289,6 +6418,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5305,6 +6435,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5341,6 +6472,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5357,6 +6489,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5403,6 +6536,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5419,6 +6553,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5465,6 +6600,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5481,6 +6617,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5497,6 +6634,7 @@ const UserMessage = ({
                             style={{ width: "32%", marginBottom: "10px" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5521,6 +6659,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5537,6 +6676,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5581,6 +6721,7 @@ const UserMessage = ({
                             style={{ width: "49%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5597,6 +6738,7 @@ const UserMessage = ({
                             style={{ width: "49%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5630,6 +6772,7 @@ const UserMessage = ({
                             style={{ width: "49%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5646,6 +6789,7 @@ const UserMessage = ({
                             style={{ width: "49%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5691,6 +6835,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5707,6 +6852,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5723,6 +6869,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5757,6 +6904,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5773,6 +6921,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5789,6 +6938,7 @@ const UserMessage = ({
                             style={{ width: "32%" }}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -5819,6 +6969,7 @@ const UserMessage = ({
                         nameValue="name"
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -5850,6 +7001,7 @@ const UserMessage = ({
                           nameValue="name"
                           onChange={async (value) => {
                             onChangeValue(
+                              indexMessage,
                               indexContent,
                               content.type,
                               value,
@@ -5877,6 +7029,7 @@ const UserMessage = ({
                                 });
                             } else {
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 null,
@@ -5898,6 +7051,7 @@ const UserMessage = ({
                           nameValue="city_name"
                           onChange={(value) =>
                             onChangeValue(
+                              indexMessage,
                               indexContent,
                               content.type,
                               value,
@@ -5992,6 +7146,7 @@ const UserMessage = ({
                         style={{ width: "100%", marginLeft: "0px" }}
                         onChange={async (value) => {
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -6005,12 +7160,14 @@ const UserMessage = ({
                               .then((res) => {
                                 if (res.data && res.data.code === 1) {
                                   onChangeValue(
+                                    indexMessage,
                                     indexContent,
                                     content.type,
                                     res.data.data.prefecture_name,
                                     "value_prefecture"
                                   );
                                   onChangeValue(
+                                    indexMessage,
                                     indexContent,
                                     content.type,
                                     `${res.data.data.city_name}${res.data.data.town_name}`,
@@ -6082,6 +7239,7 @@ const UserMessage = ({
                                 .select();
                             }
                             onChangeValue(
+                              indexMessage,
                               indexContent,
                               content.type,
                               value,
@@ -6100,12 +7258,14 @@ const UserMessage = ({
                                 .then((res) => {
                                   if (res.data && res.data.code === 1) {
                                     onChangeValue(
+                                      indexMessage,
                                       indexContent,
                                       content.type,
                                       res.data.data.prefecture_name,
                                       "value_prefecture"
                                     );
                                     onChangeValue(
+                                      indexMessage,
                                       indexContent,
                                       content.type,
                                       `${res.data.data.city_name}${res.data.data.town_name}`,
@@ -6166,6 +7326,7 @@ const UserMessage = ({
                           }}
                           onChange={async (value) => {
                             onChangeValue(
+                              indexMessage,
                               indexContent,
                               content.type,
                               value,
@@ -6184,12 +7345,14 @@ const UserMessage = ({
                                 .then((res) => {
                                   if (res.data && res.data.code === 1) {
                                     onChangeValue(
+                                      indexMessage,
                                       indexContent,
                                       content.type,
                                       res.data.data.prefecture_name,
                                       "value_prefecture"
                                     );
                                     onChangeValue(
+                                      indexMessage,
                                       indexContent,
                                       content.type,
                                       `${res.data.data.city_name}${res.data.data.town_name}`,
@@ -6265,6 +7428,7 @@ const UserMessage = ({
                         placeholder={zipCodeAddress.prefecture}
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -6279,6 +7443,7 @@ const UserMessage = ({
                         style={{ width: "100%" }}
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -6308,6 +7473,7 @@ const UserMessage = ({
                       style={{ width: "100%" }}
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -6337,6 +7503,7 @@ const UserMessage = ({
                       style={{ width: "100%" }}
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -6366,6 +7533,7 @@ const UserMessage = ({
                       style={{ width: "100%" }}
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -6416,6 +7584,7 @@ const UserMessage = ({
                       onClick={() => {
                         if (!disabled) {
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             "",
@@ -6494,6 +7663,7 @@ const UserMessage = ({
                       }
                       onChange={(date, dateString) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           dateString,
@@ -6626,6 +7796,7 @@ const UserMessage = ({
                         }
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -6657,6 +7828,7 @@ const UserMessage = ({
                       }
                       onChange={(date, dateString) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           dateString,
@@ -6677,6 +7849,7 @@ const UserMessage = ({
                       }
                       onChange={(date, dateString) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           dateString,
@@ -6738,6 +7911,7 @@ const UserMessage = ({
                         label={agreeTerm.term}
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -6774,6 +7948,7 @@ const UserMessage = ({
                       disabled={disabled}
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -6867,6 +8042,8 @@ const UserMessage = ({
                                     !disabled
                                   ) {
                                     onChangeValue(
+                                      indexMessage,
+                                      indexMessage,
                                       indexContent,
                                       content.type,
                                       itemCarousel.id,
@@ -6902,8 +8079,9 @@ const UserMessage = ({
               </div>
             )}
             {/* type == 'credit_card_payment' */}
+            
             {content.type === "credit_card_payment" && (
-              <div style={{ marginBottom: "10px" }}>
+              <div style={{ marginBottom:  "10px" }}>
                 {(creditCardPayment.title_require ||
                   creditCardPayment.require) && (
                   <div
@@ -6941,7 +8119,7 @@ const UserMessage = ({
                             {
                               dataPaymentMethod.find(
                                 (item) => item.key === itemPayment
-                              ).value
+                              ).value 
                             }
                           </div>
                         );
@@ -6971,6 +8149,7 @@ const UserMessage = ({
                             "sp_credit_card_payment"
                           ).value = value;
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -6986,6 +8165,7 @@ const UserMessage = ({
                       placeholder={creditCardPayment.card_number_placeholder}
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -7024,6 +8204,7 @@ const UserMessage = ({
                               .select();
                           }
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -7055,6 +8236,7 @@ const UserMessage = ({
                               .select();
                           }
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -7086,6 +8268,7 @@ const UserMessage = ({
                               .select();
                           }
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -7105,6 +8288,7 @@ const UserMessage = ({
                         placeholder={creditCardPayment.card_number_placeholder4}
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -7126,6 +8310,7 @@ const UserMessage = ({
                       placeholder={creditCardPayment.card_holder_placeholder}
                       onChange={(value) =>
                         onChangeValue(
+                          indexMessage,
                           indexContent,
                           content.type,
                           value,
@@ -7151,6 +8336,7 @@ const UserMessage = ({
                         )}
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -7166,6 +8352,7 @@ const UserMessage = ({
                         disabled={disabled}
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -7185,6 +8372,7 @@ const UserMessage = ({
                         disabled={disabled}
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -7204,6 +8392,7 @@ const UserMessage = ({
                         )}
                         onChange={(value) =>
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value,
@@ -7234,7 +8423,7 @@ const UserMessage = ({
                       value={creditCardPayment.cvc}
                       placeholder={creditCardPayment.cvc_placeholder}
                       onChange={(value) =>
-                        onChangeValue(indexContent, content.type, value, "cvc")
+                        onChangeValue(indexMessage,indexContent, content.type, value, "cvc")
                       }
                     />
                   </div>
@@ -7277,7 +8466,7 @@ const UserMessage = ({
                     style={{ width: "50%" }}
                     value={capture.value}
                     onChange={(value) =>
-                      onChangeValue(indexContent, content.type, value, "value")
+                      onChangeValue(indexMessage,indexContent, content.type, value, "value")
                     }
                   />
                   {/* {new DOMParser().parseFromString(capture.img, "text/xml").innerHTML} */}
@@ -7358,6 +8547,7 @@ const UserMessage = ({
                                         selectArr.push(itemProduct.id);
                                       }
                                       onChangeValue(
+                                        indexMessage,
                                         indexContent,
                                         content.type,
                                         selectArr,
@@ -7436,6 +8626,7 @@ const UserMessage = ({
                                           ) {
                                             selectArr.push(itemProduct.id);
                                             onChangeValue(
+                                              indexMessage,
                                               indexContent,
                                               content.type,
                                               selectArr,
@@ -7443,6 +8634,7 @@ const UserMessage = ({
                                             );
                                           }
                                           onChangeValue(
+                                            indexMessage,
                                             indexContent,
                                             content.type,
                                             value,
@@ -7472,6 +8664,7 @@ const UserMessage = ({
                                                     Number.MAX_SAFE_INTEGER)
                                                 ) {
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     itemProduct.quantity_select +
@@ -7493,6 +8686,7 @@ const UserMessage = ({
                                                     itemProduct.id
                                                   );
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     selectArr,
@@ -7518,6 +8712,7 @@ const UserMessage = ({
                                                   1
                                                 ) {
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     itemProduct.quantity_select -
@@ -7539,6 +8734,7 @@ const UserMessage = ({
                                                     itemProduct.id
                                                   );
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     selectArr,
@@ -7611,6 +8807,7 @@ const UserMessage = ({
                                         dataValue = [itemProduct.id];
                                       }
                                       onChangeValue(
+                                        indexMessage,
                                         indexContent,
                                         content.type,
                                         dataValue,
@@ -7692,6 +8889,7 @@ const UserMessage = ({
                                             value
                                           ) {
                                             onChangeValue(
+                                              indexMessage,
                                               indexContent,
                                               content.type,
                                               [itemProduct.id],
@@ -7699,6 +8897,7 @@ const UserMessage = ({
                                             );
                                           }
                                           onChangeValue(
+                                            indexMessage,
                                             indexContent,
                                             content.type,
                                             value,
@@ -7728,6 +8927,7 @@ const UserMessage = ({
                                                     Number.MAX_SAFE_INTEGER)
                                                 ) {
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     itemProduct.quantity_select +
@@ -7746,6 +8946,7 @@ const UserMessage = ({
                                                   )
                                                 ) {
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     [itemProduct.id],
@@ -7771,6 +8972,7 @@ const UserMessage = ({
                                                   1
                                                 ) {
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     itemProduct.quantity_select -
@@ -7789,6 +8991,7 @@ const UserMessage = ({
                                                   )
                                                 ) {
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     [itemProduct.id],
@@ -7866,6 +9069,7 @@ const UserMessage = ({
                                         selectArr.push(itemProduct.id);
                                       }
                                       onChangeValue(
+                                        indexMessage,
                                         indexContent,
                                         content.type,
                                         selectArr,
@@ -7928,6 +9132,7 @@ const UserMessage = ({
                                           ) {
                                             selectArr.push(itemProduct.id);
                                             onChangeValue(
+                                              indexMessage,
                                               indexContent,
                                               content.type,
                                               selectArr,
@@ -7935,6 +9140,7 @@ const UserMessage = ({
                                             );
                                           }
                                           onChangeValue(
+                                            indexMessage,
                                             indexContent,
                                             content.type,
                                             value,
@@ -7965,6 +9171,7 @@ const UserMessage = ({
                                                     Number.MAX_SAFE_INTEGER)
                                                 ) {
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     itemProduct.quantity_select +
@@ -7986,6 +9193,7 @@ const UserMessage = ({
                                                     itemProduct.id
                                                   );
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     selectArr,
@@ -8011,6 +9219,7 @@ const UserMessage = ({
                                                   1
                                                 ) {
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     itemProduct.quantity_select -
@@ -8032,6 +9241,7 @@ const UserMessage = ({
                                                     itemProduct.id
                                                   );
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     selectArr,
@@ -8086,6 +9296,7 @@ const UserMessage = ({
                               dataValue = [e.target.value];
                             }
                             onChangeValue(
+                              indexMessage,
                               indexContent,
                               content.type,
                               dataValue,
@@ -8164,6 +9375,7 @@ const UserMessage = ({
                                             value
                                           ) {
                                             onChangeValue(
+                                              indexMessage,
                                               indexContent,
                                               content.type,
                                               [itemProduct.id],
@@ -8171,6 +9383,7 @@ const UserMessage = ({
                                             );
                                           }
                                           onChangeValue(
+                                            indexMessage,
                                             indexContent,
                                             content.type,
                                             value,
@@ -8199,6 +9412,7 @@ const UserMessage = ({
                                                     Number.MAX_SAFE_INTEGER)
                                                 ) {
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     itemProduct.quantity_select +
@@ -8217,6 +9431,7 @@ const UserMessage = ({
                                                   )
                                                 ) {
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     [itemProduct.id],
@@ -8242,6 +9457,7 @@ const UserMessage = ({
                                                   1
                                                 ) {
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     itemProduct.quantity_select -
@@ -8260,6 +9476,7 @@ const UserMessage = ({
                                                   )
                                                 ) {
                                                   onChangeValue(
+                                                    indexMessage,
                                                     indexContent,
                                                     content.type,
                                                     [itemProduct.id],
@@ -8344,12 +9561,20 @@ const UserMessage = ({
                         disabled={disabled}
                         onChange={(value) => {
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value.target.value,
                             "initial_selection"
                           );
-                          if (messageContent.length === 1) onClickNext();
+                          if (messageContent.length === 1) {
+                            if (indexMessage === indexMessageRender){
+                              onClickNext()
+                            } else {
+                              console.log("davao");
+                              onClickNext2()
+                            }
+                          };
                         }}
                         value={productPurchaseRadioButton.initial_selection}
                       >
@@ -8427,12 +9652,19 @@ const UserMessage = ({
                         value={productPurchaseRadioButton.initial_selection}
                         onChange={(value) => {
                           onChangeValue(
+                            indexMessage,
                             indexContent,
                             content.type,
                             value.target.value,
                             "initial_selection"
                           );
-                          if (messageContent.length === 1) onClickNext();
+                          if (messageContent.length === 1) {
+                            if (indexMessage === indexMessageRender){
+                              onClickNext()
+                            } else {
+                              onClickNext2()
+                            }
+                          };
                         }}
                       >
                         {productPurchaseRadioButton.products.map(
@@ -8526,7 +9758,7 @@ const UserMessage = ({
                     disabled={disabled}
                     value={slider.value}
                     onChange={(value) =>
-                      onChangeValue(indexContent, content.type, value, "value")
+                      onChangeValue(indexMessage,indexContent, content.type, value, "value")
                     }
                     trackStyle={{ backgroundColor: slider.color || "#2C75F0" }}
                     min={
@@ -8618,6 +9850,7 @@ const UserMessage = ({
                                   dataValue = "";
                                 }
                                 onChangeValue(
+                                  indexMessage,
                                   indexContent,
                                   content.type,
                                   dataValue,
@@ -8629,6 +9862,7 @@ const UserMessage = ({
                                   dataValue
                                 ) {
                                   onChangeValue(
+                                    indexMessage,
                                     indexContent,
                                     content.type,
                                     true,
@@ -8638,13 +9872,21 @@ const UserMessage = ({
                                 } else {
                                   displayButtonNext(false);
                                   onChangeValue(
+                                    indexMessage,
                                     indexContent,
                                     content.type,
                                     false,
                                     "is_display_card_payment"
                                   );
-                                  if (messageContent.length === 1)
-                                    onClickNext();
+                                  if (messageContent.length === 1){
+                                    if (indexMessage === indexMessageRender){
+                                      onClickNext()
+                                     console.log( "indexMessage"," indexMessageRender")
+                                    } else {
+                                      console.log("davao");
+                                      onClickNext2()
+                                    }
+                                  }
                                 }
                               }}
                             >
@@ -8687,6 +9929,7 @@ const UserMessage = ({
                                   dataValue = "";
                                 }
                                 onChangeValue(
+                                  indexMessage,
                                   indexContent,
                                   content.type,
                                   dataValue,
@@ -8701,6 +9944,7 @@ const UserMessage = ({
                                   dataValue
                                 ) {
                                   onChangeValue(
+                                    indexMessage,
                                     indexContent,
                                     content.type,
                                     true,
@@ -8710,6 +9954,7 @@ const UserMessage = ({
                                 } else {
                                   displayButtonNext(false);
                                   onChangeValue(
+                                    indexMessage,
                                     indexContent,
                                     content.type,
                                     false,
@@ -8764,6 +10009,7 @@ const UserMessage = ({
                                           dataValue = "";
                                         }
                                         onChangeValue(
+                                          indexMessage,
                                           indexContent,
                                           content.type,
                                           dataValue,
@@ -8777,6 +10023,7 @@ const UserMessage = ({
                                           dataValue
                                         ) {
                                           onChangeValue(
+                                            indexMessage,
                                             indexContent,
                                             content.type,
                                             true,
@@ -8786,6 +10033,7 @@ const UserMessage = ({
                                         } else {
                                           displayButtonNext(false);
                                           onChangeValue(
+                                            indexMessage,
                                             indexContent,
                                             content.type,
                                             false,
@@ -8900,6 +10148,7 @@ const UserMessage = ({
                                 "sp_credit_card_payment"
                               ).value = value;
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -8911,12 +10160,13 @@ const UserMessage = ({
                           }}
                           // max={9999999999999999}
                           style={{ width: "100%", marginLeft: "0px" }}
-                          value={cardPaymentRadioButton.card_number}
+                          default_value={cardPaymentRadioButton.card_number}
                           placeholder={
                             cardPaymentRadioButton.card_number_placeholder
                           }
                           onChange={(value) =>
                             onChangeValue(
+                              indexMessage,
                               indexContent,
                               content.type,
                               value,
@@ -8957,6 +10207,7 @@ const UserMessage = ({
                                   .select();
                               }
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -8990,6 +10241,7 @@ const UserMessage = ({
                                   .select();
                               }
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -9023,6 +10275,7 @@ const UserMessage = ({
                                   .select();
                               }
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -9044,6 +10297,7 @@ const UserMessage = ({
                             }
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -9065,6 +10319,7 @@ const UserMessage = ({
                           value={cardPaymentRadioButton.card_holder}
                           onChange={(value) =>
                             onChangeValue(
+                              indexMessage,
                               indexContent,
                               content.type,
                               value,
@@ -9093,6 +10348,7 @@ const UserMessage = ({
                             )}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -9108,6 +10364,7 @@ const UserMessage = ({
                             disabled={disabled}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -9127,6 +10384,7 @@ const UserMessage = ({
                             disabled={disabled}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -9146,6 +10404,7 @@ const UserMessage = ({
                             )}
                             onChange={(value) =>
                               onChangeValue(
+                                indexMessage,
                                 indexContent,
                                 content.type,
                                 value,
@@ -9177,6 +10436,7 @@ const UserMessage = ({
                           placeholder={cardPaymentRadioButton.cvc_placeholder}
                           onChange={(value) =>
                             onChangeValue(
+                              indexMessage,
                               indexContent,
                               content.type,
                               value,

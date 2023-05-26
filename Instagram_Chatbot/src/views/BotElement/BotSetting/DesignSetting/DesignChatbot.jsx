@@ -855,8 +855,9 @@ function DesignChatbot() {
                                     <span className="error-message subtile"></span>
                                   </div>
                                 )}
-
-                                <div className="field-add-bot">
+{
+  positionPc === "1" && (
+<div className="field-add-bot">
                                   <div className="add-bot_field-container">
                                     <span className="label-field">
                                       ボタン内容{" "}
@@ -886,6 +887,9 @@ function DesignChatbot() {
                                   </div>
                                   <span className="error-message subtile"></span>
                                 </div>
+  )
+}
+                                
                                 <div className="field-add-bot">
                                   <div className="add-bot_field-container">
                                     <span className="label-field">
@@ -1109,37 +1113,41 @@ function DesignChatbot() {
                                     <span className="error-message subtile"></span>
                                   </div>
                                 )}
-
-                                <div className="field-add-bot">
-                                  <div className="add-bot_field-container">
-                                    <span className="label-field">
-                                      ボタン内容{" "}
-                                    </span>
-                                    <div
-                                      style={{ display: "flex", width: "100%" }}
-                                    >
-                                      <select
-                                        style={{
-                                          height: "40px",
-                                          width: "100%",
-                                          border: "1px solid #333",
-                                          borderRadius: "5px",
-                                          padding: "0 15px",
-                                        }}
-                                        value={buttonTypeSp}
-                                        onChange={(e) =>
-                                          setButtonTypeSp(e.target.value)
-                                        }
-                                      >
-                                        <option value={1}>
-                                          ボタンとタイトル
-                                        </option>
-                                        <option value={2}>ボタンのみ</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                  <span className="error-message subtile"></span>
-                                </div>
+{
+  positionSp === "1" && (
+    <div className="field-add-bot">
+    <div className="add-bot_field-container">
+      <span className="label-field">
+        ボタン内容{" "}
+      </span>
+      <div
+        style={{ display: "flex", width: "100%" }}
+      >
+        <select
+          style={{
+            height: "40px",
+            width: "100%",
+            border: "1px solid #333",
+            borderRadius: "5px",
+            padding: "0 15px",
+          }}
+          value={buttonTypeSp}
+          onChange={(e) =>
+            setButtonTypeSp(e.target.value)
+          }
+        >
+          <option value={1}>
+            ボタンとタイトル
+          </option>
+          <option value={2}>ボタンのみ</option>
+        </select>
+      </div>
+    </div>
+    <span className="error-message subtile"></span>
+  </div>
+  )
+}
+                               
                                 <div className="field-add-bot">
                                   <div className="add-bot_field-container">
                                     <span className="label-field">
