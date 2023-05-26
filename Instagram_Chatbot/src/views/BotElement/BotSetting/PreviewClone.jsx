@@ -5065,9 +5065,12 @@ const UserMessage = ({
   isPopUpZipCode,
   onChangeErrors,
   dataPrefectures,
+<<<<<<< HEAD
   onClickNext2,
-  onCheckIndex,
+  onCheckIndex
+=======
   variables
+>>>>>>> 62ec7d59b0fe5391d8df37bb6839dd2efaa1f054
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
