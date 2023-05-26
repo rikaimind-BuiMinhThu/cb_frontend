@@ -23,6 +23,7 @@ function Dashboard() {
   const [userTotal, setUserTotal] = useState();
   const [isAdminDeel, setIsAdminDeel] = useState(false);
   const [lineDataWithoutRole, setLineDataWithoutRole] = useState([]);
+  const client = JSON.parse(sessionStorage.getItem('client'));
 
   React.useEffect(() => {
     var cook = Cookies.get('user_role');
@@ -276,7 +277,7 @@ function Dashboard() {
             </a>
           </Col>
           <Col lg="3" md="6" sm="6">
-            <a href="/admin/keyword">
+          {client.is_instagram ? (<a href="/admin/keyword">
               <Card className="card-stats">
                 <CardBody>
                   <Row>
@@ -300,10 +301,10 @@ function Dashboard() {
                   <div className="stats"></div>
                 </CardFooter>
               </Card>
-            </a>
+            </a>) : ('')}
           </Col>
           <Col lg="3" md="6" sm="6">
-            <a href="/admin/chatbot">
+          {client.is_instagram ? (<a href="/admin/chatbot">
               <Card className="card-stats">
                 <CardBody>
                   <Row>
@@ -327,12 +328,12 @@ function Dashboard() {
                   <div className="stats"></div>
                 </CardFooter>
               </Card>
-            </a>
+            </a>) : ('')}
           </Col>
         </Row>
         <Row>
           <Col md="12">
-            <Card>
+            {client.is_instagram ? (<Card>
               <CardBody>
                 <div style={{ width: '100%', textAlign: 'center' }}>
                   <h3>概要</h3>
@@ -351,7 +352,7 @@ function Dashboard() {
                   <i className="fa fa-history" /> Updated 3 minutes ago
                 </div>
               </CardFooter>
-            </Card>
+            </Card>) : ('')}
           </Col>
         </Row>
         <Row>

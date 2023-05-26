@@ -1181,7 +1181,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 }
             } else if (contentArr[i].type === 'card_payment_radio_button'
                 && errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}`] !== messageError
-                && ((contentType?.initial_selection || contentType?.card_linked_setting) && contentType?.initial_selection === contentType?.card_linked_setting
+                && ((contentType?.initial_selection || contentType?.card_linked_setting.length > 0) && contentType?.card_linked_setting.includes(contentType?.initial_selection)
                     || (contentType?.initial_selection_picture || contentType?.card_linked_setting_picture) && contentType?.initial_selection_picture === contentType?.card_linked_setting_picture)) {
                 if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
                     || (contentType.is_hide_cvc !== true && stringNullOrEmpty(contentType.cvc))
@@ -1315,7 +1315,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             });
         }
         if (!dataMessages[indexMessageRender + 1]) return;
-        if (dataMessages[indexMessageRender + 1].belong_to === 'bot') {
+        if (dataMessages[indexMessageRender + 1].belong_to === 'user' || dataMessages[indexMessageRender + 1].belong_to === 'bot') {
             for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
                 if (dataMessages[i].hidden !== true) {
                     if (dataMessages[i].conditions) {
@@ -1606,6 +1606,71 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                 })
                             }
                         }
+                        function replaceVariable(content) {
+                            content = content.replaceAll(SCAN_REGEX, (text, variable) => {
+                                if (variables.length !== 0) {
+                                    let valueVar = "";
+                                    for (let j = 0; j < variables.length; j++) {
+                                        if (variables[j].variable_name === variable) {
+                                            valueVar = variables[j].default_value;
+                                        }
+                                    }
+                                    return valueVar;
+                                } else {
+                                    return "";
+                                }
+                            })
+                            return content;
+                        }
+                        dataMessages[indexMessageRender + 1].message_content.forEach((item, index) => {
+                            const dataMessageType = item.type;
+                            if (dataMessageType == 'label' && item.label && item.label.lbl_content) {
+                                item.label.lbl_content = replaceVariable(item.label.lbl_content);
+                            }
+                            if (dataMessageType == 'textarea' && item.textarea && item.textarea.invalid_input && item.textarea.invalid_input.content) {
+                                item.textarea.invalid_input.content = replaceVariable(item.textarea.invalid_input.content);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.urls && item.text_input.urls.placeholder) {
+                                item.text_input.urls.placeholder = replaceVariable(item.text_input.urls.placeholder);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.text && item.text_input.text.placeholderLeft) {
+                                item.text_input.text.placeholderLeft = replaceVariable(item.text_input.text.placeholderLeft);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.text && item.text_input.text.placeholderRight) {
+                                item.text_input.text.placeholderRight = replaceVariable(item.text_input.text.placeholderRight);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_address && item.text_input.email_address.placeholder) {
+                                item.text_input.email_address.placeholder = replaceVariable(item.text_input.email_address.placeholder);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_confirmation && item.text_input.email_confirmation.cfEmlAdd_confirm_email) {
+                                item.text_input.email_confirmation.cfEmlAdd_confirm_email = replaceVariable(item.text_input.email_confirmation.cfEmlAdd_confirm_email);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_confirmation && item.text_input.email_confirmation.cfEmlAdd_email) {
+                                item.text_input.email_confirmation.cfEmlAdd_email = replaceVariable(item.text_input.email_confirmation.cfEmlAdd_email);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number) {
+                                item.text_input.phone_number.number = replaceVariable(item.text_input.phone_number.number);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number1) {
+                                item.text_input.phone_number.number1 = replaceVariable(item.text_input.phone_number.number1);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number2) {
+                                item.text_input.phone_number.number2 = replaceVariable(item.text_input.phone_number.number2);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number3) {
+                                item.text_input.phone_number.number3 = replaceVariable(item.text_input.phone_number.number3);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.password && item.text_input.password.password) {
+                                item.text_input.password.password = replaceVariable(item.text_input.password.password);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.password_confirmation && item.text_input.password_confirmation.password) {
+                                item.text_input.password_confirmation.password = replaceVariable(item.text_input.password_confirmation.password);
+                            }
+                            if (dataMessageType == 'text_input' && item.text_input && item.text_input.password_confirmation && item.text_input.password_confirmation.confirm_password) {
+                                item.text_input.password_confirmation.confirm_password = replaceVariable(item.text_input.password_confirmation.confirm_password);
+                            }
+                            dataMessages[indexMessageRender + 1].message_content[index] = item;
+                        })
                         resolve({ ...dataMessages[indexMessageRender + 1] });
                     }, 1000);
                 }).then(data => {
@@ -1988,6 +2053,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     } else if (contentType === 'carousel') {
                         item.default_value = dataContentType[dataContentType.type].contents.find(item => item.id === value).title;
                         isSaveParam = true;
+                    } else if (field === 'text' && contentType === 'text_input' && dataContentType[field].isSplitInput) {
+                        item.default_value = `${dataContentType[field]?.valueLeft} ${dataContentType[field]?.valueRight}`
+                        isSaveParam = true;
                     } else if (contentType !== 'credit_card_payment') {
                         item.default_value = value;
                         isSaveParam = true;
@@ -2302,6 +2370,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                                     dataPrefectures={[...dataPrefectures]}
                                                     isPopUpZipCode={(isOpen, indexContent) => isPopUpZipCode(isOpen, indexContent)}
                                                     onChangeErrors={(field, value) => onChangeErrors(field, value)}
+                                                    variables={variables}
                                                 />
                                                 {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
                                                     && <div className="sp-user-message-button-action">
@@ -2325,7 +2394,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
 }
 
 const BotMessage = ({ content, index, botInfor }) => {
-
     const handleDownloadFile = (file) => {
         let link = document.createElement('a');
         link.href = file;
@@ -2411,7 +2479,7 @@ const BotMessage = ({ content, index, botInfor }) => {
     )
 }
 
-const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors, dataPrefectures }) => {
+const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, indexMessageRender, errorsProps, indexMessage, captcha, onClickNext, displayButtonNext, isPopUpZipCode, onChangeErrors, dataPrefectures, variables }) => {
     const [dataHour, setDataHour] = useState(dataHourFixed);
     const [dataYear, setDataYear] = useState(dataYearFixed);
     const [dataCity, setDataCity] = useState([]);
@@ -2439,7 +2507,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
             let message = messageContent[0];
             if ((message.type === 'card_payment_radio_button' && (stringNullOrEmpty(message?.[message.type]?.initial_selection) && stringNullOrEmpty(message?.[message.type]?.initial_selection_picture)))
                 || message.type === 'product_purchase_radio_button'
-                || (message.type === 'card_payment_radio_button' && (message?.[message.type].type !== "picture_radio" ? (stringNullOrEmpty(message?.[message.type]?.initial_selection) && message?.[message.type]?.card_linked_setting !== message?.[message.type]?.initial_selection)
+                || (message.type === 'card_payment_radio_button' && (message?.[message.type].type !== "picture_radio" ? (stringNullOrEmpty(message?.[message.type]?.initial_selection) && !message?.[message.type]?.card_linked_setting.includes(message?.[message.type]?.initial_selection))
                     : (stringNullOrEmpty(message?.[message.type]?.initial_selection_picture) && message?.[message.type]?.card_linked_setting_picture !== message?.[message.type]?.initial_selection_picture)))
                 || (message.type === 'carousel' && message?.[message.type].require)
                 || (message.type === 'radio_button' && !message[message.type].initial_selection)) {
@@ -2704,6 +2772,23 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
         // }
     }
 
+    function replaceVariable(content) {
+        content = content.replaceAll(SCAN_REGEX, (text, variable) => {
+            if (variables.length !== 0) {
+                let valueVar = "";
+                for (let j = 0; j < variables.length; j++) {
+                    if (variables[j].variable_name === variable) {
+                        valueVar = variables[j].default_value;
+                    }
+                }
+                return valueVar;
+            } else {
+                return "";
+            }
+        })
+        return content;
+    }
+
 
     return (
         <div className="ss-user-message__content-wrapper">
@@ -2729,6 +2814,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                 let cardPaymentRadioButton = content.card_payment_radio_button;
                 let variableSet = content.variable_set;
                 let labelNoTransition = content.label_no_transition;
+                if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
+                    content.textarea.invalid_input.content = replaceVariable(content.textarea.invalid_input.content);
+                }
 
                 return (
                     <React.Fragment key={indexContent}>
@@ -5100,7 +5188,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                                         }
                                                         onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
 
-                                                        if (cardPaymentRadioButton.card_linked_setting === dataValue) {
+                                                        if (cardPaymentRadioButton.card_linked_setting.includes( dataValue)) {
                                                             onChangeValue(indexContent, content.type, true, 'is_display_card_payment');
                                                             displayButtonNext(true);
                                                         } else {
@@ -5135,7 +5223,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                                         // if (cardPaymentRadioButton.card_linked_setting !== dataValue && messageContent.length === 1) {
                                                         //   onClickNext();
                                                         // }
-                                                        if (cardPaymentRadioButton.card_linked_setting === dataValue) {
+                                                        if (cardPaymentRadioButton.card_linked_setting.includes(dataValue)) {
                                                             onChangeValue(indexContent, content.type, true, 'is_display_card_payment');
                                                             displayButtonNext(true);
                                                         } else {
@@ -5188,7 +5276,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                             </div>
                                         })
                                     }
-                                    {(cardPaymentRadioButton.type !== "picture_radio" ? (cardPaymentRadioButton.card_linked_setting && cardPaymentRadioButton.card_linked_setting === cardPaymentRadioButton.initial_selection) : (cardPaymentRadioButton.card_linked_setting_picture && cardPaymentRadioButton.card_linked_setting_picture === cardPaymentRadioButton.initial_selection_picture)) &&
+                                    {(cardPaymentRadioButton.type !== "picture_radio" ? (cardPaymentRadioButton.card_linked_setting.length > 0 && cardPaymentRadioButton.card_linked_setting.includes(cardPaymentRadioButton.initial_selection)) : (cardPaymentRadioButton.card_linked_setting_picture && cardPaymentRadioButton.card_linked_setting_picture === cardPaymentRadioButton.initial_selection_picture)) &&
                                         <React.Fragment>
                                             {cardPaymentRadioButton.payment_method.length !== 0 &&
                                                 <div style={{ display: 'flex', justifyContent: 'flex-start', margin: '5px 0px' }}>

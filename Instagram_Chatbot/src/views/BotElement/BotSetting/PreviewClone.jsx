@@ -1857,9 +1857,9 @@ useEffect(()=>{
           `message${indexMessageRender}_content${i}_${contentArr[i].type}`
         ] !== messageError &&
         (((contentType?.initial_selection ||
-          contentType?.card_linked_setting) &&
-          contentType?.initial_selection ===
-            contentType?.card_linked_setting) ||
+          contentType?.card_linked_setting.length > 0) &&
+          contentType?.card_linked_setting.includes(contentType?.initial_selection)
+            ) ||
           ((contentType?.initial_selection_picture ||
             contentType?.card_linked_setting_picture) &&
             contentType?.initial_selection_picture ===
@@ -3039,9 +3039,7 @@ useEffect(()=>{
       message: renderMessageArr[indexMessage],
       user_id: uuid,
     };
-
-
-    if (dataMessages.length - 1 === indexMessageRender) {
+    if (dataMessages[indexMessageRender].message_content[0]?.text_input?.save_input_content === "pin_code") {
       await new Promise((resolve) => {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
@@ -3060,7 +3058,51 @@ useEffect(()=>{
             `/api/v1/scenario_users/scenario_user_responses/create_order`,
             data_submit
           )
-          .then((res) => {})
+          .then((res) => {
+            const conversion = {
+              scenario_data: `${deviceReceive}_conversion`,
+            };
+            api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
+            }).catch(err => {
+              console.log(err)
+            })
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired();
+            }
+          });
+      });
+    }
+    if (dataMessages.length - 1 === indexMessageRender ) {
+      await new Promise((resolve) => {
+        api
+          .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
+          .then((res) => {
+            resolve();
+          })
+          .catch((error) => {
+            console.log(error);
+            if (error.response?.data.code === 0) {
+              tokenExpired();
+            }
+          });
+      }).then(() => {
+        api
+          .post(
+            `/api/v1/scenario_users/scenario_user_responses/create_order`,
+            data_submit
+          )
+          .then((res) => {
+            const conversion = {
+              scenario_data: `${deviceReceive}_conversion`,
+            };
+            api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
+            }).catch(err => {
+              console.log(err)
+            })
+          })
           .catch((error) => {
             console.log(error);
             if (error.response?.data.code === 0) {
@@ -3086,7 +3128,7 @@ useEffect(()=>{
     }
 
     if (!dataMessages[indexMessageRender + 1]) return;
-    if (dataMessages[indexMessageRender + 1].belong_to === "bot") {
+    if (dataMessages[indexMessageRender + 1].belong_to === 'user' || dataMessages[indexMessageRender + 1].belong_to === 'bot') {
       for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
         if (dataMessages[i].hidden !== true) {
           if (dataMessages[i].conditions) {
@@ -3346,6 +3388,26 @@ useEffect(()=>{
                   }
                 })
                 .then(() => {
+                  if (dataMessages[i].message_content[0]?.text_input?.save_input_content === "pin_code") {
+                    data_submit = {
+                      scenario_id: scenarioId,
+                      user_id: uuid,
+                    };
+
+                    api
+                      .post(
+                        `/api/v1/scenario_users/scenario_user_responses/create_order`,
+                        data_submit
+                      )
+                      .then((res) => {})
+                      .catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                      });
+
+                  }
                   if (dataMessages.length - 1 === i) {
                     data_submit = {
                       scenario_id: scenarioId,
@@ -3497,6 +3559,71 @@ useEffect(()=>{
                   });
               }
             }
+            function replaceVariable(content) {
+              content = content.replaceAll(SCAN_REGEX, (text, variable) => {
+                  if (variables.length !== 0) {
+                      let valueVar = "";
+                      for (let j = 0; j < variables.length; j++) {
+                          if (variables[j].variable_name === variable) {
+                              valueVar = variables[j].default_value;
+                          }
+                      }
+                      return valueVar;
+                  } else {
+                      return "";
+                  }
+              })
+              return content;
+            }
+            dataMessages[indexMessageRender + 1].message_content.forEach((item, index) => {
+              const dataMessageType = item.type;
+              if (dataMessageType == 'label' && item.label && item.label.lbl_content) {
+                  item.label.lbl_content = replaceVariable(item.label.lbl_content);
+              }
+              if (dataMessageType == 'textarea' && item.textarea && item.textarea.invalid_input && item.textarea.invalid_input.content) {
+                  item.textarea.invalid_input.content = replaceVariable(item.textarea.invalid_input.content);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.urls && item.text_input.urls.placeholder) {
+                  item.text_input.urls.placeholder = replaceVariable(item.text_input.urls.placeholder);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.text && item.text_input.text.placeholderLeft) {
+                  item.text_input.text.placeholderLeft = replaceVariable(item.text_input.text.placeholderLeft);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.text && item.text_input.text.placeholderRight) {
+                  item.text_input.text.placeholderRight = replaceVariable(item.text_input.text.placeholderRight);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_address && item.text_input.email_address.placeholder) {
+                  item.text_input.email_address.placeholder = replaceVariable(item.text_input.email_address.placeholder);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_confirmation && item.text_input.email_confirmation.cfEmlAdd_confirm_email) {
+                  item.text_input.email_confirmation.cfEmlAdd_confirm_email = replaceVariable(item.text_input.email_confirmation.cfEmlAdd_confirm_email);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_confirmation && item.text_input.email_confirmation.cfEmlAdd_email) {
+                  item.text_input.email_confirmation.cfEmlAdd_email = replaceVariable(item.text_input.email_confirmation.cfEmlAdd_email);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number) {
+                  item.text_input.phone_number.number = replaceVariable(item.text_input.phone_number.number);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number1) {
+                  item.text_input.phone_number.number1 = replaceVariable(item.text_input.phone_number.number1);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number2) {
+                  item.text_input.phone_number.number2 = replaceVariable(item.text_input.phone_number.number2);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number3) {
+                  item.text_input.phone_number.number3 = replaceVariable(item.text_input.phone_number.number3);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.password && item.text_input.password.password) {
+                  item.text_input.password.password = replaceVariable(item.text_input.password.password);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.password_confirmation && item.text_input.password_confirmation.password) {
+                  item.text_input.password_confirmation.password = replaceVariable(item.text_input.password_confirmation.password);
+              }
+              if (dataMessageType == 'text_input' && item.text_input && item.text_input.password_confirmation && item.text_input.password_confirmation.confirm_password) {
+                  item.text_input.password_confirmation.confirm_password = replaceVariable(item.text_input.password_confirmation.confirm_password);
+              }
+              dataMessages[indexMessageRender + 1].message_content[index] = item;
+            })
             resolve({ ...dataMessages[indexMessageRender + 1] });
           }, 1000));
         }).then((data) => {
@@ -4052,6 +4179,9 @@ useEffect(()=>{
               dataContentType.type
             ].contents.find((item) => item.id === value).title;
             isSaveParam = true;
+          } else if (field === 'text' && contentType === 'text_input' && dataContentType[field].isSplitInput) {
+              item.default_value = `${dataContentType[field]?.valueLeft} ${dataContentType[field]?.valueRight}`
+              isSaveParam = true;
           } else if (contentType !== "credit_card_payment") {
             item.default_value = value;
             isSaveParam = true;
@@ -4101,10 +4231,10 @@ useEffect(()=>{
         let withdrawal = {
           scenario_data: `${deviceReceive}_close_chatbot_window`,
         };
-        // api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
-        // }).catch(err => {
-        //   console.log(err)
-        // })
+        api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+        }).catch(err => {
+          console.log(err)
+        })
       }, (indexTiming + i - indexMessageRender - 1) * 1000);
     } else if (
       botInfor?.withdrawal_prevention_status === "standard_exit_popup" ||
@@ -4217,18 +4347,18 @@ if (scenarioId && botInfor && isOpen  ){
                   let withdrawal = {
                     scenario_data: `${deviceReceive}_close_chatbot_window`,
                   };
-                  // api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
-                  // }).catch(err => {
-                  //   console.log(err)
-                  // })
+                  api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+                  }).catch(err => {
+                    console.log(err)
+                  })
                 } else {
                   let withdrawal = {
                     scenario_data: `${deviceReceive}_close_chatbot_window`,
                   };
-                  // api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
-                  // }).catch(err => {
-                  //   console.log(err)
-                  // })
+                  api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+                  }).catch(err => {
+                    console.log(err)
+                  })
                   onOpenPreview(false);
                 }
               }, (i - indexMessageRender) * 1000);
@@ -4574,6 +4704,7 @@ if (scenarioId && botInfor && isOpen  ){
                       onChangeErrors={(field, value) =>
                         onChangeErrors(field, value)
                       }
+                      variables={variables}
                     />
                     {(dataMessages[indexMessage].is_display_button_next !==
                     undefined
@@ -4934,8 +5065,12 @@ const UserMessage = ({
   isPopUpZipCode,
   onChangeErrors,
   dataPrefectures,
+<<<<<<< HEAD
   onClickNext2,
   onCheckIndex
+=======
+  variables
+>>>>>>> 62ec7d59b0fe5391d8df37bb6839dd2efaa1f054
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -4988,8 +5123,7 @@ const UserMessage = ({
         (message.type === "card_payment_radio_button" &&
           (message?.[message.type].type !== "picture_radio"
             ? stringNullOrEmpty(message?.[message.type]?.initial_selection) &&
-              message?.[message.type]?.card_linked_setting !==
-                message?.[message.type]?.initial_selection
+              !message?.[message.type]?.card_linked_setting.includes(message?.[message.type]?.initial_selection)
             : stringNullOrEmpty(
                 message?.[message.type]?.initial_selection_picture
               ) &&
@@ -5417,6 +5551,23 @@ const UserMessage = ({
     // }
   }
 
+  function replaceVariable(content) {
+    content = content.replaceAll(SCAN_REGEX, (text, variable) => {
+      if (variables.length !== 0) {
+          let valueVar = "";
+          for (let j = 0; j < variables.length; j++) {
+            if (variables[j].variable_name === variable) {
+              valueVar = variables[j].default_value;
+            }
+          }
+          return valueVar;
+      } else {
+          return "";
+      }
+    })
+    return content;
+  }
+
   return (
     <div className="ss-user-message__content-wrapper">
       {messageContent?.map((content, indexContent) => {
@@ -5441,6 +5592,10 @@ const UserMessage = ({
         let cardPaymentRadioButton = content.card_payment_radio_button;
         let variableSet = content.variable_set;
         let labelNoTransition = content.label_no_transition;
+
+        if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
+            content.textarea.invalid_input.content = replaceVariable(content.textarea.invalid_input.content);
+        }
 
         return (
           <React.Fragment key={indexContent}>
@@ -9858,8 +10013,7 @@ const UserMessage = ({
                                 );
 
                                 if (
-                                  cardPaymentRadioButton.card_linked_setting ===
-                                  dataValue
+                                  cardPaymentRadioButton.card_linked_setting.includes(dataValue)
                                 ) {
                                   onChangeValue(
                                     indexMessage,
@@ -9940,8 +10094,7 @@ const UserMessage = ({
                                 //   onClickNext();
                                 // }
                                 if (
-                                  cardPaymentRadioButton.card_linked_setting ===
-                                  dataValue
+                                  cardPaymentRadioButton.card_linked_setting(dataValue)
                                 ) {
                                   onChangeValue(
                                     indexMessage,
@@ -10067,9 +10220,8 @@ const UserMessage = ({
                     }
                   )}
                 {(cardPaymentRadioButton.type !== "picture_radio"
-                  ? cardPaymentRadioButton.card_linked_setting &&
-                    cardPaymentRadioButton.card_linked_setting ===
-                      cardPaymentRadioButton.initial_selection
+                  ? cardPaymentRadioButton.card_linked_setting.length > 0 &&
+                    cardPaymentRadioButton.card_linked_setting.includes(cardPaymentRadioButton.initial_selection)
                   : cardPaymentRadioButton.card_linked_setting_picture &&
                     cardPaymentRadioButton.card_linked_setting_picture ===
                       cardPaymentRadioButton.initial_selection_picture) && (

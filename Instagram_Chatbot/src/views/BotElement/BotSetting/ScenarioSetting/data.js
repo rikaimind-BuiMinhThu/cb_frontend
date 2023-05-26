@@ -36,7 +36,7 @@ let dataClone = {
             year_placeholder: '',
             cvc_placeholder: '',
             initial_selection: '',
-            card_linked_setting: '',
+            card_linked_setting: [],
             // initial_selection_radio_img: '',
             radio_contents: [
               {
