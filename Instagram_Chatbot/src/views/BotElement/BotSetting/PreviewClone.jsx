@@ -1997,7 +1997,7 @@ function Preview() {
       message: renderMessageArr[indexMessage],
       user_id: uuid,
     };
-    if (dataMessages[indexMessageRender].message_content[0]?.text_input?.save_input_content === "pin_code") {
+    if (dataMessages[indexMessageRender].message_content[0]?.text_input?.save_input_content === "create_order") {
       await new Promise((resolve) => {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
@@ -2346,7 +2346,7 @@ function Preview() {
                   }
                 })
                 .then(() => {
-                  if (dataMessages[i].message_content[0]?.text_input?.save_input_content === "pin_code") {
+                  if (dataMessages[i].message_content[0]?.text_input?.save_input_content === "create_order") {
                     data_submit = {
                       scenario_id: scenarioId,
                       user_id: uuid,
