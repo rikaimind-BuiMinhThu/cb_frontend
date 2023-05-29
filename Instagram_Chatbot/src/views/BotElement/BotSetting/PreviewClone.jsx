@@ -193,7 +193,7 @@ function Preview() {
   const [zipcode, setZipcode] = useState();
   const [indexContentZipcode, setContentZipcode] = useState();
   //new
-  const openBot = sessionStorage.getItem("openBot");
+
   const [buttonTypePc, setButtonTypePc] = useState("1");
   const [positionPc, setPositionPc] = useState("1");
   const [widthPc, setWidthPc] = useState(380);
@@ -244,13 +244,7 @@ function Preview() {
     })(navigator.userAgent || navigator.vendor || window.opera);
     return check;
   }
-  console.log(openBot);
-//set open from button
-useEffect(()=>{
-  if(openBot){
-    console.log("openBot",openBot);
-  }
-},[openBot])
+  
   //get chat bot setting
   useEffect(() => {
     let botIdGet = params.get("bot_id");
@@ -263,12 +257,13 @@ useEffect(()=>{
         setWidthSp(result?.width_sp?result?.width_sp:80);
         setHeightSp(result?.height_sp?result?.height_sp:580);
         setPositionPc(result?.position_pc ? result?.position_pc : "1");
-        if (result?.display_type && result?.display_type ==='1'){
+        if (result?.display_type && result?.display_type !=='2'){
           setIsOpen(true)
         } else {
           setIsOpen(false)
         }
         sessionStorage.setItem("chatbotH", result?.height_pc? result?.height_pc: 600);
+        sessionStorage.setItem("displayType", result?.display_type && result?.display_type);
         sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc? result?.bottom_margin_pc:10);
         sessionStorage.setItem("chatbotW", result?.width_pc? result?.width_pc:380);
         sessionStorage.setItem("chatbotRight", result?.right_margin_pc? result?.right_margin_pc : 30);
@@ -6052,7 +6047,6 @@ const UserMessage = ({
                                 if (indexMessage === indexMessageRender){
                                   onClickNext()
                                 } else {
-                                  console.log("davao");
                                   onClickNext2()
                                 }
                                 };
@@ -9722,7 +9716,6 @@ const UserMessage = ({
                             if (indexMessage === indexMessageRender){
                               onClickNext()
                             } else {
-                              console.log("davao");
                               onClickNext2()
                             }
                           };
@@ -10031,9 +10024,7 @@ const UserMessage = ({
                                   if (messageContent.length === 1){
                                     if (indexMessage === indexMessageRender){
                                       onClickNext()
-                                     console.log( "indexMessage"," indexMessageRender")
                                     } else {
-                                      console.log("davao");
                                       onClickNext2()
                                     }
                                   }

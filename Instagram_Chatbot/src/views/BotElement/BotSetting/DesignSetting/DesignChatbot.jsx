@@ -720,6 +720,7 @@ function DesignChatbot() {
                                       >
                                         <option value={1}>リロード</option>
                                         <option value={2}>非表示</option>
+                                        <option value={3}>ボタン押下</option>
                                       </select>
                                     </div>
                                   </div>

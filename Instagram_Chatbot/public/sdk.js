@@ -1,6 +1,7 @@
 let botId = sessionStorage.getItem("bot_id");
 let chatbotBottom = sessionStorage.getItem("chatbotBottom");
 let chatbotH = sessionStorage.getItem("chatbotH");
+let displayType = sessionStorage.getItem("displayType");
 let chatbotRight = sessionStorage.getItem("chatbotRight");
 let chatbotW = sessionStorage.getItem("chatbotW");
 let scenarioId = "";
@@ -98,14 +99,16 @@ async function displayPopup() {
     iframe.width = "100%";
     iframe.style.maxWidth = "100%";
     iframe.style.right = "0";
+    iframe.style.display = displayType=== 3|| displayType=== "3"? "none": "flex";
   } else {
+    iframe.style.display = displayType=== 3 ||  displayType=== "3"?  "none": "flex";
     iframe.width =
       chatbotW && chatbotRight
         ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
         : "400px";
     iframe.style.right = "10px";
   }
-
+  iframe.style.display = displayType=== 3 ||  displayType=== "3"? "none": "flex";
   iframe.id = "previewSdk";
   iframe.style.position = "fixed";
   iframe.style.bottom = "0";
