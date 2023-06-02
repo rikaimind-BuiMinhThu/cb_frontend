@@ -953,7 +953,17 @@ function Sidebar(props) {
                     </li>
                   </ul> */}
                 </li>
-
+                <li key={'chat-log'} >
+                      <NavLink
+                        to="/admin/bot-chat-log"
+                        className="nav-link"
+                        activeClassName="active"
+                        activeStyle={{ color: 'black' }}
+                      >
+                        <MDBIcon fas icon='fa fa-comments' style={{ color: 'black' }} />
+                        <p style={{ color: 'black' }}>Chat Logs</p>
+                      </NavLink>
+                    </li>
                 <li
                   className={
                     activeRoute('payment-management') +

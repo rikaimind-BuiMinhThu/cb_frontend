@@ -1,0 +1,922 @@
+import React, { useState, useEffect } from "react";
+import { Button, Card, CardBody, CardHeader, Col, Row } from "reactstrap";
+import DatePicker, { registerLocale } from "react-datepicker";
+import api from "api/api-management";
+import ja from "date-fns/locale/ja";
+import Cookies from "js-cookie";
+import { format } from "date-fns";
+import "assets/css/bot/bot-chat-log.css";
+import $ from "jquery";
+import BotMessage from "./BotMessage";
+import UserMessage from "./UserMessage";
+registerLocale("ja", ja);
+
+function BotChatLog() {
+  const botId = Cookies.get("bot_id");
+  const [scenarios, setScenarios] = useState([]);
+  const [chats, setChats] = useState([]);
+  const [conversions, setConversions] = useState([]);
+  const [selectScenario, setSelectScenario] = useState(null);
+  const [selectUserId, setSelectUserId] = useState(null);
+
+  const [searchUserId, setSearchUserId] = useState(null);
+  const [searchScenarioId, setSearchScenarioId] = useState(null);
+  const [searchDate, setSearchDate] = useState(null);
+  const [searchStartDate, setSearchStartDate] = useState(null);
+  const [searchEndDate, setSearchEndDate] = useState(null);
+  const [isShowSelectUserDate, setIsShowSelectUserDate] = useState(false);
+
+  useEffect(() => {
+    if (
+      Cookies.get("token") === undefined ||
+      Cookies.get("token") == null ||
+      Cookies.get("token") === ""
+    ) {
+      window.location.href = "/";
+    }
+    if (Cookies.get("is_auth") === "false") {
+      window.location.href = "/";
+    }
+  }, []);
+
+  useEffect(() => {
+    const params = {
+      sc_id: searchScenarioId ? parseInt(searchScenarioId) : null,
+      user_id: searchUserId,
+      date: searchDate ? searchDate.toISOString().slice(0, 10) : null,
+    };
+    api
+      .get(`/api/v1/managements/chat_log/${botId}/list`, params)
+      .then((res) => {
+        if (res.data.code === 1) {
+          setScenarios(res.data.scenarios);
+          var chatLength = res.data.chats.length;
+          for (var i = 0; i < chatLength; i++) {
+            res.data.chats[i].name = "ユーザー " + (chatLength - i);
+          }
+          setChats(res.data.chats);
+        }
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function onScenarioSearch(event) {
+    if (event.target.value === "all") setSearchScenarioId(null);
+    else setSearchScenarioId(event.target.value);
+  }
+
+  function pressSearchButton() {
+    const params = {
+      sc_id: searchScenarioId ? parseInt(searchScenarioId) : null,
+      user_id: searchUserId,
+      date: searchDate ? searchDate.toISOString().slice(0, 10) : null,
+    };
+    api
+      .get(`/api/v1/managements/chat_log/${botId}/list`, params)
+      .then((res) => {
+        if (res.data.code === 1) {
+          setScenarios(res.data.scenarios);
+          var chatLength = res.data.chats.length;
+          for (var i = 0; i < chatLength; i++) {
+            res.data.chats[i].name = "ユーザー " + (chatLength - i);
+          }
+          setChats(res.data.chats);
+        }
+      });
+  }
+
+  const [botInfor, setBotInfor] = useState();
+  const [dataMessages, setDataMessages] = useState([]);
+  const [dataVariables, setDataVariables] = useState([]);
+  const [variables, setVariables] = useState([]);
+
+  const [messageUser, setMessageUser] = useState([]);
+  const [indexMessageRender, setIndexMessageRender] = useState(0);
+  const [renderMessageArr, setRenderMessageArr] = useState([]);
+  const [indexUser, setIndexUser] = useState(0);
+  const [captcha, setCaptcha] = useState([]);
+  const [dataPrefectures, setDataPrefectures] = useState([]);
+
+  let SCAN_REGEX = /\{\{(.*?)\}\}/g;
+
+  const [objParam, setObjParam] = useState(() => {
+    let dataObj = {
+      current_url: window.location.href,
+      current_url_title: document.title,
+      user_id: Cookies.get("user_id"),
+      bot_id: Cookies.get("bot_id"),
+    };
+    $.getJSON("https://api.ipregistry.co/?key=tryout", function (data) {
+      dataObj.user_ip_address = data.ip;
+      dataObj.user_country = data.location.country.name;
+      dataObj.user_city = data.location.city;
+      dataObj.user_device = data.user_agent.device.type;
+      dataObj.user_browser = data.user_agent.name;
+      dataObj.user_agent = data.user_agent.header;
+      dataObj.start_datetime = new Date();
+    });
+    return dataObj;
+  });
+
+  function onSelectChat(item) {
+    setSelectUserId(item.user_input_id);
+    var sc = scenarios.find((s) => s.id === item.scenario_id);
+    sc.conversations = JSON.parse(sc.conversation).messages.sort(
+      (a, b) => a.id - b.id
+    );
+    setSelectScenario(sc);
+    api
+      .get(
+        `/api/v1/managements/chat_log/${item.scenario_id}/${item.user_input_id}`
+      )
+      .then((response) => {
+        if (response.data.code === 1) {
+          var conversations = response.data.conversations;
+          for (var i = 0; i < conversations.length; i++) {
+            if (
+              ["data_name", "zip_code_address", "birth_date"].includes(
+                conversations[i].data_input_name
+              )
+            ) {
+              let str;
+              if (conversations[i].string_value) {
+                str = conversations[i].string_value.replaceAll(SCAN_REGEX);
+              } else if (conversations[i].text_value) {
+                str = conversations[i].text_value.replaceAll(SCAN_REGEX);
+              }
+
+              conversations[i].content = JSON.parse(str ?? "");
+            }
+          }
+
+          setConversions(conversations);
+          console.log("conversations", conversations);
+
+          api
+            .get(
+              `/api/v1/managements/chatbots/${botId}/scenarios/${item.scenario_id}/preview`
+            )
+            .then(async (res) => {
+              if (res.data.code === 1) {
+                console.log("preview", res.data);
+                let messageArr = [];
+                if (res.data.data?.conversation?.messages?.length > 0) {
+                  messageArr = [...res.data.data?.conversation?.messages];
+                }
+                let variablesAll = res.data?.all_variables || [];
+                setDataVariables(variablesAll);
+                setDataMessages(messageArr);
+                if (res.data.chatbot) {
+                  let opacity_color, message_color, font_color;
+                  if (res.data.chatbot.main_color === "blue") {
+                    opacity_color = "#D6E0EF";
+                    message_color = "#3CACEF";
+                    font_color = "#fff";
+                  } else if (res.data.chatbot.main_color === "green") {
+                    opacity_color = "#DEEADB";
+                    message_color = "#9DDB7C";
+                    font_color = "#fff";
+                  } else if (res.data.chatbot.main_color === "orange") {
+                    opacity_color = "#F4E5DA";
+                    message_color = "#EF8D2F";
+                    font_color = "#fff";
+                  } else if (res.data.chatbot.main_color === "yellow") {
+                    opacity_color = "#F0EFEB";
+                    message_color = "#F3AA2D";
+                    res.data.chatbot.main_color = "#F6CA21";
+                    font_color = "#fff";
+                  } else if (res.data.chatbot.main_color === "pink") {
+                    opacity_color = "#EBDDE3";
+                    message_color = "#E65B83";
+                    res.data.chatbot.main_color = "#F170AA";
+                    font_color = "#fff";
+                  } else if (res.data.chatbot.main_color === "purple") {
+                    opacity_color = "#E9E8F1";
+                    message_color = "#AF82D5";
+                    res.data.chatbot.main_color = "#8C66D9";
+                    font_color = "#fff";
+                  } else if (res.data.chatbot.main_color === "black") {
+                    opacity_color = "#ECEDE8";
+                    message_color = "#fff";
+                    font_color = "#333333";
+                  } else if (res.data.chatbot.main_color === "white") {
+                    opacity_color = "#fff";
+                    message_color = "#F5F5F5";
+                    font_color = "#000";
+                  }
+                  res.data.chatbot.opacity_color = opacity_color;
+                  res.data.chatbot.message_color = message_color;
+                  res.data.chatbot.font_color = font_color;
+                }
+
+                setBotInfor(res.data.chatbot);
+                if (res.data.variables) {
+                  setVariables([...res.data.variables, ...variablesAll]);
+                  res.data.variables.forEach((item) => {
+                    objParam[item.variable_name] = item.default_value;
+                  });
+                }
+                setObjParam({ ...objParam });
+                let variables = [...res.data.variables];
+                let messageUserVar = messageArr.filter(
+                  (item) =>
+                    item.belong_to === "user" && item.message_content.length > 0
+                );
+                setMessageUser([...messageUserVar]);
+                let renderMessage = [];
+                let index;
+                const userMessageLength = messageArr.filter(
+                  (e) => e.belong_to === "user"
+                ).length;
+
+                let conversationIndex = 0;
+                for (let i = 0; i < messageArr.length; i++) {
+                  // if (messageArr[i].hidden !== true) {
+                  if (true) {
+                    if (messageArr[i].conditions?.length > 0) {
+                      var checked = true;
+                      for (
+                        let j = 0;
+                        j < messageArr[i].conditions.length;
+                        j++
+                      ) {
+                        let conditionItem = messageArr[i].conditions[j];
+                        if (j === 0) {
+                          if (conditionItem.condition === "include") {
+                            checked = objParam[
+                              conditionItem.nameCondition
+                            ].includes(conditionItem.inputCondition);
+                          } else if (conditionItem.condition === "is") {
+                            checked =
+                              objParam[conditionItem.nameCondition] ===
+                              conditionItem.inputCondition;
+                          } else if (
+                            conditionItem.condition === "not_include"
+                          ) {
+                            checked = !objParam[
+                              conditionItem.nameCondition
+                            ].includes(conditionItem.inputCondition);
+                          } else if (conditionItem.condition === "is_not") {
+                            checked =
+                              objParam[conditionItem.nameCondition] !==
+                              conditionItem.inputCondition;
+                          }
+                        } else if (conditionItem?.linkCondition === "and") {
+                          if (conditionItem.condition === "include") {
+                            checked =
+                              checked &&
+                              objParam[conditionItem.nameCondition].includes(
+                                conditionItem.inputCondition
+                              );
+                          } else if (conditionItem.condition === "is") {
+                            checked =
+                              checked &&
+                              objParam[conditionItem.nameCondition] ===
+                                conditionItem.inputCondition;
+                          } else if (
+                            conditionItem.condition === "not_include"
+                          ) {
+                            checked =
+                              checked &&
+                              !objParam[conditionItem.nameCondition].includes(
+                                conditionItem.inputCondition
+                              );
+                          } else if (conditionItem.condition === "is_not") {
+                            checked =
+                              checked &&
+                              objParam[conditionItem.nameCondition] !==
+                                conditionItem.inputCondition;
+                          }
+                        } else if (conditionItem?.linkCondition === "or") {
+                          if (conditionItem.condition === "include") {
+                            checked =
+                              checked ||
+                              objParam[conditionItem.nameCondition].includes(
+                                conditionItem.inputCondition
+                              );
+                          } else if (conditionItem.condition === "is") {
+                            checked =
+                              checked ||
+                              objParam[conditionItem.nameCondition] ===
+                                conditionItem.inputCondition;
+                          } else if (
+                            conditionItem.condition === "not_include"
+                          ) {
+                            checked =
+                              checked ||
+                              !objParam[conditionItem.nameCondition].includes(
+                                conditionItem.inputCondition
+                              );
+                          } else if (conditionItem.condition === "is_not") {
+                            checked =
+                              checked ||
+                              objParam[conditionItem.nameCondition] !==
+                                conditionItem.inputCondition;
+                          }
+                        }
+                      }
+                      if (checked === false) {
+                        if (messageArr[i].belong_to === "user")
+                          setIndexUser((prev) => prev + 1);
+                        // continue;
+                      }
+                    }
+                    if (
+                      messageArr[0].belong_to === "bot" &&
+                      messageArr[i].message_content.length > 0
+                    ) {
+                      if (messageArr[i]?.message_content[0]?.type === "delay") {
+                        if (
+                          messageArr[i]?.message_content[0]?.delay.typing_on
+                        ) {
+                          await new Promise((resolve) => {
+                            renderMessage.push({ ...messageArr[i] });
+                            setRenderMessageArr([...renderMessage]);
+                            resolve();
+                          }).then(() => {
+                            setIndexMessageRender(i);
+                            renderMessage.pop();
+                            renderMessage.push({});
+                            setRenderMessageArr([...renderMessage]);
+                          });
+                        } else {
+                          setIndexMessageRender(i);
+                        }
+                        index = i;
+                      } else if (
+                        messageArr[i]?.message_content[0]?.type === "email"
+                      ) {
+                        let emailId =
+                          messageArr[i]?.message_content[0][
+                            messageArr[i]?.message_content[0].type
+                          ].contentId;
+                        let variablesData = {};
+                        variablesAll.forEach((item) => {
+                          variablesData[item.variable_name] =
+                            item.default_value;
+                        });
+
+                        variables.forEach((item) => {
+                          variablesData[item.variable_name] =
+                            item.default_value;
+                        });
+                        renderMessage.push({});
+                        setRenderMessageArr([...renderMessage]);
+                        setIndexMessageRender(i);
+                        setVariables([...variables]);
+                        index = i;
+                      } else if (
+                        messageArr[i]?.message_content[0]?.type ===
+                        "variable_set"
+                      ) {
+                        if (variables.length !== 0) {
+                          let dataVarExist =
+                            messageArr[i]?.message_content[0][
+                              messageArr[i]?.message_content[0].type
+                            ].variables;
+                          variables.forEach((item) => {
+                            for (let z = 0; z < dataVarExist.length; z++) {
+                              if (item.variable_name === dataVarExist[z].key) {
+                                item.default_value = dataVarExist[z].value;
+                              }
+                            }
+                          });
+                          setVariables([...variables]);
+                        }
+                        renderMessage.push({});
+                        setRenderMessageArr([...renderMessage]);
+                        setIndexMessageRender(i);
+                        index = i;
+                      } else if (
+                        messageArr[i]?.message_content[0]?.type ===
+                        "clear_variable"
+                      ) {
+                        if (variables.length !== 0) {
+                          let dataVarExist =
+                            messageArr[i]?.message_content[0][
+                              messageArr[i]?.message_content[0].type
+                            ].variables;
+                          variables.forEach((item) => {
+                            for (let z = 0; z < dataVarExist.length; z++) {
+                              if (item.variable_name === dataVarExist[z]) {
+                                item.default_value = "";
+                              }
+                            }
+                          });
+                          setVariables([...variables]);
+                        }
+                        renderMessage.push({});
+                        setRenderMessageArr([...renderMessage]);
+                        setIndexMessageRender(i);
+                        index = i;
+                      } else if (
+                        messageArr[i]?.message_content[0]?.type === "pause"
+                      ) {
+                        renderMessage.push({});
+                        setRenderMessageArr([...renderMessage]);
+                        setIndexMessageRender(i);
+                        index = i;
+                        break;
+                      } else if (messageArr[i].belong_to !== "bot") {
+                        for (
+                          let j = 0;
+                          j < messageArr[i].message_content.length;
+                          j++
+                        ) {
+                          if (
+                            messageArr[i].message_content[j].type === "capture"
+                          ) {
+                            api
+                              .get(
+                                `https://svg-captcha-nodejs.vercel.app/captcha?size=${
+                                  messageArr[i].message_content[j][
+                                    messageArr[i].message_content[j].type
+                                  ].length
+                                }${
+                                  messageArr[i].message_content[j][
+                                    messageArr[i].message_content[j].type
+                                  ].colour
+                                    ? "&color=true"
+                                    : ""
+                                }&charPreset=${
+                                  messageArr[i].message_content[j][
+                                    messageArr[i].message_content[j].type
+                                  ].type
+                                }`
+                              )
+                              .then((res) => {
+                                captcha.push({
+                                  index: i,
+                                  indexContent: j,
+                                  ...res.data,
+                                });
+                                setCaptcha([...captcha]);
+                              })
+                              .catch((error) => {
+                                console.log(error);
+                              });
+                            // break;
+                          }
+                        }
+
+                        renderMessage.push(messageArr[i]);
+                        setIndexMessageRender(i);
+                        setRenderMessageArr([...renderMessage]);
+                        setIndexUser((prev) => prev + 1);
+                        index = i;
+                        // break;
+                      } else {
+                        if (
+                          messageArr[i].message_content[0]?.type ===
+                            "text_input" &&
+                          messageArr[i].message_content[0].text_input.content
+                        ) {
+                          messageArr[i].message_content[0].text_input.content =
+                            messageArr[
+                              i
+                            ].message_content[0].text_input.content.replaceAll(
+                              SCAN_REGEX,
+                              (text, variable) => {
+                                if (variables.length !== 0) {
+                                  let valueVar = "";
+                                  for (let j = 0; j < variables.length; j++) {
+                                    if (
+                                      variables[j].variable_name === variable
+                                    ) {
+                                      valueVar = variables[j].default_value;
+                                    }
+                                  }
+                                  return valueVar;
+                                } else {
+                                  return "";
+                                }
+                              }
+                            );
+                        }
+
+                        setIndexMessageRender(i);
+                        renderMessage.push(messageArr[i]);
+                        setRenderMessageArr([...renderMessage]);
+                      }
+                    } else if (
+                      messageArr[0].belong_to === "user" &&
+                      messageArr[i].message_content.length > 0
+                    ) {
+                      for (
+                        let j = 0;
+                        j < messageArr[i].message_content.length;
+                        j++
+                      ) {
+                        if (
+                          messageArr[i].message_content[j].type === "capture"
+                        ) {
+                          api
+                            .get(
+                              `https://svg-captcha-nodejs.vercel.app/captcha?size=${
+                                messageArr[i].message_content[j][
+                                  messageArr[i].message_content[j].type
+                                ].length
+                              }${
+                                messageArr[i].message_content[j][
+                                  messageArr[i].message_content[j].type
+                                ].colour
+                                  ? "&color=true"
+                                  : ""
+                              }&charPreset=${
+                                messageArr[i].message_content[j][
+                                  messageArr[i].message_content[j].type
+                                ].type
+                              }`
+                            )
+                            .then((res) => {
+                              captcha.push({
+                                index: i,
+                                indexContent: j,
+                                ...res.data,
+                              });
+                              setCaptcha([...captcha]);
+                            })
+                            .catch((error) => {
+                              console.log(error);
+                            });
+                        }
+                      }
+                      setIndexMessageRender(i);
+                      renderMessage.push(messageArr[i]);
+                      setRenderMessageArr([...renderMessage]);
+
+                      setIndexUser((prev) => prev + 1);
+                      // break;
+                    }
+                    // }
+                  }
+                  if (messageArr[i]?.belong_to === "user") {
+                    if (userMessageLength > conversations.length) {
+                      if (conversationIndex === conversations.length) {
+                        break;
+                      }
+                    }
+                    for (
+                      let msIndex = 0;
+                      msIndex < messageArr[i].message_content.length;
+                      msIndex++
+                    ) {
+                      const element = messageArr[i].message_content[msIndex];
+//TODO: find message type 
+                      let chat = conversations.find(
+                        (c) =>
+                          c?.data_input_name ===
+                          element[element.type]?.save_input_content
+                      );
+                      if (element.type === "radio_button") {
+                        let chat = conversations.find(
+                          (c) =>
+                            c?.data_input_name ===
+                            element?.radio_button?.save_input_content
+                        );
+                        if (chat) {
+                          if (chat.integer_value) {
+                            element.initial_selection = chat.integer_value;
+                          } else if (chat.boolean_value) {
+                            element.initial_selection = chat.boolean_value;
+                          }
+                        }
+                      }
+                      if (element.type === "pull_down") {
+                        let chat = conversations.find(
+                          (c) =>
+                            c?.data_input_name ===
+                            element?.pull_down?.save_input_content
+                        );
+                        if (chat) {
+                          if (chat.integer_value) {
+                            element.initial_selection = chat.integer_value;
+                          }
+                        }
+                      }
+                    }
+                    setRenderMessageArr(messageArr);
+                    conversationIndex++;
+                  }
+                }
+                // setIndexMessageRender(index);
+                // setRenderMessageArr(renderMessage);
+                console.log(renderMessage);
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      });
+  }
+
+  return (
+    <>
+      <div className="content">
+        <Row id="screenAll">
+          <Col md="12">
+            <Card>
+              <CardHeader>
+                <div className="div-add-bot">
+                  <div className="div-add-bot--search">
+                    <div className="bm_status-filter">
+                      <h6>Scenario</h6>&ensp;
+                      <select
+                        style={{
+                          borderRadius: "5px",
+                          border: "1px solid #7186a0",
+                          width: "max-content",
+                          padding: "6.5px 0px 6.5px 0px",
+                        }}
+                        className="input-field"
+                        defaultValue="all"
+                        name="scenarioSearch"
+                        id="scenarioSearch"
+                        onChange={onScenarioSearch}
+                      >
+                        <option value="all">すべて</option>
+                        {scenarios.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div style={{ width: "max-content", display: "flex" }}>
+                      <span style={{ marginLeft: "20px", paddingRight: "5px" }}>
+                        Date
+                      </span>
+                      <DatePicker
+                        selected={searchDate && searchDate}
+                        onChange={(date) => setSearchDate(date)}
+                        dateFormat="yyyy/MM/dd"
+                        locale="ja"
+                        value={
+                          searchDate
+                            ? searchDate
+                                .toISOString()
+                                .slice(0, 10)
+                                .replaceAll("-", "/")
+                            : null
+                        }
+                        placeholderText="yyyy/mm/dd"
+                      />
+                    </div>
+                    <h6>UserId</h6>&ensp;
+                    <input
+                      type="text"
+                      placeholder="ボット名 ..."
+                      onChange={(e) => {
+                        if (e.target.value) {
+                          setSearchUserId(e.target.value);
+                          setIsShowSelectUserDate(true);
+                        } else {
+                          setSearchUserId(null);
+                          setIsShowSelectUserDate(false);
+                        }
+                      }}
+                    />
+                    <div style={{ marginLeft: "20px" }}>
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <div style={{ borderRadius: "5px", padding: "5px" }}>
+                          <DatePicker
+                            selected={searchStartDate && searchStartDate}
+                            onChange={(date) => setSearchStartDate(date)}
+                            dateFormat="yyyy/MM/dd"
+                            locale="ja"
+                            value={
+                              searchStartDate
+                                ? searchStartDate
+                                    .toISOString()
+                                    .slice(0, 10)
+                                    .replaceAll("-", "/")
+                                : null
+                            }
+                            disabled={!isShowSelectUserDate}
+                            placeholderText="yyyy/mm/dd"
+                          />
+                        </div>
+                        <h4
+                          style={{
+                            margin: "0",
+                            fontWeight: "400",
+                            fontSize: "1.2em",
+                          }}
+                        >
+                          から
+                        </h4>
+                        <div style={{ borderRadius: "5px", padding: "5px" }}>
+                          <DatePicker
+                            selected={searchEndDate}
+                            onChange={(date) => setSearchEndDate(date)}
+                            dateFormat="yyyy/MM/dd"
+                            locale="ja"
+                            value={
+                              searchEndDate
+                                ? searchEndDate
+                                    .toISOString()
+                                    .slice(0, 10)
+                                    .replaceAll("-", "/")
+                                : null
+                            }
+                            disabled={!isShowSelectUserDate}
+                            placeholderText="yyyy/mm/dd"
+                          />
+                        </div>
+                        まで
+                      </div>
+                      <span
+                        id="dateCheckErrMsg"
+                        style={{ color: "red", display: "none" }}
+                      ></span>
+                    </div>
+                  </div>
+
+                  <Button
+                    style={{ backgroundColor: "#66615b" }}
+                    onClick={(e) => pressSearchButton()}
+                  >
+                    検索
+                  </Button>
+                </div>
+                <div
+                  style={{
+                    width: "100%",
+                    height: "1px",
+                    backgroundColor: "gray",
+                    opacity: 0.3,
+                  }}
+                ></div>
+              </CardHeader>
+              <CardBody
+                style={{
+                  display: "flex",
+                  justifyContent: "start",
+                  alignItems: "stretch",
+                  width: "100%",
+                  height: "700px",
+                  padding: "10px 15px",
+                }}
+              >
+                <div className="left-column">
+                  <div
+                    style={{
+                      backgroundColor: "#f2f2f6",
+                      padding: "5px 0px",
+                      borderBottom: ".5px solid #dbdbdb",
+                    }}
+                  >
+                    <span
+                      id="user_header_title"
+                      style={{ marginLeft: "10px", border: "" }}
+                    >
+                      会話（{chats.length}人）
+                    </span>
+                  </div>
+                  <div style={{ overflowY: "scroll", maxHeight: "647px" }}>
+                    <ul
+                      style={{ listStyle: "none", paddingInlineStart: "5px" }}
+                    >
+                      {chats.map((item) => (
+                        <li
+                          key={item.scenario_id + "_" + item.user_input_id}
+                          style={{
+                            paddingTop: "10px",
+                            paddingBottom: "10px",
+                            paddingLeft: "2px",
+                            minWidth: "180px",
+                          }}
+                        >
+                          <button
+                            className="button"
+                            onClick={(e) => onSelectChat(item)}
+                            style={
+                              item.scenario_id === selectScenario?.id &&
+                              item.user_input_id === selectUserId
+                                ? {
+                                    borderLeft: "2px solid #57c8f1",
+                                    backgroundColor: "#fafafa",
+                                  }
+                                : { paddingLeft: "2px" }
+                            }
+                          >
+                            <div style={{ display: "grid" }}>
+                              <p style={{ marginBottom: "1px" }}>{item.name}</p>
+                              <p style={{ marginBottom: "1px" }}>
+                                {" "}
+                                {format(
+                                  new Date(item.newest),
+                                  "yyyy-MM-dd HH:mm"
+                                )}{" "}
+                              </p>
+                            </div>
+                            <div className="info">
+                              <i
+                                className="fa fa-info-circle fa-2"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  console.log(item.user_input_id);
+                                }}
+                              ></i>
+                            </div>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="right-column">
+                  {selectScenario ? (
+                    <>
+                      <div
+                        id="csp-body"
+                        className="sp-body csp-body chat-area"
+                        // style={{ backgroundColor: botInfor?.opacity_color }}
+                      >
+                        {renderMessageArr.map((message, indexMessage) => {
+                          return (
+                            <React.Fragment key={indexMessage}>
+                              {message.belong_to === "bot" &&
+                                message?.message_content.map(
+                                  (content, index) => {
+                                    return (
+                                      <BotMessage
+                                        key={index}
+                                        content={content}
+                                        index={index}
+                                        botInfor={botInfor}
+                                      />
+                                    );
+                                  }
+                                )}
+                              {message.belong_to === "user" && (
+                                <div className="sp-body-user-side csp-body-user-side slideLeft">
+                                  <div className="sp-body-user-side-messages csp-body-user-side-messages">
+                                    <UserMessage
+                                      captcha={captcha}
+                                      messageContentProps={
+                                        message.message_content
+                                      }
+                                      disabled={message.disabled}
+                                      onChangeValue={(
+                                        indexContent,
+                                        contentType,
+                                        value,
+                                        field,
+                                        subFiled,
+                                        name
+                                      ) => {}}
+                                      indexMessageRender={indexMessageRender}
+                                      indexMessage={indexMessage}
+                                      displayButtonNext={(value) => {
+                                        dataMessages[
+                                          indexMessage
+                                        ].is_display_button_next = value;
+                                        setDataMessages([...dataMessages]);
+                                      }}
+                                      dataPrefectures={[...dataPrefectures]}
+                                      variables={variables}
+                                    />
+                                    {(dataMessages[indexMessage]
+                                      ?.is_display_button_next !== undefined
+                                      ? dataMessages[indexMessage]
+                                          .is_display_button_next
+                                      : true) && (
+                                      <div className="sp-user-message-button-action">
+                                        <Button
+                                          disabled={true}
+                                          style={{
+                                            backgroundColor:
+                                              botInfor?.main_color,
+                                            borderRadius: "25px",
+                                          }}
+                                          className="ss-user-message__action-btn"
+                                        >
+                                          {message.buttonName || "次へ"}
+                                        </Button>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+      </div>
+    </>
+  );
+}
+
+export default BotChatLog;

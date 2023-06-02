@@ -49,6 +49,7 @@ import PaymentGateway from 'views/BotElement/BotSetting/Payment/PaymentGateway';
 import AddPaymentGateway from 'views/BotElement/BotSetting/Payment/AddPaymentGateway';
 import ReplyMailManagement from 'views/BotElement/ReplyMailManagement';
 import DesignChatbot from 'views/BotElement/BotSetting/DesignSetting/DesignChatbot';
+import BotChatLog from 'views/BotElement/BotSetting/Report/ChatLog/BotChatLog';
 
 var routes = [
   {
@@ -434,6 +435,12 @@ var routes = [
     name: 'ボットAdmin',
     // icon: "nc-icon nc-single-02",
     component: BotAdmin,
+    layout: '/admin',
+  },
+  {
+    path: '/bot-chat-log',
+    name: 'Chat logs',
+    component: BotChatLog,
     layout: '/admin',
   },
 ];
