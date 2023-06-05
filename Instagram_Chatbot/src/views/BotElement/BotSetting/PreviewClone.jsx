@@ -4926,6 +4926,7 @@ else {
 }
 
 const BotMessage = ({ content, index, botInfor }) => {
+console.log(content);
   const handleDownloadFile = (file) => {
     let link = document.createElement("a");
     link.href = file;
@@ -4941,6 +4942,7 @@ const BotMessage = ({ content, index, botInfor }) => {
     <div key={index} className="sp-body-bot-side slideRight">
       {(content.type === "text_input" ||
         content.type === "file" ||
+        content.type === "script" ||
         content.type === "delay") && (
         <div className="sp-body-bot-side-avatar sp-avatar">
           <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} />
@@ -5040,6 +5042,10 @@ const BotMessage = ({ content, index, botInfor }) => {
                 }}
               />
             )}
+            
+         {content.type === "script" && (
+            <div dangerouslySetInnerHTML={{ __html: content.script?.content }} />
+            )}
           </React.Fragment>
         )}
       </div>
@@ -5074,8 +5080,16 @@ const UserMessage = ({
   const [bot_id, setBotId] = useState(Cookies.get("bot_id"));
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
-
-
+  function getParamFromURL(paramName) {
+    const url = new URL(window.location.href);
+    const regex = new RegExp(`[?&]${paramName}=([^&#]*)`);
+    const match = url.search.match(regex);
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+  
+  // Sử dụng
+  const clientId = getParamFromURL('clientId');
+  console.log(clientId);
   function loadCaptcha(indexContent) {
     if (
       document.getElementById(`captcha-${indexMessage}-${indexContent}`) &&
@@ -6081,7 +6095,13 @@ const UserMessage = ({
                                 item.id,
                                 "initial_selection"
                               );
-                              if (messageContent.length === 1) onClickNext();
+                              if (messageContent.length === 1){
+                                if (indexMessage === indexMessageRender){
+                                  onClickNext()
+                                } else {
+                                  onClickNext2()
+                                }
+                                };
                             }}
                           />
                           <img src={item.img} alt="" />
@@ -6148,7 +6168,13 @@ const UserMessage = ({
                                 item.id,
                                 "initial_selection"
                               );
-                              if (messageContent.length === 1) onClickNext();
+                              if (messageContent.length === 1){
+                                if (indexMessage === indexMessageRender){
+                                  onClickNext()
+                                } else {
+                                  onClickNext2()
+                                }
+                                };
                             }}
                           >
                             <span>{item.text}</span>
