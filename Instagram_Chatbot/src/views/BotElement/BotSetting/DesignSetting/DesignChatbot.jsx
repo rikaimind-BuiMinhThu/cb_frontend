@@ -130,14 +130,14 @@ function DesignChatbot() {
       let reader = new FileReader();
       let baseString;
       setBotImage(process.env.REACT_APP_API_CHATBOT_URL / `${cbImage}`);
-      // reader.onloadend = function () {
-      //   baseString = reader.result;
-      //   setBotImage(baseString);
-      //   if (baseString !== undefined || baseString !== "") {
-      //     document.querySelector(".error-message.bot-image").style.display =
-      //       "none";
-      //   }
-      // };
+      reader.onloadend = function () {
+        baseString = reader.result;
+        setBotImage(baseString);
+        if (baseString !== undefined || baseString !== "") {
+          document.querySelector(".error-message.bot-image").style.display =
+            "none";
+        }
+      };
       reader.readAsDataURL(file);
       return true;
     } else {
@@ -189,6 +189,7 @@ function DesignChatbot() {
   }, [mainColor, tabmenu]);
   //get chat bot information
   useEffect(() => {
+    // document.querySelector(".icons .icon.active")?.classList?.remove("active");
     api.get(`/api/v1/managements/chatbots/${botId}`).then((response) => {
       if (response.data.data) {
         const result = JSON.parse(response.data.data?.design_settings);
@@ -246,18 +247,19 @@ function DesignChatbot() {
     document
       .querySelector(".main-colors .color.color-0")
       .classList.add("active");
-    document.querySelector(".icons .icon.icon-0").classList.add("active");
+    // document.querySelector(".icons .icon.icon-0").classList.add("active");
     setBotId(Cookies.get("bot_id"));
   }, []);
   // update bot chat
   const addUpdateBotChat = () => {
-    if (title && subtitle && botName) {
-      let iconBot = "";
+    let iconBot = "";
       if (botImage === "") {
         iconBot = IconManDefault;
       } else {
         iconBot = botImage;
       }
+    if (title && subtitle && botName ) {
+      
       let main_color = {
         blue: "#327AED",
         green: "#26B197",
@@ -274,18 +276,31 @@ function DesignChatbot() {
           color = key;
         }
       });
-      var bot = {
-        chatbot: {
-          title: title,
-          subtitle: subtitle,
-          design_type: designType,
-          main_color: color,
-          // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
-          icon: iconBot,
-          bot_name: botName,
-        },
-      };
-
+      if (iconBot.includes("image/png;base64")||iconBot.includes("image/jpeg;base64")||iconBot.includes("image/jpg;base64")){
+        var bot = {
+          chatbot: {
+            title: title,
+            subtitle: subtitle,
+            design_type: designType,
+            main_color: color,
+            // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
+            icon: iconBot,
+            bot_name: botName,
+          },
+        };
+      } else {
+        var bot = {
+          chatbot: {
+            title: title,
+            subtitle: subtitle,
+            design_type: designType,
+            main_color: color,
+            // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
+  
+            bot_name: botName,
+          },
+        };
+      }
       api
         .put(`api/v1/managements/chatbots/${botId}`, bot)
         .then((res) => {
@@ -309,6 +324,7 @@ function DesignChatbot() {
           }
         });
     } else {
+
       if (!title) {
         document.querySelector(".error-message.title").innerHTML =
           "タイトルは、必ず指定してください。";
@@ -603,7 +619,6 @@ function DesignChatbot() {
                                       className={`icon icon-${index}`}
                                       onClick={() => {
                                         toDataURL(icon).then((dataUrl) => {
-                                          console.log(dataUrl);
                                         });
                                         handleIconClick(index, icon);
                                       }}
@@ -614,13 +629,13 @@ function DesignChatbot() {
                                 </div>
                                 <div className="add-icon">
                                   <span>+</span>
-                                  {/* <input
+                                  <input
                                     type="file"
                                     id="bot_image"
                                     onChange={getBaseUrlAdd}
                                     name="bot_image"
                                     accept="image/png, image/jpeg"
-                                  /> */}
+                                  />
                                 </div>
                               </div>
                               <span className="error-message bot-image"></span>
@@ -720,6 +735,7 @@ function DesignChatbot() {
                                       >
                                         <option value={1}>リロード</option>
                                         <option value={2}>非表示</option>
+                                        <option value={3}>ボタン押下</option>
                                       </select>
                                     </div>
                                   </div>
@@ -855,8 +871,9 @@ function DesignChatbot() {
                                     <span className="error-message subtile"></span>
                                   </div>
                                 )}
-
-                                <div className="field-add-bot">
+{
+  positionPc === "1" && (
+<div className="field-add-bot">
                                   <div className="add-bot_field-container">
                                     <span className="label-field">
                                       ボタン内容{" "}
@@ -886,6 +903,9 @@ function DesignChatbot() {
                                   </div>
                                   <span className="error-message subtile"></span>
                                 </div>
+  )
+}
+                                
                                 <div className="field-add-bot">
                                   <div className="add-bot_field-container">
                                     <span className="label-field">
@@ -1109,37 +1129,41 @@ function DesignChatbot() {
                                     <span className="error-message subtile"></span>
                                   </div>
                                 )}
-
-                                <div className="field-add-bot">
-                                  <div className="add-bot_field-container">
-                                    <span className="label-field">
-                                      ボタン内容{" "}
-                                    </span>
-                                    <div
-                                      style={{ display: "flex", width: "100%" }}
-                                    >
-                                      <select
-                                        style={{
-                                          height: "40px",
-                                          width: "100%",
-                                          border: "1px solid #333",
-                                          borderRadius: "5px",
-                                          padding: "0 15px",
-                                        }}
-                                        value={buttonTypeSp}
-                                        onChange={(e) =>
-                                          setButtonTypeSp(e.target.value)
-                                        }
-                                      >
-                                        <option value={1}>
-                                          ボタンとタイトル
-                                        </option>
-                                        <option value={2}>ボタンのみ</option>
-                                      </select>
-                                    </div>
-                                  </div>
-                                  <span className="error-message subtile"></span>
-                                </div>
+{
+  positionSp === "1" && (
+    <div className="field-add-bot">
+    <div className="add-bot_field-container">
+      <span className="label-field">
+        ボタン内容{" "}
+      </span>
+      <div
+        style={{ display: "flex", width: "100%" }}
+      >
+        <select
+          style={{
+            height: "40px",
+            width: "100%",
+            border: "1px solid #333",
+            borderRadius: "5px",
+            padding: "0 15px",
+          }}
+          value={buttonTypeSp}
+          onChange={(e) =>
+            setButtonTypeSp(e.target.value)
+          }
+        >
+          <option value={1}>
+            ボタンとタイトル
+          </option>
+          <option value={2}>ボタンのみ</option>
+        </select>
+      </div>
+    </div>
+    <span className="error-message subtile"></span>
+  </div>
+  )
+}
+                               
                                 <div className="field-add-bot">
                                   <div className="add-bot_field-container">
                                     <span className="label-field">
