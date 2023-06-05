@@ -51,7 +51,6 @@ function DesignChatbot() {
   const [subtitle, setSubtitle] = useState("");
   const [designType, setDesignType] = useState("flat");
   const [botImage, setBotImage] = useState("");
-  console.log(botImage);
   const [botName, setBotName] = useState("");
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [msgNoti, setMsgNoti] = useState("");

@@ -5089,7 +5089,6 @@ const UserMessage = ({
   
   // Sử dụng
   const clientId = getParamFromURL('clientId');
-  console.log(clientId);
   function loadCaptcha(indexContent) {
     if (
       document.getElementById(`captcha-${indexMessage}-${indexContent}`) &&
