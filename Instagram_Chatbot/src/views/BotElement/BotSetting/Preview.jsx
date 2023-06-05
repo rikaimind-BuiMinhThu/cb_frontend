@@ -2407,7 +2407,7 @@ const BotMessage = ({ content, index, botInfor }) => {
 
     return (
         <div key={index} className="sp-body-bot-side slideRight">
-            {(content.type === 'text_input' || content.type === 'file' || content.type === 'delay') && (
+            {(content.type === 'text_input' || content.type === 'file' ||content.type === "script" || content.type === 'delay') && (
                 <div className="sp-body-bot-side-avatar sp-avatar">
                     <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} alt="sp-avarta" />
                 </div>
@@ -2473,6 +2473,9 @@ const BotMessage = ({ content, index, botInfor }) => {
                         {content.type === 'delay' && (
                             <img src={messageTypingGif} style={{ backgroundColor: '#EBF7FF', height: '40px', borderRadius: '10px' }} />
                         )}
+                         {content.type === "script" && (
+            <div dangerouslySetInnerHTML={{ __html: content.script?.content }} />
+            )}
                     </React.Fragment>}
             </div>
         </div>
