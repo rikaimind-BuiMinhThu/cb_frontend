@@ -9,6 +9,7 @@ import "assets/css/bot/bot-chat-log.css";
 import $ from "jquery";
 import BotMessage from "./BotMessage";
 import UserMessage from "./UserMessage";
+import { isBoolean } from "lodash";
 registerLocale("ja", ja);
 
 function BotChatLog() {
@@ -147,6 +148,12 @@ function BotChatLog() {
 
               conversations[i].content = JSON.parse(str ?? "");
             }
+            conversations[i].value =
+              conversations[i].content ??
+              conversations[i].boolean_value ??
+              conversations[i].string_value ??
+              conversations[i].text_value ??
+              conversations[i].integer_value;
           }
 
           setConversions(conversations);
@@ -231,277 +238,176 @@ function BotChatLog() {
 
                 let conversationIndex = 0;
                 for (let i = 0; i < messageArr.length; i++) {
-                  // if (messageArr[i].hidden !== true) {
-                  if (true) {
-                    if (messageArr[i].conditions?.length > 0) {
-                      var checked = true;
-                      for (
-                        let j = 0;
-                        j < messageArr[i].conditions.length;
-                        j++
-                      ) {
-                        let conditionItem = messageArr[i].conditions[j];
-                        if (j === 0) {
-                          if (conditionItem.condition === "include") {
-                            checked = objParam[
-                              conditionItem.nameCondition
-                            ].includes(conditionItem.inputCondition);
-                          } else if (conditionItem.condition === "is") {
-                            checked =
-                              objParam[conditionItem.nameCondition] ===
-                              conditionItem.inputCondition;
-                          } else if (
-                            conditionItem.condition === "not_include"
-                          ) {
-                            checked = !objParam[
-                              conditionItem.nameCondition
-                            ].includes(conditionItem.inputCondition);
-                          } else if (conditionItem.condition === "is_not") {
-                            checked =
-                              objParam[conditionItem.nameCondition] !==
-                              conditionItem.inputCondition;
-                          }
-                        } else if (conditionItem?.linkCondition === "and") {
-                          if (conditionItem.condition === "include") {
-                            checked =
-                              checked &&
-                              objParam[conditionItem.nameCondition].includes(
-                                conditionItem.inputCondition
-                              );
-                          } else if (conditionItem.condition === "is") {
-                            checked =
-                              checked &&
-                              objParam[conditionItem.nameCondition] ===
-                                conditionItem.inputCondition;
-                          } else if (
-                            conditionItem.condition === "not_include"
-                          ) {
-                            checked =
-                              checked &&
-                              !objParam[conditionItem.nameCondition].includes(
-                                conditionItem.inputCondition
-                              );
-                          } else if (conditionItem.condition === "is_not") {
-                            checked =
-                              checked &&
-                              objParam[conditionItem.nameCondition] !==
-                                conditionItem.inputCondition;
-                          }
-                        } else if (conditionItem?.linkCondition === "or") {
-                          if (conditionItem.condition === "include") {
-                            checked =
-                              checked ||
-                              objParam[conditionItem.nameCondition].includes(
-                                conditionItem.inputCondition
-                              );
-                          } else if (conditionItem.condition === "is") {
-                            checked =
-                              checked ||
-                              objParam[conditionItem.nameCondition] ===
-                                conditionItem.inputCondition;
-                          } else if (
-                            conditionItem.condition === "not_include"
-                          ) {
-                            checked =
-                              checked ||
-                              !objParam[conditionItem.nameCondition].includes(
-                                conditionItem.inputCondition
-                              );
-                          } else if (conditionItem.condition === "is_not") {
-                            checked =
-                              checked ||
-                              objParam[conditionItem.nameCondition] !==
-                                conditionItem.inputCondition;
-                          }
+                  if (messageArr[i].conditions?.length > 0) {
+                    var checked = true;
+                    for (let j = 0; j < messageArr[i].conditions.length; j++) {
+                      let conditionItem = messageArr[i].conditions[j];
+                      if (j === 0) {
+                        if (conditionItem.condition === "include") {
+                          checked = objParam[
+                            conditionItem.nameCondition
+                          ].includes(conditionItem.inputCondition);
+                        } else if (conditionItem.condition === "is") {
+                          checked =
+                            objParam[conditionItem.nameCondition] ===
+                            conditionItem.inputCondition;
+                        } else if (conditionItem.condition === "not_include") {
+                          checked = !objParam[
+                            conditionItem.nameCondition
+                          ].includes(conditionItem.inputCondition);
+                        } else if (conditionItem.condition === "is_not") {
+                          checked =
+                            objParam[conditionItem.nameCondition] !==
+                            conditionItem.inputCondition;
                         }
-                      }
-                      if (checked === false) {
-                        if (messageArr[i].belong_to === "user")
-                          setIndexUser((prev) => prev + 1);
-                        // continue;
+                      } else if (conditionItem?.linkCondition === "and") {
+                        if (conditionItem.condition === "include") {
+                          checked =
+                            checked &&
+                            objParam[conditionItem.nameCondition].includes(
+                              conditionItem.inputCondition
+                            );
+                        } else if (conditionItem.condition === "is") {
+                          checked =
+                            checked &&
+                            objParam[conditionItem.nameCondition] ===
+                              conditionItem.inputCondition;
+                        } else if (conditionItem.condition === "not_include") {
+                          checked =
+                            checked &&
+                            !objParam[conditionItem.nameCondition].includes(
+                              conditionItem.inputCondition
+                            );
+                        } else if (conditionItem.condition === "is_not") {
+                          checked =
+                            checked &&
+                            objParam[conditionItem.nameCondition] !==
+                              conditionItem.inputCondition;
+                        }
+                      } else if (conditionItem?.linkCondition === "or") {
+                        if (conditionItem.condition === "include") {
+                          checked =
+                            checked ||
+                            objParam[conditionItem.nameCondition].includes(
+                              conditionItem.inputCondition
+                            );
+                        } else if (conditionItem.condition === "is") {
+                          checked =
+                            checked ||
+                            objParam[conditionItem.nameCondition] ===
+                              conditionItem.inputCondition;
+                        } else if (conditionItem.condition === "not_include") {
+                          checked =
+                            checked ||
+                            !objParam[conditionItem.nameCondition].includes(
+                              conditionItem.inputCondition
+                            );
+                        } else if (conditionItem.condition === "is_not") {
+                          checked =
+                            checked ||
+                            objParam[conditionItem.nameCondition] !==
+                              conditionItem.inputCondition;
+                        }
                       }
                     }
-                    if (
-                      messageArr[0].belong_to === "bot" &&
-                      messageArr[i].message_content.length > 0
-                    ) {
-                      if (messageArr[i]?.message_content[0]?.type === "delay") {
-                        if (
-                          messageArr[i]?.message_content[0]?.delay.typing_on
-                        ) {
-                          await new Promise((resolve) => {
-                            renderMessage.push({ ...messageArr[i] });
-                            setRenderMessageArr([...renderMessage]);
-                            resolve();
-                          }).then(() => {
-                            setIndexMessageRender(i);
-                            renderMessage.pop();
-                            renderMessage.push({});
-                            setRenderMessageArr([...renderMessage]);
-                          });
-                        } else {
+                    if (checked === false) {
+                      if (messageArr[i].belong_to === "user")
+                        setIndexUser((prev) => prev + 1);
+                      // continue;
+                    }
+                  }
+                  if (
+                    messageArr[0].belong_to === "bot" &&
+                    messageArr[i].message_content.length > 0
+                  ) {
+                    if (messageArr[i]?.message_content[0]?.type === "delay") {
+                      if (messageArr[i]?.message_content[0]?.delay.typing_on) {
+                        await new Promise((resolve) => {
+                          renderMessage.push({ ...messageArr[i] });
+                          setRenderMessageArr([...renderMessage]);
+                          resolve();
+                        }).then(() => {
                           setIndexMessageRender(i);
-                        }
-                        index = i;
-                      } else if (
-                        messageArr[i]?.message_content[0]?.type === "email"
-                      ) {
-                        let emailId =
+                          renderMessage.pop();
+                          renderMessage.push({});
+                          setRenderMessageArr([...renderMessage]);
+                        });
+                      } else {
+                        setIndexMessageRender(i);
+                      }
+                      index = i;
+                    } else if (
+                      messageArr[i]?.message_content[0]?.type === "email"
+                    ) {
+                      let emailId =
+                        messageArr[i]?.message_content[0][
+                          messageArr[i]?.message_content[0].type
+                        ].contentId;
+                      let variablesData = {};
+                      variablesAll.forEach((item) => {
+                        variablesData[item.variable_name] = item.default_value;
+                      });
+
+                      variables.forEach((item) => {
+                        variablesData[item.variable_name] = item.default_value;
+                      });
+                      renderMessage.push({});
+                      setRenderMessageArr([...renderMessage]);
+                      setIndexMessageRender(i);
+                      setVariables([...variables]);
+                      index = i;
+                    } else if (
+                      messageArr[i]?.message_content[0]?.type === "variable_set"
+                    ) {
+                      if (variables.length !== 0) {
+                        let dataVarExist =
                           messageArr[i]?.message_content[0][
                             messageArr[i]?.message_content[0].type
-                          ].contentId;
-                        let variablesData = {};
-                        variablesAll.forEach((item) => {
-                          variablesData[item.variable_name] =
-                            item.default_value;
-                        });
-
+                          ].variables;
                         variables.forEach((item) => {
-                          variablesData[item.variable_name] =
-                            item.default_value;
-                        });
-                        renderMessage.push({});
-                        setRenderMessageArr([...renderMessage]);
-                        setIndexMessageRender(i);
-                        setVariables([...variables]);
-                        index = i;
-                      } else if (
-                        messageArr[i]?.message_content[0]?.type ===
-                        "variable_set"
-                      ) {
-                        if (variables.length !== 0) {
-                          let dataVarExist =
-                            messageArr[i]?.message_content[0][
-                              messageArr[i]?.message_content[0].type
-                            ].variables;
-                          variables.forEach((item) => {
-                            for (let z = 0; z < dataVarExist.length; z++) {
-                              if (item.variable_name === dataVarExist[z].key) {
-                                item.default_value = dataVarExist[z].value;
-                              }
+                          for (let z = 0; z < dataVarExist.length; z++) {
+                            if (item.variable_name === dataVarExist[z].key) {
+                              item.default_value = dataVarExist[z].value;
                             }
-                          });
-                          setVariables([...variables]);
-                        }
-                        renderMessage.push({});
-                        setRenderMessageArr([...renderMessage]);
-                        setIndexMessageRender(i);
-                        index = i;
-                      } else if (
-                        messageArr[i]?.message_content[0]?.type ===
-                        "clear_variable"
-                      ) {
-                        if (variables.length !== 0) {
-                          let dataVarExist =
-                            messageArr[i]?.message_content[0][
-                              messageArr[i]?.message_content[0].type
-                            ].variables;
-                          variables.forEach((item) => {
-                            for (let z = 0; z < dataVarExist.length; z++) {
-                              if (item.variable_name === dataVarExist[z]) {
-                                item.default_value = "";
-                              }
-                            }
-                          });
-                          setVariables([...variables]);
-                        }
-                        renderMessage.push({});
-                        setRenderMessageArr([...renderMessage]);
-                        setIndexMessageRender(i);
-                        index = i;
-                      } else if (
-                        messageArr[i]?.message_content[0]?.type === "pause"
-                      ) {
-                        renderMessage.push({});
-                        setRenderMessageArr([...renderMessage]);
-                        setIndexMessageRender(i);
-                        index = i;
-                        break;
-                      } else if (messageArr[i].belong_to !== "bot") {
-                        for (
-                          let j = 0;
-                          j < messageArr[i].message_content.length;
-                          j++
-                        ) {
-                          if (
-                            messageArr[i].message_content[j].type === "capture"
-                          ) {
-                            api
-                              .get(
-                                `https://svg-captcha-nodejs.vercel.app/captcha?size=${
-                                  messageArr[i].message_content[j][
-                                    messageArr[i].message_content[j].type
-                                  ].length
-                                }${
-                                  messageArr[i].message_content[j][
-                                    messageArr[i].message_content[j].type
-                                  ].colour
-                                    ? "&color=true"
-                                    : ""
-                                }&charPreset=${
-                                  messageArr[i].message_content[j][
-                                    messageArr[i].message_content[j].type
-                                  ].type
-                                }`
-                              )
-                              .then((res) => {
-                                captcha.push({
-                                  index: i,
-                                  indexContent: j,
-                                  ...res.data,
-                                });
-                                setCaptcha([...captcha]);
-                              })
-                              .catch((error) => {
-                                console.log(error);
-                              });
-                            // break;
                           }
-                        }
-
-                        renderMessage.push(messageArr[i]);
-                        setIndexMessageRender(i);
-                        setRenderMessageArr([...renderMessage]);
-                        setIndexUser((prev) => prev + 1);
-                        index = i;
-                        // break;
-                      } else {
-                        if (
-                          messageArr[i].message_content[0]?.type ===
-                            "text_input" &&
-                          messageArr[i].message_content[0].text_input.content
-                        ) {
-                          messageArr[i].message_content[0].text_input.content =
-                            messageArr[
-                              i
-                            ].message_content[0].text_input.content.replaceAll(
-                              SCAN_REGEX,
-                              (text, variable) => {
-                                if (variables.length !== 0) {
-                                  let valueVar = "";
-                                  for (let j = 0; j < variables.length; j++) {
-                                    if (
-                                      variables[j].variable_name === variable
-                                    ) {
-                                      valueVar = variables[j].default_value;
-                                    }
-                                  }
-                                  return valueVar;
-                                } else {
-                                  return "";
-                                }
-                              }
-                            );
-                        }
-
-                        setIndexMessageRender(i);
-                        renderMessage.push(messageArr[i]);
-                        setRenderMessageArr([...renderMessage]);
+                        });
+                        setVariables([...variables]);
                       }
+                      renderMessage.push({});
+                      setRenderMessageArr([...renderMessage]);
+                      setIndexMessageRender(i);
+                      index = i;
                     } else if (
-                      messageArr[0].belong_to === "user" &&
-                      messageArr[i].message_content.length > 0
+                      messageArr[i]?.message_content[0]?.type ===
+                      "clear_variable"
                     ) {
+                      if (variables.length !== 0) {
+                        let dataVarExist =
+                          messageArr[i]?.message_content[0][
+                            messageArr[i]?.message_content[0].type
+                          ].variables;
+                        variables.forEach((item) => {
+                          for (let z = 0; z < dataVarExist.length; z++) {
+                            if (item.variable_name === dataVarExist[z]) {
+                              item.default_value = "";
+                            }
+                          }
+                        });
+                        setVariables([...variables]);
+                      }
+                      renderMessage.push({});
+                      setRenderMessageArr([...renderMessage]);
+                      setIndexMessageRender(i);
+                      index = i;
+                    } else if (
+                      messageArr[i]?.message_content[0]?.type === "pause"
+                    ) {
+                      renderMessage.push({});
+                      setRenderMessageArr([...renderMessage]);
+                      setIndexMessageRender(i);
+                      index = i;
+                      break;
+                    } else if (messageArr[i].belong_to !== "bot") {
                       for (
                         let j = 0;
                         j < messageArr[i].message_content.length;
@@ -539,16 +445,47 @@ function BotChatLog() {
                             .catch((error) => {
                               console.log(error);
                             });
+                          // break;
                         }
                       }
+
+                      renderMessage.push(messageArr[i]);
+                      setIndexMessageRender(i);
+                      setRenderMessageArr([...renderMessage]);
+                      setIndexUser((prev) => prev + 1);
+                      index = i;
+                      // break;
+                    } else {
+                      if (
+                        messageArr[i].message_content[0]?.type ===
+                          "text_input" &&
+                        messageArr[i].message_content[0].text_input.content
+                      ) {
+                        messageArr[i].message_content[0].text_input.content =
+                          messageArr[
+                            i
+                          ].message_content[0].text_input.content.replaceAll(
+                            SCAN_REGEX,
+                            (text, variable) => {
+                              if (variables.length !== 0) {
+                                let valueVar = "";
+                                for (let j = 0; j < variables.length; j++) {
+                                  if (variables[j].variable_name === variable) {
+                                    valueVar = variables[j].default_value;
+                                  }
+                                }
+                                return valueVar;
+                              } else {
+                                return "";
+                              }
+                            }
+                          );
+                      }
+
                       setIndexMessageRender(i);
                       renderMessage.push(messageArr[i]);
                       setRenderMessageArr([...renderMessage]);
-
-                      setIndexUser((prev) => prev + 1);
-                      // break;
                     }
-                    // }
                   }
                   if (messageArr[i]?.belong_to === "user") {
                     if (userMessageLength > conversations.length) {
@@ -562,25 +499,18 @@ function BotChatLog() {
                       msIndex++
                     ) {
                       const element = messageArr[i].message_content[msIndex];
-//TODO: find message type 
+                      console.log(element);
+                      console.log(conversations[conversationIndex]);
+                      //TODO: find message type
                       let chat = conversations.find(
                         (c) =>
                           c?.data_input_name ===
-                          element[element.type]?.save_input_content
+                          element[element.type]?.save_input_content || c?.ui_type === element[element.type]?.save_input_content
                       );
                       if (element.type === "radio_button") {
-                        let chat = conversations.find(
-                          (c) =>
-                            c?.data_input_name ===
-                            element?.radio_button?.save_input_content
-                        );
-                        if (chat) {
-                          if (chat.integer_value) {
-                            element.initial_selection = chat.integer_value;
-                          } else if (chat.boolean_value) {
-                            element.initial_selection = chat.boolean_value;
-                          }
-                        }
+                      } else
+                      if (element.type === "text_input") {
+                        
                       }
                       if (element.type === "pull_down") {
                         let chat = conversations.find(
