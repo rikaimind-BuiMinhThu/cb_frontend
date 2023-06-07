@@ -446,7 +446,7 @@ var routes = [
     layout: '/admin',
   },
   {
-    path: '/client-payment-detail/:id',
+    path: '/client-payment-detail',
     name: 'クライアントの支払い詳細',
     component: ClientPaymentDetail,
     layout: '/admin',

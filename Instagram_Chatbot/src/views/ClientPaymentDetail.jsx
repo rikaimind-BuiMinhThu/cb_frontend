@@ -13,23 +13,28 @@ import { tokenExpired } from "api/tokenExpired";
 import DatePicker, { registerLocale } from "react-datepicker";
 import ja from "date-fns/locale/ja";
 import "react-datepicker/dist/react-datepicker.css";
+import { MDBIcon } from "mdbreact";
+import moment from "moment-timezone";
 registerLocale("ja", ja);
 
 function ClientPaymentDetail() {
-  var [dataList, setDataList] = useState([]);
+  const [editMode, setEditMode] = useState(true);
+  const [dataList, setDataList] = useState([]);
   const [clientDetail, setClientDetail] = useState({});
+  const [subscriptionStartAt, setSubscriptionStartAt] = useState(null);
+  const [subscriptionEndAt, setSubscriptionEndAt] = useState(null);
 
-  var [totalPage, setTotalPage] = useState();
-  var [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState();
+  const [page, setPage] = useState(1);
 
   //Update, Detail
-  var [paymentHisId, setPaymentHisId] = useState();
-  var [startAt, setStartAt] = useState("");
-  var [endAt, setEndAt] = useState("");
-  var [status, setStatus] = useState("unpaid");
-  var [paidAt, setPaidAt] = useState("");
+  const [paymentHisId, setPaymentHisId] = useState();
+  const [startAt, setStartAt] = useState();
+  const [endAt, setEndAt] = useState();
+  const [status, setStatus] = useState("unpaid");
+  const [paidAt, setPaidAt] = useState();
 
-  var [msgNoti, setMsgNoti] = useState();
+  const [msgNoti, setMsgNoti] = useState();
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [isOpenAddPayment, setIsOpenAddPayment] = useState(false);
@@ -39,7 +44,10 @@ function ClientPaymentDetail() {
     const url = window.location.pathname;
     if (url.includes("client-payment-detail")) {
       var id = url.slice(url.lastIndexOf("/") + 1);
-      console.log("==========================\n Client Id: " + id);
+      if (id === "client-payment-detail") {
+        id = JSON.parse(sessionStorage.getItem("client")).id;
+        setEditMode(false);
+      }
       return id;
     }
     return "";
@@ -59,7 +67,9 @@ function ClientPaymentDetail() {
       window.location.href = "/";
     }
     const userRole = Cookies.get("user_role");
-    if (!userRole || userRole !== "admin_deel") {
+    if (
+      !(userRole || userRole === "admin_deel" || userRole === "admin_client")
+    ) {
       window.location.href = "/";
     }
   }, []);
@@ -70,8 +80,19 @@ function ClientPaymentDetail() {
     api
       .get(`/api/v1/managements/clients/${id}`)
       .then((res) => {
-        console.log(res.data.data);
-        setClientDetail(res.data.data);
+        let client = res.data.data;
+        console.log(client);
+        setClientDetail(client);
+        if (client.subscription_start_at) {
+          setSubscriptionStartAt(
+            moment.tz(client.subscription_start_at, "Asia/Tokyo").toDate()
+          );
+        }
+        if (client.subscription_end_at) {
+          setSubscriptionEndAt(
+            moment.tz(client.subscription_end_at, "Asia/Tokyo").toDate()
+          );
+        }
       })
       .catch((error) => {
         console.log(error);
@@ -85,6 +106,7 @@ function ClientPaymentDetail() {
       .then((res) => {
         console.log(res.data);
         setDataList(res.data.data);
+        setTotalPage(Math.ceil(res.data.total / 20));
       })
       .catch((error) => {
         console.log(error);
@@ -100,7 +122,7 @@ function ClientPaymentDetail() {
         `/api/v1/managements/payment_histories/${clientDetail.id}?&page=${pgIndex}`
       )
       .then((res) => {
-        var totalPage = Math.ceil(res.data.total / 25);
+        var totalPage = Math.ceil(res.data.total / 20);
         if (pgIndex > totalPage) {
           api
             .get(
@@ -156,13 +178,8 @@ function ClientPaymentDetail() {
   }
 
   function updatePayment() {
-    if(!checkStatus()) return;
-    var elements = document.getElementById("updateForm").elements;
-    var obj = {};
-    for (var i = 0; i < elements.length; i++) {
-      var item = elements.item(i);
-      obj[item.name] = item.value;
-    }
+    if (!checkStatus()) return;
+    var obj = getFormData("updateForm");
     api
       .patch(`/api/v1/managements/payment_histories/${paymentHisId}`, {
         payment: obj,
@@ -170,7 +187,8 @@ function ClientPaymentDetail() {
       .then((res) => {
         reloadListPayment(page);
         showNotification("クライアント更新しました!");
-        setIsOpenUpdate(false);resetVariable();
+        setIsOpenUpdate(false);
+        resetVariable();
       })
       .catch((error) => {
         console.log(error);
@@ -184,13 +202,8 @@ function ClientPaymentDetail() {
     setIsOpenAddPayment(true);
   }
   function addPayment() {
-    if(!checkStatus()) return;
-    var elements = document.getElementById("addForm").elements;
-    var obj = {};
-    for (var i = 0; i < elements.length - 1; i++) {
-      var item = elements.item(i);
-      obj[item.name] = item.value;
-    }
+    if (!checkStatus()) return;
+    var obj = getFormData("addForm");
     obj["client_id"] = clientDetail.id;
     api
       .post(`/api/v1/managements/payment_histories`, { payment: obj })
@@ -202,7 +215,8 @@ function ClientPaymentDetail() {
           resetVariable();
         } else if (res.data?.code === 2 || res.data?.code === "2") {
           showNotification(res.data.message);
-          setIsOpenAddPayment(false);resetVariable();
+          setIsOpenAddPayment(false);
+          resetVariable();
         }
       })
       .catch((error) => {
@@ -228,25 +242,68 @@ function ClientPaymentDetail() {
     }, 2000);
   }
 
-  function resetVariable(){
+  function resetVariable() {
     setPaymentHisId("");
-        setStartAt("");
-        setEndAt("");
-        setStatus("unpaid");
-        setPaidAt("");
+    setStartAt("");
+    setEndAt("");
+    setStatus("unpaid");
+    setPaidAt("");
   }
 
-  function checkStatus(){
+  function checkStatus() {
     var status = document.getElementById("status").value;
     var paidAt = document.getElementById("paidAt").value;
-    if(status === 'paid'){
-      if(paidAt === 'yyyy/mm/dd' || paidAt === null || paidAt === undefined){
-        document.getElementById('paidAtErrMsg').innerHTML = '支払日は必須です';
-        document.getElementById('paidAtErrMsg').style.display = 'block';
-        return false;
+    var startAt = document.getElementById("startAt").value;
+    var endAt = document.getElementById("endAt").value;
+    var error = 0;
+    if (status === "paid") {
+      if (!paidAt) {
+        document.getElementById("paidAtErrMsg").innerHTML = "支払日は必須です";
+        document.getElementById("paidAtErrMsg").style.display = "block";
+        error += 1;
       }
     }
-    return true;
+    if (!startAt) {
+      document.getElementById("startAtErrMsg").innerHTML =
+        "課金開始日は必須です";
+      document.getElementById("startAtErrMsg").style.display = "block";
+      error += 1;
+    }
+    if (!endAt) {
+      document.getElementById("endAtErrMsg").innerHTML = "課金終了日は必須です";
+      document.getElementById("endAtErrMsg").style.display = "block";
+      error += 1;
+    }
+    return error === 0;
+  }
+
+  function getFormData(formId) {
+    var elements = document.getElementById(formId).elements;
+    var obj = {};
+    let now = new moment.tz("Asia/Tokyo").toISOString().slice(10);
+    for (var i = 0; i < elements.length - 1; i++) {
+      var item = elements.item(i);
+      obj[item.name] = item.value;
+    }
+    obj.start_at = obj.start_at.replaceAll("/", "-") + now;
+    obj.end_at = obj.end_at.replaceAll("/", "-") + now;
+    if (obj.paid_at) {
+      obj.paid_at = obj.paid_at.replaceAll("/", "-") + now;
+    }
+    return obj;
+  }
+
+  function onChangeStartAt(date) {
+    setStartAt(date);
+    if (endAt && date > endAt) {
+      setEndAt(date);
+    }
+  }
+  function onChangeStatus(event) {
+    setStatus(event.target.value);
+    if (event.target.value === "unpaid") {
+      setPaidAt(null);
+    }
   }
 
   return (
@@ -255,38 +312,42 @@ function ClientPaymentDetail() {
         <Row id="screenAll">
           <Col md="12">
             <Card>
-              <CardHeader>
-                <div
-                  className="swap"
-                  style={{
-                    display: "flex",
-                    width: "100%",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
+              {editMode ? (
+                <CardHeader>
                   <div
+                    className="swap"
                     style={{
                       display: "flex",
+                      width: "100%",
                       alignItems: "center",
+                      justifyContent: "space-between",
                     }}
                   >
-                    {/* date pick */}
-                  </div>
-                  <div
-                    className="div_right"
-                    style={{ float: "right", width: "15%" }}
-                  >
-                    <Button
-                      type="text"
-                      onClick={() => addPaymentPopup()}
-                      style={{ backgroundColor: "#66615b" }}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
                     >
-                      支払いの追加
-                    </Button>
+                      {/* date pick */}
+                    </div>
+                    <div
+                      className="div_right"
+                      style={{ float: "right", width: "15%" }}
+                    >
+                      <Button
+                        type="text"
+                        onClick={() => addPaymentPopup()}
+                        style={{ backgroundColor: "#66615b" }}
+                      >
+                        支払いの追加
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </CardHeader>
+                </CardHeader>
+              ) : (
+                <></>
+              )}
               <CardBody>
                 <div style={{ width: "100%", overflowX: "auto" }}>
                   <Table style={{ textAlign: "center", tableLayout: "fixed" }}>
@@ -297,7 +358,7 @@ function ClientPaymentDetail() {
                         <th colSpan={2}> 課金終了日 </th>
                         <th colSpan={2}> スターテス </th>
                         <th colSpan={2}> 支払日 </th>
-                        <th colSpan={3}> アクション </th>
+                        {editMode ? <th colSpan={3}> アクション </th> : <></>}
                       </tr>
                     </thead>
                     <tbody>
@@ -311,16 +372,16 @@ function ClientPaymentDetail() {
                               backgroundColor: "white",
                             }}
                           >
-                            <td colSpan={1}>{item.id}</td>
+                            <td colSpan={1}>{index + 1}</td>
                             <td colSpan={2}>
-                              {item.start_at != null
+                              {item.start_at
                                 ? item.start_at
                                     .slice(0, 10)
                                     .replaceAll("-", "/")
                                 : ""}
                             </td>
                             <td colSpan={2}>
-                              {item.end_at != null
+                              {item.end_at
                                 ? item.end_at.slice(0, 10).replaceAll("-", "/")
                                 : ""}
                             </td>
@@ -328,36 +389,31 @@ function ClientPaymentDetail() {
                               {item.status === "paid" ? "支払われた" : "未払い"}
                             </td>
                             <td colSpan={2}>
-                              {item.paid_at != null
+                              {item.paid_at
                                 ? item.paid_at.slice(0, 10).replaceAll("-", "/")
                                 : ""}
                             </td>
-                            <td colSpan={3}>
-                              <div style={{ display: "inline-flex" }}>
-                                <div onClick={() => updatePaymentHis(item)}>
-                                  <i
-                                    className="nc-icon nc-align-center nc-3x"
-                                    style={{
-                                      fontSize: "30px",
-                                      marginTop: "5px",
-                                      marginRight: "30px",
-                                    }}
-                                  ></i>
+                            {editMode ? (
+                              <td colSpan={3}>
+                                <div style={{ display: "inline-flex" }}>
+                                  <MDBIcon
+                                    far
+                                    icon="edit"
+                                    onClick={() => updatePaymentHis(item)}
+                                    size="2x"
+                                  />
+                                  <div style={{ width: "20px" }}></div>
+                                  <MDBIcon
+                                    far
+                                    icon="trash-alt"
+                                    onClick={() => deletePaymentPopUp(item.id)}
+                                    size="2x"
+                                  />
                                 </div>
-                                <div
-                                  onClick={() => deletePaymentPopUp(item.id)}
-                                >
-                                  <i
-                                    className="nc-icon nc-box nc-3x"
-                                    style={{
-                                      fontSize: "30px",
-                                      marginTop: "5px",
-                                      cursor: "pointer",
-                                    }}
-                                  ></i>
-                                </div>
-                              </div>
-                            </td>
+                              </td>
+                            ) : (
+                              <></>
+                            )}
                           </tr>
                         ))}
                     </tbody>
@@ -375,8 +431,14 @@ function ClientPaymentDetail() {
           </Col>
         </Row>
 
-        <Modal open={isOpenUpdate} onClose={() => {setIsOpenUpdate(false); resetVariable();}}>
-          <div style={{ width: "100%" }}>
+        <Modal
+          open={isOpenUpdate}
+          onClose={() => {
+            setIsOpenUpdate(false);
+            resetVariable();
+          }}
+        >
+          <div style={{ width: "100%", minHeight: "500px" }}>
             <div style={{ marginTop: "-30px" }}>
               <h4>支払いの更新</h4>
               <div
@@ -389,26 +451,19 @@ function ClientPaymentDetail() {
               ></div>
               <form id="updateForm" className="swap">
                 <div className="label-input">
-                  課金開始日
+                  課金開始日 <span className="span-require">*必須</span>
                   <div style={{ marginTop: "-24px" }}>
                     <DatePicker
                       id="startAt"
                       className="input-field"
                       selected={startAt && startAt}
-                      onChange={(date) => setStartAt(date)}
+                      onChange={(date) => onChangeStartAt(date)}
                       dateFormat="yyyy/MM/dd"
                       name="start_at"
                       locale="ja"
-                      value={
-                        startAt === "" ||
-                        startAt === undefined ||
-                        startAt === null
-                          ? "yyyy/mm/dd"
-                          : startAt
-                              .toISOString()
-                              .slice(0, 10)
-                              .replaceAll("-", "/")
-                      }
+                      value={startAt}
+                      placeholderText="yyyy/mm/dd"
+                      minDate={subscriptionStartAt}
                     />
                   </div>
                   <label
@@ -425,7 +480,7 @@ function ClientPaymentDetail() {
                 <br />
                 <br />
                 <div className="label-input">
-                  課金終了日
+                  課金終了日 <span className="span-require">*必須</span>
                   <div style={{ marginTop: "-24px" }}>
                     <DatePicker
                       id="endAt"
@@ -435,14 +490,9 @@ function ClientPaymentDetail() {
                       dateFormat="yyyy/MM/dd"
                       name="end_at"
                       locale="ja"
-                      value={
-                        endAt === "" || endAt === undefined || endAt === null
-                          ? "yyyy/mm/dd"
-                          : endAt
-                              .toISOString()
-                              .slice(0, 10)
-                              .replaceAll("-", "/")
-                      }
+                      value={endAt}
+                      placeholderText="yyyy/mm/dd"
+                      minDate={startAt ?? subscriptionStartAt}
                     />
                   </div>
                   <label
@@ -459,16 +509,14 @@ function ClientPaymentDetail() {
                 <br />
                 <br />
                 <label className="label-input">
-                  {" "}
                   スターテス
-                  <span className="span-require">*必須</span>
                   <select
                     style={{ padding: "3px 0px 3px 0px" }}
                     className="input-field"
                     defaultValue={status}
                     name="status"
                     id="status"
-                    onChange={(e) => setStatus(e.target.value)}
+                    onChange={(e) => onChangeStatus(e)}
                   >
                     <option key={0} value="paid">
                       Paid
@@ -482,7 +530,10 @@ function ClientPaymentDetail() {
                 <br />
 
                 <div className="label-input">
-                支払日 {status === 'paid'? <span className="span-require">*必須</span> : null}
+                  支払日
+                  {status === "paid" ? (
+                    <span className="span-require">*必須</span>
+                  ) : null}
                   <div style={{ marginTop: "-24px" }}>
                     <DatePicker
                       id="paidAt"
@@ -492,14 +543,10 @@ function ClientPaymentDetail() {
                       dateFormat="yyyy/MM/dd"
                       name="paid_at"
                       locale="ja"
-                      value={
-                        paidAt === "" || paidAt === undefined || paidAt === null
-                          ? "yyyy/mm/dd"
-                          : paidAt
-                              .toISOString()
-                              .slice(0, 10)
-                              .replaceAll("-", "/")
-                      }
+                      value={paidAt}
+                      placeholderText="yyyy/mm/dd"
+                      disabled={status === "unpaid"}
+                      minDate={startAt ?? subscriptionStartAt}
                     />
                   </div>
                   <label
@@ -525,9 +572,12 @@ function ClientPaymentDetail() {
 
         <Modal
           open={isOpenAddPayment}
-          onClose={() => {setIsOpenAddPayment(false); resetVariable();}}
+          onClose={() => {
+            setIsOpenAddPayment(false);
+            resetVariable();
+          }}
         >
-          <div style={{ width: "100%", minHeight: "300px" }}>
+          <div style={{ width: "100%", minHeight: "500px" }}>
             <div style={{ marginTop: "-30px" }}>
               <h4>支払いの追加</h4>
               <div
@@ -540,26 +590,19 @@ function ClientPaymentDetail() {
               ></div>
               <form id="addForm" className="swap">
                 <div className="label-input">
-                  課金開始日
+                  課金開始日 <span className="span-require">*必須</span>
                   <div style={{ marginTop: "-24px" }}>
                     <DatePicker
                       id="startAt"
                       className="input-field"
                       selected={startAt && startAt}
-                      onChange={(date) => setStartAt(date)}
+                      onChange={(date) => onChangeStartAt(date)}
                       dateFormat="yyyy/MM/dd"
                       name="start_at"
                       locale="ja"
-                      value={
-                        startAt === "" ||
-                        startAt === undefined ||
-                        startAt === null
-                          ? "yyyy/mm/dd"
-                          : startAt
-                              .toISOString()
-                              .slice(0, 10)
-                              .replaceAll("-", "/")
-                      }
+                      value={startAt}
+                      placeholderText="yyyy/mm/dd"
+                      minDate={subscriptionStartAt}
                     />
                   </div>
                   <label
@@ -576,24 +619,19 @@ function ClientPaymentDetail() {
                 <br />
                 <br />
                 <div className="label-input">
-                  課金終了日
+                  課金終了日 <span className="span-require">*必須</span>
                   <div style={{ marginTop: "-24px" }}>
                     <DatePicker
-                      id="endAtNew"
+                      id="endAt"
                       className="input-field"
                       selected={endAt && endAt}
                       onChange={(date) => setEndAt(date)}
                       dateFormat="yyyy/MM/dd"
                       name="end_at"
                       locale="ja"
-                      value={
-                        endAt === "" || endAt === undefined || endAt === null
-                          ? "yyyy/mm/dd"
-                          : endAt
-                              .toISOString()
-                              .slice(0, 10)
-                              .replaceAll("-", "/")
-                      }
+                      value={endAt}
+                      placeholderText="yyyy/mm/dd"
+                      minDate={startAt ?? subscriptionStartAt}
                     />
                   </div>
                   <label
@@ -611,14 +649,13 @@ function ClientPaymentDetail() {
                 <br />
                 <label className="label-input">
                   スターテス
-                  <span className="span-require">*必須</span>
                   <select
                     style={{ padding: "3px 0px 3px 0px" }}
                     className="input-field"
                     defaultValue={"unpaid"}
                     name="status"
                     id="status"
-                    onChange={(e) => setStatus(e.target.value)}
+                    onChange={(e) => onChangeStatus(e)}
                   >
                     <option key={0} value="paid">
                       Paid
@@ -632,7 +669,10 @@ function ClientPaymentDetail() {
                 <br />
 
                 <div className="label-input">
-                支払日 {status === 'paid'? <span className="span-require">*必須</span> : null}
+                  支払日{" "}
+                  {status === "paid" ? (
+                    <span className="span-require">*必須</span>
+                  ) : null}
                   <div style={{ marginTop: "-24px" }}>
                     <DatePicker
                       id="paidAt"
@@ -642,14 +682,10 @@ function ClientPaymentDetail() {
                       dateFormat="yyyy/MM/dd"
                       name="paid_at"
                       locale="ja"
-                      value={
-                        paidAt === "" || paidAt === undefined || paidAt === null
-                          ? "yyyy/mm/dd"
-                          : paidAt
-                              .toISOString()
-                              .slice(0, 10)
-                              .replaceAll("-", "/")
-                      }
+                      value={paidAt}
+                      placeholderText="yyyy/mm/dd"
+                      disabled={status === "unpaid"}
+                      minDate={startAt ?? subscriptionStartAt}
                     />
                   </div>
                   <label
@@ -680,7 +716,7 @@ function ClientPaymentDetail() {
             <span style={{ fontSize: "16px" }}>{msgNoti}</span>
           </div>
         </ModalNoti>
-        
+
         <ModalShort
           open={isOpenDeletePaymentHis}
           onClose={() => setIsOpenDeletePaymentHis(false)}
