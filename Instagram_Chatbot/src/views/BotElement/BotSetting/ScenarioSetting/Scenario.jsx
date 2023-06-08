@@ -1655,6 +1655,9 @@ const Scenario = () => {
           dataMessages[indexMessage].message_content[indexContent][type][name].push(check_box_value)
         }
         console.log(dataMessages[indexMessage].message_content[indexContent][type][name])
+        if(dataMessages[indexMessage].message_content[indexContent][type][name].includes(value))
+          dataMessages[indexMessage].message_content[indexContent][type][name] = dataMessages[indexMessage].message_content[indexContent][type][name].filter((el) => el !== value);
+        else
         dataMessages[indexMessage].message_content[indexContent][type][name].push(value);
       } else {
         if (dataMessages[indexMessage].message_content[indexContent][type] === undefined) {
@@ -8379,13 +8382,7 @@ const Scenario = () => {
                                                                                       <CheckboxCustom
                                                                                         label="カード決済連動設定"
                                                                                         value={cardPaymentRadioButton.card_linked_setting.includes(itemPaymentRadio.value)}
-                                                                                        onChange={() => {
-                                                                                          if (!cardPaymentRadioButton.card_linked_setting.includes(itemPaymentRadio.value)) {
-                                                                                            onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'card_linked_setting');
-                                                                                          } else {
-                                                                                            onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'card_linked_setting');
-                                                                                          }
-                                                                                        }}
+                                                                                        onChange={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'card_linked_setting')}
                                                                                       />
                                                                                     </div>
                                                                                     {array.length > 1 &&
