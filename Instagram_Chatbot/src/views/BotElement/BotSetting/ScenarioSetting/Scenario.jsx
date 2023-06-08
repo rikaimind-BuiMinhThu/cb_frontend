@@ -2216,7 +2216,7 @@ const Scenario = () => {
                     <label>定期注文のみ</label>
                   </div>
                   {/* Overview scenario */}
-                  <div style={{ ...errorScenarioName ? { height: 'calc(100% - 109px)' } : { height: 'calc(100% - 87px)' }, backgroundColor: '#f6fbff' }}>
+                  <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
                     <div className="ss-overview-detail">
                       {(!dataMessages || dataMessages.length === 0) &&
                         <div className="ss-add-action-wrapper-empty-data">
