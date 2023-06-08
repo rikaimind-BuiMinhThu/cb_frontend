@@ -16,6 +16,7 @@ import ja from "date-fns/locale/ja";
 import 'react-datepicker/dist/react-datepicker.css';
 import { tokenExpired } from 'api/tokenExpired';
 import { EC_CHATBOT_URL } from '../variables/constants'
+import { MDBIcon } from 'mdbreact';
 registerLocale("ja", ja);
 
 function ClientManagement() {
@@ -1593,15 +1594,8 @@ function ClientManagement() {
                             <td>{item.last_sign_in_at?.replaceAll('/', '-')}</td>
                             <td className="actionListClient">
                               <div style={{ display: 'flex' }}>
-                                <div onClick={(e) => gotoPaymentDetail(item)}>
-                                  <i
-                                    className="nc-icon nc-money-coins nc-3x"
-                                    style={{
-                                      fontSize: '30px',
-                                      marginTop: '5px',
-                                      marginRight: '30px',
-                                    }}
-                                  ></i>
+                                <div style={{marginRight: '30px', marginTop: '5px'}}>
+                                  <MDBIcon fas icon="yen-sign" size='2x' onClick={(e) => gotoPaymentDetail(item)}/>
                                 </div><div onClick={(e) => getUserDetail(item)}>
                                   <i
                                     className="nc-icon nc-badge nc-3x"

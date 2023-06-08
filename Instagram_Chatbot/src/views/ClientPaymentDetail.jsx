@@ -81,7 +81,6 @@ function ClientPaymentDetail() {
       .get(`/api/v1/managements/clients/${id}`)
       .then((res) => {
         let client = res.data.data;
-        console.log(client);
         setClientDetail(client);
         if (client.subscription_start_at) {
           setSubscriptionStartAt(
@@ -104,7 +103,6 @@ function ClientPaymentDetail() {
     api
       .get(`/api/v1/managements/payment_histories/${id}?&page=1`)
       .then((res) => {
-        console.log(res.data);
         setDataList(res.data.data);
         setTotalPage(Math.ceil(res.data.total / 20));
       })
@@ -129,11 +127,9 @@ function ClientPaymentDetail() {
               `/api/v1/managements/payment_histories/${clientDetail.id}?&page=${totalPage}`
             )
             .then((resp) => {
-              console.log(res.data.data);
               setDataList(resp.data.data);
             });
         } else {
-          console.log(res.data.data);
           setDataList(res.data.data);
         }
         setTotalPage(totalPage);
@@ -147,11 +143,13 @@ function ClientPaymentDetail() {
   }
 
   function updatePaymentHis(item) {
-    console.log("detail: ", item);
     setPaymentHisId(item.id);
-    if (item.start_at != null) setStartAt(new Date(item.start_at));
-    if (item.end_at != null) setEndAt(new Date(item.end_at));
-    if (item.paid_at != null) setPaidAt(new Date(item.paid_at));
+    if (item.start_at != null)
+      setStartAt(moment.tz(item.start_at, "Asia/Tokyo").toDate());
+    if (item.end_at != null)
+      setEndAt(moment.tz(item.end_at, "Asia/Tokyo").toDate());
+    if (item.paid_at != null)
+      setPaidAt(moment.tz(item.paid_at, "Asia/Tokyo").toDate());
     setStatus(item.status);
 
     setIsOpenUpdate(true);
@@ -228,7 +226,6 @@ function ClientPaymentDetail() {
   }
 
   function handleChange(event, value) {
-    console.log("pageIndex: ", value);
     setPage(parseInt(value));
     reloadListPayment(value);
     document.querySelector(".main-panel").scrollTop = 0;
@@ -356,9 +353,10 @@ function ClientPaymentDetail() {
                         <th colSpan={1}> ID </th>
                         <th colSpan={2}> 課金開始日 </th>
                         <th colSpan={2}> 課金終了日 </th>
-                        <th colSpan={2}> スターテス </th>
+                        <th colSpan={1}> スターテス </th>
                         <th colSpan={2}> 支払日 </th>
-                        {editMode ? <th colSpan={3}> アクション </th> : <></>}
+                        <th colSpan={2}> 作成日 </th>
+                        {editMode ? <th colSpan={2}> アクション </th> : <></>}
                       </tr>
                     </thead>
                     <tbody>
@@ -372,7 +370,7 @@ function ClientPaymentDetail() {
                               backgroundColor: "white",
                             }}
                           >
-                            <td colSpan={1}>{index + 1}</td>
+                            <td colSpan={1}>{dataList.length - index}</td>
                             <td colSpan={2}>
                               {item.start_at
                                 ? item.start_at
@@ -385,7 +383,7 @@ function ClientPaymentDetail() {
                                 ? item.end_at.slice(0, 10).replaceAll("-", "/")
                                 : ""}
                             </td>
-                            <td colSpan={2}>
+                            <td colSpan={1}>
                               {item.status === "paid" ? "支払われた" : "未払い"}
                             </td>
                             <td colSpan={2}>
@@ -393,22 +391,46 @@ function ClientPaymentDetail() {
                                 ? item.paid_at.slice(0, 10).replaceAll("-", "/")
                                 : ""}
                             </td>
+                            <td colSpan={2}>
+                              {item.created_at.slice(0, 10).replaceAll("-", "/")}
+                            </td>
                             {editMode ? (
-                              <td colSpan={3}>
-                                <div style={{ display: "inline-flex" }}>
-                                  <MDBIcon
-                                    far
-                                    icon="edit"
-                                    onClick={() => updatePaymentHis(item)}
-                                    size="2x"
-                                  />
-                                  <div style={{ width: "20px" }}></div>
-                                  <MDBIcon
-                                    far
-                                    icon="trash-alt"
-                                    onClick={() => deletePaymentPopUp(item.id)}
-                                    size="2x"
-                                  />
+                              <td colSpan={2}>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      marginTop: "5px",
+                                      marginRight: "20px",
+                                      fontSize: "1.5em",
+                                    }}
+                                  >
+                                    <MDBIcon
+                                      far
+                                      icon="edit"
+                                      onClick={() => updatePaymentHis(item)}
+                                    />
+                                  </div>
+                                  <div
+                                    style={{
+                                      marginTop: "5px",
+                                      cursor: "pointer",
+                                      fontSize: "1.5em",
+                                    }}
+                                  >
+                                    <MDBIcon
+                                      far
+                                      icon="trash-alt"
+                                      onClick={() =>
+                                        deletePaymentPopUp(item.id)
+                                      }
+                                      light
+                                    />
+                                  </div>
                                 </div>
                               </td>
                             ) : (

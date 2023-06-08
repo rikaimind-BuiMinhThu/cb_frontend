@@ -11,6 +11,7 @@ import { Button } from "react-bootstrap";
 import { Pagination } from "@material-ui/lab";
 import ModalShort from "./Popup/ModalShort";
 import { tokenExpired } from "api/tokenExpired";
+import { MDBIcon } from "mdbreact";
 
 function PlanManagement() {
   var [dataList, setDataList] = useState([]);
@@ -408,27 +409,12 @@ function PlanManagement() {
                             <td colSpan={2}>{item.price}</td>
                             <td colSpan={5}>{item.description}</td>
                             <td colSpan={2}>
-                              <div style={{ display: "inline-flex" }}>
-                                <div onClick={() => updateClientUser(item)}>
-                                  <i
-                                    className="nc-icon nc-align-center nc-3x"
-                                    style={{
-                                      fontSize: "30px",
-                                      marginTop: "5px",
-                                      marginRight: "30px",
-                                    }}
-                                  ></i>
+                              <div style={{ display: 'flex', justifyContent:"center" }}>
+                                <div style={{ marginTop: '5px', marginRight: '20px', fontSize:"1.5em"}}>
+                                  <MDBIcon far icon="edit" onClick={() => updateClientUser(item)}/>
                                 </div>
-
-                                <div onClick={() => deleteClientPopup(item.id)}>
-                                  <i
-                                    className="nc-icon nc-box nc-3x"
-                                    style={{
-                                      fontSize: "30px",
-                                      marginTop: "5px",
-                                      cursor: "pointer",
-                                    }}
-                                  ></i>
+                                <div style={{ marginTop: '5px', cursor:'pointer', fontSize:"1.5em"}}>
+                                  <MDBIcon far icon="trash-alt" onClick={() => deleteClientPopup(item.id)} light/>
                                 </div>
                               </div>
                             </td>
@@ -450,7 +436,7 @@ function PlanManagement() {
         </Row>
 
         <Modal open={isOpenAddPlan} onClose={() => setIsOpenAddPlan(false)}>
-          <div style={{ width: "100%" }}>
+          <div style={{ width: "100%", minHeight:"500px" }}>
             <div style={{ marginTop: "-30px" }}>
               <h4>プラン追加</h4>
               <div
@@ -528,7 +514,7 @@ function PlanManagement() {
         </Modal>
 
         <Modal open={isOpenUpdate} onClose={() => setIsOpenUpdate(false)}>
-          <div style={{ width: "100%" }}>
+          <div style={{ width: "100%", minHeight:"500px" }}>
             <div style={{ marginTop: "-30px" }}>
               <h4>プラン追加</h4>
               <div
