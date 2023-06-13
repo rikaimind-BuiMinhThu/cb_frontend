@@ -1996,6 +1996,7 @@ function Preview() {
       scenario_id: scenarioId,
       message: renderMessageArr[indexMessage],
       user_id: uuid,
+      bot_type: "web"
     };
     if (dataMessages[indexMessageRender].message_content[0]?.text_input?.save_input_content === "create_order") {
       await new Promise((resolve) => {

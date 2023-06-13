@@ -22,7 +22,6 @@ function ClientPaymentDetail() {
   const [dataList, setDataList] = useState([]);
   const [clientDetail, setClientDetail] = useState({});
   const [subscriptionStartAt, setSubscriptionStartAt] = useState(null);
-  const [subscriptionEndAt, setSubscriptionEndAt] = useState(null);
 
   const [totalPage, setTotalPage] = useState();
   const [page, setPage] = useState(1);
@@ -33,6 +32,7 @@ function ClientPaymentDetail() {
   const [endAt, setEndAt] = useState();
   const [status, setStatus] = useState("unpaid");
   const [paidAt, setPaidAt] = useState();
+  const [price, setPrice] = useState(0);
 
   const [msgNoti, setMsgNoti] = useState();
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
@@ -85,11 +85,6 @@ function ClientPaymentDetail() {
         if (client.subscription_start_at) {
           setSubscriptionStartAt(
             moment.tz(client.subscription_start_at, "Asia/Tokyo").toDate()
-          );
-        }
-        if (client.subscription_end_at) {
-          setSubscriptionEndAt(
-            moment.tz(client.subscription_end_at, "Asia/Tokyo").toDate()
           );
         }
       })
@@ -151,6 +146,7 @@ function ClientPaymentDetail() {
     if (item.paid_at != null)
       setPaidAt(moment.tz(item.paid_at, "Asia/Tokyo").toDate());
     setStatus(item.status);
+    setPrice(item.price);
 
     setIsOpenUpdate(true);
   }
@@ -292,7 +288,9 @@ function ClientPaymentDetail() {
 
   function onChangeStartAt(date) {
     setStartAt(date);
-    if (endAt && date > endAt) {
+    if (!endAt) {
+      setEndAt(moment(date).add(1, "months").toDate());
+    } else if (endAt && date > endAt) {
       setEndAt(date);
     }
   }
@@ -353,6 +351,7 @@ function ClientPaymentDetail() {
                         <th colSpan={1}> ID </th>
                         <th colSpan={2}> 課金開始日 </th>
                         <th colSpan={2}> 課金終了日 </th>
+                        <th colSpan={1}> 価格 </th>
                         <th colSpan={1}> スターテス </th>
                         <th colSpan={2}> 支払日 </th>
                         <th colSpan={2}> 作成日 </th>
@@ -383,6 +382,7 @@ function ClientPaymentDetail() {
                                 ? item.end_at.slice(0, 10).replaceAll("-", "/")
                                 : ""}
                             </td>
+                            <td colSpan={1}>{item.price}</td>
                             <td colSpan={1}>
                               {item.status === "paid" ? "支払われた" : "未払い"}
                             </td>
@@ -392,7 +392,9 @@ function ClientPaymentDetail() {
                                 : ""}
                             </td>
                             <td colSpan={2}>
-                              {item.created_at.slice(0, 10).replaceAll("-", "/")}
+                              {item.created_at
+                                .slice(0, 10)
+                                .replaceAll("-", "/")}
                             </td>
                             {editMode ? (
                               <td colSpan={2}>
@@ -530,6 +532,23 @@ function ClientPaymentDetail() {
                 </div>
                 <br />
                 <br />
+
+                <label className="label-input">
+                  価格
+                  <input
+                    style={{ padding: "3px 0px 3px 5px" }}
+                    className="input-field"
+                    defaultValue={0}
+                    name="price"
+                    id="price"
+                    onChange={(e) => onChangeStatus(e)}
+                    value={price}
+                    disabled={true}
+                  />
+                </label>
+                <br />
+                <br />
+
                 <label className="label-input">
                   スターテス
                   <select
@@ -667,6 +686,21 @@ function ClientPaymentDetail() {
                     }}
                   ></label>
                 </div>
+                <br />
+                <br />
+                <label className="label-input">
+                  価格
+                  <input
+                    style={{ padding: "3px 0px 3px 5px" }}
+                    className="input-field"
+                    defaultValue={0}
+                    name="price"
+                    id="price"
+                    onChange={(e) => onChangeStatus(e)}
+                    value={price}
+                    disabled={true}
+                  />
+                </label>
                 <br />
                 <br />
                 <label className="label-input">

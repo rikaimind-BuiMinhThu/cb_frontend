@@ -1587,10 +1587,10 @@ function ClientManagement() {
                             <td>{item?.is_web ? 'あり' : 'なし'}</td> {/* Web bot */}
                             <td>{item?.is_line ? 'あり' : 'なし'}</td> {/* Line bot */}
                             <td>{item?.is_tiktok ? 'あり' : 'なし'}</td> {/* Tiktok bot */}
-                            <td>{item.instagram_conversion_count}</td>{/* Instagram bot conversion  */}
-                            <td>{item?.web_conversation_count}</td>{/* Web bot conversion  */}
-                            <td></td>{/* Line bot conversion  */}
-                            <td></td>{/* Tiktkl bot conversion  */}
+                            <td>{item.bot_cv_instagram}</td>{/* Instagram bot conversion  */}
+                            <td>{item.bot_cv_web}</td>{/* Web bot conversion  */}
+                            <td>{item.bot_cv_line}</td>{/* Line bot conversion  */}
+                            <td>{item.bot_cv_tiktok}</td>{/* Tiktkl bot conversion  */}
                             <td>{item.last_sign_in_at?.replaceAll('/', '-')}</td>
                             <td className="actionListClient">
                               <div style={{ display: 'flex' }}>

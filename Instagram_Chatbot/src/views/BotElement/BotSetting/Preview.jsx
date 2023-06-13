@@ -1274,7 +1274,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
         setIndexUser(prev => prev + 1);
         let data_submit = {
             scenario_id: scenarioId,
-            message: renderMessageArr[indexMessage]
+            message: renderMessageArr[indexMessage],
+            bot_type: "web"
         }
         if (dataMessages.length - 1 === indexMessageRender) {
             await new Promise((resolve) => {
