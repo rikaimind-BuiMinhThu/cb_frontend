@@ -439,7 +439,7 @@ var routes = [
   },
   {
     path: '/bot-chat-log',
-    name: 'Chat logs',
+    name: '会話',
     component: BotChatLog,
     layout: '/admin',
   },

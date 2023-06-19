@@ -961,7 +961,7 @@ function Sidebar(props) {
                         activeStyle={{ color: 'black' }}
                       >
                         <MDBIcon fas icon='fa fa-comments' style={{ color: 'black' }} />
-                        <p style={{ color: 'black' }}>Chat Logs</p>
+                        <p style={{ color: 'black' }}>会話</p>
                       </NavLink>
                     </li>
                 <li
