@@ -1114,7 +1114,6 @@ export default function UserMessage({
                               );
                               if (messageContent.length === 1) onClickNext();
                             }}
-                            
                           >
                             <span>{item.text}</span>
                           </div>
@@ -2397,39 +2396,21 @@ export default function UserMessage({
                     >
                       都道府県
                     </div>
-                    {zipCodeAddress.is_use_dropdown ? (
-                      <SelectCustom
-                        style={{ width: "100%" }}
-                        value={zipCodeAddress?.value_prefecture}
-                        data={dataPrefectures}
-                        keyValue="name"
-                        nameValue="name"
-                        placeholder={zipCodeAddress.prefecture}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "value_prefecture"
-                          )
-                        }
-                      />
-                    ) : (
-                      <InputCustom
-                        placeholder={zipCodeAddress.prefecture}
-                        disabled={true}
-                        style={{ width: "100%" }}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            "value_prefecture"
-                          )
-                        }
-                        value={zipCodeAddress.value_prefecture}
-                      />
-                    )}
+
+                    <InputCustom
+                      placeholder={zipCodeAddress.prefecture}
+                      disabled={true}
+                      style={{ width: "100%" }}
+                      onChange={(value) =>
+                        onChangeValue(
+                          indexContent,
+                          content.type,
+                          value,
+                          "value_prefecture"
+                        )
+                      }
+                      value={zipCodeAddress.value_prefecture}
+                    />
                   </div>
                 )}
                 {zipCodeAddress.municipality !== undefined && (

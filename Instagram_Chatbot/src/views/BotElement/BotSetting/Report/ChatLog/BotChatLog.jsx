@@ -157,7 +157,6 @@ function BotChatLog() {
           }
 
           setConversions(conversations);
-          console.log("conversations", conversations);
 
           api
             .get(
@@ -165,7 +164,6 @@ function BotChatLog() {
             )
             .then(async (res) => {
               if (res.data.code === 1) {
-                console.log("preview", res.data);
                 let messageArr = [];
                 if (res.data.data?.conversation?.messages?.length > 0) {
                   messageArr = [...res.data.data?.conversation?.messages];
@@ -493,45 +491,138 @@ function BotChatLog() {
                         break;
                       }
                     }
-                    for (
-                      let msIndex = 0;
-                      msIndex < messageArr[i].message_content.length;
-                      msIndex++
-                    ) {
+                    for (let msIndex = 0; msIndex < messageArr[i].message_content.length; msIndex++) {
                       const element = messageArr[i].message_content[msIndex];
-                      console.log(element);
-                      console.log(conversations[conversationIndex]);
                       //TODO: find message type
-                      let chat = conversations.find(
-                        (c) =>
-                          c?.data_input_name ===
-                          element[element.type]?.save_input_content || c?.ui_type === element[element.type]?.save_input_content
-                      );
-                      if (element.type === "radio_button") {
-                      } else
-                      if (element.type === "text_input") {
-                        
+                      let chats = conversations.filter((c) =>c?.message_id === messageArr[i].id);
+                      if(chats.length === 0) {
+                        if (element.type === "agree_term") {
+                          element[element.type].isAgree = true;
+                        }
+                        break;
                       }
+                      let chat = chats.find(
+                        (c) => c?.data_input_name === element[element.type]?.save_input_content
+                      );
+                      if(!chat) {
+                        chat = chats.find((c) => c?.ui_type === element.type);
+                      }
+                      const subElement = element[element.type];
+                      if (element.type === "text_input") {
+                        if(subElement.type === "text"){
+                          if(element[element.type].isSplitInput){
+                            element[element.type][subElement.type].valueLeft = chat.valueLeft
+                            element[element.type][subElement.type].valueRight = chat.valueRight
+                          } else element[element.type][subElement.type].value = chat.value
+                        }
+                        if(subElement.type === "phone_number"){
+                          if(subElement.withHyphen){
+                            
+                          } else element[element.type][subElement.type].value = chat.value
+                        }
+                        if(subElement.type === "password"){
+                          element[element.type][subElement.type].password = "********"
+                        }
+                        if(["urls", "email_address"].includes( subElement.type)){
+                          element[element.type][subElement.type].value = chat.value;
+                        }
+                        if(subElement.type === "email_confirmation"){
+                          element[element.type][subElement.type].value = chat.value;
+                          element[element.type][subElement.type].valueConfirm = chat.value;
+                        }
+                        if(subElement.type === "password_confirmation"){
+                          element[element.type][subElement.type].password = "********"
+                          element[element.type][subElement.type].confirm_password = "********"
+                        }
+                      } 
+                      if (element.type === "radio_button") {
+                        element[element.type].initial_selection = chat.value;
+                        // if(subElement.type==="default"){
+                        //   element[element.type].initial_selection = chat.value;
+                        // }
+                      } 
+                      if (element.type === "checkbox") {
+                        element[element.type][subElement.type].checkedValue = chat.value
+                        element[element.type][subElement.type].initial_selection_picture = chat.value
+                      } 
                       if (element.type === "pull_down") {
-                        let chat = conversations.find(
-                          (c) =>
-                            c?.data_input_name ===
-                            element?.pull_down?.save_input_content
-                        );
-                        if (chat) {
-                          if (chat.integer_value) {
-                            element.initial_selection = chat.integer_value;
-                          }
+                        element[element.type][subElement.type].value = chat.value
+
+                        element[element.type][subElement.type].valueLeft = chat.valueLeft
+                        element[element.type][subElement.type].valueRight = chat.valueRight
+
+                        if(subElement.type === 'time_hm'){
+                          element[element.type][subElement.type].valueHour = chat.valueHour
+                          element[element.type][subElement.type].valueMinute = chat.valueMinute
+                        }
+                        if(["date_ym", "date_ymd_hm", "dob_ym", "date_md", "date_ymd", "dob_ymd"].includes( subElement.type)){
+                          element[element.type][subElement.type].valueYear = chat.valueYear
+                          element[element.type][subElement.type].valueMonth = chat.valueMonth
+                          element[element.type][subElement.type].valueDay = chat.valueDay
+                        }
+                        if(subElement.type === 'timezone_from_to'){
+                          element[element.type][subElement.type].valueHour1 = chat.valueHour1
+                          element[element.type][subElement.type].valueMinute1 = chat.valueMinute1
+                          element[element.type][subElement.type].valueHour2 = chat.valueHour2
+                          element[element.type][subElement.type].valueMinute2 = chat.valueMinute2
+                        }
+                        if(subElement.type === 'period_from_to'){
+                          element[element.type][subElement.type].valueYear1 = chat.valueYear1
+                          element[element.type][subElement.type].valueMonth1 = chat.valueMonth1
+                          element[element.type][subElement.type].valueDay1 = chat.valueDay1
+                          element[element.type][subElement.type].valueYear2 = chat.valueYear2
+                          element[element.type][subElement.type].valueMonth2 = chat.valueMonth2
+                          element[element.type][subElement.type].valueDay2 = chat.valueDay2
+                        }
+                        if(subElement.type === 'up_to_municipality'){
+                          element[element.type][subElement.type].prefecture = chat.prefecture
+                          element[element.type][subElement.type].city = chat.city
+                        }
+                      } 
+                      if (element.type === "zip_code_address") {
+                        element[element.type].value_address = chat.content?.value_address
+                        element[element.type].value_building_name = chat.content?.value_building_name
+                        element[element.type].value_municipality = chat.content?.value_municipality
+                        element[element.type].value_post_code = chat.content?.value_post_code
+                        element[element.type].value_post_code_left = chat.content?.value_post_code_left
+                        element[element.type].value_post_code_right = chat.content?.value_post_code_right
+                        element[element.type].value_prefecture = chat.content?.value_prefecture
+                      }
+
+                      if(element.type === "calendar"){
+                        if(["date_selection", "embedded"].includes(subElement.type)){
+                          element[element.type][subElement.type].date_select = chat.date_select
+                        }
+                        if(subElement.type === "start_end_date"){
+                          element[element.type][subElement.type].start_date_select = chat.start_date_select
+                          element[element.type][subElement.type].end_date_select = chat.end_date_select
                         }
                       }
+
+                      if (element.type === "card_payment_radio_button") {
+                        if(subElement.type === "default") {
+                          element[element.type].initial_selection = chat.value;
+                        }
+                      } 
+                      if (element.type === "capture") {
+                        element[element.type][subElement.type].value = chat.value
+                      } 
+                      if (["product_purchase","product_purchase_radio_button"].includes( element.type)) {
+                        if(subElement.multiple_item_purchase) {
+                          subElement.initial_selection = chat.value;
+                        } else {
+                          subElement.initial_selection = [chat.value];
+                        }
+                      } 
+
+                      if (element.type === "slider") {
+                        element[element.type][subElement.type].value = chat.value
+                      } 
                     }
                     setRenderMessageArr(messageArr);
                     conversationIndex++;
                   }
                 }
-                // setIndexMessageRender(index);
-                // setRenderMessageArr(renderMessage);
-                console.log(renderMessage);
               }
             })
             .catch((error) => {
@@ -746,7 +837,6 @@ function BotChatLog() {
                                 className="fa fa-info-circle fa-2"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  console.log(item.user_input_id);
                                 }}
                               ></i>
                             </div>
