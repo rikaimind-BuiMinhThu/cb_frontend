@@ -3668,7 +3668,7 @@ if (scenarioId && botInfor && isOpen  ){
       justifyContent: "center",
       position:'fixed',
       bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
-      right:rightMarginPc? `${rightMarginPc}px`: '10px',
+      right:rightMarginPc? `${rightMarginPc}px`: '0px',
     }}
   >
     <img
@@ -3695,7 +3695,7 @@ if (scenarioId && botInfor && isOpen  ){
       justifyContent: "left",
       position:'fixed',
       bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
-      right:rightMarginPc? `${rightMarginPc}px`: '10px',
+      right:rightMarginPc? `${rightMarginPc}px`: '0px',
     }}
   >
      <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
