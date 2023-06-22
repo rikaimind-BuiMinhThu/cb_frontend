@@ -2217,7 +2217,7 @@ const Scenario = () => {
                   </div>
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
-                    <div className="ss-overview-detail" style={{width:"100%", paddingRight:"10px"}}>
+                    <div className="ss-overview-detail">
                       {(!dataMessages || dataMessages.length === 0) &&
                         <div className="ss-add-action-wrapper-empty-data">
                           <MDBIcon fas icon="plus-circle" className="ss-add-icon"></MDBIcon>
