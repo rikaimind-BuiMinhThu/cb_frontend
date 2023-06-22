@@ -2216,8 +2216,8 @@ const Scenario = () => {
                     <label>定期注文のみ</label>
                   </div>
                   {/* Overview scenario */}
-                  <div style={{ ...errorScenarioName ? { height: 'calc(100% - 109px)' } : { height: 'calc(100% - 87px)' }, backgroundColor: '#f6fbff' }}>
-                    <div className="ss-overview-detail">
+                  <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
+                    <div className="ss-overview-detail" style={{width:"100%", paddingRight:"10px"}}>
                       {(!dataMessages || dataMessages.length === 0) &&
                         <div className="ss-add-action-wrapper-empty-data">
                           <MDBIcon fas icon="plus-circle" className="ss-add-icon"></MDBIcon>
