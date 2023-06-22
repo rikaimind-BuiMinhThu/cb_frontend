@@ -73,7 +73,7 @@
 
 /* ss overview */
 .ss-overview-detail {
-  width: 140%;
+  width: 100%;
   height: 100%;
   margin-top: 10px;
   border-radius: 5px;
@@ -82,7 +82,7 @@
   padding: 10px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 42%;
+  padding-right: 130px;
 }
 
 .ss-message-wrapper {
