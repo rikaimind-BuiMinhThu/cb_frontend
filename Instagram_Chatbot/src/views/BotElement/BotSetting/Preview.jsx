@@ -2313,7 +2313,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         </div>
                     </div>
                 </div>
-                <div id="sp-header" style={botInfor?.main_color && { backgroundColor: "red" }} className="sp-header">
+                <div id="sp-header" style={botInfor?.main_color && { backgroundColor:  botInfor?.main_color }} className="sp-header">
                     <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
                         <div className="sp-header-left-avatar sp-avatar">
                             <img src={botInfor?.icon?.url && (EC_CHATBOT_URL + "/" + botInfor?.icon?.url)} />
