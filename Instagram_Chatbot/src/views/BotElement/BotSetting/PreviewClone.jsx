@@ -1659,7 +1659,7 @@ function Preview() {
                 ) {
                   isValidZipCode = false;
                 }
-              } else if (stringNullOrEmpty(contentType.value_post_code)) {
+              } else if (stringNullOrEmpty(contentType.value_post_code) ) {
                 isValidZipCode = false;
               }
             }
@@ -1691,6 +1691,12 @@ function Preview() {
             if (
               contentType.address !== undefined &&
               stringNullOrEmpty(contentType.value_address)
+            ) {
+              isValidZipCode = false;
+            }
+            if (
+              contentType.address !== undefined &&
+              stringNullOrEmpty(contentType.value_building_name)
             ) {
               isValidZipCode = false;
             }
@@ -6516,14 +6522,17 @@ const UserMessage = ({
                       id="ss-user-input-building"
                       disabled={disabled}
                       style={{ width: "100%" }}
-                      onChange={(value) =>
+                      onChange={(value) =>{
                         onChangeValue(
                           indexContent,
                           content.type,
                           value,
                           "value_building_name"
-                        )
+                        );
+                        
                       }
+                      }
+                      
                       value={zipCodeAddress.value_building_name}
                     />
                   </div>
