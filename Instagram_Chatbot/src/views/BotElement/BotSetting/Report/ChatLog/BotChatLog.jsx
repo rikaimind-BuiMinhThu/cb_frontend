@@ -709,19 +709,18 @@ function BotChatLog() {
     <>
       <div className="content">
         <Row id="screenAll">
-          <Col md="12">
+          <Col>
             <Card>
               <CardHeader>
-                <div className="div-add-bot">
-                  <div className="div-add-bot--search">
-                    <div className="bm_status-filter">
-                      <h6>Scenario</h6>&ensp;
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '20px 0px' }}>
+                  <div className="div-add-bot--search" style={{ width: 'calc(100% - 80px)' }}>
+                    <div className="bm_status-filter" style={{ width: '25%', marginRight: "15px" }}>
+                      <label style={{ margin: '0px 5px 0px 0px', color: '#2c2c2c', fontSize: '14px' }}>シナリオ</label>
                       <select
                         style={{
                           borderRadius: "5px",
                           border: "1px solid #7186a0",
-                          width: "max-content",
-                          padding: "6.5px 0px 6.5px 0px",
+                          padding: "5.5px 0px",
                         }}
                         className="input-field"
                         defaultValue="all"
@@ -737,111 +736,97 @@ function BotChatLog() {
                         ))}
                       </select>
                     </div>
-                    <div style={{ width: "max-content", display: "flex" }}>
-                      <span style={{ marginLeft: "20px", paddingRight: "5px" }}>
-                        Date
-                      </span>
-                      <DatePicker
-                        selected={searchDate && searchDate}
-                        onChange={(date) => setSearchDate(date)}
-                        dateFormat="yyyy/MM/dd"
-                        locale="ja"
-                        value={
-                          searchDate
-                            ? searchDate
-                                .toISOString()
-                                .slice(0, 10)
-                                .replaceAll("-", "/")
-                            : null
-                        }
-                        placeholderText="yyyy/mm/dd"
+                    <div className="bm_status-filter" style={{ marginRight: "15px" }}>
+                      <label style={{ margin: '0px 5px 0px 0px', color: '#2c2c2c', fontSize: '14px' }}>年月日</label>
+                      <div style={{ width: 'calc(100% - 85px)' }}>
+                        <DatePicker
+                          selected={searchDate && searchDate}
+                          onChange={(date) => setSearchDate(date)}
+                          dateFormat="yyyy/MM/dd"
+                          locale="ja"
+                          value={
+                            searchDate
+                              ? searchDate
+                                  .toISOString()
+                                  .slice(0, 10)
+                                  .replaceAll("-", "/")
+                              : null
+                          }
+                          placeholderText="yyyy/mm/dd"
+                        />
+                      </div>
+                    </div>
+                    <div className="bm_status-filter" style={{ width: "30%", marginLeft: "15px", marginRight: "15px" }}>
+                      <label style={{ margin: '0px 5px 0px 0px', color: '#2c2c2c', fontSize: '14px' }}>ユーザーID</label>
+                      <input
+                        style={{ width: 'calc(100% - 85px)' }}
+                        type="text"
+                        placeholder="ボット名 ..."
+                        onChange={(e) => {
+                          if (e.target.value) {
+                            setSearchUserId(e.target.value);
+                            setIsShowSelectUserDate(true);
+                          } else {
+                            setSearchUserId(null);
+                            setIsShowSelectUserDate(false);
+                          }
+                        }}
                       />
                     </div>
-                    <h6>ユーザーID</h6>&ensp;
-                    <input
-                      type="text"
-                      placeholder="ボット名 ..."
-                      onChange={(e) => {
-                        if (e.target.value) {
-                          setSearchUserId(e.target.value);
-                          setIsShowSelectUserDate(true);
-                        } else {
-                          setSearchUserId(null);
-                          setIsShowSelectUserDate(false);
-                        }
-                      }}
-                    />
-                    <div style={{ marginLeft: "20px" }}>
-                      <div style={{ display: "flex", alignItems: "center" }}>
-                        <div style={{ borderRadius: "5px", padding: "5px" }}>
-                          <DatePicker
-                            selected={searchStartDate && searchStartDate}
-                            onChange={(date) => setSearchStartDate(date)}
-                            dateFormat="yyyy/MM/dd"
-                            locale="ja"
-                            value={
-                              searchStartDate
-                                ? searchStartDate
-                                    .toISOString()
-                                    .slice(0, 10)
-                                    .replaceAll("-", "/")
-                                : null
-                            }
-                            disabled={!isShowSelectUserDate}
-                            placeholderText="yyyy/mm/dd"
-                          />
-                        </div>
-                        <h4
-                          style={{
-                            margin: "0",
-                            fontWeight: "400",
-                            fontSize: "1.2em",
-                          }}
-                        >
-                          から
-                        </h4>
-                        <div style={{ borderRadius: "5px", padding: "5px" }}>
-                          <DatePicker
-                            selected={searchEndDate}
-                            onChange={(date) => setSearchEndDate(date)}
-                            dateFormat="yyyy/MM/dd"
-                            locale="ja"
-                            value={
-                              searchEndDate
-                                ? searchEndDate
-                                    .toISOString()
-                                    .slice(0, 10)
-                                    .replaceAll("-", "/")
-                                : null
-                            }
-                            disabled={!isShowSelectUserDate}
-                            placeholderText="yyyy/mm/dd"
-                          />
-                        </div>
-                        まで
+                    <div className="bm_status-filter" style={{ marginRight: "15px" }}>
+                      <label style={{ margin: '0px 5px 0px 0px', color: '#2c2c2c', fontSize: '14px' }}>から</label>
+                      <div style={{ width: 'calc(100% - 85px)' }}>
+                        <DatePicker
+                          selected={searchStartDate && searchStartDate}
+                          onChange={(date) => setSearchStartDate(date)}
+                          dateFormat="yyyy/MM/dd"
+                          locale="ja"
+                          value={
+                            searchStartDate
+                              ? searchStartDate
+                                  .toISOString()
+                                  .slice(0, 10)
+                                  .replaceAll("-", "/")
+                              : null
+                          }
+                          disabled={!isShowSelectUserDate}
+                          placeholderText="yyyy/mm/dd"
+                        />
                       </div>
-                      <span
-                        id="dateCheckErrMsg"
-                        style={{ color: "red", display: "none" }}
-                      ></span>
+                    </div>
+                    <div className="bm_status-filter">
+                      <label style={{ margin: '0px 5px 0px 0px', color: '#2c2c2c', fontSize: '14px' }}>まで</label>
+                      <div style={{ width: 'calc(100% - 85px)' }}>
+                        <DatePicker
+                          selected={searchEndDate}
+                          onChange={(date) => setSearchEndDate(date)}
+                          dateFormat="yyyy/MM/dd"
+                          locale="ja"
+                          value={
+                            searchEndDate
+                              ? searchEndDate
+                                  .toISOString()
+                                  .slice(0, 10)
+                                  .replaceAll("-", "/")
+                              : null
+                          }
+                          disabled={!isShowSelectUserDate}
+                          placeholderText="yyyy/mm/dd"
+                        />
+                      </div>
                     </div>
                   </div>
+                  <div>
+                    <Button
+                      style={{ backgroundColor: "#66615b", margin: "0px" }}
+                      onClick={(e) => pressSearchButton()}
+                    >
+                      検索
+                    </Button>
 
-                  <Button
-                    style={{ backgroundColor: "#66615b" }}
-                    onClick={(e) => pressSearchButton()}
-                  >
-                    検索
-                  </Button>
+                  </div>
                 </div>
-                <div
-                  style={{
-                    width: "100%",
-                    height: "1px",
-                    backgroundColor: "gray",
-                    opacity: 0.3,
-                  }}
-                ></div>
+                <hr />
               </CardHeader>
               <CardBody
                 style={{
