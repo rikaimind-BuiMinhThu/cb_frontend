@@ -20,14 +20,18 @@ function Sidebar(props) {
   React.useEffect(() => {
     var cook = Cookies.get('user_role');
     if (cook == 'admin_deel') {
+      document.getElementById('clientPaymentDetail').style.display = 'none';
     } else if (cook == 'admin_client') {
       document.getElementById('sidebarClient').style.display = 'none';
       document.getElementById('sidebarUser').style.display = 'none';
+      document.getElementById('planManagement').style.display = 'none';
       // var elem = document.getElementById('sidebarClient');
       // elem.parentNode.removeChild(elem);
     } else if (cook == 'client') {
       document.getElementById('sidebarClient').style.display = 'none';
       document.getElementById('sidebarUser').style.display = 'none';
+      document.getElementById('planManagement').style.display = 'none';
+      document.getElementById('clientPaymentDetail').style.display = 'none';
     }
   });
 
@@ -528,7 +532,39 @@ function Sidebar(props) {
                   <MDBIcon fas icon='user' style={{ color: 'black' }} />
                   <p style={{ color: 'black' }}>ユーザー管理</p>
                 </NavLink>
-              </li>
+            </li>
+            <li
+              id='planManagement'
+              style={{ listStyleType: 'none', marginLeft: '-50px' }}
+              className={activeRoute('plan-management') + (true ? ' active-pro' : '')}
+              key={'plan-management'}
+            >
+              <NavLink
+                to="/admin/plan-management"
+                className="nav-link"
+                activeClassName="active"
+                activeStyle={{ color: 'black' }}
+              >
+                <MDBIcon fas icon="cogs" style={{ color: "black" }} />
+                <p style={{ color: 'black' }}>Plan Management</p>
+              </NavLink>
+            </li>
+            <li
+              id='clientPaymentDetail'
+              style={{ listStyleType: 'none', marginLeft: '-50px' }}
+              className={activeRoute('client-payment-detail') + (true ? ' active-pro' : '')}
+              key={'client-payment-detail'}
+            >
+              <NavLink
+                to="/admin/client-payment-detail"
+                className="nav-link"
+                activeClassName="active"
+                activeStyle={{ color: 'black' }}
+              >
+                <MDBIcon fas icon="money-check-alt" style={{color: 'black'}} />
+                <p style={{ color: 'black' }}>Payment History</p>
+              </NavLink>
+            </li>
           </ul>
           <ul id='side_bar_bot'>
             <li

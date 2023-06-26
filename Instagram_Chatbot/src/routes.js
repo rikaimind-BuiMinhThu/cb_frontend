@@ -2,6 +2,8 @@ import Dashboard from 'views/Dashboard.jsx';
 import Chatbot from 'views/InstagramBotElement/Chatbot';
 
 import ClientManagement from 'views/ClientManagement';
+import PlanManagement from 'views/PlanManagement';
+import Policy from 'views/InstagramBotElement/Policy';
 import Release from 'views/InstagramBotElement/Release';
 import UserManagement from 'views/UserManagement';
 import Keyword from 'views/InstagramBotElement/Keyword';
@@ -49,6 +51,7 @@ import PaymentGateway from 'views/BotElement/BotSetting/Payment/PaymentGateway';
 import AddPaymentGateway from 'views/BotElement/BotSetting/Payment/AddPaymentGateway';
 import ReplyMailManagement from 'views/BotElement/ReplyMailManagement';
 import DesignChatbot from 'views/BotElement/BotSetting/DesignSetting/DesignChatbot';
+import ClientPaymentDetail from 'views/ClientPaymentDetail';
 
 var routes = [
   {
@@ -434,6 +437,18 @@ var routes = [
     name: 'ボットAdmin',
     // icon: "nc-icon nc-single-02",
     component: BotAdmin,
+    layout: '/admin',
+  },
+  {
+    path: '/plan-management',
+    name: 'プラン管理',
+    component: PlanManagement,
+    layout: '/admin',
+  },
+  {
+    path: '/client-payment-detail',
+    name: 'クライアントの支払い詳細',
+    component: ClientPaymentDetail,
     layout: '/admin',
   },
 ];

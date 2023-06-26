@@ -1274,7 +1274,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
         setIndexUser(prev => prev + 1);
         let data_submit = {
             scenario_id: scenarioId,
-            message: renderMessageArr[indexMessage]
+            message: renderMessageArr[indexMessage],
+            bot_type: "web"
         }
         if (dataMessages.length - 1 === indexMessageRender) {
             await new Promise((resolve) => {
@@ -1287,8 +1288,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     }
                 });
             }).then(() => {
-                api.post(`/api/v1/scenario_users/scenario_user_responses/create_order`, data_submit).then(res => {
-                }).catch((error) => {
+                api.post(`/api/v1/scenario_users/scenario_user_responses/create_order`, data_submit)
+                .then(res => {}).catch((error) => {
                     console.log(error);
                     if (error.response?.data.code === 0) {
                         tokenExpired()
@@ -1521,9 +1522,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                 }
                             }).then(() => {
                                 if (dataMessages.length - 1 === i) {
-                                    api.post(`/api/v1/scenario_users/scenario_user_responses/create_order`, data_submit).then(res => {
-                                        
-                                    }).catch((error) => {
+                                    api.post(`/api/v1/scenario_users/scenario_user_responses/create_order`, data_submit)
+                                    .then(res => {}).catch((error) => {
                                         console.log(error);
                                         if (error.response?.data.code === 0) {
                                             tokenExpired()

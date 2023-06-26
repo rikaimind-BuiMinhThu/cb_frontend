@@ -2002,6 +2002,7 @@ function Preview() {
       scenario_id: scenarioId,
       message: renderMessageArr[indexMessage],
       user_id: uuid,
+      bot_type: "web"
     };
     if (dataMessages[indexMessageRender].message_content[0]?.text_input?.save_input_content === "create_order") {
       await new Promise((resolve) => {
@@ -2065,6 +2066,13 @@ function Preview() {
             api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
             }).catch(err => {
               console.log(err)
+            })
+          
+            api.post(`/api/v1/managements/payment_histories`, data_submit).then((res)=>{}).catch((err) => {
+              console.log(err);
+            if (err.response?.data.code === 0) {
+              tokenExpired();
+            }
             })
           })
           .catch((error) => {
@@ -2382,7 +2390,14 @@ function Preview() {
                         `/api/v1/scenario_users/scenario_user_responses/create_order`,
                         data_submit
                       )
-                      .then((res) => {})
+                      .then((res) => {
+                        api.post(`/api/v1/managements/payment_histories`, data_submit).then((res)=>{}).catch((err) => {
+                          console.log(err);
+                        if (err.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                        })
+                      })
                       .catch((error) => {
                         console.log(error);
                         if (error.response?.data.code === 0) {

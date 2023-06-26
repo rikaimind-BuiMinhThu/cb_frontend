@@ -16,6 +16,7 @@ import ja from "date-fns/locale/ja";
 import 'react-datepicker/dist/react-datepicker.css';
 import { tokenExpired } from 'api/tokenExpired';
 import { EC_CHATBOT_URL } from '../variables/constants'
+import { MDBIcon } from 'mdbreact';
 registerLocale("ja", ja);
 
 function ClientManagement() {
@@ -73,6 +74,8 @@ function ClientManagement() {
   const [endDate, setEndDate] = useState(null);
   const [startDatePreview, setStartDatePreview] = useState(null);
   const [endDatePreview, setEndDatePreview] = useState(null);
+
+  const [plans, setPlans] = useState([]);
 
   /**
    * Check the user permissions
@@ -135,6 +138,23 @@ function ClientManagement() {
         }
       });
   }, [pageIndex]);
+
+  /**
+  * Get list plan  
+  */
+  React.useEffect(() => {
+    api
+      .get(`/api/v1/managements/plans`)
+      .then((res) => {
+        setPlans(res.data.data);
+      })
+      .catch((error) => {
+        React.error(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired()
+        }
+      });
+  }, []);
 
   React.useEffect(() => {
     const datePickerInputs = document.querySelectorAll(
@@ -1350,6 +1370,19 @@ function ClientManagement() {
     }
   };
 
+  function onSelectPlan(el){
+    let plan = plans.find((o) => o.code == el.target.value);
+    if(plan){
+      document.getElementById("newPlanPrice").value = plan.price;
+      if(isOpen){
+        setPrice(plan.price);
+      }
+    }
+  }
+  function gotoPaymentDetail(item){
+    window.location.href = '/admin/client-payment-detail/'+item.id;
+  }
+
   const items = dataList.clients;
   return (
     <>
@@ -1508,13 +1541,7 @@ function ClientManagement() {
                             </td>
                             <td>{item.name}</td>
                             <td>
-                              {item.plan == 'startup'
-                                ? 'スタートアップ'
-                                : item.plan == 'expert'
-                                  ? 'エキスパート'
-                                  : item.plan == 'complete'
-                                    ? '完全成果報酬'
-                                    : 'プレミアム'}
+                              {plans.find((el)=> el.code === item.plan).name}
                             </td>
                             <td>
                               {item?.status === 'pause'
@@ -1560,14 +1587,16 @@ function ClientManagement() {
                             <td>{item?.is_web ? 'あり' : 'なし'}</td> {/* Web bot */}
                             <td>{item?.is_line ? 'あり' : 'なし'}</td> {/* Line bot */}
                             <td>{item?.is_tiktok ? 'あり' : 'なし'}</td> {/* Tiktok bot */}
-                            <td>{item.instagram_conversion_count}</td>{/* Instagram bot conversion  */}
-                            <td>{item?.web_conversation_count}</td>{/* Web bot conversion  */}
-                            <td></td>{/* Line bot conversion  */}
-                            <td></td>{/* Tiktkl bot conversion  */}
+                            <td>{item.bot_cv_instagram}</td>{/* Instagram bot conversion  */}
+                            <td>{item.bot_cv_web}</td>{/* Web bot conversion  */}
+                            <td>{item.bot_cv_line}</td>{/* Line bot conversion  */}
+                            <td>{item.bot_cv_tiktok}</td>{/* Tiktkl bot conversion  */}
                             <td>{item.last_sign_in_at?.replaceAll('/', '-')}</td>
                             <td className="actionListClient">
                               <div style={{ display: 'flex' }}>
-                                <div onClick={(e) => getUserDetail(item)}>
+                                <div style={{marginRight: '30px', marginTop: '5px'}}>
+                                  <MDBIcon fas icon="yen-sign" size='2x' onClick={(e) => gotoPaymentDetail(item)}/>
+                                </div><div onClick={(e) => getUserDetail(item)}>
                                   <i
                                     className="nc-icon nc-badge nc-3x"
                                     style={{
@@ -1704,12 +1733,9 @@ function ClientManagement() {
                     defaultValue={plan}
                     name="plan"
                     id="plan"
+                    onChange={onSelectPlan}
                   >
-                    {/* <option value="" disabled={true}>Select one option</option> */}
-                    <option value="startup">スタートアッププラン</option>
-                    <option value="premium">プレミアムプラン</option>
-                    <option value="expert">エキスパートプラン</option>
-                    <option value="complete">完全成果報酬プラン</option>
+                  {plans.map(e => <option key={e.id} value={e.code}>{e.name}プラン</option>)}
                   </select>
                 </label>
                 <br />
@@ -2677,15 +2703,12 @@ function ClientManagement() {
                   <select
                     style={{ padding: '3px 0px 3px 0px' }}
                     className="input-field"
-                    defaultValue={'start_up_plan'}
+                    defaultValue={plans[0]?.code}
                     name="plan"
                     id="plan"
+                    onChange={onSelectPlan}
                   >
-                    {/* <option value="" disabled={true}>Select one option</option> */}
-                    <option value="startup">スタートアッププラン</option>
-                    <option value="premium">プレミアムプラン</option>
-                    <option value="expert">エキスパートプラン</option>
-                    <option value="complete">完全成果報酬プラン</option>
+                    {plans.map(e => <option key={e.id} value={e.code} >{e.name}プラン</option>)}
                   </select>
                 </label>
                 <br />
@@ -2698,6 +2721,7 @@ function ClientManagement() {
                     type="text"
                     id="newPlanPrice"
                     name="price"
+                    defaultValue={plans[0]?.price}
                   />
                   <label
                     id="newClientプラン価格ErrMsg"
