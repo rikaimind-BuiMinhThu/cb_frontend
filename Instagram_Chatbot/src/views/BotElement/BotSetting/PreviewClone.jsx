@@ -3735,8 +3735,8 @@ if (scenarioId && botInfor && isOpen  ){
               {botInfor?.subtitle}
             </div>
             <div className="sp-header-left-label-title">{botInfor?.title}</div> */}
-            <div id="comment_bubble" style={{display:'flex',  alignContent:'center', alignItems:'center', justifyContent:'center'}}>
-              <p style={{ fontSize:'16px', fontWeight:900,  alignItems:'center', marginTop:'16px' }}>簡単90秒で注文完了</p>
+            <div id="comment_bubble" style={{display:'flex', paddingLeft:'20px'}}>
+              <p style={{ fontSize:'18px', fontWeight:900,  alignItems:'center', marginTop:'8px' }}>簡単90秒で注文完了</p>
             </div>
           </div>
          <div className="sp-header-right-arrow" style={{marginRight:'8px'}}>
