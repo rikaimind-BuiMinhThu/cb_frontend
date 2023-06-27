@@ -52,6 +52,7 @@ import AddPaymentGateway from 'views/BotElement/BotSetting/Payment/AddPaymentGat
 import ReplyMailManagement from 'views/BotElement/ReplyMailManagement';
 import DesignChatbot from 'views/BotElement/BotSetting/DesignSetting/DesignChatbot';
 import ClientPaymentDetail from 'views/ClientPaymentDetail';
+import BotChatLog from 'views/BotElement/BotSetting/Report/ChatLog/BotChatLog';
 
 var routes = [
   {
@@ -449,6 +450,12 @@ var routes = [
     path: '/client-payment-detail',
     name: 'クライアントの支払い詳細',
     component: ClientPaymentDetail,
+    layout: '/admin',
+  },
+  {
+    path: '/bot-chat-log',
+    name: '会話',
+    component: BotChatLog,
     layout: '/admin',
   },
 ];
