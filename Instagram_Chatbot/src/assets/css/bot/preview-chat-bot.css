@@ -88,7 +88,7 @@
 
 .sp-avatar img {
     border-radius: 50%;
-    width: 50px;
+    width: 60px;
 }
 
 .sp-header-left-label {
@@ -639,9 +639,55 @@ slideUp
         align-items: center;
         padding: 15px;
     }
+    .sp-header-left-bt {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+    }
+    #comment_bubble {
+        width: 220px;
+        height: 46px;
+        background: #fff;
+        position: relative;
+        -moz-border-radius: 12px;
+        -webkit-border-radius: 12px;
+        border-radius: 23px;
+    }
+    
+    #comment_bubble:before {
+        content: "";
+        width: 0;
+        height: 0;
+        right: 92%;
+        top: 13px;
+        position: absolute;
+        border-top: 9px solid transparent;
+        border-right: 26px solid #fff;
+        border-bottom: 9px solid transparent;
+    }
+    .arrow {
+        border: solid black;
+        border-width: 0 3px 3px 0;
+        display: inline-block;
+        padding: 3px;
+      }
+      
+     
+      
+      .up {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+      }
     .sp-avatar img {
         border-radius: 50%;
         width: 50px;
+    }
+    .sp-avatar-bt img {
+        border-radius: 50%;
+        width: 58px;
     }
 
 

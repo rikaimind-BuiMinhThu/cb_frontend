@@ -3706,34 +3706,42 @@ if (scenarioId && botInfor && isOpen  ){
     onClick={() => onOpenPreview(!isOpen)}
     style={{
       backgroundColor: botInfor?.main_color && botInfor?.main_color,
-      width: `${widthPc}px`,
-      height: "65px",
-      borderTopLeftRadius: "5px",
-      borderTopRightRadius: "5px",
-      borderBottomLeftRadius: "15px",
-      borderBottomRightRadius: "15px",
+      // width: `${widthPc}px`,
+      width: `360px`,
+      height: "66px",
+      borderRadius:'35px',
       display: "flex",
-      justifyContent: "left",
+      justifyContent: 'space-between',
+      alignItems:'center',
+      paddingLeft:'3px',
+      paddingRight:'3px',
       position:'fixed',
+      padding:'auto',
       bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
       right:rightMarginPc? `${rightMarginPc}px`: '0px',
     }}
   >
-     <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
-          <div className="sp-header-left-avatar sp-avatar">
+     <div className="sp-header-left-bt" onClick={() => onOpenPreview(!isOpen)}>
+          <div className="sp-header-left-avatar sp-avatar-bt">
             <img
               src={
                 botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
               }
             />
           </div>
-          <div className="sp-header-left-label">
-            <div className="sp-header-left-label-sub-title">
+        </div>
+        <div style={{ alignItems:'center', justifyContent:"center", padding:'auto'}}>
+            {/* <div className="sp-header-left-label-sub-title">
               {botInfor?.subtitle}
             </div>
-            <div className="sp-header-left-label-title">{botInfor?.title}</div>
+            <div className="sp-header-left-label-title">{botInfor?.title}</div> */}
+            <div id="comment_bubble" style={{display:'flex',  alignContent:'center', alignItems:'center', justifyContent:'center'}}>
+              <p style={{ fontSize:'16px', fontWeight:900,  alignItems:'center', marginTop:'16px' }}>簡単90秒で注文完了</p>
+            </div>
           </div>
-        </div>
+         <div className="sp-header-right-arrow" style={{marginRight:'8px'}}>
+              <MDBIcon fas icon="chevron-circle-up" />
+          </div>
   </div>
     )
   } else if (isOpen===false &&mobileCheck()===false && positionPc ==='2'){
