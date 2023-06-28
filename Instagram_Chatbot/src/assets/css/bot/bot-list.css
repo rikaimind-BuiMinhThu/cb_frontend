@@ -52,9 +52,10 @@
 }
 .div-add-bot--search input {
   margin-right: 10px;
-  padding: 5px 15px;
+  padding: 5px 10px;
   border-radius: 5px;
   border: 1px solid #7186a0;
+  width: 100%;
 }
 .bm_status-filter {
   display: flex;
@@ -139,4 +140,22 @@ table.bl-table thead tr th {
 
 .bm__bot-name:hover {
   color: #327aed;
+}
+
+.filter-from-to {
+  padding: 10px 0;
+}
+
+@media screen and (max-width: 1456px) {
+  .wrap-bot-search {
+    display: block !important;
+  }
+
+  .filter-from-to {
+    padding: 0 0 10px 0;
+  }
+
+  .filter-id {
+    padding-top: 10px;
+  }
 }
