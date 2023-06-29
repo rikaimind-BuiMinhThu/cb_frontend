@@ -289,7 +289,7 @@ function ClientPaymentDetail() {
   function onChangeStartAt(date) {
     setStartAt(date);
     if (!endAt) {
-      setEndAt(moment(date).add(1, "months").toDate());
+      setEndAt(moment(date).add(1, "months").subtract(1, 'days').toDate());
     } else if (endAt && date > endAt) {
       setEndAt(date);
     }
