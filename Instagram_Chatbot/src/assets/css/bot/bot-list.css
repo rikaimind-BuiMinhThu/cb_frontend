@@ -57,6 +57,9 @@
   border: 1px solid #7186a0;
   width: 100%;
 }
+.bot-chat-log .div-add-bot--search input {
+  margin-right: unset;
+}
 .bm_status-filter {
   display: flex;
   align-items: center;

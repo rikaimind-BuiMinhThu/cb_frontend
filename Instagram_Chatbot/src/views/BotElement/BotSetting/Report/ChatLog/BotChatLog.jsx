@@ -712,7 +712,7 @@ function BotChatLog() {
           <Col>
             <Card>
               <CardHeader>
-              <Row>
+              <Row className="bot-chat-log">
                 <Col md="12">
                   <div className="d-flex justify-content-between align-items-center" style={{ padding: '10px 0px' }}>
                     <div className="div-add-bot--search wrap-bot-search">
@@ -723,7 +723,9 @@ function BotChatLog() {
                             style={{
                               borderRadius: "5px",
                               border: "1px solid #7186a0",
-                              padding: "5.5px 0px",
+                              padding: "5px 10px",
+                              width: "283px",
+                              height: "34px"
                             }}
                             className="input-field"
                             defaultValue="all"
