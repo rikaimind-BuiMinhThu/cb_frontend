@@ -461,9 +461,31 @@
     white-space: pre-wrap;
     width: fit-content !important;
     max-width: 100%;
+    overflow-y: unset;
 }
 
 
+.btn-cancel__modal-bot {
+    background-color: rgb(255, 255, 255);
+    color: rgba(0, 0, 0, 0.85);
+    font-family: 'Fira Sans', sans-serif;
+    border: 1px solid #D0D6DC;
+    font-weight: 500;
+}
+.btn-cancel__modal-bot:hover {
+    background-color: #e6e6e6 !important;
+    color: #333 !important;
+    border: 1px solid #D0D6DC;
+}
+
+.btn-close__modal-bot {
+    background-color: #d9534f;
+    font-family: 'Fira Sans', sans-serif;
+    font-weight: 500;
+}
+.btn-close__modal-bot:hover {
+    background-color: #d9534f !important;
+}
 
 .sp-product-purchase-custom-input-quantity input {
     text-align: center;

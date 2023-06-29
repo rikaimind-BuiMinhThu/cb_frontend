@@ -29,6 +29,15 @@ import {
 } from '../../../variables/constants';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
+import ModalPreviewBot from '../../../views/Popup/ModalPreviewBot';
+import iconMessageBlue from "../../../assets/img/icon-mess/icon-message-chat-blue.png";
+import iconMessageGreen from "../../../assets/img/icon-mess/icon-message-chat-green.png";
+import iconMessageOrange from "../../../assets/img/icon-mess/icon-message-chat-orange.png";
+import iconMessageYellow from "../../../assets/img/icon-mess/icon-message-chat-yellow.png";
+import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pink.png";
+import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
+import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
+import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
 // import { Input, rgbToHex } from '@material-ui/core';
 
 const _ = require('lodash');
@@ -177,6 +186,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     const [towns, setTowns] = useState();
     const [zipcode, setZipcode] = useState();
     const [indexContentZipcode, setContentZipcode] = useState();
+    const [showPopupCloseBot, setShowPopupCloseBot] = useState(false);
+    const [activePopupCloseBot, setActivePopupCloseBot] = useState(true);
 
     const [objParam, setObjParam] = useState(() => {
         let dataObj = {
@@ -197,6 +208,15 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
         });
         return dataObj;
     });
+
+    
+    function handleCloseBot(isOpen) {
+        if (activePopupCloseBot && isOpen) {
+            setShowPopupCloseBot(true);
+            return;
+        }
+        onOpenPreview(!isOpen);
+    }
 
     function getAllUrlParams(url) {
         var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
@@ -269,47 +289,57 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     setDataVariables(variablesAll);
                     setDataMessages(messageArr);
                     setUrlThanksPage(urlThanks);
+                    setActivePopupCloseBot(res.data.design_settings?.popup_close_bot ? true : false)
                     if (res.data.chatbot) {
-                        let opacity_color, message_color, font_color;
+                        let opacity_color, message_color, font_color, icon_mess;
                         if (res.data.chatbot.main_color === 'blue') {
                             opacity_color = '#D6E0EF';
                             message_color = '#3CACEF';
-                            font_color = '#fff'
+                            font_color = '#fff';
+                            icon_mess = iconMessageBlue;
                         } else if (res.data.chatbot.main_color === 'green') {
                             opacity_color = '#DEEADB';
                             message_color = '#9DDB7C';
-                            font_color = '#fff'
+                            font_color = '#fff';
+                            icon_mess = iconMessageGreen;
                         } else if (res.data.chatbot.main_color === 'orange') {
                             opacity_color = '#F4E5DA';
                             message_color = '#EF8D2F';
-                            font_color = '#fff'
+                            font_color = '#fff';
+                            icon_mess = iconMessageOrange;
                         } else if (res.data.chatbot.main_color === 'yellow') {
                             opacity_color = '#F0EFEB';
                             message_color = '#F3AA2D';
                             res.data.chatbot.main_color = "#F6CA21";
-                            font_color = '#fff'
+                            font_color = '#fff';
+                            icon_mess = iconMessageYellow;
                         } else if (res.data.chatbot.main_color === 'pink') {
                             opacity_color = '#EBDDE3';
                             message_color = '#E65B83';
                             res.data.chatbot.main_color = "#F170AA";
-                            font_color = '#fff'
+                            font_color = '#fff';
+                            icon_mess = iconMessagePink;
                         } else if (res.data.chatbot.main_color === 'purple') {
                             opacity_color = '#E9E8F1';
                             message_color = '#AF82D5';
                             res.data.chatbot.main_color = "#8C66D9";
-                            font_color = '#fff'
+                            font_color = '#fff';
+                            icon_mess = iconMessagePurple;
                         } else if (res.data.chatbot.main_color === 'black') {
                             opacity_color = '#ECEDE8';
                             message_color = '#fff';
-                            font_color = '#333333'
+                            font_color = '#333333';
+                            icon_mess = iconMessageBlack;
                         } else if (res.data.chatbot.main_color === 'white') {
                             opacity_color = '#fff';
                             message_color = '#F5F5F5';
-                            font_color = '#000'
+                            font_color = '#000';
+                            icon_mess = iconMessageWhite;
                         }
                         res.data.chatbot.opacity_color = opacity_color;
                         res.data.chatbot.message_color = message_color;
                         res.data.chatbot.font_color = font_color;
+                        res.data.chatbot.icon_mess = icon_mess;
                     }
 
                     setBotInfor(res.data.chatbot);
@@ -2072,6 +2102,10 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     }
 
     const handleOpenWithDrawal = () => {
+        if (activePopupCloseBot) {
+            setShowPopupCloseBot(true)
+            return;
+          }
         if (botInfor && botInfor.withdrawal_prevention_status === "invalid") {
             setIndexUser(0);
             let indexTiming = 0;
@@ -2167,6 +2201,37 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     return (
         <React.Fragment>
             <div id="sp-container" className="sp-container slideUp" >
+                {activePopupCloseBot ? 
+                    <ModalPreviewBot isAdmin={true} open={showPopupCloseBot} onClose={() => setShowPopupCloseBot(false)}>
+                        <Row>
+                        <Col md="12"> 
+                            <span className="title-bot-modal">本当に閉じますか？</span>
+                        </Col>
+                        </Row>
+                        
+                        <Row className="justify-content-around">
+                        <Col md="6"> 
+                            <Button
+                                className="btn-cancel__modal-bot"
+                                onClick={() => setShowPopupCloseBot(false)}
+                            >
+                            チャットに戻る
+                            </Button>
+                        </Col>
+                        <Col md="6"> 
+                            <Button
+                                className="btn-close__modal-bot"
+                                onClick={() => {
+                                    setShowPopupCloseBot(false);
+                                    onOpenPreview(false)
+                                }}
+                            >
+                            閉じる
+                            </Button>
+                        </Col>
+                        </Row>
+                    </ModalPreviewBot>
+                : "" }
                 <div id="sp-withdrawal-container" className="sp-withdrawal-container">
                 </div>
                 <div id="sp-withdrawal-content" className="sp-withdrawal-content">
@@ -2314,7 +2379,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     </div>
                 </div>
                 <div id="sp-header" style={botInfor?.main_color && { backgroundColor:  botInfor?.main_color }} className="sp-header">
-                    <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
+                    <div className="sp-header-left" onClick={() => handleCloseBot(isOpen)}>
                         <div className="sp-header-left-avatar sp-avatar">
                             <img src={botInfor?.icon?.url && (EC_CHATBOT_URL + "/" + botInfor?.icon?.url)} />
                         </div>
@@ -2418,21 +2483,39 @@ const BotMessage = ({ content, index, botInfor }) => {
                     <React.Fragment>
                         {/* bot: type == 'text_input' */}
                         {content.type === 'text_input' && (
-                            <div
-                                className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                                style={{
-                                    overflowWrap: 'break-word',
+                            <div className="position-relative">
+                                <div
+                                    className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative`}
+                                    style={{
+                                        overflowWrap: 'break-word',
+                                        backgroundColor: botInfor?.message_color,
+                                        color: botInfor?.font_color, height: 'auto',
+                                        border: 'none',
+                                        borderRadius: '20px'
+                                    }}
+                                    dangerouslySetInnerHTML={{ __html: content[content.type]?.content }} 
+                                // value={content[content.type]?.content || ''}
+                                // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
+                                >
+                                    {/* {content[content.type]?.content || ''} */}
+                                    {/* <div dangerouslySetInnerHTML={{ __html: content[content.type]?.content }} /> */}
+                                </div>
+                            
+                                <div
+                                    style={{
+                                    content: " ",
+                                    display: "block",
+                                    position: "absolute",
+                                    bottom: 0,
+                                    left: "-3px",
+                                    width: "12px",
+                                    height: "18px",
                                     backgroundColor: botInfor?.message_color,
-                                    color: botInfor?.font_color, height: 'auto',
-                                    overflowY: 'hidden',
-                                    border: 'none',
-                                    borderRadius: '20px'
-                                }}
-                            // value={content[content.type]?.content || ''}
-                            // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
-                            >
-                                {/* {content[content.type]?.content || ''} */}
-                                <div dangerouslySetInnerHTML={{ __html: content[content.type]?.content }} />
+                                    background: `url(${botInfor?.icon_mess})`,
+                                    backgroundSize: "contain",
+                                    backgroundRepeat: "no-repeat",
+                                    }}
+                                ></div>
 
                             </div>
                         )}

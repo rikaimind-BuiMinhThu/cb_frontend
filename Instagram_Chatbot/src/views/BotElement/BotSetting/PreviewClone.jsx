@@ -8,6 +8,7 @@ import CheckboxCustom from "./ScenarioSetting/scenarioComon/CheckboxCustom";
 import InputCustom from "./ScenarioSetting/scenarioComon/InputCustom";
 import { Button } from "reactstrap";
 import ModalNoti from "../../../views/Popup/ModalNoti";
+import ModalPreviewBot from '../../../views/Popup/ModalPreviewBot';
 import {
   Checkbox,
   Radio,
@@ -36,6 +37,14 @@ import { SHORTEN_URL, EC_CHATBOT_URL, log } from "../../../variables/constants";
 import locale from "antd/es/date-picker/locale/ja_JP";
 import "moment/locale/zh-cn";
 import { rgbToHex } from "@material-ui/core";
+import iconMessageBlue from "../../../assets/img/icon-mess/icon-message-chat-blue.png";
+import iconMessageGreen from "../../../assets/img/icon-mess/icon-message-chat-green.png";
+import iconMessageOrange from "../../../assets/img/icon-mess/icon-message-chat-orange.png";
+import iconMessageYellow from "../../../assets/img/icon-mess/icon-message-chat-yellow.png";
+import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pink.png";
+import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
+import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
+import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
 
 const _ = require("lodash");
 
@@ -208,6 +217,9 @@ function Preview() {
   const [rightSpTitle, setRightSpTitle] = useState("");
   const [rightMarginSp, setRightMarginSp] = useState(10);
   const [bottomMarginSp, setBottomMarginSp] = useState(10);
+  const [showPopupCloseBot, setShowPopupCloseBot] = useState(false);
+  const [activePopupCloseBot, setActivePopupCloseBot] = useState(true);
+  const [styleModal, setStyleModal] = useState({});
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
       current_url: window.location.href,
@@ -228,6 +240,24 @@ function Preview() {
     return dataObj;
   });
 
+  function handleStyleModal() {
+
+    if (mobileCheck()) {
+       return {
+          bottom: bottomMarginSp ? `${bottomMarginSp}px` : "20px",
+          right: rightMarginSp ? `${rightMarginSp}px` : "20px",
+          width: widthSp ? `${widthSp}%` : "80%",
+          height: heightSp ? `${heightSp}px` : "580px"
+       }
+    } else {
+      return {
+        bottom: bottomMarginPc ? `${bottomMarginPc}px` : "10px",
+        right: rightMarginPc ? `${rightMarginPc}px` : "30px",
+        width: widthPc ? `${widthPc}px` : "380px",
+        height: heightPc ? `${heightPc}px` : "600px"
+     }
+    }
+  }
 
   function mobileCheck() {
     let check = false;
@@ -251,6 +281,7 @@ function Preview() {
     api.get(`/api/v1/managements/chatbots/${botIdGet}`).then((response) => {
       if (response.data.data) {
         const result = JSON.parse(response.data.data?.design_settings);
+        setActivePopupCloseBot(result?.popup_close_bot ? true : false);
         setDisplayType(result?.display_type);
         setWidthPc(result?.width_pc? result?.width_pc: 380);
         setHeightPc(result?.height_pc? result?.height_pc:600);
@@ -318,9 +349,38 @@ function Preview() {
 
     return obj;
   }
+
+  function handleCloseBot() {
+    if (document.getElementById("sp-container1")) {
+      
+      Cookies.set("openPre", true);
+      if (window && window.parent) {
+        window.parent.postMessage(true, urlReceive);
+      }
+      document.getElementById("sp-container1").style.height = heightPc
+        ? `${heightPc}px`
+        : "600px";
+      document.getElementById("sp-header").style.position = "static";
+      document.getElementById("sp-header").style.borderBottomLeftRadius =
+        "0px";
+      document.getElementById("sp-header").style.borderBottomRightRadius =
+        "0px";
+      document.getElementById("sp-header").style.borderTopLeftRadius = "2px";
+      document.getElementById("sp-header").style.borderTopRightRadius = "2px";
+      document.getElementById("sp-process-bar").style.display = "block";
+      document.getElementById("sp-body").style.display = "block";
+    } 
+    setIsOpen(false);
+    setShowPopupCloseBot(false);
+  }
+
   function onOpenPreview() {
     if (document.getElementById("sp-container1")) {
-      if (isOpen) {
+      if (activePopupCloseBot) {
+        setShowPopupCloseBot(true)
+        return;
+      }
+      if (isOpen && !activePopupCloseBot) {
         Cookies.set("openPre", true);
         if (window && window.parent) {
           window.parent.postMessage(true, urlReceive);
@@ -338,7 +398,7 @@ function Preview() {
         document.getElementById("sp-process-bar").style.display = "block";
         document.getElementById("sp-body").style.display = "block";
       } 
-    }
+      }
     setIsOpen(!isOpen);
   }
 
@@ -396,46 +456,55 @@ function Preview() {
             setDataMessages(messageArr);
             setUrlThanksPage(urlThanks);
             if (res.data.chatbot) {
-              let opacity_color, message_color, font_color;
+              let opacity_color, message_color, font_color, icon_mess;
               if (res.data.chatbot.main_color === "blue") {
                 opacity_color = "#D6E0EF";
                 message_color = "#3CACEF";
                 font_color = "#fff";
+                icon_mess = iconMessageBlue;
               } else if (res.data.chatbot.main_color === "green") {
                 opacity_color = "#DEEADB";
                 message_color = "#9DDB7C";
                 font_color = "#fff";
+                icon_mess = iconMessageGreen;
               } else if (res.data.chatbot.main_color === "orange") {
                 opacity_color = "#F4E5DA";
                 message_color = "#EF8D2F";
                 font_color = "#fff";
+                icon_mess = iconMessageOrange;
               } else if (res.data.chatbot.main_color === "yellow") {
                 opacity_color = "#F0EFEB";
                 message_color = "#F3AA2D";
                 res.data.chatbot.main_color = "#F6CA21";
                 font_color = "#fff";
+                icon_mess = iconMessageYellow;
               } else if (res.data.chatbot.main_color === "pink") {
                 opacity_color = "#EBDDE3";
                 message_color = "#E65B83";
                 res.data.chatbot.main_color = "#F170AA";
                 font_color = "#fff";
+                icon_mess = iconMessagePink;
               } else if (res.data.chatbot.main_color === "purple") {
                 opacity_color = "#E9E8F1";
                 message_color = "#AF82D5";
                 res.data.chatbot.main_color = "#8C66D9";
                 font_color = "#fff";
+                icon_mess = iconMessagePurple;
               } else if (res.data.chatbot.main_color === "black") {
                 opacity_color = "#ECEDE8";
                 message_color = "#fff";
                 font_color = "#333333";
+                icon_mess = iconMessageBlack;
               } else if (res.data.chatbot.main_color === "white") {
                 opacity_color = "#fff";
                 message_color = "#F5F5F5";
                 font_color = "#000";
+                icon_mess = iconMessageWhite;
               }
               res.data.chatbot.opacity_color = opacity_color;
               res.data.chatbot.message_color = message_color;
               res.data.chatbot.font_color = font_color;
+              res.data.chatbot.icon_mess = icon_mess;
             }
 
             setBotInfor(res.data.chatbot);
@@ -3559,123 +3628,153 @@ if (scenarioId && botInfor && isOpen  ){
         </div>
       </div>
       
-
+      {activePopupCloseBot ? 
+        <ModalPreviewBot
+        isMobile={mobileCheck()}
+        styleBot={handleStyleModal()}
+        open={showPopupCloseBot} isAdmin={false} onClose={() => setShowPopupCloseBot(false)}>
+            <Row>
+              <Col md="12"> 
+                <span className="title-bot-modal">本当に閉じますか？</span>
+              </Col>
+            </Row>
+            
+            <Row className="justify-content-around">
+              <Col md="6"> 
+                <Button
+                    className="btn-cancel__modal-bot"
+                    onClick={() => setShowPopupCloseBot(false)}
+                  >
+                  チャットに戻る
+                </Button>
+              </Col>
+              <Col md="6"> 
+                <Button
+                    className="btn-close__modal-bot"
+                    onClick={() => handleCloseBot()}
+                  >
+                  閉じる
+                </Button>
+              </Col>
+            </Row>
+        </ModalPreviewBot>
+      : "" }
       <div
-        id="sp-process-bar"
-        className="sp-process-bar"
-        style={{ backgroundColor: botInfor?.opacity_color }}
-      >
-        <div
-          className="sp-process-bar-color animation"
-          style={{
-            width: indexUser
-              ? `${
-                  ((indexUser - 1 < 0 ? 0 : indexUser - 1) * 100) /
-                  messageUser.length
-                }%`
-              : "100%",
-            ...(botInfor?.main_color && {
-              backgroundColor: botInfor?.main_color,
-            }),
-          }}
+          id="sp-process-bar"
+          className="sp-process-bar"
+          style={{ backgroundColor: botInfor?.opacity_color }}
         >
-          {indexUser
-            ? messageUser.length !== indexUser - 1
-              ? `あと${messageUser.length - indexUser + 1}間`
-              : "完了しました。"
-            : `あと${messageUser.length}間`}
+          <div
+            className="sp-process-bar-color animation"
+            style={{
+              width: indexUser
+                ? `${
+                    ((indexUser - 1 < 0 ? 0 : indexUser - 1) * 100) /
+                    messageUser.length
+                  }%`
+                : "100%",
+              ...(botInfor?.main_color && {
+                backgroundColor: botInfor?.main_color,
+              }),
+            }}
+          >
+            {indexUser
+              ? messageUser.length !== indexUser - 1
+                ? `あと${messageUser.length - indexUser + 1}間`
+                : "完了しました。"
+              : `あと${messageUser.length}間`}
+          </div>
         </div>
-      </div>
-      <div
-        id="sp-body"
-        className="sp-body"
-        style={{ backgroundColor: botInfor?.opacity_color }}
-      >
-        {renderMessageArr.map((message, indexMessage) => {
-          return (
-            <React.Fragment key={indexMessage}>
-              {message.belong_to === "bot" &&
-                message?.message_content.map((content, index) => {
-                  return (
-                    <BotMessage
-                      key={index}
-                      content={content}
-                      index={index}
-                      botInfor={botInfor}
-                    />
-                  );
-                })}
-              {message.belong_to === "user" && (
-                <div
-                  // id={`sp-body-user-side-${indexMessage}`}
-                  className="sp-body-user-side slideLeft"
-                >
-                  <div className="sp-body-user-side-messages">
-                    <UserMessage
-                      captcha={captcha}
-                      messageContentProps={message.message_content}
-                      disabled={message.disabled}
-                      onChangeValue={(
-                        indexContent,
-                        contentType,
-                        value,
-                        field,
-                        subFiled,
-                        name
-                      ) =>
-                        onChangeValue(
+        <div
+          id="sp-body"
+          className="sp-body"
+          style={{ backgroundColor: botInfor?.opacity_color }}
+        >
+          {renderMessageArr.map((message, indexMessage) => {
+            return (
+              <React.Fragment key={indexMessage}>
+                {message.belong_to === "bot" &&
+                  message?.message_content.map((content, index) => {
+                    return (
+                      <BotMessage
+                        key={index}
+                        content={content}
+                        index={index}
+                        botInfor={botInfor}
+                      />
+                    );
+                  })}
+                {message.belong_to === "user" && (
+                  <div
+                    // id={`sp-body-user-side-${indexMessage}`}
+                    className="sp-body-user-side slideLeft"
+                  >
+                    <div className="sp-body-user-side-messages">
+                      <UserMessage
+                        captcha={captcha}
+                        messageContentProps={message.message_content}
+                        disabled={message.disabled}
+                        onChangeValue={(
                           indexContent,
                           contentType,
                           value,
                           field,
                           subFiled,
                           name
-                        )
-                      }
-                      indexMessageRender={indexMessageRender}
-                      onClickNext={() => onClickNext(indexMessage)}
-                      indexMessage={indexMessage}
-                      errorsProps={errors}
-                      displayButtonNext={(value) => {
-                        dataMessages[indexMessage].is_display_button_next =
-                          value;
-                        setDataMessages([...dataMessages]);
-                      }}
-                      dataPrefectures={[...dataPrefectures]}
-                      isPopUpZipCode={(isOpen, indexContent) =>
-                        isPopUpZipCode(isOpen, indexContent)
-                      }
-                      onChangeErrors={(field, value) =>
-                        onChangeErrors(field, value)
-                      }
-                      variables={variables}
-                    />
-                    {(dataMessages[indexMessage].is_display_button_next !==
-                    undefined
-                      ? dataMessages[indexMessage].is_display_button_next
-                      : true) && (
-                      <div className="sp-user-message-button-action">
-                        <Button
-                          disabled={message.disabled}
-                          style={{
-                            backgroundColor: botInfor?.main_color,
-                            borderRadius: "25px",
-                          }}
-                          className="ss-user-message__action-btn"
-                          onClick={() => onClickNext(indexMessage)}
-                        >
-                          {message.buttonName || "次へ"}
-                        </Button>
-                      </div>
-                    )}
+                        ) =>
+                          onChangeValue(
+                            indexContent,
+                            contentType,
+                            value,
+                            field,
+                            subFiled,
+                            name
+                          )
+                        }
+                        indexMessageRender={indexMessageRender}
+                        onClickNext={() => onClickNext(indexMessage)}
+                        indexMessage={indexMessage}
+                        errorsProps={errors}
+                        displayButtonNext={(value) => {
+                          dataMessages[indexMessage].is_display_button_next =
+                            value;
+                          setDataMessages([...dataMessages]);
+                        }}
+                        dataPrefectures={[...dataPrefectures]}
+                        isPopUpZipCode={(isOpen, indexContent) =>
+                          isPopUpZipCode(isOpen, indexContent)
+                        }
+                        onChangeErrors={(field, value) =>
+                          onChangeErrors(field, value)
+                        }
+                        variables={variables}
+                      />
+                      {(dataMessages[indexMessage].is_display_button_next !==
+                      undefined
+                        ? dataMessages[indexMessage].is_display_button_next
+                        : true) && (
+                        <div className="sp-user-message-button-action">
+                          <Button
+                            disabled={message.disabled}
+                            style={{
+                              backgroundColor: botInfor?.main_color,
+                              borderRadius: "25px",
+                            }}
+                            className="ss-user-message__action-btn"
+                            onClick={() => onClickNext(indexMessage)}
+                          >
+                            {message.buttonName || "次へ"}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
-            </React.Fragment>
-          );
-        })}
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
       </div>
-    </div>
   ) } else if (isOpen===false &&mobileCheck()===false && positionPc ==='1' && buttonTypePc==='2'){ return (
       <div
     onClick={() => onOpenPreview(!isOpen)}
@@ -3902,26 +4001,46 @@ const BotMessage = ({ content, index, botInfor }) => {
           <React.Fragment>
             {/* bot: type == 'text_input' */}
             {content.type === "text_input" && (
-              <div
-                className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
-                style={{
-                  overflowWrap: "break-word",
-                  backgroundColor: botInfor?.message_color,
-                  color: botInfor?.font_color,
-                  height: "auto",
-                  overflowY: "hidden",
-                  border: "none",
-                  borderRadius: "20px",
-                }}
-                // value={content[content.type]?.content || ''}
-                // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
-              >
-                {/* {content[content.type]?.content || ''} */}
+              <div className="position-relative">
                 <div
+                  className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative`}
+                  style={{
+                    overflowWrap: "break-word",
+                    backgroundColor: botInfor?.message_color,
+                    color: botInfor?.font_color,
+                    height: "auto",
+                    border: "none",
+                    borderRadius: "20px",
+                  }}
+
                   dangerouslySetInnerHTML={{
                     __html: content[content.type]?.content,
                   }}
-                />
+                  // value={content[content.type]?.content || ''}
+                  // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
+                >
+                  {/* {content[content.type]?.content || ''} */}
+                  {/* <div
+                    dangerouslySetInnerHTML={{
+                      __html: content[content.type]?.content,
+                    }}
+                  /> */}
+                </div>
+              <div
+                style={{
+                  content: " ",
+                  display: "block",
+                  position: "absolute",
+                  bottom: 0,
+                  left: "-3px",
+                  width: "12px",
+                  height: "18px",
+                  backgroundColor: botInfor?.message_color,
+                  background: `url(${botInfor?.icon_mess})`,
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                }}
+              ></div>
               </div>
             )}
             {content.type === "file" &&
