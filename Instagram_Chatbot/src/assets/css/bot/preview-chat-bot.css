@@ -88,7 +88,7 @@
 
 .sp-avatar img {
     border-radius: 50%;
-    width: 50px;
+    width: 60px;
 }
 
 .sp-header-left-label {
@@ -461,9 +461,31 @@
     white-space: pre-wrap;
     width: fit-content !important;
     max-width: 100%;
+    overflow-y: unset;
 }
 
 
+.btn-cancel__modal-bot {
+    background-color: rgb(255, 255, 255);
+    color: rgba(0, 0, 0, 0.85);
+    font-family: 'Fira Sans', sans-serif;
+    border: 1px solid #D0D6DC;
+    font-weight: 500;
+}
+.btn-cancel__modal-bot:hover {
+    background-color: #e6e6e6 !important;
+    color: #333 !important;
+    border: 1px solid #D0D6DC;
+}
+
+.btn-close__modal-bot {
+    background-color: #d9534f;
+    font-family: 'Fira Sans', sans-serif;
+    font-weight: 500;
+}
+.btn-close__modal-bot:hover {
+    background-color: #d9534f !important;
+}
 
 .sp-product-purchase-custom-input-quantity input {
     text-align: center;
@@ -639,9 +661,55 @@ slideUp
         align-items: center;
         padding: 15px;
     }
+    .sp-header-left-bt {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+    }
+    #comment_bubble {
+        width: 240px;
+        height: 46px;
+        background: #fff;
+        position: relative;
+        -moz-border-radius: 12px;
+        -webkit-border-radius: 12px;
+        border-radius: 23px;
+    }
+    
+    #comment_bubble:before {
+        content: "";
+        width: 0;
+        height: 0;
+        right: 92%;
+        top: 13px;
+        position: absolute;
+        border-top: 9px solid transparent;
+        border-right: 26px solid #fff;
+        border-bottom: 9px solid transparent;
+    }
+    .arrow {
+        border: solid black;
+        border-width: 0 3px 3px 0;
+        display: inline-block;
+        padding: 3px;
+      }
+      
+     
+      
+      .up {
+        transform: rotate(-135deg);
+        -webkit-transform: rotate(-135deg);
+      }
     .sp-avatar img {
         border-radius: 50%;
         width: 50px;
+    }
+    .sp-avatar-bt img {
+        border-radius: 50%;
+        width: 58px;
     }
 
 

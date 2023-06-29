@@ -73,6 +73,7 @@ function DesignChatbot() {
   const [rightMarginSp, setRightMarginSp] = useState(10);
   const [bottomMarginSp, setBottomMarginSp] = useState(10);
   const [cbImage, setCbImage] = useState("");
+  const [popupCloseBot, setPopupCloseBot] = useState(false);
 
   // design type: handle click
   const designTypeClick = (e) => {
@@ -215,6 +216,7 @@ function DesignChatbot() {
         setTitle(response.data.data?.title);
         setSubtitle(response.data.data?.subtitle);
         setDesignType(response.data.data?.design_type);
+        setPopupCloseBot(result?.popup_close_bot ? true : false);
         const colorMap = {
           blue: "#327AED",
           green: "#26B197",
@@ -363,6 +365,7 @@ function DesignChatbot() {
         right_position_sp_title: rightSpTitle,
         right_margin_sp: rightMarginSp,
         bottom_margin_sp: bottomMarginSp,
+        popup_close_bot: popupCloseBot
       },
     };
 
@@ -1219,6 +1222,53 @@ function DesignChatbot() {
                           </CardBody>
                         </div>
                       </div>
+                      <hr/>
+                      <div
+                        style={{
+                          width: "50%",
+                          padding: "0 40px",
+                        }}
+                      >
+                        <CardBody>
+                          <div className="add-bot-container">
+                         
+                          <div className="field-add-bot">
+                              <div className="add-bot_field-container">
+                                <span className="label-field">
+                                  離脱防止
+                                </span>
+                                <span className="d-flex" style={{width: "100%" }}>
+                                  <input
+                                    name="popup_close_bot"
+                                    type="radio"
+                                    id="in_active"
+                                    className="in_active_popup"
+                                    value={false}
+                                    checked={!popupCloseBot}
+                                    onClick={() => setPopupCloseBot(false)}
+                                  />
+                                  <label htmlFor="in_active" className="radio-btn-action">
+                                    無効
+                                  </label>
+                                  <input
+                                    name="popup_close_bot"
+                                    className="active_popup"
+                                    type="radio"
+                                    id="active"
+                                    value={true}
+                                    checked={popupCloseBot}
+                                    onClick={() => setPopupCloseBot(true)}
+                                  />
+                                  <label htmlFor="active" className="radio-btn-action">
+                                    有効
+                                  </label>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </CardBody>
+                      </div>
+
                       <div
                         style={{
                           width: "100%",
