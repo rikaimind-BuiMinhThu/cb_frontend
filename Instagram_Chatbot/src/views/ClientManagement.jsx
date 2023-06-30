@@ -1595,43 +1595,45 @@ function ClientManagement() {
                             <td className="actionListClient">
                               <div style={{ display: 'flex' }}>
                                 <div style={{marginRight: '30px', marginTop: '5px'}}>
-                                  <MDBIcon fas icon="yen-sign" size='2x' onClick={(e) => gotoPaymentDetail(item)}/>
-                                </div><div onClick={(e) => getUserDetail(item)}>
-                                  <i
-                                    className="nc-icon nc-badge nc-3x"
-                                    style={{
-                                      fontSize: '30px',
-                                      marginTop: '5px',
-                                      marginRight: '30px',
+                                  <MDBIcon fas icon="yen-sign"
+                                   style={{
+                                      fontSize: '1.5em',
+                                    }}  
+                                    onClick={(e) => gotoPaymentDetail(item)}/>
+                                </div>
+
+                                <div style={{marginRight: '30px', marginTop: '5px'}}>
+                                  <MDBIcon
+                                   onClick={(e) => getUserDetail(item)}
+                                   style={{
+                                      fontSize: '1.5em',
                                     }}
-                                  ></i>
+                                      far
+                                      icon="eye"
+                                    />
                                 </div>
-                                {/* <Button onClick={() => getUserDetail(item)}>詳細</Button> */}
-                                <div onClick={() => updateClientUser(item)}>
-                                  <i
-                                    className="nc-icon nc-align-center nc-3x"
-                                    style={{
-                                      fontSize: '30px',
-                                      marginTop: '5px',
-                                      marginRight: '30px',
+                                
+                                <div style={{marginRight: '30px', marginTop: '5px'}}>
+                                  <MDBIcon
+                                   onClick={(e) => updateClientUser(item)}
+                                   style={{
+                                      fontSize: '1.5em',
                                     }}
-                                  ></i>
+                                      far
+                                      icon="edit"
+                                    />
                                 </div>
-                                {/* <Button className="editBtn" onClick={() => updateClientUser(item)}>
-                                編集
-                              </Button> */}
-                                <div onClick={() => deleteClientPopup(item.id)}>
-                                  <i
-                                    className="nc-icon nc-box nc-3x"
-                                    style={{ fontSize: '30px', marginTop: '5px', cursor: 'pointer' }}
-                                  ></i>
+
+                                <div style={{marginTop: '5px'}}>
+                                  <MDBIcon
+                                   onClick={(e) => deleteClientPopup(item.id)}
+                                   style={{
+                                      fontSize: '1.5em',
+                                    }}
+                                      far
+                                      icon="trash-alt"
+                                    />
                                 </div>
-                                {/* <Button
-                                className="deleteBtn"
-                                onClick={() => deleteClientPopup(item.id)}
-                              >
-                                削除
-                              </Button> */}
                               </div>
                             </td>
                           </tr>
