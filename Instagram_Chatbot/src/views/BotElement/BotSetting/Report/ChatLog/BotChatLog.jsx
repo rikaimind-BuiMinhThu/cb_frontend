@@ -26,7 +26,6 @@ function BotChatLog() {
   const [searchDate, setSearchDate] = useState(null);
   const [searchStartDate, setSearchStartDate] = useState(null);
   const [searchEndDate, setSearchEndDate] = useState(null);
-  const [isDisableEndDate, setIsDisableEndDate] = useState(true);
 
   useEffect(() => {
     if (
@@ -127,16 +126,6 @@ function BotChatLog() {
     });
     return dataObj;
   });
-
-  function changeStartDate(date) {
-    if (!date) {
-      setSearchEndDate(null);
-      setIsDisableEndDate(true);
-    } else {
-      setIsDisableEndDate(false);
-    }
-    setSearchStartDate(date);
-  }
 
   function onSelectChat(item) {
     setSelectUserId(item.user_input_id);
@@ -788,7 +777,7 @@ function BotChatLog() {
                         <div style={{ width: '283px' }}>
                           <DatePicker
                             selected={searchStartDate && searchStartDate}
-                            onChange={(date) => changeStartDate(date)}
+                            onChange={(date) => setSearchStartDate(date)}
                             dateFormat="yyyy/MM/dd"
                             locale="ja"
                             placeholderText="yyyy/mm/dd"
@@ -803,7 +792,6 @@ function BotChatLog() {
                             onChange={(date) => setSearchEndDate(date)}
                             dateFormat="yyyy/MM/dd"
                             locale="ja"
-                            disabled={isDisableEndDate}
                             placeholderText="yyyy/mm/dd"
                           />
                         </div>
