@@ -148,17 +148,3 @@ table.bl-table thead tr th {
 .filter-from-to {
   padding: 10px 0;
 }
-
-@media screen and (max-width: 1456px) {
-  .wrap-bot-search {
-    display: block !important;
-  }
-
-  .filter-from-to {
-    padding: 0 0 10px 0;
-  }
-
-  .filter-id {
-    padding-top: 10px;
-  }
-}

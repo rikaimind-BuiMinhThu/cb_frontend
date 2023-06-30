@@ -10,6 +10,7 @@ import $ from "jquery";
 import BotMessage from "./BotMessage";
 import UserMessage from "./UserMessage";
 import { isBoolean } from "lodash";
+import moment from "moment";
 registerLocale("ja", ja);
 
 function BotChatLog() {
@@ -25,7 +26,7 @@ function BotChatLog() {
   const [searchDate, setSearchDate] = useState(null);
   const [searchStartDate, setSearchStartDate] = useState(null);
   const [searchEndDate, setSearchEndDate] = useState(null);
-  const [isShowSelectUserDate, setIsShowSelectUserDate] = useState(false);
+  const [isDisableEndDate, setIsDisableEndDate] = useState(true);
 
   useEffect(() => {
     if (
@@ -66,14 +67,20 @@ function BotChatLog() {
     else setSearchScenarioId(event.target.value);
   }
 
+  function formatDate(date) {
+    return moment(date).format("YYYY-MM-DD");
+  }
+
   function pressSearchButton() {
     const params = {
       sc_id: searchScenarioId ? parseInt(searchScenarioId) : null,
       user_id: searchUserId,
-      date: searchDate ? searchDate : null,
+      date: searchDate ? formatDate(searchDate) : null,
+      start_date: searchStartDate ? formatDate(searchStartDate) : null,
+      end_date: searchEndDate ? formatDate(searchEndDate) : null
     };
     api
-      .get(`/api/v1/managements/chat_log/${botId}/list`, params)
+      .get(`/api/v1/managements/chat_log/${botId}/list`, {params})
       .then((res) => {
         if (res.data.code === 1) {
           setScenarios(res.data.scenarios);
@@ -118,6 +125,16 @@ function BotChatLog() {
     });
     return dataObj;
   });
+
+  function changeStartDate(date) {
+    if (!date) {
+      setSearchEndDate(null);
+      setIsDisableEndDate(true);
+    } else {
+      setIsDisableEndDate(false);
+    }
+    setSearchStartDate(date);
+  }
 
   function onSelectChat(item) {
     setSelectUserId(item.user_input_id);
@@ -741,20 +758,7 @@ function BotChatLog() {
                             ))}
                           </select>
                         </div>
-                        <div className="bm_status-filter" style={{marginRight: '30px'}}>
-                          <label style={{ margin: '0px 5px 0px 0px', color: '#2c2c2c', fontSize: '14px', width: '50px' }}>年月日</label>
-                          <div style={{ width: '283px' }}>
-                            <DatePicker
-                              selected={searchDate && searchDate}
-                              onChange={(date) => setSearchDate(date) }
-                              dateFormat="yyyy/MM/dd"
-                              locale="ja"
-                              placeholderText="yyyy/mm/dd"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="bm_status-filter filter-id" style={{ width: '368px', minWidth: '368px' }}>
+                        <div className="bm_status-filter" style={{ width: '368px', minWidth: '368px' }}>
                         <label style={{ margin: '0px 5px 0px 0px', color: '#2c2c2c', fontSize: '14px', width: '70px' }}>ユーザーID</label>
                         <input
                           style={{ width: 'calc(100% - 85px)' }}
@@ -763,13 +767,12 @@ function BotChatLog() {
                           onChange={(e) => {
                             if (e.target.value) {
                               setSearchUserId(e.target.value);
-                              setIsShowSelectUserDate(true);
                             } else {
                               setSearchUserId(null);
-                              setIsShowSelectUserDate(false);
                             }
                           }}
                         />
+                      </div>
                       </div>
                     </div>
                   </div>
@@ -783,23 +786,22 @@ function BotChatLog() {
                         <div style={{ width: '283px' }}>
                           <DatePicker
                             selected={searchStartDate && searchStartDate}
-                            onChange={(date) => setSearchStartDate(date)}
+                            onChange={(date) => changeStartDate(date)}
                             dateFormat="yyyy/MM/dd"
                             locale="ja"
-                            disabled={!isShowSelectUserDate}
                             placeholderText="yyyy/mm/dd"
                           />
                         </div>
                       </div>
                       <div className="bm_status-filter">
-                        <label style={{ margin: '0px 5px 0px 14px', color: '#2c2c2c', fontSize: '14px', width: '50px' }}>まで</label>
+                        <label style={{ margin: '0px 26px 0px 14px', color: '#2c2c2c', fontSize: '14px', width: '50px' }}>まで</label>
                         <div style={{ width: '283px' }}>
                           <DatePicker
                             selected={searchEndDate}
                             onChange={(date) => setSearchEndDate(date)}
                             dateFormat="yyyy/MM/dd"
                             locale="ja"
-                            disabled={!isShowSelectUserDate}
+                            disabled={isDisableEndDate}
                             placeholderText="yyyy/mm/dd"
                           />
                         </div>
