@@ -91,6 +91,8 @@ function BotChatLog() {
           setChats(res.data.chats);
         }
       });
+    setRenderMessageArr([]);
+    setSelectUserId(null);
   }
 
   const [botInfor, setBotInfor] = useState();
