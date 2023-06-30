@@ -3620,9 +3620,9 @@ if (scenarioId && botInfor && isOpen  ){
         >
           <div className="sp-header-right-arrow">
             {isOpen ? (
-              <MDBIcon fas icon="chevron-circle-up" />
-            ) : (
               <MDBIcon fas icon="chevron-circle-down" />
+            ) : (
+              <MDBIcon fas icon="chevron-circle-up" />
             )}
           </div>
         </div>
