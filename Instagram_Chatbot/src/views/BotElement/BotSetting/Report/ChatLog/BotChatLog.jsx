@@ -781,6 +781,7 @@ function BotChatLog() {
                             dateFormat="yyyy/MM/dd"
                             locale="ja"
                             placeholderText="yyyy/mm/dd"
+                            maxDate={searchEndDate}
                           />
                         </div>
                       </div>
@@ -793,6 +794,7 @@ function BotChatLog() {
                             dateFormat="yyyy/MM/dd"
                             locale="ja"
                             placeholderText="yyyy/mm/dd"
+                            minDate={searchStartDate}
                           />
                         </div>
                       </div>
