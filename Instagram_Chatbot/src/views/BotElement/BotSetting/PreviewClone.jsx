@@ -2137,12 +2137,12 @@ function Preview() {
               console.log(err)
             })
           
-            api.post(`/api/v1/managements/payment_histories`, data_submit).then((res)=>{}).catch((err) => {
-              console.log(err);
-            if (err.response?.data.code === 0) {
-              tokenExpired();
-            }
-            })
+            // api.post(`/api/v1/managements/payment_histories`, data_submit).then((res)=>{}).catch((err) => {
+            //   console.log(err);
+            // if (err.response?.data.code === 0) {
+            //   tokenExpired();
+            // }
+            // })
           })
           .catch((error) => {
             console.log(error);
