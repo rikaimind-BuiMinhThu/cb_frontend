@@ -1004,12 +1004,12 @@ export default function UserMessage({
                             disabled={true}
                             type="radio"
                             id="ss-message__content--user-radio_button"
-                            checked={radioButton.initial_selection === item.id}
+                            checked={radioButton.initial_selection == item.value}
                             onChange={() => {
                               onChangeValue(
                                 indexContent,
                                 content.type,
-                                item.id,
+                                item.value,
                                 "initial_selection"
                               );
                               if (messageContent.length === 1) onClickNext();
@@ -1323,7 +1323,7 @@ export default function UserMessage({
                                   pullDown[pullDown.type]
                                     .options_without_comment
                                 }
-                                keyValue="text"
+                                keyValue="value"
                                 style={{ width: "100%" }}
                                 placeholder={
                                   pullDown[pullDown.type].display_unselected
@@ -1354,7 +1354,7 @@ export default function UserMessage({
                                 data={
                                   pullDown[pullDown.type].options_with_comment
                                 }
-                                keyValue="text"
+                                keyValue="value"
                                 style={{ width: "49%" }}
                                 placeholder={
                                   pullDown[pullDown.type].display_unselected
