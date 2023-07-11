@@ -74,6 +74,7 @@ function DesignChatbot() {
   const [bottomMarginSp, setBottomMarginSp] = useState(10);
   const [cbImage, setCbImage] = useState("");
   const [popupCloseBot, setPopupCloseBot] = useState(false);
+  const [isOpenPreviewBot, setIsOpenPreviewBot] = useState(true);
 
   // design type: handle click
   const designTypeClick = (e) => {
@@ -451,6 +452,7 @@ function DesignChatbot() {
       document.getElementById("sp-header").style.position = "absolute";
       document.getElementById("sp-header").style.bottom = "13px";
     }
+    setIsOpenPreviewBot(!isOpenPreviewBot);
   };
   return (
     <div className="content">
@@ -1318,7 +1320,7 @@ function DesignChatbot() {
             </div>
             <div className="sp-header-right">
               <div className="sp-header-right-arrow">
-                {isOpenPreview ? (
+                {isOpenPreviewBot ? (
                   <MDBIcon fas icon="chevron-down" />
                 ) : (
                   <MDBIcon fas icon="chevron-up" />
