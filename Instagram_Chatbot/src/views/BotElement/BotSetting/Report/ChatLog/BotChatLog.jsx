@@ -11,6 +11,7 @@ import BotMessage from "./BotMessage";
 import UserMessage from "./UserMessage";
 import { isBoolean } from "lodash";
 import moment from "moment";
+import jwt_decode from 'jwt-decode'
 registerLocale("ja", ja);
 
 function BotChatLog() {
@@ -514,22 +515,25 @@ function BotChatLog() {
                         chat = chats.find((c) => c?.ui_type === element.type);
                       }
                       conversations = conversations.filter(
-                        (el) => el.id !== chat.id
+                        (el) => el.id !== chat?.id
                       );
                       const subElement = element[element.type];
                       if (element.type === "text_input") {
                         if (subElement.type === "text") {
-                          if (element[element.type].isSplitInput) {
-                            element[element.type][subElement.type].valueLeft =
-                              chat.valueLeft;
-                            element[element.type][subElement.type].valueRight =
-                              chat.valueRight;
+                          let value;
+                          try {
+                            value = JSON.parse(chat.value);
+                          } catch (error) {
+                            value = chat;
+                          }
+                          if (element[element.type][subElement.type].isSplitInput) {
+                            element[element.type][subElement.type].valueLeft = value.valueLeft;
+                            element[element.type][subElement.type].valueRight = value.valueRight;
                           } else
-                            element[element.type][subElement.type].value =
-                              chat.value;
+                            element[element.type][subElement.type].value = value.value;
                         }
                         if (subElement.type === "phone_number") {
-                          if (subElement.withHyphen) {
+                          if (subElement?.withHyphen) {
                           } else
                             element[element.type][subElement.type].value =
                               chat.value;
@@ -573,18 +577,18 @@ function BotChatLog() {
                       }
                       if (element.type === "pull_down") {
                         element[element.type][subElement.type].value =
-                          chat.value;
+                        chat?.value?.toString();
 
                         element[element.type][subElement.type].valueLeft =
-                          chat.valueLeft;
+                          chat?.valueLeft ? chat.valueLeft : chat?.content?.valueLeft;
                         element[element.type][subElement.type].valueRight =
-                          chat.valueRight;
+                          chat?.valueRight ? chat.valueRight : chat?.content?.valueRight;
 
                         if (subElement.type === "time_hm") {
                           element[element.type][subElement.type].valueHour =
-                            chat.valueHour;
+                            chat.valueHour ? chat.valueHour : chat?.content?.valueHour;;
                           element[element.type][subElement.type].valueMinute =
-                            chat.valueMinute;
+                            chat.valueMinute ? chat.valueMinute : chat?.content?.valueMinute;;
                         }
                         if (
                           [
@@ -597,41 +601,41 @@ function BotChatLog() {
                           ].includes(subElement.type)
                         ) {
                           element[element.type][subElement.type].valueYear =
-                            chat.valueYear;
+                            chat?.valueYear ? chat.valueYear : chat?.content?.valueYear;
                           element[element.type][subElement.type].valueMonth =
-                            chat.valueMonth;
+                            chat?.valueMonth ? chat.valueMonth : chat?.content?.valueMonth;
                           element[element.type][subElement.type].valueDay =
-                            chat.valueDay;
+                            chat?.valueDay ? chat.valueDay : chat?.content?.valueDay;
                         }
                         if (subElement.type === "timezone_from_to") {
                           element[element.type][subElement.type].valueHour1 =
-                            chat.valueHour1;
+                            chat?.valueHour1 ? chat.valueHour1 : chat?.content?.valueHour1;
                           element[element.type][subElement.type].valueMinute1 =
-                            chat.valueMinute1;
+                            chat?.valueMinute1 ? chat.valueMinute1 : chat?.content?.valueMinute1;
                           element[element.type][subElement.type].valueHour2 =
-                            chat.valueHour2;
+                            chat?.valueHour2 ? chat.valueHour2 : chat?.content?.valueHour2;
                           element[element.type][subElement.type].valueMinute2 =
-                            chat.valueMinute2;
+                            chat?.valueMinute2 ? chat.valueMinute2 : chat?.content?.valueMinute2;
                         }
                         if (subElement.type === "period_from_to") {
                           element[element.type][subElement.type].valueYear1 =
-                            chat.valueYear1;
+                            chat?.valueYear1 ? chat.valueYear1 : chat?.content?.valueYear1;
                           element[element.type][subElement.type].valueMonth1 =
-                            chat.valueMonth1;
+                            chat?.valueMonth1 ? chat.valueMonth1 : chat?.content?.valueMonth1;
                           element[element.type][subElement.type].valueDay1 =
-                            chat.valueDay1;
+                            chat?.valueDay1 ? chat.valueDay1 : chat?.content?.valueDay1;
                           element[element.type][subElement.type].valueYear2 =
-                            chat.valueYear2;
+                            chat?.valueYear2 ? chat.valueYear2 : chat?.content?.valueYear2;
                           element[element.type][subElement.type].valueMonth2 =
-                            chat.valueMonth2;
+                            chat?.valueMonth2 ? chat.valueMonth2 : chat?.content?.valueMonth2;
                           element[element.type][subElement.type].valueDay2 =
-                            chat.valueDay2;
+                            chat?.valueDay2 ? chat.valueDay2 : chat?.content?.valueDay2;
                         }
                         if (subElement.type === "up_to_municipality") {
                           element[element.type][subElement.type].prefecture =
-                            chat.prefecture;
+                            chat?.prefecture ? chat.prefecture : chat?.content?.prefecture;
                           element[element.type][subElement.type].city =
-                            chat.city;
+                            chat?.city ? chat.city : chat?.content?.prefecture;
                         }
                       }
                       if (element.type === "zip_code_address") {
@@ -658,21 +662,39 @@ function BotChatLog() {
                           )
                         ) {
                           element[element.type][subElement.type].date_select =
-                            chat.date_select;
+                            chat?.date_select ? chat.date_select : chat?.content?.date_select;
                         }
                         if (subElement.type === "start_end_date") {
                           element[element.type][
                             subElement.type
-                          ].start_date_select = chat.start_date_select;
+                          ].start_date_select = chat?.start_date_select ? chat.start_date_select : chat?.content?.start_date_select;
                           element[element.type][
                             subElement.type
-                          ].end_date_select = chat.end_date_select;
+                          ].end_date_select = chat?.end_date_select ? chat.end_date_select : chat?.content?.end_date_select;
                         }
                       }
 
                       if (element.type === "card_payment_radio_button") {
                         if (subElement.type === "default") {
-                          element[element.type].initial_selection = chat.value;
+                          // Regex valueChat matches JWT format
+                          const jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/;
+                          if (jwtRegex.test(chat?.value)) {
+                            const decoded = jwt_decode(chat?.value);
+                            try {
+                              const data = JSON.parse(decoded?.data);
+                              element[element.type].initial_selection = data?.initial_selection;
+                              element[element.type].card_number = data?.card_number;
+                              element[element.type].card_holder = data?.card_holder;
+                              element[element.type].year = data?.year;
+                              element[element.type].month = data?.month;
+                              element[element.type].cvc = data?.cvc;
+                            } catch (error) {
+                              element[element.type].initial_selection = decoded?.data;
+                            }
+                          } else {
+                            element[element.type].initial_selection = chat?.value;
+                          }
+                          
                         }
                       }
                       if (element.type === "capture") {
@@ -699,7 +721,7 @@ function BotChatLog() {
                       if (element.type === "agree_term") {
                         element[element.type].isAgree = true;
                       }
-                      element.updated_at = chat.updated_at;
+                      element.updated_at = chat?.updated_at;
                     }
                     setRenderMessageArr(messageArr);
                   }
