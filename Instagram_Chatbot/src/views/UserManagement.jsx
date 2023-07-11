@@ -15,6 +15,7 @@ import ModalShort from './Popup/ModalShort';
 // import { Pagination } from "element-react";
 import $ from 'jquery';
 import { tokenExpired } from 'api/tokenExpired';
+import { MDBIcon } from 'mdbreact';
 
 function UserManagement() {
   var [dataList, setDataList] = useState([]);
@@ -586,7 +587,29 @@ function UserManagement() {
                           <td className="actionListUser">
                             <div style={{ display: 'flex' }}>
                               {/* <Button onClick={() => getUserDetail(item)}>View Detail</Button> */}
-                              <div onClick={() => updateClientUser(item)}>
+                              <div style={{marginRight: '30px', marginTop: '5px'}}>
+                                  <MDBIcon
+                                   onClick={(e) => updateClientUser(item)}
+                                   style={{
+                                      fontSize: '1.5em',
+                                    }}
+                                      far
+                                      icon="edit"
+                                    />
+                                </div>
+
+                                <div style={{marginTop: '5px'}}>
+                                  <MDBIcon
+                                   onClick={(e) => confirmDeleteUser(item.id)}
+                                   style={{
+                                      fontSize: '1.5em',
+                                    }}
+                                      far
+                                      icon="trash-alt"
+                                    />
+                                </div>
+
+                              {/* <div onClick={() => updateClientUser(item)}>
                                 <i
                                   className="nc-icon nc-align-center nc-3x"
                                   style={{
@@ -595,16 +618,16 @@ function UserManagement() {
                                     marginRight: '30px',
                                   }}
                                 ></i>
-                              </div>
+                              </div> */}
                               {/* <Button className="editBtn" onClick={() => updateClientUser(item)}>
                                 編集
                               </Button> */}
-                              <div onClick={() => confirmDeleteUser(item.id)}>
+                              {/* <div onClick={() => confirmDeleteUser(item.id)}>
                                 <i
                                   className="nc-icon nc-box nc-3x"
                                   style={{ fontSize: '30px', marginTop: '5px', cursor: 'pointer' }}
                                 ></i>
-                              </div>
+                              </div> */}
                               {/* <Button
                                 className="deleteBtn"
                                 onClick={() => confirmDeleteUser(item.id)}
