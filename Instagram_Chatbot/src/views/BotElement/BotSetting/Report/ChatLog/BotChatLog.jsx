@@ -701,17 +701,6 @@ function BotChatLog() {
                         element[element.type][subElement.type].value =
                           chat.value;
                       }
-                      if (
-                        [
-                          "product_purchase",
-                        ].includes(element.type)
-                      ) {
-                        if (subElement.multiple_item_purchase) {
-                          subElement.initial_selection = chat.value;
-                        } else {
-                          subElement.initial_selection = [chat.value];
-                        }
-                      }
                       if (element.type === "product_purchase_radio_button") {
                         try {
                           const resultPurchase = JSON.parse(chat?.value);
@@ -721,7 +710,18 @@ function BotChatLog() {
                           element[element.type].initial_selection = chat?.value;
                         }
                       }
-
+                      if (
+                        [
+                          "product_purchase"
+                        ].includes(element.type)
+                      ) {
+                        if (subElement.multiple_item_purchase) {
+                          subElement.initial_selection = chat.value;
+                        } else {
+                          subElement.initial_selection = [chat.value];
+                        }
+                      }
+                      
                       if (element.type === "slider") {
                         element[element.type][subElement.type].value =
                           chat.value;
