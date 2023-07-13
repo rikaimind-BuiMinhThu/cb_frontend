@@ -520,17 +520,17 @@ function BotChatLog() {
                       const subElement = element[element.type];
                       if (element.type === "text_input") {
                         if (subElement.type === "text") {
-                          let value;
+                          let data;
                           try {
-                            value = JSON.parse(chat.value);
+                            data = JSON.parse(chat.value);
                           } catch (error) {
-                            value = chat;
+                            data = chat;
                           }
                           if (element[element.type][subElement.type].isSplitInput) {
-                            element[element.type][subElement.type].valueLeft = value.valueLeft;
-                            element[element.type][subElement.type].valueRight = value.valueRight;
+                            element[element.type][subElement.type].valueLeft = data.valueLeft;
+                            element[element.type][subElement.type].valueRight = data.valueRight;
                           } else
-                            element[element.type][subElement.type].value = value.value;
+                            element[element.type][subElement.type].value = data?.value;
                         }
                         if (subElement.type === "phone_number") {
                           if (subElement?.withHyphen) {
@@ -704,13 +704,21 @@ function BotChatLog() {
                       if (
                         [
                           "product_purchase",
-                          "product_purchase_radio_button",
                         ].includes(element.type)
                       ) {
                         if (subElement.multiple_item_purchase) {
                           subElement.initial_selection = chat.value;
                         } else {
                           subElement.initial_selection = [chat.value];
+                        }
+                      }
+                      if (element.type === "product_purchase_radio_button") {
+                        try {
+                          const resultPurchase = JSON.parse(chat?.value);
+                          element[element.type].value = resultPurchase;
+                          element[element.type].initial_selection = resultPurchase.initial_selection;
+                        } catch (error) {
+                          element[element.type].initial_selection = chat?.value;
                         }
                       }
 
