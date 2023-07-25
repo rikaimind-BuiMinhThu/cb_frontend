@@ -22,7 +22,6 @@ function BotChatLog() {
   const [selectScenario, setSelectScenario] = useState(null);
   const [selectUserId, setSelectUserId] = useState(null);
 
-  const [searchUserId, setSearchUserId] = useState(null);
   const [searchScenarioId, setSearchScenarioId] = useState(null);
   const [searchDate, setSearchDate] = useState(null);
   const [searchStartDate, setSearchStartDate] = useState(null);
@@ -44,7 +43,6 @@ function BotChatLog() {
   useEffect(() => {
     const params = {
       sc_id: searchScenarioId ? parseInt(searchScenarioId) : null,
-      user_id: searchUserId,
       date: searchDate ? searchDate : null,
     };
     api
@@ -74,7 +72,6 @@ function BotChatLog() {
   function pressSearchButton() {
     const params = {
       sc_id: searchScenarioId ? parseInt(searchScenarioId) : null,
-      user_id: searchUserId,
       date: searchDate ? formatDate(searchDate) : null,
       start_date: searchStartDate ? formatDate(searchStartDate) : null,
       end_date: searchEndDate ? formatDate(searchEndDate) : null
@@ -745,8 +742,8 @@ function BotChatLog() {
               <Row className="bot-chat-log">
                 <Col md="12">
                   <div className="d-flex justify-content-between align-items-center" style={{ padding: '10px 0px' }}>
-                    <div className="div-add-bot--search wrap-bot-search">
-                      <div className="d-flex">
+                    <div className="div-add-bot--search">
+                      <div className="wrap-bot-search">
                         <div className="bm_status-filter" style={{ width: '357px', minWidth: '358px', marginRight: "30px" }}>
                           <label style={{ margin: '0px 5px 0px 0px', color: '#2c2c2c', fontSize: '14px', width: '70px' }}>シナリオ</label>
                           <select
@@ -771,56 +768,35 @@ function BotChatLog() {
                             ))}
                           </select>
                         </div>
-                        <div className="bm_status-filter" style={{ width: '368px', minWidth: '368px' }}>
-                        <label style={{ margin: '0px 5px 0px 0px', color: '#2c2c2c', fontSize: '14px', width: '70px' }}>ユーザーID</label>
-                        <input
-                          style={{ width: 'calc(100% - 85px)' }}
-                          type="text"
-                          placeholder="ボット名 ..."
-                          onChange={(e) => {
-                            if (e.target.value) {
-                              setSearchUserId(e.target.value);
-                            } else {
-                              setSearchUserId(null);
-                            }
-                          }}
-                        />
-                      </div>
-                      </div>
-                    </div>
-                  </div>
-                </Col>
-                <Col md="12">
-                  <div className="d-flex justify-content-between align-items-center filter-from-to">
-                    <div className="div-add-bot--search">
-
-                    <div className="bm_status-filter" style={{ marginRight: "15px" }}>
-                        <label style={{ margin: '0px 5px 0px 0px', color: '#2c2c2c', fontSize: '14px', width: '70px' }}>から</label>
-                        <div style={{ width: '283px' }}>
-                          <DatePicker
-                            selected={searchStartDate && searchStartDate}
-                            onChange={(date) => setSearchStartDate(date)}
-                            dateFormat="yyyy/MM/dd"
-                            locale="ja"
-                            placeholderText="yyyy/mm/dd"
-                            maxDate={searchEndDate}
-                          />
+                        <div className="wapper-search-date">
+                          <div className="bm_status-filter search-date-from">
+                            <label className="label-search-date">から</label>
+                            <div style={{ width: '283px' }}>
+                              <DatePicker
+                                selected={searchStartDate && searchStartDate}
+                                onChange={(date) => setSearchStartDate(date)}
+                                dateFormat="yyyy/MM/dd"
+                                locale="ja"
+                                placeholderText="yyyy/mm/dd"
+                                maxDate={searchEndDate}
+                              />
+                            </div>
+                          </div>
+                          <div className="bm_status-filter">
+                            <label className="label-search-date">まで</label>
+                            <div style={{ width: '283px' }}>
+                              <DatePicker
+                                selected={searchEndDate}
+                                onChange={(date) => setSearchEndDate(date)}
+                                dateFormat="yyyy/MM/dd"
+                                locale="ja"
+                                placeholderText="yyyy/mm/dd"
+                                minDate={searchStartDate}
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="bm_status-filter">
-                        <label style={{ margin: '0px 26px 0px 14px', color: '#2c2c2c', fontSize: '14px', width: '50px' }}>まで</label>
-                        <div style={{ width: '283px' }}>
-                          <DatePicker
-                            selected={searchEndDate}
-                            onChange={(date) => setSearchEndDate(date)}
-                            dateFormat="yyyy/MM/dd"
-                            locale="ja"
-                            placeholderText="yyyy/mm/dd"
-                            minDate={searchStartDate}
-                          />
-                        </div>
-                      </div>
-
                     </div>
                   </div>
                 </Col>
