@@ -312,6 +312,19 @@ function Preview() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    window.addEventListener(
+      "message",
+      (event) => {
+        if (event.data === 'openPreview') {
+          onOpenPreview(true)
+        }
+      },
+      false,
+    );
+  }, [])
+
   function getAllUrlParams(url) {
     var queryString = url ? url.split("?")[1] : window.location.search.slice(1);
     var obj = {};
