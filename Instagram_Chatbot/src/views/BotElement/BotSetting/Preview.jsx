@@ -1157,11 +1157,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         && !stringNullOrEmpty(contentType[contentType.type].value2)
                         && !stringNullOrEmpty(contentType[contentType.type].value3)
                         && (!REGEX_PHONE.test(`${contentType[contentType.type].value1}${contentType[contentType.type].value2}${contentType[contentType.type].value3}`))) {
-                        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "形式が正しくない。";
+                        errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "入力形式が正しくありません。";
                         isValid = false;
                     }
                 } else if (!stringNullOrEmpty(contentType[contentType.type].value) && !REGEX_PHONE.test(contentType[contentType.type].value)) {
-                    errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "形式が正しくない。";
+                    errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = "入力形式が正しくありません。";
                     isValid = false;
                 }
             } else if (contentType.type === 'urls' && !stringNullOrEmpty(contentType[contentType.type].value)) {
