@@ -3848,7 +3848,7 @@ if (scenarioId && botInfor && isOpen  ){
             </div>
             <div className="sp-header-left-label-title">{botInfor?.title}</div> */}
             <div id="comment_bubble" style={{display:'flex', paddingLeft:'20px'}}>
-              <p style={{ fontSize:'18px', fontWeight:900,  alignItems:'center', marginTop:'8px' }}>簡単90秒で注文完了</p>
+              <p style={{ fontSize:'18px', fontWeight:900,  alignItems:'center', marginTop:'9px' }}>簡単90秒で注文完了</p>
             </div>
           </div>
          <div className="sp-header-right-arrow" style={{marginRight:'8px'}}>
@@ -3914,39 +3914,38 @@ if (scenarioId && botInfor && isOpen  ){
 )} else if (isOpen===false && mobileCheck()===true && positionSp ==='1' && buttonTypeSp==='1') {
   return (
     <div
-  onClick={() => onOpenPreview(!isOpen)}
-  style={{
-    backgroundColor: botInfor?.main_color && botInfor?.main_color,
-    width:  widthPc? `${widthPc}px`:'380px',
-    maxWidth:mobileCheck()===true && '100%',
-    height: "65px",
-    borderTopLeftRadius: "5px",
-    borderTopRightRadius: "5px",
-    borderBottomLeftRadius: "5px",
-    borderBottomRightRadius: "5px",
-    display: "flex",
-    justifyContent: "left",
-    position:'fixed',
-    bottom:bottomMarginSp? `${bottomMarginSp}px`: '20px',
-    right:rightMarginSp? `${rightMarginSp}px`: '20px',
-  }}
->
-   <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
-        <div className="sp-header-left-avatar sp-avatar">
+      onClick={() => onOpenPreview(!isOpen)}
+      style={{
+        backgroundColor: botInfor?.main_color && botInfor?.main_color,
+        width: '240px',
+        height: "48px",
+        borderRadius:'35px',
+        display: "flex",
+        justifyContent: "left",
+        position:'fixed',
+        bottom:bottomMarginSp? `${bottomMarginSp}px`: '10px',
+        right:rightMarginSp? `${rightMarginSp}px`: '10px',
+      }}
+    >
+      <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)} style={{width: '100%', padding: '4px'}}>
+        <div className="sp-header-left-avatar sp-avatar" style={{width: '38px'}}>
           <img
             src={
               botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
             }
+            alt="bot-avatar"
           />
         </div>
-        <div className="sp-header-left-label">
-          <div className="sp-header-left-label-sub-title">
-            {botInfor?.subtitle}
+        <div>
+          <div id="comment_bubble" className="sp-bubble">
+            <span style={{ fontSize:'14px', fontWeight:700,  alignItems:'center', marginTop:'5px' }}>簡単90秒で注文完了</span>
           </div>
-          <div className="sp-header-left-label-title">{botInfor?.title}</div>
+        </div>
+        <div className="sp-header-right-arrow" style={{marginLeft: 'auto'}}>
+            <MDBIcon fas icon="chevron-circle-up" />
         </div>
       </div>
-</div>
+    </div>
   )
 }else if (isOpen===false && mobileCheck()===true&& positionSp ==='2'){
   return (
