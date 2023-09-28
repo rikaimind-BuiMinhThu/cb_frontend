@@ -1810,7 +1810,7 @@ function Preview() {
           ) {
             errorsMess[
               `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
-            ] = "形式が正しくない。";
+            ] = "入力形式が正しくありません。";
             isValid = false;
           }
         } else if (
@@ -1819,7 +1819,7 @@ function Preview() {
         ) {
           errorsMess[
             `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
-          ] = "形式が正しくない。";
+          ] = "入力形式が正しくありません。";
           isValid = false;
         }
       } else if (
