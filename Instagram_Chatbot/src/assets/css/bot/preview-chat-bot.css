@@ -666,7 +666,6 @@ slideUp
         display: flex;
         align-items: center;
         justify-content: center;
-
     }
     #comment_bubble {
         width: 240px;
@@ -676,6 +675,14 @@ slideUp
         -moz-border-radius: 12px;
         -webkit-border-radius: 12px;
         border-radius: 23px;
+    }
+
+    #comment_bubble.sp-bubble {
+        display: flex;
+        padding: 0 10px;
+        width: 100%;
+        height: 30px;
+        margin-left: 10px;
     }
     
     #comment_bubble:before {
@@ -688,6 +695,12 @@ slideUp
         border-top: 9px solid transparent;
         border-right: 26px solid #fff;
         border-bottom: 9px solid transparent;
+    }
+
+    #comment_bubble.sp-bubble::before {
+        right: 95%;
+        top: 6px;
+        border-right: 14px solid #fff;
     }
     .arrow {
         border: solid black;
