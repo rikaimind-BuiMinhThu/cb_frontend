@@ -2544,6 +2544,27 @@ function Preview() {
                           tokenExpired();
                         }
                       });
+                  } else if (dataMessages[i].message_content[j].type === "label" &&
+                    dataMessages[i].message_content[j].label.lbl_content) {
+                    dataMessages[i].message_content[j].label.lbl_content =
+                      dataMessages[
+                        i
+                      ].message_content[j].label.lbl_content.replaceAll(
+                        SCAN_REGEX,
+                        (text, variable) => {
+                          if (variables.length !== 0) {
+                            let valueVar = "";
+                            for (let k = 0; k < variables.length; k++) {
+                              if (variables[k].variable_name === variable) {
+                                valueVar = variables[k].default_value;
+                              }
+                            }
+                            return valueVar;
+                          } else {
+                            return "";
+                          }
+                        }
+                      );
                   }
                 }
                 resolve({ ...dataMessages[i] });
