@@ -535,8 +535,10 @@ function ClientManagement() {
     var emailCheck;
     var emailCheckLen;
     let dateCheck = false;
-    if (utils.checkDateEndIn(inputEndDate.toISOString().slice(0, 10), inputStartDate.toISOString().slice(0, 10)) === true) {
-      dateCheck = true;
+    if (inputEndDate !== '' && inputStartDate !== '') {
+      if (utils.checkDateEndIn(inputEndDate.toISOString().slice(0, 10), inputStartDate.toISOString().slice(0, 10)) === true) {
+        dateCheck = true;
+      }
     }
 
     var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,20})+$/;
@@ -612,7 +614,7 @@ function ClientManagement() {
       managerKata == true &&
       emailCheck == true &&
       emailCheckLen == true &&
-      dateCheck === true &&
+      // dateCheck === true &&
       price > 0 &&
       zipCode > 0
     ) {
@@ -692,7 +694,7 @@ function ClientManagement() {
       if (utils.checkPhoneNumber(phone, '電話番号') !== true) {
         utils.checkPhoneNumber(phone, '電話番号');
       }
-      if (dateCheck === false) {
+      if (dateCheck === false && inputEndDate !== '' && inputStartDate !== '') {
         utils.checkDateEndIn(inputEndDate.toISOString().slice(0, 10), inputStartDate.toISOString().slice(0, 10));
       }
       if (updateImageChange && getBaseUrlAdd() === false) {
