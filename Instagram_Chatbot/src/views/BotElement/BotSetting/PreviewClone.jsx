@@ -3868,8 +3868,8 @@ if (scenarioId && botInfor && isOpen  ){
               {botInfor?.subtitle}
             </div>
             <div className="sp-header-left-label-title">{botInfor?.title}</div> */}
-            <div id="comment_bubble" style={{display:'flex', paddingLeft:'20px'}}>
-              <p style={{ fontSize:'18px', fontWeight:900,  alignItems:'center', marginTop:'9px' }}>簡単90秒で注文完了</p>
+            <div id="comment_bubble" style={{display:'flex', alignItems:'center', paddingLeft:'20px'}}>
+              <span style={{ fontSize:'18px', fontWeight:900}}>簡単90秒で注文完了</span>
             </div>
           </div>
          <div className="sp-header-right-arrow" style={{marginRight:'8px'}}>
@@ -3959,7 +3959,7 @@ if (scenarioId && botInfor && isOpen  ){
         </div>
         <div>
           <div id="comment_bubble" className="sp-bubble">
-            <span style={{ fontSize:'14px', fontWeight:700,  alignItems:'center', marginTop:'5px' }}>簡単90秒で注文完了</span>
+            <span style={{ fontSize:'14px', fontWeight:700}}>簡単90秒で注文完了</span>
           </div>
         </div>
         <div className="sp-header-right-arrow" style={{marginLeft: 'auto'}}>
