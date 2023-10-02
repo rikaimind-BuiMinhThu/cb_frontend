@@ -744,6 +744,7 @@ const Scenario = () => {
   const [scenarioName, setScenarioName] = useState('');
   const [urlThanks, setUrlThanks] = useState('');
   const [lpProductUrl, setLpProductUrl] = useState('');
+  const [coupon, setCoupon] = useState('');
   const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
   const [errorScenarioName, setErrorScenarioName] = useState('');
 
@@ -794,6 +795,8 @@ const Scenario = () => {
   const [errorVariable, setErrorVariable] = useState('');
 
   const [dataCondition, setDataCondition] = useState([]);
+
+  const client = JSON.parse(sessionStorage.getItem('client'));
 
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
@@ -847,6 +850,7 @@ const Scenario = () => {
       
       setScenarioName(res.data.data?.scenario_name || '');
       setUrlThanks(res.data.data?.conversation?.urlThanksPage || '');
+      setCoupon(res.data.data?.conversation?.coupon || '');
       setLpProductUrl(res.data.data?.tamagoLandingPageUrl || '');
       setIsUseOnlyRegularOrder(res.data.data?.isUseOnlyRegularOrder || false);
     }).catch((error) => {
@@ -1786,7 +1790,8 @@ const Scenario = () => {
     const data = {
       conversation: {
         messages: [...dataMessages],
-        urlThanksPage: urlThanks
+        urlThanksPage: urlThanks,
+        coupon: coupon
       },
       scenario_name: scenarioName,
       landing_page_product_url: lpProductUrl,
@@ -1828,7 +1833,8 @@ const Scenario = () => {
     const data = {
       conversation: {
         messages: [...dataMessages],
-        urlThanksPage: urlThanks
+        urlThanksPage: urlThanks,
+        coupon: coupon
       },
       scenario_name: scenarioName,
       landing_page_product_url: lpProductUrl,
@@ -2206,6 +2212,14 @@ const Scenario = () => {
                       placeholder="商品購入のURL"
                     />
                   </div>
+                  {client.cart_system === "ec_force" && <div>
+                    <InputCustom
+                      style={{ width: '100%', marginTop: '5px' }}
+                      value={coupon}
+                      onChange={value => setCoupon(value)}
+                      placeholder="Coupon"
+                    />
+                  </div>}
                   <div>
                     <input
                       type="checkbox"
