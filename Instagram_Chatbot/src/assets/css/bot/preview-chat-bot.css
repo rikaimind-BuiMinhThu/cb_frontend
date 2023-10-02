@@ -137,6 +137,10 @@
     width: 100%;
 }
 
+.is_mobile .sp-body input {
+    font-size: 16px;
+}
+
 .sp-body>div {
     margin-bottom: 7px;
 }
