@@ -2616,6 +2616,9 @@ function ClientManagement() {
                     <option onClick={() => setSizeAfterSelectCartSystem()} value="shopify">
                       Shopify
                     </option>
+                    <option onClick={() => setSizeAfterSelectCartSystem()} value="ec_force">
+                      Ec-Force
+                    </option>
                     <option onClick={() => setSizeAfterSelectCartSystem()} value="repeat_plus"> 
                       リピートPLUS
                     </option>
