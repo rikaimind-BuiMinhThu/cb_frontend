@@ -3332,10 +3332,10 @@ if (scenarioId && botInfor && isOpen  ){
       className="sp-container1 slideUp"
       style={{
         position:'fixed',
-        bottom: mobileCheck()===true? `${bottomMarginSp}px`:`${bottomMarginPc}px`,
-        right: mobileCheck()===true? `${rightMarginSp}px`: `${rightMarginPc}px`,
-        width:mobileCheck()===true? `${widthSp}%` : `${widthPc}px`,
-        height:mobileCheck()===true? `${heightSp}px` :  `${heightPc}px`,
+        bottom: mobileCheck()===true ? isOpen ? 0 : `${bottomMarginSp}px`:`${bottomMarginPc}px`,
+        right: mobileCheck()===true ? isOpen ? 0 : `${rightMarginSp}px`: `${rightMarginPc}px`,
+        width: mobileCheck()===true ? `${widthSp}%` : `${widthPc}px`,
+        height: mobileCheck()===true ? `${heightSp}px` :  `${heightPc}px`,
         zIndex: 999,
       }}
     >
