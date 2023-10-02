@@ -3868,11 +3868,11 @@ if (scenarioId && botInfor && isOpen  ){
               {botInfor?.subtitle}
             </div>
             <div className="sp-header-left-label-title">{botInfor?.title}</div> */}
-            <div id="comment_bubble" style={{display:'flex', alignItems:'center', paddingLeft:'20px'}}>
+            <div id="comment_bubble" style={{display:'flex', alignItems:'center', paddingLeft:'20px', paddingTop: '3px'}}>
               <span style={{ fontSize:'18px', fontWeight:900}}>簡単90秒で注文完了</span>
             </div>
           </div>
-         <div className="sp-header-right-arrow" style={{marginRight:'8px'}}>
+          <div className="sp-header-right-arrow" style={{marginRight:'8px'}}>
               <MDBIcon fas icon="chevron-circle-up" />
           </div>
   </div>
