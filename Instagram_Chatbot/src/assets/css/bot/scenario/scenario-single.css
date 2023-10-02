@@ -60,6 +60,10 @@
   border: 1px solid gray;
 }
 
+.is_mobile .ss-input-value {
+  font-size: 16px;
+}
+
 .ss-scenario-name {
   height: 34px;
 }
