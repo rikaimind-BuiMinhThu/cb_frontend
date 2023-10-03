@@ -244,8 +244,8 @@ function Preview() {
 
     if (mobileCheck()) {
        return {
-          bottom: bottomMarginSp ? `${bottomMarginSp}px` : "0px",
-          right: rightMarginSp ? `${rightMarginSp}px` : "0px",
+          bottom: "0px",
+          right: "0px",
           width: widthSp ? `${widthSp}%` : "80%",
           height: heightSp ? `${heightSp}px` : "580px"
        }
@@ -3338,8 +3338,8 @@ if (scenarioId && botInfor && isOpen  ){
       className="sp-container1 slideUp"
       style={{
         position:'fixed',
-        bottom: mobileCheck()===true ? isOpen && !bottomMarginSp ? '0px' : `${bottomMarginSp}px`:`${bottomMarginPc}px`,
-        right: mobileCheck()===true ? isOpen && !rightMarginSp ? '0px' : `${rightMarginSp}px`: `${rightMarginPc}px`,
+        bottom: mobileCheck()===true ? isOpen ? 0 : `${bottomMarginSp}px`:`${bottomMarginPc}px`,
+        right: mobileCheck()===true ? isOpen ? 0 : `${rightMarginSp}px`: `${rightMarginPc}px`,
         width: mobileCheck()===true ? `${widthSp}%` : `${widthPc}px`,
         height: mobileCheck()===true ? `${heightSp}px` :  `${heightPc}px`,
         zIndex: 999,
