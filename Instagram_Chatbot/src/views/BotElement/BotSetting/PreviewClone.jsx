@@ -244,8 +244,8 @@ function Preview() {
 
     if (mobileCheck()) {
        return {
-          bottom: bottomMarginSp ? `0px` : "0px",
-          right: rightMarginSp ? `0px` : "0px",
+          bottom: "0px",
+          right: "0px",
           width: widthSp ? `${widthSp}%` : "80%",
           height: heightSp ? `${heightSp}px` : "580px"
        }
