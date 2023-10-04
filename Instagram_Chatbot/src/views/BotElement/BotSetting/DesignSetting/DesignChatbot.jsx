@@ -369,7 +369,7 @@ function DesignChatbot() {
         right_margin_sp: rightMarginSp,
         bottom_margin_sp: bottomMarginSp,
         popup_close_bot: popupCloseBot,
-        title_bubble: titleBubble
+        title_bubble: titleBubble.trim()
       },
     };
 

@@ -2042,7 +2042,7 @@ function Preview() {
             messageLog = "全角カタカナを入力してください。";
             break;
           case "double_byte":
-            REGEX_CHECK = /[^ァ-ンぁ-んｧ-ﾝﾞﾟ]+/;
+            REGEX_CHECK = /[^ァ-ンぁ-んｧ-ﾝﾞﾟ]+$/;
             messageLog = "全角文字を入力してください。";
             break;
           default:
