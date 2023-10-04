@@ -219,6 +219,7 @@ function Preview() {
   const [bottomMarginSp, setBottomMarginSp] = useState(10);
   const [showPopupCloseBot, setShowPopupCloseBot] = useState(false);
   const [activePopupCloseBot, setActivePopupCloseBot] = useState(true);
+  const [titleBubble, setTitleBubble] = useState("");
   const [styleModal, setStyleModal] = useState({});
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
@@ -282,6 +283,7 @@ function Preview() {
       if (response.data.data) {
         const result = JSON.parse(response.data.data?.design_settings);
         setActivePopupCloseBot(result?.popup_close_bot ? true : false);
+        setTitleBubble(result?.title_bubble ? result?.title_bubble : "簡単90秒で注文完了");
         setDisplayType(result?.display_type);
         setWidthPc(result?.width_pc? result?.width_pc: 380);
         setHeightPc(result?.height_pc? result?.height_pc:600);
@@ -3875,7 +3877,7 @@ if (scenarioId && botInfor && isOpen  ){
             </div>
             <div className="sp-header-left-label-title">{botInfor?.title}</div> */}
             <div id="comment_bubble" style={{display:'flex', alignItems:'center', paddingLeft:'20px', paddingTop: '3px'}}>
-              <span style={{ fontSize:'18px', fontWeight:900}}>簡単90秒で注文完了</span>
+              <span style={{ fontSize:'18px', fontWeight:900}}>{titleBubble}</span>
             </div>
           </div>
           <div className="sp-header-right-arrow" style={{marginRight:'8px'}}>
@@ -3965,7 +3967,7 @@ if (scenarioId && botInfor && isOpen  ){
         </div>
         <div>
           <div id="comment_bubble" className="sp-bubble">
-            <span style={{ fontSize:'14px', fontWeight:700}}>簡単90秒で注文完了</span>
+            <span style={{ fontSize:'14px', fontWeight:700}}>{titleBubble}</span>
           </div>
         </div>
         <div className="sp-header-right-arrow" style={{marginLeft: 'auto'}}>
