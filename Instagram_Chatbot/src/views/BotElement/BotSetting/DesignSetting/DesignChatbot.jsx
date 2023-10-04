@@ -74,6 +74,7 @@ function DesignChatbot() {
   const [bottomMarginSp, setBottomMarginSp] = useState(10);
   const [cbImage, setCbImage] = useState("");
   const [popupCloseBot, setPopupCloseBot] = useState(false);
+  const [titleBubble, setTitleBubble] = useState("");
   const [isOpenPreviewBot, setIsOpenPreviewBot] = useState(true);
 
   // design type: handle click
@@ -217,6 +218,7 @@ function DesignChatbot() {
         setTitle(response.data.data?.title);
         setSubtitle(response.data.data?.subtitle);
         setDesignType(response.data.data?.design_type);
+        setTitleBubble(result?.title_bubble);
         setPopupCloseBot(result?.popup_close_bot ? true : false);
         const colorMap = {
           blue: "#327AED",
@@ -366,7 +368,8 @@ function DesignChatbot() {
         right_position_sp_title: rightSpTitle,
         right_margin_sp: rightMarginSp,
         bottom_margin_sp: bottomMarginSp,
-        popup_close_bot: popupCloseBot
+        popup_close_bot: popupCloseBot,
+        title_bubble: titleBubble
       },
     };
 
@@ -1228,43 +1231,65 @@ function DesignChatbot() {
                       <div
                         style={{
                           width: "50%",
-                          padding: "0 40px",
+                          paddingLeft: "40px",
                         }}
                       >
                         <CardBody>
                           <div className="add-bot-container">
-                         
-                          <div className="field-add-bot">
-                              <div className="add-bot_field-container">
-                                <span className="label-field">
-                                  離脱防止
-                                </span>
-                                <span className="d-flex" style={{width: "100%" }}>
-                                  <input
-                                    name="popup_close_bot"
-                                    type="radio"
-                                    id="in_active"
-                                    className="in_active_popup"
-                                    value={false}
-                                    checked={!popupCloseBot}
-                                    onClick={() => setPopupCloseBot(false)}
-                                  />
-                                  <label htmlFor="in_active" className="radio-btn-action">
-                                    無効
-                                  </label>
-                                  <input
-                                    name="popup_close_bot"
-                                    className="active_popup"
-                                    type="radio"
-                                    id="active"
-                                    value={true}
-                                    checked={popupCloseBot}
-                                    onClick={() => setPopupCloseBot(true)}
-                                  />
-                                  <label htmlFor="active" className="radio-btn-action">
-                                    有効
-                                  </label>
-                                </span>
+                            <div className="bot-haft">
+                              <div className="field-add-bot">
+                                <div className="add-bot_field-container">
+                                  <span className="label-field">
+                                    タイトル
+                                  </span>
+                                  <div
+                                    style={{ display: "flex", width: "100%" }}
+                                  >
+                                    <input
+                                      type="text"
+                                      name="bottom_margin_sp"
+                                      defaultValue={titleBubble}
+                                      className="input-setting"
+                                      placeholder="簡単90秒で注文完了"
+                                      onChange={(e) => {
+                                        setTitleBubble(e.target.value);
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="field-add-bot">
+                                <div className="add-bot_field-container">
+                                  <span className="label-field">
+                                    離脱防止
+                                  </span>
+                                  <span className="d-flex" style={{width: "100%" }}>
+                                    <input
+                                      name="popup_close_bot"
+                                      type="radio"
+                                      id="in_active"
+                                      className="in_active_popup"
+                                      value={false}
+                                      checked={!popupCloseBot}
+                                      onClick={() => setPopupCloseBot(false)}
+                                    />
+                                    <label htmlFor="in_active" className="radio-btn-action">
+                                      無効
+                                    </label>
+                                    <input
+                                      name="popup_close_bot"
+                                      className="active_popup"
+                                      type="radio"
+                                      id="active"
+                                      value={true}
+                                      checked={popupCloseBot}
+                                      onClick={() => setPopupCloseBot(true)}
+                                    />
+                                    <label htmlFor="active" className="radio-btn-action">
+                                      有効
+                                    </label>
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>
