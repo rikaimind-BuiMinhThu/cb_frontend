@@ -182,7 +182,7 @@ async function displayPopup() {
     let checkDevice = { scenario_data: `${device}_open_chatbot_window` };
     // submitForm(url, checkDevice)
     getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
-  }, 1000);
+  }, 30000);
 }
 
 async function getUser(url, datacount) {
