@@ -302,7 +302,7 @@ function Preview() {
         setRightPcTitle(result?.right_position_pc_title);
         setButtonTypePc(result?.button_type_pc? result?.button_type_pc: "1");
         setRightMarginPc(result?.right_margin_pc?result?.right_margin_pc:10);
-        setBottomMarginPc(result?.bottom_margin_pc?result?.bottom_margin_pc:10);
+        setBottomMarginPc(result?.bottom_margin_pc?result?.bottom_margin_pc:0);
         setPositionSp(result?.position_sp? result?.position_sp:"1");
         setButtonTypeSp(result?.button_type_sp?result?.button_type_sp:"2");
         setRightSpTitle(
@@ -332,6 +332,12 @@ function Preview() {
       document.body.classList.add('is_mobile');
     }
   }, [])
+
+  useEffect(() => {
+    if (window && window.parent) {
+      window.parent.postMessage(isOpen, urlReceive);
+    }
+  }, [isOpen, urlReceive])
 
   function getAllUrlParams(url) {
     var queryString = url ? url.split("?")[1] : window.location.search.slice(1);
@@ -376,7 +382,7 @@ function Preview() {
       
       Cookies.set("openPre", true);
       if (window && window.parent) {
-        window.parent.postMessage(true, urlReceive);
+        window.parent.postMessage(false, urlReceive);
       }
       document.getElementById("sp-container1").style.height = heightPc
         ? `${heightPc}px`
