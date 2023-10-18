@@ -112,7 +112,7 @@ async function displayPopup() {
   iframe.height =
     chatbotH && chatbotBottom
       ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px`
-      : "630px";
+      : "0px";
 
   iframe.style.border = "none";
   iframe.style.padding = "0";
