@@ -14,8 +14,8 @@ function getEnvironment() {
   const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
   });
-
-  return params.env || "production";
+  // return params.env || "production";
+  return "local";
 }
 
 function getDebugFlag() {
@@ -36,7 +36,6 @@ function log(message) {
 
 function getEcChatBotApiServerBaseUrl() {
   const environment = getEnvironment();
-
   switch (environment) {
     case "staging":
     case "test":

@@ -309,7 +309,7 @@ function DataAnalyst() {
         var useEC = res.data.counts;
         var dateEC = [];
         var user_count = [];
-        for (var i = 0; i < useEC.length; i++) {
+        for (var i = 0; i < useEC?.length; i++) {
           // useEC[i].log_date.slice(0,5)
           dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
           user_count.push(useEC[i].user_count);
@@ -333,7 +333,7 @@ function DataAnalyst() {
         // console.log('message EC: ', res.data.counts);
         var messageECA = res.data.counts;
         var message_count = [];
-        for (var i = 0; i < messageECA.length; i++) {
+        for (var i = 0; i < messageECA?.length; i++) {
           message_count.push(messageECA[i].message_count);
         }
         setMessageEC(message_count);
@@ -351,7 +351,7 @@ function DataAnalyst() {
         var useEC = res.data.user_counts;
         setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count));
         var user_count_all = 0;
-        for (var i = 0; i < useEC.length; i++) {
+        for (var i = 0; i < useEC?.length; i++) {
           user_count_all = user_count_all + useEC[i].user_count;
         }
         setUserChatwithCB(user_count_all);
@@ -370,7 +370,7 @@ function DataAnalyst() {
         // console.log(res.data);
         var useEC = res.data.user_counts;
         var user_count_alltime = 0;
-        for (var i = 0; i < useEC.length; i++) {
+        for (var i = 0; i < useEC?.length; i++) {
           user_count_alltime = user_count_alltime + useEC[i].user_count;
         }
         setUserChatwithCBAll(user_count_alltime);
@@ -615,7 +615,7 @@ function DataAnalyst() {
           var useEC = res.data.counts;
           var dateEC = [];
           var user_count = [];
-          for (var i = 0; i < useEC.length; i++) {
+          for (var i = 0; i < useEC?.length; i++) {
             // useEC[i].log_date.slice(0,5)
 
             // dateEC.push(useEC[i].log_date.slice(0, 5));
@@ -635,7 +635,7 @@ function DataAnalyst() {
           // console.log('message: ', res.data.counts);
           var messageECA = res.data.counts;
           var message_count = [];
-          for (var i = 0; i < messageECA.length; i++) {
+          for (var i = 0; i < messageECA?.length; i++) {
             message_count.push(messageECA[i].message_count);
           }
           setMessageEC(message_count);
@@ -947,7 +947,7 @@ function DataAnalyst() {
           // console.log('message: ', res.data.counts);
           let messageECA = res.data.counts;
           let message_count = [];
-          for (let i = 0; i < messageECA.length; i++) {
+          for (let i = 0; i < messageECA?.length; i++) {
             message_count.push(messageECA[i].message_count);
           }
           setMessageEC(message_count);

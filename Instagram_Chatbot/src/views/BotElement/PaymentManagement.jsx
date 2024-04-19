@@ -169,13 +169,13 @@ function PaymentManagement() {
         else setNoShip(false);
         if (res.data?.data?.need_np_deferred_payment === 'no') setNoNP(true);
         else setNoNP(false);
-        if (res.data?.data?.specify_payment_variables[0].id !== null) {
+        if (res.data?.data?.specify_payment_variables[0]?.id !== null) {
           setCustomDivSpecifyPaymentGW(res.data?.data?.specify_payment_variables);
         }
-        if (res.data?.data?.settlement_fee_variables[0].id !== null) {
+        if (res.data?.data?.settlement_fee_variables[0]?.id !== null) {
           setCustomDivSettlementPaymentGW(res.data?.data?.settlement_fee_variables);
         }
-        if (res.data?.data?.np_value_settlements[0].id !== null) {
+        if (res.data?.data?.np_value_settlements[0]?.id !== null) {
           setCustomDivSettlementFee(res.data?.data?.np_value_settlements);
         }
       })
@@ -203,13 +203,13 @@ function PaymentManagement() {
         else setNoShip(false);
         if (res.data?.data?.need_np_deferred_payment === 'no') setNoNP(true);
         else setNoNP(false);
-        if (res.data?.data?.specify_payment_variables[0].id !== null) {
+        if (res.data?.data?.specify_payment_variables[0]?.id !== null) {
           setCustomDivSpecifyPaymentGW(res.data?.data?.specify_payment_variables);
         }
-        if (res.data?.data?.settlement_fee_variables[0].id !== null) {
+        if (res.data?.data?.settlement_fee_variables[0]?.id !== null) {
           setCustomDivSettlementPaymentGW(res.data?.data?.settlement_fee_variables);
         }
-        if (res.data?.data?.np_value_settlements[0].id !== null) {
+        if (res.data?.data?.np_value_settlements[0]?.id !== null) {
           setCustomDivSettlementFee(res.data?.data?.np_value_settlements);
         }
       })

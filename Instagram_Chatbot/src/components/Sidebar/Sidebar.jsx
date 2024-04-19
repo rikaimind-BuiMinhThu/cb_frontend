@@ -198,7 +198,7 @@ function Sidebar(props) {
       <div className='sidebar-wrapper' ref={sidebar}>
         <Nav>
           <ul id='sidebar_all'>
-            {client.is_instagram ? (
+            {client?.is_instagram ? (
               <li
                 style={{ listStyleType: 'none', marginLeft: '-50px' }}
                 className={activeRoute('instagram') + (true ? ' active-pro' : '')}
@@ -379,7 +379,7 @@ function Sidebar(props) {
                   </li>
                 </ul>
               </li>) : ('')}
-            {client.is_web ? (
+            {client?.is_web ? (
               <li
                 style={{ listStyleType: 'none', marginLeft: '-50px' }}
                 className={
