@@ -1041,8 +1041,8 @@ function Preview() {
     return false;
   };
 
-  const handleValidateField = () => {
-    let contentArr = [...dataMessages[indexMessageRender].message_content];
+  const handleValidateField = (index) => {
+    let contentArr = [...dataMessages[index].message_content];
     let isValid = true;
     let errorsMess = {};
 
@@ -1061,7 +1061,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueRight)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+                `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
               ] = messageError;
               isValid = false;
             }
@@ -1069,17 +1069,17 @@ function Preview() {
             //   || contentType[contentType.type].valueLeft?.length > limitTo
             //   || contentType[contentType.type].valueRight?.length < limitFrom
             //   || contentType[contentType.type].valueRight?.length > limitTo) {
-            //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+            //   errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
             //   isValid = false;
             // }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
           //  else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
-          //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          //   errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
           //   isValid = false;
           // }
         } else if (contentType.type === "phone_number") {
@@ -1090,13 +1090,13 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].value3)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+                `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
               ] = messageError;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1109,7 +1109,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueConfirm)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1118,7 +1118,7 @@ function Preview() {
           //     || contentType[contentType.type].value.length > limitTo
           //     || contentType[contentType.type].valueConfirm.length < limitFrom
           //     || contentType[contentType.type].valueConfirm.length > limitTo)) {
-          //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          //   errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
           //   isValid = false;
           // }
         } else if (contentType.type === "customization") {
@@ -1128,13 +1128,13 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueRight)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+                `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
               ] = messageError;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1144,7 +1144,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueMinute)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1158,7 +1158,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueDay)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1168,7 +1168,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueDay)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1181,7 +1181,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueMonth)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1194,7 +1194,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueMinute)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1206,7 +1206,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueMinute2)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1220,7 +1220,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueDay2)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1230,14 +1230,14 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].city)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === "attaching_file") {
           if (stringNullOrEmpty(contentType.value)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1247,7 +1247,7 @@ function Preview() {
         ) {
           if (stringNullOrEmpty(contentType.date_select)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1257,7 +1257,7 @@ function Preview() {
             stringNullOrEmpty(contentType.end_date_select)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1267,14 +1267,14 @@ function Preview() {
             contentType.isAgree === false
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === "radio_button") {
           if (stringNullOrEmpty(contentType.initial_selection)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1285,7 +1285,7 @@ function Preview() {
               contentType.checkedValue.length === 0
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+                `message${index}_content${i}_${contentArr[i].type}`
               ] = messageError;
               isValid = false;
             } else if (
@@ -1294,7 +1294,7 @@ function Preview() {
                 parseInt(contentType.selection_limit_from)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+                `message${index}_content${i}_${contentArr[i].type}`
               ] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
               isValid = false;
             } else if (
@@ -1303,7 +1303,7 @@ function Preview() {
                 parseInt(contentType.selection_limit_to)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+                `message${index}_content${i}_${contentArr[i].type}`
               ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
               isValid = false;
             }
@@ -1313,7 +1313,7 @@ function Preview() {
               contentType.initial_selection_picture.length === 0
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+                `message${index}_content${i}_${contentArr[i].type}`
               ] = messageError;
               isValid = false;
             } else if (
@@ -1322,7 +1322,7 @@ function Preview() {
                 parseInt(contentType.selection_limit_from)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+                `message${index}_content${i}_${contentArr[i].type}`
               ] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
               isValid = false;
             } else if (
@@ -1331,7 +1331,7 @@ function Preview() {
                 parseInt(contentType.selection_limit_to)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+                `message${index}_content${i}_${contentArr[i].type}`
               ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
               isValid = false;
             }
@@ -1339,47 +1339,47 @@ function Preview() {
         } else if (contentArr[i].type === "carousel") {
           if (stringNullOrEmpty(contentType.initial_selection)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === "capture") {
           if (stringNullOrEmpty(contentType.value)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           } else if (
             captcha
               .filter(
                 (item) =>
-                  item.index === indexMessageRender && item.indexContent === i
+                  item.index === index && item.indexContent === i
               )?.[0]
               ?.text.toLowerCase() !== contentType.value.toLowerCase()
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = "認証コードが間違っています。";
             isValid = false;
           }
         } else if (contentArr[i].type === "product_purchase") {
           if (contentType.initial_selection.length === 0) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === "slider") {
           if (stringNullOrEmpty(contentType.value)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === "product_purchase_radio_button") {
           if (contentType.initial_selection.length === 0) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1389,7 +1389,7 @@ function Preview() {
             stringNullOrEmpty(contentType.initial_selection)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           } else if (
@@ -1397,7 +1397,7 @@ function Preview() {
             stringNullOrEmpty(contentType.initial_selection_picture)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1407,7 +1407,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].value)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1416,7 +1416,7 @@ function Preview() {
           stringNullOrEmpty(contentType[contentType.type].value)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = messageError;
           isValid = false;
         } else if (
@@ -1425,7 +1425,7 @@ function Preview() {
             contentType[contentType.type]?.value?.length > limitTo)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
           isValid = false;
         }
@@ -1438,7 +1438,7 @@ function Preview() {
               parseInt(contentType.selection_limit_to)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
             isValid = false;
           } else if (
@@ -1448,7 +1448,7 @@ function Preview() {
               parseInt(contentType.selection_limit_to)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
             isValid = false;
           }
@@ -1465,7 +1465,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].value3))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1477,7 +1477,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueHour))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1494,7 +1494,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueDay))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1506,7 +1506,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueDay))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1521,7 +1521,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueMonth))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1539,7 +1539,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueMinute))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1555,7 +1555,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueMinute2))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1575,7 +1575,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueDay2))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1587,7 +1587,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].city))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1605,7 +1605,7 @@ function Preview() {
               contentType[contentType.type].valueRight?.length < limitFrom)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = `${limitFrom}文字以上入力してください。`;
             isValid = false;
           } else if (
@@ -1615,7 +1615,7 @@ function Preview() {
               contentType[contentType.type].valueRight?.length > limitTo)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = `${limitTo}文字以下入力してください。`;
             isValid = false;
           }
@@ -1624,7 +1624,7 @@ function Preview() {
           contentType[contentType.type].value?.length < limitFrom
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `${limitFrom}文字以上入力してください。`;
           isValid = false;
         } else if (
@@ -1632,7 +1632,7 @@ function Preview() {
           contentType[contentType.type].value?.length > limitTo
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `${limitTo}文字以下入力してください。`;
           isValid = false;
         } else if (
@@ -1641,7 +1641,7 @@ function Preview() {
           !REGEX_PASSWORD.test(contentType[contentType.type].value)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
           isValid = false;
         }
@@ -1653,7 +1653,7 @@ function Preview() {
           contentType.products.forEach((itemProduct, indexProduct) => {
             if (item === itemProduct.id && !itemProduct.quantity_select) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}_${indexProduct}`
+                `message${index}_content${i}_${contentArr[i].type}_${indexProduct}`
               ] = messageError;
               isValid = false;
             }
@@ -1667,7 +1667,7 @@ function Preview() {
             contentType[contentType.type].valueConfirm?.length < limitFrom)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `${limitFrom}文字以上入力してください。`;
           isValid = false;
         } else if (
@@ -1677,7 +1677,7 @@ function Preview() {
             contentType[contentType.type].valueConfirm?.length > limitTo)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `${limitTo}文字以下入力してください。`;
           isValid = false;
         } else if (
@@ -1685,7 +1685,7 @@ function Preview() {
           !REGEX_PASSWORD.test(contentType[contentType.type].value)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
           isValid = false;
         } else if (
@@ -1693,7 +1693,7 @@ function Preview() {
           !REGEX_PASSWORD.test(contentType[contentType.type].valueConfirm)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
           isValid = false;
         } else if (
@@ -1703,7 +1703,7 @@ function Preview() {
             contentType[contentType.type].valueConfirm
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = "パスワードとパスワード確認が一致しません。";
           isValid = false;
         }
@@ -1716,7 +1716,7 @@ function Preview() {
           contentType[contentType.type].value.length < limitFrom
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = `${limitFrom}文字以上入力してください。`;
           isValid = false;
         } else if (
@@ -1724,24 +1724,24 @@ function Preview() {
           contentType[contentType.type].value.length > limitTo
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = `${limitTo}文字以下入力してください。`;
           isValid = false;
         }
       } else if (contentArr[i].type === "zip_code_address") {
         if (
           errors[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] &&
           errors[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] !== messageError
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] =
             errors[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ];
           isValid = false;
         } else {
@@ -1799,7 +1799,7 @@ function Preview() {
           }
           if (isValidZipCode === false) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1807,7 +1807,7 @@ function Preview() {
       } else if (
         contentType.type === "phone_number" &&
         !errorsMess[
-          `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+          `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
         ]
       ) {
         let REGEX_PHONE = /^0\d{9}$|^0\d{10}$/;
@@ -1823,7 +1823,7 @@ function Preview() {
             )
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = "入力形式が正しくありません。";
             isValid = false;
           }
@@ -1832,7 +1832,7 @@ function Preview() {
           !REGEX_PHONE.test(contentType[contentType.type].value)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = "入力形式が正しくありません。";
           isValid = false;
         }
@@ -1844,7 +1844,7 @@ function Preview() {
           /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
         if (!REGEX_URLS.test(contentType[contentType.type].value)) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `有効なURL形式で指定してください。`;
           isValid = false;
         }
@@ -1854,7 +1854,7 @@ function Preview() {
       ) {
         if (!REGEX_EMAIL.test(contentType[contentType.type].value)) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
         }
@@ -1864,7 +1864,7 @@ function Preview() {
           !REGEX_EMAIL.test(contentType[contentType.type].value)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
         } else if (
@@ -1872,7 +1872,7 @@ function Preview() {
           !REGEX_EMAIL.test(contentType[contentType.type].valueConfirm)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
         } else if (
@@ -1882,19 +1882,19 @@ function Preview() {
             contentType[contentType.type].valueConfirm
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `メールアドレスとメールアドレス確認が一致しません。`;
           isValid = false;
         }
       } else if (
         contentArr[i].type === "attaching_file" &&
-        errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]
+        errors[`message${index}_content${i}_${contentArr[i].type}`]
       ) {
         errorsMess[
-          `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+          `message${index}_content${i}_${contentArr[i].type}`
         ] =
           errors[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ];
         isValid = false;
       } else if (contentArr[i].type === "credit_card_payment") {
@@ -1916,7 +1916,7 @@ function Preview() {
           stringNullOrEmpty(contentType.month)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = messageError;
           isValid = false;
         } else if (
@@ -1933,7 +1933,7 @@ function Preview() {
               (contentType.card_number4 + "").length !== 4))
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = "クレジットカード番号は無効です。";
           isValid = false;
         } else if (
@@ -1943,14 +1943,14 @@ function Preview() {
           ).isBefore(moment().format("YYYY-MM"))
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = "有効期限に誤りがあるために、決済を完了できませんでした。";
           isValid = false;
         }
       } else if (
         contentArr[i].type === "card_payment_radio_button" &&
         errorsMess[
-          `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+          `message${index}_content${i}_${contentArr[i].type}`
         ] !== messageError &&
         (((contentType?.initial_selection ||
           contentType?.card_linked_setting.length > 0) &&
@@ -1979,7 +1979,7 @@ function Preview() {
           stringNullOrEmpty(contentType.month)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = messageError;
           isValid = false;
         } else if (
@@ -1996,7 +1996,7 @@ function Preview() {
               (contentType.card_number4 + "").length !== 4))
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = "クレジットカード番号は無効です。";
           isValid = false;
         } else if (
@@ -2006,7 +2006,7 @@ function Preview() {
           ).isBefore(moment().format("YYYY-MM"))
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = "有効期限に誤りがあるために、決済を完了できませんでした。";
           isValid = false;
         }
@@ -2063,12 +2063,12 @@ function Preview() {
           ) {
             isValid = false;
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageLog;
           } else if (!contentType[contentType.type].isSplitInput && REGEX_CHECK.test(contentType[contentType.type].value)) {
             isValid = false;
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageLog;
           }
         }
@@ -2084,8 +2084,17 @@ function Preview() {
     return isValid;
   };
 
-  const onClickNext = async (indexMessage) => {
-    if (!handleValidateField()) {
+  const onClickNext = async (indexMessage, message) => {
+    let indexClickLocation = indexMessageRender
+
+    for (let i = 0; i < dataMessages.length; i++) {
+      if (dataMessages[i]?.id === message?.id) {
+        indexClickLocation = i
+        break
+      }
+    }
+
+    if (!handleValidateField(indexClickLocation)) {
       return;
     }
     renderMessageArr[indexMessage].disabled = true;
@@ -2093,14 +2102,14 @@ function Preview() {
     let index;
     let isPauseScroll = false;
     let delayRender;
-    setIndexUser((prev) => prev + 1);
+    if (indexClickLocation === indexMessageRender) setIndexUser(prev => prev + 1);
     let data_submit = {
       scenario_id: scenarioId,
       message: renderMessageArr[indexMessage],
       user_id: uuid,
       bot_type: "web"
     };
-    if (dataMessages[indexMessageRender].message_content[0]?.text_input?.save_input_content === "create_order") {
+    if (dataMessages[indexClickLocation].message_content[0]?.text_input?.save_input_content === "create_order") {
       await new Promise((resolve) => {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
@@ -2136,7 +2145,7 @@ function Preview() {
           });
       });
     }
-    if (dataMessages.length - 1 === indexMessageRender ) {
+    if (dataMessages.length - 1 === indexClickLocation) {
       await new Promise((resolve) => {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
@@ -2183,19 +2192,28 @@ function Preview() {
           window.parent.location.href = urlThanksPage;
         }, 2000);
       }
-    } else {
-      api
-        .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
-        .then((res) => {})
-        .catch((error) => {
-          console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired();
-          }
-        });
+
+      for (let i = 0; i < renderMessage.length; i++) {
+        renderMessage[i].disabled = true;
+      }
+      return setRenderMessageArr(renderMessage)
+    }
+    await api
+      .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
+      .then((res) => {})
+      .catch((error) => {
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+
+    if (!dataMessages[indexMessageRender + 1] || indexMessageRender > indexClickLocation) {
+      renderMessage[indexMessage].disabled = false
+      setRenderMessageArr(renderMessage)
+      return;
     }
 
-    if (!dataMessages[indexMessageRender + 1]) return;
     if (dataMessages[indexMessageRender + 1].belong_to === 'user' || dataMessages[indexMessageRender + 1].belong_to === 'bot') {
       for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
         if (dataMessages[i].hidden !== true) {
@@ -2956,6 +2974,8 @@ function Preview() {
         }
       }
     }
+
+    renderMessageArr[indexMessage].disabled = false;
   };
 
   const onChangeValue = (
@@ -2964,45 +2984,57 @@ function Preview() {
     value,
     field,
     subFiled,
-    name
+    name,
+    message
   ) => {
+    let index = indexMessageRender
+
+    if (message) {
+      for (let i = 0; i < dataMessages.length; i++) {
+        if (dataMessages[i]?.id === message?.id) {
+          index = i
+          break
+        }
+      }
+    }
+
     if (name) {
       if (
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[index].message_content[indexContent][
           contentType
         ][field][subFiled] === undefined
       ) {
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[index].message_content[indexContent][
           contentType
         ][field][subFiled] = {};
       }
-      dataMessages[indexMessageRender].message_content[indexContent][
+      dataMessages[index].message_content[indexContent][
         contentType
       ][field][subFiled][name] = value;
     } else if (subFiled) {
       if (
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[index].message_content[indexContent][
           contentType
         ][field] === undefined
       ) {
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[index].message_content[indexContent][
           contentType
         ][field] = {};
       }
-      dataMessages[indexMessageRender].message_content[indexContent][
+      dataMessages[index].message_content[indexContent][
         contentType
       ][field][subFiled] = value;
     } else if (field) {
       if (
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[index].message_content[indexContent][
           contentType
         ] === undefined
       ) {
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[index].message_content[indexContent][
           contentType
         ] = {};
       }
-      dataMessages[indexMessageRender].message_content[indexContent][
+      dataMessages[index].message_content[indexContent][
         contentType
       ][field] = value;
     }
@@ -3013,7 +3045,7 @@ function Preview() {
       value.length > 0
     ) {
       let dataContentType = {
-        ...dataMessages[indexMessageRender].message_content[indexContent][
+        ...dataMessages[index].message_content[indexContent][
           contentType
         ],
       };
@@ -3065,7 +3097,7 @@ function Preview() {
       field === "initial_selection"
     ) {
       let dataContentType = {
-        ...dataMessages[indexMessageRender].message_content[indexContent][
+        ...dataMessages[index].message_content[indexContent][
           contentType
         ],
       };
@@ -3104,19 +3136,19 @@ function Preview() {
     }
 
     if (
-      dataMessages[indexMessageRender].message_content[indexContent][
+      dataMessages[index].message_content[indexContent][
         contentType
       ].is_save_input_content
     ) {
       let isSaveParam = false;
       variables.forEach((item) => {
         let dataContentType = {
-          ...dataMessages[indexMessageRender].message_content[indexContent][
+          ...dataMessages[index].message_content[indexContent][
             contentType
           ],
         };
         if (
-          dataMessages[indexMessageRender].message_content[indexContent][
+          dataMessages[index].message_content[indexContent][
             contentType
           ].save_input_content === item.variable_name
         ) {
@@ -3256,7 +3288,7 @@ function Preview() {
       setVariables([...variables]);
       if (isSaveParam) {
         objParam[
-          dataMessages[indexMessageRender].message_content[indexContent][
+          dataMessages[index].message_content[indexContent][
             contentType
           ].save_input_content
         ] = value;
@@ -3776,11 +3808,12 @@ if (scenarioId && botInfor && isOpen  ){
                             value,
                             field,
                             subFiled,
-                            name
+                            name,
+                            message
                           )
                         }
                         indexMessageRender={indexMessageRender}
-                        onClickNext={() => onClickNext(indexMessage)}
+                        onClickNext={() => onClickNext(indexMessage, message)}
                         indexMessage={indexMessage}
                         errorsProps={errors}
                         displayButtonNext={(value) => {
@@ -3809,7 +3842,7 @@ if (scenarioId && botInfor && isOpen  ){
                               borderRadius: "25px",
                             }}
                             className="ss-user-message__action-btn"
-                            onClick={() => onClickNext(indexMessage)}
+                            onClick={() => onClickNext(indexMessage, message)}
                           >
                             {message.buttonName || "次へ"}
                           </Button>
