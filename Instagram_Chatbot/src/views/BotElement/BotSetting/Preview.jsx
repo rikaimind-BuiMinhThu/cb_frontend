@@ -873,7 +873,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                             errorsMess[`message${index}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
                             isValid = false;
                         } else if (contentType.selection_limit_to && contentType.checkedValue.length > parseInt(contentType.selection_limit_to)) {
-                            errorsMess[`message${v}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
+                            errorsMess[`message${index}_content${i}_${contentArr[i].type}`] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
                             isValid = false;
                         }
                     } else {
@@ -1187,7 +1187,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     isValid = false;
                 }
             } else if (contentArr[i].type === 'attaching_file' && errors[`message${index}_content${i}_${contentArr[i].type}`]) {
-                errorsMess[`message${v}_content${i}_${contentArr[i].type}`] = errors[`message${index}_content${i}_${contentArr[i].type}`];
+                errorsMess[`message${index}_content${i}_${contentArr[i].type}`] = errors[`message${index}_content${i}_${contentArr[i].type}`];
                 isValid = false;
             } else if (contentArr[i].type === 'credit_card_payment') {
                 if ((contentType.is_hide_card_name !== true && stringNullOrEmpty(contentType.card_holder))
