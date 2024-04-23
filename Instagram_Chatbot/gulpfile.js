@@ -5,21 +5,21 @@ gulp.task("licenses", async function () {
   gulp
     .src("build/static/js/*chunk.js", { base: "./" })
     .pipe(
-        gap.prependText('/* Copyright (c) 2024 */\n')
+      gap.prependText(``)
     )
     .pipe(gulp.dest("./", { overwrite: true }));
 
   gulp
     .src("build/index.html", { base: "./" })
     .pipe(
-        gap.prependText('/* Copyright (c) 2024 */\n')
+      gap.prependText(``)
     )
     .pipe(gulp.dest("./", { overwrite: true }));
 
   gulp
     .src("build/static/css/*chunk.css", { base: "./" })
     .pipe(
-        gap.prependText('/* Copyright (c) 2024 */\n')
+      gap.prependText(``)
     )
     .pipe(gulp.dest("./", { overwrite: true }));
   return;
