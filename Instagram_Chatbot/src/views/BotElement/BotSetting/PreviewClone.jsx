@@ -2086,7 +2086,9 @@ function Preview() {
 
   const setMessagesSessionStorage = (data) => {
     const temp = getMessagesSessionStorage()
-    sessionStorage.setItem("messages", JSON.stringify(dataMessages.map(x => {
+    const bot_id = objParam.bot_id || Number(objParam?.current_url_param?.bot_id)
+    console.log("zz11", bot_id)
+    sessionStorage.setItem(`messages_bot_${bot_id}`, JSON.stringify(dataMessages.map(x => {
       if (x.id === data.id) {
         return { ...data }
       }
@@ -2095,7 +2097,8 @@ function Preview() {
   }
 
   const getMessagesSessionStorage = () => {
-    const data = sessionStorage.getItem("messages")
+    const bot_id = objParam.bot_id || Number(objParam?.current_url_param?.bot_id)
+    const data = sessionStorage.getItem(`messages_bot_${bot_id}`)
     if (!data) return null;
     return JSON.parse(data)
   }
