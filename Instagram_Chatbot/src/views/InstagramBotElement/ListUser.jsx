@@ -81,7 +81,7 @@ function ListUser() {
         var dateEC = [];
         var user_count = [];
         var totalEC = 0;
-        for (var i = 0; i < useEC.length; i++) {
+        for (var i = 0; i < useEC?.length; i++) {
           // useEC[i].log_date.slice(0,5)
           // dateEC.push(useEC[i].log_date.slice(0, 5));
           dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
@@ -111,7 +111,7 @@ function ListUser() {
         var messageECA = res.data.counts;
         var message_count = [];
         var totalM = 0;
-        for (var i = 0; i < messageECA.length; i++) {
+        for (var i = 0; i < messageECA?.length; i++) {
           message_count.push(messageECA[i].message_count);
           totalM = totalM + messageECA[i].message_count;
         }
@@ -136,7 +136,7 @@ function ListUser() {
         // console.log('message EC: ', res.data.counts);
         var messageECA = res.data.counts;
         var message_count = 0;
-        for (var i = 0; i < messageECA.length; i++) {
+        for (var i = 0; i < messageECA?.length; i++) {
           message_count = message_count + messageECA[i].message_count;
         }
         setMessageECAll(message_count);
@@ -157,7 +157,7 @@ function ListUser() {
         // console.log('instagram user list: ', res.data.user_counts);
         setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count));
         var user_count_all = 0;
-        for (var i = 0; i < useEC.length; i++) {
+        for (var i = 0; i < useEC?.length; i++) {
           user_count_all = user_count_all + useEC[i].user_count;
         }
         setUserChatwithCB(user_count_all);
@@ -177,7 +177,7 @@ function ListUser() {
       .then((res) => {
         var useEC = res.data.user_counts;
         var user_count_alltime = 0;
-        for (var i = 0; i < useEC.length; i++) {
+        for (var i = 0; i < useEC?.length; i++) {
           user_count_alltime = user_count_alltime + useEC[i].user_count;
         }
         setUserChatwithCBAll(user_count_alltime);
@@ -198,7 +198,7 @@ function ListUser() {
       .then((res) => {
         var useEC = res.data.counts;
         var user_count_alltime = 0;
-        for (var i = 0; i < useEC.length; i++) {
+        for (var i = 0; i < useEC?.length; i++) {
           user_count_alltime = user_count_alltime + useEC[i].user_count;
         }
         setUserCBAll(user_count_alltime / useEC.length);
@@ -221,7 +221,7 @@ function ListUser() {
       .then((res) => {
         var useEC = res.data.counts;
         var user_count_alltime = 0;
-        for (var i = 0; i < useEC.length; i++) {
+        for (var i = 0; i < useEC?.length; i++) {
           user_count_alltime = user_count_alltime + useEC[i].user_count;
         }
         setUserCB(user_count_alltime / useEC.length);
@@ -396,7 +396,7 @@ function ListUser() {
           let messageECA = res.data.counts;
           let message_count = [];
           let totalM = 0;
-          for (let i = 0; i < messageECA.length; i++) {
+          for (let i = 0; i < messageECA?.length; i++) {
             message_count.push(messageECA[i].message_count);
             totalM = totalM + messageECA[i].message_count;
           }
@@ -650,7 +650,7 @@ function ListUser() {
           let messageECA = res.data.counts;
           let message_count = [];
           let totalM = 0;
-          for (let i = 0; i < messageECA.length; i++) {
+          for (let i = 0; i < messageECA?.length; i++) {
             message_count.push(messageECA[i].message_count);
             totalM = totalM + messageECA[i].message_count;
           }

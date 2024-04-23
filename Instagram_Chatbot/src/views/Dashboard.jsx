@@ -80,7 +80,7 @@ function Dashboard() {
         var useEC = res.data.counts;
         var dateEC = [];
         var user_count = [];
-        for (var i = 0; i < useEC.length; i++) {
+        for (var i = 0; i < useEC?.length; i++) {
           // useEC[i].log_date.slice(0,5)
           // dateEC.push(useEC[i].log_date.slice(0, 5));
           dateEC.push(`${useEC[i].log_date.slice(3, 5)}/${useEC[i].log_date.slice(0, 2)}`);
@@ -102,7 +102,7 @@ function Dashboard() {
         // console.log('message EC: ', res.data.counts);
         var messageECA = res.data.counts;
         var message_count = [];
-        for (var i = 0; i < messageECA.length; i++) {
+        for (var i = 0; i < messageECA?.length; i++) {
           message_count.push(messageECA[i].message_count);
         }
         setMessageEC(message_count);
@@ -120,7 +120,7 @@ function Dashboard() {
         setLineDataWithoutRole(res.data?.user_counts?.map((user) => user.user_count));
         var useEC = res.data.user_counts;
         var user_count_all = 0;
-        for (var i = 0; i < useEC.length; i++) {
+        for (var i = 0; i < useEC?.length; i++) {
           user_count_all = user_count_all + useEC[i].user_count;
         }
         setUserChatwithCB(user_count_all);
@@ -141,7 +141,7 @@ function Dashboard() {
       .then((res) => {
         var useEC = res.data.user_counts;
         var user_count_alltime = 0;
-        for (var i = 0; i < useEC.length; i++) {
+        for (var i = 0; i < useEC?.length; i++) {
           user_count_alltime = user_count_alltime + useEC[i].user_count;
         }
         setUserChatwithCBAll(user_count_alltime);
@@ -277,7 +277,7 @@ function Dashboard() {
             </a>
           </Col>
           <Col lg="3" md="6" sm="6">
-          {client.is_instagram ? (<a href="/admin/keyword">
+          {client?.is_instagram ? (<a href="/admin/keyword">
               <Card className="card-stats">
                 <CardBody>
                   <Row>
@@ -304,7 +304,7 @@ function Dashboard() {
             </a>) : ('')}
           </Col>
           <Col lg="3" md="6" sm="6">
-          {client.is_instagram ? (<a href="/admin/chatbot">
+          {client?.is_instagram ? (<a href="/admin/chatbot">
               <Card className="card-stats">
                 <CardBody>
                   <Row>
@@ -333,7 +333,7 @@ function Dashboard() {
         </Row>
         <Row>
           <Col md="12">
-            {client.is_instagram ? (<Card>
+            {client?.is_instagram ? (<Card>
               <CardBody>
                 <div style={{ width: '100%', textAlign: 'center' }}>
                   <h3>概要</h3>

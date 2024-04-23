@@ -2212,7 +2212,7 @@ const Scenario = () => {
                       placeholder="商品購入のURL"
                     />
                   </div>
-                  {client.cart_system === "ec_force" && <div>
+                  {client?.cart_system === "ec_force" && <div>
                     <InputCustom
                       style={{ width: '100%', marginTop: '5px' }}
                       value={coupon}

@@ -1543,7 +1543,7 @@ function ClientManagement() {
                             </td>
                             <td>{item.name}</td>
                             <td>
-                              {plans.find((el)=> el.code === item.plan).name}
+                              {plans.find((el)=> el.code === item.plan) && plans.find((el)=> el.code === item.plan).name}
                             </td>
                             <td>
                               {item?.status === 'pause'

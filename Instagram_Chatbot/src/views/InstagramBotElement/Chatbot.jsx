@@ -8484,7 +8484,7 @@ function Chatbot() {
               <label id="webSC" style={{ color: "red", display: "none" }}>ウェブサイトを入力してください。(例：https://ec-chatbot.com)</label>
             </div>
             <span>ラベル</span>
-            <div id={`labelSC`} style={{ padding: "15px 15px 0px 15px", display: "none", display: "flex" }}>
+            <div id={`labelSC`} style={{ padding: "15px 15px 0px 15px", display: "flex" }}>
               <div id="labelLSCInputed" style={{ display: "flex" }}></div>
               <input id="labelLSC" onKeyPress={(e) => checkInputedLabelSC(e, e.target.value)} style={{ width: "100%", border: "none" }}></input>
               <input id={`lblSCAddALL_${bagAddSC}`} defaultValue={labelInputSCAll} type="text" hidden></input>
