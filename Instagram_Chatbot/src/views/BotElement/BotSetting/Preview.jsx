@@ -1295,7 +1295,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
 
     const setMessagesSessionStorage = (data) => {
         const temp = getMessagesSessionStorage()
-        sessionStorage.setItem("messages", JSON.stringify(dataMessages.map(x => {
+        sessionStorage.setItem(`messages_bot_${objParam.bot_id}`, JSON.stringify(dataMessages.map(x => {
             if (x.id === data.id) {
                 return { ...data }
             }
@@ -1304,7 +1304,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     }
 
     const getMessagesSessionStorage = () => {
-        const data = sessionStorage.getItem("messages")
+        const data = sessionStorage.getItem(`messages_bot_${objParam.bot_id}`)
         if (!data) return null;
         return JSON.parse(data)
     }
