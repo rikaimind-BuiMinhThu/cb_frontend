@@ -717,7 +717,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     }
 
     const handleValidateField = (index) => {
-        let contentArr = [...dataMessages[index].message_content];
+        let contentArr = [...renderMessageArr[index].message_content];
         let isValid = true;
         let errorsMess = {};
 
@@ -1292,6 +1292,23 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
         return isValid;
     }
 
+
+    const setMessagesSessionStorage = (data) => {
+        const temp = getMessagesSessionStorage()
+        sessionStorage.setItem("messages", JSON.stringify(dataMessages.map(x => {
+            if (x.id === data.id) {
+                return { ...data }
+            }
+            return temp && temp.find(o => o.id === x.id) ? temp.find(o => o.id === x.id) : { ...x }
+        })))
+    }
+
+    const getMessagesSessionStorage = () => {
+        const data = sessionStorage.getItem("messages")
+        if (!data) return null;
+        return JSON.parse(data)
+    }
+
     const onClickNext = async (indexMessage, message) => {
         let indexClickLocation = indexMessageRender
 
@@ -1306,6 +1323,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             return;
         }
         renderMessageArr[indexMessage].disabled = true;
+        setRenderMessageArr(renderMessageArr);
         let renderMessage = [...renderMessageArr];
         let index;
         let isPauseScroll = false;
@@ -1320,6 +1338,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
         if (dataMessages.length - 1 === indexClickLocation) {
             await new Promise((resolve) => {
                 api.post(`/api/v1/scenario_users/scenario_user_responses`, data_submit).then(res => {
+                    setMessagesSessionStorage(renderMessageArr[indexMessage])
                     resolve()
                 }).catch((error) => {
                     console.log(error);
@@ -1352,7 +1371,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
         }
         await api.post(
             `/api/v1/scenario_users/scenario_user_responses`, data_submit
-        ).then(res => {}).catch((error) => {
+        ).then(res => {
+            setMessagesSessionStorage(renderMessageArr[indexMessage])
+        }).catch((error) => {
             console.log(error);
             if (error.response?.data.code === 0) {
                 tokenExpired()
@@ -1614,6 +1635,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                             }, 1000);
                         }).then(data => {
                             setIndexMessageRender(i);
+                            const dataSessionStorage = getMessagesSessionStorage()
+                            if (dataSessionStorage) {
+                                const temp = dataSessionStorage.find(x => x.id === data.id)
+                                if (temp) data.message_content = [...temp.message_content]
+                            }
                             renderMessage.push(data);
                             setRenderMessageArr([
                                 ...renderMessage
@@ -2130,6 +2156,10 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             }
         }
         setDataMessages([...dataMessages]);
+        setRenderMessageArr(renderMessageArr.map(x => {
+            if (x?.id === dataMessages[index]?.id) return {...dataMessages[index]}
+            return {...x}
+        }))
     }
 
     const handleOpenWithDrawal = () => {

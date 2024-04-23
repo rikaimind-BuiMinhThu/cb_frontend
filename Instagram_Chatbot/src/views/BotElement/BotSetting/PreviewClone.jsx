@@ -1042,7 +1042,7 @@ function Preview() {
   };
 
   const handleValidateField = (index) => {
-    let contentArr = [...dataMessages[index].message_content];
+    let contentArr = [...renderMessageArr[index].message_content];
     let isValid = true;
     let errorsMess = {};
 
@@ -2084,9 +2084,24 @@ function Preview() {
     return isValid;
   };
 
+  const setMessagesSessionStorage = (data) => {
+    const temp = getMessagesSessionStorage()
+    sessionStorage.setItem("messages", JSON.stringify(dataMessages.map(x => {
+      if (x.id === data.id) {
+        return { ...data }
+      }
+      return temp && temp.find(o => o.id === x.id) ? temp.find(o => o.id === x.id) : { ...x }
+    })))
+  }
+
+  const getMessagesSessionStorage = () => {
+    const data = sessionStorage.getItem("messages")
+    if (!data) return null;
+    return JSON.parse(data)
+  }
+
   const onClickNext = async (indexMessage, message) => {
     let indexClickLocation = indexMessageRender
-
     for (let i = 0; i < dataMessages.length; i++) {
       if (dataMessages[i]?.id === message?.id) {
         indexClickLocation = i
@@ -2097,8 +2112,9 @@ function Preview() {
     if (!handleValidateField(indexClickLocation)) {
       return;
     }
-    renderMessageArr[indexMessage].disabled = true;
     let renderMessage = [...renderMessageArr];
+    renderMessageArr[indexMessage].disabled = true;
+    setRenderMessageArr(renderMessageArr)
     let index;
     let isPauseScroll = false;
     let delayRender;
@@ -2114,6 +2130,7 @@ function Preview() {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
           .then((res) => {
+            setMessagesSessionStorage(renderMessageArr[indexMessage])
             resolve();
           })
           .catch((error) => {
@@ -2150,6 +2167,7 @@ function Preview() {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
           .then((res) => {
+            setMessagesSessionStorage(renderMessageArr[indexMessage])
             resolve();
           })
           .catch((error) => {
@@ -2200,7 +2218,9 @@ function Preview() {
     }
     await api
       .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
-      .then((res) => {})
+      .then((res) => {
+        setMessagesSessionStorage(renderMessageArr[indexMessage])
+      })
       .catch((error) => {
         console.log(error);
         if (error.response?.data.code === 0) {
@@ -2603,6 +2623,11 @@ function Preview() {
               }, 1000));
             }).then((data) => {
               setIndexMessageRender(i);
+              const dataSessionStorage = getMessagesSessionStorage()
+              if (dataSessionStorage) {
+                const temp = dataSessionStorage.find(x => x.id === data.id)
+                if (temp) data.message_content = [...temp.message_content]
+              }
               renderMessage.push(data);
               setRenderMessageArr([...renderMessage]);
               if (isPauseScroll === false) {
@@ -3295,7 +3320,13 @@ function Preview() {
         setObjParam({ ...objParam });
       }
     }
+
+    setMessagesSessionStorage(dataMessages[index])
     setDataMessages([...dataMessages]);
+    setRenderMessageArr(renderMessageArr.map(x => {
+      if (x?.id === dataMessages[index]?.id) return {...dataMessages[index]}
+      return {...x}
+    }))
   };
 
   const handleOpenWithDrawal = () => {
@@ -3695,7 +3726,7 @@ if (scenarioId && botInfor && isOpen  ){
         <div
           className="sp-header-right"
           onClick={() => {
-            isOpen ? onOpenPreview(true) : handleOpenWithDrawal();
+            isOpen ? handleOpenWithDrawal() : onOpenPreview(true);
           }}
         >
           <div className="sp-header-right-arrow">
