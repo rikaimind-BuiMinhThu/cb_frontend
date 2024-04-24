@@ -1635,11 +1635,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                             }, 1000);
                         }).then(data => {
                             setIndexMessageRender(i);
-                            const dataSessionStorage = getMessagesSessionStorage()
-                            if (dataSessionStorage) {
-                                const temp = dataSessionStorage.find(x => x.id === data.id)
-                                if (temp) data.message_content = [...temp.message_content]
-                            }
+                            // const dataSessionStorage = getMessagesSessionStorage()
+                            // if (dataSessionStorage) {
+                            //     const temp = dataSessionStorage.find(x => x.id === data.id)
+                            //     if (temp) data.message_content = [...temp.message_content]
+                            // }
                             renderMessage.push(data);
                             setRenderMessageArr([
                                 ...renderMessage
