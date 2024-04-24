@@ -2087,7 +2087,6 @@ function Preview() {
   const setMessagesSessionStorage = (data) => {
     const temp = getMessagesSessionStorage()
     const bot_id = objParam.bot_id || Number(objParam?.current_url_param?.bot_id)
-    console.log("zz11", bot_id)
     sessionStorage.setItem(`messages_bot_${bot_id}`, JSON.stringify(dataMessages.map(x => {
       if (x.id === data.id) {
         return { ...data }
