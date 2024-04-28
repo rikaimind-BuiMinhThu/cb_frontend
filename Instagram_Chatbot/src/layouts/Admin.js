@@ -37,8 +37,6 @@ function Dashboard(props) {
     const client = JSON.parse(localStorage.getItem('client'));
     const isInstagram = client?.is_instagram;
     const isWeb = client?.is_web;
-    console.log("isWeb", isWeb)
-    console.log("isInstagram", isInstagram)
     // const isInstagram = true;
     // const isWeb = true;
     const instagramRolesUrl = ['/admin/chatbot', '/admin/keyword', '/admin/release', '/admin/data', '/admin/data-analyst', '/admin/list-user', '/admin/attracted-customer', '/admin/crm'];
