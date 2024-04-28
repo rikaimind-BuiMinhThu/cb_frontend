@@ -717,6 +717,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     }
 
     const handleValidateField = (index) => {
+        console.log("index", index)
+        console.log("render", renderMessageArr[index])
+        console.log("dataMessages", dataMessages)
         let contentArr = [...renderMessageArr[index].message_content];
         let isValid = true;
         let errorsMess = {};
