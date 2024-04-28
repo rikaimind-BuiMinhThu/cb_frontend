@@ -33,7 +33,8 @@ function Dashboard(props) {
     mainPanel.current.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     const pathname = location.pathname;
-    const client = JSON.parse(sessionStorage.getItem('client'));
+    // const client = JSON.parse(sessionStorage.getItem('client'));
+    const client = JSON.parse(localStorage.getItem('client'));
     const isInstagram = client?.is_instagram;
     const isWeb = client?.is_web;
     // const isInstagram = true;

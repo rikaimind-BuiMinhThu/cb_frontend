@@ -48,7 +48,8 @@ function Sidebar(props) {
   });
 
   const sidebar = React.useRef();
-  const client = JSON.parse(sessionStorage.getItem('client'));
+  // const client = JSON.parse(sessionStorage.getItem('client'));
+  const client = JSON.parse(localStorage.getItem('client'));
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
     return props.location.pathname.indexOf(routeName) > -1 ? 'active' : '';

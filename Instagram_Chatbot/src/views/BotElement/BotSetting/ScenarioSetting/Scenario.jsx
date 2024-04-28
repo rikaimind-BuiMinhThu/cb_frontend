@@ -796,6 +796,7 @@ const Scenario = () => {
 
   const [dataCondition, setDataCondition] = useState([]);
 
+  // const client = JSON.parse(sessionStorage.getItem('client'));
   const client = JSON.parse(sessionStorage.getItem('client'));
 
   useEffect(() => {

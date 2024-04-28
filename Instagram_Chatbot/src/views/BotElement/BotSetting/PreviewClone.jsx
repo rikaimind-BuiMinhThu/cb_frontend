@@ -2102,6 +2102,85 @@ function Preview() {
     return JSON.parse(data)
   }
 
+  const createOrAddLinesCart = async (res) => {
+    const product = JSON.parse(res?.data?.data?.find(x => x.data_input_name === "text_with_thumbnail_image")?.text_value || null)
+    const quantity = res?.data?.data?.find(x => x.data_input_name === "quantity")?.string_value || null
+    console.log("product", product)
+    console.log("product", product?.products?.find(x => x.id === product?.initial_selection))
+    // console.log("quantity", JSON.parse(quantity))
+
+    const email = res?.data?.data?.find(x => x.data_input_name === "email")?.string_value || null
+    const user_name = res?.data?.data?.find(x => x.data_input_name === "user_name")?.string_value || null
+    const user_name_kana = res?.data?.data?.find(x => x.data_input_name === "user_name_kana")?.string_value || null
+    const first_name_kana = res?.data?.data?.find(x => x.data_input_name === "first_name_kana")?.string_value || null
+    const last_name_kana = res?.data?.data?.find(x => x.data_input_name === "last_name_kana")?.string_value || null
+    if (email || (user_name && user_name_kana && first_name_kana && last_name_kana)) {
+      const lines = []
+      console.log("data", renderMessageArr[indexMessageRender])
+      await api
+        .post('/api/v1/shopify/cart_create', {
+          first_name: JSON.parse(first_name_kana)?.value || JSON.parse(user_name)?.value,
+          last_name: JSON.parse(last_name_kana)?.value || JSON.parse(last_name_kana)?.value,
+          email: email,
+          scenario_id: scenarioId
+        })
+        .then(async res => {
+          sessionStorage.setItem("cart", JSON.stringify(res?.data?.data))
+          // if (r?.data?.data?.cartCreate?.cart?.checkoutUrl) {
+          //   window.open(r?.data?.data?.cartCreate?.cart?.checkoutUrl, '_blank');
+          // }
+          await api
+              .post('/api/v1/shopify/cart_lines_add', {
+                cart_id: res?.data?.data?.cartCreate?.cart?.id,
+                scenario_id: scenarioId,
+                lines: [
+                  {
+                    "merchandiseId": "gid://shopify/ProductVariant/44841017114925",
+                    "quantity": 1
+                  }
+                ]
+              })
+              .then(r => {
+                if (r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl) {
+                  window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
+                }
+                sessionStorage.removeItem("cart")
+              })
+              .catch(e => {
+                console.log(e)
+              })
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    } else if (product) {
+      const cart = JSON.parse(sessionStorage.getItem("cart") || null)
+
+      if (cart?.cartCreate?.cart) {
+        await api
+          .post('/api/v1/shopify/cart_lines_add', {
+            cart_id: cart?.cartCreate?.cart?.id,
+            scenario_id: scenarioId,
+            lines: [
+              {
+                "merchandiseId": "gid://shopify/ProductVariant/44841017114925",
+                "quantity": 1
+              }
+            ]
+          })
+          .then(r => {
+            // if (r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl) {
+            //   window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
+            // }
+            sessionStorage.removeItem("cart")
+          })
+          .catch(e => {
+            console.log(e)
+          })
+      }
+    }
+  }
+
   const onClickNext = async (indexMessage, message) => {
     let indexClickLocation = indexMessageRender
     for (let i = 0; i < dataMessages.length; i++) {
@@ -2131,8 +2210,9 @@ function Preview() {
       await new Promise((resolve) => {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
-          .then((res) => {
+          .then(async (res) => {
             setMessagesSessionStorage(renderMessageArr[indexMessage])
+            await createOrAddLinesCart(res)
             resolve();
           })
           .catch((error) => {
@@ -2168,8 +2248,9 @@ function Preview() {
       await new Promise((resolve) => {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
-          .then((res) => {
+          .then(async (res) => {
             setMessagesSessionStorage(renderMessageArr[indexMessage])
+            await createOrAddLinesCart(res)
             resolve();
           })
           .catch((error) => {
@@ -2220,8 +2301,9 @@ function Preview() {
     }
     await api
       .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
-      .then((res) => {
+      .then(async (res) => {
         setMessagesSessionStorage(renderMessageArr[indexMessage])
+        await createOrAddLinesCart(res)
       })
       .catch((error) => {
         console.log(error);
