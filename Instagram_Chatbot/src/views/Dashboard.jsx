@@ -25,7 +25,7 @@ function Dashboard() {
   const [isAdminDeel, setIsAdminDeel] = useState(false);
   const [lineDataWithoutRole, setLineDataWithoutRole] = useState([]);
   // const client = JSON.parse(sessionStorage.getItem('client'));
-  const client = JSON.parse(sessionStorage.getItem('client'));
+  const client = JSON.parse(localStorage.getItem('client'));
 
   React.useEffect(() => {
     var cook = Cookies.get('user_role');
