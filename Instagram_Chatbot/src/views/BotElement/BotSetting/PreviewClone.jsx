@@ -221,6 +221,9 @@ function Preview() {
   const [activePopupCloseBot, setActivePopupCloseBot] = useState(true);
   const [titleBubble, setTitleBubble] = useState("");
   const [styleModal, setStyleModal] = useState({});
+
+  const [scenarioUserResponses, setScenarioUserResponses] = useState([])
+
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
       current_url: window.location.href,
@@ -2103,20 +2106,20 @@ function Preview() {
   }
 
   const createOrAddLinesCart = async (res) => {
-    const product = JSON.parse(res?.data?.data?.find(x => x.data_input_name === "text_with_thumbnail_image")?.text_value || null)
-    const quantity = res?.data?.data?.find(x => x.data_input_name === "quantity")?.string_value || null
-    console.log("product", product)
-    console.log("product", product?.products?.find(x => x.id === product?.initial_selection))
-    // console.log("quantity", JSON.parse(quantity))
+    const newArr = scenarioUserResponses.concat(res.data?.data || [])
+    setScenarioUserResponses([...newArr])
+
+    const products = JSON.parse(newArr.find(x => x.data_input_name === "text_with_thumbnail_image")?.text_value || null)
+    const quantity = newArr.find(x => x.data_input_name === "quantity")?.integer_value || 1
+    const product = products?.products?.find(x => x.id === products?.initial_selection)
 
     const email = res?.data?.data?.find(x => x.data_input_name === "email")?.string_value || null
     const user_name = res?.data?.data?.find(x => x.data_input_name === "user_name")?.string_value || null
     const user_name_kana = res?.data?.data?.find(x => x.data_input_name === "user_name_kana")?.string_value || null
     const first_name_kana = res?.data?.data?.find(x => x.data_input_name === "first_name_kana")?.string_value || null
     const last_name_kana = res?.data?.data?.find(x => x.data_input_name === "last_name_kana")?.string_value || null
+
     if (email || (user_name && user_name_kana && first_name_kana && last_name_kana)) {
-      const lines = []
-      console.log("data", renderMessageArr[indexMessageRender])
       await api
         .post('/api/v1/shopify/cart_create', {
           first_name: JSON.parse(first_name_kana)?.value || JSON.parse(user_name)?.value,
@@ -2126,36 +2129,34 @@ function Preview() {
         })
         .then(async res => {
           sessionStorage.setItem("cart", JSON.stringify(res?.data?.data))
-          // if (r?.data?.data?.cartCreate?.cart?.checkoutUrl) {
-          //   window.open(r?.data?.data?.cartCreate?.cart?.checkoutUrl, '_blank');
-          // }
-          await api
-              .post('/api/v1/shopify/cart_lines_add', {
-                cart_id: res?.data?.data?.cartCreate?.cart?.id,
-                scenario_id: scenarioId,
-                lines: [
-                  {
-                    "merchandiseId": "gid://shopify/ProductVariant/44841017114925",
-                    "quantity": 1
+          if (product?.productVariantId) {
+            await api
+                .post('/api/v1/shopify/cart_lines_add', {
+                  cart_id: res?.data?.data?.cartCreate?.cart?.id,
+                  scenario_id: scenarioId,
+                  lines: [
+                    {
+                      "merchandiseId": product.productVariantId,
+                      "quantity": quantity
+                    }
+                  ]
+                })
+                .then(r => {
+                  if (r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl) {
+                    window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
                   }
-                ]
-              })
-              .then(r => {
-                if (r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl) {
-                  window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
-                }
-                sessionStorage.removeItem("cart")
-              })
-              .catch(e => {
-                console.log(e)
-              })
+                  sessionStorage.removeItem("cart")
+                })
+                .catch(e => {
+                  console.log(e)
+                })
+          }
         })
         .catch(e => {
           console.log(e)
         })
-    } else if (product) {
+    } else if (product?.productVariantId) {
       const cart = JSON.parse(sessionStorage.getItem("cart") || null)
-
       if (cart?.cartCreate?.cart) {
         await api
           .post('/api/v1/shopify/cart_lines_add', {
@@ -2163,15 +2164,15 @@ function Preview() {
             scenario_id: scenarioId,
             lines: [
               {
-                "merchandiseId": "gid://shopify/ProductVariant/44841017114925",
-                "quantity": 1
+                "merchandiseId": product.productVariantId,
+                "quantity": quantity
               }
             ]
           })
           .then(r => {
-            // if (r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl) {
-            //   window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
-            // }
+            if (r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl) {
+              window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
+            }
             sessionStorage.removeItem("cart")
           })
           .catch(e => {
