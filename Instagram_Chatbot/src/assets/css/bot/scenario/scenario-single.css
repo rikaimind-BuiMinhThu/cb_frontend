@@ -1523,6 +1523,9 @@ input#ss-message__content--user-checkbox--checkbox_img {
   width: 919px;
 }
 
+.ss-popup-shopify-reference-scenario {
+  width: 500px;
+}
 
 .fr-popup-container {}
 
@@ -1919,4 +1922,17 @@ input#ss-message__content--user-checkbox--checkbox_img {
 .ss-user-setting__item-custom-input-checkbox .ant-checkbox-wrapper span:nth-child(2) {
   width: 97%;
   padding-right: 0px;
+}
+
+.ss-shopify-icon {
+  width: 36px;
+  height: 36px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.popup-shopify .ant-radio-button-wrapper {
+  border: none;
+  border-top-width: 0;
+  border-left-width: 0;
 }
