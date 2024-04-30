@@ -8006,13 +8006,7 @@ const Scenario = () => {
                                                               onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'product_number_display')}
                                                             />
                                                           </Col>
-                                                          <Col xl={3} style={{ display: "flex", justifyContent: 'flex-start' }}>
-                                                            <CheckboxCustom
-                                                              label="値段表示"
-                                                              value={productPurchaseRadioButton.price_display}
-                                                              onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'price_display')}
-                                                            />
-                                                          </Col>
+                                                          
                                                         </Row>
                                                       </div>
                                                       {productPurchaseRadioButton.type !== 'consume_api_respone' &&
