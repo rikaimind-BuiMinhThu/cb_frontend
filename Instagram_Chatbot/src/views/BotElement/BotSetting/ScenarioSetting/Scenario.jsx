@@ -8095,21 +8095,12 @@ const Scenario = () => {
                                                                                     </div>
                                                                                     <div
                                                                                         className="ss-user-setting-product-purchase-sub-infor">
-                                                                                      {productPurchaseRadioButton.price_display &&
-                                                                                          <div style={{width: '50%'}}>
-                                                                                            <InputCustom
-                                                                                                className="ss-mg-bottom-5"
-                                                                                                label="値段表示内容（カスタマイズ）"
-                                                                                                value={itemProduct.price_display_custom}
-                                                                                                onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'price_display_custom')}
-                                                                                            />
-                                                                                          </div>
-                                                                                      }
                                                                                     </div>
                                                                                     <div
                                                                                         className="ss-user-setting-product-purchase-file-img">
                                                                                       <InputCustom
                                                                                           className="ss-mg-bottom-5"
+                                                                                          placeholder="バリアントID"
                                                                                           value={itemProduct.productVariantId}
                                                                                           onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'productVariantId')}
                                                                                       />

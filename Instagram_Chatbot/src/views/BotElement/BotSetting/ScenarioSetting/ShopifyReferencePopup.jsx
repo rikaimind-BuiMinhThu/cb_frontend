@@ -83,7 +83,7 @@ function ShopifyReferencePopup({onCancel, onReferProductVariant}) {
                     className="ss-popup-add-variable-input-keep-button"
                     onClick={() => onReferProductVariant(productVariantSelected)}
                 >
-                    設
+                    設定
                 </Button>
             </div>
         </React.Fragment>
