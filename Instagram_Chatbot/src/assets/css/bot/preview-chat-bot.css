@@ -461,11 +461,25 @@
     padding-right: 0px !important;
 }
 
+.sp-body-bot-side-messages > div {
+    width: 100%;
+}
+
 .sp-body-bot-side-messages .ss-bot-chat-detail-content {
     white-space: pre-wrap;
     width: fit-content !important;
     max-width: 100%;
     overflow-y: unset;
+}
+
+.sp-body-bot-side-messages .ss-bot-chat-detail-content a {
+    color: white;
+    transition: all .3s;
+}
+
+
+.sp-body-bot-side-messages .ss-bot-chat-detail-content a:hover {
+    color: #f1f1f1;
 }
 
 
