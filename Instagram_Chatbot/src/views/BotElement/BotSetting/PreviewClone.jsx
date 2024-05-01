@@ -223,6 +223,7 @@ function Preview() {
   const [styleModal, setStyleModal] = useState({});
 
   const [scenarioUserResponses, setScenarioUserResponses] = useState([])
+  const [checkoutUrl, setCheckoutUrl] = useState("")
 
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
@@ -279,6 +280,7 @@ function Preview() {
     return check;
   }
 
+  let socket;
   //get chat bot setting
   useEffect(() => {
     let botIdGet = params.get("bot_id");
@@ -316,6 +318,27 @@ function Preview() {
         setBottomMarginSp(result?.bottom_margin_sp);
       }
     });
+
+    socket = new WebSocket("ws://localhost:3000/cable");
+
+    socket.onopen = () => {
+      const msg = {
+        command: "subscribe",
+        identifier: JSON.stringify({
+          id: uuid,
+          channel: "ShopifyChannel"
+        })
+      }
+      socket.send(JSON.stringify(msg))
+    };
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+    };
+
+    return () => {
+      socket.close();
+    };
   }, []);
 
   useEffect(() => {
@@ -2129,9 +2152,11 @@ function Preview() {
         })
         .then(async res => {
           sessionStorage.setItem("cart", JSON.stringify(res?.data?.data))
+          setCheckoutUrl(res?.data?.data?.cartCreate?.cart?.checkoutUrl)
           if (product?.productVariantId) {
             await api
                 .post('/api/v1/shopify/cart_lines_add', {
+                  uuid: uuid,
                   cart_id: res?.data?.data?.cartCreate?.cart?.id,
                   scenario_id: scenarioId,
                   lines: [
@@ -2160,6 +2185,7 @@ function Preview() {
       if (cart?.cartCreate?.cart) {
         await api
           .post('/api/v1/shopify/cart_lines_add', {
+            uuid: uuid,
             cart_id: cart?.cartCreate?.cart?.id,
             scenario_id: scenarioId,
             lines: [
@@ -2171,6 +2197,7 @@ function Preview() {
           })
           .then(r => {
             if (r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl) {
+              setCheckoutUrl(res?.data?.data?.cartCreate?.cart?.checkoutUrl)
               window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
             }
             sessionStorage.removeItem("cart")
@@ -3897,6 +3924,7 @@ if (scenarioId && botInfor && isOpen  ){
                         content={content}
                         index={index}
                         botInfor={botInfor}
+                        checkoutUrl={checkoutUrl}
                       />
                     );
                   })}
@@ -4170,7 +4198,7 @@ else {
   }
 }
 
-const BotMessage = ({ content, index, botInfor }) => {
+const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
   const handleDownloadFile = (file) => {
     let link = document.createElement("a");
     link.href = file;
@@ -4210,7 +4238,9 @@ const BotMessage = ({ content, index, botInfor }) => {
                   }}
 
                   dangerouslySetInnerHTML={{
-                    __html: content[content.type]?.content,
+                    // __html: content[content.type]?.content.replace("{checkout_url}", <a href={checkoutUrl}>{checkoutUrl}</a>)
+                    __html: content[content.type]?.content.replace("{checkout_url}",
+                        `<a href="${checkoutUrl}" target="_blank">${checkoutUrl}</a>`)
                   }}
                   // value={content[content.type]?.content || ''}
                   // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
