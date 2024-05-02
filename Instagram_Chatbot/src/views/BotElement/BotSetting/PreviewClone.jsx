@@ -2168,7 +2168,7 @@ function Preview() {
                 })
                 .then(r => {
                   if (r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl) {
-                    window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
+                    // window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
                   }
                   sessionStorage.removeItem("cart")
                 })
@@ -2198,7 +2198,7 @@ function Preview() {
           .then(r => {
             if (r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl) {
               setCheckoutUrl(res?.data?.data?.cartCreate?.cart?.checkoutUrl)
-              window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
+              // window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
             }
             sessionStorage.removeItem("cart")
           })
