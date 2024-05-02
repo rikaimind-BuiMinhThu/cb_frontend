@@ -2136,18 +2136,17 @@ function Preview() {
     const quantity = newArr.find(x => x.data_input_name === "quantity")?.integer_value || 1
     const product = products?.products?.find(x => x.id === products?.initial_selection)
 
-    const email = res?.data?.data?.find(x => x.data_input_name === "email")?.string_value || null
+    const email = newArr.find(x => x.data_input_name === "email")?.string_value || null
+
     const user_name = res?.data?.data?.find(x => x.data_input_name === "user_name")?.string_value || null
     const user_name_kana = res?.data?.data?.find(x => x.data_input_name === "user_name_kana")?.string_value || null
-    const first_name_kana = res?.data?.data?.find(x => x.data_input_name === "first_name_kana")?.string_value || null
-    const last_name_kana = res?.data?.data?.find(x => x.data_input_name === "last_name_kana")?.string_value || null
 
-    if (email || (user_name && user_name_kana && first_name_kana && last_name_kana)) {
+    if (user_name && user_name_kana && email) {
       await api
         .post('/api/v1/shopify/cart_create', {
-          first_name: JSON.parse(first_name_kana)?.value || JSON.parse(user_name)?.value,
-          last_name: JSON.parse(last_name_kana)?.value || JSON.parse(last_name_kana)?.value,
-          email: email,
+          first_name: JSON.parse(user_name)?.valueLeft || JSON.parse(user_name_kana)?.valueLeft,
+          last_name: JSON.parse(user_name)?.valueRight || JSON.parse(user_name_kana)?.valueRight,
+          email: email || "example@gmail.com",
           scenario_id: scenarioId
         })
         .then(async res => {
