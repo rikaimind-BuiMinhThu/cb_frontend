@@ -1,45 +1,32 @@
 import React, {useState, useEffect} from 'react';
 import api from '../../../../api/api-management';
 import {
-    S3_UPLOAD_URL
-} from '../../../../variables/constants';
-import iconPdf from '../../../../assets/img/icons8-pdf-80.png';
-import {
     Button
 } from 'reactstrap';
 import {tokenExpired} from 'api/tokenExpired';
-import Pagination from '@material-ui/lab/Pagination';
 import {Radio} from "antd";
 
 function ShopifyReferencePopup({onCancel, onReferProductVariant}) {
-    const [pageIndex, setPageIndex] = useState(1);
-    const [totalPage, setTotalPage] = useState();
-    const [page, setPage] = useState(1);
     const [productVariantSelected, setProductVariantSelected] = useState(null);
     const [listProductVariants, setListProductVariants] = useState([]);
 
     useEffect(() => {
-        getListProductVariants(1);
+        getListProductVariants(null);
     }, [])
 
-    const getListProductVariants = (pgIndex) => {
-        api.get(`/api/v1/shopify/product_variants`).then(res => {
-            setListProductVariants(res?.data?.data?.productVariants?.edges || []);
+    const getListProductVariants = (cursor) => {
+        const query = cursor? `cursor=${cursor}` : ""
+        api.get(`/api/v1/shopify/product_variants?${query}`).then(res => {
+            setListProductVariants(prev => prev.concat(res?.data?.data?.productVariants?.edges));
+            const next = res?.data?.data?.productVariants?.pageInfo?.hasNextPage;
+            const endCursor = res?.data?.data?.productVariants?.pageInfo?.endCursor;
+            if (next) setTimeout(() => getListProductVariants(endCursor), 1000);
         }).catch((error) => {
             console.log(error);
             if (error.response?.data.code === 0) {
                 tokenExpired();
             }
         });
-    }
-
-    function handleChange(event, value) {
-        console.log(value);
-        if (totalPage > 1) {
-            setPage(parseInt(value));
-            setPageIndex(value);
-            getListProductVariants(value);
-        }
     }
 
     const onChangeProductVariant = (e) => {
@@ -53,7 +40,13 @@ function ShopifyReferencePopup({onCancel, onReferProductVariant}) {
                     <Radio.Group
                         value={productVariantSelected}
                         onChange={onChangeProductVariant}
-                        style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '10px',
+                            maxHeight: '400px',
+                            overflow: 'auto'
+                        }}>
                     >
                         {listProductVariants.map(item =>
                             <Radio value={item?.node?.id}>
@@ -62,14 +55,6 @@ function ShopifyReferencePopup({onCancel, onReferProductVariant}) {
                         )}
                     </Radio.Group>
                 </div>
-                {/*<div style={{marginTop: '10px', display: 'flex', justifyContent: 'flex-end'}}>*/}
-                {/*    <Pagination*/}
-                {/*        count={totalPage}*/}
-                {/*        variant="outlined"*/}
-                {/*        page={page}*/}
-                {/*        onChange={handleChange}*/}
-                {/*    />*/}
-                {/*</div>*/}
             </div>
             <div className="sl-popup-create-scenario-btn-wrapper">
                 <Button
