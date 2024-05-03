@@ -4237,9 +4237,8 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
                   }}
 
                   dangerouslySetInnerHTML={{
-                    // __html: content[content.type]?.content.replace("{checkout_url}", <a href={checkoutUrl}>{checkoutUrl}</a>)
                     __html: content[content.type]?.content.replace("{checkout_url}",
-                        `<a href="${checkoutUrl}" target="_blank">${checkoutUrl}</a>`)
+                        `<a href="${checkoutUrl}" target="_blank" style="color: ${botInfor?.font_color}">${checkoutUrl || ""}</a>`)
                   }}
                   // value={content[content.type]?.content || ''}
                   // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}

@@ -472,14 +472,8 @@
     overflow-y: unset;
 }
 
-.sp-body-bot-side-messages .ss-bot-chat-detail-content a {
-    color: white;
-    transition: all .3s;
-}
-
-
 .sp-body-bot-side-messages .ss-bot-chat-detail-content a:hover {
-    color: #f1f1f1;
+    text-decoration: underline;
 }
 
 
