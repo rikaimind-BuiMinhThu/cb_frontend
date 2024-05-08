@@ -2,7 +2,7 @@ import React from 'react';
 import { MDBIcon } from 'mdbreact';
 import CheckboxCustom from './CheckboxCustom';
 
-const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false, style, classLabel, disabled = false, styleLabel, inline = true, onKeyPress, pattern, onPaste }) => {
+const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false, style, classLabel, disabled = false, styleLabel, inline = true, onKeyPress, pattern, onPaste, readOnly = false }) => {
 
     return (
         <React.Fragment>
@@ -21,6 +21,7 @@ const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, plac
                 value={value}
                 style={{...style}}
                 onChange={e => onChange(e.target.value)}
+                readOnly={readOnly}
             />
             {handleCheckBox &&
                 <CheckboxCustom

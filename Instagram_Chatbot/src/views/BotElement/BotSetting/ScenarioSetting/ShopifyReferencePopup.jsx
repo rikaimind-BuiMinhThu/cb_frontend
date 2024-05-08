@@ -8,6 +8,7 @@ import {Radio} from "antd";
 
 function ShopifyReferencePopup({onCancel, onReferProductVariant}) {
     const [productVariantSelected, setProductVariantSelected] = useState(null);
+    const [displayName, setDisplayName] = useState("");
     const [listProductVariants, setListProductVariants] = useState([]);
 
     useEffect(() => {
@@ -30,6 +31,7 @@ function ShopifyReferencePopup({onCancel, onReferProductVariant}) {
     }
 
     const onChangeProductVariant = (e) => {
+        setDisplayName(listProductVariants.find(x => x.node.id === e.target.value).node.displayName)
         setProductVariantSelected(e.target.value);
     }
 
@@ -66,7 +68,7 @@ function ShopifyReferencePopup({onCancel, onReferProductVariant}) {
                 <Button
                     style={{backgroundColor: '#024BB9'}}
                     className="ss-popup-add-variable-input-keep-button"
-                    onClick={() => onReferProductVariant(productVariantSelected)}
+                    onClick={() => onReferProductVariant(productVariantSelected, displayName)}
                 >
                     設定
                 </Button>

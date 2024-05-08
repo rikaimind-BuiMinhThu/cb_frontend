@@ -1361,7 +1361,8 @@ const Scenario = () => {
             products: [
               {
                 id: 1,
-                productVariantId: ''
+                productVariantId: '',
+                displayName: ''
               }
             ]
           }
@@ -8095,8 +8096,8 @@ const Scenario = () => {
                                                                                       <InputCustom
                                                                                           className="ss-mg-bottom-5"
                                                                                           placeholder="バリアントID"
-                                                                                          value={itemProduct.productVariantId}
-                                                                                          onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'productVariantId')}
+                                                                                          value={itemProduct.displayName}
+                                                                                          readOnly={true}
                                                                                       />
                                                                                       <div className="ss-mg-bottom-5 ss-shopify-icon"
                                                                                            onClick={() => {
@@ -8106,7 +8107,8 @@ const Scenario = () => {
                                                                                                contentType: content.type,
                                                                                                subContentType: 'products',
                                                                                                indexSubContent: indexProduct,
-                                                                                               productVariantId: 'productVariantId'
+                                                                                               productVariantId: 'productVariantId',
+                                                                                               displayName: 'displayName'
                                                                                              })
                                                                                            }}>
                                                                                         <img src={shopifIcon} alt=""/>
@@ -9081,14 +9083,17 @@ const Scenario = () => {
               onCancel={() => {
                 setIsOpenShopifyReference(false)
               }}
-              onReferProductVariant={(productVariantId) => {
+              onReferProductVariant={(productVariantId, displayName) => {
                 if (dataMessages[indexMessageSelect].belong_to === 'user') {
                   if (varFileReference.indexChildSubContentType !== undefined) {
                     onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, productVariantId, varShopifyReference.subContentType, varShopifyReference.indexSubContentType, varShopifyReference.childSubContentType, varShopifyReference.indexChildSubContentType, varShopifyReference.productVariantId);
+                    onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, displayName, varShopifyReference.subContentType, varShopifyReference.indexSubContentType, varShopifyReference.childSubContentType, varShopifyReference.indexChildSubContentType, varShopifyReference.displayName);
                   } else if (varFileReference.childSubContentType !== undefined) {
                     onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, productVariantId, varShopifyReference.subContentType, varShopifyReference.childSubContentType, varShopifyReference.indexSubContent, varShopifyReference.productVariantId);
+                    onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, displayName, varShopifyReference.subContentType, varShopifyReference.childSubContentType, varShopifyReference.indexSubContent, varShopifyReference.displayName);
                   } else {
                     onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, productVariantId, varShopifyReference.subContentType, varShopifyReference.indexSubContent, varShopifyReference.productVariantId);
+                    onChangeValueMessageContent(indexMessageSelect, varShopifyReference.indexContent, varShopifyReference.contentType, displayName, varShopifyReference.subContentType, varShopifyReference.indexSubContent, varShopifyReference.displayName);
                   }
                 } else {
                   onChangeValueMessageContent(indexMessageSelect, 0, messageType, productVariantId, 'content')
