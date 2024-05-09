@@ -2137,74 +2137,37 @@ function Preview() {
     const product = products?.products?.find(x => x.id === products?.initial_selection)
 
     const email = newArr.find(x => x.data_input_name === "email")?.string_value || null
+    const user_name = newArr.find(x => x.data_input_name === "user_name")?.string_value || null
+    const user_name_kana = newArr.find(x => x.data_input_name === "user_name_kana")?.string_value || null
 
-    const user_name = res?.data?.data?.find(x => x.data_input_name === "user_name")?.string_value || null
-    const user_name_kana = res?.data?.data?.find(x => x.data_input_name === "user_name_kana")?.string_value || null
+    const zip_code_address = newArr.find(x => x.data_input_name === "zip_code_address")?.text_value || null
 
-    if (user_name && user_name_kana && email) {
+    if (product && quantity && user_name && user_name_kana && email && zip_code_address) {
       await api
         .post('/api/v1/shopify/cart_create', {
           first_name: JSON.parse(user_name)?.valueLeft || JSON.parse(user_name_kana)?.valueLeft,
           last_name: JSON.parse(user_name)?.valueRight || JSON.parse(user_name_kana)?.valueRight,
           email: email || "example@gmail.com",
+          zip: JSON.parse(zip_code_address)?.value_post_code || "9500945",
+          province: JSON.parse(zip_code_address)?.value_prefecture,
+          city: JSON.parse(zip_code_address)?.value_municipality,
+          address1: JSON.parse(zip_code_address)?.value_address,
+          address2: JSON.parse(zip_code_address)?.value_building_name,
+          lines: [
+            {
+              "merchandiseId": product.productVariantId,
+              "quantity": quantity
+            }
+          ],
           scenario_id: scenarioId
         })
         .then(async res => {
           sessionStorage.setItem("cart", JSON.stringify(res?.data?.data))
           setCheckoutUrl(res?.data?.data?.cartCreate?.cart?.checkoutUrl)
-          if (product?.productVariantId) {
-            await api
-                .post('/api/v1/shopify/cart_lines_add', {
-                  uuid: uuid,
-                  cart_id: res?.data?.data?.cartCreate?.cart?.id,
-                  scenario_id: scenarioId,
-                  lines: [
-                    {
-                      "merchandiseId": product.productVariantId,
-                      "quantity": quantity
-                    }
-                  ]
-                })
-                .then(r => {
-                  if (r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl) {
-                    // window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
-                  }
-                  sessionStorage.removeItem("cart")
-                })
-                .catch(e => {
-                  console.log(e)
-                })
-          }
         })
         .catch(e => {
           console.log(e)
         })
-    } else if (product?.productVariantId) {
-      const cart = JSON.parse(sessionStorage.getItem("cart") || null)
-      if (cart?.cartCreate?.cart) {
-        await api
-          .post('/api/v1/shopify/cart_lines_add', {
-            uuid: uuid,
-            cart_id: cart?.cartCreate?.cart?.id,
-            scenario_id: scenarioId,
-            lines: [
-              {
-                "merchandiseId": product.productVariantId,
-                "quantity": quantity
-              }
-            ]
-          })
-          .then(r => {
-            if (r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl) {
-              setCheckoutUrl(res?.data?.data?.cartCreate?.cart?.checkoutUrl)
-              // window.open(r?.data?.data?.cartLinesAdd?.cart?.checkoutUrl, '_blank');
-            }
-            sessionStorage.removeItem("cart")
-          })
-          .catch(e => {
-            console.log(e)
-          })
-      }
     }
   }
 
@@ -2233,6 +2196,7 @@ function Preview() {
       user_id: uuid,
       bot_type: "web"
     };
+    console.log("render ", renderMessageArr[indexMessage])
     if (dataMessages[indexClickLocation].message_content[0]?.text_input?.save_input_content === "create_order") {
       await new Promise((resolve) => {
         api
@@ -3442,6 +3406,8 @@ function Preview() {
 
   const handleOpenWithDrawal = () => {
     if (botInfor && botInfor.withdrawal_prevention_status === "invalid") {
+      sessionStorage.remove("cart")
+      setScenarioUserResponses([])
       setIndexUser(0);
       let indexTiming = 0;
       let i;
@@ -4237,7 +4203,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
                   }}
 
                   dangerouslySetInnerHTML={{
-                    __html: content[content.type]?.content.replace("{checkout_url}",
+                    __html: content[content.type]?.content?.replace("{checkout_url}",
                         `<a href="${checkoutUrl}" target="_blank" style="color: ${botInfor?.font_color}">${checkoutUrl || ""}</a>`)
                   }}
                   // value={content[content.type]?.content || ''}
