@@ -1448,6 +1448,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                         }, (dataMessages[i]?.message_content[0].delay.content * 1000));
                                     });
                                 }).then(() => {
+                                    renderMessage[indexMessage].disabled = false;
+                                    renderMessageArr[indexMessage].disabled = false;
                                     setIndexMessageRender(i)
                                     renderMessage.pop();
                                     renderMessage.push({});
@@ -1502,6 +1504,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                             let data = {
                                 variables: variablesData
                             }
+                            renderMessage[indexMessage].disabled = false;
+                            renderMessageArr[indexMessage].disabled = false;
                             renderMessage.push({});
                             setRenderMessageArr([
                                 ...renderMessage
@@ -1529,6 +1533,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                 setVariables([...variables]);
                             }
                             renderMessage.push({});
+                            renderMessage[indexMessage].disabled = false;
+                            renderMessageArr[indexMessage].disabled = false;
                             setRenderMessageArr([
                                 ...renderMessage
                             ]);
@@ -1547,6 +1553,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                 setVariables([...variables]);
                             }
                             renderMessage.push({});
+                            renderMessage[indexMessage].disabled = false;
+                            renderMessageArr[indexMessage].disabled = false;
                             setRenderMessageArr([
                                 ...renderMessage
                             ]);
@@ -1554,6 +1562,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                             index = i;
                         } else if (dataMessages[i]?.message_content[0]?.type === 'pause') {
                             renderMessage.push({});
+                            renderMessage[indexMessage].disabled = false;
+                            renderMessageArr[indexMessage].disabled = false;
                             setRenderMessageArr([
                                 ...renderMessage
                             ]);
@@ -1583,6 +1593,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                             }).then(data => {
                                 setIndexMessageRender(i);
                                 renderMessage.push(data);
+                                renderMessage[indexMessage].disabled = false;
+                                renderMessageArr[indexMessage].disabled = false;
                                 setRenderMessageArr([
                                     ...renderMessage
                                 ]);
@@ -1644,6 +1656,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                             //     if (temp) data.message_content = [...temp.message_content]
                             // }
                             renderMessage.push(data);
+                            renderMessage[indexMessage].disabled = false;
+                            renderMessageArr[indexMessage].disabled = false;
                             setRenderMessageArr([
                                 ...renderMessage
                             ]);
@@ -1753,6 +1767,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 }).then(data => {
                     setIndexMessageRender(indexMessageRender + 1);
                     renderMessage.push(data);
+                    renderMessage[indexMessage].disabled = false;
+                    renderMessageArr[indexMessage].disabled = false;
                     setRenderMessageArr([
                         ...renderMessage
                     ]);
@@ -1791,6 +1807,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                             }).then(data => {
                                 setIndexMessageRender(i);
                                 renderMessage.push(data);
+                                renderMessage[indexMessage].disabled = false;
+                                renderMessageArr[indexMessage].disabled = false;
                                 setRenderMessageArr([
                                     ...renderMessage
                                 ]);
@@ -1805,6 +1823,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                 if (dataMessages[i]?.message_content[0]?.delay.typing_on) {
                                     await new Promise((resolve) => {
                                         renderMessage.push({ ...dataMessages[i] });
+                                        renderMessage[indexMessage].disabled = false;
+                                        renderMessageArr[indexMessage].disabled = false;
                                         setRenderMessageArr([
                                             ...renderMessage
                                         ]);
@@ -1819,6 +1839,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                         setIndexMessageRender(i);
                                         renderMessage.pop();
                                         renderMessage.push({});
+                                        renderMessage[indexMessage].disabled = false;
+                                        renderMessageArr[indexMessage].disabled = false;
                                         setRenderMessageArr([
                                             ...renderMessage
                                         ]);
@@ -1846,6 +1868,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                     variables: variablesData
                                 }
                                 renderMessage.push({});
+                                renderMessage[indexMessage].disabled = false;
+                                renderMessageArr[indexMessage].disabled = false;
                                 setRenderMessageArr([
                                     ...renderMessage
                                 ]);
@@ -1872,6 +1896,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                     setVariables([...variables]);
                                 }
                                 renderMessage.push({});
+                                renderMessage[indexMessage].disabled = false;
+                                renderMessageArr[indexMessage].disabled = false;
                                 setRenderMessageArr([
                                     ...renderMessage
                                 ]);
@@ -1890,6 +1916,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                     setVariables([...variables]);
                                 }
                                 renderMessage.push({});
+                                renderMessage[indexMessage].disabled = false;
+                                renderMessageArr[indexMessage].disabled = false;
                                 setRenderMessageArr([
                                     ...renderMessage
                                 ]);
@@ -1897,6 +1925,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                 index = i;
                             } else if (dataMessages[i]?.message_content[0]?.type === 'pause') {
                                 renderMessage.push({});
+                                renderMessage[indexMessage].disabled = false;
+                                renderMessageArr[indexMessage].disabled = false;
                                 setRenderMessageArr([
                                     ...renderMessage
                                 ]);
@@ -1926,6 +1956,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                 }).then(data => {
                                     setIndexMessageRender(i);
                                     renderMessage.push(data);
+                                    renderMessage[indexMessage].disabled = false;
+                                    renderMessageArr[indexMessage].disabled = false;
                                     setRenderMessageArr([
                                         ...renderMessage
                                     ]);
@@ -1937,6 +1969,8 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         }
                     } else {
                         renderMessage.push({});
+                        renderMessage[indexMessage].disabled = false;
+                        renderMessageArr[indexMessage].disabled = false;
                         setRenderMessageArr([
                             ...renderMessage
                         ]);
@@ -1945,7 +1979,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             }
         }
 
-        renderMessageArr[indexMessage].disabled = false;
+        // renderMessageArr[indexMessage].disabled = false;
 
         // clearTimeout(delayRender);
 
