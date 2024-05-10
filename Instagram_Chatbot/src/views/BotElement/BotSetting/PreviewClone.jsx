@@ -2132,15 +2132,15 @@ function Preview() {
     const newArr = scenarioUserResponses.concat(res.data?.data || [])
     setScenarioUserResponses([...newArr])
 
-    const products = JSON.parse(newArr.find(x => x.data_input_name === "text_with_thumbnail_image")?.text_value || null)
-    const quantity = newArr.find(x => x.data_input_name === "quantity")?.integer_value || 1
-    const product = products?.products?.find(x => x.id === products?.initial_selection)
+    const products = JSON.parse(newArr.findLast(x => x.data_input_name === "text_with_thumbnail_image")?.text_value || null)
+    const quantity = newArr.findLast(x => x.data_input_name === "quantity")?.integer_value || 1
+    const product = products?.products?.findLast(x => x.id === products?.initial_selection)
 
-    const email = newArr.find(x => x.data_input_name === "email")?.string_value || null
-    const user_name = newArr.find(x => x.data_input_name === "user_name")?.string_value || null
-    const user_name_kana = newArr.find(x => x.data_input_name === "user_name_kana")?.string_value || null
+    const email = newArr.findLast(x => x.data_input_name === "email")?.string_value || null
+    const user_name = newArr.findLast(x => x.data_input_name === "user_name")?.string_value || null
+    const user_name_kana = newArr.findLast(x => x.data_input_name === "user_name_kana")?.string_value || null
 
-    const zip_code_address = newArr.find(x => x.data_input_name === "zip_code_address")?.text_value || null
+    const zip_code_address = newArr.findLast(x => x.data_input_name === "zip_code_address")?.text_value || null
 
     if (product && quantity && user_name && user_name_kana && email && zip_code_address) {
       await api
@@ -2148,7 +2148,7 @@ function Preview() {
           first_name: JSON.parse(user_name)?.valueLeft || JSON.parse(user_name_kana)?.valueLeft,
           last_name: JSON.parse(user_name)?.valueRight || JSON.parse(user_name_kana)?.valueRight,
           email: email || "example@gmail.com",
-          zip: JSON.parse(zip_code_address)?.value_post_code || "9500945",
+          zip: JSON.parse(zip_code_address)?.value_post_code || "950-0945",
           province: JSON.parse(zip_code_address)?.value_prefecture,
           city: JSON.parse(zip_code_address)?.value_municipality,
           address1: JSON.parse(zip_code_address)?.value_address,
@@ -2196,7 +2196,6 @@ function Preview() {
       user_id: uuid,
       bot_type: "web"
     };
-    console.log("render ", renderMessageArr[indexMessage])
     if (dataMessages[indexClickLocation].message_content[0]?.text_input?.save_input_content === "create_order") {
       await new Promise((resolve) => {
         api
@@ -2289,6 +2288,9 @@ function Preview() {
         renderMessage[i].disabled = true;
       }
       return setRenderMessageArr(renderMessage)
+      // renderMessage[indexMessage].disabled = false
+      // setRenderMessageArr(renderMessage)
+      // return;
     }
     await api
       .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
@@ -2409,6 +2411,8 @@ function Preview() {
                     setIndexMessageRender(i);
                     renderMessage.pop();
                     renderMessage.push({});
+                    renderMessage[indexMessage].disabled = false;
+                    renderMessageArr[indexMessage].disabled = false;
                     setRenderMessageArr([...renderMessage]);
                   })
                   .then(() => {
@@ -2462,6 +2466,8 @@ function Preview() {
               let data = {
                 variables: variablesData,
               };
+              renderMessage[indexMessage].disabled = false;
+              renderMessageArr[indexMessage].disabled = false;
               renderMessage.push({});
               setRenderMessageArr([...renderMessage]);
 
@@ -2514,6 +2520,8 @@ function Preview() {
                 });
                 setVariables([...variables]);
               }
+              renderMessage[indexMessage].disabled = false;
+              renderMessageArr[indexMessage].disabled = false;
               renderMessage.push({});
               setRenderMessageArr([...renderMessage]);
               setIndexMessageRender(i);
@@ -2555,6 +2563,8 @@ function Preview() {
                 }, 1000));
               })
                 .then((data) => {
+                  renderMessage[indexMessage].disabled = false;
+                  renderMessageArr[indexMessage].disabled = false;
                   setIndexMessageRender(i);
                   renderMessage.push(data);
                   setRenderMessageArr([...renderMessage]);
@@ -2703,6 +2713,8 @@ function Preview() {
                 const temp = dataSessionStorage.find(x => x.id === data.id)
                 if (temp) data.message_content = [...temp.message_content]
               }
+              renderMessage[indexMessage].disabled = false;
+              renderMessageArr[indexMessage].disabled = false;
               renderMessage.push(data);
               setRenderMessageArr([...renderMessage]);
               if (isPauseScroll === false) {
@@ -2841,6 +2853,8 @@ function Preview() {
             resolve({ ...dataMessages[indexMessageRender + 1] });
           }, 1000));
         }).then((data) => {
+          renderMessage[indexMessage].disabled = false;
+          renderMessageArr[indexMessage].disabled = false;
           setIndexMessageRender(indexMessageRender + 1);
           renderMessage.push(data);
           setRenderMessageArr([...renderMessage]);
@@ -2903,6 +2917,8 @@ function Preview() {
                   resolve({ ...dataMessages[i] });
                 }, 1000));
               }).then((data) => {
+                renderMessage[indexMessage].disabled = false;
+                renderMessageArr[indexMessage].disabled = false;
                 setIndexMessageRender(i);
                 renderMessage.push(data);
                 setRenderMessageArr([...renderMessage]);
@@ -2916,6 +2932,8 @@ function Preview() {
               if (dataMessages[i]?.message_content[0].type === "delay") {
                 if (dataMessages[i]?.message_content[0]?.delay.typing_on) {
                   await new Promise((resolve) => {
+                    renderMessage[indexMessage].disabled = false;
+                    renderMessageArr[indexMessage].disabled = false;
                     renderMessage.push({ ...dataMessages[i] });
                     setRenderMessageArr([...renderMessage]);
                     resolve();
@@ -2994,6 +3012,8 @@ function Preview() {
                   });
                   setVariables([...variables]);
                 }
+                renderMessage[indexMessage].disabled = false;
+                renderMessageArr[indexMessage].disabled = false;
                 renderMessage.push({});
                 setRenderMessageArr([...renderMessage]);
                 setIndexMessageRender(i);
@@ -3015,6 +3035,8 @@ function Preview() {
                   });
                   setVariables([...variables]);
                 }
+                renderMessage[indexMessage].disabled = false;
+                renderMessageArr[indexMessage].disabled = false;
                 renderMessage.push({});
                 setRenderMessageArr([...renderMessage]);
                 setIndexMessageRender(i);
@@ -3022,6 +3044,8 @@ function Preview() {
               } else if (
                 dataMessages[i]?.message_content[0]?.type === "pause"
               ) {
+                renderMessage[indexMessage].disabled = false;
+                renderMessageArr[indexMessage].disabled = false;
                 renderMessage.push({});
                 setRenderMessageArr([...renderMessage]);
                 setIndexMessageRender(i);
@@ -3058,6 +3082,8 @@ function Preview() {
                     resolve({ ...dataMessages[i] });
                   }, 1000));
                 }).then((data) => {
+                  renderMessage[indexMessage].disabled = false;
+                  renderMessageArr[indexMessage].disabled = false;
                   setIndexMessageRender(i);
                   renderMessage.push(data);
                   setRenderMessageArr([...renderMessage]);
@@ -3068,6 +3094,8 @@ function Preview() {
               }
             }
           } else {
+            renderMessage[indexMessage].disabled = false;
+            renderMessageArr[indexMessage].disabled = false;
             renderMessage.push({});
             setRenderMessageArr([...renderMessage]);
           }
@@ -3075,7 +3103,7 @@ function Preview() {
       }
     }
 
-    renderMessageArr[indexMessage].disabled = false;
+    // renderMessageArr[indexMessage].disabled = false;
   };
 
   const onChangeValue = (
@@ -3406,7 +3434,7 @@ function Preview() {
 
   const handleOpenWithDrawal = () => {
     if (botInfor && botInfor.withdrawal_prevention_status === "invalid") {
-      sessionStorage.remove("cart")
+      sessionStorage.removeItem("cart")
       setScenarioUserResponses([])
       setIndexUser(0);
       let indexTiming = 0;
@@ -4175,6 +4203,48 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     link.remove();
   };
 
+  const formatResult = () => {
+    const cart = JSON.parse(sessionStorage.getItem("cart") || null)
+
+    const url = cart?.cartCreate?.cart?.checkoutUrl || ""
+
+    const email = cart?.cartCreate?.cart?.buyerIdentity?.email || ""
+
+    const name = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.name || ""
+    const formattedArea = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.formattedArea || ""
+    const address1 = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.address1 || ""
+    const address2 = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.address2 || ""
+    const zip = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.zip || ""
+    const province = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.province || ""
+    const city = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.city || ""
+
+    const product = cart?.cartCreate?.cart?.lines?.edges[0]?.node?.merchandise?.product?.title || ""
+    const variant = cart?.cartCreate?.cart?.lines?.edges[0]?.node?.merchandise?.title || ""
+
+    const totalQuantity = cart?.cartCreate?.cart?.totalQuantity || ""
+
+    const totalAmount = cart?.cartCreate?.cart?.cost?.totalAmount?.amount || ""
+    const currencyCode = cart?.cartCreate?.cart?.cost?.totalAmount?.currencyCode || ""
+
+    let result = content[content.type]?.content;
+    result = result?.replace("{checkout_url}",
+        `<a href="${url}" target="_blank" style="color: ${botInfor?.font_color}">${url}</a>`)
+    result = result?.replace("{email}", email)
+    result = result?.replace("{name}", name)
+    result = result?.replace("{totalQuantity}", totalQuantity)
+    result = result?.replace("{totalAmount}", totalAmount.toString() + currencyCode)
+    result = result?.replace("{product}", product + ' - ' + variant)
+    result = result?.replace("{address}", formattedArea + address1 + address2)
+    result = result?.replace("{address1}", address1)
+    result = result?.replace("{address2}", address2)
+    result = result?.replace("{zip}", zip)
+    result = result?.replace("{province}", province)
+    result = result?.replace("{city}", city)
+
+    console.log(result)
+    return result;
+  }
+
   return (
     <div key={index} className="sp-body-bot-side slideRight">
       {(content.type === "text_input" ||
@@ -4203,8 +4273,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
                   }}
 
                   dangerouslySetInnerHTML={{
-                    __html: content[content.type]?.content?.replace("{checkout_url}",
-                        `<a href="${checkoutUrl}" target="_blank" style="color: ${botInfor?.font_color}">${checkoutUrl || ""}</a>`)
+                    __html: formatResult()
                   }}
                   // value={content[content.type]?.content || ''}
                   // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
