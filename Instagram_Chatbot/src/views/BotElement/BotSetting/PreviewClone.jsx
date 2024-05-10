@@ -4241,7 +4241,6 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     result = result?.replace("{province}", province)
     result = result?.replace("{city}", city)
 
-    console.log(result)
     return result;
   }
 
