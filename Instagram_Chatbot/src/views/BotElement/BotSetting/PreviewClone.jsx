@@ -319,26 +319,26 @@ function Preview() {
       }
     });
 
-    socket = new WebSocket("ws://localhost:3000/cable");
-
-    socket.onopen = () => {
-      const msg = {
-        command: "subscribe",
-        identifier: JSON.stringify({
-          id: uuid,
-          channel: "ShopifyChannel"
-        })
-      }
-      socket.send(JSON.stringify(msg))
-    };
-
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-    };
-
-    return () => {
-      socket.close();
-    };
+    // socket = new WebSocket("ws://localhost:3000/cable");
+    //
+    // socket.onopen = () => {
+    //   const msg = {
+    //     command: "subscribe",
+    //     identifier: JSON.stringify({
+    //       id: uuid,
+    //       channel: "ShopifyChannel"
+    //     })
+    //   }
+    //   socket.send(JSON.stringify(msg))
+    // };
+    //
+    // socket.onmessage = (event) => {
+    //   const data = JSON.parse(event.data);
+    // };
+    //
+    // return () => {
+    //   socket.close();
+    // };
   }, []);
 
   useEffect(() => {
@@ -559,6 +559,8 @@ function Preview() {
               res.data.chatbot.font_color = font_color;
               res.data.chatbot.icon_mess = icon_mess;
             }
+
+            checkUpdateMessagesSessionStorage(res.data.data.updated_at)
 
             setBotInfor(res.data.chatbot);
             if (res.data.variables) {
@@ -2126,6 +2128,15 @@ function Preview() {
     const data = sessionStorage.getItem(`messages_bot_${bot_id}`)
     if (!data) return null;
     return JSON.parse(data)
+  }
+
+  const checkUpdateMessagesSessionStorage = (updated_at) => {
+    const temp = sessionStorage.getItem("bot_update_at")
+    const bot_id = objParam.bot_id || Number(objParam?.current_url_param?.bot_id)
+    if (temp !== updated_at) {
+      sessionStorage.removeItem(`messages_bot_${bot_id}`)
+      sessionStorage.setItem("bot_update_at", updated_at)
+    }
   }
 
   const createOrAddLinesCart = async (res) => {
@@ -4227,8 +4238,17 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     const currencyCode = cart?.cartCreate?.cart?.cost?.totalAmount?.currencyCode || ""
 
     let result = content[content.type]?.content;
-    result = result?.replace("{checkout_url}",
+    result = result?.replace("{checkoutUrl}",
         `<a href="${url}" target="_blank" style="color: ${botInfor?.font_color}">${url}</a>`)
+    result = result?.replace("{checkoutUrlBtn}",
+      `<a href="${url}" target="_blank" class="sp-user-message-button-action underline-none">
+        <button
+            style="background-color: ${botInfor?.main_color}; 
+                   border-radius: 25px;
+                   margin: 5px 0;"
+            class="ss-user-message__action-btn btn btn-secondary"
+        >決済画面へ進む</button>
+      </a>`)
     result = result?.replace("{email}", email)
     result = result?.replace("{name}", name)
     result = result?.replace("{totalQuantity}", totalQuantity)
@@ -4245,21 +4265,21 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
   }
 
   return (
-    <div key={index} className="sp-body-bot-side slideRight">
-      {(content.type === "text_input" ||
-        content.type === "file" ||
-        content.type === "delay") && (
-        <div className="sp-body-bot-side-avatar sp-avatar">
-          <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} />
-        </div>
-      )}
-      <div className="sp-body-bot-side-messages">
-        {/* <img className="ss-bot-ava" src={icon} alt="" /> */}
-        {content && (
-          <React.Fragment>
-            {/* bot: type == 'text_input' */}
-            {content.type === "text_input" && (
-              <div className="position-relative">
+      <div key={index} className="sp-body-bot-side slideRight">
+        {(content.type === "text_input" ||
+            content.type === "file" ||
+            content.type === "delay") && (
+            <div className="sp-body-bot-side-avatar sp-avatar">
+              <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url}/>
+            </div>
+        )}
+        <div className="sp-body-bot-side-messages">
+          {/* <img className="ss-bot-ava" src={icon} alt="" /> */}
+          {content && (
+              <React.Fragment>
+                {/* bot: type == 'text_input' */}
+                {content.type === "text_input" && (
+                    <div className="position-relative">
                 <div
                   className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative`}
                   style={{
