@@ -200,6 +200,10 @@
     justify-content: center;
 }
 
+.underline-none:hover {
+    text-decoration: none !important;
+}
+
 .sp-body-user-side-messages button {
     margin: 0px;
     width: 40%;
