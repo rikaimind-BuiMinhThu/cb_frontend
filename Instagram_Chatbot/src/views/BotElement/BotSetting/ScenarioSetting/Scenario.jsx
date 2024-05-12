@@ -39,6 +39,7 @@ import shopifIcon from '../../../../assets/img/shopify-icon.png';
 import nanoMetadata from 'nano-metadata';
 import locale from 'antd/es/date-picker/locale/ja_JP';
 import 'moment/locale/zh-cn';
+import ShopifyReferenceSelect from "./ShopifyReferenceSelect";
 
 const _ = require('lodash');
 
@@ -804,6 +805,13 @@ const Scenario = () => {
   // const client = JSON.parse(sessionStorage.getItem('client'));
   const client = JSON.parse(sessionStorage.getItem('client'));
 
+  // ProductVariant - Shopify
+  const [listProductVariants, setListProductVariants] = useState([]);
+
+  useEffect(() => {
+    getListProductVariants(null);
+  }, [])
+
   useEffect(() => {
     setBotId(Cookies.get('bot_id'));
     setScenarioId(Cookies.get('scenario_id'));
@@ -863,6 +871,30 @@ const Scenario = () => {
       console.log(error);
       if (error.response?.data.code === 0) {
         tokenExpired()
+      }
+    });
+  }
+
+  const getListProductVariants = (cursor) => {
+    const query = cursor? `cursor=${cursor}` : ""
+    api.get(`/api/v1/shopify/product_variants?${query}`).then(res => {
+      setListProductVariants(prev => prev.concat(
+          res?.data?.data?.productVariants?.edges.map(x => {
+            return {
+              ...x,
+              key: x.node.id,
+              value: x.node.displayName
+            }
+          })
+      ));
+
+      const next = res?.data?.data?.productVariants?.pageInfo?.hasNextPage;
+      const endCursor = res?.data?.data?.productVariants?.pageInfo?.endCursor;
+      if (next) setTimeout(() => getListProductVariants(endCursor), 1000);
+    }).catch((error) => {
+      console.log(error);
+      if (error.response?.data.code === 0) {
+        tokenExpired();
       }
     });
   }
@@ -8093,26 +8125,43 @@ const Scenario = () => {
                                                                                     </div>
                                                                                     <div
                                                                                         className="ss-user-setting-product-purchase-file-img">
-                                                                                      <InputCustom
-                                                                                          className="ss-mg-bottom-5"
-                                                                                          placeholder="バリアントID"
-                                                                                          value={itemProduct.displayName}
-                                                                                          readOnly={true}
+                                                                                      <ShopifyReferenceSel.
+                                                                                      ect
+                                                                                          listProductVariants={listProductVariants}
+                                                                                          value={itemProduct.productVariantId}
+                                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect,
+                                                                                              indexContent,
+                                                                                              content.type,
+                                                                                              value,
+                                                                                              "products",
+                                                                                              indexProduct,
+                                                                                              "productVariantId")}
                                                                                       />
-                                                                                      <div className="ss-mg-bottom-5 ss-shopify-icon"
-                                                                                           onClick={() => {
-                                                                                             setIsOpenShopifyReference(true)
-                                                                                             setVarShopifyReference({
-                                                                                               indexContent,
-                                                                                               contentType: content.type,
-                                                                                               subContentType: 'products',
-                                                                                               indexSubContent: indexProduct,
-                                                                                               productVariantId: 'productVariantId',
-                                                                                               displayName: 'displayName'
-                                                                                             })
-                                                                                           }}>
+                                                                                      <div className="ss-mg-bottom-5 ss-shopify-icon" style={{
+                                                                                        cursor: "default"
+                                                                                      }}>
                                                                                         <img src={shopifIcon} alt=""/>
                                                                                       </div>
+                                                                                      {/*<InputCustom*/}
+                                                                                      {/*    className="ss-mg-bottom-5"*/}
+                                                                                      {/*    placeholder="バリアントID"*/}
+                                                                                      {/*    value={itemProduct.displayName}*/}
+                                                                                      {/*    readOnly={true}*/}
+                                                                                      {/*/>*/}
+                                                                                      {/*<div className="ss-mg-bottom-5 ss-shopify-icon"*/}
+                                                                                      {/*     onClick={() => {*/}
+                                                                                      {/*       setIsOpenShopifyReference(true)*/}
+                                                                                      {/*       setVarShopifyReference({*/}
+                                                                                      {/*         indexContent,*/}
+                                                                                      {/*         contentType: content.type,*/}
+                                                                                      {/*         subContentType: 'products',*/}
+                                                                                      {/*         indexSubContent: indexProduct,*/}
+                                                                                      {/*         productVariantId: 'productVariantId',*/}
+                                                                                      {/*         displayName: 'displayName'*/}
+                                                                                      {/*       })*/}
+                                                                                      {/*     }}>*/}
+                                                                                      {/*  <img src={shopifIcon} alt=""/>*/}
+                                                                                      {/*</div>*/}
                                                                                       {/*<MDBIcon*/}
                                                                                       {/*    className="ss-mg-bottom-5" fas*/}
                                                                                       {/*    icon="folder-open"*/}
