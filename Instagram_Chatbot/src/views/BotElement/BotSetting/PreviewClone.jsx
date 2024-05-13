@@ -2170,7 +2170,8 @@ function Preview() {
               "quantity": quantity
             }
           ],
-          scenario_id: scenarioId
+          scenario_id: scenarioId,
+          uuid: uuid
         })
         .then(async res => {
           sessionStorage.setItem("cart", JSON.stringify(res?.data?.data))
