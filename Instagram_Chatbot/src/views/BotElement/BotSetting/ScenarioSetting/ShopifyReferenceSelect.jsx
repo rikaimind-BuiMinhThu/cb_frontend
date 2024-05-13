@@ -1,0 +1,18 @@
+import React, {useState, useEffect} from 'react';
+import SelectCustom from "./scenarioComon/SelectCustom";
+
+function ShopifyReferenceSelect({listProductVariants, value, onChange, placeholder}) {
+    return (
+        <SelectCustom
+            value={value}
+            data={listProductVariants}
+            onChange={value => onChange(value)}
+            keyValue="key"
+            nameValue="value"
+            placeholder={placeholder}
+        />
+    )
+}
+
+export default ShopifyReferenceSelect
+
