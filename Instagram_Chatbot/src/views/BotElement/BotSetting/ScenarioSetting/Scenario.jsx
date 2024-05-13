@@ -8125,8 +8125,8 @@ const Scenario = () => {
                                                                                     </div>
                                                                                     <div
                                                                                         className="ss-user-setting-product-purchase-file-img">
-                                                                                      <ShopifyReferenceSel.
-                                                                                      ect
+                                                                                      <ShopifyReferenceSelect
+                                                                                          placeholder="バリアントID"
                                                                                           listProductVariants={listProductVariants}
                                                                                           value={itemProduct.productVariantId}
                                                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect,
