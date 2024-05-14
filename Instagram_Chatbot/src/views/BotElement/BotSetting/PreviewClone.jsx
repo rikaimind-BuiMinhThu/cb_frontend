@@ -499,7 +499,7 @@ function Preview() {
           if (res.data.code == 1) {
             let messageArr = [];
             if (res.data.data?.conversation?.messages?.length > 0) {
-              messageArr = [...res.data.data?.conversation?.messages];
+              messageArr = [...res.data.data?.conversation?.messages.filter(x => !x.hidden)];
             }
             let urlThanks = res.data.data?.conversation?.urlThanksPage || "";
 
@@ -1411,6 +1411,14 @@ function Preview() {
             ] = messageError;
             isValid = false;
           }
+        } else if (contentArr[i].type === 'product_purchase_select_option') {
+          console.log(contentType.value)
+          if (stringNullOrEmpty(contentType.value)) {
+            errorsMess[
+              `message${index}_content${i}_${contentArr[i].type}`
+              ] = messageError;
+            isValid = false;
+          }
         } else if (contentArr[i].type === "card_payment_radio_button") {
           if (
             contentType.type !== "picture_radio" &&
@@ -2145,7 +2153,7 @@ function Preview() {
 
     const products = JSON.parse(newArr.findLast(x => x.data_input_name === "text_with_thumbnail_image")?.text_value || null)
     const quantity = newArr.findLast(x => x.data_input_name === "quantity")?.integer_value || 1
-    const product = products?.products?.findLast(x => x.id === products?.initial_selection)
+    const product = products?.products?.findLast(x => x?.id === products?.initial_selection || x?.productVariantId === products?.value)
 
     const email = newArr.findLast(x => x.data_input_name === "email")?.string_value || null
     const user_name = newArr.findLast(x => x.data_input_name === "user_name")?.string_value || null
@@ -4917,6 +4925,7 @@ const UserMessage = ({
         let capture = content.capture;
         let productPurchase = content.product_purchase;
         let productPurchaseRadioButton = content.product_purchase_radio_button;
+        let productPurchaseSelectOption = content.product_purchase_select_option;
         let smsVerify = content.sms_verify;
         let afteePaymentModule = content.AFTEE_payment_module;
         let slider = content.slider;
@@ -5643,6 +5652,60 @@ const UserMessage = ({
                 )}
               </div>
             )}
+            {/* type == 'product_purchase_select_option */}
+            {
+                content.type === 'product_purchase_select_option' &&
+                <div style={{marginBottom: '10px'}}>
+                  {(productPurchaseSelectOption.title_require || productPurchaseSelectOption.require) &&
+                      <div className="ss-message__content--user-pull_down-top"
+                           style={{marginBottom: '0px'}}>
+                        {productPurchaseSelectOption.title_require &&
+                            <span className="ss-message__content--user-pull_down-title">
+                              {productPurchaseSelectOption.title}
+                            </span>
+                        }
+                        {productPurchaseSelectOption.require === true &&
+                            <span className="ss-message__content--user-text-input-required">
+                              ※必須
+                            </span>
+                        }
+                      </div>
+                  }
+                  <div className="ss-message__content--user-pull_down-wrapper">
+                    {productPurchaseSelectOption.type === 'text_with_thumbnail_image' && (
+                        <>
+                          <div className="ss-message__content--user-pull_down--customization">
+                            <div className="">
+                              <div className="ss-message__content--user-pull_down-col col-12"
+                                   style={{padding: '0'}}>
+                                <SelectCustom
+                                    data={productPurchaseSelectOption.products}
+                                    style={{width: '100%'}}
+                                    placeholder={productPurchaseSelectOption.display_unselected}
+                                    keyValue="productVariantId"
+                                    nameValue="title"
+                                    onChange={(value) => onChangeValue(indexContent, content.type, value, 'value')}
+                                    value={productPurchaseSelectOption.value}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                    )}
+                  </div>
+                  {errors?.[
+                      `message${indexMessage}_content${indexContent}_${content.type}`
+                      ] && (
+                      <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                        {
+                          errors?.[
+                              `message${indexMessage}_content${indexContent}_${content.type}`
+                              ]
+                        }
+                      </div>
+                  )}
+                </div>
+            }
             {/* type == 'pull_down' */}
             {content.type === "pull_down" && (
               <div style={{ marginBottom: "10px" }}>

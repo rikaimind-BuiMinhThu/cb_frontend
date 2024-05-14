@@ -1400,6 +1400,29 @@ const Scenario = () => {
           }
         }
       );
+    } else if (messageType === 'product_purchase_select_option') {
+      dataMessages[indexMessageSelect].message_content.push(
+        {
+          id: idMax,
+          type: messageType,
+          [messageType]: {
+            title_require: false,
+            require: false,
+            type: 'text_with_thumbnail_image',
+            product_number_display: false,
+            price_display: false,
+            product_name_display: false,
+            display_unselected: '選択してください',
+            products: [
+              {
+                id: 1,
+                productVariantId: '',
+                displayName: ''
+              }
+            ]
+          }
+        }
+      );
     } else if (messageType === 'AFTEE_payment_module') {
       dataMessages[indexMessageSelect].message_content.push(
         {
@@ -1568,6 +1591,26 @@ const Scenario = () => {
     setDataMessages([...dataMessages]);
   }
 
+  const handleAddItemProductPullDown = (indexMessage, indexContent, contentType) => {
+    let arr = dataMessages[indexMessage].message_content[indexContent][contentType].products;
+
+    if (arr === undefined || arr === null) {
+      dataMessages[indexMessage].message_content[indexContent][contentType].products = [];
+      arr = dataMessages[indexMessage].message_content[indexContent][contentType].products;
+    }
+    let idMax;
+    if (arr.length !== 0) {
+      idMax = Math.max(...arr.map(item => item.id)) + 1;
+    } else {
+      idMax = 1;
+    }
+
+    arr.push({
+      id: idMax
+    });
+    setDataMessages([...dataMessages]);
+  }
+
   const handleAddItemAgreeTerm = (indexMessage, indexContent, type, contentType) => {
     let arr = dataMessages[indexMessage].message_content[indexContent][type][contentType];
     if (arr === undefined || arr === null) {
@@ -1642,6 +1685,24 @@ const Scenario = () => {
       }
     }
     dataMessages[indexMessageSelect].message_content[indexItem][type][contentType][subContentType] = items;
+    setDataMessages([...dataMessages]);
+  }
+
+  const handleDragEndProduct = (result, idContent, type, contentType) => {
+    if (!result.destination) return;
+    let messageArr = dataMessages.filter((message, index) => message.belong_to === 'user' && index === indexMessageSelect)[0].message_content
+        .filter(content => content.id === idContent)[0][type][contentType];
+    const items = Array.from(messageArr);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    let indexItem;
+    for (let i = 0; i < dataMessages[indexMessageSelect].message_content.length; i++) {
+      if (dataMessages[indexMessageSelect].message_content[i].id === idContent) {
+        indexItem = i;
+      }
+    }
+    dataMessages[indexMessageSelect].message_content[indexItem][type][contentType] = items;
     setDataMessages([...dataMessages]);
   }
 
@@ -1751,6 +1812,12 @@ const Scenario = () => {
   const handleRemoveItemCustomizePullDown = (indexMessage, indexContent, contentType, pullDownType, name, indexPullDown) => {
     let newArrRadio = dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name].filter((item, index) => index !== indexPullDown);
     dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name] = newArrRadio;
+    setDataMessages([...dataMessages]);
+  }
+
+  const handleRemoveItemProductPullDown = (indexMessage, indexContent, contentType, name, indexPullDown) => {
+    const newArrRadio = dataMessages[indexMessage].message_content[indexContent][contentType].products.filter((item, index) => index !== indexPullDown);
+    dataMessages[indexMessage].message_content[indexContent][contentType].products = newArrRadio;
     setDataMessages([...dataMessages]);
   }
 
@@ -2638,6 +2705,7 @@ const Scenario = () => {
                                                     let capture = content.capture;
                                                     let productPurchase = content.product_purchase;
                                                     let productPurchaseRadioButton = content.product_purchase_radio_button;
+                                                    let productPurchaseSelectOption = content.product_purchase_select_option;
                                                     let smsVerify = content.sms_verify;
                                                     let afteePaymentModule = content.AFTEE_payment_module;
                                                     let slider = content.slider;
@@ -4124,6 +4192,46 @@ const Scenario = () => {
                                                             </div>
                                                           )
                                                         }
+                                                        {/* type == 'product_purchase_select_option' */}
+                                                        {
+                                                            content.type === 'product_purchase_select_option' && (
+                                                                <div style={{ marginBottom: '10px' }}>
+                                                                  {(productPurchaseSelectOption.title_require || productPurchaseSelectOption.require) &&
+                                                                      <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
+                                                                        {productPurchaseSelectOption.title_require &&
+                                                                            <span className="ss-message__content--user-pull_down-title">
+                                                                      {productPurchaseSelectOption.title}
+                                                                    </span>
+                                                                        }
+                                                                        {productPurchaseSelectOption.require === true &&
+                                                                            <span className="ss-message__content--user-text-input-required">
+                                                                      ※必須
+                                                                    </span>
+                                                                        }
+                                                                      </div>
+                                                                  }
+                                                                  <div className="ss-message__content--user-pull_down-wrapper">
+                                                                    {productPurchaseSelectOption.type === 'text_with_thumbnail_image' && (
+                                                                        <>
+                                                                          <div className="ss-message__content--user-pull_down--customization">
+                                                                            <div className="">
+                                                                              <div className="ss-message__content--user-pull_down-col col-12" style={{ padding: '0' }}>
+                                                                                <SelectCustom
+                                                                                    data={productPurchaseSelectOption.products}
+                                                                                    style={{ width: '100%' }}
+                                                                                    placeholder={productPurchaseSelectOption.display_unselected}
+                                                                                    keyValue="productVariantId"
+                                                                                    nameValue="title"
+                                                                                />
+                                                                              </div>
+                                                                            </div>
+                                                                          </div>
+                                                                        </>
+                                                                    )}
+                                                                  </div>
+                                                                </div>
+                                                            )
+                                                        }
                                                         {/* type == 'sms_verify' */}
                                                         {content.type === 'sms_verify' && (
                                                           <div style={{ marginBottom: '10px' }}>
@@ -4871,6 +4979,7 @@ const Scenario = () => {
                                         let capture = content.capture;
                                         let productPurchase = content.product_purchase;
                                         let productPurchaseRadioButton = content.product_purchase_radio_button;
+                                        let productPurchaseSelectOption = content.product_purchase_select_option;
                                         let smsVerify = content.sms_verify;
                                         let afteePaymentModule = content.AFTEE_payment_module;
                                         let slider = content.slider;
@@ -8237,42 +8346,232 @@ const Scenario = () => {
                                                       }
                                                     </>
                                                   )}
+                                                  {/* user: type = 'product_purchase_select_option' */}
+                                                  {content.type === 'product_purchase_select_option' && (
+                                                        <React.Fragment>
+                                                          <div className="ss-user-setting__item-text_input-top">
+                                                            <CheckboxCustom
+                                                                label="必須"
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'require')}
+                                                                value={productPurchaseSelectOption.require}
+                                                            />
+                                                          </div>
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <div
+                                                                className="ss-user-setting__item-bottom">
+                                                              <SelectCustom
+                                                                  id="title"
+                                                                  value={productPurchaseSelectOption?.title_require}
+                                                                  data={dropDownTitle}
+                                                                  placeholder="タイトル"
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
+                                                              />
+                                                            </div>
+                                                          </div>
+                                                          {productPurchaseSelectOption.title_require === true &&
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <InputCustom
+                                                                    placeholder="タイトル"
+                                                                    value={productPurchaseSelectOption.title}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
+                                                                />
+                                                              </div>
+                                                          }
+                                                          {/* pull_down: type = text_with_thumbnail_image */}
+                                                          {productPurchaseSelectOption.type === 'text_with_thumbnail_image' &&
+                                                              <React.Fragment>
+                                                                <div className="ss-user-setting__item-bottom">
+                                                                  <div style={{ backgroundColor: '#F8F9FA', width: '90%', padding: '5px' }} >
+                                                                    <InputCustom
+                                                                        label="デフォルトオプション"
+                                                                        style={{ width: '60%', marginBottom: '10px', marginLeft: '10px' }}
+                                                                        placeholder="コメント"
+                                                                        value={productPurchaseSelectOption?.display_unselected}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'display_unselected')}
+                                                                    />
+                                                                    <DragDropContext onDragEnd={result => handleDragEndProduct(result, content.id, content.type, 'products')}>
+                                                                      <Droppable droppableId='customize-pull-down'>
+
+                                                                        {(providedChild) => {
+                                                                          let arrOptions = productPurchaseSelectOption?.products;
+                                                                          return <div className="ss-user-setting-item-pull-down-drag" {...providedChild.droppableProps} ref={providedChild.innerRef}>
+                                                                            {
+                                                                                Array.isArray(arrOptions) && arrOptions
+                                                                                    .map((itemPullDown, indexPullDown, array) => {
+                                                                                      return (
+                                                                                          <Draggable draggable={true} key={itemPullDown.id} draggableId={itemPullDown.id + ''} index={indexPullDown}>
+                                                                                            {(providedChild) => (
+                                                                                                <div
+                                                                                                    {...providedChild.draggableProps}
+                                                                                                    {...providedChild.dragHandleProps}
+                                                                                                    ref={providedChild.innerRef}
+                                                                                                >
+                                                                                                  <div style={{
+                                                                                                    marginBottom: '10px',
+                                                                                                    width: '100%',
+                                                                                                    backgroundColor: '#F8F9FA',
+                                                                                                    padding: '5px',
+                                                                                                  }}>
+                                                                                                    {/*<MDBIcon fas*/}
+                                                                                                    {/*         icon="grip-horizontal"/>*/}
+                                                                                                    <div
+                                                                                                        className="ss-user-setting-product-purchase-file-img">
+                                                                                                      <InputCustom
+                                                                                                          className="ss-mg-bottom-5"
+                                                                                                          value={itemPullDown.img_url}
+                                                                                                          onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexPullDown, 'img_url')}
+                                                                                                      />
+                                                                                                      <MDBIcon
+                                                                                                          className="ss-mg-bottom-5"
+                                                                                                          fas
+                                                                                                          icon="folder-open"
+                                                                                                          onClick={() => {
+                                                                                                            setIsOpenFileReference(true)
+                                                                                                            setVarFileReference({
+                                                                                                              indexContent,
+                                                                                                              contentType: content.type,
+                                                                                                              subContentType: 'products',
+                                                                                                              indexSubContent: indexPullDown,
+                                                                                                              img: 'img_url'
+                                                                                                            })
+                                                                                                          }}
+                                                                                                      />
+                                                                                                    </div>
+                                                                                                    <div
+                                                                                                        className="ss-user-setting-product-purchase-infor-product">
+                                                                                                      <InputCustom
+                                                                                                          placeholder="タイトル"
+                                                                                                          style={{
+                                                                                                            borderTopRightRadius: '0px',
+                                                                                                            borderBottomRightRadius: '0px'
+                                                                                                          }}
+                                                                                                          className="ss-mg-bottom-5 ss-user-setting-product-purchase-input-left"
+                                                                                                          value={itemPullDown.title}
+                                                                                                          onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexPullDown, 'title')}
+                                                                                                      />
+                                                                                                      <InputCustom
+                                                                                                          placeholder="商品番号"
+                                                                                                          style={{
+                                                                                                            borderTopLeftRadius: '0px',
+                                                                                                            borderBottomLeftRadius: '0px',
+                                                                                                            borderTopRightRadius: '0px',
+                                                                                                            borderBottomRightRadius: '0px',
+                                                                                                            borderLeft: '0px',
+                                                                                                            borderRight: '0px'
+                                                                                                          }}
+                                                                                                          className="ss-mg-bottom-5 ss-user-setting-product-purchase-input-middle"
+                                                                                                          value={itemPullDown.item_number}
+                                                                                                          onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexPullDown, 'item_number')}
+                                                                                                      />
+                                                                                                      <InputNum
+                                                                                                          placeholder="値段"
+                                                                                                          className="ss-mg-bottom-5 ss-user-setting-input-limit-character"
+                                                                                                          style={{
+                                                                                                            borderTopLeftRadius: '0px',
+                                                                                                            borderBottomLeftRadius: '0px',
+                                                                                                            marginLeft: '0px',
+                                                                                                            width: '78%'
+                                                                                                          }}
+                                                                                                          value={itemPullDown.item_price}
+                                                                                                          onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexPullDown, 'item_price')}
+                                                                                                      />
+                                                                                                    </div>
+                                                                                                    <div className="ss-user-setting-product-purchase-file-img">
+                                                                                                      <ShopifyReferenceSelect
+                                                                                                          placeholder="バリアントID"
+                                                                                                          listProductVariants={listProductVariants}
+                                                                                                          value={itemPullDown.productVariantId}
+                                                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect,
+                                                                                                              indexContent,
+                                                                                                              content.type,
+                                                                                                              value,
+                                                                                                              "products",
+                                                                                                              indexPullDown,
+                                                                                                              "productVariantId")}
+                                                                                                      />
+                                                                                                      <div className="ss-mg-bottom-5 ss-shopify-icon" style={{
+                                                                                                        cursor: "default"
+                                                                                                      }}>
+                                                                                                        <img src={shopifIcon} alt=""/>
+                                                                                                      </div>
+                                                                                                    </div>
+
+                                                                                                    {array.length >= 2 &&
+                                                                                                        <MDBIcon
+                                                                                                            fas
+                                                                                                            style={{fontSize: '25px'}}
+                                                                                                            icon="times-circle"
+                                                                                                            onClick={() => handleRemoveItemProductPullDown(indexMessageSelect, indexContent, content.type, productPurchaseSelectOption.type, indexPullDown)}
+                                                                                                        />
+                                                                                                    }
+                                                                                                  </div>
+                                                                                                </div>
+                                                                                            )}
+                                                                                          </Draggable>
+                                                                                      )
+                                                                                    })
+                                                                            }
+                                                                            {providedChild.placeholder}
+                                                                          </div>
+                                                                        }}
+                                                                      </Droppable>
+                                                                    </DragDropContext>
+                                                                    <div className="ss-user-setting__item-bottom"
+                                                                         style={{
+                                                                           display: 'flex',
+                                                                           justifyContent: 'flex-end'
+                                                                         }}>
+                                                                      <MDBIcon
+                                                                          fas
+                                                                          icon="plus-circle"
+                                                                          className="ss-plus-circle-option-icon"
+                                                                          onClick={() => handleAddItemProductPullDown(indexMessageSelect, indexContent, content.type, productPurchaseSelectOption.type)}
+                                                                      />
+                                                                    </div>
+                                                                  </div>
+                                                                </div>
+                                                              </React.Fragment>
+                                                          }
+                                                        </React.Fragment>
+                                                  )}
                                                   {/* user: type = 'sms_verify' */}
                                                   {content.type === 'sms_verify' && (
-                                                    <React.Fragment>
-                                                      <div className="ss-user-setting__item-bottom">
-                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
-                                                          <SelectCustom
-                                                            id="title"
-                                                            style={{ width: '49%' }}
-                                                            value={smsVerify.title_require}
-                                                            data={dropDownTitle}
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
-                                                            keyValue="key"
-                                                          />
-                                                        </div>
-                                                      </div>
-                                                      {/* smsVerify: withTitle = true */}
-                                                      {smsVerify?.title_require === true &&
+                                                      <React.Fragment>
                                                         <div className="ss-user-setting__item-bottom">
-                                                          <InputCustom
-                                                            placeholder="タイトル"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
-                                                            value={smsVerify.title}
-                                                          />
+                                                          <div
+                                                              className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                            <SelectCustom
+                                                                id="title"
+                                                                style={{width: '49%'}}
+                                                                value={smsVerify.title_require}
+                                                                data={dropDownTitle}
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title_require')}
+                                                                keyValue="key"
+                                                            />
+                                                          </div>
                                                         </div>
-                                                      }
-                                                    </React.Fragment>
+                                                        {/* smsVerify: withTitle = true */}
+                                                        {smsVerify?.title_require === true &&
+                                                            <div className="ss-user-setting__item-bottom">
+                                                              <InputCustom
+                                                                  placeholder="タイトル"
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'title')}
+                                                                  value={smsVerify.title}
+                                                              />
+                                                            </div>
+                                                        }
+                                                      </React.Fragment>
                                                   )}
                                                   {/* user: type = 'AFTEE_payment_module' */}
                                                   {content.type === 'AFTEE_payment_module' && (
-                                                    <React.Fragment>
-                                                      <div className="ss-user-setting__item-bottom">
-                                                        <div className="ss-user-setting__item-select-bottom-wrapper-flex">
-                                                          <SelectCustom
-                                                            style={{ width: '49%' }}
-                                                            value={afteePaymentModule.type}
-                                                            data={[
+                                                      <React.Fragment>
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <div
+                                                              className="ss-user-setting__item-select-bottom-wrapper-flex">
+                                                            <SelectCustom
+                                                                style={{width: '49%'}}
+                                                                value={afteePaymentModule.type}
+                                                                data={[
                                                               { key: 'aftee', value: 'Aftee' },
                                                               { key: 'atone', value: 'Atone' },
                                                               { key: 'paidy', value: 'Paidy' },
@@ -8934,6 +9233,7 @@ const Scenario = () => {
                                   <option value="capture">キャプチャ</option>
                                   <option value="product_purchase">商品購入</option>
                                   <option value="product_purchase_radio_button">商品購入（ラジオボタン型）</option>
+                                  <option value="product_purchase_select_option">商品購入（プルダウン）</option>
                                   <option value="sms_verify">SMS Verify</option>
                                   <option value="AFTEE_payment_module">AFTEE決済モジュール</option>
                                   <option value="slider">スライダー</option>
@@ -9153,7 +9453,7 @@ const Scenario = () => {
         </div>
       </ModalShort>
       {isOpenPreview && <Preview isOpen={isOpenPreview} onOpenPreview={(isOpen) => handleOpenPreview(isOpen)} isFromScenario={true} />}
-    </div >
+    </div>
   );
 };
 
