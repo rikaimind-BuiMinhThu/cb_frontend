@@ -2464,7 +2464,7 @@ const Scenario = () => {
                                                             icon="angle-double-up"
                                                             className="ss-add-option-icon"
                                                           ></MDBIcon>
-                                                          <span>To enable</span>
+                                                          <span>有効にする</span>
                                                         </React.Fragment> :
                                                         <React.Fragment>
                                                           <MDBIcon
@@ -4348,7 +4348,7 @@ const Scenario = () => {
                                                         icon="angle-double-up"
                                                         className="ss-add-option-icon"
                                                       ></MDBIcon>
-                                                      <span>To enable</span>
+                                                      <span>有効にする</span>
                                                     </React.Fragment> :
                                                     <React.Fragment>
                                                       <MDBIcon
