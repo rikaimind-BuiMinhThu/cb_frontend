@@ -1400,6 +1400,34 @@ const Scenario = () => {
           }
         }
       );
+    } else if (messageType === 'product_purchase_select_option') {
+      dataMessages[indexMessageSelect].message_content.push(
+        {
+          id: idMax,
+          type: messageType,
+          [messageType]: {
+            title_require: false,
+            require: false,
+            type: 'customization',
+            customization: {
+              display_unselected: '選択してください',
+              options_with_comment: [{
+                id: 1,
+                productVariantId: '',
+                displayName: ''
+              }],
+              options_without_comment: [{
+                id: 1,
+                productVariantId: '',
+                displayName: ''
+              }]
+            },
+            product_number_display: false,
+            price_display: false,
+            product_name_display: false,
+          }
+        }
+      );
     } else if (messageType === 'AFTEE_payment_module') {
       dataMessages[indexMessageSelect].message_content.push(
         {
@@ -8237,6 +8265,223 @@ const Scenario = () => {
                                                       }
                                                     </>
                                                   )}
+                                                  {/* user: type = 'product_purchase_select_option' */}
+                                                  {content.type === 'product_purchase_select_option' && (
+                                                      <>
+                                                        v
+                                                        <div className="ss-user-setting__item-bottom">
+                                                          <Row style={{ width: '90%' }}>
+                                                            <Col xl={4} style={{ display: "flex", justifyContent: 'flex-start' }}>
+                                                              <CheckboxCustom
+                                                                  label="商品名表示"
+                                                                  value={productPurchaseRadioButton.product_name_display}
+                                                                  onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'product_name_display')}
+                                                              />
+                                                            </Col>
+                                                            <Col xl={5} style={{ display: "flex", justifyContent: 'flex-start' }}>
+                                                              <CheckboxCustom
+                                                                  label="商品番号表示"
+                                                                  value={productPurchaseRadioButton.product_number_display}
+                                                                  onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'product_number_display')}
+                                                              />
+                                                            </Col>
+                                                          </Row>
+                                                        </div>
+                                                        {productPurchaseRadioButton.type !== 'consume_api_respone' &&
+                                                            <React.Fragment>
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <DragDropContext onDragEnd={result => handleDragEndRadioCheckbox(result, content.id, content.type, 'products')}>
+                                                                  <Droppable droppableId='product-purchase'>
+                                                                    {(providedChild) => {
+                                                                      return <div className="ss-user-setting-item-product-purchase" {...providedChild.droppableProps} ref={providedChild.innerRef}>
+                                                                        {
+                                                                            Array.isArray(productPurchaseRadioButton?.products) && productPurchaseRadioButton?.products
+                                                                                .map((itemProduct, indexProduct, array) => {
+                                                                                  return (
+                                                                                      <Draggable draggable={true} key={itemProduct.id} draggableId={itemProduct.id + ''} index={indexProduct}>
+                                                                                        {(providedChild) => (
+                                                                                            <div {...providedChild.draggableProps} {...providedChild.dragHandleProps} ref={providedChild.innerRef} >
+                                                                                              <div
+                                                                                                  className="ss-user-setting-product-purchase-container"
+                                                                                                  style={array.length > 1 ? {marginBottom: '10px'} : {}}>
+                                                                                                <div
+                                                                                                    className="ss-user-setting-product-purchase-file-img">
+                                                                                                  <InputCustom
+                                                                                                      className="ss-mg-bottom-5"
+                                                                                                      value={itemProduct.img_url}
+                                                                                                      onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'img_url')}
+                                                                                                  />
+                                                                                                  <MDBIcon
+                                                                                                      className="ss-mg-bottom-5" fas
+                                                                                                      icon="folder-open"
+                                                                                                      onClick={() => {
+                                                                                                        setIsOpenFileReference(true)
+                                                                                                        setVarFileReference({
+                                                                                                          indexContent,
+                                                                                                          contentType: content.type,
+                                                                                                          subContentType: 'products',
+                                                                                                          indexSubContent: indexProduct,
+                                                                                                          img: 'img_url'
+                                                                                                        })
+                                                                                                      }}
+                                                                                                  />
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    className="ss-user-setting-product-purchase-infor-product">
+                                                                                                  <InputCustom
+                                                                                                      placeholder="タイトル"
+                                                                                                      style={{
+                                                                                                        borderTopRightRadius: '0px',
+                                                                                                        borderBottomRightRadius: '0px'
+                                                                                                      }}
+                                                                                                      className="ss-mg-bottom-5 ss-user-setting-product-purchase-input-left"
+                                                                                                      value={itemProduct.title}
+                                                                                                      onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'title')}
+                                                                                                  />
+                                                                                                  <InputCustom
+                                                                                                      placeholder="商品番号"
+                                                                                                      style={{
+                                                                                                        borderTopLeftRadius: '0px',
+                                                                                                        borderBottomLeftRadius: '0px',
+                                                                                                        borderTopRightRadius: '0px',
+                                                                                                        borderBottomRightRadius: '0px',
+                                                                                                        borderLeft: '0px',
+                                                                                                        borderRight: '0px'
+                                                                                                      }}
+                                                                                                      className="ss-mg-bottom-5 ss-user-setting-product-purchase-input-middle"
+                                                                                                      value={itemProduct.item_number}
+                                                                                                      onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'item_number')}
+                                                                                                  />
+                                                                                                  <InputNum
+                                                                                                      placeholder="値段"
+                                                                                                      className="ss-mg-bottom-5 ss-user-setting-input-limit-character"
+                                                                                                      style={{
+                                                                                                        borderTopLeftRadius: '0px',
+                                                                                                        borderBottomLeftRadius: '0px',
+                                                                                                        marginLeft: '0px',
+                                                                                                        width: '78%'
+                                                                                                      }}
+                                                                                                      value={itemProduct.item_price}
+                                                                                                      onChange={(value) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'products', indexProduct, 'item_price')}
+                                                                                                  />
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    className="ss-user-setting-product-purchase-sub-infor">
+                                                                                                </div>
+                                                                                                <div
+                                                                                                    className="ss-user-setting-product-purchase-file-img">
+                                                                                                  <ShopifyReferenceSelect
+                                                                                                      placeholder="バリアントID"
+                                                                                                      listProductVariants={listProductVariants}
+                                                                                                      value={itemProduct.productVariantId}
+                                                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect,
+                                                                                                          indexContent,
+                                                                                                          content.type,
+                                                                                                          value,
+                                                                                                          "products",
+                                                                                                          indexProduct,
+                                                                                                          "productVariantId")}
+                                                                                                  />
+                                                                                                  <div className="ss-mg-bottom-5 ss-shopify-icon" style={{
+                                                                                                    cursor: "default"
+                                                                                                  }}>
+                                                                                                    <img src={shopifIcon} alt=""/>
+                                                                                                  </div>
+                                                                                                  {/*<InputCustom*/}
+                                                                                                  {/*    className="ss-mg-bottom-5"*/}
+                                                                                                  {/*    placeholder="バリアントID"*/}
+                                                                                                  {/*    value={itemProduct.displayName}*/}
+                                                                                                  {/*    readOnly={true}*/}
+                                                                                                  {/*/>*/}
+                                                                                                  {/*<div className="ss-mg-bottom-5 ss-shopify-icon"*/}
+                                                                                                  {/*     onClick={() => {*/}
+                                                                                                  {/*       setIsOpenShopifyReference(true)*/}
+                                                                                                  {/*       setVarShopifyReference({*/}
+                                                                                                  {/*         indexContent,*/}
+                                                                                                  {/*         contentType: content.type,*/}
+                                                                                                  {/*         subContentType: 'products',*/}
+                                                                                                  {/*         indexSubContent: indexProduct,*/}
+                                                                                                  {/*         productVariantId: 'productVariantId',*/}
+                                                                                                  {/*         displayName: 'displayName'*/}
+                                                                                                  {/*       })*/}
+                                                                                                  {/*     }}>*/}
+                                                                                                  {/*  <img src={shopifIcon} alt=""/>*/}
+                                                                                                  {/*</div>*/}
+                                                                                                  {/*<MDBIcon*/}
+                                                                                                  {/*    className="ss-mg-bottom-5" fas*/}
+                                                                                                  {/*    icon="folder-open"*/}
+                                                                                                  {/*    onClick={() => {*/}
+                                                                                                  {/*      setIsOpenFileReference(true)*/}
+                                                                                                  {/*      setVarFileReference({*/}
+                                                                                                  {/*        indexContent,*/}
+                                                                                                  {/*        contentType: content.type,*/}
+                                                                                                  {/*        subContentType: 'products',*/}
+                                                                                                  {/*        indexSubContent: indexProduct,*/}
+                                                                                                  {/*        img: 'img_url'*/}
+                                                                                                  {/*      })*/}
+                                                                                                  {/*    }}*/}
+                                                                                                  {/*/>*/}
+                                                                                                </div>
+                                                                                                {array.length > 1 &&
+                                                                                                    <div
+                                                                                                        className="ss-user-setting-product-purchase-times-icons">
+                                                                                                      <MDBIcon fas
+                                                                                                               icon="times-circle"
+                                                                                                               onClick={() => {
+                                                                                                                 let arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].products];
+                                                                                                                 let startArr = arrMessage.slice(0, indexProduct);
+                                                                                                                 let lastArr = arrMessage.slice(indexProduct + 1, arrMessage.length);
+                                                                                                                 console.log(arrMessage, [...startArr, ...lastArr]);
+                                                                                                                 dataMessages[indexMessageSelect].message_content[indexContent][content.type].products = [...startArr, ...lastArr];
+                                                                                                                 dataMessages[indexMessageSelect].message_content[indexContent][content.type].initial_selection = dataMessages[indexMessageSelect].message_content[indexContent][content.type].initial_selection.filter(item => item !== itemProduct.id);
+                                                                                                                 setDataMessages([...dataMessages]);
+                                                                                                               }}/>
+                                                                                                    </div>
+                                                                                                }
+                                                                                              </div>
+                                                                                            </div>
+                                                                                        )}
+                                                                                      </Draggable>
+                                                                                  )
+                                                                                })
+                                                                        }
+                                                                        {providedChild.placeholder}
+                                                                      </div>
+                                                                    }}
+                                                                  </Droppable>
+                                                                </DragDropContext>
+                                                              </div>
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <div style={{width: '90%'}}>
+                                                                  <Button
+                                                                      style={{
+                                                                        margin: '0px',
+                                                                        backgroundColor: '#327AED',
+                                                                        textTransform: 'lowercase'
+                                                                      }}
+                                                                      onClick={() => {
+                                                                        let arrMess = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].products];
+                                                                        let idMax;
+                                                                        if (arrMess.length !== 0) {
+                                                                          idMax = Math.max(...arrMess.map(item => item.id)) + 1;
+                                                                        } else {
+                                                                          idMax = 1;
+                                                                        }
+                                                                        dataMessages[indexMessageSelect].message_content[indexContent][content.type].products.push({
+                                                                          id: idMax,
+                                                                          is_quantity_designation: false
+                                                                        });
+                                                                        setDataMessages([...dataMessages]);
+                                                                      }}
+                                                                  >
+                                                                    追加
+                                                                  </Button>
+                                                                </div>
+                                                              </div>
+                                                            </React.Fragment>
+                                                        }
+                                                      </>
+                                                  )}
                                                   {/* user: type = 'sms_verify' */}
                                                   {content.type === 'sms_verify' && (
                                                     <React.Fragment>
@@ -8934,6 +9179,7 @@ const Scenario = () => {
                                   <option value="capture">キャプチャ</option>
                                   <option value="product_purchase">商品購入</option>
                                   <option value="product_purchase_radio_button">商品購入（ラジオボタン型）</option>
+                                  <option value="product_purchase_select_option">商品購入（プルダウン）</option>
                                   <option value="sms_verify">SMS Verify</option>
                                   <option value="AFTEE_payment_module">AFTEE決済モジュール</option>
                                   <option value="slider">スライダー</option>
