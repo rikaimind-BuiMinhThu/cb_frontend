@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Line, Pie } from 'react-chartjs-2';
 import { Card, CardHeader, CardBody, CardFooter, CardTitle, Row, Col } from 'reactstrap';
@@ -23,7 +24,8 @@ function Dashboard() {
   const [userTotal, setUserTotal] = useState();
   const [isAdminDeel, setIsAdminDeel] = useState(false);
   const [lineDataWithoutRole, setLineDataWithoutRole] = useState([]);
-  const client = JSON.parse(sessionStorage.getItem('client'));
+  // const client = JSON.parse(sessionStorage.getItem('client'));
+  const client = JSON.parse(localStorage.getItem('client'));
 
   React.useEffect(() => {
     var cook = Cookies.get('user_role');

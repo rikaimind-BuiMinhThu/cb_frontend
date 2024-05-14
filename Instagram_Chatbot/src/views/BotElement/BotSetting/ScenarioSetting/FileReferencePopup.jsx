@@ -25,7 +25,7 @@ function FileReferencePopup({ onCancel, onReferFile, acceptFile = ['image', 'pdf
     }, [fileType])
 
     const getListFile = (pgIndex) => {
-        api.get(`/api/v1//managements/file?page=${pgIndex}&file_type=${fileType}`).then(res => {
+        api.get(`/api/v1/managements/file?page=${pgIndex}&file_type=${fileType}`).then(res => {
             console.log(res);
             setDataFile(res.data.data);
             let totalPage = Math.ceil(res?.data?.total / 25);

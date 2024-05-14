@@ -221,6 +221,10 @@ function Preview() {
   const [activePopupCloseBot, setActivePopupCloseBot] = useState(true);
   const [titleBubble, setTitleBubble] = useState("");
   const [styleModal, setStyleModal] = useState({});
+
+  const [scenarioUserResponses, setScenarioUserResponses] = useState([])
+  const [checkoutUrl, setCheckoutUrl] = useState("")
+
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
       current_url: window.location.href,
@@ -276,6 +280,7 @@ function Preview() {
     return check;
   }
 
+  let socket;
   //get chat bot setting
   useEffect(() => {
     let botIdGet = params.get("bot_id");
@@ -313,6 +318,27 @@ function Preview() {
         setBottomMarginSp(result?.bottom_margin_sp);
       }
     });
+
+    // socket = new WebSocket("ws://localhost:3000/cable");
+    //
+    // socket.onopen = () => {
+    //   const msg = {
+    //     command: "subscribe",
+    //     identifier: JSON.stringify({
+    //       id: uuid,
+    //       channel: "ShopifyChannel"
+    //     })
+    //   }
+    //   socket.send(JSON.stringify(msg))
+    // };
+    //
+    // socket.onmessage = (event) => {
+    //   const data = JSON.parse(event.data);
+    // };
+    //
+    // return () => {
+    //   socket.close();
+    // };
   }, []);
 
   useEffect(() => {
@@ -533,6 +559,8 @@ function Preview() {
               res.data.chatbot.font_color = font_color;
               res.data.chatbot.icon_mess = icon_mess;
             }
+
+            checkUpdateMessagesSessionStorage(res.data.data.updated_at)
 
             setBotInfor(res.data.chatbot);
             if (res.data.variables) {
@@ -1041,8 +1069,8 @@ function Preview() {
     return false;
   };
 
-  const handleValidateField = () => {
-    let contentArr = [...dataMessages[indexMessageRender].message_content];
+  const handleValidateField = (index) => {
+    let contentArr = [...renderMessageArr[index].message_content];
     let isValid = true;
     let errorsMess = {};
 
@@ -1061,7 +1089,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueRight)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+                `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
               ] = messageError;
               isValid = false;
             }
@@ -1069,17 +1097,17 @@ function Preview() {
             //   || contentType[contentType.type].valueLeft?.length > limitTo
             //   || contentType[contentType.type].valueRight?.length < limitFrom
             //   || contentType[contentType.type].valueRight?.length > limitTo) {
-            //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+            //   errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
             //   isValid = false;
             // }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
           //  else if (contentType[contentType.type].value.length < limitFrom || contentType[contentType.type].value.length > limitTo) {
-          //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          //   errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
           //   isValid = false;
           // }
         } else if (contentType.type === "phone_number") {
@@ -1090,13 +1118,13 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].value3)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+                `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
               ] = messageError;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1109,7 +1137,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueConfirm)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1118,7 +1146,7 @@ function Preview() {
           //     || contentType[contentType.type].value.length > limitTo
           //     || contentType[contentType.type].valueConfirm.length < limitFrom
           //     || contentType[contentType.type].valueConfirm.length > limitTo)) {
-          //   errorsMess[`message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
+          //   errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
           //   isValid = false;
           // }
         } else if (contentType.type === "customization") {
@@ -1128,13 +1156,13 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueRight)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+                `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
               ] = messageError;
               isValid = false;
             }
           } else if (stringNullOrEmpty(contentType[contentType.type].value)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1144,7 +1172,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueMinute)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1158,7 +1186,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueDay)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1168,7 +1196,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueDay)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1181,7 +1209,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueMonth)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1194,7 +1222,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueMinute)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1206,7 +1234,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueMinute2)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1220,7 +1248,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].valueDay2)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1230,14 +1258,14 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].city)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === "attaching_file") {
           if (stringNullOrEmpty(contentType.value)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1247,7 +1275,7 @@ function Preview() {
         ) {
           if (stringNullOrEmpty(contentType.date_select)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1257,7 +1285,7 @@ function Preview() {
             stringNullOrEmpty(contentType.end_date_select)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1267,14 +1295,14 @@ function Preview() {
             contentType.isAgree === false
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === "radio_button") {
           if (stringNullOrEmpty(contentType.initial_selection)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1285,7 +1313,7 @@ function Preview() {
               contentType.checkedValue.length === 0
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+                `message${index}_content${i}_${contentArr[i].type}`
               ] = messageError;
               isValid = false;
             } else if (
@@ -1294,7 +1322,7 @@ function Preview() {
                 parseInt(contentType.selection_limit_from)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+                `message${index}_content${i}_${contentArr[i].type}`
               ] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
               isValid = false;
             } else if (
@@ -1303,7 +1331,7 @@ function Preview() {
                 parseInt(contentType.selection_limit_to)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+                `message${index}_content${i}_${contentArr[i].type}`
               ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
               isValid = false;
             }
@@ -1313,7 +1341,7 @@ function Preview() {
               contentType.initial_selection_picture.length === 0
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+                `message${index}_content${i}_${contentArr[i].type}`
               ] = messageError;
               isValid = false;
             } else if (
@@ -1322,7 +1350,7 @@ function Preview() {
                 parseInt(contentType.selection_limit_from)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+                `message${index}_content${i}_${contentArr[i].type}`
               ] = `この項目は、${contentType.selection_limit_from}個以上選択してください。`;
               isValid = false;
             } else if (
@@ -1331,7 +1359,7 @@ function Preview() {
                 parseInt(contentType.selection_limit_to)
             ) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+                `message${index}_content${i}_${contentArr[i].type}`
               ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
               isValid = false;
             }
@@ -1339,47 +1367,47 @@ function Preview() {
         } else if (contentArr[i].type === "carousel") {
           if (stringNullOrEmpty(contentType.initial_selection)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === "capture") {
           if (stringNullOrEmpty(contentType.value)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           } else if (
             captcha
               .filter(
                 (item) =>
-                  item.index === indexMessageRender && item.indexContent === i
+                  item.index === index && item.indexContent === i
               )?.[0]
               ?.text.toLowerCase() !== contentType.value.toLowerCase()
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = "認証コードが間違っています。";
             isValid = false;
           }
         } else if (contentArr[i].type === "product_purchase") {
           if (contentType.initial_selection.length === 0) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === "slider") {
           if (stringNullOrEmpty(contentType.value)) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === "product_purchase_radio_button") {
           if (contentType.initial_selection.length === 0) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1389,7 +1417,7 @@ function Preview() {
             stringNullOrEmpty(contentType.initial_selection)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           } else if (
@@ -1397,7 +1425,7 @@ function Preview() {
             stringNullOrEmpty(contentType.initial_selection_picture)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1407,7 +1435,7 @@ function Preview() {
             stringNullOrEmpty(contentType[contentType.type].value)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1416,7 +1444,7 @@ function Preview() {
           stringNullOrEmpty(contentType[contentType.type].value)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = messageError;
           isValid = false;
         } else if (
@@ -1425,7 +1453,7 @@ function Preview() {
             contentType[contentType.type]?.value?.length > limitTo)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
           isValid = false;
         }
@@ -1438,7 +1466,7 @@ function Preview() {
               parseInt(contentType.selection_limit_to)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
             isValid = false;
           } else if (
@@ -1448,7 +1476,7 @@ function Preview() {
               parseInt(contentType.selection_limit_to)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = `この項目は、${contentType.selection_limit_to}個以下選択してください。`;
             isValid = false;
           }
@@ -1465,7 +1493,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].value3))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1477,7 +1505,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueHour))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1494,7 +1522,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueDay))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1506,7 +1534,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueDay))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1521,7 +1549,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueMonth))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1539,7 +1567,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueMinute))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1555,7 +1583,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueMinute2))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1575,7 +1603,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].valueDay2))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1587,7 +1615,7 @@ function Preview() {
               stringNullOrEmpty(contentType[contentType.type].city))
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageError;
             isValid = false;
           }
@@ -1605,7 +1633,7 @@ function Preview() {
               contentType[contentType.type].valueRight?.length < limitFrom)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = `${limitFrom}文字以上入力してください。`;
             isValid = false;
           } else if (
@@ -1615,7 +1643,7 @@ function Preview() {
               contentType[contentType.type].valueRight?.length > limitTo)
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = `${limitTo}文字以下入力してください。`;
             isValid = false;
           }
@@ -1624,7 +1652,7 @@ function Preview() {
           contentType[contentType.type].value?.length < limitFrom
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `${limitFrom}文字以上入力してください。`;
           isValid = false;
         } else if (
@@ -1632,7 +1660,7 @@ function Preview() {
           contentType[contentType.type].value?.length > limitTo
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `${limitTo}文字以下入力してください。`;
           isValid = false;
         } else if (
@@ -1641,7 +1669,7 @@ function Preview() {
           !REGEX_PASSWORD.test(contentType[contentType.type].value)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
           isValid = false;
         }
@@ -1653,7 +1681,7 @@ function Preview() {
           contentType.products.forEach((itemProduct, indexProduct) => {
             if (item === itemProduct.id && !itemProduct.quantity_select) {
               errorsMess[
-                `message${indexMessageRender}_content${i}_${contentArr[i].type}_${indexProduct}`
+                `message${index}_content${i}_${contentArr[i].type}_${indexProduct}`
               ] = messageError;
               isValid = false;
             }
@@ -1667,7 +1695,7 @@ function Preview() {
             contentType[contentType.type].valueConfirm?.length < limitFrom)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `${limitFrom}文字以上入力してください。`;
           isValid = false;
         } else if (
@@ -1677,7 +1705,7 @@ function Preview() {
             contentType[contentType.type].valueConfirm?.length > limitTo)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `${limitTo}文字以下入力してください。`;
           isValid = false;
         } else if (
@@ -1685,7 +1713,7 @@ function Preview() {
           !REGEX_PASSWORD.test(contentType[contentType.type].value)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
           isValid = false;
         } else if (
@@ -1693,7 +1721,7 @@ function Preview() {
           !REGEX_PASSWORD.test(contentType[contentType.type].valueConfirm)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `英数字('A-Z','a-z','0-9')が使用できます。`;
           isValid = false;
         } else if (
@@ -1703,7 +1731,7 @@ function Preview() {
             contentType[contentType.type].valueConfirm
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = "パスワードとパスワード確認が一致しません。";
           isValid = false;
         }
@@ -1716,7 +1744,7 @@ function Preview() {
           contentType[contentType.type].value.length < limitFrom
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = `${limitFrom}文字以上入力してください。`;
           isValid = false;
         } else if (
@@ -1724,24 +1752,24 @@ function Preview() {
           contentType[contentType.type].value.length > limitTo
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = `${limitTo}文字以下入力してください。`;
           isValid = false;
         }
       } else if (contentArr[i].type === "zip_code_address") {
         if (
           errors[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] &&
           errors[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] !== messageError
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] =
             errors[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ];
           isValid = false;
         } else {
@@ -1799,7 +1827,7 @@ function Preview() {
           }
           if (isValidZipCode === false) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+              `message${index}_content${i}_${contentArr[i].type}`
             ] = messageError;
             isValid = false;
           }
@@ -1807,7 +1835,7 @@ function Preview() {
       } else if (
         contentType.type === "phone_number" &&
         !errorsMess[
-          `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+          `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
         ]
       ) {
         let REGEX_PHONE = /^0\d{9}$|^0\d{10}$/;
@@ -1823,7 +1851,7 @@ function Preview() {
             )
           ) {
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = "入力形式が正しくありません。";
             isValid = false;
           }
@@ -1832,7 +1860,7 @@ function Preview() {
           !REGEX_PHONE.test(contentType[contentType.type].value)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = "入力形式が正しくありません。";
           isValid = false;
         }
@@ -1844,7 +1872,7 @@ function Preview() {
           /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/;
         if (!REGEX_URLS.test(contentType[contentType.type].value)) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `有効なURL形式で指定してください。`;
           isValid = false;
         }
@@ -1854,7 +1882,7 @@ function Preview() {
       ) {
         if (!REGEX_EMAIL.test(contentType[contentType.type].value)) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
         }
@@ -1864,7 +1892,7 @@ function Preview() {
           !REGEX_EMAIL.test(contentType[contentType.type].value)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
         } else if (
@@ -1872,7 +1900,7 @@ function Preview() {
           !REGEX_EMAIL.test(contentType[contentType.type].valueConfirm)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `有効なメールアドレス形式で指定してください。`;
           isValid = false;
         } else if (
@@ -1882,19 +1910,19 @@ function Preview() {
             contentType[contentType.type].valueConfirm
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+            `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
           ] = `メールアドレスとメールアドレス確認が一致しません。`;
           isValid = false;
         }
       } else if (
         contentArr[i].type === "attaching_file" &&
-        errors[`message${indexMessageRender}_content${i}_${contentArr[i].type}`]
+        errors[`message${index}_content${i}_${contentArr[i].type}`]
       ) {
         errorsMess[
-          `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+          `message${index}_content${i}_${contentArr[i].type}`
         ] =
           errors[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ];
         isValid = false;
       } else if (contentArr[i].type === "credit_card_payment") {
@@ -1916,7 +1944,7 @@ function Preview() {
           stringNullOrEmpty(contentType.month)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = messageError;
           isValid = false;
         } else if (
@@ -1933,7 +1961,7 @@ function Preview() {
               (contentType.card_number4 + "").length !== 4))
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = "クレジットカード番号は無効です。";
           isValid = false;
         } else if (
@@ -1943,14 +1971,14 @@ function Preview() {
           ).isBefore(moment().format("YYYY-MM"))
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = "有効期限に誤りがあるために、決済を完了できませんでした。";
           isValid = false;
         }
       } else if (
         contentArr[i].type === "card_payment_radio_button" &&
         errorsMess[
-          `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+          `message${index}_content${i}_${contentArr[i].type}`
         ] !== messageError &&
         (((contentType?.initial_selection ||
           contentType?.card_linked_setting.length > 0) &&
@@ -1979,7 +2007,7 @@ function Preview() {
           stringNullOrEmpty(contentType.month)
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = messageError;
           isValid = false;
         } else if (
@@ -1996,7 +2024,7 @@ function Preview() {
               (contentType.card_number4 + "").length !== 4))
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = "クレジットカード番号は無効です。";
           isValid = false;
         } else if (
@@ -2006,7 +2034,7 @@ function Preview() {
           ).isBefore(moment().format("YYYY-MM"))
         ) {
           errorsMess[
-            `message${indexMessageRender}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
           ] = "有効期限に誤りがあるために、決済を完了できませんでした。";
           isValid = false;
         }
@@ -2063,12 +2091,12 @@ function Preview() {
           ) {
             isValid = false;
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageLog;
           } else if (!contentType[contentType.type].isSplitInput && REGEX_CHECK.test(contentType[contentType.type].value)) {
             isValid = false;
             errorsMess[
-              `message${indexMessageRender}_content${i}_${contentArr[i].type}_${contentType.type}`
+              `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
             ] = messageLog;
           }
         }
@@ -2084,27 +2112,109 @@ function Preview() {
     return isValid;
   };
 
-  const onClickNext = async (indexMessage) => {
-    if (!handleValidateField()) {
+  const setMessagesSessionStorage = (data) => {
+    const temp = getMessagesSessionStorage()
+    const bot_id = objParam.bot_id || Number(objParam?.current_url_param?.bot_id)
+    sessionStorage.setItem(`messages_bot_${bot_id}`, JSON.stringify(dataMessages.map(x => {
+      if (x.id === data.id) {
+        return { ...data }
+      }
+      return temp && temp.find(o => o.id === x.id) ? temp.find(o => o.id === x.id) : { ...x }
+    })))
+  }
+
+  const getMessagesSessionStorage = () => {
+    const bot_id = objParam.bot_id || Number(objParam?.current_url_param?.bot_id)
+    const data = sessionStorage.getItem(`messages_bot_${bot_id}`)
+    if (!data) return null;
+    return JSON.parse(data)
+  }
+
+  const checkUpdateMessagesSessionStorage = (updated_at) => {
+    const temp = sessionStorage.getItem("bot_update_at")
+    const bot_id = objParam.bot_id || Number(objParam?.current_url_param?.bot_id)
+    if (temp !== updated_at) {
+      sessionStorage.removeItem(`messages_bot_${bot_id}`)
+      sessionStorage.setItem("bot_update_at", updated_at)
+    }
+  }
+
+  const createOrAddLinesCart = async (res) => {
+    const newArr = scenarioUserResponses.concat(res.data?.data || [])
+    setScenarioUserResponses([...newArr])
+
+    const products = JSON.parse(newArr.findLast(x => x.data_input_name === "text_with_thumbnail_image")?.text_value || null)
+    const quantity = newArr.findLast(x => x.data_input_name === "quantity")?.integer_value || 1
+    const product = products?.products?.findLast(x => x.id === products?.initial_selection)
+
+    const email = newArr.findLast(x => x.data_input_name === "email")?.string_value || null
+    const user_name = newArr.findLast(x => x.data_input_name === "user_name")?.string_value || null
+    const user_name_kana = newArr.findLast(x => x.data_input_name === "user_name_kana")?.string_value || null
+
+    const zip_code_address = newArr.findLast(x => x.data_input_name === "zip_code_address")?.text_value || null
+
+    if (product && quantity && user_name && user_name_kana && email && zip_code_address) {
+      await api
+        .post('/api/v1/shopify/cart_create', {
+          first_name: JSON.parse(user_name)?.valueLeft || JSON.parse(user_name_kana)?.valueLeft,
+          last_name: JSON.parse(user_name)?.valueRight || JSON.parse(user_name_kana)?.valueRight,
+          email: email || "example@gmail.com",
+          zip: JSON.parse(zip_code_address)?.value_post_code || "950-0945",
+          province: JSON.parse(zip_code_address)?.value_prefecture,
+          city: JSON.parse(zip_code_address)?.value_municipality,
+          address1: JSON.parse(zip_code_address)?.value_address,
+          address2: JSON.parse(zip_code_address)?.value_building_name,
+          lines: [
+            {
+              "merchandiseId": product.productVariantId,
+              "quantity": quantity
+            }
+          ],
+          scenario_id: scenarioId,
+          uuid: uuid
+        })
+        .then(async res => {
+          sessionStorage.setItem("cart", JSON.stringify(res?.data?.data))
+          setCheckoutUrl(res?.data?.data?.cartCreate?.cart?.checkoutUrl)
+        })
+        .catch(e => {
+          console.log(e)
+        })
+    }
+  }
+
+  const onClickNext = async (indexMessage, message) => {
+    let indexClickLocation = indexMessageRender
+    for (let i = 0; i < dataMessages.length; i++) {
+      if (dataMessages[i]?.id === message?.id) {
+        indexClickLocation = i
+        break
+      }
+    }
+
+    if (!handleValidateField(indexClickLocation)) {
       return;
     }
-    renderMessageArr[indexMessage].disabled = true;
     let renderMessage = [...renderMessageArr];
+    renderMessageArr[indexMessage].disabled = true;
+    setRenderMessageArr(renderMessageArr)
     let index;
     let isPauseScroll = false;
     let delayRender;
-    setIndexUser((prev) => prev + 1);
+    if (indexClickLocation === indexMessageRender) setIndexUser(prev => prev + 1);
     let data_submit = {
       scenario_id: scenarioId,
       message: renderMessageArr[indexMessage],
       user_id: uuid,
       bot_type: "web"
     };
-    if (dataMessages[indexMessageRender].message_content[0]?.text_input?.save_input_content === "create_order") {
+    if (dataMessages[indexClickLocation].message_content[0]?.text_input?.save_input_content === "create_order") {
       await new Promise((resolve) => {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
-          .then((res) => {
+          .then(async (res) => {
+            setMessagesSessionStorage(renderMessageArr[indexMessage])
+            await createOrAddLinesCart(res)
             resolve();
           })
           .catch((error) => {
@@ -2136,11 +2246,13 @@ function Preview() {
           });
       });
     }
-    if (dataMessages.length - 1 === indexMessageRender ) {
+    if (dataMessages.length - 1 === indexClickLocation) {
       await new Promise((resolve) => {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
-          .then((res) => {
+          .then(async (res) => {
+            setMessagesSessionStorage(renderMessageArr[indexMessage])
+            await createOrAddLinesCart(res)
             resolve();
           })
           .catch((error) => {
@@ -2183,19 +2295,34 @@ function Preview() {
           window.parent.location.href = urlThanksPage;
         }, 2000);
       }
-    } else {
-      api
-        .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
-        .then((res) => {})
-        .catch((error) => {
-          console.log(error);
-          if (error.response?.data.code === 0) {
-            tokenExpired();
-          }
-        });
+
+      for (let i = 0; i < renderMessage.length; i++) {
+        renderMessage[i].disabled = true;
+      }
+      return setRenderMessageArr(renderMessage)
+      // renderMessage[indexMessage].disabled = false
+      // setRenderMessageArr(renderMessage)
+      // return;
+    }
+    await api
+      .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
+      .then(async (res) => {
+        setMessagesSessionStorage(renderMessageArr[indexMessage])
+        await createOrAddLinesCart(res)
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response?.data.code === 0) {
+          tokenExpired();
+        }
+      });
+
+    if (!dataMessages[indexMessageRender + 1] || indexMessageRender > indexClickLocation) {
+      renderMessage[indexMessage].disabled = false
+      setRenderMessageArr(renderMessage)
+      return;
     }
 
-    if (!dataMessages[indexMessageRender + 1]) return;
     if (dataMessages[indexMessageRender + 1].belong_to === 'user' || dataMessages[indexMessageRender + 1].belong_to === 'bot') {
       for (let i = indexMessageRender + 1; i < dataMessages.length; i++) {
         if (dataMessages[i].hidden !== true) {
@@ -2296,6 +2423,8 @@ function Preview() {
                     setIndexMessageRender(i);
                     renderMessage.pop();
                     renderMessage.push({});
+                    renderMessage[indexMessage].disabled = false;
+                    renderMessageArr[indexMessage].disabled = false;
                     setRenderMessageArr([...renderMessage]);
                   })
                   .then(() => {
@@ -2349,6 +2478,8 @@ function Preview() {
               let data = {
                 variables: variablesData,
               };
+              renderMessage[indexMessage].disabled = false;
+              renderMessageArr[indexMessage].disabled = false;
               renderMessage.push({});
               setRenderMessageArr([...renderMessage]);
 
@@ -2401,6 +2532,8 @@ function Preview() {
                 });
                 setVariables([...variables]);
               }
+              renderMessage[indexMessage].disabled = false;
+              renderMessageArr[indexMessage].disabled = false;
               renderMessage.push({});
               setRenderMessageArr([...renderMessage]);
               setIndexMessageRender(i);
@@ -2442,6 +2575,8 @@ function Preview() {
                 }, 1000));
               })
                 .then((data) => {
+                  renderMessage[indexMessage].disabled = false;
+                  renderMessageArr[indexMessage].disabled = false;
                   setIndexMessageRender(i);
                   renderMessage.push(data);
                   setRenderMessageArr([...renderMessage]);
@@ -2585,6 +2720,13 @@ function Preview() {
               }, 1000));
             }).then((data) => {
               setIndexMessageRender(i);
+              const dataSessionStorage = getMessagesSessionStorage()
+              if (dataSessionStorage) {
+                const temp = dataSessionStorage.find(x => x.id === data.id)
+                if (temp) data.message_content = [...temp.message_content]
+              }
+              renderMessage[indexMessage].disabled = false;
+              renderMessageArr[indexMessage].disabled = false;
               renderMessage.push(data);
               setRenderMessageArr([...renderMessage]);
               if (isPauseScroll === false) {
@@ -2723,6 +2865,8 @@ function Preview() {
             resolve({ ...dataMessages[indexMessageRender + 1] });
           }, 1000));
         }).then((data) => {
+          renderMessage[indexMessage].disabled = false;
+          renderMessageArr[indexMessage].disabled = false;
           setIndexMessageRender(indexMessageRender + 1);
           renderMessage.push(data);
           setRenderMessageArr([...renderMessage]);
@@ -2785,6 +2929,8 @@ function Preview() {
                   resolve({ ...dataMessages[i] });
                 }, 1000));
               }).then((data) => {
+                renderMessage[indexMessage].disabled = false;
+                renderMessageArr[indexMessage].disabled = false;
                 setIndexMessageRender(i);
                 renderMessage.push(data);
                 setRenderMessageArr([...renderMessage]);
@@ -2798,6 +2944,8 @@ function Preview() {
               if (dataMessages[i]?.message_content[0].type === "delay") {
                 if (dataMessages[i]?.message_content[0]?.delay.typing_on) {
                   await new Promise((resolve) => {
+                    renderMessage[indexMessage].disabled = false;
+                    renderMessageArr[indexMessage].disabled = false;
                     renderMessage.push({ ...dataMessages[i] });
                     setRenderMessageArr([...renderMessage]);
                     resolve();
@@ -2876,6 +3024,8 @@ function Preview() {
                   });
                   setVariables([...variables]);
                 }
+                renderMessage[indexMessage].disabled = false;
+                renderMessageArr[indexMessage].disabled = false;
                 renderMessage.push({});
                 setRenderMessageArr([...renderMessage]);
                 setIndexMessageRender(i);
@@ -2897,6 +3047,8 @@ function Preview() {
                   });
                   setVariables([...variables]);
                 }
+                renderMessage[indexMessage].disabled = false;
+                renderMessageArr[indexMessage].disabled = false;
                 renderMessage.push({});
                 setRenderMessageArr([...renderMessage]);
                 setIndexMessageRender(i);
@@ -2904,6 +3056,8 @@ function Preview() {
               } else if (
                 dataMessages[i]?.message_content[0]?.type === "pause"
               ) {
+                renderMessage[indexMessage].disabled = false;
+                renderMessageArr[indexMessage].disabled = false;
                 renderMessage.push({});
                 setRenderMessageArr([...renderMessage]);
                 setIndexMessageRender(i);
@@ -2940,6 +3094,8 @@ function Preview() {
                     resolve({ ...dataMessages[i] });
                   }, 1000));
                 }).then((data) => {
+                  renderMessage[indexMessage].disabled = false;
+                  renderMessageArr[indexMessage].disabled = false;
                   setIndexMessageRender(i);
                   renderMessage.push(data);
                   setRenderMessageArr([...renderMessage]);
@@ -2950,12 +3106,16 @@ function Preview() {
               }
             }
           } else {
+            renderMessage[indexMessage].disabled = false;
+            renderMessageArr[indexMessage].disabled = false;
             renderMessage.push({});
             setRenderMessageArr([...renderMessage]);
           }
         }
       }
     }
+
+    // renderMessageArr[indexMessage].disabled = false;
   };
 
   const onChangeValue = (
@@ -2964,45 +3124,57 @@ function Preview() {
     value,
     field,
     subFiled,
-    name
+    name,
+    message
   ) => {
+    let index = indexMessageRender
+
+    if (message) {
+      for (let i = 0; i < dataMessages.length; i++) {
+        if (dataMessages[i]?.id === message?.id) {
+          index = i
+          break
+        }
+      }
+    }
+
     if (name) {
       if (
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[index].message_content[indexContent][
           contentType
         ][field][subFiled] === undefined
       ) {
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[index].message_content[indexContent][
           contentType
         ][field][subFiled] = {};
       }
-      dataMessages[indexMessageRender].message_content[indexContent][
+      dataMessages[index].message_content[indexContent][
         contentType
       ][field][subFiled][name] = value;
     } else if (subFiled) {
       if (
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[index].message_content[indexContent][
           contentType
         ][field] === undefined
       ) {
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[index].message_content[indexContent][
           contentType
         ][field] = {};
       }
-      dataMessages[indexMessageRender].message_content[indexContent][
+      dataMessages[index].message_content[indexContent][
         contentType
       ][field][subFiled] = value;
     } else if (field) {
       if (
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[index].message_content[indexContent][
           contentType
         ] === undefined
       ) {
-        dataMessages[indexMessageRender].message_content[indexContent][
+        dataMessages[index].message_content[indexContent][
           contentType
         ] = {};
       }
-      dataMessages[indexMessageRender].message_content[indexContent][
+      dataMessages[index].message_content[indexContent][
         contentType
       ][field] = value;
     }
@@ -3013,7 +3185,7 @@ function Preview() {
       value.length > 0
     ) {
       let dataContentType = {
-        ...dataMessages[indexMessageRender].message_content[indexContent][
+        ...dataMessages[index].message_content[indexContent][
           contentType
         ],
       };
@@ -3065,7 +3237,7 @@ function Preview() {
       field === "initial_selection"
     ) {
       let dataContentType = {
-        ...dataMessages[indexMessageRender].message_content[indexContent][
+        ...dataMessages[index].message_content[indexContent][
           contentType
         ],
       };
@@ -3104,19 +3276,19 @@ function Preview() {
     }
 
     if (
-      dataMessages[indexMessageRender].message_content[indexContent][
+      dataMessages[index].message_content[indexContent][
         contentType
       ].is_save_input_content
     ) {
       let isSaveParam = false;
       variables.forEach((item) => {
         let dataContentType = {
-          ...dataMessages[indexMessageRender].message_content[indexContent][
+          ...dataMessages[index].message_content[indexContent][
             contentType
           ],
         };
         if (
-          dataMessages[indexMessageRender].message_content[indexContent][
+          dataMessages[index].message_content[indexContent][
             contentType
           ].save_input_content === item.variable_name
         ) {
@@ -3256,18 +3428,26 @@ function Preview() {
       setVariables([...variables]);
       if (isSaveParam) {
         objParam[
-          dataMessages[indexMessageRender].message_content[indexContent][
+          dataMessages[index].message_content[indexContent][
             contentType
           ].save_input_content
         ] = value;
         setObjParam({ ...objParam });
       }
     }
+
+    setMessagesSessionStorage(dataMessages[index])
     setDataMessages([...dataMessages]);
+    setRenderMessageArr(renderMessageArr.map(x => {
+      if (x?.id === dataMessages[index]?.id) return {...dataMessages[index]}
+      return {...x}
+    }))
   };
 
   const handleOpenWithDrawal = () => {
     if (botInfor && botInfor.withdrawal_prevention_status === "invalid") {
+      sessionStorage.removeItem("cart")
+      setScenarioUserResponses([])
       setIndexUser(0);
       let indexTiming = 0;
       let i;
@@ -3663,7 +3843,7 @@ if (scenarioId && botInfor && isOpen  ){
         <div
           className="sp-header-right"
           onClick={() => {
-            isOpen ? onOpenPreview(true) : handleOpenWithDrawal();
+            isOpen ? handleOpenWithDrawal() : onOpenPreview(true);
           }}
         >
           <div className="sp-header-right-arrow">
@@ -3749,6 +3929,7 @@ if (scenarioId && botInfor && isOpen  ){
                         content={content}
                         index={index}
                         botInfor={botInfor}
+                        checkoutUrl={checkoutUrl}
                       />
                     );
                   })}
@@ -3776,11 +3957,12 @@ if (scenarioId && botInfor && isOpen  ){
                             value,
                             field,
                             subFiled,
-                            name
+                            name,
+                            message
                           )
                         }
                         indexMessageRender={indexMessageRender}
-                        onClickNext={() => onClickNext(indexMessage)}
+                        onClickNext={() => onClickNext(indexMessage, message)}
                         indexMessage={indexMessage}
                         errorsProps={errors}
                         displayButtonNext={(value) => {
@@ -3809,7 +3991,7 @@ if (scenarioId && botInfor && isOpen  ){
                               borderRadius: "25px",
                             }}
                             className="ss-user-message__action-btn"
-                            onClick={() => onClickNext(indexMessage)}
+                            onClick={() => onClickNext(indexMessage, message)}
                           >
                             {message.buttonName || "次へ"}
                           </Button>
@@ -4021,7 +4203,7 @@ else {
   }
 }
 
-const BotMessage = ({ content, index, botInfor }) => {
+const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
   const handleDownloadFile = (file) => {
     let link = document.createElement("a");
     link.href = file;
@@ -4033,22 +4215,72 @@ const BotMessage = ({ content, index, botInfor }) => {
     link.remove();
   };
 
+  const formatResult = () => {
+    const cart = JSON.parse(sessionStorage.getItem("cart") || null)
+
+    const url = cart?.cartCreate?.cart?.checkoutUrl || ""
+
+    const email = cart?.cartCreate?.cart?.buyerIdentity?.email || ""
+
+    const name = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.name || ""
+    const formattedArea = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.formattedArea || ""
+    const address1 = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.address1 || ""
+    const address2 = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.address2 || ""
+    const zip = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.zip || ""
+    const province = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.province || ""
+    const city = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.city || ""
+
+    const product = cart?.cartCreate?.cart?.lines?.edges[0]?.node?.merchandise?.product?.title || ""
+    const variant = cart?.cartCreate?.cart?.lines?.edges[0]?.node?.merchandise?.title || ""
+
+    const totalQuantity = cart?.cartCreate?.cart?.totalQuantity || ""
+
+    const totalAmount = cart?.cartCreate?.cart?.cost?.totalAmount?.amount || ""
+    const currencyCode = cart?.cartCreate?.cart?.cost?.totalAmount?.currencyCode || ""
+
+    let result = content[content.type]?.content;
+    result = result?.replace("{checkoutUrl}",
+        `<a href="${url}" target="_blank" style="color: ${botInfor?.font_color}">${url}</a>`)
+    result = result?.replace("{checkoutUrlBtn}",
+      `<a href="${url}" target="_blank" class="sp-user-message-button-action underline-none">
+        <button
+            style="background-color: ${botInfor?.main_color}; 
+                   border-radius: 25px;
+                   margin: 5px 0;"
+            class="ss-user-message__action-btn btn btn-secondary"
+        >決済画面へ進む</button>
+      </a>`)
+    result = result?.replace("{email}", email)
+    result = result?.replace("{name}", name)
+    result = result?.replace("{totalQuantity}", totalQuantity)
+    result = result?.replace("{totalAmount}", totalAmount.toString() + currencyCode)
+    result = result?.replace("{product}", product + ' - ' + variant)
+    result = result?.replace("{address}", formattedArea + address1 + address2)
+    result = result?.replace("{address1}", address1)
+    result = result?.replace("{address2}", address2)
+    result = result?.replace("{zip}", zip)
+    result = result?.replace("{province}", province)
+    result = result?.replace("{city}", city)
+
+    return result;
+  }
+
   return (
-    <div key={index} className="sp-body-bot-side slideRight">
-      {(content.type === "text_input" ||
-        content.type === "file" ||
-        content.type === "delay") && (
-        <div className="sp-body-bot-side-avatar sp-avatar">
-          <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} />
-        </div>
-      )}
-      <div className="sp-body-bot-side-messages">
-        {/* <img className="ss-bot-ava" src={icon} alt="" /> */}
-        {content && (
-          <React.Fragment>
-            {/* bot: type == 'text_input' */}
-            {content.type === "text_input" && (
-              <div className="position-relative">
+      <div key={index} className="sp-body-bot-side slideRight">
+        {(content.type === "text_input" ||
+            content.type === "file" ||
+            content.type === "delay") && (
+            <div className="sp-body-bot-side-avatar sp-avatar">
+              <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url}/>
+            </div>
+        )}
+        <div className="sp-body-bot-side-messages">
+          {/* <img className="ss-bot-ava" src={icon} alt="" /> */}
+          {content && (
+              <React.Fragment>
+                {/* bot: type == 'text_input' */}
+                {content.type === "text_input" && (
+                    <div className="position-relative">
                 <div
                   className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative`}
                   style={{
@@ -4061,7 +4293,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                   }}
 
                   dangerouslySetInnerHTML={{
-                    __html: content[content.type]?.content,
+                    __html: formatResult()
                   }}
                   // value={content[content.type]?.content || ''}
                   // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}

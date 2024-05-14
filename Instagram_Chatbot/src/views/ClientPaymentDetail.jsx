@@ -45,7 +45,8 @@ function ClientPaymentDetail() {
     if (url.includes("client-payment-detail")) {
       var id = url.slice(url.lastIndexOf("/") + 1);
       if (id === "client-payment-detail") {
-        id = JSON.parse(sessionStorage.getItem("client")).id;
+        // id = JSON.parse(sessionStorage.getItem("client")).id;
+        id = JSON.parse(localStorage.getItem("client")).id;
         setEditMode(false);
       }
       return id;
