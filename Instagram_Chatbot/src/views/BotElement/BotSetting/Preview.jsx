@@ -282,7 +282,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 if (res.data.code == 1) {
                     let messageArr = [];
                     if (res.data.data?.conversation?.messages?.length > 0) {
-                        messageArr = [...res.data.data?.conversation?.messages];
+                        messageArr = [...res.data.data?.conversation?.messages.filter(x => !x.hidden)];
                     }
                     let urlThanks = res.data.data?.conversation?.urlThanksPage || '';
                     let variablesAll = res.data?.all_variables || [];
@@ -717,9 +717,6 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     }
 
     const handleValidateField = (index) => {
-        console.log("index", index)
-        console.log("render", renderMessageArr[index])
-        console.log("dataMessages", dataMessages)
         let contentArr = [...renderMessageArr[index].message_content];
         let isValid = true;
         let errorsMess = {};
@@ -916,6 +913,11 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     }
                 } else if (contentArr[i].type === 'product_purchase_radio_button') {
                     if (contentType.initial_selection.length === 0) {
+                        errorsMess[`message${index}_content${i}_${contentArr[i].type}`] = messageError;
+                        isValid = false;
+                    }
+                } else if (contentArr[i].type === 'product_purchase_select_option') {
+                    if (stringNullOrEmpty(contentType.value)) {
                         errorsMess[`message${index}_content${i}_${contentArr[i].type}`] = messageError;
                         isValid = false;
                     }
@@ -1314,9 +1316,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
 
     const onClickNext = async (indexMessage, message) => {
         let indexClickLocation = indexMessageRender
-
-        for (let i = 0; i < dataMessages.length; i++) {
-            if (dataMessages[i]?.id === message?.id) {
+        const filterDataMessages = dataMessages.filter(x => !x.hidden)
+        for (let i = 0; i < filterDataMessages.length; i++) {
+            if (filterDataMessages[i]?.id === message?.id) {
                 indexClickLocation = i
                 break
             }
@@ -2091,6 +2093,40 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
             objParam.product_name = valueName;
             objParam.product_unit_price = valuePrice;
             setObjParam({ ...objParam });
+        } else if (contentType === 'product_purchase_select_option' && field === 'initial_selection') {
+            let dataContentType = { ...dataMessages[index].message_content[indexContent][contentType] };
+
+            let valueCode;
+            let valueName;
+            let valuePrice;
+
+            for (let i = 0; i < dataContentType.products?.length; i++) {
+                if (dataContentType.products[i].id === value) {
+                    valueCode = dataContentType.products[i].item_number;
+                    valueName = dataContentType.products[i].title;
+                    valuePrice = dataContentType.products[i].item_price;
+                }
+            }
+
+            variables.push(
+                {
+                    variable_name: 'product_code',
+                    default_value: valueCode
+                },
+                {
+                    variable_name: 'product_name',
+                    default_value: valueName
+                },
+                {
+                    variable_name: 'product_unit_price',
+                    default_value: valuePrice
+                }
+            )
+            setVariables([...variables]);
+            objParam.product_code = valueCode;
+            objParam.product_name = valueName;
+            objParam.product_unit_price = valuePrice;
+            setObjParam({ ...objParam });
         }
 
         if (dataMessages[index].message_content[indexContent][contentType].is_save_input_content) {
@@ -2535,6 +2571,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                                     onChangeErrors={(field, value) => onChangeErrors(field, value)}
                                                     variables={variables}
                                                 />
+
                                                 {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
                                                     && <div className="sp-user-message-button-action">
                                                         <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color, borderRadius: '25px' }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage, message)}>
@@ -2989,6 +3026,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                 let capture = content.capture;
                 let productPurchase = content.product_purchase;
                 let productPurchaseRadioButton = content.product_purchase_radio_button;
+                let productPurchaseSelectOption = content.product_purchase_select_option;
                 let smsVerify = content.sms_verify;
                 let afteePaymentModule = content.AFTEE_payment_module;
                 let slider = content.slider;
@@ -3456,12 +3494,67 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                 </div>
                             )
                         }
+                        {/* type == 'product_purchase_select_option */}
+                        {
+                            content.type === 'product_purchase_select_option' &&
+                            <div style={{marginBottom: '10px'}}>
+                                {(productPurchaseSelectOption.title_require || productPurchaseSelectOption.require) &&
+                                    <div className="ss-message__content--user-pull_down-top"
+                                         style={{marginBottom: '0px'}}>
+                                        {productPurchaseSelectOption.title_require &&
+                                            <span className="ss-message__content--user-pull_down-title">
+                                              {productPurchaseSelectOption.title}
+                                            </span>
+                                        }
+                                        {productPurchaseSelectOption.require === true &&
+                                            <span className="ss-message__content--user-text-input-required">
+                                              ※必須
+                                            </span>
+                                        }
+                                    </div>
+                                }
+                                <div className="ss-message__content--user-pull_down-wrapper">
+                                    {productPurchaseSelectOption.type === 'text_with_thumbnail_image' && (
+                                        <>
+                                            <div className="ss-message__content--user-pull_down--customization">
+                                                <div className="">
+                                                    <div className="ss-message__content--user-pull_down-col col-12"
+                                                         style={{padding: '0'}}>
+                                                        <SelectCustom
+                                                            data={productPurchaseSelectOption.products}
+                                                            style={{width: '100%'}}
+                                                            placeholder={productPurchaseSelectOption.display_unselected}
+                                                            keyValue="productVariantId"
+                                                            nameValue="title"
+                                                            onChange={(value) => onChangeValue(indexContent, content.type, value, 'value')}
+                                                            value={productPurchaseSelectOption.value}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                                {errors?.[
+                                    `message${indexMessage}_content${indexContent}_${content.type}`
+                                    ] && (
+                                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                                        {
+                                            errors?.[
+                                                `message${indexMessage}_content${indexContent}_${content.type}`
+                                                ]
+                                        }
+                                    </div>
+                                )}
+                            </div>
+                        }
                         {/* type == 'pull_down' */}
                         {
                             content.type === 'pull_down' && (
-                                <div style={{ marginBottom: '10px' }}>
+                                <div style={{marginBottom: '10px'}}>
                                     {(pullDown.title_require || pullDown.require) &&
-                                        <div className="ss-message__content--user-pull_down-top" style={{ marginBottom: '0px' }}>
+                                        <div className="ss-message__content--user-pull_down-top"
+                                             style={{marginBottom: '0px'}}>
                                             {pullDown.title_require &&
                                                 <span className="ss-message__content--user-pull_down-title">
                                                     {pullDown.title}
@@ -3480,19 +3573,20 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                                 <div className="ss-message__content--user-pull_down--customization">
                                                     <div
                                                         className="ss-message__content--user-pull_down-comment"
-                                                        style={{ marginBottom: '4px' }}
+                                                        style={{marginBottom: '4px'}}
                                                     >
                                                         <span>{pullDown[pullDown.type].title_comment}</span>
                                                     </div>
                                                     <div className="">
                                                         {
                                                             pullDown[pullDown.type].is_comment === false ?
-                                                                <div className="ss-message__content--user-pull_down-col col-12">
+                                                                <div
+                                                                    className="ss-message__content--user-pull_down-col col-12">
                                                                     <SelectCustom
                                                                         disabled={disabled}
                                                                         data={pullDown[pullDown.type].options_without_comment}
                                                                         keyValue="text"
-                                                                        style={{ width: '100%' }}
+                                                                        style={{width: '100%'}}
                                                                         placeholder={pullDown[pullDown.type].display_unselected}
                                                                         nameValue="text"
                                                                         onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'value')}
