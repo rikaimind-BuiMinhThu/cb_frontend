@@ -15,7 +15,6 @@ function getEnvironment() {
     get: (searchParams, prop) => searchParams.get(prop),
   });
   return params.env || "production";
-  // return "local";
 }
 
 function getDebugFlag() {
