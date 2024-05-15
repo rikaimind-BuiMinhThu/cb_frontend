@@ -4001,7 +4001,7 @@ if (scenarioId && botInfor && isOpen  ){
                             className="ss-user-message__action-btn"
                             onClick={() => onClickNext(indexMessage, message)}
                           >
-                            {message.buttonName || "次へ"}
+                            {message.buttonName || (indexMessage >= indexMessageRender ? "次へ" : "更新")}
                           </Button>
                         </div>
                       )}
