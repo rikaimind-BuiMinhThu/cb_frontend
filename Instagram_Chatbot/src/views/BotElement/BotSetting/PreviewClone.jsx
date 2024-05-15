@@ -2167,7 +2167,7 @@ function Preview() {
           first_name: JSON.parse(user_name)?.valueLeft || JSON.parse(user_name_kana)?.valueLeft,
           last_name: JSON.parse(user_name)?.valueRight || JSON.parse(user_name_kana)?.valueRight,
           email: email || "example@gmail.com",
-          zip: JSON.parse(zip_code_address)?.value_post_code || "950-0945",
+          zip: JSON.parse(zip_code_address)?.value_post_code || (JSON.parse(zip_code_address)?.value_post_code_left + JSON.parse(zip_code_address)?.value_post_code_right),
           province: JSON.parse(zip_code_address)?.value_prefecture,
           city: JSON.parse(zip_code_address)?.value_municipality,
           address1: JSON.parse(zip_code_address)?.value_address,
