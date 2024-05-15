@@ -2575,7 +2575,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                                 {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
                                                     && <div className="sp-user-message-button-action">
                                                         <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color, borderRadius: '25px' }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage, message)}>
-                                                            {message.buttonName || "次へ"}
+                                                            {message.buttonName || (indexMessage >= indexMessageRender ? "次へ" : "更新")}
                                                         </Button>
                                                     </div>
                                                 }
