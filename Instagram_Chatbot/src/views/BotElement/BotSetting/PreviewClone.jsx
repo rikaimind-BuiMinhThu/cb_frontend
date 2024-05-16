@@ -207,7 +207,7 @@ function Preview() {
   const [widthPc, setWidthPc] = useState(380);
   const [heightPc, setHeightPc] = useState(600);
   const [widthSp, setWidthSp] = useState(100);
-  const [heightSp, setHeightSp] = useState(600);
+  const [heightSp, setHeightSp] = useState(100);
   const [rightPcTitle, setRightPcTitle] = useState("");
   const [positionSp, setPositionSp] = useState("1");
   const [buttonTypeSp, setButtonTypeSp] = useState("1");
@@ -251,8 +251,8 @@ function Preview() {
        return {
           bottom: "0px",
           right: "0px",
-          width: widthSp ? `${widthSp}%` : "80%",
-          height: heightSp ? `${heightSp}px` : "580px"
+          width: widthSp ? `${widthSp}%` : "100%%",
+          height: heightSp ? `${heightSp}px` : "100%"
        }
     } else {
       return {
@@ -292,8 +292,8 @@ function Preview() {
         setDisplayType(result?.display_type);
         setWidthPc(result?.width_pc? result?.width_pc: 380);
         setHeightPc(result?.height_pc? result?.height_pc:600);
-        setWidthSp(result?.width_sp?result?.width_sp:80);
-        setHeightSp(result?.height_sp?result?.height_sp:580);
+        setWidthSp(result?.width_sp?result?.width_sp:100);
+        setHeightSp(result?.height_sp?result?.height_sp:100);
         setPositionPc(result?.position_pc ? result?.position_pc : "1");
         if (result?.display_type && result?.display_type ==='1'){
           setIsOpen(true)
@@ -3537,8 +3537,10 @@ if (scenarioId && botInfor && isOpen  ){
         bottom: "0px",
         right: mobileCheck()===true ? isOpen ? 0 : `${rightMarginSp}px`: `${rightMarginPc}px`,
         width: mobileCheck()===true ? `${widthSp}%` : `${widthPc}px`,
-        height: mobileCheck()===true ? `${heightSp}px` :  `${heightPc}px`,
+        height: mobileCheck()===true ? `${heightSp}%` :  `${heightPc}px`,
         zIndex: 999,
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <div
@@ -3924,7 +3926,7 @@ if (scenarioId && botInfor && isOpen  ){
         <div
           id="sp-body"
           className="sp-body"
-          style={{ backgroundColor: botInfor?.opacity_color }}
+          style={{ backgroundColor: botInfor?.opacity_color, flex: 1 }}
         >
           {renderMessageArr.map((message, indexMessage) => {
             return (
@@ -4149,7 +4151,7 @@ if (scenarioId && botInfor && isOpen  ){
         justifyContent: "left",
         position:'fixed',
         bottom:bottomMarginSp? `${bottomMarginSp}px`: '10px',
-        right:rightMarginSp? `${rightMarginSp}px`: '10px',
+        right: rightMarginSp? `${rightMarginSp}px`: '10px'
       }}
     >
       <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)} style={{width: '100%', padding: '4px'}}>

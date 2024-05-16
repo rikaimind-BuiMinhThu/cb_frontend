@@ -201,13 +201,13 @@ function DesignChatbot() {
         setHeightPc(result?.height_pc);
         setWidthSp(result?.width_sp);
         setHeightSp(result?.height_sp);
-        setPositionPc(result?.position_pc);
+        setPositionPc(result?.position_pc || 1);
         setRightPcTitle(result?.right_position_pc_title);
-        setButtonTypePc(result?.button_type_pc);
+        setButtonTypePc(result?.button_type_pc || 1);
         setRightMarginPc(result?.right_margin_pc);
         setBottomMarginPc(result?.bottom_margin_pc);
-        setPositionSp(result?.position_sp);
-        setButtonTypeSp(result?.button_type_sp);
+        setPositionSp(result?.position_sp || 1);
+        setButtonTypeSp(result?.button_type_sp || 1);
         setRightSpTitle(
           JSON.parse(response.data.data?.design_settings)
             ?.right_position_sp_title
@@ -369,9 +369,10 @@ function DesignChatbot() {
         right_margin_sp: rightMarginSp,
         bottom_margin_sp: bottomMarginSp,
         popup_close_bot: popupCloseBot,
-        title_bubble: titleBubble.trim()
+        title_bubble: titleBubble?.trim()
       },
     };
+    console.log(settings)
 
     api
       .post(`api/v1/managements/chatbots/${botId}/design_settings`, settings)
@@ -1039,7 +1040,7 @@ function DesignChatbot() {
                                                               placeholder="高さ"
                                                               onChange={e => setHeightSp(e)}
                                                             />
-                                                            <p style={{textAlign:'center', margin:'auto 0'}}>px</p>
+                                                            <p style={{textAlign:'center', margin:'auto 0'}}>%</p>
                                                             </div>
                                         
                                         {/* <input

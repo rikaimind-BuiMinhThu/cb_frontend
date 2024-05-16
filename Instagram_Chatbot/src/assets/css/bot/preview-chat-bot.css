@@ -130,7 +130,8 @@
 .sp-body {
     padding: 10px;
     overflow-y: auto;
-    height: calc(86% + 1px);
+    /*height: calc(86% + 1px);*/
+    /*height: 100%;*/
 }
 
 .sp-body input {
