@@ -4085,7 +4085,7 @@ if (scenarioId && botInfor && isOpen  ){
           </div>
   </div>
     )
-  } else if (isOpen===false &&mobileCheck()===false && positionPc == 2'){
+  } else if (isOpen===false &&mobileCheck()===false && positionPc == 2){
     return (
     <div
     onClick={() => onOpenPreview(!isOpen)}
