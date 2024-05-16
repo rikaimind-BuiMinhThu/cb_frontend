@@ -2642,7 +2642,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                                     display: "block",
                                     position: "absolute",
                                     bottom: 0,
-                                    left: "-3px",
+                                    left: "-4.5px",
                                     width: "12px",
                                     height: "18px",
                                     backgroundColor: botInfor?.message_color,

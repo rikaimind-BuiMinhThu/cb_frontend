@@ -421,12 +421,6 @@ function Preview() {
       document.getElementById("sp-header").style.borderTopLeftRadius = mobileCheck() ? "0px" : "5px";
       document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
 
-      if (mobileCheck()) {
-        document.getElementById("sp-header").classList.add('rounder-t-5')
-      } else {
-        document.getElementById("sp-header").classList.remove('rounder-t-5')
-      }
-
       document.getElementById("sp-process-bar").style.display = "block";
       document.getElementById("sp-body").style.display = "block";
     } 
@@ -455,13 +449,7 @@ function Preview() {
           "0px";
         document.getElementById("sp-header").style.borderTopLeftRadius = mobileCheck() ? "0px" : "5px";
         document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
-        console.log("1", document.getElementById("sp-header").classList)
-        if (mobileCheck()) {
-          document.getElementById("sp-header").classList.add('rounder-t-5')
-        } else {
-          document.getElementById("sp-header").classList.remove('rounder-t-5')
-        }
-        console.log("2", document.getElementById("sp-header").classList)
+
         document.getElementById("sp-process-bar").style.display = "block";
         document.getElementById("sp-body").style.display = "block";
       } 
