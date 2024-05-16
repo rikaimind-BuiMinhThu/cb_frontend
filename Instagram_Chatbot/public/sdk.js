@@ -138,7 +138,8 @@ async function displayPopup() {
         (e.data && !firstOpen && mobileCheck() === true)
       ) {
         iframe.width = "100%";
-        iframe.height = "620px";
+        // iframe.height = "620px";
+        iframe.height = "100%";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       } else if (firstOpen || (e.data && !firstOpen)) {
@@ -157,7 +158,7 @@ async function displayPopup() {
         getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
       } else if (!e.data && !firstOpen && mobileCheck() === true) {
         iframe.width = "300px";
-        iframe.height = "65px";
+        iframe.height = "77px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
         log("close");
@@ -166,7 +167,7 @@ async function displayPopup() {
           chatbotW && chatbotRight
             ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
             : "400px";
-        iframe.height = chatbotBottom ? `${parseInt(chatbotH) + 65}px` : "77px";
+        iframe.height = chatbotBottom ? `${parseInt(chatbotH) + 77}px` : "77px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
         log("close");
