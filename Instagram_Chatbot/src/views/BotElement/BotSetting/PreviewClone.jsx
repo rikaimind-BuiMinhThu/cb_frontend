@@ -295,7 +295,7 @@ function Preview() {
         setWidthSp(result?.width_sp?result?.width_sp:100);
         setHeightSp(result?.height_sp?result?.height_sp:100);
         setPositionPc(result?.position_pc ? result?.position_pc : "1");
-        if (result?.display_type && result?.display_type == 1){
+        if (result?.display_type && Number(result?.display_type) === 1){
           setIsOpen(true)
         } else {
           setIsOpen(false)
@@ -4017,7 +4017,7 @@ if (scenarioId && botInfor && isOpen  ){
           })}
         </div>
       </div>
-  ) } else if (isOpen===false &&mobileCheck()===false && positionPc == 1 && buttonTypePc== 2){ return (
+  ) } else if (isOpen===false &&mobileCheck()===false && Number(positionPc) === 1 && Number(buttonTypePc) === 2){ return (
       <div
     onClick={() => onOpenPreview(!isOpen)}
     style={{
@@ -4041,7 +4041,7 @@ if (scenarioId && botInfor && isOpen  ){
     />
   </div>
 
-  )} else if (isOpen===false && mobileCheck()===false && positionPc == 1 && buttonTypePc == 2) {
+  )} else if (isOpen===false && mobileCheck()===false && Number(positionPc) === 1 && Number(buttonTypePc) === 2) {
     return (
       <div
     onClick={() => onOpenPreview(!isOpen)}
@@ -4085,7 +4085,7 @@ if (scenarioId && botInfor && isOpen  ){
           </div>
   </div>
     )
-  } else if (isOpen===false &&mobileCheck()===false && positionPc == 2){
+  } else if (isOpen===false &&mobileCheck()===false && Number(positionPc) === 2){
     return (
     <div
     onClick={() => onOpenPreview(!isOpen)}
@@ -4116,7 +4116,7 @@ if (scenarioId && botInfor && isOpen  ){
           </div>
         </div>
   </div>)
-  } else if (isOpen===false && mobileCheck()===true && positionSp == 1 && buttonTypeSp == 2){ return (
+  } else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 1 && Number(buttonTypeSp) === 2){ return (
     <div
   onClick={() => onOpenPreview(!isOpen)}
   style={{
@@ -4140,7 +4140,7 @@ if (scenarioId && botInfor && isOpen  ){
   />
 </div>
 
-)} else if (isOpen===false && mobileCheck()===true && positionSp == 1 && buttonTypeSp == 2) {
+)} else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 1 && Number(buttonTypeSp) === 2) {
   return (
     <div
       onClick={() => onOpenPreview(!isOpen)}
@@ -4176,7 +4176,7 @@ if (scenarioId && botInfor && isOpen  ){
       </div>
     </div>
   )
-}else if (isOpen===false && mobileCheck()===true&& positionSp == 2){
+}else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 2){
   return (
   <div
   onClick={() => onOpenPreview(!isOpen)}
