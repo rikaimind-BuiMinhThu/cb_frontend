@@ -309,7 +309,7 @@ function Preview() {
         setRightMarginPc(result?.right_margin_pc?result?.right_margin_pc:10);
         setBottomMarginPc(result?.bottom_margin_pc?result?.bottom_margin_pc:0);
         setPositionSp(result?.position_sp? result?.position_sp:"1");
-        setButtonTypeSp(result?.button_type_sp?result?.button_type_sp:"2");
+        setButtonTypeSp(result?.button_type_sp?result?.button_type_sp:"1");
         setRightSpTitle(
           JSON.parse(response.data.data?.design_settings)
             ?.right_position_sp_title
@@ -3530,6 +3530,7 @@ function Preview() {
 
   ///body container
 if (scenarioId && botInfor && isOpen  ){
+
   return  (
     <div
       id="sp-container1"
@@ -4041,7 +4042,7 @@ if (scenarioId && botInfor && isOpen  ){
     />
   </div>
 
-  )} else if (isOpen===false && mobileCheck()===false && Number(positionPc) === 1 && Number(buttonTypePc) === 2) {
+  )} else if (isOpen===false && mobileCheck()===false && Number(positionPc) === 1 && Number(buttonTypePc) === 1) {
     return (
       <div
     onClick={() => onOpenPreview(!isOpen)}
@@ -4140,7 +4141,7 @@ if (scenarioId && botInfor && isOpen  ){
   />
 </div>
 
-)} else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 1 && Number(buttonTypeSp) === 2) {
+)} else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 1 && Number(buttonTypeSp) === 1) {
   return (
     <div
       onClick={() => onOpenPreview(!isOpen)}
