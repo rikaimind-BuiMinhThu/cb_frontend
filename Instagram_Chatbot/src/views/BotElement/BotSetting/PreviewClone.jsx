@@ -295,7 +295,7 @@ function Preview() {
         setWidthSp(result?.width_sp?result?.width_sp:100);
         setHeightSp(result?.height_sp?result?.height_sp:100);
         setPositionPc(result?.position_pc ? result?.position_pc : "1");
-        if (result?.display_type && result?.display_type ==='1'){
+        if (result?.display_type && result?.display_type == 1){
           setIsOpen(true)
         } else {
           setIsOpen(false)
