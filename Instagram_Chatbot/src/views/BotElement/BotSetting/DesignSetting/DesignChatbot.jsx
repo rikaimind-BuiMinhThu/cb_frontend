@@ -61,8 +61,8 @@ function DesignChatbot() {
   const [positionPc, setPositionPc] = useState(1);
   const [widthPc, setWidthPc] = useState(380);
   const [heightPc, setHeightPc] = useState(620);
-  const [widthSp, setWidthSp] = useState(350);
-  const [heightSp, setHeightSp] = useState(600);
+  const [widthSp, setWidthSp] = useState(100);
+  const [heightSp, setHeightSp] = useState(100);
   const [rightPcTitle, setRightPcTitle] = useState("");
   const [positionSp, setPositionSp] = useState(1);
   const [buttonTypeSp, setButtonTypeSp] = useState(1);
@@ -358,13 +358,13 @@ function DesignChatbot() {
         height_pc: heightPc,
         width_sp: widthSp,
         height_sp: heightSp,
-        position_pc: positionPc,
-        button_type_pc: buttonTypePc,
+        position_pc: positionPc.toString(),
+        button_type_pc: buttonTypePc.toString(),
         right_position_pc_title: rightPcTitle,
         right_margin_pc: rightMarginPc,
         bottom_margin_pc: bottomMarginPc,
-        position_sp: positionSp,
-        button_type_sp: buttonTypeSp,
+        position_sp: positionSp.toString(),
+        button_type_sp: buttonTypeSp.toString(),
         right_position_sp_title: rightSpTitle,
         right_margin_sp: rightMarginSp,
         bottom_margin_sp: bottomMarginSp,
@@ -1034,7 +1034,7 @@ function DesignChatbot() {
                                           <InputNum
                                                              style={{display:'flex', flex:1}}
                                                               name="height_sp"
-                                                             
+                                                              max={100}
                                                               min={1}
                                                               value={heightSp}
                                                               placeholder="高さ"
