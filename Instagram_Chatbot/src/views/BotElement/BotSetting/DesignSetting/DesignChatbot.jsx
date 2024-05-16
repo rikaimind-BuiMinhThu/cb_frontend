@@ -201,13 +201,13 @@ function DesignChatbot() {
         setHeightPc(result?.height_pc);
         setWidthSp(result?.width_sp);
         setHeightSp(result?.height_sp);
-        setPositionPc(result?.position_pc || 1);
+        setPositionPc(result?.position_pc ? Number(result?.position_sp) : 1);
         setRightPcTitle(result?.right_position_pc_title);
-        setButtonTypePc(result?.button_type_pc || 1);
+        setButtonTypePc(result?.button_type_pc ? Number(result?.position_sp) : 1);
         setRightMarginPc(result?.right_margin_pc);
         setBottomMarginPc(result?.bottom_margin_pc);
-        setPositionSp(result?.position_sp || 1);
-        setButtonTypeSp(result?.button_type_sp || 1);
+        setPositionSp(result?.position_sp ? Number(result?.position_sp) : 1);
+        setButtonTypeSp(result?.button_type_sp ? Number(result?.position_sp) : 1);
         setRightSpTitle(
           JSON.parse(response.data.data?.design_settings)
             ?.right_position_sp_title
@@ -739,7 +739,7 @@ function DesignChatbot() {
                                         }}
                                         value={displayType}
                                         onChange={(e) =>
-                                          setDisplayType(e.target.value)
+                                          setDisplayType(Number(e.target.value))
                                         }
                                       >
                                         <option value={1}>リロード</option>
@@ -839,7 +839,7 @@ function DesignChatbot() {
                                         }}
                                         value={positionPc}
                                         onChange={(e) =>
-                                          setPositionPc(e.target.value)
+                                          setPositionPc(Number(e.target.value))
                                         }
                                       >
                                         <option value={1}>底辺に設置</option>
@@ -850,7 +850,7 @@ function DesignChatbot() {
                                   <span className="error-message subtile"></span>
                                 </div>
 
-                                {positionPc === "2" && (
+                                {positionPc === 2 && (
                                   <div className="field-add-bot">
                                     <div className="add-bot_field-container">
                                       <span className="label-field">
@@ -881,7 +881,7 @@ function DesignChatbot() {
                                   </div>
                                 )}
 {
-  positionPc === "1" && (
+  positionPc === 1 && (
 <div className="field-add-bot">
                                   <div className="add-bot_field-container">
                                     <span className="label-field">
@@ -900,7 +900,7 @@ function DesignChatbot() {
                                         }}
                                         value={buttonTypePc}
                                         onChange={(e) =>
-                                          setButtonTypePc(e.target.value)
+                                          setButtonTypePc(Number(e.target.value))
                                         }
                                       >
                                         <option value={1}>
@@ -1097,7 +1097,7 @@ function DesignChatbot() {
                                         }}
                                         value={positionSp}
                                         onChange={(e) =>
-                                          setPositionSp(e.target.value)
+                                          setPositionSp(Number(e.target.value))
                                         }
                                       >
                                         <option value={1}>底辺に設置</option>
@@ -1108,7 +1108,7 @@ function DesignChatbot() {
                                   <span className="error-message subtile"></span>
                                 </div>
 
-                                {positionSp === "2" && (
+                                {positionSp === 2 && (
                                   <div className="field-add-bot">
                                     <div className="add-bot_field-container">
                                       <span className="label-field">
@@ -1139,7 +1139,7 @@ function DesignChatbot() {
                                   </div>
                                 )}
 {
-  positionSp === "1" && (
+  positionSp === 1 && (
     <div className="field-add-bot">
     <div className="add-bot_field-container">
       <span className="label-field">
@@ -1158,7 +1158,7 @@ function DesignChatbot() {
           }}
           value={buttonTypeSp}
           onChange={(e) =>
-            setButtonTypeSp(e.target.value)
+            setButtonTypeSp(Number(e.target.value))
           }
         >
           <option value={1}>
