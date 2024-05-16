@@ -1249,7 +1249,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         break;
                     case 'single_byte':
                         REGEX_CHECK = /[^0-9 ]+/;
-                        messageLog = "数字を入力してください。";
+                        messageLog = "半角数字で入力してください";
                         break;
                     case 'alphanumeric_hyphen':
                         REGEX_CHECK = /[^A-Za-z0-9-_ ]+/;

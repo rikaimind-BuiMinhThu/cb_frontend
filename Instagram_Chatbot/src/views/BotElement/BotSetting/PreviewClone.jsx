@@ -418,8 +418,15 @@ function Preview() {
         "0px";
       document.getElementById("sp-header").style.borderBottomRightRadius =
         "0px";
-      document.getElementById("sp-header").style.borderTopLeftRadius = "2px";
-      document.getElementById("sp-header").style.borderTopRightRadius = "2px";
+      document.getElementById("sp-header").style.borderTopLeftRadius = mobileCheck() ? "0px" : "5px";
+      document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
+
+      if (mobileCheck()) {
+        document.getElementById("sp-header").classList.add('rounder-t-5')
+      } else {
+        document.getElementById("sp-header").classList.remove('rounder-t-5')
+      }
+
       document.getElementById("sp-process-bar").style.display = "block";
       document.getElementById("sp-body").style.display = "block";
     } 
@@ -446,8 +453,15 @@ function Preview() {
           "0px";
         document.getElementById("sp-header").style.borderBottomRightRadius =
           "0px";
-        document.getElementById("sp-header").style.borderTopLeftRadius = "2px";
-        document.getElementById("sp-header").style.borderTopRightRadius = "2px";
+        document.getElementById("sp-header").style.borderTopLeftRadius = mobileCheck() ? "0px" : "5px";
+        document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
+        console.log("1", document.getElementById("sp-header").classList)
+        if (mobileCheck()) {
+          document.getElementById("sp-header").classList.add('rounder-t-5')
+        } else {
+          document.getElementById("sp-header").classList.remove('rounder-t-5')
+        }
+        console.log("2", document.getElementById("sp-header").classList)
         document.getElementById("sp-process-bar").style.display = "block";
         document.getElementById("sp-body").style.display = "block";
       } 
@@ -2064,7 +2078,7 @@ function Preview() {
             break;
           case "single_byte":
             REGEX_CHECK = /[^0-9 ]+/;
-            messageLog = "数字を入力してください。";
+            messageLog = "半角数字で入力してください";
             break;
           case "alphanumeric_hyphen":
             REGEX_CHECK = /[^A-Za-z0-9-_ ]+/;
@@ -4321,7 +4335,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
                   display: "block",
                   position: "absolute",
                   bottom: 0,
-                  left: "-3px",
+                  left: "-4.5px",
                   width: "12px",
                   height: "18px",
                   backgroundColor: botInfor?.message_color,
