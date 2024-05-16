@@ -1249,7 +1249,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         break;
                     case 'single_byte':
                         REGEX_CHECK = /[^0-9 ]+/;
-                        messageLog = "数字を入力してください。";
+                        messageLog = "半角数字で入力してください";
                         break;
                     case 'alphanumeric_hyphen':
                         REGEX_CHECK = /[^A-Za-z0-9-_ ]+/;
@@ -2642,7 +2642,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                                     display: "block",
                                     position: "absolute",
                                     bottom: 0,
-                                    left: "-3px",
+                                    left: "-4.5px",
                                     width: "12px",
                                     height: "18px",
                                     backgroundColor: botInfor?.message_color,
