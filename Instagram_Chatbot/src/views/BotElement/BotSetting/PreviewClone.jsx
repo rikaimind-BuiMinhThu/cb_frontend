@@ -2158,17 +2158,25 @@ function Preview() {
     const product = products?.products?.findLast(x => x?.id === products?.initial_selection || x?.productVariantId === products?.value)
 
     const email = newArr.findLast(x => x.data_input_name === "email")?.string_value || null
+    const phone = newArr.findLast(x => x.data_input_name === "phone_number")?.string_value || null
     const user_name = newArr.findLast(x => x.data_input_name === "user_name")?.string_value || null
     const user_name_kana = newArr.findLast(x => x.data_input_name === "user_name_kana")?.string_value || null
 
     const zip_code_address = newArr.findLast(x => x.data_input_name === "zip_code_address")?.text_value || null
 
     if (product && quantity && user_name && user_name_kana && email && zip_code_address) {
+      let phoneNumber = phone
+      try {
+          phoneNumber = `${JSON.parse(phone)?.value1}${JSON.parse(phone)?.value2}${JSON.parse(phone)?.value3}`
+      } catch (e) {
+         phoneNumber = phone || ""
+      }
       await api
         .post('/api/v1/shopify/cart_create', {
           first_name: JSON.parse(user_name)?.valueLeft || JSON.parse(user_name_kana)?.valueLeft,
           last_name: JSON.parse(user_name)?.valueRight || JSON.parse(user_name_kana)?.valueRight,
           email: email || "example@gmail.com",
+          phone: phoneNumber,
           zip: JSON.parse(zip_code_address)?.value_post_code || (JSON.parse(zip_code_address)?.value_post_code_left + JSON.parse(zip_code_address)?.value_post_code_right),
           province: JSON.parse(zip_code_address)?.value_prefecture,
           city: JSON.parse(zip_code_address)?.value_municipality,
@@ -4242,6 +4250,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     const zip = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.zip || ""
     const province = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.province || ""
     const city = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.city || ""
+    const phone = cart?.cartCreate?.cart?.buyerIdentity?.deliveryAddressPreferences[0]?.phone || ""
 
     const product = cart?.cartCreate?.cart?.lines?.edges[0]?.node?.merchandise?.product?.title || ""
     const variant = cart?.cartCreate?.cart?.lines?.edges[0]?.node?.merchandise?.title || ""
@@ -4264,6 +4273,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
         >決済画面へ進む</button>
       </a>`)
     result = result?.replace("{email}", email)
+    result = result?.replace("{phone}", phone)
     result = result?.replace("{name}", name)
     result = result?.replace("{totalQuantity}", totalQuantity)
     result = result?.replace("{totalAmount}", totalAmount.toString() + currencyCode)
