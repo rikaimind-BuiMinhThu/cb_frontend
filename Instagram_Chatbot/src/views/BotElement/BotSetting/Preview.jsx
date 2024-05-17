@@ -2533,7 +2533,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。") : `あと${messageUser.length}間`}
                     </div>
                 </div>
-                <div id="sp-body" className="sp-body" style={{ backgroundColor: botInfor?.opacity_color }}>
+                <div id="sp-body" className="sp-body" style={{ backgroundColor: botInfor?.opacity_color, flex: 1 }}>
                     {
                         renderMessageArr.map((message, indexMessage) => {
                             return (
