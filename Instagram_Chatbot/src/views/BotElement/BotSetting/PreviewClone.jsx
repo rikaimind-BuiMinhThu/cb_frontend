@@ -2167,7 +2167,7 @@ function Preview() {
     if (product && quantity && user_name && user_name_kana && email && zip_code_address) {
       let phoneNumber;
       try {
-          phoneNumber = `${JSON.parse(phone)?.value1}${JSON.parse(phone)?.value2}${JSON.parse(phone)?.value3}`
+          phoneNumber = `${JSON.parse(phone)?.value1 || ""}${JSON.parse(phone)?.value2 || ""}${JSON.parse(phone)?.value3 || ""}`
       } catch (e) {
          phoneNumber = phone || ""
       }
