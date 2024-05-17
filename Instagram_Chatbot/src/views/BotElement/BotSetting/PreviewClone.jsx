@@ -2165,7 +2165,7 @@ function Preview() {
     const zip_code_address = newArr.findLast(x => x.data_input_name === "zip_code_address")?.text_value || null
 
     if (product && quantity && user_name && user_name_kana && email && zip_code_address) {
-      let phoneNumber = phone
+      let phoneNumber;
       try {
           phoneNumber = `${JSON.parse(phone)?.value1}${JSON.parse(phone)?.value2}${JSON.parse(phone)?.value3}`
       } catch (e) {
