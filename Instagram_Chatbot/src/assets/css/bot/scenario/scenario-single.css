@@ -1316,7 +1316,8 @@ input#ss-message__content--user-checkbox--checkbox_img {
   font-size: 14px;
   border-radius: 5px !important;
   min-height: 36px !important;
-
+  display: flex;
+  align-items: center;
 }
 
 .ss-user-setting__item-custom .react-datepicker-wrapper {

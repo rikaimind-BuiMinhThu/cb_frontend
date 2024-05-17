@@ -1249,7 +1249,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         break;
                     case 'single_byte':
                         REGEX_CHECK = /[^0-9 ]+/;
-                        messageLog = "数字を入力してください。";
+                        messageLog = "半角数字で入力してください";
                         break;
                     case 'alphanumeric_hyphen':
                         REGEX_CHECK = /[^A-Za-z0-9-_ ]+/;
@@ -2533,7 +2533,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。") : `あと${messageUser.length}間`}
                     </div>
                 </div>
-                <div id="sp-body" className="sp-body" style={{ backgroundColor: botInfor?.opacity_color }}>
+                <div id="sp-body" className="sp-body" style={{ backgroundColor: botInfor?.opacity_color, flex: 1 }}>
                     {
                         renderMessageArr.map((message, indexMessage) => {
                             return (
@@ -2641,7 +2641,7 @@ const BotMessage = ({ content, index, botInfor }) => {
                                     content: " ",
                                     display: "block",
                                     position: "absolute",
-                                    bottom: 0,
+                                    bottom: 1,
                                     left: "-3px",
                                     width: "12px",
                                     height: "18px",

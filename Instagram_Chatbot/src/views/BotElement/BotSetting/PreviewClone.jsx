@@ -207,7 +207,7 @@ function Preview() {
   const [widthPc, setWidthPc] = useState(380);
   const [heightPc, setHeightPc] = useState(600);
   const [widthSp, setWidthSp] = useState(100);
-  const [heightSp, setHeightSp] = useState(600);
+  const [heightSp, setHeightSp] = useState(100);
   const [rightPcTitle, setRightPcTitle] = useState("");
   const [positionSp, setPositionSp] = useState("1");
   const [buttonTypeSp, setButtonTypeSp] = useState("1");
@@ -251,8 +251,8 @@ function Preview() {
        return {
           bottom: "0px",
           right: "0px",
-          width: widthSp ? `${widthSp}%` : "80%",
-          height: heightSp ? `${heightSp}px` : "580px"
+          width: widthSp ? `${widthSp}%` : "100%%",
+          height: heightSp ? `${heightSp}px` : "100%"
        }
     } else {
       return {
@@ -292,10 +292,10 @@ function Preview() {
         setDisplayType(result?.display_type);
         setWidthPc(result?.width_pc? result?.width_pc: 380);
         setHeightPc(result?.height_pc? result?.height_pc:600);
-        setWidthSp(result?.width_sp?result?.width_sp:80);
-        setHeightSp(result?.height_sp?result?.height_sp:580);
+        setWidthSp(result?.width_sp?result?.width_sp:100);
+        setHeightSp(result?.height_sp?result?.height_sp:100);
         setPositionPc(result?.position_pc ? result?.position_pc : "1");
-        if (result?.display_type && result?.display_type ==='1'){
+        if (result?.display_type && Number(result?.display_type) === 1){
           setIsOpen(true)
         } else {
           setIsOpen(false)
@@ -309,7 +309,7 @@ function Preview() {
         setRightMarginPc(result?.right_margin_pc?result?.right_margin_pc:10);
         setBottomMarginPc(result?.bottom_margin_pc?result?.bottom_margin_pc:0);
         setPositionSp(result?.position_sp? result?.position_sp:"1");
-        setButtonTypeSp(result?.button_type_sp?result?.button_type_sp:"2");
+        setButtonTypeSp(result?.button_type_sp?result?.button_type_sp:"1");
         setRightSpTitle(
           JSON.parse(response.data.data?.design_settings)
             ?.right_position_sp_title
@@ -418,8 +418,9 @@ function Preview() {
         "0px";
       document.getElementById("sp-header").style.borderBottomRightRadius =
         "0px";
-      document.getElementById("sp-header").style.borderTopLeftRadius = "2px";
-      document.getElementById("sp-header").style.borderTopRightRadius = "2px";
+      document.getElementById("sp-header").style.borderTopLeftRadius = mobileCheck() ? "0px" : "5px";
+      document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
+
       document.getElementById("sp-process-bar").style.display = "block";
       document.getElementById("sp-body").style.display = "block";
     } 
@@ -446,8 +447,9 @@ function Preview() {
           "0px";
         document.getElementById("sp-header").style.borderBottomRightRadius =
           "0px";
-        document.getElementById("sp-header").style.borderTopLeftRadius = "2px";
-        document.getElementById("sp-header").style.borderTopRightRadius = "2px";
+        document.getElementById("sp-header").style.borderTopLeftRadius = mobileCheck() ? "0px" : "5px";
+        document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
+
         document.getElementById("sp-process-bar").style.display = "block";
         document.getElementById("sp-body").style.display = "block";
       } 
@@ -2064,7 +2066,7 @@ function Preview() {
             break;
           case "single_byte":
             REGEX_CHECK = /[^0-9 ]+/;
-            messageLog = "数字を入力してください。";
+            messageLog = "半角数字で入力してください";
             break;
           case "alphanumeric_hyphen":
             REGEX_CHECK = /[^A-Za-z0-9-_ ]+/;
@@ -3528,6 +3530,7 @@ function Preview() {
 
   ///body container
 if (scenarioId && botInfor && isOpen  ){
+
   return  (
     <div
       id="sp-container1"
@@ -3537,8 +3540,10 @@ if (scenarioId && botInfor && isOpen  ){
         bottom: "0px",
         right: mobileCheck()===true ? isOpen ? 0 : `${rightMarginSp}px`: `${rightMarginPc}px`,
         width: mobileCheck()===true ? `${widthSp}%` : `${widthPc}px`,
-        height: mobileCheck()===true ? `${heightSp}px` :  `${heightPc}px`,
+        height: mobileCheck()===true ? `${heightSp}%` :  `${heightPc}px`,
         zIndex: 999,
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <div
@@ -3924,7 +3929,7 @@ if (scenarioId && botInfor && isOpen  ){
         <div
           id="sp-body"
           className="sp-body"
-          style={{ backgroundColor: botInfor?.opacity_color }}
+          style={{ backgroundColor: botInfor?.opacity_color, flex: 1 }}
         >
           {renderMessageArr.map((message, indexMessage) => {
             return (
@@ -4013,7 +4018,7 @@ if (scenarioId && botInfor && isOpen  ){
           })}
         </div>
       </div>
-  ) } else if (isOpen===false &&mobileCheck()===false && positionPc ==='1' && buttonTypePc==='2'){ return (
+  ) } else if (isOpen===false &&mobileCheck()===false && Number(positionPc) === 1 && Number(buttonTypePc) === 2){ return (
       <div
     onClick={() => onOpenPreview(!isOpen)}
     style={{
@@ -4037,7 +4042,7 @@ if (scenarioId && botInfor && isOpen  ){
     />
   </div>
 
-  )} else if (isOpen===false &&mobileCheck()===false && positionPc ==='1' && buttonTypePc==='1') {
+  )} else if (isOpen===false && mobileCheck()===false && Number(positionPc) === 1 && Number(buttonTypePc) === 1) {
     return (
       <div
     onClick={() => onOpenPreview(!isOpen)}
@@ -4081,7 +4086,7 @@ if (scenarioId && botInfor && isOpen  ){
           </div>
   </div>
     )
-  } else if (isOpen===false &&mobileCheck()===false && positionPc ==='2'){
+  } else if (isOpen===false &&mobileCheck()===false && Number(positionPc) === 2){
     return (
     <div
     onClick={() => onOpenPreview(!isOpen)}
@@ -4112,7 +4117,7 @@ if (scenarioId && botInfor && isOpen  ){
           </div>
         </div>
   </div>)
-  } else if (isOpen===false && mobileCheck()===true && positionSp ==='1' && buttonTypeSp==='2'){ return (
+  } else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 1 && Number(buttonTypeSp) === 2){ return (
     <div
   onClick={() => onOpenPreview(!isOpen)}
   style={{
@@ -4136,7 +4141,7 @@ if (scenarioId && botInfor && isOpen  ){
   />
 </div>
 
-)} else if (isOpen===false && mobileCheck()===true && positionSp ==='1' && buttonTypeSp==='1') {
+)} else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 1 && Number(buttonTypeSp) === 1) {
   return (
     <div
       onClick={() => onOpenPreview(!isOpen)}
@@ -4149,7 +4154,7 @@ if (scenarioId && botInfor && isOpen  ){
         justifyContent: "left",
         position:'fixed',
         bottom:bottomMarginSp? `${bottomMarginSp}px`: '10px',
-        right:rightMarginSp? `${rightMarginSp}px`: '10px',
+        right: rightMarginSp? `${rightMarginSp}px`: '10px'
       }}
     >
       <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)} style={{width: '100%', padding: '4px'}}>
@@ -4172,7 +4177,7 @@ if (scenarioId && botInfor && isOpen  ){
       </div>
     </div>
   )
-}else if (isOpen===false && mobileCheck()===true&& positionSp ==='2'){
+}else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 2){
   return (
   <div
   onClick={() => onOpenPreview(!isOpen)}
@@ -4318,7 +4323,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
                   content: " ",
                   display: "block",
                   position: "absolute",
-                  bottom: 0,
+                  bottom: 1,
                   left: "-3px",
                   width: "12px",
                   height: "18px",
