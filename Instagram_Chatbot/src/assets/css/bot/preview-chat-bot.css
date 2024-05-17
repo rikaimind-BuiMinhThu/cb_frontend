@@ -8,6 +8,8 @@
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     z-index: 900;
+    display: flex;
+    flex-direction: column;
 }
 
 .sp-header {
@@ -654,7 +656,8 @@ slideUp
       border-top-left-radius: 2px;
       border-top-right-radius: 2px;
       z-index: 900;
-
+        display: flex;
+        flex-direction: column;
       
     }
 
