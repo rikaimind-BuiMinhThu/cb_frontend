@@ -308,7 +308,10 @@ function DesignChatbot() {
         };
 
         if (color) bot.chatbot.main_color = color
-        else bot.chatbot.main_color_other = mainColor
+        else {
+          bot.chatbot.main_color_other = mainColor
+          bot.chatbot.main_color = ""
+        }
       } else {
         var bot = {
           chatbot: {
@@ -322,7 +325,10 @@ function DesignChatbot() {
         };
 
         if (color) bot.chatbot.main_color = color
-        else bot.chatbot.main_color_other = mainColor
+        else {
+          bot.chatbot.main_color_other = mainColor
+          bot.chatbot.main_color = ""
+        }
       }
       api
         .put(`api/v1/managements/chatbots/${botId}`, bot)
