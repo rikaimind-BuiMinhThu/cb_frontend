@@ -1428,7 +1428,6 @@ function Preview() {
             isValid = false;
           }
         } else if (contentArr[i].type === 'product_purchase_select_option') {
-          console.log(contentType.value)
           if (stringNullOrEmpty(contentType.value)) {
             errorsMess[
               `message${index}_content${i}_${contentArr[i].type}`
@@ -2187,8 +2186,8 @@ function Preview() {
       }
       await api
         .post('/api/v1/shopify/cart_create', {
-          first_name: JSON.parse(user_name)?.valueLeft || JSON.parse(user_name_kana)?.valueLeft,
-          last_name: JSON.parse(user_name)?.valueRight || JSON.parse(user_name_kana)?.valueRight,
+          first_name: JSON.parse(user_name)?.valueRight || JSON.parse(user_name_kana)?.valueRight,
+          last_name: JSON.parse(user_name)?.valueLeft || JSON.parse(user_name_kana)?.valueLeft,
           email: email || "example@gmail.com",
           phone: phoneNumber,
           zip: JSON.parse(zip_code_address)?.value_post_code || (JSON.parse(zip_code_address)?.value_post_code_left + JSON.parse(zip_code_address)?.value_post_code_right),
@@ -4291,7 +4290,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     result = result?.replace("{phone}", phone)
     result = result?.replace("{name}", name)
     result = result?.replace("{totalQuantity}", totalQuantity)
-    result = result?.replace("{totalAmount}", totalAmount.toString() + currencyCode)
+    result = result?.replace("{totalAmount}", Number(totalAmount.toString()) + currencyCode.replace('JPY', '円'))
     result = result?.replace("{product}", product + ' - ' + variant)
     result = result?.replace("{address}", formattedArea + address1 + address2)
     result = result?.replace("{address1}", address1)
