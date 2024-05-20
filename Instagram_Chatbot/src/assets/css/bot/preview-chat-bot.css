@@ -8,11 +8,13 @@
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     z-index: 900;
+    display: flex;
+    flex-direction: column;
 }
 
 .sp-header {
     /* background-color: #546DA7; */
-    width: 380px;
+    min-width: 380px;
     height: 65px;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
@@ -130,7 +132,8 @@
 .sp-body {
     padding: 10px;
     overflow-y: auto;
-    height: calc(86% + 1px);
+    /*height: calc(86% + 1px);*/
+    /*height: 100%;*/
 }
 
 .sp-body input {
@@ -197,7 +200,7 @@
 
 .sp-user-message-button-action {
     display: flex;
-    justify-content: center;
+    justify-content: end;
 }
 
 .underline-none:hover {
@@ -206,10 +209,13 @@
 
 .sp-body-user-side-messages button {
     margin: 0px;
-    width: 40%;
-    font-size: 10px;
-    padding: 13px;
+    /*width: 40%;*/
+    min-width: 90px;
+    min-height: 42px;
+    font-size: 12px;
+    padding: 1px 8px;
     border-radius: 2px;
+    box-sizing: content-box;
 }
 
 .sp-body-user-side-messages .ss-message__content--user-pull_down-col {
@@ -653,7 +659,8 @@ slideUp
       border-top-left-radius: 2px;
       border-top-right-radius: 2px;
       z-index: 900;
-
+        display: flex;
+        flex-direction: column;
       
     }
 

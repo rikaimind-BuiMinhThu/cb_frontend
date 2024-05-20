@@ -15,7 +15,6 @@ function getEnvironment() {
     get: (searchParams, prop) => searchParams.get(prop),
   });
   return params.env || "production";
-  // return "local";
 }
 
 function getDebugFlag() {
@@ -74,6 +73,7 @@ async function displayPopup() {
       : "smartphone";
   const response = await fetch(
     `${getEcChatBotApiServerBaseUrl()}/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
+    // `https://ec-chatbot-test1.com/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
     {
       method: "GET",
       headers: {
@@ -139,7 +139,8 @@ async function displayPopup() {
         (e.data && !firstOpen && mobileCheck() === true)
       ) {
         iframe.width = "100%";
-        iframe.height = "620px";
+        // iframe.height = "620px";
+        iframe.height = "100%";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       } else if (firstOpen || (e.data && !firstOpen)) {
@@ -158,7 +159,7 @@ async function displayPopup() {
         getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
       } else if (!e.data && !firstOpen && mobileCheck() === true) {
         iframe.width = "300px";
-        iframe.height = "65px";
+        iframe.height = "77px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
         log("close");
@@ -167,7 +168,7 @@ async function displayPopup() {
           chatbotW && chatbotRight
             ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
             : "400px";
-        iframe.height = chatbotBottom ? `${parseInt(chatbotH) + 65}px` : "77px";
+        iframe.height = chatbotBottom ? `${parseInt(chatbotH) + 77}px` : "77px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
         log("close");

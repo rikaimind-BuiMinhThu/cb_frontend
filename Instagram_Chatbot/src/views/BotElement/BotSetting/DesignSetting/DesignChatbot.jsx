@@ -61,8 +61,8 @@ function DesignChatbot() {
   const [positionPc, setPositionPc] = useState(1);
   const [widthPc, setWidthPc] = useState(380);
   const [heightPc, setHeightPc] = useState(620);
-  const [widthSp, setWidthSp] = useState(350);
-  const [heightSp, setHeightSp] = useState(600);
+  const [widthSp, setWidthSp] = useState(100);
+  const [heightSp, setHeightSp] = useState(100);
   const [rightPcTitle, setRightPcTitle] = useState("");
   const [positionSp, setPositionSp] = useState(1);
   const [buttonTypeSp, setButtonTypeSp] = useState(1);
@@ -98,7 +98,12 @@ function DesignChatbot() {
   };
   // color: handle click
   const handleColorClick = (index, color) => {
-    setMainColor(color);
+    if (color) {
+      setMainColor(color);
+    } else {
+      const customColor = document.querySelector('#custom-color')
+      customColor.click()
+    }
     document
       .querySelector(".main-colors .color.active")
       ?.classList?.remove("active");
@@ -188,6 +193,13 @@ function DesignChatbot() {
       document
         .querySelector(`.main-colors .color.color-${index}`)
         ?.classList?.add("active");
+    } else if (index === -1 && tabmenu) {
+      document
+          .querySelector(".main-colors .color.active")
+          ?.classList?.remove("active");
+      document
+          .querySelector(`.main-colors .color.color-999`)
+          ?.classList?.add("active");
     }
   }, [mainColor, tabmenu]);
   //get chat bot information
@@ -201,13 +213,13 @@ function DesignChatbot() {
         setHeightPc(result?.height_pc);
         setWidthSp(result?.width_sp);
         setHeightSp(result?.height_sp);
-        setPositionPc(result?.position_pc);
+        setPositionPc(result?.position_pc ? Number(result?.position_sp) : 1);
         setRightPcTitle(result?.right_position_pc_title);
-        setButtonTypePc(result?.button_type_pc);
+        setButtonTypePc(result?.button_type_pc ? Number(result?.position_sp) : 1);
         setRightMarginPc(result?.right_margin_pc);
         setBottomMarginPc(result?.bottom_margin_pc);
-        setPositionSp(result?.position_sp);
-        setButtonTypeSp(result?.button_type_sp);
+        setPositionSp(result?.position_sp ? Number(result?.position_sp) : 1);
+        setButtonTypeSp(result?.button_type_sp ? Number(result?.position_sp) : 1);
         setRightSpTitle(
           JSON.parse(response.data.data?.design_settings)
             ?.right_position_sp_title
@@ -233,9 +245,11 @@ function DesignChatbot() {
         setBotImage(
           `${process.env.REACT_APP_API_CHATBOT_URL}${response.data.data?.icon?.url}`
         );
-        const mainColor = response?.data?.data?.main_color;
+        const mainColor = response?.data?.data?.main_color || response?.data?.data?.main_color_other;
         if (mainColor && colorMap[mainColor]) {
           setMainColor(colorMap[mainColor]);
+        } else if (mainColor) {
+          setMainColor(mainColor);
         }
         // setMainColor(response.data.data?.main_color);
         setDefaultIcon(response.data.data?.icon?.url);
@@ -264,7 +278,6 @@ function DesignChatbot() {
         iconBot = botImage;
       }
     if (title && subtitle && botName ) {
-      
       let main_color = {
         blue: "#327AED",
         green: "#26B197",
@@ -287,24 +300,29 @@ function DesignChatbot() {
             title: title,
             subtitle: subtitle,
             design_type: designType,
-            main_color: color,
+            // main_color: color,
             // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
             icon: iconBot,
             bot_name: botName,
           },
         };
+
+        if (color) bot.chatbot.main_color = color
+        else bot.chatbot.main_color_other = mainColor
       } else {
         var bot = {
           chatbot: {
             title: title,
             subtitle: subtitle,
             design_type: designType,
-            main_color: color,
+            // main_color: color,
             // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
-  
             bot_name: botName,
           },
         };
+
+        if (color) bot.chatbot.main_color = color
+        else bot.chatbot.main_color_other = mainColor
       }
       api
         .put(`api/v1/managements/chatbots/${botId}`, bot)
@@ -358,20 +376,21 @@ function DesignChatbot() {
         height_pc: heightPc,
         width_sp: widthSp,
         height_sp: heightSp,
-        position_pc: positionPc,
-        button_type_pc: buttonTypePc,
+        position_pc: positionPc.toString(),
+        button_type_pc: buttonTypePc.toString(),
         right_position_pc_title: rightPcTitle,
         right_margin_pc: rightMarginPc,
         bottom_margin_pc: bottomMarginPc,
-        position_sp: positionSp,
-        button_type_sp: buttonTypeSp,
+        position_sp: positionSp.toString(),
+        button_type_sp: buttonTypeSp.toString(),
         right_position_sp_title: rightSpTitle,
         right_margin_sp: rightMarginSp,
         bottom_margin_sp: bottomMarginSp,
         popup_close_bot: popupCloseBot,
-        title_bubble: titleBubble.trim()
+        title_bubble: titleBubble?.trim()
       },
     };
+    console.log(settings)
 
     api
       .post(`api/v1/managements/chatbots/${botId}/design_settings`, settings)
@@ -589,27 +608,42 @@ function DesignChatbot() {
                               <span className="label-field">メインカラー</span>
                               <div className="main-colors">
                                 {colors.map((color, index) => (
-                                  <div
-                                    key={index}
-                                    className={`color color-${index}`}
-                                    onClick={() =>
-                                      handleColorClick(index, color)
-                                    }
-                                  >
+                                    <div
+                                        key={index}
+                                        className={`color color-${index}`}
+                                        onClick={() =>
+                                            handleColorClick(index, color)
+                                        }
+                                    >
                                     <span
-                                      style={{ backgroundColor: color }}
+                                        style={{backgroundColor: color}}
                                     ></span>
-                                  </div>
+                                    </div>
                                 ))}
+
+                                <div
+                                    className={`color color-999`}
+                                    style={{position: "relative"}}
+                                    onClick={() => handleColorClick(999)}
+                                >
+                                  <span style={{backgroundColor: mainColor}}></span>
+                                  <span style={{position: "absolute", bottom: "-35px", width: "60px"}}>カスタム</span>
+                                </div>
+                                <input id="custom-color" type="color"
+                                       value={mainColor}
+                                       onChange={(e) => {
+                                         setMainColor(e.target.value)
+                                       }}
+                                       style={{visibility: "hidden", width: "0px", height: "0px"}}/>
                               </div>
                             </div>
                             <span className="error-message main-colors"></span>
                           </div>
                           <div className="btn-wrapper">
                             <button
-                              type="button"
-                              className="btn btn-preview"
-                              onClick={handlePreview}
+                                type="button"
+                                className="btn btn-preview"
+                                onClick={handlePreview}
                             >
                               プレビュー
                             </button>
@@ -738,7 +772,7 @@ function DesignChatbot() {
                                         }}
                                         value={displayType}
                                         onChange={(e) =>
-                                          setDisplayType(e.target.value)
+                                          setDisplayType(Number(e.target.value))
                                         }
                                       >
                                         <option value={1}>リロード</option>
@@ -838,7 +872,7 @@ function DesignChatbot() {
                                         }}
                                         value={positionPc}
                                         onChange={(e) =>
-                                          setPositionPc(e.target.value)
+                                          setPositionPc(Number(e.target.value))
                                         }
                                       >
                                         <option value={1}>底辺に設置</option>
@@ -849,7 +883,7 @@ function DesignChatbot() {
                                   <span className="error-message subtile"></span>
                                 </div>
 
-                                {positionPc === "2" && (
+                                {positionPc === 2 && (
                                   <div className="field-add-bot">
                                     <div className="add-bot_field-container">
                                       <span className="label-field">
@@ -880,7 +914,7 @@ function DesignChatbot() {
                                   </div>
                                 )}
 {
-  positionPc === "1" && (
+  positionPc === 1 && (
 <div className="field-add-bot">
                                   <div className="add-bot_field-container">
                                     <span className="label-field">
@@ -899,7 +933,7 @@ function DesignChatbot() {
                                         }}
                                         value={buttonTypePc}
                                         onChange={(e) =>
-                                          setButtonTypePc(e.target.value)
+                                          setButtonTypePc(Number(e.target.value))
                                         }
                                       >
                                         <option value={1}>
@@ -1033,13 +1067,13 @@ function DesignChatbot() {
                                           <InputNum
                                                              style={{display:'flex', flex:1}}
                                                               name="height_sp"
-                                                             
+                                                              max={100}
                                                               min={1}
                                                               value={heightSp}
                                                               placeholder="高さ"
                                                               onChange={e => setHeightSp(e)}
                                                             />
-                                                            <p style={{textAlign:'center', margin:'auto 0'}}>px</p>
+                                                            <p style={{textAlign:'center', margin:'auto 0'}}>%</p>
                                                             </div>
                                         
                                         {/* <input
@@ -1096,7 +1130,7 @@ function DesignChatbot() {
                                         }}
                                         value={positionSp}
                                         onChange={(e) =>
-                                          setPositionSp(e.target.value)
+                                          setPositionSp(Number(e.target.value))
                                         }
                                       >
                                         <option value={1}>底辺に設置</option>
@@ -1107,7 +1141,7 @@ function DesignChatbot() {
                                   <span className="error-message subtile"></span>
                                 </div>
 
-                                {positionSp === "2" && (
+                                {positionSp === 2 && (
                                   <div className="field-add-bot">
                                     <div className="add-bot_field-container">
                                       <span className="label-field">
@@ -1138,7 +1172,7 @@ function DesignChatbot() {
                                   </div>
                                 )}
 {
-  positionSp === "1" && (
+  positionSp === 1 && (
     <div className="field-add-bot">
     <div className="add-bot_field-container">
       <span className="label-field">
@@ -1157,7 +1191,7 @@ function DesignChatbot() {
           }}
           value={buttonTypeSp}
           onChange={(e) =>
-            setButtonTypeSp(e.target.value)
+            setButtonTypeSp(Number(e.target.value))
           }
         >
           <option value={1}>

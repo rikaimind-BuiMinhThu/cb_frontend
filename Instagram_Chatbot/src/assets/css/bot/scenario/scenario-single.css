@@ -1316,7 +1316,8 @@ input#ss-message__content--user-checkbox--checkbox_img {
   font-size: 14px;
   border-radius: 5px !important;
   min-height: 36px !important;
-
+  display: flex;
+  align-items: center;
 }
 
 .ss-user-setting__item-custom .react-datepicker-wrapper {
@@ -1935,4 +1936,8 @@ input#ss-message__content--user-checkbox--checkbox_img {
   border: none;
   border-top-width: 0;
   border-left-width: 0;
+}
+
+.ant-select-single .ant-select-selector .ant-select-selection-item, .ant-select-single .ant-select-selector .ant-select-selection-placeholder {
+  line-height: normal !important;
 }
