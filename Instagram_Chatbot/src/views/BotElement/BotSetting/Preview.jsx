@@ -263,6 +263,35 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     //   }).catch(err => console.log(err));
     // }, [])
 
+    function lightenColor(hex, opacity) {
+        let r = parseInt(hex.slice(1, 3), 16);
+        let g = parseInt(hex.slice(3, 5), 16);
+        let b = parseInt(hex.slice(5, 7), 16);
+
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+
+    function hexToRgb(hex) {
+        let r = parseInt(hex.slice(1, 3), 16);
+        let g = parseInt(hex.slice(3, 5), 16);
+        let b = parseInt(hex.slice(5, 7), 16);
+        return { r, g, b };
+    }
+
+    function getLuminance(r, g, b) {
+        const a = [r, g, b].map(v => {
+            v /= 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+    }
+
+    function isDarkColor(hex) {
+        const { r, g, b } = hexToRgb(hex);
+        const luminance = getLuminance(r, g, b);
+        return luminance < 0.5;
+    }
+
     useEffect(() => {
         api.get(`/api/v1/prefectures`).then((res) => {
             setDataPrefectures(res.data.data);
@@ -279,7 +308,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
 
         if (scenarioId) {
             api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/preview`).then(async res => {
-                if (res.data.code == 1) {
+                if (res.data.code === 1) {
                     let messageArr = [];
                     if (res.data.data?.conversation?.messages?.length > 0) {
                         messageArr = [...res.data.data?.conversation?.messages.filter(x => !x.hidden)];
@@ -335,13 +364,17 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                             message_color = '#F5F5F5';
                             font_color = '#000';
                             icon_mess = iconMessageWhite;
+                        } else if (res.data.chatbot.main_color_other) {
+                            opacity_color = lightenColor(res.data.chatbot.main_color_other, 0.1);
+                            message_color = res.data.chatbot.main_color_other;
+                            font_color = "#fff";
                         }
                         res.data.chatbot.opacity_color = opacity_color;
                         res.data.chatbot.message_color = message_color;
                         res.data.chatbot.font_color = font_color;
                         res.data.chatbot.icon_mess = icon_mess;
                     }
-
+                    console.log(res.data.chatbot)
                     setBotInfor(res.data.chatbot);
                     if (res.data.variables) {
                         setVariables([...res.data.variables, ...variablesAll]);
@@ -2512,7 +2545,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         </div>
                     </div>
                 </div>
-                <div id="sp-header" style={botInfor?.main_color && { backgroundColor:  botInfor?.main_color }} className="sp-header">
+                <div id="sp-header" style={(botInfor?.main_color || botInfor?.main_color_other) && { backgroundColor: botInfor?.main_color || botInfor?.main_color_other }} className="sp-header">
                     <div className="sp-header-left" onClick={() => handleCloseBot(isOpen)}>
                         <div className="sp-header-left-avatar sp-avatar">
                             <img src={botInfor?.icon?.url && (EC_CHATBOT_URL + "/" + botInfor?.icon?.url)} />
@@ -2529,7 +2562,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                     </div>
                 </div>
                 <div id="sp-process-bar" className="sp-process-bar" style={{ backgroundColor: botInfor?.opacity_color }}>
-                    <div className="sp-process-bar-color animation" style={{ width: indexUser ? `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` : '100%', ...botInfor?.main_color && { backgroundColor: botInfor?.main_color } }}>
+                    <div className="sp-process-bar-color animation" style={{ width: indexUser ? `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` : '100%', ...((botInfor?.main_color || botInfor?.main_color_other) && { backgroundColor: botInfor?.main_color || botInfor?.main_color_other}) }}>
                         {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。") : `あと${messageUser.length}間`}
                     </div>
                 </div>
@@ -2574,7 +2607,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
 
                                                 {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
                                                     && <div className="sp-user-message-button-action">
-                                                        <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color, borderRadius: '25px' }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage, message)}>
+                                                        <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color || botInfor?.main_color_other, borderRadius: '25px' }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage, message)}>
                                                             {message.buttonName || (indexMessage >= indexMessageRender ? "次へ" : "更新")}
                                                         </Button>
                                                     </div>

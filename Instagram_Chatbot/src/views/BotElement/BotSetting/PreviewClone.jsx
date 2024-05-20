@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "../../../assets/css/bot/preview-chat-bot.css";
 import api from "../../../api/api-management";
 import Cookies from "js-cookie";
@@ -172,6 +172,8 @@ var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
 
 function Preview() {
+  const containerRef = useRef(null);
+
   const [isOpen, setIsOpen] = useState(false);
   const [urlSend, setUrlSend] = useState();
   const [urlReceive, setUrlReceive] = useState();
@@ -457,6 +459,14 @@ function Preview() {
     setIsOpen(!isOpen);
   }
 
+  function lightenColor(hex, opacity) {
+    let r = parseInt(hex.slice(1, 3), 16);
+    let g = parseInt(hex.slice(3, 5), 16);
+    let b = parseInt(hex.slice(5, 7), 16);
+
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+  }
+
   // useEffect(() => {
   //   api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
   //     if (res.data.code == 1) {
@@ -555,6 +565,10 @@ function Preview() {
                 message_color = "#F5F5F5";
                 font_color = "#000";
                 icon_mess = iconMessageWhite;
+              } else if (res.data.chatbot.main_color_other) {
+                opacity_color = lightenColor(res.data.chatbot.main_color_other, 0.1);
+                message_color = res.data.chatbot.main_color_other;
+                font_color = "#fff";
               }
               res.data.chatbot.opacity_color = opacity_color;
               res.data.chatbot.message_color = message_color;
@@ -3541,6 +3555,7 @@ if (scenarioId && botInfor && isOpen  ){
 
   return  (
     <div
+      ref={containerRef}
       id="sp-container1"
       className="sp-container1 slideUp"
       style={{
@@ -3842,7 +3857,7 @@ if (scenarioId && botInfor && isOpen  ){
       <div
         id="sp-header"
         style={
-          botInfor?.main_color && { backgroundColor: botInfor?.main_color }
+            (botInfor?.main_color || botInfor?.main_color_other) && { backgroundColor: botInfor?.main_color || botInfor?.main_color_other}
         }
         className="sp-header"
       >
@@ -3922,8 +3937,8 @@ if (scenarioId && botInfor && isOpen  ){
                     messageUser.length
                   }%`
                 : "100%",
-              ...(botInfor?.main_color && {
-                backgroundColor: botInfor?.main_color,
+              ...((botInfor?.main_color || botInfor?.main_color_other) && {
+                backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
               }),
             }}
           >
@@ -4008,7 +4023,7 @@ if (scenarioId && botInfor && isOpen  ){
                           <Button
                             disabled={message.disabled}
                             style={{
-                              backgroundColor: botInfor?.main_color,
+                              backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
                               borderRadius: "25px",
                             }}
                             className="ss-user-message__action-btn"
@@ -4030,7 +4045,7 @@ if (scenarioId && botInfor && isOpen  ){
       <div
     onClick={() => onOpenPreview(!isOpen)}
     style={{
-      backgroundColor: botInfor?.main_color && botInfor?.main_color,
+      backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
       width: "56px",
       height: "56px",
       borderRadius: "30px",
@@ -4055,7 +4070,7 @@ if (scenarioId && botInfor && isOpen  ){
       <div
     onClick={() => onOpenPreview(!isOpen)}
     style={{
-      backgroundColor: botInfor?.main_color && botInfor?.main_color,
+      backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
       // width: `${widthPc}px`,
       width: `360px`,
       height: "66px",
@@ -4099,7 +4114,7 @@ if (scenarioId && botInfor && isOpen  ){
     <div
     onClick={() => onOpenPreview(!isOpen)}
     style={{
-      backgroundColor: botInfor?.main_color && botInfor?.main_color,
+      backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
       width:'300px',
       height: "65px",
       borderRadius: "0px",
@@ -4129,7 +4144,7 @@ if (scenarioId && botInfor && isOpen  ){
     <div
   onClick={() => onOpenPreview(!isOpen)}
   style={{
-    backgroundColor: botInfor?.main_color && botInfor?.main_color,
+    backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
     width: "56px",
     height: "56px",
     borderRadius: "30px",
@@ -4154,7 +4169,7 @@ if (scenarioId && botInfor && isOpen  ){
     <div
       onClick={() => onOpenPreview(!isOpen)}
       style={{
-        backgroundColor: botInfor?.main_color && botInfor?.main_color,
+        backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
         width: '240px',
         height: "48px",
         borderRadius:'35px',
@@ -4190,7 +4205,7 @@ if (scenarioId && botInfor && isOpen  ){
   <div
   onClick={() => onOpenPreview(!isOpen)}
   style={{
-    backgroundColor: botInfor?.main_color && botInfor?.main_color,
+    backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
     width:'300px',
     height: "60px",
     borderRadius: "0px",
@@ -4266,7 +4281,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     result = result?.replace("{checkoutUrlBtn}",
       `<a href="${url}" target="_blank" class="sp-user-message-button-action underline-none">
         <button
-            style="background-color: ${botInfor?.main_color}; 
+            style="background-color: ${botInfor?.main_color || botInfor?.main_color_other}; 
                    border-radius: 25px;
                    margin: 5px 0;"
             class="ss-user-message__action-btn btn btn-secondary"

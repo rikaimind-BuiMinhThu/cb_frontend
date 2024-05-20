@@ -98,7 +98,12 @@ function DesignChatbot() {
   };
   // color: handle click
   const handleColorClick = (index, color) => {
-    setMainColor(color);
+    if (color) {
+      setMainColor(color);
+    } else {
+      const customColor = document.querySelector('#custom-color')
+      customColor.click()
+    }
     document
       .querySelector(".main-colors .color.active")
       ?.classList?.remove("active");
@@ -188,6 +193,13 @@ function DesignChatbot() {
       document
         .querySelector(`.main-colors .color.color-${index}`)
         ?.classList?.add("active");
+    } else if (index === -1 && tabmenu) {
+      document
+          .querySelector(".main-colors .color.active")
+          ?.classList?.remove("active");
+      document
+          .querySelector(`.main-colors .color.color-999`)
+          ?.classList?.add("active");
     }
   }, [mainColor, tabmenu]);
   //get chat bot information
@@ -233,9 +245,11 @@ function DesignChatbot() {
         setBotImage(
           `${process.env.REACT_APP_API_CHATBOT_URL}${response.data.data?.icon?.url}`
         );
-        const mainColor = response?.data?.data?.main_color;
+        const mainColor = response?.data?.data?.main_color || response?.data?.data?.main_color_other;
         if (mainColor && colorMap[mainColor]) {
           setMainColor(colorMap[mainColor]);
+        } else if (mainColor) {
+          setMainColor(mainColor);
         }
         // setMainColor(response.data.data?.main_color);
         setDefaultIcon(response.data.data?.icon?.url);
@@ -264,7 +278,6 @@ function DesignChatbot() {
         iconBot = botImage;
       }
     if (title && subtitle && botName ) {
-      
       let main_color = {
         blue: "#327AED",
         green: "#26B197",
@@ -287,24 +300,29 @@ function DesignChatbot() {
             title: title,
             subtitle: subtitle,
             design_type: designType,
-            main_color: color,
+            // main_color: color,
             // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
             icon: iconBot,
             bot_name: botName,
           },
         };
+
+        if (color) bot.chatbot.main_color = color
+        else bot.chatbot.main_color_other = mainColor
       } else {
         var bot = {
           chatbot: {
             title: title,
             subtitle: subtitle,
             design_type: designType,
-            main_color: color,
+            // main_color: color,
             // icon: !iconBot.includes('image/png;base64') ? defaultIcon : iconBot,
-  
             bot_name: botName,
           },
         };
+
+        if (color) bot.chatbot.main_color = color
+        else bot.chatbot.main_color_other = mainColor
       }
       api
         .put(`api/v1/managements/chatbots/${botId}`, bot)
@@ -590,27 +608,42 @@ function DesignChatbot() {
                               <span className="label-field">メインカラー</span>
                               <div className="main-colors">
                                 {colors.map((color, index) => (
-                                  <div
-                                    key={index}
-                                    className={`color color-${index}`}
-                                    onClick={() =>
-                                      handleColorClick(index, color)
-                                    }
-                                  >
+                                    <div
+                                        key={index}
+                                        className={`color color-${index}`}
+                                        onClick={() =>
+                                            handleColorClick(index, color)
+                                        }
+                                    >
                                     <span
-                                      style={{ backgroundColor: color }}
+                                        style={{backgroundColor: color}}
                                     ></span>
-                                  </div>
+                                    </div>
                                 ))}
+
+                                <div
+                                    className={`color color-999`}
+                                    style={{position: "relative"}}
+                                    onClick={() => handleColorClick(999)}
+                                >
+                                  <span style={{backgroundColor: mainColor}}></span>
+                                  <span style={{position: "absolute", bottom: "-35px", width: "60px"}}>カスタム</span>
+                                </div>
+                                <input id="custom-color" type="color"
+                                       value={mainColor}
+                                       onChange={(e) => {
+                                         setMainColor(e.target.value)
+                                       }}
+                                       style={{visibility: "hidden", width: "0px", height: "0px"}}/>
                               </div>
                             </div>
                             <span className="error-message main-colors"></span>
                           </div>
                           <div className="btn-wrapper">
                             <button
-                              type="button"
-                              className="btn btn-preview"
-                              onClick={handlePreview}
+                                type="button"
+                                className="btn btn-preview"
+                                onClick={handlePreview}
                             >
                               プレビュー
                             </button>
