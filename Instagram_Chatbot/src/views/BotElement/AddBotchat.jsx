@@ -18,6 +18,7 @@ import { Link } from 'react-router-dom';
 import { tokenExpired } from 'api/tokenExpired';
 import Cookies from 'js-cookie';
 import { MDBIcon } from 'mdbreact';
+import {Input} from "antd";
 
 const colors = [
   '#327AED',
@@ -84,7 +85,12 @@ console.log();
 
   // color: handle click
   const handleColorClick = (index, color) => {
-    setMainColor(color);
+    if (color) {
+      setMainColor(color);
+    } else {
+      const customColor = document.querySelector('#custom-color')
+      customColor.click()
+    }
     document.querySelector('.main-colors .color.active').classList.remove('active');
     document.querySelector(`.main-colors .color.color-${index}`).classList.add('active');
   };
@@ -163,25 +169,27 @@ console.log();
         black: '#7C8290',
         white: '#D8E2EF',
       };
-      var color;
+      let color;
       Object.entries(main_color).forEach(([key, val]) => {
         if (mainColor === val) {
           color = key;
         }
       });
-      var bot = {
+
+      let bot = {
         chatbot: {
           title: title,
           subtitle: subtitle,
           design_type: designType,
-          main_color: color,
+          // main_color: color,
+          // main_color: mainColor,
           icon: iconBot,
           bot_name: botName,
         },
       };
 
-
-      // console.log('bot info: ', bot)
+      if (color) bot.chatbot.main_color = color
+      else bot.chatbot.main_color_other = mainColor
 
       api
         .post(`api/v1/managements/chatbots`, bot)
@@ -339,14 +347,27 @@ console.log();
                           <span className="label-field">メインカラー</span>
                           <div className="main-colors">
                             {colors.map((color, index) => (
-                              <div
-                                key={index}
-                                className={`color color-${index}`}
-                                onClick={() => handleColorClick(index, color)}
-                              >
-                                <span style={{ backgroundColor: color }}></span>
-                              </div>
+                                <div
+                                    key={index}
+                                    className={`color color-${index}`}
+                                    onClick={() => handleColorClick(index, color)}
+                                >
+                                  <span style={{backgroundColor: color}}></span>
+                                </div>
                             ))}
+
+                            <div
+                                className={`color color-999`}
+                                style={{position: "relative"}}
+                                onClick={() => handleColorClick(999)}
+                            >
+                              <span style={{backgroundColor: mainColor}}></span>
+                              <span style={{position: "absolute", bottom: "-35px", width: "60px"}}>カスタム</span>
+                            </div>
+                            <input id="custom-color" type="color"
+                                   value={mainColor}
+                                   onChange={(e) => {setMainColor(e.target.value)}}
+                                   style={{visibility: "hidden", width: "0px", height: "0px"}}/>
                           </div>
                         </div>
                         <span className="error-message main-colors"></span>
