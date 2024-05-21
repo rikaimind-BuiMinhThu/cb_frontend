@@ -258,7 +258,7 @@ function Preview() {
        }
     } else {
       return {
-        bottom: bottomMarginPc ? `${bottomMarginPc}px` : "10px",
+        bottom: bottomMarginPc ? `${bottomMarginPc}px` : "0px",
         right: rightMarginPc ? `${rightMarginPc}px` : "30px",
         width: widthPc ? `${widthPc}px` : "380px",
         height: heightPc ? `${heightPc}px` : "600px"
@@ -3476,6 +3476,10 @@ function Preview() {
   };
 
   const handleOpenWithDrawal = () => {
+    if (activePopupCloseBot) {
+      setShowPopupCloseBot(true)
+      return
+    }
     if (botInfor && botInfor.withdrawal_prevention_status === "invalid") {
       sessionStorage.removeItem("cart")
       setScenarioUserResponses([])
