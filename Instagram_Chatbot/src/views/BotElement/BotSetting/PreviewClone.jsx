@@ -254,7 +254,7 @@ function Preview() {
           bottom: "0px",
           right: "0px",
           width: widthSp ? `${widthSp}%` : "100%%",
-          height: heightSp ? `${heightSp}px` : "100%"
+          height: heightSp ? `${heightSp}%` : "100%"
        }
     } else {
       return {
@@ -566,6 +566,7 @@ function Preview() {
                 font_color = "#000";
                 icon_mess = iconMessageWhite;
               } else if (res.data.chatbot.main_color_other) {
+                // opacity_color = lightenColor(res.data.chatbot.main_color_other, 0.1);
                 opacity_color = lightenColor(res.data.chatbot.main_color_other, 0.1);
                 message_color = res.data.chatbot.main_color_other;
                 font_color = "#fff";
@@ -3570,6 +3571,7 @@ if (scenarioId && botInfor && isOpen  ){
         zIndex: 999,
         display: "flex",
         flexDirection: "column",
+        backgroundColor: "white"
       }}
     >
       <div
