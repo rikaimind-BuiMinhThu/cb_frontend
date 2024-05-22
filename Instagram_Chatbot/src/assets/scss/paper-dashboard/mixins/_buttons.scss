@@ -13,9 +13,9 @@
     .show > &.dropdown-toggle,
     .show > &.dropdown-toggle:focus,
     .show > &.dropdown-toggle:hover {
-        background-color: $btn-states-color !important;
-        color: $white-color !important;
-        box-shadow: none !important;
+        //background-color: $btn-states-color !important;
+        //color: $white-color !important;
+        //box-shadow: none !important;
     }
 
     &:not([data-action]):hover{
