@@ -72,8 +72,8 @@ async function displayPopup() {
       ? "tablet"
       : "smartphone";
   const response = await fetch(
-    // `${getEcChatBotApiServerBaseUrl()}/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
-    `https://ec-chatbot-test1.com/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
+    `${getEcChatBotApiServerBaseUrl()}/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
+    // `https://ec-chatbot-test1.com/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
     {
       method: "GET",
       headers: {

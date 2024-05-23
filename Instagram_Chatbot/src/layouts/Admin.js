@@ -14,8 +14,7 @@ var ps;
 
 function Dashboard(props) {
   const mainPanel = React.useRef();
-  // const location = useLocation();
-  const location = "";
+  const location = useLocation();
 
   React.useEffect(() => {
     if (navigator.platform.indexOf("Win") > -1) {
