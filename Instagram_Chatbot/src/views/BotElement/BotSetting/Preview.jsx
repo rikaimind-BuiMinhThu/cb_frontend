@@ -3563,6 +3563,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                                     <div className="ss-message__content--user-pull_down-col col-12"
                                                          style={{padding: '0'}}>
                                                         <SelectCustom
+                                                            showSearch={false}
                                                             data={productPurchaseSelectOption.products}
                                                             style={{width: '100%'}}
                                                             placeholder={productPurchaseSelectOption.display_unselected}

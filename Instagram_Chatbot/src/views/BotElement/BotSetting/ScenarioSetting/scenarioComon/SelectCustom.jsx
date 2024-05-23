@@ -5,12 +5,12 @@ import { InboxOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
-const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label, disabled = false, styleLabel }) => {
+const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue = "key", style, placeholder, nameValue = "value", mode, label, disabled = false, styleLabel, showSearch = true }) => {
   return (
     <React.Fragment>
       {label && <span style={{ marginRight: '2%', fontSize: '14px', fontWeight: '400', ...styleLabel }}>{label}</span>}
       <Select
-        showSearch
+        showSearch={showSearch}
         allowClear={allowClear}
         style={style || { width: '90%' }}
         placeholder={placeholder}
