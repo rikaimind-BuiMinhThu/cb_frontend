@@ -1941,3 +1941,11 @@ input#ss-message__content--user-checkbox--checkbox_img {
 .ant-select-single .ant-select-selector .ant-select-selection-item, .ant-select-single .ant-select-selector .ant-select-selection-placeholder {
   line-height: normal !important;
 }
+
+.sp-container1 input {
+  background-color: #eff4fd;
+}
+
+.sp-container input {
+  background-color: #eff4fd;
+}

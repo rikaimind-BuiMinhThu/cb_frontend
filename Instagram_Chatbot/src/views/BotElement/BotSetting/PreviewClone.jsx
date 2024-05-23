@@ -556,9 +556,9 @@ function Preview() {
                 font_color = "#fff";
                 icon_mess = iconMessagePurple;
               } else if (res.data.chatbot.main_color === "black") {
-                opacity_color = "#ECEDE8";
-                message_color = "#fff";
-                font_color = "#333333";
+                opacity_color = "#ecede8";
+                message_color = "#c3c3c3";
+                font_color = "#000";
                 icon_mess = iconMessageBlack;
               } else if (res.data.chatbot.main_color === "white") {
                 opacity_color = "#fff";
