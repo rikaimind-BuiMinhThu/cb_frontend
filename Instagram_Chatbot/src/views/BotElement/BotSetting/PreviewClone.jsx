@@ -4286,7 +4286,8 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     result = result?.replace("{checkoutUrlBtn}",
       `<a href="${url}" target="_blank" class="sp-user-message-button-action underline-none">
         <button
-            style="background-color: ${botInfor?.main_color || botInfor?.main_color_other}; 
+            style="background-color: ${botInfor?.main_color || botInfor?.font_color}; 
+                   color: ${botInfor?.main_color ? botInfor?.font_color : botInfor?.main_color_other};
                    border-radius: 25px;
                    margin: 5px 0;"
             class="ss-user-message__action-btn btn btn-secondary"
