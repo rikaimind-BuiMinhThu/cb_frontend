@@ -556,9 +556,9 @@ function Preview() {
                 font_color = "#fff";
                 icon_mess = iconMessagePurple;
               } else if (res.data.chatbot.main_color === "black") {
-                opacity_color = "#ECEDE8";
-                message_color = "#fff";
-                font_color = "#333333";
+                opacity_color = "#ecede8";
+                message_color = "#c3c3c3";
+                font_color = "#000";
                 icon_mess = iconMessageBlack;
               } else if (res.data.chatbot.main_color === "white") {
                 opacity_color = "#fff";
@@ -4286,7 +4286,8 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     result = result?.replace("{checkoutUrlBtn}",
       `<a href="${url}" target="_blank" class="sp-user-message-button-action underline-none">
         <button
-            style="background-color: ${botInfor?.main_color || botInfor?.main_color_other}; 
+            style="background-color: ${botInfor?.main_color || botInfor?.font_color}; 
+                   color: ${botInfor?.main_color ? botInfor?.font_color : botInfor?.main_color_other};
                    border-radius: 25px;
                    margin: 5px 0;"
             class="ss-user-message__action-btn btn btn-secondary"
@@ -5722,6 +5723,7 @@ const UserMessage = ({
                               <div className="ss-message__content--user-pull_down-col col-12"
                                    style={{padding: '0'}}>
                                 <SelectCustom
+                                    showSearch={false}
                                     data={productPurchaseSelectOption.products}
                                     style={{width: '100%'}}
                                     placeholder={productPurchaseSelectOption.display_unselected}
