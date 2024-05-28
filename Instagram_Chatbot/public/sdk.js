@@ -99,7 +99,7 @@ async function displayPopup() {
     iframe.width =
       chatbotW && chatbotRight
         ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
-        : "400px";
+        : "460px";
     iframe.style.right = "10px";
   }
 
@@ -165,7 +165,7 @@ async function displayPopup() {
         iframe.width =
           chatbotW && chatbotRight
             ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
-            : "400px";
+            : "460px";
         iframe.height = chatbotBottom ? `${parseInt(chatbotH) + 77}px` : "77px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
