@@ -99,11 +99,11 @@
 }
 
 .sp-header-left-label-sub-title {
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .sp-header-left-label-title {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
 }
 
@@ -119,13 +119,15 @@
 
 .sp-process-bar {
     background-color: #EBF7FF;
+    margin-top: 1px;
 }
 
 .sp-process-bar-color {
+    font-size: 13px;
     min-width: 25%;
     height: 20px;
     background-color: #70A5FC;
-    padding: 0px 5px;
+    padding: 0 5px;
     color: #FFFFFF;
 }
 
@@ -208,11 +210,11 @@
 }
 
 .sp-body-user-side-messages button {
-    margin: 0px;
+    margin: 0;
     /*width: 40%;*/
     min-width: 90px;
     min-height: 42px;
-    font-size: 12px;
+    font-size: 14px;
     padding: 1px 8px;
     border-radius: 2px;
     box-sizing: content-box;
@@ -646,6 +648,41 @@ slideUp
     }
 }
 
+.slideDown {
+    animation-name: slideDown;
+    -webkit-animation-name: slideDown;
+
+    animation-duration: 1s;
+    -webkit-animation-duration: 1s;
+
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+}
+
+@keyframes slideDown {
+    0% {
+        transform: translateY(0%);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+@-webkit-keyframes slideDown {
+    0% {
+        -webkit-transform: translateY(0%);
+        opacity: 1;
+    }
+
+    100% {
+        -webkit-transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
 /* CSS cho màn hình mobile */
 @media (max-width: 767px) {
     .sp-container {
@@ -760,4 +797,3 @@ slideUp
 
 
   }
-  
