@@ -65,7 +65,7 @@ function getEcChatBotFrontEndBaseUrl() {
 }
 
 async function displayPopup() {
-  var device =
+  const device =
     !tabletCheck() && !mobileCheck()
       ? "pc"
       : !tabletCheck()
@@ -83,8 +83,6 @@ async function displayPopup() {
     }
   );
   const data = await response.json();
-
-  log("data: ", data);
 
   scenarioId = data.data.id;
   let uuid =
@@ -147,11 +145,11 @@ async function displayPopup() {
         iframe.width =
           chatbotW && chatbotRight
             ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
-            : "400px";
+            : "460px";
         iframe.height =
           chatbotH && chatbotBottom
             ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px`
-            : "620px";
+            : "700px";
         iframe.style.bottom = "0px";
         iframe.style.right = "10px";
         let add = { scenario_data: device };

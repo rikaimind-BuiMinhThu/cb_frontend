@@ -206,8 +206,8 @@ function Preview() {
   //new
   const [buttonTypePc, setButtonTypePc] = useState("1");
   const [positionPc, setPositionPc] = useState("1");
-  const [widthPc, setWidthPc] = useState(380);
-  const [heightPc, setHeightPc] = useState(600);
+  const [widthPc, setWidthPc] = useState(450);
+  const [heightPc, setHeightPc] = useState(700);
   const [widthSp, setWidthSp] = useState(100);
   const [heightSp, setHeightSp] = useState(100);
   const [rightPcTitle, setRightPcTitle] = useState("");
@@ -260,8 +260,8 @@ function Preview() {
       return {
         bottom: bottomMarginPc ? `${bottomMarginPc}px` : "0px",
         right: rightMarginPc ? `${rightMarginPc}px` : "30px",
-        width: widthPc ? `${widthPc}px` : "380px",
-        height: heightPc ? `${heightPc}px` : "600px"
+        width: widthPc ? `${widthPc}px` : "450px",
+        height: heightPc ? `${heightPc}px` : "700px"
      }
     }
   }
@@ -292,8 +292,8 @@ function Preview() {
         setActivePopupCloseBot(result?.popup_close_bot ? true : false);
         setTitleBubble(result?.title_bubble ? result?.title_bubble : "簡単90秒で注文完了");
         setDisplayType(result?.display_type);
-        setWidthPc(result?.width_pc? result?.width_pc: 380);
-        setHeightPc(result?.height_pc? result?.height_pc:600);
+        setWidthPc(result?.width_pc? result?.width_pc: 450);
+        setHeightPc(result?.height_pc? result?.height_pc:700);
         setWidthSp(result?.width_sp?result?.width_sp:100);
         setHeightSp(result?.height_sp?result?.height_sp:100);
         setPositionPc(result?.position_pc ? result?.position_pc : "1");
@@ -302,9 +302,9 @@ function Preview() {
         } else {
           setIsOpen(false)
         }
-        sessionStorage.setItem("chatbotH", result?.height_pc? result?.height_pc: 600);
+        sessionStorage.setItem("chatbotH", result?.height_pc? result?.height_pc: 700);
         sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc? result?.bottom_margin_pc:10);
-        sessionStorage.setItem("chatbotW", result?.width_pc? result?.width_pc:380);
+        sessionStorage.setItem("chatbotW", result?.width_pc? result?.width_pc:450);
         sessionStorage.setItem("chatbotRight", result?.right_margin_pc? result?.right_margin_pc : 30);
         setRightPcTitle(result?.right_position_pc_title);
         setButtonTypePc(result?.button_type_pc? result?.button_type_pc: "1");
@@ -406,31 +406,53 @@ function Preview() {
   }
 
   function handleCloseBot() {
-    if (document.getElementById("sp-container1")) {
-      
-      Cookies.set("openPre", true);
-      if (window && window.parent) {
-        window.parent.postMessage(false, urlReceive);
-      }
-      document.getElementById("sp-container1").style.height = heightPc
-        ? `${heightPc}px`
-        : "600px";
-      document.getElementById("sp-header").style.position = "static";
-      document.getElementById("sp-header").style.borderBottomLeftRadius =
-        "0px";
-      document.getElementById("sp-header").style.borderBottomRightRadius =
-        "0px";
-      document.getElementById("sp-header").style.borderTopLeftRadius = mobileCheck() ? "0px" : "5px";
-      document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
-
-      document.getElementById("sp-process-bar").style.display = "block";
-      document.getElementById("sp-body").style.display = "block";
-    } 
-    setIsOpen(false);
+    // if (document.getElementById("sp-container1")) {
+    //
+    //   Cookies.set("openPre", true);
+    //   if (window && window.parent) {
+    //     window.parent.postMessage(false, urlReceive);
+    //   }
+    //   document.getElementById("sp-container1").style.height = heightPc
+    //     ? `${heightPc}px`
+    //     : "600px";
+    //   document.getElementById("sp-header").style.position = "static";
+    //   document.getElementById("sp-header").style.borderBottomLeftRadius =
+    //     "0px";
+    //   document.getElementById("sp-header").style.borderBottomRightRadius =
+    //     "0px";
+    //   document.getElementById("sp-header").style.borderTopLeftRadius = mobileCheck() ? "0px" : "5px";
+    //   document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
+    //
+    //   document.getElementById("sp-process-bar").style.display = "block";
+    //   document.getElementById("sp-process-bar").style.marginTop = "1px";
+    //   document.getElementById("sp-body").style.display = "block";
+    // }
     setShowPopupCloseBot(false);
+
+    const element = document.getElementById('sp-container1');
+    element.classList.remove('slideUp');
+    element.classList.add('slideDown');
+    setTimeout(() => {
+      setIsOpen(false);
+    }, 1000)
   }
 
   function onOpenPreview() {
+    if (isOpen && activePopupCloseBot) {
+      setShowPopupCloseBot(true)
+      return;
+    }
+
+    if (isOpen && !activePopupCloseBot) {
+      const element = document.getElementById('sp-container1');
+      element.classList.remove('slideUp');
+      element.classList.add('slideDown');
+      setTimeout(() => {
+        setIsOpen(!isOpen);
+      }, 1000)
+    } else {
+      setIsOpen(!isOpen);
+    }
     if (document.getElementById("sp-container1")) {
       if (activePopupCloseBot) {
         setShowPopupCloseBot(true)
@@ -453,10 +475,11 @@ function Preview() {
         document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
 
         document.getElementById("sp-process-bar").style.display = "block";
+        document.getElementById("sp-process-bar").style.marginTop = "1px";
+
         document.getElementById("sp-body").style.display = "block";
       } 
       }
-    setIsOpen(!isOpen);
   }
 
   function lightenColor(hex, opacity) {
@@ -3862,7 +3885,12 @@ if (scenarioId && botInfor && isOpen  ){
       <div
         id="sp-header"
         style={
-            (botInfor?.main_color || botInfor?.main_color_other) && { backgroundColor: botInfor?.main_color || botInfor?.main_color_other}
+            (botInfor?.main_color || botInfor?.main_color_other) &&
+            {
+              backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
+              borderTopLeftRadius: mobileCheck() ? "0px" : "5px",
+              borderTopRightRadius: mobileCheck() ? "0px" : "5px",
+            }
         }
         className="sp-header"
       >
