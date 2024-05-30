@@ -611,7 +611,7 @@ slideUp
 ==========
 */
 
-
+/* Animation PC */
 .slideUp {
     animation-name: slideUp;
     -webkit-animation-name: slideUp;
@@ -621,31 +621,6 @@ slideUp
 
     animation-timing-function: ease;
     -webkit-animation-timing-function: ease;
-
-}
-
-@keyframes slideUp {
-    0% {
-        transform: translateY(100%);
-        opacity: 0;
-    }
-
-    100% {
-        transform: translateY(0%);
-        opacity: 1;
-    }
-}
-
-@-webkit-keyframes slideUp {
-    0% {
-        -webkit-transform: translateY(100%);
-        opacity: 0;
-    }
-
-    100% {
-        -webkit-transform: translateY(0%);
-        opacity: 1;
-    }
 }
 
 .slideDown {
@@ -659,6 +634,32 @@ slideUp
     -webkit-animation-timing-function: ease;
 }
 
+@keyframes slideUp {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+        width: 360px;
+    }
+
+    100% {
+        transform: translateY(0%);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes slideUp {
+    0% {
+        -webkit-transform: translateY(100%);
+        opacity: 0;
+        width: 360px;
+    }
+
+    100% {
+        -webkit-transform: translateY(0%);
+        opacity: 1;
+    }
+}
+
 @keyframes slideDown {
     0% {
         transform: translateY(0%);
@@ -668,6 +669,7 @@ slideUp
     100% {
         transform: translateY(100%);
         opacity: 0;
+        width: 360px;
     }
 }
 
@@ -680,6 +682,81 @@ slideUp
     100% {
         -webkit-transform: translateY(100%);
         opacity: 0;
+        width: 360px;
+    }
+}
+
+/*Animation mobile*/
+.slideUpSp {
+    animation-name: slideUpSp;
+    -webkit-animation-name: slideUpSp;
+
+    animation-duration: 1s;
+    -webkit-animation-duration: 1s;
+
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+}
+
+.slideDownSp {
+    animation-name: slideDownSp;
+    -webkit-animation-name: slideDownSp;
+
+    animation-duration: 1s;
+    -webkit-animation-duration: 1s;
+
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+}
+@keyframes slideUpSp {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+        width: 250px;
+    }
+
+    100% {
+        transform: translateY(0%);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes slideUpSp {
+    0% {
+        -webkit-transform: translateY(100%);
+        opacity: 0;
+        width: 250px;
+    }
+
+    100% {
+        -webkit-transform: translateY(0%);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDownSp {
+    0% {
+        transform: translateY(0%);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+        width: 250px;
+    }
+}
+
+@-webkit-keyframes slideDownSp {
+    0% {
+        -webkit-transform: translateY(0%);
+        opacity: 1;
+    }
+
+    100% {
+        -webkit-transform: translateY(100%);
+        opacity: 0;
+        width: 250px;
     }
 }
 
