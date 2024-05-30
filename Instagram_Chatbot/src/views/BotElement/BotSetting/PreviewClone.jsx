@@ -363,7 +363,16 @@ function Preview() {
 
   useEffect(() => {
     if (window && window.parent) {
-      window.parent.postMessage(isOpen, urlReceive);
+      // window.parent.postMessage(isOpen, urlReceive);
+      window.parent.postMessage({
+        isOpen: isOpen,
+        widthPc: widthPc,
+        heightPc: heightPc,
+        widthSp: widthSp,
+        heightSp: heightSp,
+        chatbotRight: rightMarginPc,
+        chatbotBottom: bottomMarginPc,
+      }, urlReceive);
     }
   }, [isOpen, urlReceive])
 
@@ -430,11 +439,17 @@ function Preview() {
     setShowPopupCloseBot(false);
 
     const element = document.getElementById('sp-container1');
-    element.classList.remove('slideUp');
-    element.classList.add('slideDown');
+    if (mobileCheck()) {
+      element.classList.remove('slideUpSp');
+      element.classList.add('slideDownSp');
+    } else {
+      element.classList.remove('slideUp');
+      element.classList.add('slideDown');
+    }
+
     setTimeout(() => {
       setIsOpen(false);
-    }, 1000)
+    }, 900)
   }
 
   function onOpenPreview() {
@@ -445,11 +460,16 @@ function Preview() {
 
     if (isOpen && !activePopupCloseBot) {
       const element = document.getElementById('sp-container1');
-      element.classList.remove('slideUp');
-      element.classList.add('slideDown');
+      if (mobileCheck()) {
+        element.classList.remove('slideUpSp');
+        element.classList.add('slideDownSp');
+      } else {
+        element.classList.remove('slideUp');
+        element.classList.add('slideDown');
+      }
       setTimeout(() => {
         setIsOpen(!isOpen);
-      }, 1000)
+      }, 900)
     } else {
       setIsOpen(!isOpen);
     }
@@ -461,7 +481,16 @@ function Preview() {
       if (isOpen && !activePopupCloseBot) {
         Cookies.set("openPre", true);
         if (window && window.parent) {
-          window.parent.postMessage(true, urlReceive);
+          // window.parent.postMessage(true, urlReceive);
+          window.parent.postMessage({
+            isOpen: true,
+            widthPc: widthPc,
+            heightPc: heightPc,
+            widthSp: widthSp,
+            heightSp: heightSp,
+            chatbotRight: rightMarginPc,
+            chatbotBottom: bottomMarginPc,
+          }, urlReceive);
         }
         document.getElementById("sp-container1").style.height = heightPc
           ? `${heightPc}px`
@@ -3584,7 +3613,7 @@ if (scenarioId && botInfor && isOpen  ){
     <div
       ref={containerRef}
       id="sp-container1"
-      className="sp-container1 slideUp"
+      className={`sp-container1 ${mobileCheck() ? 'slideUpSp' : 'slideUp'}`}
       style={{
         position:'fixed',
         bottom: "0px",
