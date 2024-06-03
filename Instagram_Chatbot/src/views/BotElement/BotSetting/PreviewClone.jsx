@@ -347,7 +347,7 @@ function Preview() {
     window.addEventListener(
       "message",
       (event) => {
-        if (event.data === 'openPreview') {
+        if (event.data === 'openPreview' && isOpen !== true) {
           onOpenPreview(true)
         }
       },
@@ -415,27 +415,6 @@ function Preview() {
   }
 
   function handleCloseBot() {
-    // if (document.getElementById("sp-container1")) {
-    //
-    //   Cookies.set("openPre", true);
-    //   if (window && window.parent) {
-    //     window.parent.postMessage(false, urlReceive);
-    //   }
-    //   document.getElementById("sp-container1").style.height = heightPc
-    //     ? `${heightPc}px`
-    //     : "600px";
-    //   document.getElementById("sp-header").style.position = "static";
-    //   document.getElementById("sp-header").style.borderBottomLeftRadius =
-    //     "0px";
-    //   document.getElementById("sp-header").style.borderBottomRightRadius =
-    //     "0px";
-    //   document.getElementById("sp-header").style.borderTopLeftRadius = mobileCheck() ? "0px" : "5px";
-    //   document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
-    //
-    //   document.getElementById("sp-process-bar").style.display = "block";
-    //   document.getElementById("sp-process-bar").style.marginTop = "1px";
-    //   document.getElementById("sp-body").style.display = "block";
-    // }
     setShowPopupCloseBot(false);
 
     const element = document.getElementById('sp-container1');
@@ -474,7 +453,7 @@ function Preview() {
       setIsOpen(!isOpen);
     }
     if (document.getElementById("sp-container1")) {
-      if (activePopupCloseBot) {
+      if (isOpen && activePopupCloseBot) {
         setShowPopupCloseBot(true)
         return;
       }
