@@ -4335,7 +4335,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     result = result?.replace("{totalQuantity}", totalQuantity)
     result = result?.replace("{totalAmount}", Number(totalAmount.toString()) + currencyCode.replace('JPY', '円'))
     result = result?.replace("{product}", product + ' - ' + variant)
-    result = result?.replace("{address}", formattedArea + address1 + address2)
+    result = result?.replace("{address}", formattedArea + address1 + address2).replace("日本：", "")
     result = result?.replace("{address1}", address1)
     result = result?.replace("{address2}", address2)
     result = result?.replace("{zip}", zip)
