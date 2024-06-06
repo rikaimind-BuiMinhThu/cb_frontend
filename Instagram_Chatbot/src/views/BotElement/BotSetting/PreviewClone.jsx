@@ -428,7 +428,7 @@ function Preview() {
 
     setTimeout(() => {
       setIsOpen(false);
-    }, 600)
+    }, 650)
   }
 
   function onOpenPreview() {
@@ -448,7 +448,7 @@ function Preview() {
       }
       setTimeout(() => {
         setIsOpen(!isOpen);
-      }, 600)
+      }, 650)
     } else {
       setIsOpen(!isOpen);
     }
