@@ -61,14 +61,14 @@ button:hover .info {
 .csp-body-bot-side {
   display: flex;
   width: calc(700px * 0.7);
-  justify-content: start;
+  justify-content: flex-start;
 }
 .csp-body-user-side-messages {
   width: calc(700px * 0.7);
   background-color: #fff;
   padding: 10px;
   border-radius: 20px;
-  justify-self: end;
+  justify-self: flex-end;
   margin-right: calc(100% - 700px);
 }
 @media screen and (max-width: 750px) {

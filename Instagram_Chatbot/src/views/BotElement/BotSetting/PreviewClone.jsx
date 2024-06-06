@@ -428,7 +428,7 @@ function Preview() {
 
     setTimeout(() => {
       setIsOpen(false);
-    }, 900)
+    }, 600)
   }
 
   function onOpenPreview() {
@@ -448,7 +448,7 @@ function Preview() {
       }
       setTimeout(() => {
         setIsOpen(!isOpen);
-      }, 900)
+      }, 600)
     } else {
       setIsOpen(!isOpen);
     }
@@ -3587,7 +3587,6 @@ function Preview() {
 
   ///body container
 if (scenarioId && botInfor && isOpen  ){
-
   return  (
     <div
       ref={containerRef}
@@ -4083,20 +4082,20 @@ if (scenarioId && botInfor && isOpen  ){
         </div>
       </div>
   ) } else if (isOpen===false &&mobileCheck()===false && Number(positionPc) === 1 && Number(buttonTypePc) === 2){ return (
-      <div
-    onClick={() => onOpenPreview(!isOpen)}
-    style={{
-      backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-      width: "56px",
-      height: "56px",
-      borderRadius: "30px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      position:'fixed',
-      bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
-      right:rightMarginPc? `${rightMarginPc}px`: '0px',
-    }}
+    <div
+      onClick={() => onOpenPreview(!isOpen)}
+        style={{
+        backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+        width: "56px",
+        height: "56px",
+        borderRadius: "30px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position:'fixed',
+        bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
+        right:rightMarginPc? `${rightMarginPc}px`: '0px',
+      }}
   >
     <img
       style={{ width: "96%", height: "96%", borderRadius: "30px" }}
@@ -4105,27 +4104,26 @@ if (scenarioId && botInfor && isOpen  ){
       }
     />
   </div>
-
   )} else if (isOpen===false && mobileCheck()===false && Number(positionPc) === 1 && Number(buttonTypePc) === 1) {
     return (
       <div
-    onClick={() => onOpenPreview(!isOpen)}
-    style={{
-      backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-      // width: `${widthPc}px`,
-      width: `360px`,
-      height: "66px",
-      borderRadius:'35px',
-      display: "flex",
-      justifyContent: 'space-between',
-      alignItems:'center',
-      paddingLeft:'3px',
-      paddingRight:'3px',
-      position:'fixed',
-      padding:'auto',
-      bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
-      right:rightMarginPc? `${rightMarginPc}px`: '0px',
-    }}
+        onClick={() => onOpenPreview(!isOpen)}
+        style={{
+          backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+          // width: `${widthPc}px`,
+          width: `360px`,
+          height: "66px",
+          borderRadius:'35px',
+          display: "flex",
+          justifyContent: 'space-between',
+          alignItems:'center',
+          paddingLeft:'3px',
+          paddingRight:'3px',
+          position:'fixed',
+          padding:'auto',
+          bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
+          right:rightMarginPc? `${rightMarginPc}px`: '0px',
+        }}
   >
      <div className="sp-header-left-bt" onClick={() => onOpenPreview(!isOpen)}>
           <div className="sp-header-left-avatar sp-avatar-bt">
@@ -4153,19 +4151,19 @@ if (scenarioId && botInfor && isOpen  ){
   } else if (isOpen===false &&mobileCheck()===false && Number(positionPc) === 2){
     return (
     <div
-    onClick={() => onOpenPreview(!isOpen)}
-    style={{
-      backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-      width:'300px',
-      height: "65px",
-      borderRadius: "0px",
-      display: "flex",
-      justifyContent: "left",
-      position:'fixed',
-      transform:' rotate(-90deg)',
-      bottom: bottomMarginPc ? `${parseInt(bottomMarginPc) + widthPc/2}px`: '20px',
-      right: `${-120}px`,
-    }}
+      onClick={() => onOpenPreview(!isOpen)}
+      style={{
+        backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+        width:'300px',
+        height: "65px",
+        borderRadius: "0px",
+        display: "flex",
+        justifyContent: "left",
+        position:'fixed',
+        transform:' rotate(-90deg)',
+        bottom: bottomMarginPc ? `${parseInt(bottomMarginPc) + widthPc/2}px`: '20px',
+        right: `${-120}px`,
+      }}
   >
      <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
           <div className="sp-header-left-avatar sp-avatar">
@@ -4183,28 +4181,27 @@ if (scenarioId && botInfor && isOpen  ){
   </div>)
   } else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 1 && Number(buttonTypeSp) === 2){ return (
     <div
-  onClick={() => onOpenPreview(!isOpen)}
-  style={{
-    backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-    width: "56px",
-    height: "56px",
-    borderRadius: "30px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    position:'fixed',
-    bottom:bottomMarginSp? `${bottomMarginSp}px`: '20px',
-    right:rightMarginSp? `${rightMarginSp}px`: '20px',
-  }}
->
-  <img
-    style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-    src={
-      botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
-    }
-  />
-</div>
-
+      onClick={() => onOpenPreview(!isOpen)}
+      style={{
+        backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+        width: "56px",
+        height: "56px",
+        borderRadius: "30px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position:'fixed',
+        bottom:bottomMarginSp? `${bottomMarginSp}px`: '20px',
+        right:rightMarginSp? `${rightMarginSp}px`: '20px',
+      }}
+    >
+      <img
+        style={{ width: "96%", height: "96%", borderRadius: "30px" }}
+        src={
+          botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
+        }
+      />
+    </div>
 )} else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 1 && Number(buttonTypeSp) === 1) {
   return (
     <div
@@ -4244,19 +4241,19 @@ if (scenarioId && botInfor && isOpen  ){
 }else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 2){
   return (
   <div
-  onClick={() => onOpenPreview(!isOpen)}
-  style={{
-    backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-    width:'300px',
-    height: "60px",
-    borderRadius: "0px",
-    display: "flex",
-    justifyContent: "left",
-    position:'fixed',
-    transform:' rotate(-90deg)',
-    bottom: bottomMarginSp ? `${parseInt(bottomMarginSp) + widthPc/2}px`: '20px',
-    right: `${-120}px`,
-  }}
+    onClick={() => onOpenPreview(!isOpen)}
+    style={{
+      backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+      width:'300px',
+      height: "60px",
+      borderRadius: "0px",
+      display: "flex",
+      justifyContent: "left",
+      position:'fixed',
+      transform:' rotate(-90deg)',
+      bottom: bottomMarginSp ? `${parseInt(bottomMarginSp) + widthPc/2}px`: '20px',
+      right: `${-120}px`,
+    }}
 >
    <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
         <div className="sp-header-left-avatar sp-avatar">
@@ -4273,11 +4270,8 @@ if (scenarioId && botInfor && isOpen  ){
       </div>
 </div>)
 }
-else {
-    return (
-      <div></div>
-    )
-  }
+
+    return (<div></div>)
 }
 
 const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {

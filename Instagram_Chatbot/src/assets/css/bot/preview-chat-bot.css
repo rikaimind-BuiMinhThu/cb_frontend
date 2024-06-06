@@ -202,7 +202,7 @@
 
 .sp-user-message-button-action {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
 }
 
 .underline-none:hover {
