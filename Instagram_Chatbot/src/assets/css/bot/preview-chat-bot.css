@@ -634,6 +634,7 @@ slideUp
     -webkit-animation-timing-function: ease;
     bottom: 10px !important;
     overflow: hidden;
+    background-color: transparent !important;
 }
 
 .slideDown .sp-header-left {
