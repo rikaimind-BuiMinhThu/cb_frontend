@@ -50,6 +50,7 @@ function Report() {
   const [isAdminDeel, setIsAdminDeel] = useState(false);
   const [allClient, setAllClient] = useState([]);
   const [currentClientId, setCurrentClientId] = useState('deel');
+  const [emptyDevice, setEmptyDevice] = useState(false);
 
   const [startDateEx, setStartDateEx] = useState();
   const [endDateEx, setEndDateEx] = useState();
@@ -695,7 +696,6 @@ function Report() {
     }
   }
 
-  const [emptyDevice, setEmptyDevice] = useState(false);
   function handleSearch(e) {
     e.preventDefault();
     const formSearch = document.getElementById('formSearch');
