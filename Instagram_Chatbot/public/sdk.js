@@ -65,7 +65,7 @@ function getEcChatBotFrontEndBaseUrl() {
 }
 
 async function displayPopup() {
-  var device =
+  const device =
     !tabletCheck() && !mobileCheck()
       ? "pc"
       : !tabletCheck()
@@ -84,8 +84,6 @@ async function displayPopup() {
   );
   const data = await response.json();
 
-  log("data: ", data);
-
   scenarioId = data.data.id;
   let uuid =
     Math.random().toString(36).substring(2, 15) +
@@ -101,7 +99,7 @@ async function displayPopup() {
     iframe.width =
       chatbotW && chatbotRight
         ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
-        : "400px";
+        : "360px";
     iframe.style.right = "10px";
   }
 
@@ -128,50 +126,54 @@ async function displayPopup() {
   window.addEventListener(
     "message",
     function (e) {
-      let firstOpen = false;
-      if (e.data === "") {
+      chatbotW = e.data.widthPc
+      chatbotH = e.data.heightPc
+      chatbotRight = e.data.chatbotRight
+      chatbotBottom = e.data.chatbotBottom
+
+      let firstOpen;
+
+      if (e.data.isOpen === "") {
         firstOpen = true;
       } else {
         firstOpen = false;
       }
       if (
         (firstOpen && mobileCheck() === true) ||
-        (e.data && !firstOpen && mobileCheck() === true)
+        (e.data.isOpen && !firstOpen && mobileCheck() === true)
       ) {
         iframe.width = "100%";
         // iframe.height = "620px";
         iframe.height = "100%";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
-      } else if (firstOpen || (e.data && !firstOpen)) {
+      } else if (firstOpen || (e.data.isOpen && !firstOpen)) {
         iframe.width =
-          chatbotW && chatbotRight
+          chatbotW && (chatbotRight !== null)
             ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
-            : "400px";
+            : "460px";
         iframe.height =
-          chatbotH && chatbotBottom
+          chatbotH && (chatbotBottom !== null)
             ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px`
-            : "620px";
+            : "700px";
         iframe.style.bottom = "0px";
-        iframe.style.right = "10px";
+        iframe.style.right = "0px";
         let add = { scenario_data: device };
         // submitForm(url, add)
         getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
-      } else if (!e.data && !firstOpen && mobileCheck() === true) {
-        iframe.width = "300px";
-        iframe.height = "77px";
+      } else if (!e.data.isOpen && !firstOpen && mobileCheck() === true) {
+        iframe.width = "250px";
+        iframe.height = "58px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
-        log("close");
-      } else if (!e.data && !firstOpen) {
+      } else if (!e.data.isOpen && !firstOpen) {
         iframe.width =
-          chatbotW && chatbotRight
-            ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
-            : "400px";
-        iframe.height = chatbotBottom ? `${parseInt(chatbotH) + 77}px` : "77px";
+          chatbotRight
+            ? `${parseInt(chatbotRight) + 360}px`
+            : "360px";
+        iframe.height = chatbotBottom ? `${parseInt(chatbotBottom) + 77}px` : "77px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
-        log("close");
       }
     },
     false

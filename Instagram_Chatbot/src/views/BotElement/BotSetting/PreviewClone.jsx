@@ -206,8 +206,8 @@ function Preview() {
   //new
   const [buttonTypePc, setButtonTypePc] = useState("1");
   const [positionPc, setPositionPc] = useState("1");
-  const [widthPc, setWidthPc] = useState(380);
-  const [heightPc, setHeightPc] = useState(600);
+  const [widthPc, setWidthPc] = useState(450);
+  const [heightPc, setHeightPc] = useState(700);
   const [widthSp, setWidthSp] = useState(100);
   const [heightSp, setHeightSp] = useState(100);
   const [rightPcTitle, setRightPcTitle] = useState("");
@@ -260,8 +260,8 @@ function Preview() {
       return {
         bottom: bottomMarginPc ? `${bottomMarginPc}px` : "0px",
         right: rightMarginPc ? `${rightMarginPc}px` : "30px",
-        width: widthPc ? `${widthPc}px` : "380px",
-        height: heightPc ? `${heightPc}px` : "600px"
+        width: widthPc ? `${widthPc}px` : "450px",
+        height: heightPc ? `${heightPc}px` : "700px"
      }
     }
   }
@@ -292,8 +292,8 @@ function Preview() {
         setActivePopupCloseBot(result?.popup_close_bot ? true : false);
         setTitleBubble(result?.title_bubble ? result?.title_bubble : "簡単90秒で注文完了");
         setDisplayType(result?.display_type);
-        setWidthPc(result?.width_pc? result?.width_pc: 380);
-        setHeightPc(result?.height_pc? result?.height_pc:600);
+        setWidthPc(result?.width_pc? result?.width_pc: 450);
+        setHeightPc(result?.height_pc? result?.height_pc:700);
         setWidthSp(result?.width_sp?result?.width_sp:100);
         setHeightSp(result?.height_sp?result?.height_sp:100);
         setPositionPc(result?.position_pc ? result?.position_pc : "1");
@@ -302,9 +302,9 @@ function Preview() {
         } else {
           setIsOpen(false)
         }
-        sessionStorage.setItem("chatbotH", result?.height_pc? result?.height_pc: 600);
+        sessionStorage.setItem("chatbotH", result?.height_pc? result?.height_pc: 700);
         sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc? result?.bottom_margin_pc:10);
-        sessionStorage.setItem("chatbotW", result?.width_pc? result?.width_pc:380);
+        sessionStorage.setItem("chatbotW", result?.width_pc? result?.width_pc:450);
         sessionStorage.setItem("chatbotRight", result?.right_margin_pc? result?.right_margin_pc : 30);
         setRightPcTitle(result?.right_position_pc_title);
         setButtonTypePc(result?.button_type_pc? result?.button_type_pc: "1");
@@ -347,7 +347,7 @@ function Preview() {
     window.addEventListener(
       "message",
       (event) => {
-        if (event.data === 'openPreview') {
+        if (event.data === 'openPreview' && isOpen !== true) {
           onOpenPreview(true)
         }
       },
@@ -363,7 +363,16 @@ function Preview() {
 
   useEffect(() => {
     if (window && window.parent) {
-      window.parent.postMessage(isOpen, urlReceive);
+      // window.parent.postMessage(isOpen, urlReceive);
+      window.parent.postMessage({
+        isOpen: isOpen,
+        widthPc: widthPc,
+        heightPc: heightPc,
+        widthSp: widthSp,
+        heightSp: heightSp,
+        chatbotRight: rightMarginPc,
+        chatbotBottom: bottomMarginPc,
+      }, urlReceive);
     }
   }, [isOpen, urlReceive])
 
@@ -406,40 +415,58 @@ function Preview() {
   }
 
   function handleCloseBot() {
-    if (document.getElementById("sp-container1")) {
-      
-      Cookies.set("openPre", true);
-      if (window && window.parent) {
-        window.parent.postMessage(false, urlReceive);
-      }
-      document.getElementById("sp-container1").style.height = heightPc
-        ? `${heightPc}px`
-        : "600px";
-      document.getElementById("sp-header").style.position = "static";
-      document.getElementById("sp-header").style.borderBottomLeftRadius =
-        "0px";
-      document.getElementById("sp-header").style.borderBottomRightRadius =
-        "0px";
-      document.getElementById("sp-header").style.borderTopLeftRadius = mobileCheck() ? "0px" : "5px";
-      document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
-
-      document.getElementById("sp-process-bar").style.display = "block";
-      document.getElementById("sp-body").style.display = "block";
-    } 
-    setIsOpen(false);
     setShowPopupCloseBot(false);
+
+    const element = document.getElementById('sp-container1');
+    if (mobileCheck()) {
+      setIsOpen(false);
+    } else {
+      element.classList.remove('slideUp');
+      element.classList.add('slideDown');
+      setTimeout(() => {
+        setIsOpen(false);
+      }, 680)
+    }
   }
 
   function onOpenPreview() {
+    if (isOpen && activePopupCloseBot) {
+      setShowPopupCloseBot(true)
+      return;
+    }
+
+    if (isOpen && !activePopupCloseBot) {
+      const element = document.getElementById('sp-container1');
+      if (mobileCheck()) {
+        setIsOpen(!isOpen);
+      } else {
+        element.classList.remove('slideUp');
+        element.classList.add('slideDown');
+        setTimeout(() => {
+          setIsOpen(!isOpen);
+        }, 680)
+      }
+    } else {
+      setIsOpen(!isOpen);
+    }
     if (document.getElementById("sp-container1")) {
-      if (activePopupCloseBot) {
+      if (isOpen && activePopupCloseBot) {
         setShowPopupCloseBot(true)
         return;
       }
       if (isOpen && !activePopupCloseBot) {
         Cookies.set("openPre", true);
         if (window && window.parent) {
-          window.parent.postMessage(true, urlReceive);
+          // window.parent.postMessage(true, urlReceive);
+          window.parent.postMessage({
+            isOpen: true,
+            widthPc: widthPc,
+            heightPc: heightPc,
+            widthSp: widthSp,
+            heightSp: heightSp,
+            chatbotRight: rightMarginPc,
+            chatbotBottom: bottomMarginPc,
+          }, urlReceive);
         }
         document.getElementById("sp-container1").style.height = heightPc
           ? `${heightPc}px`
@@ -453,10 +480,11 @@ function Preview() {
         document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
 
         document.getElementById("sp-process-bar").style.display = "block";
+        document.getElementById("sp-process-bar").style.marginTop = "1px";
+
         document.getElementById("sp-body").style.display = "block";
       } 
       }
-    setIsOpen(!isOpen);
   }
 
   function lightenColor(hex, opacity) {
@@ -3556,12 +3584,11 @@ function Preview() {
 
   ///body container
 if (scenarioId && botInfor && isOpen  ){
-
   return  (
     <div
       ref={containerRef}
       id="sp-container1"
-      className="sp-container1 slideUp"
+      className={`sp-container1 ${mobileCheck() ? 'slideUpSp' : 'slideUp'}`}
       style={{
         position:'fixed',
         bottom: "0px",
@@ -3862,7 +3889,12 @@ if (scenarioId && botInfor && isOpen  ){
       <div
         id="sp-header"
         style={
-            (botInfor?.main_color || botInfor?.main_color_other) && { backgroundColor: botInfor?.main_color || botInfor?.main_color_other}
+            (botInfor?.main_color || botInfor?.main_color_other) &&
+            {
+              backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
+              borderTopLeftRadius: mobileCheck() ? "0px" : "5px",
+              borderTopRightRadius: mobileCheck() ? "0px" : "5px",
+            }
         }
         className="sp-header"
       >
@@ -4047,20 +4079,20 @@ if (scenarioId && botInfor && isOpen  ){
         </div>
       </div>
   ) } else if (isOpen===false &&mobileCheck()===false && Number(positionPc) === 1 && Number(buttonTypePc) === 2){ return (
-      <div
-    onClick={() => onOpenPreview(!isOpen)}
-    style={{
-      backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-      width: "56px",
-      height: "56px",
-      borderRadius: "30px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      position:'fixed',
-      bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
-      right:rightMarginPc? `${rightMarginPc}px`: '0px',
-    }}
+    <div
+      onClick={() => onOpenPreview(!isOpen)}
+        style={{
+        backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+        width: "56px",
+        height: "56px",
+        borderRadius: "30px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position:'fixed',
+        bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
+        right:rightMarginPc? `${rightMarginPc}px`: '0px',
+      }}
   >
     <img
       style={{ width: "96%", height: "96%", borderRadius: "30px" }}
@@ -4069,27 +4101,26 @@ if (scenarioId && botInfor && isOpen  ){
       }
     />
   </div>
-
   )} else if (isOpen===false && mobileCheck()===false && Number(positionPc) === 1 && Number(buttonTypePc) === 1) {
     return (
       <div
-    onClick={() => onOpenPreview(!isOpen)}
-    style={{
-      backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-      // width: `${widthPc}px`,
-      width: `360px`,
-      height: "66px",
-      borderRadius:'35px',
-      display: "flex",
-      justifyContent: 'space-between',
-      alignItems:'center',
-      paddingLeft:'3px',
-      paddingRight:'3px',
-      position:'fixed',
-      padding:'auto',
-      bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
-      right:rightMarginPc? `${rightMarginPc}px`: '0px',
-    }}
+        onClick={() => onOpenPreview(!isOpen)}
+        style={{
+          backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+          // width: `${widthPc}px`,
+          width: `360px`,
+          height: "66px",
+          borderRadius:'35px',
+          display: "flex",
+          justifyContent: 'space-between',
+          alignItems:'center',
+          paddingLeft:'3px',
+          paddingRight:'3px',
+          position:'fixed',
+          padding:'auto',
+          bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
+          right:rightMarginPc? `${rightMarginPc}px`: '0px',
+        }}
   >
      <div className="sp-header-left-bt" onClick={() => onOpenPreview(!isOpen)}>
           <div className="sp-header-left-avatar sp-avatar-bt">
@@ -4117,19 +4148,19 @@ if (scenarioId && botInfor && isOpen  ){
   } else if (isOpen===false &&mobileCheck()===false && Number(positionPc) === 2){
     return (
     <div
-    onClick={() => onOpenPreview(!isOpen)}
-    style={{
-      backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-      width:'300px',
-      height: "65px",
-      borderRadius: "0px",
-      display: "flex",
-      justifyContent: "left",
-      position:'fixed',
-      transform:' rotate(-90deg)',
-      bottom: bottomMarginPc ? `${parseInt(bottomMarginPc) + widthPc/2}px`: '20px',
-      right: `${-120}px`,
-    }}
+      onClick={() => onOpenPreview(!isOpen)}
+      style={{
+        backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+        width:'300px',
+        height: "65px",
+        borderRadius: "0px",
+        display: "flex",
+        justifyContent: "left",
+        position:'fixed',
+        transform:' rotate(-90deg)',
+        bottom: bottomMarginPc ? `${parseInt(bottomMarginPc) + widthPc/2}px`: '20px',
+        right: `${-120}px`,
+      }}
   >
      <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
           <div className="sp-header-left-avatar sp-avatar">
@@ -4147,28 +4178,27 @@ if (scenarioId && botInfor && isOpen  ){
   </div>)
   } else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 1 && Number(buttonTypeSp) === 2){ return (
     <div
-  onClick={() => onOpenPreview(!isOpen)}
-  style={{
-    backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-    width: "56px",
-    height: "56px",
-    borderRadius: "30px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    position:'fixed',
-    bottom:bottomMarginSp? `${bottomMarginSp}px`: '20px',
-    right:rightMarginSp? `${rightMarginSp}px`: '20px',
-  }}
->
-  <img
-    style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-    src={
-      botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
-    }
-  />
-</div>
-
+      onClick={() => onOpenPreview(!isOpen)}
+      style={{
+        backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+        width: "56px",
+        height: "56px",
+        borderRadius: "30px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        position:'fixed',
+        bottom:bottomMarginSp? `${bottomMarginSp}px`: '20px',
+        right:rightMarginSp? `${rightMarginSp}px`: '20px',
+      }}
+    >
+      <img
+        style={{ width: "96%", height: "96%", borderRadius: "30px" }}
+        src={
+          botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
+        }
+      />
+    </div>
 )} else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 1 && Number(buttonTypeSp) === 1) {
   return (
     <div
@@ -4208,19 +4238,19 @@ if (scenarioId && botInfor && isOpen  ){
 }else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 2){
   return (
   <div
-  onClick={() => onOpenPreview(!isOpen)}
-  style={{
-    backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-    width:'300px',
-    height: "60px",
-    borderRadius: "0px",
-    display: "flex",
-    justifyContent: "left",
-    position:'fixed',
-    transform:' rotate(-90deg)',
-    bottom: bottomMarginSp ? `${parseInt(bottomMarginSp) + widthPc/2}px`: '20px',
-    right: `${-120}px`,
-  }}
+    onClick={() => onOpenPreview(!isOpen)}
+    style={{
+      backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+      width:'300px',
+      height: "60px",
+      borderRadius: "0px",
+      display: "flex",
+      justifyContent: "left",
+      position:'fixed',
+      transform:' rotate(-90deg)',
+      bottom: bottomMarginSp ? `${parseInt(bottomMarginSp) + widthPc/2}px`: '20px',
+      right: `${-120}px`,
+    }}
 >
    <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
         <div className="sp-header-left-avatar sp-avatar">
@@ -4237,11 +4267,8 @@ if (scenarioId && botInfor && isOpen  ){
       </div>
 </div>)
 }
-else {
-    return (
-      <div></div>
-    )
-  }
+
+    return (<div></div>)
 }
 
 const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {

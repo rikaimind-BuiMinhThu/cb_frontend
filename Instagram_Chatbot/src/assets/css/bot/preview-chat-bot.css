@@ -14,7 +14,7 @@
 
 .sp-header {
     /* background-color: #546DA7; */
-    min-width: 380px;
+    min-width: 360px;
     height: 65px;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
@@ -99,11 +99,11 @@
 }
 
 .sp-header-left-label-sub-title {
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .sp-header-left-label-title {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 600;
 }
 
@@ -119,13 +119,15 @@
 
 .sp-process-bar {
     background-color: #EBF7FF;
+    margin-top: 1px;
 }
 
 .sp-process-bar-color {
+    font-size: 13px;
     min-width: 25%;
     height: 20px;
     background-color: #70A5FC;
-    padding: 0px 5px;
+    padding: 0 5px;
     color: #FFFFFF;
 }
 
@@ -200,7 +202,7 @@
 
 .sp-user-message-button-action {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
 }
 
 .underline-none:hover {
@@ -208,11 +210,11 @@
 }
 
 .sp-body-user-side-messages button {
-    margin: 0px;
+    margin: 0;
     /*width: 40%;*/
     min-width: 90px;
     min-height: 42px;
-    font-size: 12px;
+    font-size: 14px;
     padding: 1px 8px;
     border-radius: 2px;
     box-sizing: content-box;
@@ -609,7 +611,7 @@ slideUp
 ==========
 */
 
-
+/* Animation PC */
 .slideUp {
     animation-name: slideUp;
     -webkit-animation-name: slideUp;
@@ -619,13 +621,49 @@ slideUp
 
     animation-timing-function: ease;
     -webkit-animation-timing-function: ease;
+}
 
+.slideDown {
+    animation-name: slideDown;
+    -webkit-animation-name: slideDown;
+
+    animation-duration: 0.70s;
+    -webkit-animation-duration: 0.70s;
+
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+    bottom: 10px !important;
+    overflow: hidden;
+}
+
+.slideDown .sp-header-left {
+    padding: 0 3px !important;
+    display: flex;
+    align-items: center;
+}
+
+.slideDown .sp-header-left img {
+    height: 58px !important;
+    width: 58px !important;
+}
+
+.slideDown .sp-header {
+    border-radius: 35px !important;
+}
+
+.slideDown #sp-process-bar {
+    display: none !important;
+}
+
+.slideDown #sp-body {
+    display: none !important;;
 }
 
 @keyframes slideUp {
     0% {
         transform: translateY(100%);
         opacity: 0;
+        width: 360px;
     }
 
     100% {
@@ -638,6 +676,76 @@ slideUp
     0% {
         -webkit-transform: translateY(100%);
         opacity: 0;
+        width: 360px;
+    }
+
+    100% {
+        -webkit-transform: translateY(0%);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    0% {
+        transform: translateY(0%);
+        opacity: 1;
+    }
+
+    100% {
+        height: 66px;
+        /*transform: translateY(100%);*/
+        /*opacity: 0;*/
+        width: 360px;
+        /*border-radius: 35px;*/
+    }
+}
+
+@-webkit-keyframes slideDown {
+    0% {
+        -webkit-transform: translateY(0%);
+        opacity: 1;
+    }
+
+    100% {
+        height: 66px;
+        /*-webkit-transform: translateY(100%);*/
+        /*opacity: 0;*/
+        width: 360px;
+        /*border-radius: 35px;*/
+    }
+}
+
+/*Animation mobile*/
+.slideUpSp {
+    animation-name: slideUpSp;
+    -webkit-animation-name: slideUpSp;
+
+    animation-duration: 1s;
+    -webkit-animation-duration: 1s;
+
+    animation-timing-function: ease;
+    -webkit-animation-timing-function: ease;
+}
+
+
+@keyframes slideUpSp {
+    0% {
+        transform: translateY(100%);
+        opacity: 0;
+        width: 250px;
+    }
+
+    100% {
+        transform: translateY(0%);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes slideUpSp {
+    0% {
+        -webkit-transform: translateY(100%);
+        opacity: 0;
+        width: 250px;
     }
 
     100% {
@@ -760,4 +868,3 @@ slideUp
 
 
   }
-  
