@@ -627,11 +627,36 @@ slideUp
     animation-name: slideDown;
     -webkit-animation-name: slideDown;
 
-    animation-duration: 1s;
-    -webkit-animation-duration: 1s;
+    animation-duration: 0.70s;
+    -webkit-animation-duration: 0.70s;
 
     animation-timing-function: ease;
     -webkit-animation-timing-function: ease;
+    bottom: 10px !important;
+    overflow: hidden;
+}
+
+.slideDown .sp-header-left {
+    padding: 0 3px !important;
+    display: flex;
+    align-items: center;
+}
+
+.slideDown .sp-header-left img {
+    height: 58px !important;
+    width: 58px !important;
+}
+
+.slideDown .sp-header {
+    border-radius: 35px !important;
+}
+
+.slideDown #sp-process-bar {
+    display: none !important;
+}
+
+.slideDown #sp-body {
+    display: none !important;;
 }
 
 @keyframes slideUp {
@@ -667,9 +692,11 @@ slideUp
     }
 
     100% {
-        transform: translateY(100%);
-        opacity: 0;
+        height: 66px;
+        /*transform: translateY(100%);*/
+        /*opacity: 0;*/
         width: 360px;
+        /*border-radius: 35px;*/
     }
 }
 
@@ -680,9 +707,11 @@ slideUp
     }
 
     100% {
-        -webkit-transform: translateY(100%);
-        opacity: 0;
+        height: 66px;
+        /*-webkit-transform: translateY(100%);*/
+        /*opacity: 0;*/
         width: 360px;
+        /*border-radius: 35px;*/
     }
 }
 
@@ -698,16 +727,7 @@ slideUp
     -webkit-animation-timing-function: ease;
 }
 
-.slideDownSp {
-    animation-name: slideDownSp;
-    -webkit-animation-name: slideDownSp;
 
-    animation-duration: 1s;
-    -webkit-animation-duration: 1s;
-
-    animation-timing-function: ease;
-    -webkit-animation-timing-function: ease;
-}
 @keyframes slideUpSp {
     0% {
         transform: translateY(100%);
@@ -731,32 +751,6 @@ slideUp
     100% {
         -webkit-transform: translateY(0%);
         opacity: 1;
-    }
-}
-
-@keyframes slideDownSp {
-    0% {
-        transform: translateY(0%);
-        opacity: 1;
-    }
-
-    100% {
-        transform: translateY(100%);
-        opacity: 0;
-        width: 250px;
-    }
-}
-
-@-webkit-keyframes slideDownSp {
-    0% {
-        -webkit-transform: translateY(0%);
-        opacity: 1;
-    }
-
-    100% {
-        -webkit-transform: translateY(100%);
-        opacity: 0;
-        width: 250px;
     }
 }
 
