@@ -157,7 +157,7 @@ async function displayPopup() {
             ? `${parseInt(chatbotH) + parseInt(chatbotBottom)}px`
             : "700px";
         iframe.style.bottom = "0px";
-        iframe.style.right = "10px";
+        iframe.style.right = "0px";
         let add = { scenario_data: device };
         // submitForm(url, add)
         getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
