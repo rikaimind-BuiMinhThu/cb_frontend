@@ -419,16 +419,14 @@ function Preview() {
 
     const element = document.getElementById('sp-container1');
     if (mobileCheck()) {
-      element.classList.remove('slideUpSp');
-      element.classList.add('slideDownSp');
+      setIsOpen(false);
     } else {
       element.classList.remove('slideUp');
       element.classList.add('slideDown');
+      setTimeout(() => {
+        setIsOpen(false);
+      }, 680)
     }
-
-    setTimeout(() => {
-      setIsOpen(false);
-    }, 650)
   }
 
   function onOpenPreview() {
@@ -440,15 +438,14 @@ function Preview() {
     if (isOpen && !activePopupCloseBot) {
       const element = document.getElementById('sp-container1');
       if (mobileCheck()) {
-        element.classList.remove('slideUpSp');
-        element.classList.add('slideDownSp');
+        setIsOpen(!isOpen);
       } else {
         element.classList.remove('slideUp');
         element.classList.add('slideDown');
+        setTimeout(() => {
+          setIsOpen(!isOpen);
+        }, 680)
       }
-      setTimeout(() => {
-        setIsOpen(!isOpen);
-      }, 650)
     } else {
       setIsOpen(!isOpen);
     }
