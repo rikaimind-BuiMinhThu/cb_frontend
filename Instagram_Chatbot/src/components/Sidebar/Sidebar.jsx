@@ -403,7 +403,7 @@ function Sidebar(props) {
                   id='webChatDrop'
                   style={{ display: 'none', marginLeft: '-30px' }}
                 >
-                  <li
+                  {/* <li
                     className={
                       activeRoute('account-information') +
                       (true ? ' active-pro' : '')
@@ -416,7 +416,7 @@ function Sidebar(props) {
                       activeClassName='active'
                       activeStyle={{ color: 'black' }}
                     >
-                      {/* <i className="nc-icon nc-badge" style={{ color: 'black' }} /> */}
+                      // <i className="nc-icon nc-badge" style={{ color: 'black' }} />
                       <MDBIcon
                         fas
                         icon='address-book'
@@ -424,7 +424,7 @@ function Sidebar(props) {
                       />
                       <p style={{ color: 'black' }}>アカウント情報</p>
                     </NavLink>
-                  </li>
+                  </li> */}
                   <li
                     className={
                       activeRoute('basic-setting') + (true ? ' active-pro' : '')
@@ -552,7 +552,7 @@ function Sidebar(props) {
             </li>
             <li
               id='clientPaymentDetail'
-              style={{ listStyleType: 'none', marginLeft: '-50px' }}
+              style={{ listStyleType: 'none', marginLeft: '-50px', display: "none" }}
               className={activeRoute('client-payment-detail') + (true ? ' active-pro' : '')}
               key={'client-payment-detail'}
             >
