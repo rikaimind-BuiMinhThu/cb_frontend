@@ -174,13 +174,13 @@ var routes = [
     component: AddBotchat,
     layout: '/admin',
   },
-  {
-    path: '/account-information',
-    name: 'アカウント情報',
-    // icon: "nc-icon nc-single-02",
-    component: AccountInformation,
-    layout: '/admin',
-  },
+  // {
+  //   path: '/account-information',
+  //   name: 'アカウント情報',
+  //   // icon: "nc-icon nc-single-02",
+  //   component: AccountInformation,
+  //   layout: '/admin',
+  // },
   {
     path: '/reply-mail-management',
     name: '送信メール管理',
