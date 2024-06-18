@@ -376,6 +376,43 @@ function Preview() {
     }
   }, [isOpen, urlReceive])
 
+  useEffect(() => {
+    const observer = new MutationObserver((mutationsList, observer) => {
+        for (let mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                const button = document.getElementById('btn-checkout-url');
+                if (button) {
+                    button.addEventListener('click', handleClick);
+                    observer.disconnect();
+                }
+            }
+        }
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
+    const handleClick = () => {
+        let deviceRe = params.get("deviceReceive");
+        let scenarioId = params.get("scenario_id");
+        console.log("deviceReceive", deviceRe);
+        console.log("scenarioId", scenarioId);
+        const conversion = {
+          scenario_data: `${deviceRe}_conversion`,
+        };
+        api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
+        }).catch(err => {
+          console.log(err)
+        })
+    };
+
+    return () => {
+        observer.disconnect();
+    };
+  }, []);
+
   function getAllUrlParams(url) {
     var queryString = url ? url.split("?")[1] : window.location.search.slice(1);
     var obj = {};
@@ -4272,43 +4309,42 @@ if (scenarioId && botInfor && isOpen  ){
 }
 
 const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
+  // useEffect(() => {
+  //   const observer = new MutationObserver((mutationsList, observer) => {
+  //       for (let mutation of mutationsList) {
+  //           if (mutation.type === 'childList') {
+  //               const button = document.getElementById('btn-checkout-url');
+  //               if (button) {
+  //                   button.addEventListener('click', handleClick);
+  //                   observer.disconnect();
+  //               }
+  //           }
+  //       }
+  //   });
 
-  useEffect(() => {
-    const observer = new MutationObserver((mutationsList, observer) => {
-        for (let mutation of mutationsList) {
-            if (mutation.type === 'childList') {
-                const button = document.getElementById('btn-checkout-url');
-                if (button) {
-                    button.addEventListener('click', handleClick);
-                    observer.disconnect();
-                }
-            }
-        }
-    });
+  //   observer.observe(document.body, {
+  //       childList: true,
+  //       subtree: true
+  //   });
 
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
+  //   const handleClick = () => {
+  //       let deviceRe = params.get("deviceReceive");
+  //       let scenarioId = params.get("scenario_id");
+  //       console.log("deviceReceive", deviceRe);
+  //       console.log("scenarioId", scenarioId);
+  //       const conversion = {
+  //         scenario_data: `${deviceRe}_conversion`,
+  //       };
+  //       api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
+  //       }).catch(err => {
+  //         console.log(err)
+  //       })
+  //   };
 
-    const handleClick = () => {
-        let deviceRe = params.get("deviceReceive");
-        let scenarioId = params.get("scenario_id");
-        console.log("deviceReceive", deviceRe);
-        console.log("scenarioId", scenarioId);
-        const conversion = {
-          scenario_data: `${deviceRe}_conversion`,
-        };
-        api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
-        }).catch(err => {
-          console.log(err)
-        })
-    };
-
-    return () => {
-        observer.disconnect();
-    };
-  }, []);
+  //   return () => {
+  //       observer.disconnect();
+  //   };
+  // }, []);
 
   const handleDownloadFile = (file) => {
     let link = document.createElement("a");
