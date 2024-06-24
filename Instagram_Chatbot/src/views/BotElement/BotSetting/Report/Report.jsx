@@ -418,7 +418,7 @@ function Report() {
       },
       plotOptions: {
         bar: {
-          distributed: true,
+          // distributed: true,
           horizontal: true,
           dataLabels: {
             total: {
