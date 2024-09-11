@@ -2128,7 +2128,8 @@ function Preview() {
             messageLog = "全角カタカナを入力してください。";
             break;
           case "double_byte":
-            REGEX_CHECK = /[^ァ-ンぁ-んｧ-ﾝﾞﾟ]+$/;
+            // REGEX_CHECK = /[^ァ-ンぁ-んｧ-ﾝﾞﾟ]+$/;
+            REGEX_CHECK = /[^ァ-ンぁ-ん一-龥]+$/;
             messageLog = "全角文字を入力してください。";
             break;
           default:
@@ -3614,7 +3615,7 @@ if (scenarioId && botInfor && isOpen  ){
           {botInfor && botInfor.withdrawal_prevention_status === "image_popup" && (
             <a
               href={botInfor.withdrawal_prevention_link_url || ""}
-              target="_blank"
+              target="_blank" rel="noreferrer"
             >
               <img
                 src={botInfor.withdrawal_prevention_image_url}
@@ -7479,7 +7480,7 @@ const UserMessage = ({
                           <span style={{ marginRight: "8px" }}>
                             {item.title_comment}
                           </span>
-                          <a href={item.urls} target="_blank">
+                          <a href={item.urls} target="_blank" rel="noreferrer">
                             {item.title}
                           </a>
                           <span style={{ marginLeft: "8px" }}>
