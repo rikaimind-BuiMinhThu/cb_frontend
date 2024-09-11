@@ -48,6 +48,7 @@ function Header(props) {
   const [color, setColor] = React.useState("transparent");
   const sidebarToggle = React.useRef();
   const location = useLocation();
+  // const location = null;
   const toggle = () => {
     if (isOpen) {
       setColor("transparent");

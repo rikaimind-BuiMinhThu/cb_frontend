@@ -1302,13 +1302,16 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         messageLog = "全角カタカナを入力してください。";
                         break;
                     case 'double_byte':
-                        REGEX_CHECK = /[^ァ-ンぁ-んｧ-ﾝﾞﾟ]+/;
+                        REGEX_CHECK = /[^ァ-ンぁ-ん一-龥]+$/;
                         messageLog = "全角文字を入力してください。";
                         break;
                     default:
                         REGEX_CHECK = "";
                         break;
                 }
+                console.log(REGEX_CHECK.test(contentType[contentType.type].value));
+                console.log(contentType[contentType.type].value);
+                
                 if (REGEX_CHECK !== "") {
                     if (contentType[contentType.type].isSplitInput && (REGEX_CHECK.test(contentType[contentType.type].valueLeft)
                         || REGEX_CHECK.test(contentType[contentType.type].valueRight))) {
@@ -1318,6 +1321,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                         isValid = false;
                         errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = messageLog;
                     }
+
                 }
             }
         }
@@ -4506,7 +4510,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                             {agreeTerm[agreeTerm.type].map((item, index) => {
                                                 return <div key={index} className="ss-message__content--user-agree_to_term-post_link_only">
                                                     <span style={{ marginRight: '8px' }}>{item.title_comment}</span>
-                                                    <a href={item.urls} target="_blank">{item.title}</a>
+                                                    <a href={item.urls} target="_blank" rel="noreferrer">{item.title}</a>
                                                     <span style={{ marginLeft: '8px' }}>{item.url_comment}</span>
                                                 </div>
                                             })}
