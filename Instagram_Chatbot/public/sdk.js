@@ -68,7 +68,7 @@ async function displayPopup() {
   const device =
     !tabletCheck() && !mobileCheck()
       ? "pc"
-      : !tabletCheck()
+      : tabletCheck()
       ? "tablet"
       : "smartphone";
   const response = await fetch(
@@ -158,7 +158,7 @@ async function displayPopup() {
             : "700px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
-        let add = { scenario_data: device };
+        let add = { scenario_data: `${device}_open_chatbot_window` };
         // submitForm(url, add)
         getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
       } else if (!e.data.isOpen && !firstOpen && mobileCheck() === true) {
@@ -181,10 +181,10 @@ async function displayPopup() {
 
   log("device: ", device);
   setTimeout(() => {
-    let checkDevice = { scenario_data: `${device}_open_chatbot_window` };
+    let checkDevice = { scenario_data: device };
     // submitForm(url, checkDevice)
     getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
-  }, 30000);
+  }, 5000);
 }
 
 async function getUser(url, datacount) {
