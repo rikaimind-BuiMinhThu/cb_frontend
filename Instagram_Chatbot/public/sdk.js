@@ -68,7 +68,7 @@ async function displayPopup() {
   const device =
     !tabletCheck() && !mobileCheck()
       ? "pc"
-      : !tabletCheck()
+      : tabletCheck()
       ? "tablet"
       : "smartphone";
   const response = await fetch(
@@ -123,6 +123,8 @@ async function displayPopup() {
 
   body.appendChild(iframe);
 
+ let chatbotOpenedBefore = false;
+
   window.addEventListener(
     "message",
     function (e) {
@@ -133,14 +135,15 @@ async function displayPopup() {
 
       let firstOpen;
 
-      if (e.data.isOpen === "") {
+      if (!chatbotOpenedBefore && !e.data.isOpen) {
         firstOpen = true;
+        chatbotOpenedBefore = true;
       } else {
         firstOpen = false;
-      }
+      }    
       if (
-        (firstOpen && mobileCheck() === true) ||
-        (e.data.isOpen && !firstOpen && mobileCheck() === true)
+        (firstOpen && mobileCheck()) ||
+        (e.data.isOpen && !firstOpen && mobileCheck())
       ) {
         iframe.width = "100%";
         // iframe.height = "620px";
@@ -158,9 +161,9 @@ async function displayPopup() {
             : "700px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
-        let add = { scenario_data: device };
-        // submitForm(url, add)
-        getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
+        // let add = { scenario_data: `${device}_open_chatbot_window` };
+        // // submitForm(url, add)
+        // getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
       } else if (!e.data.isOpen && !firstOpen && mobileCheck() === true) {
         iframe.width = "250px";
         iframe.height = "58px";
@@ -181,10 +184,10 @@ async function displayPopup() {
 
   log("device: ", device);
   setTimeout(() => {
-    let checkDevice = { scenario_data: `${device}_open_chatbot_window` };
+    let checkDevice = { scenario_data: device };
     // submitForm(url, checkDevice)
     getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
-  }, 30000);
+  }, 5000);
 }
 
 async function getUser(url, datacount) {

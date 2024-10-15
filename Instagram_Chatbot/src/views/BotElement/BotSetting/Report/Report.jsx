@@ -180,14 +180,14 @@ function Report() {
                 setConversionAll(numOfCon);
                 setConversionCVRCTR(numOfCon);
                 let numOfBS =
-                  chatbotData.pc_open_chatbot_window_count +
-                  chatbotData.tablet_open_chatbot_window_count +
-                  chatbotData.smartphone_open_chatbot_window_count;
+                  chatbotData.pc_count +
+                  chatbotData.tablet_count +
+                  chatbotData.smartphone_count;
                 setOpWinAll(numOfBS);
                 setNumofBotStart(numOfBS);
                 // setBotCVRCTR(numOfBS)
                 let numOfOB =
-                  chatbotData.pc_count + chatbotData.tablet_count + chatbotData.smartphone_count;
+                  chatbotData.pc_open_chatbot_window_count + chatbotData.tablet_open_chatbot_window_count + chatbotData.smartphone_open_chatbot_window_count;
                 setOpPCAll(numOfOB);
                 setNumOfOpenBot(numOfOB);
                 let numOfCB =
@@ -311,10 +311,10 @@ function Report() {
                     index.pc_count + index.smartphone_count + index.tablet_count,
                   ]);
                   totalBotStart +=
-                    index.pc_open_chatbot_window_count +
-                    index.smartphone_open_chatbot_window_count +
-                    index.tablet_open_chatbot_window_count;
-                  totalBotOpen += index.pc_count + index.smartphone_count + index.tablet_count;
+                    index.pc_count +
+                    index.smartphone_count +
+                    index.tablet_count;
+                  totalBotOpen += index.pc_open_chatbot_window_count + index.smartphone_open_chatbot_window_count + index.tablet_open_chatbot_window_count;
                   ctrPC += index.pc_open_chatbot_window_count;
                   ctrTB += index.tablet_open_chatbot_window_count;
                   ctrSP += index.smartphone_open_chatbot_window_count;
@@ -765,14 +765,14 @@ function Report() {
             setConversionAll(numOfCon);
             // setConversionCVRCTR(numOfCon)
             let numOfBS =
-              chatbotData.pc_open_chatbot_window_count +
-              chatbotData.tablet_open_chatbot_window_count +
-              chatbotData.smartphone_open_chatbot_window_count;
+              chatbotData.pc_count +
+              chatbotData.tablet_count +
+              chatbotData.smartphone_count;
             setOpWinAll(numOfBS);
             // setNumofBotStart(numOfBS)
             // setBotCVRCTR(numOfBS)
             let numOfOB =
-              chatbotData.pc_count + chatbotData.tablet_count + chatbotData.smartphone_count;
+              chatbotData.pc_open_chatbot_window_count + chatbotData.tablet_open_chatbot_window_count + chatbotData.smartphone_open_chatbot_window_count;
             setOpPCAll(numOfOB);
             // setNumOfOpenBot(numOfOB)
             let numOfCB =
@@ -792,18 +792,18 @@ function Report() {
               setNumOfCloseBot(numOfCB);
             } else if (searchVal.device == 'computer') {
               setConversionCVRCTR(chatbotData.pc_conversion_count);
-              setNumofBotStart(chatbotData.pc_open_chatbot_window_count);
-              setNumOfOpenBot(chatbotData.pc_count);
+              setNumofBotStart(chatbotData.pc_count);
+              setNumOfOpenBot(chatbotData.pc_open_chatbot_window_count);
               setNumOfCloseBot(chatbotData.pc_close_chatbot_window_count);
             } else if (searchVal.device == 'tablet') {
               setConversionCVRCTR(chatbotData.tablet_conversion_count);
-              setNumofBotStart(chatbotData.tablet_open_chatbot_window_count);
-              setNumOfOpenBot(chatbotData.tablet_count);
+              setNumofBotStart(chatbotData.tablet_count);
+              setNumOfOpenBot(chatbotData.tablet_open_chatbot_window_count);
               setNumOfCloseBot(chatbotData.tablet_close_chatbot_window_count);
             } else if (searchVal.device == 'smartphone') {
               setConversionCVRCTR(chatbotData.smartphone_conversion_count);
-              setNumofBotStart(chatbotData.smartphone_open_chatbot_window_count);
-              setNumOfOpenBot(chatbotData.smartphone_count);
+              setNumofBotStart(chatbotData.smartphone_count);
+              setNumOfOpenBot(chatbotData.smartphone_open_chatbot_window_count);
               setNumOfCloseBot(chatbotData.smartphone_close_chatbot_window_count);
             }
           })
@@ -936,25 +936,25 @@ function Report() {
               ]);
               totalBotStart +=
                 searchVal.device == 'all'
-                  ? index.pc_open_chatbot_window_count +
-                  index.smartphone_open_chatbot_window_count +
-                  index.tablet_open_chatbot_window_count
+                  ? index.pc_count +
+                  index.smartphone_count +
+                  index.tablet_count
                   : searchVal.device == 'computer'
-                    ? index.pc_open_chatbot_window_count
-                    : searchVal.device == 'tablet'
-                      ? index.tablet_open_chatbot_window_count
-                      : index.smartphone_open_chatbot_window_count;
-              totalBotOpen +=
-                searchVal.device == 'all'
-                  ? index.pc_count + index.smartphone_count + index.tablet_count
-                  : (searchVal.device == 'computer'
                     ? index.pc_count
                     : searchVal.device == 'tablet'
                       ? index.tablet_count
-                      : index.smartphone_count)
-              ctrPC += index.pc_open_chatbot_window_count;
-              ctrTB += index.tablet_open_chatbot_window_count;
-              ctrSP += index.smartphone_open_chatbot_window_count;
+                      : index.smartphone_count;
+              totalBotOpen +=
+                searchVal.device == 'all'
+                  ? index.pc_open_chatbot_window_count + index.smartphone_open_chatbot_window_count + index.tablet_open_chatbot_window_count
+                  : (searchVal.device == 'computer'
+                    ? index.pc_open_chatbot_window_count
+                    : searchVal.device == 'tablet'
+                      ? index.tablet_open_chatbot_window_count
+                      : index.smartphone_open_chatbot_window_count)
+              ctrPC += index.pc_count;
+              ctrTB += index.tablet_count;
+              ctrSP += index.smartphone_count;
               exportBotLeave.push(
                 searchVal.device == 'all'
                   ? [
