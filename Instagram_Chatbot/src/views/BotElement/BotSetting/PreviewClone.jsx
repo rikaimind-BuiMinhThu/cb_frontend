@@ -2306,11 +2306,7 @@ function Preview() {
           .then((res) => {
             const conversion = {
               scenario_data: `${deviceReceive}_conversion`,
-            };
-            api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
-            }).catch(err => {
-              console.log(err)
-            })
+            };           
           })
           .catch((error) => {
             console.log(error);
@@ -2345,11 +2341,7 @@ function Preview() {
             const conversion = {
               scenario_data: `${deviceReceive}_conversion`,
             };
-            api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
-            }).catch(err => {
-              console.log(err)
-            })
-          
+                    
             // api.post(`/api/v1/managements/payment_histories`, data_submit).then((res)=>{}).catch((err) => {
             //   console.log(err);
             // if (err.response?.data.code === 0) {
