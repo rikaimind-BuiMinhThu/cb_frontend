@@ -47,7 +47,7 @@ import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-bl
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
 
 const _ = require("lodash");
-sessionStorage.setItem("openBefore", "0");
+sessionStorage.setItem("prevOpenStatus", "0");
 
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
@@ -450,14 +450,15 @@ function Preview() {
     } else {
       setIsOpen(!isOpen);
     }
-    var openBefore  = sessionStorage.getItem("openBefore");
-    if(openBefore=="0" && opening) {
-      sessionStorage.setItem("openBefore", "1");
-      let add = {
+    var prevOpenStatus  = sessionStorage.getItem("prevOpenStatus");
+    if (prevOpenStatus == "0" && opening) {
+      sessionStorage.setItem("prevOpenStatus", "1");
+      const openChatbotCountApiParams = {
         scenario_data: `${deviceReceive}_open_chatbot_window`,
       };
-      api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, add).then(res => {
-      }).catch(err => {
+      const apiUrl = `/api/v1/analytics/scenario_counts/${scenarioId}`;
+      api.patch(apiUrl, openChatbotCountApiParams)
+        .catch(err => {
         console.log(err)
       })
     }
@@ -539,7 +540,7 @@ function Preview() {
       let urlRe = params.get("urlReceive"); // 'chrome-instant'
       let receiveDeviceParam = params.get("deviceReceive"); // 'chrome-instant'
       let scenarioIdGet = params.get("scenario_id"); // 'mdn query string'
-      const prevOpenStatus = sessionStorage.getItem("openBefore");
+      const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
       setUrlSend(url.href);
       setUrlReceive(urlRe);
       setDeviceReceive(receiveDeviceParam);
@@ -552,7 +553,7 @@ function Preview() {
         .then(async (res) => {
           if (res.data.code == 1) {
             if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
-              sessionStorage.setItem("openBefore", "1");
+              sessionStorage.setItem("prevOpenStatus", "1");
               const openChatbotCountApiParams = {
                 scenario_data: `${receiveDeviceParam}_open_chatbot_window`,
               };
