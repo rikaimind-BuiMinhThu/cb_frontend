@@ -551,12 +551,12 @@ function Preview() {
         )
         .then(async (res) => {
           if (res.data.code == 1) {
-            if(res.data.design_settings.display_type == 1 && openBefore == "0") {
+            if (res.data.design_settings.display_type == 1 && openBefore == "0") {
               sessionStorage.setItem("openBefore", "1");
-              let add = {
+              let openChatbotCountApiParams = {
                 scenario_data: `${deviceRe}_open_chatbot_window`,
               };
-              api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, add).then(res => {
+              api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, openChatbotCountApiParams).then(res => {
               }).catch(err => {
                 console.log(err)
               })
