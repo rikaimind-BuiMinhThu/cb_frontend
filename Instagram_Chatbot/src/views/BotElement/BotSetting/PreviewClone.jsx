@@ -450,7 +450,7 @@ function Preview() {
     } else {
       setIsOpen(!isOpen);
     }
-    var prevOpenStatus  = sessionStorage.getItem("prevOpenStatus");
+    const prevOpenStatus  = sessionStorage.getItem("prevOpenStatus");
     if (prevOpenStatus == "0" && opening) {
       sessionStorage.setItem("prevOpenStatus", "1");
       const openChatbotCountApiParams = {
