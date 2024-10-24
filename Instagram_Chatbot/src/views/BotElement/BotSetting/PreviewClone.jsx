@@ -539,7 +539,7 @@ function Preview() {
       let urlRe = params.get("urlReceive"); // 'chrome-instant'
       let receiveDeviceParam = params.get("deviceReceive"); // 'chrome-instant'
       let scenarioIdGet = params.get("scenario_id"); // 'mdn query string'
-      const openBefore = sessionStorage.getItem("openBefore");
+      const prevOpenStatus = sessionStorage.getItem("openBefore");
       setUrlSend(url.href);
       setUrlReceive(urlRe);
       setDeviceReceive(receiveDeviceParam);
@@ -551,14 +551,14 @@ function Preview() {
         )
         .then(async (res) => {
           if (res.data.code == 1) {
-            if (res.data.design_settings.display_type == 1 && openBefore == "0") {
+            if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
               sessionStorage.setItem("openBefore", "1");
               const openChatbotCountApiParams = {
                 scenario_data: `${receiveDeviceParam}_open_chatbot_window`,
               };
               const apiUrl = `/api/v1/analytics/scenario_counts/${scenarioId}`;
-              api.patch(apiUrl, openChatbotCountApiParams).then(res => {
-              }).catch(err => {
+              api.patch(apiUrl, openChatbotCountApiParams)
+                .catch(err => {
                 console.log(err)
               })
             }
