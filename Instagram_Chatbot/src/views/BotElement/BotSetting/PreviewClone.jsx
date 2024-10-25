@@ -2308,10 +2308,10 @@ function Preview() {
               scenario_data: `${deviceReceive}_conversion`,
                             
             };            
-            api.get(`/api/v1/chatbots/${botId}/cart_system`).then(
+            api.get(`/api/v1/managements/chatbots/${botId}/get_scenario_selected`).then(
               response =>
               {
-                if (response.data.data.cart_system !== "shopify") {  
+                if (response.data.cart_system !== "shopify") {  
                     api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
                     }).catch(err => {
                       console.log(err)
@@ -2353,11 +2353,12 @@ function Preview() {
           .then((res) => {
             const conversion = {
               scenario_data: `${deviceReceive}_conversion`,
-            };            
-            api.get(`/api/v1/chatbots/${botId}/cart_system`).then(
+            };  
+            api.get(`/api/v1/managements/chatbots/${botId}/get_scenario_selected`).then(
               response =>
               {
-                if (response.data.data.cart_system !== "shopify") {
+                debugger;
+                if (response.data.cart_system !== "shopify") {
                     api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
                     }).catch(err => {
                       console.log(err)
