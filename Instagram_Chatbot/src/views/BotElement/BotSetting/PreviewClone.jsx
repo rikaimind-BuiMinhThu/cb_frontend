@@ -2304,16 +2304,13 @@ function Preview() {
             data_submit
           )
           .then((res) => {
+            if (params.get('cartSystem') === 'shopify') return;
             const conversion = {
               scenario_data: `${deviceReceive}_conversion`,
-                            
-            };            
-            if (params.get('cartSystem') !== "shopify") {
-              api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
-              }).catch(err => {
-                console.log(err)
-              })
-          }                    
+            };
+            api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion)
+              .then(res => console.log(res))
+              .catch(err => console.error(err));
           })
           .catch((error) => {
             console.log(error);
@@ -2345,15 +2342,13 @@ function Preview() {
             data_submit
           )
           .then((res) => {
+            if (params.get('cartSystem') === 'shopify') return;
             const conversion = {
               scenario_data: `${deviceReceive}_conversion`,
-            }; 
-              if (params.get('cartSystem') !== "shopify") {
-                  api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
-                  }).catch(err => {
-                    console.log(err)
-                  })
-              }
+            };
+            api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion)
+              .then(res => console.log(res))
+              .catch(err => console.error(err));
             // api.post(`/api/v1/managements/payment_histories`, data_submit).then((res)=>{}).catch((err) => {
             //   console.log(err);
             // if (err.response?.data.code === 0) {
