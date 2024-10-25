@@ -2311,15 +2311,14 @@ function Preview() {
             api.get(`/api/v1/chatbots/${botId}/cart_system`).then(
               response =>
               {
-                  if (response.data.cart_system != "shopify") {
-                    console.log('This is not shopify')
-                      api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
-                      }).catch(err => {
-                        console.log(err)
-                      })
-                  }                
+                if (response.data.data.cart_system !== "shopify") {  
+                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
+                    }).catch(err => {
+                      console.log(err)
+                    })
+                }                
               }
-            )        
+            )      
                                 
           })
           .catch((error) => {
@@ -2358,13 +2357,12 @@ function Preview() {
             api.get(`/api/v1/chatbots/${botId}/cart_system`).then(
               response =>
               {
-                  if (response.data.cart_system != "shopify") {
-                    console.log('This is not shopify')
-                      api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
-                      }).catch(err => {
-                        console.log(err)
-                      })
-                  }                
+                if (response.data.data.cart_system !== "shopify") {
+                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
+                    }).catch(err => {
+                      console.log(err)
+                    })
+                }                
               }
             )  
                     
