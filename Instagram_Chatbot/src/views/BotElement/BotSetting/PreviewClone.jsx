@@ -431,7 +431,7 @@ function Preview() {
   }
 
   function onOpenPreview(opening) {
-    let receiveDeviceParam = params.get("deviceReceive");
+    const receiveDeviceParam = params.get("deviceReceive");
     if (isOpen && activePopupCloseBot) {
       setShowPopupCloseBot(true)
       return;
