@@ -431,6 +431,7 @@ function Preview() {
   }
 
   function onOpenPreview(opening) {
+    let receiveDeviceParam = params.get("deviceReceive");
     if (isOpen && activePopupCloseBot) {
       setShowPopupCloseBot(true)
       return;
@@ -454,7 +455,7 @@ function Preview() {
     if (prevOpenStatus == "0" && opening) {
       sessionStorage.setItem("prevOpenStatus", "1");
       const openChatbotCountApiParams = {
-        scenario_data: `${deviceReceive}_open_chatbot_window`,
+        scenario_data: `${receiveDeviceParam}_open_chatbot_window`,
       };
       const apiUrl = `/api/v1/analytics/scenario_counts/${scenarioId}`;
       api.patch(apiUrl, openChatbotCountApiParams)
