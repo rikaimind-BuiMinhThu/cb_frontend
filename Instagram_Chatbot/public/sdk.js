@@ -82,8 +82,8 @@ async function displayPopup() {
       },
     }
   );
-  const data = await response.json();
 
+  const data = await response.json();
   scenarioId = data.data.id;
   let uuid =
     Math.random().toString(36).substring(2, 15) +
@@ -119,7 +119,7 @@ async function displayPopup() {
   iframe.style.zIndex = "999999";
   iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${
     window.location.origin
-  }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}`;
+  }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}`;
 
   body.appendChild(iframe);
 
