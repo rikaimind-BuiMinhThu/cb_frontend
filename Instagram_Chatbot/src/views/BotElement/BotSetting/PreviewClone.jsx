@@ -2306,7 +2306,21 @@ function Preview() {
           .then((res) => {
             const conversion = {
               scenario_data: `${deviceReceive}_conversion`,
-            };           
+                            
+            };            
+            api.get(`/api/v1/chatbots/${botId}/cart_system`).then(
+              response =>
+              {
+                  if (response.data.cart_system != "shopify") {
+                    console.log('This is not shopify')
+                      api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
+                      }).catch(err => {
+                        console.log(err)
+                      })
+                  }                
+              }
+            )        
+                                
           })
           .catch((error) => {
             console.log(error);
@@ -2340,7 +2354,19 @@ function Preview() {
           .then((res) => {
             const conversion = {
               scenario_data: `${deviceReceive}_conversion`,
-            };
+            };            
+            api.get(`/api/v1/chatbots/${botId}/cart_system`).then(
+              response =>
+              {
+                  if (response.data.cart_system != "shopify") {
+                    console.log('This is not shopify')
+                      api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
+                      }).catch(err => {
+                        console.log(err)
+                      })
+                  }                
+              }
+            )  
                     
             // api.post(`/api/v1/managements/payment_histories`, data_submit).then((res)=>{}).catch((err) => {
             //   console.log(err);
