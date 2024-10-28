@@ -47,6 +47,7 @@ import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-bl
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
 
 const _ = require("lodash");
+sessionStorage.setItem("prevOpenStatus", "0");
 
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
@@ -429,7 +430,8 @@ function Preview() {
     }
   }
 
-  function onOpenPreview() {
+  function onOpenPreview(opening) {
+    const receiveDeviceParam = params.get("deviceReceive");
     if (isOpen && activePopupCloseBot) {
       setShowPopupCloseBot(true)
       return;
@@ -449,6 +451,19 @@ function Preview() {
     } else {
       setIsOpen(!isOpen);
     }
+    const prevOpenStatus  = sessionStorage.getItem("prevOpenStatus");
+    if (prevOpenStatus == "0" && opening) {
+      sessionStorage.setItem("prevOpenStatus", "1");
+      const openChatbotCountApiParams = {
+        scenario_data: `${receiveDeviceParam}_open_chatbot_window`,
+      };
+      const apiUrl = `/api/v1/analytics/scenario_counts/${scenarioId}`;
+      api.patch(apiUrl, openChatbotCountApiParams)
+        .catch(err => {
+        console.log(err)
+      })
+    }
+
     if (document.getElementById("sp-container1")) {
       if (isOpen && activePopupCloseBot) {
         setShowPopupCloseBot(true)
@@ -524,11 +539,12 @@ function Preview() {
       // let params = new URLSearchParams(url.search);
       let botIdGet = params.get("bot_id"); // 'chrome-instant'
       let urlRe = params.get("urlReceive"); // 'chrome-instant'
-      let deviceRe = params.get("deviceReceive"); // 'chrome-instant'
+      let receiveDeviceParam = params.get("deviceReceive"); // 'chrome-instant'
       let scenarioIdGet = params.get("scenario_id"); // 'mdn query string'
+      const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
       setUrlSend(url.href);
       setUrlReceive(urlRe);
-      setDeviceReceive(deviceRe);
+      setDeviceReceive(receiveDeviceParam);
       setBotId(botIdGet);
       // setScenarioId(scenarioIdGet)
       api
@@ -537,6 +553,17 @@ function Preview() {
         )
         .then(async (res) => {
           if (res.data.code == 1) {
+            if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
+              sessionStorage.setItem("prevOpenStatus", "1");
+              const openChatbotCountApiParams = {
+                scenario_data: `${receiveDeviceParam}_open_chatbot_window`,
+              };
+              const apiUrl = `/api/v1/analytics/scenario_counts/${scenarioId}`;
+              api.patch(apiUrl, openChatbotCountApiParams)
+                .catch(err => {
+                console.log(err)
+              })
+            }
             let messageArr = [];
             if (res.data.data?.conversation?.messages?.length > 0) {
               messageArr = [...res.data.data?.conversation?.messages.filter(x => !x.hidden)];
@@ -2291,13 +2318,13 @@ function Preview() {
             data_submit
           )
           .then((res) => {
+            if (params.get('cartSystem') === 'shopify') return;
             const conversion = {
               scenario_data: `${deviceReceive}_conversion`,
             };
-            api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
-            }).catch(err => {
-              console.log(err)
-            })
+            api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion)
+              .then(res => console.log(res))
+              .catch(err => console.error(err));
           })
           .catch((error) => {
             console.log(error);
@@ -2329,14 +2356,13 @@ function Preview() {
             data_submit
           )
           .then((res) => {
+            if (params.get('cartSystem') === 'shopify') return;
             const conversion = {
               scenario_data: `${deviceReceive}_conversion`,
             };
-            api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion).then(res => {
-            }).catch(err => {
-              console.log(err)
-            })
-          
+            api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, conversion)
+              .then(res => console.log(res))
+              .catch(err => console.error(err));
             // api.post(`/api/v1/managements/payment_histories`, data_submit).then((res)=>{}).catch((err) => {
             //   console.log(err);
             // if (err.response?.data.code === 0) {
