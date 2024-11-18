@@ -10,6 +10,7 @@ import SelectCustom from './scenarioComon/SelectCustom';
 import CheckboxCustom from './scenarioComon/CheckboxCustom';
 import InputNum from './scenarioComon/InputNum';
 import InputDouble from './scenarioComon/InputDouble';
+import FukushashikiSelect from './scenarioComon/FukishashikiSelect';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from './scenarioComon/InputCustom';
 import moment from 'moment';
@@ -749,6 +750,7 @@ const Scenario = () => {
   const [lpProductUrl, setLpProductUrl] = useState('');
   const [coupon, setCoupon] = useState('');
   const [isUseOnlyRegularOrder, setIsUseOnlyRegularOrder] = useState(false);
+  const [isUseFukushashiki, setIsUseFukushashiki] = useState(false);
   const [errorScenarioName, setErrorScenarioName] = useState('');
 
   const [belongTo, setBelongTo] = useState('bot');
@@ -861,12 +863,12 @@ const Scenario = () => {
   const handleGetMessage = () => {
     api.get(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`).then((res) => {
       setDataMessages(res.data.data?.conversation?.messages || []);
-      
       setScenarioName(res.data.data?.scenario_name || '');
       setUrlThanks(res.data.data?.conversation?.urlThanksPage || '');
       setCoupon(res.data.data?.conversation?.coupon || '');
       setLpProductUrl(res.data.data?.tamagoLandingPageUrl || '');
       setIsUseOnlyRegularOrder(res.data.data?.isUseOnlyRegularOrder || false);
+      setIsUseFukushashiki(res.data.data?.isUseFukushashiki || false);
     }).catch((error) => {
       console.log(error);
       if (error.response?.data.code === 0) {
@@ -1903,6 +1905,7 @@ const Scenario = () => {
       scenario_name: scenarioName,
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
+      is_used_fukushashiki: isUseFukushashiki,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
       console.log(res.data);
@@ -1946,6 +1949,7 @@ const Scenario = () => {
       scenario_name: scenarioName,
       landing_page_product_url: lpProductUrl,
       is_use_only_regular_order: isUseOnlyRegularOrder,
+      is_used_fukushashiki: isUseFukushashiki,
     }
     try {
       const res = await api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data);
@@ -2063,7 +2067,6 @@ const Scenario = () => {
 
     setBelongTo('');
     setDataMessages([...dataMessagesClone]);
-    // handleSelectMessage(indexMessage ? indexMessage + 1 : indexMessage, belongTo);
   }
 
   const handlePannelCondition = (isUpCondition, role = 'bot') => {
@@ -2335,6 +2338,15 @@ const Scenario = () => {
                       checked={isUseOnlyRegularOrder}
                     />
                     <label>定期注文のみ</label>
+                  </div>
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={(value) => setIsUseFukushashiki(!isUseFukushashiki)}
+                      checked={isUseFukushashiki}
+                    />
+                    <label>複写式利用フラグ</label>
                   </div>
                   {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
@@ -4014,11 +4026,6 @@ const Scenario = () => {
                                                                                     </div> :
                                                                                     ""
                                                                                   }
-                                                                                  {/* {productPurchase.multiple_item_purchase &&
-                                                                                  <div className="ss-user-overview-product-purchase-infor-price">
-                                                                                    複数商品購入
-                                                                                  </div>
-                                                                                } */}
                                                                                 </div>
                                                                               }
                                                                             </div>
@@ -5140,27 +5147,55 @@ const Scenario = () => {
                                                               placeholder={['プレースホルダ', 'プレースホルダ']}
                                                             />
                                                           </div>
+                                                          {isUseFukushashiki && (
+                                                            <FukushashikiSelect
+                                                              dataMessages={dataMessages}
+                                                              onChangeValueMessageContent={onChangeValueMessageContent}
+                                                              indexMessageSelect={indexMessageSelect}
+                                                              indexContent={indexContent}
+                                                            />
+                                                          )}
                                                         </React.Fragment>
                                                       )}
                                                       {/* text_input: type = urls */}
                                                       {textInput.type === 'urls' &&
-                                                        <div className="ss-user-setting__item-bottom">
-                                                          <InputCustom
-                                                            placeholder="プレースホルダ"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'placeholder')}
-                                                            value={textInput[textInput.type]?.placeholder}
-                                                          />
-                                                        </div>
-                                                      }
+                                                        <>
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <InputCustom
+                                                              placeholder="プレースホルダ"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'placeholder')}
+                                                              value={textInput[textInput.type]?.placeholder}
+                                                            />
+                                                          </div>
+                                                          {isUseFukushashiki && (
+                                                            <FukushashikiSelect
+                                                              dataMessages={dataMessages}
+                                                              onChangeValueMessageContent={onChangeValueMessageContent}
+                                                              indexMessageSelect={indexMessageSelect}
+                                                              indexContent={indexContent}
+                                                            />
+                                                          )}
+                                                        </>
+                                                      } 
                                                       {/* text_input: type = email_address */}
                                                       {textInput.type === 'email_address' &&
-                                                        <div className="ss-user-setting__item-bottom">
-                                                          <InputCustom
-                                                            placeholder="プレースホルダ"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'placeholder')}
-                                                            value={textInput[textInput.type].placeholder}
-                                                          />
-                                                        </div>
+                                                        <>
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <InputCustom
+                                                              placeholder="プレースホルダ"
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, textInput.type, 'placeholder')}
+                                                              value={textInput[textInput.type].placeholder}
+                                                            />
+                                                          </div>
+                                                          {isUseFukushashiki && (
+                                                            <FukushashikiSelect
+                                                              dataMessages={dataMessages}
+                                                              onChangeValueMessageContent={onChangeValueMessageContent}
+                                                              indexMessageSelect={indexMessageSelect}
+                                                              indexContent={indexContent}
+                                                            />
+                                                          )}
+                                                        </>
                                                       }
                                                       {/* text_input: type = email_confirmation */}
                                                       {textInput.type === 'email_confirmation' &&
@@ -5179,6 +5214,14 @@ const Scenario = () => {
                                                               value={textInput[textInput.type]?.cfEmlAdd_confirm_email || ''}
                                                             />
                                                           </div>
+                                                          {isUseFukushashiki && (
+                                                            <FukushashikiSelect
+                                                              dataMessages={dataMessages}
+                                                              onChangeValueMessageContent={onChangeValueMessageContent}
+                                                              indexMessageSelect={indexMessageSelect}
+                                                              indexContent={indexContent}
+                                                            />
+                                                          )}
                                                         </React.Fragment>
                                                       }
                                                       {/* text_input: type = phone_number */}
@@ -5231,6 +5274,14 @@ const Scenario = () => {
                                                               </div>
                                                             </React.Fragment>
                                                           }
+                                                          {isUseFukushashiki && (
+                                                            <FukushashikiSelect
+                                                              dataMessages={dataMessages}
+                                                              onChangeValueMessageContent={onChangeValueMessageContent}
+                                                              indexMessageSelect={indexMessageSelect}
+                                                              indexContent={indexContent}
+                                                            />
+                                                          )}
                                                         </React.Fragment>
                                                       }
                                                       {/* text_input: type = password || password_confirmation */}
