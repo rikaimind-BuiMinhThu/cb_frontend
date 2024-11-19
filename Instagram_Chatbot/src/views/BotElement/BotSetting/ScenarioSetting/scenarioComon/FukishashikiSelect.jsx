@@ -7,9 +7,9 @@ const FukushashikiSelect = ({ dataMessages, onChangeValueMessageContent, indexMe
     const searchValue = dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_value'] || '';
 
     const placeholders = {
-        id: '複写先要素のIDを入力ください',
-        css_selector: '複写先要素のcss_selectorを入力ください',
-        xpath: '複写先要素のxPathを入力ください',
+        1: '複写先要素のIDを入力ください',
+        2: '複写先要素のcss_selectorを入力ください',
+        3: '複写先要素のxPathを入力ください',
     };
 
     return (
