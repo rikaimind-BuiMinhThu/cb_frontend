@@ -69,8 +69,8 @@ async function displayPopup() {
     !tabletCheck() && !mobileCheck()
       ? "pc"
       : tabletCheck()
-      ? "tablet"
-      : "smartphone";
+        ? "tablet"
+        : "smartphone";
   const response = await fetch(
     `${getEcChatBotApiServerBaseUrl()}/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
     // `https://ec-chatbot-test1.com/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
@@ -117,13 +117,12 @@ async function displayPopup() {
   iframe.style.borderRadius = "0px";
   // iframe.style.display = "none";
   iframe.style.zIndex = "999999";
-  iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${
-    window.location.origin
-  }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}`;
+  iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
+    }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}`;
 
   body.appendChild(iframe);
 
- let chatbotOpenedBefore = false;
+  let chatbotOpenedBefore = false;
 
   window.addEventListener(
     "message",
@@ -132,7 +131,9 @@ async function displayPopup() {
       chatbotH = e.data.heightPc
       chatbotRight = e.data.chatbotRight
       chatbotBottom = e.data.chatbotBottom
-
+      if (e.data.fukushashikiResponse) {
+        fillDataFromMessage(e.data.fukushashikiResponse)
+      }
       let firstOpen;
 
       if (!chatbotOpenedBefore && !e.data.isOpen) {
@@ -140,7 +141,7 @@ async function displayPopup() {
         chatbotOpenedBefore = true;
       } else {
         firstOpen = false;
-      }    
+      }
       if (
         (firstOpen && mobileCheck()) ||
         (e.data.isOpen && !firstOpen && mobileCheck())
@@ -181,6 +182,49 @@ async function displayPopup() {
     },
     false
   );
+
+  function fillDataFromMessage(obj) {
+    obj.forEach((item) => {
+      switch (item.type) {
+        case "text_input":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+          }
+        default:
+          return;
+
+      }
+    })
+  }
+  
+  function fillDataWithId(id, value) {
+    let element = document.getElementById(id);
+    if (element) {
+      element.value = value;
+    }
+  }
+
+  function fillDataWithCssSelector(cssSelector, value) {
+    let element = document.querySelector(cssSelector);
+    if (element) {
+      element.value = value;
+    }
+  }
+
+  function fillDataWithXPath(xpathElement, value) {
+    let element = document.evaluate(xpathElement, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    if (element) {
+      element.value = value;
+    }
+  }
 
   log("device: ", device);
   setTimeout(() => {
