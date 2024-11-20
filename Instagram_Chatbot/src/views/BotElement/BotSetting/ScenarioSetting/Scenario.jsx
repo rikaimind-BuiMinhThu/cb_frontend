@@ -5913,7 +5913,7 @@ const Scenario = () => {
                                                       }
                                                     </React.Fragment>
                                                   )}
-                                                  {/* user: type = 'zip_code_address' */}
+                                                  {/* user: type = 'zip_code_address' ADD_FUKU */}
                                                   {content.type === 'zip_code_address' && (
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-text_input-top">
@@ -6027,6 +6027,7 @@ const Scenario = () => {
                                                           </div>
                                                       )}
                                                       {zipCodeAddress.prefecture !== undefined &&
+                                                      <>
                                                         <div className="ss-user-setting__item-bottom" style={{ flexWrap: 'nowrap', alignItems: 'center' }}>
                                                           <span style={{ fontSize: '14px', fontWeight: '400' }}
                                                             className="ss-custom-label-zip-code">都道府県</span>
@@ -6080,38 +6081,154 @@ const Scenario = () => {
                                                             className={"ss-plus-circle-option-icon-times-custom"}
                                                           />
                                                         </div>
+                                                        {isUseFukushashiki && (
+                                                          <>
+                                                            <div className='ss-user-setting__item-row' style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '0 17px 20px 130px' }}>
+                                                              <div style={{ flex: '0 0 30%' }}>
+                                                                <SelectCustom
+                                                                  id="title"
+                                                                  style={{ width: '100%' }}
+                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['prefecture_fukushashiki_search_mode']}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'prefecture_fukushashiki_search_mode', value)}
+                                                                  data={[
+                                                                    { key: 1, value: 'id' },
+                                                                    { key: 2, value: 'css_selector' },
+                                                                    { key: 3, value: 'xpath' }
+                                                                  ]}
+                                                                  keyValue="key"
+                                                                  placeholder="複写先要素の取得方法をお選びください"
+                                                                />
+                                                              </div>
+                                                              <div style={{ flex: '0 0 70%' }}>
+                                                                <InputCustom
+                                                                  styleLabel={{ width: '100%' }}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'prefecture_fukushashiki_search_value', value)}
+                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['prefecture_fukushashiki_search_value']}
+                                                                  placeholder={{
+                                                                    1: '複写先要素のIDを入力ください',
+                                                                    2: '複写先要素のcss_selectorを入力ください',
+                                                                    3: '複写先要素のxPathを入力ください',
+                                                                  }[
+                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['prefecture_fukushashiki_search_mode']
+                                                                  ] || ''}
+                                                                />
+                                                              </div>
+                                                            </div>
+
+                                                          </>
+
+                                                        )}
+                                                      </>
+
                                                       }
                                                       {zipCodeAddress.municipality !== undefined &&
-                                                        <div className="ss-user-setting__item-bottom">
-                                                          <InputCustom
-                                                            classLabel="ss-custom-label-zip-code"
-                                                            label="市区町村"
-                                                            className={"ss-user-setting__item-input-zip-code"}
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'municipality')}
-                                                            onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'municipality')}
-                                                            value={zipCodeAddress.municipality}
-                                                            icon="times-circle"
-                                                            placeholder="プレースホルダ"
-                                                            classIcon={"ss-plus-circle-option-icon-times-custom"}
-                                                          />
-                                                        </div>
+                                                        <>
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <InputCustom
+                                                              classLabel="ss-custom-label-zip-code"
+                                                              label="市区町村"
+                                                              className={"ss-user-setting__item-input-zip-code"}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'municipality')}
+                                                              onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'municipality')}
+                                                              value={zipCodeAddress.municipality}
+                                                              icon="times-circle"
+                                                              placeholder="プレースホルダ"
+                                                              classIcon={"ss-plus-circle-option-icon-times-custom"}
+                                                            />
+                                                          </div>
+                                                          {isUseFukushashiki && (
+                                                            <>
+                                                              <div className='ss-user-setting__item-bottom'>
+                                                                <SelectCustom
+                                                                  id="title"
+                                                                  style={{ width: '90%' }}
+                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['municipality_fukushashiki_search_mode']}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'municipality_fukushashiki_search_mode', value)}
+                                                                  data={[
+                                                                    {
+                                                                      key: 1,
+                                                                      value: 'id'
+                                                                    },
+                                                                    {
+                                                                      key: 2,
+                                                                      value: 'css_selector'
+                                                                    },
+                                                                    {
+                                                                      key: 3,
+                                                                      value: 'xpath'
+                                                                    }
+                                                                  ]}
+                                                                  keyValue="key"
+                                                                  placeholder="複写先要素の取得方法をお選びください"
+                                                                />
+                                                              </div>
+                                                              <div className='ss-user-setting__item-bottom'>
+                                                                <InputCustom
+                                                                  styleLabel={{ width: '100%' }}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'municipality_fukushashiki_search_value', value)}
+                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['municipality_fukushashiki_search_value']}
+                                                                  placeholder={'a'}
+                                                                />
+                                                              </div>
+                                                            </>
+                                                          )}
+                                                        </>
                                                       }
                                                       {zipCodeAddress.address !== undefined &&
-                                                        <div className="ss-user-setting__item-bottom">
-                                                          <InputCustom
-                                                            classLabel="ss-custom-label-zip-code"
-                                                            label="番地"
-                                                            className={"ss-user-setting__item-input-zip-code"}
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'address')}
-                                                            onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'address')}
-                                                            value={zipCodeAddress.address}
-                                                            icon="times-circle"
-                                                            placeholder="プレースホルダ"
-                                                            classIcon={"ss-plus-circle-option-icon-times-custom"}
-                                                          />
-                                                        </div>
+                                                        <>
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <InputCustom
+                                                              classLabel="ss-custom-label-zip-code"
+                                                              label="番地"
+                                                              className={"ss-user-setting__item-input-zip-code"}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'address')}
+                                                              onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'address')}
+                                                              value={zipCodeAddress.address}
+                                                              icon="times-circle"
+                                                              placeholder="プレースホルダ"
+                                                              classIcon={"ss-plus-circle-option-icon-times-custom"}
+                                                            />
+                                                          </div>
+                                                          {isUseFukushashiki && (
+                                                            <>
+                                                              <div className='ss-user-setting__item-bottom'>
+                                                                <SelectCustom
+                                                                  id="title"
+                                                                  style={{ width: '90%' }}
+                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['address_fukushashiki_search_mode']}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'address_fukushashiki_search_mode', value)}
+                                                                  data={[
+                                                                    {
+                                                                      key: 1,
+                                                                      value: 'id'
+                                                                    },
+                                                                    {
+                                                                      key: 2,
+                                                                      value: 'css_selector'
+                                                                    },
+                                                                    {
+                                                                      key: 3,
+                                                                      value: 'xpath'
+                                                                    }
+                                                                  ]}
+                                                                  keyValue="key"
+                                                                  placeholder="複写先要素の取得方法をお選びください"
+                                                                />
+                                                              </div>
+                                                              <div className='ss-user-setting__item-bottom'>
+                                                                <InputCustom
+                                                                  styleLabel={{ width: '100%' }}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'address_fukushashiki_search_value', value)}
+                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['address_fukushashiki_search_value']}
+                                                                  placeholder={'a'}
+                                                                />
+                                                              </div>
+                                                            </>
+                                                          )}
+                                                        </>
                                                       }
                                                       {zipCodeAddress.building_name !== undefined &&
+                                                      <>
                                                         <div className="ss-user-setting__item-bottom">
                                                           <InputCustom
                                                             classLabel="ss-custom-label-zip-code"
@@ -6125,6 +6242,43 @@ const Scenario = () => {
                                                             classIcon={"ss-plus-circle-option-icon-times-custom"}
                                                           />
                                                         </div>
+                                                        {isUseFukushashiki && (
+                                                          <>
+                                                            <div className='ss-user-setting__item-bottom'>
+                                                              <SelectCustom
+                                                                id="title"
+                                                                style={{ width: '90%' }}
+                                                                value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['building_name_fukushashiki_search_mode']}
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'building_name_fukushashiki_search_mode', value)}
+                                                                data={[
+                                                                  {
+                                                                    key: 1,
+                                                                    value: 'id'
+                                                                  },
+                                                                  {
+                                                                    key: 2,
+                                                                    value: 'css_selector'
+                                                                  },
+                                                                  {
+                                                                    key: 3,
+                                                                    value: 'xpath'
+                                                                  }
+                                                                ]}
+                                                                keyValue="key"
+                                                                placeholder="複写先要素の取得方法をお選びください"
+                                                              />
+                                                            </div>
+                                                            <div className='ss-user-setting__item-bottom'>
+                                                              <InputCustom
+                                                                styleLabel={{ width: '100%' }}
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'building_name_fukushashiki_search_value', value)}
+                                                                value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['building_name_fukushashiki_search_value']}
+                                                                placeholder={'a'}
+                                                              />
+                                                            </div>
+                                                          </>
+                                                        )}
+                                                        </>
                                                       }
                                                     </React.Fragment>
                                                   )}
@@ -6517,7 +6671,7 @@ const Scenario = () => {
                                                       </div>
                                                     </React.Fragment>
                                                   )}
-                                                  {/* user: type = 'agree_term' */}
+                                                  {/* user: type = 'agree_term' ADD_FUKU */}
                                                   {content.type === 'agree_term' && (
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-bottom">
@@ -6628,7 +6782,7 @@ const Scenario = () => {
                                                       </div>
                                                     </React.Fragment>
                                                   )}
-                                                  {/* user: type = 'pull_down' */}
+                                                  {/* user: type = 'pull_down' ADD_FUKU */}
                                                   {content.type === 'pull_down' && (
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-text_input-top">
@@ -7407,7 +7561,7 @@ const Scenario = () => {
                                                       }
                                                     </React.Fragment>
                                                   )}
-                                                  {/* user: type = 'carousel' */}
+                                                  {/* user: type = 'carousel' ADD_FUKU */}
                                                   {content.type === 'carousel' && (
                                                     <>
                                                       <div className="ss-user-setting__item-text_input-top">
@@ -8644,7 +8798,7 @@ const Scenario = () => {
                                                       </div>
                                                     </React.Fragment>
                                                   )}
-                                                  {/* user: type = 'slider' */}
+                                                  {/* user: type = 'slider' ADD_FUKU */}
                                                   {content.type === 'slider' && (
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px' }}>
@@ -8781,7 +8935,7 @@ const Scenario = () => {
                                                       </div>
                                                     </React.Fragment>
                                                   )}
-                                                  {/* user: type = 'card_payment_radio_button' */}
+                                                  {/* user: type = 'card_payment_radio_button' ADD_FUKU */}
                                                   {content.type === 'card_payment_radio_button' && (
                                                     <>
                                                       <div className="ss-user-setting__item-text_input-top">
