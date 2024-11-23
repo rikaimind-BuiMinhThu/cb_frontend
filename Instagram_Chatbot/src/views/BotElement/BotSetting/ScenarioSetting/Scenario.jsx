@@ -9623,14 +9623,15 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-bottom">
                                                           <div style={{ width: '90%' }}>カード番号</div>
                                                           <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type" style={{flexWrap:'wrap',rowGap:'10px'}}>
-                                                            <div style={{width:'50%'}}>
+                                                            <div style={{width:isUseFukushashiki?'100%':'49%'}}>
                                                             <InputCustom
+                                                            style={{width:'100%'}}
                                                               placeholder="プレースホルダ"
                                                               value={cardPaymentRadioButton.card_number_placeholder1}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder1')}
                                                             />
                                                            {isUseFukushashiki &&  <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', width: '90%',marginTop:'10px' }}>
+                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px',marginTop:'10px' }}>
                                                         <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
                                                               <div style={{ width: '20%' }}>
                                                                 <SelectCustom
@@ -9673,14 +9674,15 @@ const Scenario = () => {
                                                         </Tooltip>
                                                             </div> </>}
                                                             </div>
-                                                           <div style={{width:'50%'}}>
+                                                           <div style={{width:isUseFukushashiki?'100%':'49%'}}>
                                                            <InputCustom
+                                                           style={{width:'100%'}}
                                                               placeholder="プレースホルダ"
                                                               value={cardPaymentRadioButton.card_number_placeholder2}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder2')}
                                                             />
                                                             {isUseFukushashiki &&  <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', width: '90%' ,marginTop:'10px'}}>
+                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px' ,marginTop:'10px'}}>
                                                         <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
                                                               <div style={{ width: '20%' }}>
                                                                 <SelectCustom
@@ -9723,14 +9725,15 @@ const Scenario = () => {
                                                         </Tooltip>
                                                             </div> </>}
                                                            </div>
-                                                          <div style={{width:'50%'}}>
+                                                          <div style={{width:isUseFukushashiki?'100%':'49%'}}>
                                                           <InputCustom
+                                                          style={{width:'100%'}}
                                                               placeholder="プレースホルダ"
                                                               value={cardPaymentRadioButton.card_number_placeholder3}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder3')}
                                                             />
                                                             {isUseFukushashiki &&  <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', width: '90%' ,marginTop:'10px'}}>
+                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px',marginTop:'10px'}}>
                                                         <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
                                                               <div style={{ width: '20%' }}>
                                                                 <SelectCustom
@@ -9773,14 +9776,15 @@ const Scenario = () => {
                                                         </Tooltip>
                                                             </div> </>}
                                                           </div>
-                                                           <div style={{width:'50%'}}>
+                                                           <div style={{width:isUseFukushashiki?'100%':'49%'}}>
                                                            <InputCustom
+                                                           style={{width:'100%'}}
                                                               placeholder="プレースホルダ"
                                                               value={cardPaymentRadioButton.card_number_placeholder4}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder4')}
                                                             />
                                                             {isUseFukushashiki &&  <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', width: '90%',marginTop:'10px' }}>
+                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px',marginTop:'10px' }}>
                                                         <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
                                                               <div style={{ width: '20%' }}>
                                                                 <SelectCustom
@@ -9885,8 +9889,8 @@ const Scenario = () => {
                                                       </div>
                                                       <div className="ss-user-setting__item-bottom">
                                                         <div style={{ width: '90%' }}>有効期限</div>
-                                                        <div style={{ display: 'flex', width: '90%',gap:'15px' }}>
-                                                          <div style={{width: '49%'}}>
+                                                        <div style={{ display: 'flex', width: '90%',gap:'15px' ,flexWrap:isUseFukushashiki?'wrap':'no-wrap'}}>
+                                                          <div style={{width: isUseFukushashiki?'100%':'49%'}}>
                                                           <SelectCustom
                                                             placeholder="年"
                                                             style={{ width: '100%' }}
@@ -9941,7 +9945,7 @@ const Scenario = () => {
                                                           </>
                                       }
                                                           </div>
-                                                         <div style={{width: '49%'}}>
+                                                         <div style={{width: isUseFukushashiki?'100%':'49%'}}>
                                                          <SelectCustom
                                                             placeholder="月"
                                                             style={{ width: '100%' }}
