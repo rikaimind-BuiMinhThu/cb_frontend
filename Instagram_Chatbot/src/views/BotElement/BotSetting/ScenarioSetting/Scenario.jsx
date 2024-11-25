@@ -9150,46 +9150,46 @@ const Scenario = () => {
                                                       </div>
                                                       {isUseFukushashiki && <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginLeft: '30px' }}>
                                                         <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                              <div style={{ width: '20%' }}>
-                                                                <SelectCustom
-                                                                  id="title"
-                                                                  style={{ width: '100%' }}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode']}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_mode', value)}
-                                                                  data={[
-                                                                    { key: 1, value: 'id' },
-                                                                    { key: 2, value: 'css_selector' },
-                                                                    { key: 3, value: 'xpath' }
-                                                                  ]}
-                                                                  keyValue="key"
-                                                                  placeholder="複写先要素の取得方法をお選びください"
-                                                                />
-                                                              </div>
+                                                          <div style={{ width: '25%' }}>
+                                                            <SelectCustom
+                                                              id="title"
+                                                              style={{ width: '100%' }}
+                                                              value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode']}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_mode', value)}
+                                                              data={[
+                                                                { key: 1, value: 'id' },
+                                                                { key: 2, value: 'css_selector' },
+                                                                { key: 3, value: 'xpath' }
+                                                              ]}
+                                                              keyValue="key"
+                                                              placeholder="複写先要素の取得方法をお選びください"
+                                                            />
+                                                          </div>
                                                         </Tooltip>
                                                         <Tooltip title={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode']
-                                                                  ] || ''} placement="top">
-                                                              <div style={{ flex: '80%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode']
-                                                                  ] || ''}
-                                                                />
-                                                              </div>
+                                                          1: '複写先要素のIDを入力ください',
+                                                          2: '複写先要素のcss_selectorを入力ください',
+                                                          3: '複写先要素のxPathを入力ください',
+                                                        }[
+                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode']
+                                                        ] || ''} placement="top">
+                                                          <div style={{ flex: '75%' }}>
+                                                            <InputCustom
+                                                              styleLabel={{ width: '100%' }}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_value', value)}
+                                                              value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_value']}
+                                                              placeholder={{
+                                                                1: '複写先要素のIDを入力ください',
+                                                                2: '複写先要素のcss_selectorを入力ください',
+                                                                3: '複写先要素のxPathを入力ください',
+                                                              }[
+                                                                dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode']
+                                                              ] || ''}
+                                                            />
+                                                          </div>
                                                         </Tooltip>
-                                                            </div>}
-                                                      
+                                                      </div>}
+
                                                     </React.Fragment>
                                                   )}
                                                   {/* user: type = 'card_payment_radio_button' ADD_FUKU */}
@@ -9575,264 +9575,263 @@ const Scenario = () => {
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder')}
                                                           />
                                                           {isUseFukushashiki &&
-                                                          <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', width: '90%' ,marginTop:'10px'}}>
-                                                        <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                              <div style={{ width: '20%' }}>
-                                                                <SelectCustom
-                                                                  id="title"
-                                                                  style={{ width: '100%' }}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number_fukushashiki_search_mode']}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number_fukushashiki_search_mode', value)}
-                                                                  data={[
-                                                                    { key: 1, value: 'id' },
-                                                                    { key: 2, value: 'css_selector' },
-                                                                    { key: 3, value: 'xpath' }
-                                                                  ]}
-                                                                  keyValue="key"
-                                                                  placeholder="複写先要素の取得方法をお選びください"
-                                                                />
+                                                            <>
+                                                              <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', width: '90%', marginTop: '10px' }}>
+                                                                <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                                  <div style={{ width: '20%' }}>
+                                                                    <SelectCustom
+                                                                      id="title"
+                                                                      style={{ width: '100%' }}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number_fukushashiki_search_mode', value)}
+                                                                      data={[
+                                                                        { key: 1, value: 'id' },
+                                                                        { key: 2, value: 'css_selector' },
+                                                                        { key: 3, value: 'xpath' }
+                                                                      ]}
+                                                                      keyValue="key"
+                                                                      placeholder="複写先要素の取得方法をお選びください"
+                                                                    />
+                                                                  </div>
+                                                                </Tooltip>
+                                                                <Tooltip title={{
+                                                                  1: '複写先要素のIDを入力ください',
+                                                                  2: '複写先要素のcss_selectorを入力ください',
+                                                                  3: '複写先要素のxPathを入力ください',
+                                                                }[
+                                                                  dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number_fukushashiki_search_mode']
+                                                                ] || ''} placement="top">
+                                                                  <div style={{ flex: '80%' }}>
+                                                                    <InputCustom
+                                                                      styleLabel={{ width: '100%' }}
+                                                                      style={{ width: '100%' }}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number_fukushashiki_search_value', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number_fukushashiki_search_value']}
+                                                                      placeholder={{
+                                                                        1: '複写先要素のIDを入力ください',
+                                                                        2: '複写先要素のcss_selectorを入力ください',
+                                                                        3: '複写先要素のxPathを入力ください',
+                                                                      }[
+                                                                        dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number_fukushashiki_search_value']
+                                                                      ] || ''}
+                                                                    />
+                                                                  </div>
+                                                                </Tooltip>
                                                               </div>
-                                                        </Tooltip>
-                                                        <Tooltip title={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number_fukushashiki_search_mode']
-                                                                  ] || ''} placement="top">
-                                                              <div style={{ flex: '80%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  style={{width: '100%'}}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number_fukushashiki_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number_fukushashiki_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number_fukushashiki_search_value']
-                                                                  ] || ''}
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                            </div>
-                                                          </>}
+                                                            </>}
                                                         </div> :
                                                         <div className="ss-user-setting__item-bottom">
                                                           <div style={{ width: '90%' }}>カード番号</div>
-                                                          <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type" style={{flexWrap:'wrap',rowGap:'10px'}}>
-                                                            <div style={{width:isUseFukushashiki?'100%':'49%'}}>
-                                                            <InputCustom
-                                                            style={{width:'100%'}}
-                                                              placeholder="プレースホルダ"
-                                                              value={cardPaymentRadioButton.card_number_placeholder1}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder1')}
-                                                            />
-                                                           {isUseFukushashiki &&  <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px',marginTop:'10px' }}>
-                                                        <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                              <div style={{ width: '20%' }}>
-                                                                <SelectCustom
-                                                                  id="title"
-                                                                  style={{ width: '100%' }}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_mode']}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number1_fukushashiki_search_mode', value)}
-                                                                  data={[
-                                                                    { key: 1, value: 'id' },
-                                                                    { key: 2, value: 'css_selector' },
-                                                                    { key: 3, value: 'xpath' }
-                                                                  ]}
-                                                                  keyValue="key"
-                                                                  placeholder="複写先要素の取得方法をお選びください"
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                        <Tooltip title={{
+                                                          <div className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type" style={{ flexWrap: 'wrap', rowGap: '10px' }}>
+                                                            <div style={{ width: isUseFukushashiki ? '100%' : '49%' }}>
+                                                              <InputCustom
+                                                                style={{ width: '100%' }}
+                                                                placeholder="プレースホルダ"
+                                                                value={cardPaymentRadioButton.card_number_placeholder1}
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder1')}
+                                                              />
+                                                              {isUseFukushashiki && <>
+                                                                <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                                                                  <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                                    <div style={{ width: '20%' }}>
+                                                                      <SelectCustom
+                                                                        id="title"
+                                                                        style={{ width: '100%' }}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number1_fukushashiki_search_mode', value)}
+                                                                        data={[
+                                                                          { key: 1, value: 'id' },
+                                                                          { key: 2, value: 'css_selector' },
+                                                                          { key: 3, value: 'xpath' }
+                                                                        ]}
+                                                                        keyValue="key"
+                                                                        placeholder="複写先要素の取得方法をお選びください"
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                  <Tooltip title={{
                                                                     1: '複写先要素のIDを入力ください',
                                                                     2: '複写先要素のcss_selectorを入力ください',
                                                                     3: '複写先要素のxPathを入力ください',
                                                                   }[
                                                                     dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_mode']
                                                                   ] || ''} placement="top">
-                                                              <div style={{ flex: '80%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  style={{width: '100%'}}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number1_fukushashiki_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_value']
-                                                                  ] || ''}
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                            </div> </>}
+                                                                    <div style={{ flex: '80%' }}>
+                                                                      <InputCustom
+                                                                        styleLabel={{ width: '100%' }}
+                                                                        style={{ width: '100%' }}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number1_fukushashiki_search_value', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_value']}
+                                                                        placeholder={{
+                                                                          1: '複写先要素のIDを入力ください',
+                                                                          2: '複写先要素のcss_selectorを入力ください',
+                                                                          3: '複写先要素のxPathを入力ください',
+                                                                        }[
+                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_value']
+                                                                        ] || ''}
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                </div> </>}
                                                             </div>
-                                                           <div style={{width:isUseFukushashiki?'100%':'49%'}}>
-                                                           <InputCustom
-                                                           style={{width:'100%'}}
-                                                              placeholder="プレースホルダ"
-                                                              value={cardPaymentRadioButton.card_number_placeholder2}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder2')}
-                                                            />
-                                                            {isUseFukushashiki &&  <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px' ,marginTop:'10px'}}>
-                                                        <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                              <div style={{ width: '20%' }}>
-                                                                <SelectCustom
-                                                                  id="title"
-                                                                  style={{ width: '100%' }}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_mode']}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number2_fukushashiki_search_mode', value)}
-                                                                  data={[
-                                                                    { key: 1, value: 'id' },
-                                                                    { key: 2, value: 'css_selector' },
-                                                                    { key: 3, value: 'xpath' }
-                                                                  ]}
-                                                                  keyValue="key"
-                                                                  placeholder="複写先要素の取得方法をお選びください"
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                        <Tooltip title={{
+                                                            <div style={{ width: isUseFukushashiki ? '100%' : '49%' }}>
+                                                              <InputCustom
+                                                                style={{ width: '100%' }}
+                                                                placeholder="プレースホルダ"
+                                                                value={cardPaymentRadioButton.card_number_placeholder2}
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder2')}
+                                                              />
+                                                              {isUseFukushashiki && <>
+                                                                <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                                                                  <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                                    <div style={{ width: '20%' }}>
+                                                                      <SelectCustom
+                                                                        id="title"
+                                                                        style={{ width: '100%' }}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number2_fukushashiki_search_mode', value)}
+                                                                        data={[
+                                                                          { key: 1, value: 'id' },
+                                                                          { key: 2, value: 'css_selector' },
+                                                                          { key: 3, value: 'xpath' }
+                                                                        ]}
+                                                                        keyValue="key"
+                                                                        placeholder="複写先要素の取得方法をお選びください"
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                  <Tooltip title={{
                                                                     1: '複写先要素のIDを入力ください',
                                                                     2: '複写先要素のcss_selectorを入力ください',
                                                                     3: '複写先要素のxPathを入力ください',
                                                                   }[
                                                                     dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_mode']
                                                                   ] || ''} placement="top">
-                                                              <div style={{ flex: '80%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  style={{width: '100%'}}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number2_fukushashiki_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_value']
-                                                                  ] || ''}
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                            </div> </>}
-                                                           </div>
-                                                          <div style={{width:isUseFukushashiki?'100%':'49%'}}>
-                                                          <InputCustom
-                                                          style={{width:'100%'}}
-                                                              placeholder="プレースホルダ"
-                                                              value={cardPaymentRadioButton.card_number_placeholder3}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder3')}
-                                                            />
-                                                            {isUseFukushashiki &&  <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px',marginTop:'10px'}}>
-                                                        <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                              <div style={{ width: '20%' }}>
-                                                                <SelectCustom
-                                                                  id="title"
-                                                                  style={{ width: '100%' }}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_mode']}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number3_fukushashiki_search_mode', value)}
-                                                                  data={[
-                                                                    { key: 1, value: 'id' },
-                                                                    { key: 2, value: 'css_selector' },
-                                                                    { key: 3, value: 'xpath' }
-                                                                  ]}
-                                                                  keyValue="key"
-                                                                  placeholder="複写先要素の取得方法をお選びください"
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                        <Tooltip title={{
+                                                                    <div style={{ flex: '80%' }}>
+                                                                      <InputCustom
+                                                                        styleLabel={{ width: '100%' }}
+                                                                        style={{ width: '100%' }}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number2_fukushashiki_search_value', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_value']}
+                                                                        placeholder={{
+                                                                          1: '複写先要素のIDを入力ください',
+                                                                          2: '複写先要素のcss_selectorを入力ください',
+                                                                          3: '複写先要素のxPathを入力ください',
+                                                                        }[
+                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_value']
+                                                                        ] || ''}
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                </div> </>}
+                                                            </div>
+                                                            <div style={{ width: isUseFukushashiki ? '100%' : '49%' }}>
+                                                              <InputCustom
+                                                                style={{ width: '100%' }}
+                                                                placeholder="プレースホルダ"
+                                                                value={cardPaymentRadioButton.card_number_placeholder3}
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder3')}
+                                                              />
+                                                              {isUseFukushashiki && <>
+                                                                <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                                                                  <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                                    <div style={{ width: '20%' }}>
+                                                                      <SelectCustom
+                                                                        id="title"
+                                                                        style={{ width: '100%' }}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number3_fukushashiki_search_mode', value)}
+                                                                        data={[
+                                                                          { key: 1, value: 'id' },
+                                                                          { key: 2, value: 'css_selector' },
+                                                                          { key: 3, value: 'xpath' }
+                                                                        ]}
+                                                                        keyValue="key"
+                                                                        placeholder="複写先要素の取得方法をお選びください"
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                  <Tooltip title={{
                                                                     1: '複写先要素のIDを入力ください',
                                                                     2: '複写先要素のcss_selectorを入力ください',
                                                                     3: '複写先要素のxPathを入力ください',
                                                                   }[
                                                                     dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_mode']
                                                                   ] || ''} placement="top">
-                                                              <div style={{ flex: '80%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  style={{width: '100%'}}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number3_fukushashiki_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_value']
-                                                                  ] || ''}
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                            </div> </>}
-                                                          </div>
-                                                           <div style={{width:isUseFukushashiki?'100%':'49%'}}>
-                                                           <InputCustom
-                                                           style={{width:'100%'}}
-                                                              placeholder="プレースホルダ"
-                                                              value={cardPaymentRadioButton.card_number_placeholder4}
-                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder4')}
-                                                            />
-                                                            {isUseFukushashiki &&  <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px',marginTop:'10px' }}>
-                                                        <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                              <div style={{ width: '20%' }}>
-                                                                <SelectCustom
-                                                                  id="title"
-                                                                  style={{ width: '100%' }}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number4_fukushashiki_search_mode']}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number4_fukushashiki_search_mode', value)}
-                                                                  data={[
-                                                                    { key: 1, value: 'id' },
-                                                                    { key: 2, value: 'css_selector' },
-                                                                    { key: 3, value: 'xpath' }
-                                                                  ]}
-                                                                  keyValue="key"
-                                                                  placeholder="複写先要素の取得方法をお選びください"
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                        <Tooltip title={{
+                                                                    <div style={{ flex: '80%' }}>
+                                                                      <InputCustom
+                                                                        styleLabel={{ width: '100%' }}
+                                                                        style={{ width: '100%' }}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number3_fukushashiki_search_value', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_value']}
+                                                                        placeholder={{
+                                                                          1: '複写先要素のIDを入力ください',
+                                                                          2: '複写先要素のcss_selectorを入力ください',
+                                                                          3: '複写先要素のxPathを入力ください',
+                                                                        }[
+                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_value']
+                                                                        ] || ''}
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                </div> </>}
+                                                            </div>
+                                                            <div style={{ width: isUseFukushashiki ? '100%' : '49%' }}>
+                                                              <InputCustom
+                                                                style={{ width: '100%' }}
+                                                                placeholder="プレースホルダ"
+                                                                value={cardPaymentRadioButton.card_number_placeholder4}
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_number_placeholder4')}
+                                                              />
+                                                              {isUseFukushashiki && <>
+                                                                <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                                                                  <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                                    <div style={{ width: '20%' }}>
+                                                                      <SelectCustom
+                                                                        id="title"
+                                                                        style={{ width: '100%' }}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number4_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number4_fukushashiki_search_mode', value)}
+                                                                        data={[
+                                                                          { key: 1, value: 'id' },
+                                                                          { key: 2, value: 'css_selector' },
+                                                                          { key: 3, value: 'xpath' }
+                                                                        ]}
+                                                                        keyValue="key"
+                                                                        placeholder="複写先要素の取得方法をお選びください"
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                  <Tooltip title={{
                                                                     1: '複写先要素のIDを入力ください',
                                                                     2: '複写先要素のcss_selectorを入力ください',
                                                                     3: '複写先要素のxPathを入力ください',
                                                                   }[
                                                                     dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number4_fukushashiki_search_mode']
                                                                   ] || ''} placement="top">
-                                                              <div style={{ flex: '80%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  style={{width: '100%'}}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number4_fukushashiki_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number4_fukushashiki_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number4_fukushashiki_search_value']
-                                                                  ] || ''}
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                            </div> </>}
-                                                           </div>
+                                                                    <div style={{ flex: '80%' }}>
+                                                                      <InputCustom
+                                                                        styleLabel={{ width: '100%' }}
+                                                                        style={{ width: '100%' }}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number4_fukushashiki_search_value', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number4_fukushashiki_search_value']}
+                                                                        placeholder={{
+                                                                          1: '複写先要素のIDを入力ください',
+                                                                          2: '複写先要素のcss_selectorを入力ください',
+                                                                          3: '複写先要素のxPathを入力ください',
+                                                                        }[
+                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number4_fukushashiki_search_value']
+                                                                        ] || ''}
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                </div> </>}
+                                                            </div>
                                                           </div>
-                                                          
+
                                                         </div>
                                                       }
                                                       <div className="ss-user-setting__item-bottom">
-                                                      
                                                         <InputCustom
                                                           styleLabel={{ width: '90%' }}
                                                           label="カード名義"
@@ -9843,167 +9842,167 @@ const Scenario = () => {
                                                         />
                                                         {isUseFukushashiki &&
                                                           <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', width: '90%' ,marginTop:'10px'}}>
-                                                        <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                              <div style={{ width: '20%' }}>
-                                                                <SelectCustom
-                                                                  id="title"
-                                                                  style={{ width: '100%' }}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['holder_fukushashiki_search_mode']}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'holder_fukushashiki_search_mode', value)}
-                                                                  data={[
-                                                                    { key: 1, value: 'id' },
-                                                                    { key: 2, value: 'css_selector' },
-                                                                    { key: 3, value: 'xpath' }
-                                                                  ]}
-                                                                  keyValue="key"
-                                                                  placeholder="複写先要素の取得方法をお選びください"
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                        <Tooltip title={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['holder_fukushashiki_search_mode']
-                                                                  ] || ''} placement="top">
-                                                              <div style={{ flex: '80%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  style={{width: '100%'}}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'holder_fukushashiki_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['holder_fukushashiki_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['holder_fukushashiki_search_value']
-                                                                  ] || ''}
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
+                                                            <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', width: '90%', marginTop: '10px' }}>
+                                                              <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                                <div style={{ width: '20%' }}>
+                                                                  <SelectCustom
+                                                                    id="title"
+                                                                    style={{ width: '100%' }}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['holder_fukushashiki_search_mode']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'holder_fukushashiki_search_mode', value)}
+                                                                    data={[
+                                                                      { key: 1, value: 'id' },
+                                                                      { key: 2, value: 'css_selector' },
+                                                                      { key: 3, value: 'xpath' }
+                                                                    ]}
+                                                                    keyValue="key"
+                                                                    placeholder="複写先要素の取得方法をお選びください"
+                                                                  />
+                                                                </div>
+                                                              </Tooltip>
+                                                              <Tooltip title={{
+                                                                1: '複写先要素のIDを入力ください',
+                                                                2: '複写先要素のcss_selectorを入力ください',
+                                                                3: '複写先要素のxPathを入力ください',
+                                                              }[
+                                                                dataMessages[indexMessageSelect]?.message_content[indexContent]?.['holder_fukushashiki_search_mode']
+                                                              ] || ''} placement="top">
+                                                                <div style={{ flex: '80%' }}>
+                                                                  <InputCustom
+                                                                    styleLabel={{ width: '100%' }}
+                                                                    style={{ width: '100%' }}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'holder_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['holder_fukushashiki_search_value']}
+                                                                    placeholder={{
+                                                                      1: '複写先要素のIDを入力ください',
+                                                                      2: '複写先要素のcss_selectorを入力ください',
+                                                                      3: '複写先要素のxPathを入力ください',
+                                                                    }[
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['holder_fukushashiki_search_value']
+                                                                    ] || ''}
+                                                                  />
+                                                                </div>
+                                                              </Tooltip>
                                                             </div>
                                                           </>}
                                                       </div>
                                                       <div className="ss-user-setting__item-bottom">
                                                         <div style={{ width: '90%' }}>有効期限</div>
-                                                        <div style={{ display: 'flex', width: '90%',gap:'15px' ,flexWrap:isUseFukushashiki?'wrap':'no-wrap'}}>
-                                                          <div style={{width: isUseFukushashiki?'100%':'49%'}}>
-                                                          <SelectCustom
-                                                            placeholder="年"
-                                                            style={{ width: '100%' }}
-                                                            value={cardPaymentRadioButton.year_placeholder}
-                                                            data={dataYearFixed.filter(item => item.key >= new Date().getFullYear() && item.key <= (new Date().getFullYear() + 10))}
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'year_placeholder')}
-                                                          />
-                                                          {isUseFukushashiki &&
-                                                          <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px',marginTop:'10px' }}>
-                                                        <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                              <div style={{ width: '20%' }}>
-                                                                <SelectCustom
-                                                                  id="title"
-                                                                  style={{ width: '100%' }}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_mode']}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_mode', value)}
-                                                                  data={[
-                                                                    { key: 1, value: 'id' },
-                                                                    { key: 2, value: 'css_selector' },
-                                                                    { key: 3, value: 'xpath' }
-                                                                  ]}
-                                                                  keyValue="key"
-                                                                  placeholder="複写先要素の取得方法をお選びください"
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                        <Tooltip title={{
+                                                        <div style={{ display: 'flex', width: '90%', gap: '15px', flexWrap: isUseFukushashiki ? 'wrap' : 'no-wrap' }}>
+                                                          <div style={{ width: isUseFukushashiki ? '100%' : '49%' }}>
+                                                            <SelectCustom
+                                                              placeholder="年"
+                                                              style={{ width: '100%' }}
+                                                              value={cardPaymentRadioButton.year_placeholder}
+                                                              data={dataYearFixed.filter(item => item.key >= new Date().getFullYear() && item.key <= (new Date().getFullYear() + 10))}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'year_placeholder')}
+                                                            />
+                                                            {isUseFukushashiki &&
+                                                              <>
+                                                                <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                                                                  <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                                    <div style={{ width: '20%' }}>
+                                                                      <SelectCustom
+                                                                        id="title"
+                                                                        style={{ width: '100%' }}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_mode', value)}
+                                                                        data={[
+                                                                          { key: 1, value: 'id' },
+                                                                          { key: 2, value: 'css_selector' },
+                                                                          { key: 3, value: 'xpath' }
+                                                                        ]}
+                                                                        keyValue="key"
+                                                                        placeholder="複写先要素の取得方法をお選びください"
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                  <Tooltip title={{
                                                                     1: '複写先要素のIDを入力ください',
                                                                     2: '複写先要素のcss_selectorを入力ください',
                                                                     3: '複写先要素のxPathを入力ください',
                                                                   }[
                                                                     dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_mode']
                                                                   ] || ''} placement="top">
-                                                              <div style={{ flex: '80%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  style={{width: '100%'}}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_value']
-                                                                  ] || ''}
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                            </div>
-                                                          </>
-                                      }
+                                                                    <div style={{ flex: '80%' }}>
+                                                                      <InputCustom
+                                                                        styleLabel={{ width: '100%' }}
+                                                                        style={{ width: '100%' }}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_value', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_value']}
+                                                                        placeholder={{
+                                                                          1: '複写先要素のIDを入力ください',
+                                                                          2: '複写先要素のcss_selectorを入力ください',
+                                                                          3: '複写先要素のxPathを入力ください',
+                                                                        }[
+                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_value']
+                                                                        ] || ''}
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                </div>
+                                                              </>
+                                                            }
                                                           </div>
-                                                         <div style={{width: isUseFukushashiki?'100%':'49%'}}>
-                                                         <SelectCustom
-                                                            placeholder="月"
-                                                            style={{ width: '100%' }}
-                                                            value={cardPaymentRadioButton.month_placeholder}
-                                                            data={dataMonthFixed}
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'month_placeholder')}
-                                                          />
-                                                          {isUseFukushashiki &&
-                                                          <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px',marginTop:'10px' }}>
-                                                        <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                              <div style={{ width: '20%' }}>
-                                                                <SelectCustom
-                                                                  id="title"
-                                                                  style={{ width: '100%' }}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_mode', value)}
-                                                                  data={[
-                                                                    { key: 1, value: 'id' },
-                                                                    { key: 2, value: 'css_selector' },
-                                                                    { key: 3, value: 'xpath' }
-                                                                  ]}
-                                                                  keyValue="key"
-                                                                  placeholder="複写先要素の取得方法をお選びください"
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                        <Tooltip title={{
+                                                          <div style={{ width: isUseFukushashiki ? '100%' : '49%' }}>
+                                                            <SelectCustom
+                                                              placeholder="月"
+                                                              style={{ width: '100%' }}
+                                                              value={cardPaymentRadioButton.month_placeholder}
+                                                              data={dataMonthFixed}
+                                                              onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'month_placeholder')}
+                                                            />
+                                                            {isUseFukushashiki &&
+                                                              <>
+                                                                <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                                                                  <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                                    <div style={{ width: '20%' }}>
+                                                                      <SelectCustom
+                                                                        id="title"
+                                                                        style={{ width: '100%' }}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_mode', value)}
+                                                                        data={[
+                                                                          { key: 1, value: 'id' },
+                                                                          { key: 2, value: 'css_selector' },
+                                                                          { key: 3, value: 'xpath' }
+                                                                        ]}
+                                                                        keyValue="key"
+                                                                        placeholder="複写先要素の取得方法をお選びください"
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                  <Tooltip title={{
                                                                     1: '複写先要素のIDを入力ください',
                                                                     2: '複写先要素のcss_selectorを入力ください',
                                                                     3: '複写先要素のxPathを入力ください',
                                                                   }[
                                                                     dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']
                                                                   ] || ''} placement="top">
-                                                              <div style={{ flex: '80%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  style={{width: '100%'}}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_value']
-                                                                  ] || ''}
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                            </div>
-                                                          </>
-                                      }
-                                                         </div>
+                                                                    <div style={{ flex: '80%' }}>
+                                                                      <InputCustom
+                                                                        styleLabel={{ width: '100%' }}
+                                                                        style={{ width: '100%' }}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_value', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_value']}
+                                                                        placeholder={{
+                                                                          1: '複写先要素のIDを入力ください',
+                                                                          2: '複写先要素のcss_selectorを入力ください',
+                                                                          3: '複写先要素のxPathを入力ください',
+                                                                        }[
+                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_value']
+                                                                        ] || ''}
+                                                                      />
+                                                                    </div>
+                                                                  </Tooltip>
+                                                                </div>
+                                                              </>
+                                                            }
+                                                          </div>
                                                         </div>
                                                       </div>
                                                       <div className="ss-user-setting__item-bottom">
-                                                      
+
                                                         <InputCustom
                                                           styleLabel={{ width: '90%' }}
                                                           label="CVC非表示"
@@ -10014,50 +10013,50 @@ const Scenario = () => {
                                                         />
                                                         {isUseFukushashiki &&
                                                           <>
-                                                          <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', width: '90%',marginTop:'10px' }}>
-                                                        <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                              <div style={{ width: '20%' }}>
-                                                                <SelectCustom
-                                                                  id="title"
-                                                                  style={{ width: '100%' }}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['cvc_fukushashiki_search_mode']}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'cvc_fukushashiki_search_mode', value)}
-                                                                  data={[
-                                                                    { key: 1, value: 'id' },
-                                                                    { key: 2, value: 'css_selector' },
-                                                                    { key: 3, value: 'xpath' }
-                                                                  ]}
-                                                                  keyValue="key"
-                                                                  placeholder="複写先要素の取得方法をお選びください"
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
-                                                        <Tooltip title={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['cvc_fukushashiki_search_mode']
-                                                                  ] || ''} placement="top">
-                                                              <div style={{ flex: '80%' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  style={{width: '100%'}}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'cvc_fukushashiki_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['cvc_fukushashiki_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['cvc_fukushashiki_search_value']
-                                                                  ] || ''}
-                                                                />
-                                                              </div>
-                                                        </Tooltip>
+                                                            <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', width: '90%', marginTop: '10px' }}>
+                                                              <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                                <div style={{ width: '20%' }}>
+                                                                  <SelectCustom
+                                                                    id="title"
+                                                                    style={{ width: '100%' }}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['cvc_fukushashiki_search_mode']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'cvc_fukushashiki_search_mode', value)}
+                                                                    data={[
+                                                                      { key: 1, value: 'id' },
+                                                                      { key: 2, value: 'css_selector' },
+                                                                      { key: 3, value: 'xpath' }
+                                                                    ]}
+                                                                    keyValue="key"
+                                                                    placeholder="複写先要素の取得方法をお選びください"
+                                                                  />
+                                                                </div>
+                                                              </Tooltip>
+                                                              <Tooltip title={{
+                                                                1: '複写先要素のIDを入力ください',
+                                                                2: '複写先要素のcss_selectorを入力ください',
+                                                                3: '複写先要素のxPathを入力ください',
+                                                              }[
+                                                                dataMessages[indexMessageSelect]?.message_content[indexContent]?.['cvc_fukushashiki_search_mode']
+                                                              ] || ''} placement="top">
+                                                                <div style={{ flex: '80%' }}>
+                                                                  <InputCustom
+                                                                    styleLabel={{ width: '100%' }}
+                                                                    style={{ width: '100%' }}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'cvc_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['cvc_fukushashiki_search_value']}
+                                                                    placeholder={{
+                                                                      1: '複写先要素のIDを入力ください',
+                                                                      2: '複写先要素のcss_selectorを入力ください',
+                                                                      3: '複写先要素のxPathを入力ください',
+                                                                    }[
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['cvc_fukushashiki_search_value']
+                                                                    ] || ''}
+                                                                  />
+                                                                </div>
+                                                              </Tooltip>
                                                             </div>
                                                           </>
-                                      }
+                                                        }
                                                       </div>
                                                     </>
                                                   )}
