@@ -9148,7 +9148,7 @@ const Scenario = () => {
                                                           <div style={{ width: '90%', color: '#b94a48', marginLeft: '21%' }}>カラーには、有効な正規表現を指定してください。</div>
                                                         }
                                                       </div>
-                                                      {isUseFukushashiki && <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginLeft: '30px' }}>
+                                                      {isUseFukushashiki && <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginLeft: '35px',width:'90%' }}>
                                                         <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
                                                           <div style={{ width: '25%' }}>
                                                             <SelectCustom
@@ -9176,6 +9176,7 @@ const Scenario = () => {
                                                           <div style={{ flex: '75%' }}>
                                                             <InputCustom
                                                               styleLabel={{ width: '100%' }}
+                                                              style={{ width: '100%' }}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_value', value)}
                                                               value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_value']}
                                                               placeholder={{
