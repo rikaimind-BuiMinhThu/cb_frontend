@@ -2290,6 +2290,19 @@ function Preview() {
                 bindingValue: message.text_input.text.value,
               };
               listFukuObject.push(fukuObject);
+              
+              break;
+            }
+          case 'agree_term':
+            {
+              const fukuObject = {
+                type: message.type,
+                bindingMode: message.fukushashiki_search_mode,
+                bindingAddress: message.fukushashiki_search_value,
+                bindingValue: message.agree_term.isAgree,
+              };
+              listFukuObject.push(fukuObject);
+              
               break;
             }
           default:
