@@ -6952,7 +6952,7 @@ const Scenario = () => {
                                                           value={false}
                                                         />
                                                       </div>
-                                                      {isUseFukushashiki && <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginLeft: '30px' }}>
+                                                      {isUseFukushashiki && <div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginLeft: '34px',width:'90%' }}>
                                                         <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
                                                               <div style={{ width: '20%' }}>
                                                                 <SelectCustom
@@ -6980,6 +6980,7 @@ const Scenario = () => {
                                                               <div style={{ flex: '80%' }}>
                                                                 <InputCustom
                                                                   styleLabel={{ width: '100%' }}
+                                                                  style={{ width: '100%' }}
                                                                   onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_value', value)}
                                                                   value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_value']}
                                                                   placeholder={{
