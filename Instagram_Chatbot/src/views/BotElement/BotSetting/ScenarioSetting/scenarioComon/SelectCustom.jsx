@@ -31,7 +31,7 @@ const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue =
           </div>
         }
         onChange={onChange}
-        value={value}
+        value={value || undefined}
         disabled={disabled}
         filterOption={(input, option) =>
           option.children ?
