@@ -10,7 +10,6 @@ import SelectCustom from './scenarioComon/SelectCustom';
 import CheckboxCustom from './scenarioComon/CheckboxCustom';
 import InputNum from './scenarioComon/InputNum';
 import InputDouble from './scenarioComon/InputDouble';
-import FukushashikiSelect from './scenarioComon/FukishashikiSelect';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import InputCustom from './scenarioComon/InputCustom';
 import moment from 'moment';
