@@ -2335,9 +2335,8 @@ function Preview() {
                     listFukuObject.push(fukuObject);
                   }
   
-                break;
+                break;             
               
-              break;
             }
           case 'agree_term':
             {
@@ -2348,7 +2347,7 @@ function Preview() {
                 bindingValue: message.agree_term.isAgree,
               };
               listFukuObject.push(fukuObject);             
-              
+              break;
             }
           case 'zip_code_address':
             {
