@@ -211,13 +211,26 @@ async function displayPopup() {
               fillDataWithXPath(item.bindingAddress, item.bindingValue)
             }
           }
+        case "agree_term":
+          {
+            if (item.bindingMode == 1) {
+              fillDataAgreementWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataAgreementWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataAgreementWithXPath(item.bindingAddress, item.bindingValue)
+            }
+          }
+          break;
         default:
           return;
 
       }
     })
   }
-  
+
   function fillDataWithId(id, value) {
     let element = document.getElementById(id);
     if (element) {
@@ -236,6 +249,27 @@ async function displayPopup() {
     let element = document.evaluate(xpathElement, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     if (element) {
       element.value = value;
+    }
+  }
+
+  function fillDataAgreementWithId(id, value) {
+    let element = document.getElementById(id);
+    if (element && element.type === 'checkbox') {
+      element.checked = value === true;
+    }
+  }
+
+  function fillDataAgreementWithCssSelector(cssSelector, value) {
+    let element = document.querySelector(cssSelector);
+    if (element && element.type === 'checkbox') {
+      element.checked = value === true;
+    }
+  }
+
+  function fillDataAgreementWithXPath(xpathElement, value) {
+    let element = document.evaluate(xpathElement, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    if (element && element.type === 'checkbox') {
+      element.checked = value === true;
     }
   }
 
