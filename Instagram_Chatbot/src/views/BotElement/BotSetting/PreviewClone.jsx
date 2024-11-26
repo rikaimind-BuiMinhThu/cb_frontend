@@ -2310,7 +2310,7 @@ function Preview() {
                 }
               }
 
-              if (Object.keys(message.text_input.urls).length != 0) {
+              if (Object.keys(message.text_input.urls).length != 0 && message.text_input.urls.value != undefined) {
                 const fukuObject = {
                   type: message.type,
                   bindingMode: message.fukushashiki_search_mode,
@@ -2320,7 +2320,45 @@ function Preview() {
                 listFukuObject.push(fukuObject);
               }
 
-              if (Object.keys(message.text_input.email_address).length != 0) {
+              if (Object.keys(message.text_input.phone_number).length != 0) {
+
+                if (message.text_input.phone_number.withHyphen == false) {
+                  const fukuObject = {
+                    type: message.type,
+                    bindingMode: message.fukushashiki_search_mode,
+                    bindingAddress: message.fukushashiki_search_value,
+                    bindingValue: message.text_input.phone_number.value,
+                  };
+                  listFukuObject.push(fukuObject);
+                }
+                else {
+                  const userInputData = Object.fromEntries(
+                    Object.entries(message.text_input.phone_number).filter(([key, value]) => key.includes("value"))
+                  );
+                  console.log('alo123')
+                  console.log(userInputData);
+                  const dataInforFukushashiki = Object.fromEntries(
+                    Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+                  );
+                  console.log('ping')
+                  console.log(dataInforFukushashiki)
+                  const types = ["value1", "value2", "value3"];
+                  const result = types
+                    .filter(type => `${type}` in userInputData)
+                    .map(type => ({
+                      type: message.type,
+                      bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
+                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                      bindingValue: userInputData[`${type}`]
+                    }));
+                  console.log(result)
+                  listFukuObject.push(...result);
+                  break;
+                }
+
+              }
+
+              if (Object.keys(message.text_input.email_address).length != 0 && message.text_input.urls.email_address != undefined) {
                 const fukuObject = {
                   type: message.type,
                   bindingMode: message.fukushashiki_search_mode,
@@ -2408,7 +2446,44 @@ function Preview() {
                   bindingValue: userInputData[`value_${type}`]
                 }));
               listFukuObject.push(...result);
+              break;
+            }
+          case 'card_payment_radio_button':
+            {
+              const keysToExtract = [
+                "initial_selection",
+                "card_number1",
+                "card_number2",
+                "card_number3",
+                "card_number4",
+                "card_holder",
+                "card_number",
+                "year",
+                "month",
+                "cvc"
+              ];
 
+              const userInputData = keysToExtract.reduce((result, key) => {
+                if (message.card_payment_radio_button[key] !== undefined) {
+                  result[key] = message.card_payment_radio_button[key];
+                }
+                return result;
+              }, {});
+              console.log('User data')
+              console.log(userInputData);
+              const dataInforFukushashiki = Object.fromEntries(
+                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+              );
+              const types = ["card_number", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4"];
+              const result = types
+                .filter(type => `${type}` in userInputData)
+                .map(type => ({
+                  type: "zip_code_address",
+                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
+                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                  bindingValue: userInputData[`${type}`]
+                }));
+              listFukuObject.push(...result);
             }
 
           case 'card_payment_radio_button':
