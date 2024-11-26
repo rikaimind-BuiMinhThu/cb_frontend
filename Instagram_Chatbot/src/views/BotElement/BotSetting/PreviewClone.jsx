@@ -2281,60 +2281,72 @@ function Preview() {
           case 'text_input':
             {
               if(Object.keys(message.text_input.text).length!=0)
-              {
-                if(message.text_input.text.isSplitInput==true)
-                  {
-                    const fukuObjectLeft = {
-                      type: message.type,
-                      bindingMode: message.left_fukushashiki_search_mode,
-                      bindingAddress: message.left_fukushashiki_search_value,
-                      bindingValue: message.text_input.text.valueLeft,
-                    };
-    
-                    const fukuObjectRight = {
-                      type: message.type,
-                      bindingMode: message.right_fukushashiki_search_mode,
-                      bindingAddress: message.right_fukushashiki_search_value,
-                      bindingValue: message.text_input.text.valueRight,
-                    };
-    
-                    listFukuObject.push(fukuObjectLeft);
-                    listFukuObject.push(fukuObjectRight);
-                  }
-                  else
-                  {
-                    const fukuObject = {
-                      type: message.type,
-                      bindingMode: message.fukushashiki_search_mode,
-                      bindingAddress: message.fukushashiki_search_value,
-                      bindingValue: message.text_input.text.value,
-                    };
-                    listFukuObject.push(fukuObject);
-                  }
-              }
-
-              if(Object.keys(message.text_input.urls).length!=0)
-              {
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.text_input.urls.value,
-                };
-                listFukuObject.push(fukuObject);
-              }
-
-              if(Object.keys(message.text_input.email_address).length!=0)
+                {
+                  if(message.text_input.text.isSplitInput==true)
+                    {
+                      const fukuObjectLeft = {
+                        type: message.type,
+                        bindingMode: message.left_fukushashiki_search_mode,
+                        bindingAddress: message.left_fukushashiki_search_value,
+                        bindingValue: message.text_input.text.valueLeft,
+                      };
+      
+                      const fukuObjectRight = {
+                        type: message.type,
+                        bindingMode: message.right_fukushashiki_search_mode,
+                        bindingAddress: message.right_fukushashiki_search_value,
+                        bindingValue: message.text_input.text.valueRight,
+                      };
+      
+                      listFukuObject.push(fukuObjectLeft);
+                      listFukuObject.push(fukuObjectRight);
+                    }
+                    else
+                    {
+                      const fukuObject = {
+                        type: message.type,
+                        bindingMode: message.fukushashiki_search_mode,
+                        bindingAddress: message.fukushashiki_search_value,
+                        bindingValue: message.text_input.text.value,
+                      };
+                      listFukuObject.push(fukuObject);
+                    }
+                }
+  
+                if(Object.keys(message.text_input.urls).length!=0)
                 {
                   const fukuObject = {
                     type: message.type,
                     bindingMode: message.fukushashiki_search_mode,
                     bindingAddress: message.fukushashiki_search_value,
-                    bindingValue: message.text_input.email_address.value,
+                    bindingValue: message.text_input.urls.value,
                   };
                   listFukuObject.push(fukuObject);
                 }
-
+  
+                if(Object.keys(message.text_input.email_address).length!=0)
+                  {
+                    const fukuObject = {
+                      type: message.type,
+                      bindingMode: message.fukushashiki_search_mode,
+                      bindingAddress: message.fukushashiki_search_value,
+                      bindingValue: message.text_input.email_address.value,
+                    };
+                    listFukuObject.push(fukuObject);
+                  }
+  
+                break;             
+              
+            }
+          case 'agree_term':
+            {
+              const fukuObject = {
+                type: message.type,
+                bindingMode: message.fukushashiki_search_mode,
+                bindingAddress: message.fukushashiki_search_value,
+                bindingValue: message.agree_term.isAgree,
+              };
+              listFukuObject.push(fukuObject);             
               break;
             }
           case 'zip_code_address':
