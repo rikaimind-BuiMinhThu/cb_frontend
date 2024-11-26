@@ -5458,8 +5458,8 @@ const Scenario = () => {
                                                                           <SelectCustom
                                                                             id="title"
                                                                             style={{ width: '100%' }}
-                                                                            value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_mode']}
-                                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number1_fukushashiki_search_mode', value)}
+                                                                            value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['value1_fukushashiki_search_mode']}
+                                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'value1_fukushashiki_search_mode', value)}
                                                                             data={[
                                                                               { key: 1, value: 'id' },
                                                                               { key: 2, value: 'css_selector' },
@@ -5475,14 +5475,14 @@ const Scenario = () => {
                                                                           styleLabel={{ width: '100%' }}
                                                                           maxLength={250}
                                                                           useFukushashiki={true}
-                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number1_fukushashiki_search_value', value)}
-                                                                          value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_value']}
+                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'value1_fukushashiki_search_value', value)}
+                                                                          value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['value1_fukushashiki_search_value']}
                                                                           placeholder={{
                                                                             1: '複写先要素のIDを入力ください',
                                                                             2: '複写先要素のcss_selectorを入力ください',
                                                                             3: '複写先要素のxPathを入力ください',
                                                                           }[
-                                                                            dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_mode']
+                                                                            dataMessages[indexMessageSelect]?.message_content[indexContent]?.['value1_fukushashiki_search_mode']
                                                                           ] || ''}
                                                                         />
                                                                       </div>
@@ -5493,8 +5493,8 @@ const Scenario = () => {
                                                                           <SelectCustom
                                                                             id="title"
                                                                             style={{ width: '100%' }}
-                                                                            value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_mode']}
-                                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number2_fukushashiki_search_mode', value)}
+                                                                            value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['value2_fukushashiki_search_mode']}
+                                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'value2_fukushashiki_search_mode', value)}
                                                                             data={[
                                                                               { key: 1, value: 'id' },
                                                                               { key: 2, value: 'css_selector' },
@@ -5510,14 +5510,14 @@ const Scenario = () => {
                                                                           styleLabel={{ width: '100%' }}
                                                                           maxLength={250}
                                                                           useFukushashiki={true}
-                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number2_fukushashiki_search_value', value)}
-                                                                          value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_value']}
+                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'value2_fukushashiki_search_value', value)}
+                                                                          value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['value2_fukushashiki_search_value']}
                                                                           placeholder={{
                                                                             1: '複写先要素のIDを入力ください',
                                                                             2: '複写先要素のcss_selectorを入力ください',
                                                                             3: '複写先要素のxPathを入力ください',
                                                                           }[
-                                                                            dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_mode']
+                                                                            dataMessages[indexMessageSelect]?.message_content[indexContent]?.['value2_fukushashiki_search_mode']
                                                                           ] || ''}
                                                                         />
                                                                       </div>
@@ -5528,8 +5528,8 @@ const Scenario = () => {
                                                                           <SelectCustom
                                                                             id="title"
                                                                             style={{ width: '100%' }}
-                                                                            value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_mode']}
-                                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number3_fukushashiki_search_mode', value)}
+                                                                            value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['value3_fukushashiki_search_mode']}
+                                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'value3_fukushashiki_search_mode', value)}
                                                                             data={[
                                                                               { key: 1, value: 'id' },
                                                                               { key: 2, value: 'css_selector' },
@@ -5545,14 +5545,14 @@ const Scenario = () => {
                                                                           styleLabel={{ width: '100%' }}
                                                                           maxLength={250}
                                                                           useFukushashiki={true}
-                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number3_fukushashiki_search_value', value)}
-                                                                          value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_value']}
+                                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'value3_fukushashiki_search_value', value)}
+                                                                          value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['value3_fukushashiki_search_value']}
                                                                           placeholder={{
                                                                             1: '複写先要素のIDを入力ください',
                                                                             2: '複写先要素のcss_selectorを入力ください',
                                                                             3: '複写先要素のxPathを入力ください',
                                                                           }[
-                                                                            dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_mode']
+                                                                            dataMessages[indexMessageSelect]?.message_content[indexContent]?.['value3_fukushashiki_search_mode']
                                                                           ] || ''}
                                                                         />
                                                                       </div>
@@ -7585,8 +7585,8 @@ const Scenario = () => {
                                                                     <SelectCustom
                                                                       id="title"
                                                                       style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['hour_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'hour_fukushashiki_search_mode', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueHour_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueHour_fukushashiki_search_mode', value)}
                                                                       data={[
                                                                         { key: 1, value: 'id' },
                                                                         { key: 2, value: 'css_selector' },
@@ -7602,14 +7602,14 @@ const Scenario = () => {
                                                                     styleLabel={{ width: '100%' }}
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'hour_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['hour_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueHour_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueHour_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['hour_fukushashiki_search_mode']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueHour_fukushashiki_search_mode']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
@@ -7619,8 +7619,8 @@ const Scenario = () => {
                                                                   <SelectCustom
                                                                     id="title"
                                                                     style={{ width: '100%' }}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['minute_fukushashiki_search_mode']}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'minute_fukushashiki_search_mode', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMinute_fukushashiki_search_mode']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueMinute_fukushashiki_search_mode', value)}
                                                                     data={[
                                                                       { key: 1, value: 'id' },
                                                                       { key: 2, value: 'css_selector' },
@@ -7635,14 +7635,14 @@ const Scenario = () => {
                                                                     styleLabel={{ width: '100%' }}
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'minute_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['minute_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueMinute_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMinute_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['minute_fukushashiki_search_mode']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMinute_fukushashiki_search_mode']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
@@ -7712,8 +7712,8 @@ const Scenario = () => {
                                                                     <SelectCustom
                                                                       id="title"
                                                                       style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_mode', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueYear_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueYear_fukushashiki_search_mode', value)}
                                                                       data={[
                                                                         { key: 1, value: 'id' },
                                                                         { key: 2, value: 'css_selector' },
@@ -7729,14 +7729,14 @@ const Scenario = () => {
                                                                     styleLabel={{ width: '100%' }}
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueYear_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueYear_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_mode']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueYear_fukushashiki_search_mode']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
@@ -7747,8 +7747,8 @@ const Scenario = () => {
                                                                     <SelectCustom
                                                                       id="title"
                                                                       style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_mode', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueMonth_fukushashiki_search_mode', value)}
                                                                       data={[
                                                                         { key: 1, value: 'id' },
                                                                         { key: 2, value: 'css_selector' },
@@ -7764,14 +7764,14 @@ const Scenario = () => {
                                                                     styleLabel={{ width: '100%' }}
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueMonth_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_mode']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
@@ -7782,8 +7782,8 @@ const Scenario = () => {
                                                                     <SelectCustom
                                                                       id="title"
                                                                       style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['day_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'day_fukushashiki_search_mode', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueDay_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueDay_fukushashiki_search_mode', value)}
                                                                       data={[
                                                                         { key: 1, value: 'id' },
                                                                         { key: 2, value: 'css_selector' },
@@ -7799,14 +7799,14 @@ const Scenario = () => {
                                                                     styleLabel={{ width: '100%' }}
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'day_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['day_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueDay_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueDay_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['day_fukushashiki_search_mode']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueDay_fukushashiki_search_mode']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
@@ -7850,8 +7850,8 @@ const Scenario = () => {
                                                                     <SelectCustom
                                                                       id="title"
                                                                       style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_mode', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueMonth_fukushashiki_search_mode', value)}
                                                                       data={[
                                                                         { key: 1, value: 'id' },
                                                                         { key: 2, value: 'css_selector' },
@@ -7867,14 +7867,14 @@ const Scenario = () => {
                                                                     styleLabel={{ width: '100%' }}
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueMonth_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_mode']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
@@ -7885,8 +7885,8 @@ const Scenario = () => {
                                                                     <SelectCustom
                                                                       id="title"
                                                                       style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['day_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'day_fukushashiki_search_mode', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueDay_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueDay_fukushashiki_search_mode', value)}
                                                                       data={[
                                                                         { key: 1, value: 'id' },
                                                                         { key: 2, value: 'css_selector' },
@@ -7902,14 +7902,14 @@ const Scenario = () => {
                                                                     styleLabel={{ width: '100%' }}
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'day_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['day_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueDay_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueDay_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['day_fukushashiki_search_mode']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueDay_fukushashiki_search_mode']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
@@ -7971,8 +7971,8 @@ const Scenario = () => {
                                                                       <SelectCustom
                                                                         id="title"
                                                                         style={{ width: '100%' }}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_mode']}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_mode', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueYear_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueYear_fukushashiki_search_mode', value)}
                                                                         data={[
                                                                           { key: 1, value: 'id' },
                                                                           { key: 2, value: 'css_selector' },
@@ -7988,14 +7988,14 @@ const Scenario = () => {
                                                                       styleLabel={{ width: '100%' }}
                                                                       maxLength={250}
                                                                       useFukushashiki={true}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_value', value)}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_value']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueYear_fukushashiki_search_value', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueYear_fukushashiki_search_value']}
                                                                       placeholder={{
                                                                         1: '複写先要素のIDを入力ください',
                                                                         2: '複写先要素のcss_selectorを入力ください',
                                                                         3: '複写先要素のxPathを入力ください',
                                                                       }[
-                                                                        dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_mode']
+                                                                        dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueYear_fukushashiki_search_mode']
                                                                       ] || ''}
                                                                     />
                                                                   </div>
@@ -8006,8 +8006,8 @@ const Scenario = () => {
                                                                       <SelectCustom
                                                                         id="title"
                                                                         style={{ width: '100%' }}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_mode', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueMonth_fukushashiki_search_mode', value)}
                                                                         data={[
                                                                           { key: 1, value: 'id' },
                                                                           { key: 2, value: 'css_selector' },
@@ -8023,14 +8023,14 @@ const Scenario = () => {
                                                                       styleLabel={{ width: '100%' }}
                                                                       maxLength={250}
                                                                       useFukushashiki={true}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_value', value)}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_value']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueMonth_fukushashiki_search_value', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_value']}
                                                                       placeholder={{
                                                                         1: '複写先要素のIDを入力ください',
                                                                         2: '複写先要素のcss_selectorを入力ください',
                                                                         3: '複写先要素のxPathを入力ください',
                                                                       }[
-                                                                        dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']
+                                                                        dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_mode']
                                                                       ] || ''}
                                                                     />
                                                                   </div>
@@ -8193,8 +8193,8 @@ const Scenario = () => {
                                                                     <SelectCustom
                                                                       id="title"
                                                                       style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_mode', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueYear_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueYear_fukushashiki_search_mode', value)}
                                                                       data={[
                                                                         { key: 1, value: 'id' },
                                                                         { key: 2, value: 'css_selector' },
@@ -8210,14 +8210,14 @@ const Scenario = () => {
                                                                     styleLabel={{ width: '100%' }}
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueYear_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueYear_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_mode']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueYear_fukushashiki_search_mode']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
@@ -8228,8 +8228,8 @@ const Scenario = () => {
                                                                     <SelectCustom
                                                                       id="title"
                                                                       style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_mode', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueMonth_fukushashiki_search_mode', value)}
                                                                       data={[
                                                                         { key: 1, value: 'id' },
                                                                         { key: 2, value: 'css_selector' },
@@ -8245,14 +8245,14 @@ const Scenario = () => {
                                                                     styleLabel={{ width: '100%' }}
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueMonth_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_mode']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
@@ -8263,8 +8263,8 @@ const Scenario = () => {
                                                                     <SelectCustom
                                                                       id="title"
                                                                       style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['day_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'day_fukushashiki_search_mode', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueDay_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueDay_fukushashiki_search_mode', value)}
                                                                       data={[
                                                                         { key: 1, value: 'id' },
                                                                         { key: 2, value: 'css_selector' },
@@ -8280,14 +8280,14 @@ const Scenario = () => {
                                                                     styleLabel={{ width: '100%' }}
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'day_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['day_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueDay_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueDay_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['day_fukushashiki_search_mode']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueDay_fukushashiki_search_mode']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
@@ -8362,8 +8362,8 @@ const Scenario = () => {
                                                                     <SelectCustom
                                                                       id="title"
                                                                       style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_mode', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueYear_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueYear_fukushashiki_search_mode', value)}
                                                                       data={[
                                                                         { key: 1, value: 'id' },
                                                                         { key: 2, value: 'css_selector' },
@@ -8379,14 +8379,14 @@ const Scenario = () => {
                                                                     styleLabel={{ width: '100%' }}
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'year_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueYear_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueYear_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['year_fukushashiki_search_mode']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueYear_fukushashiki_search_mode']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
@@ -8397,8 +8397,8 @@ const Scenario = () => {
                                                                     <SelectCustom
                                                                       id="title"
                                                                       style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_mode', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueMonth_fukushashiki_search_mode', value)}
                                                                       data={[
                                                                         { key: 1, value: 'id' },
                                                                         { key: 2, value: 'css_selector' },
@@ -8414,14 +8414,14 @@ const Scenario = () => {
                                                                     styleLabel={{ width: '100%' }}
                                                                     maxLength={250}
                                                                     useFukushashiki={true}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'month_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'valueMonth_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['month_fukushashiki_search_mode']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['valueMonth_fukushashiki_search_mode']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
@@ -10463,8 +10463,8 @@ const Scenario = () => {
                                                                     <SelectCustom
                                                                       id="title"
                                                                       style={{ width: '100%' }}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number_fukushashiki_search_mode']}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number_fukushashiki_search_mode', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number_fukushashiki_search_mode']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number_fukushashiki_search_mode', value)}
                                                                       data={[
                                                                         { key: 1, value: 'id' },
                                                                         { key: 2, value: 'css_selector' },
@@ -10480,20 +10480,20 @@ const Scenario = () => {
                                                                   2: '複写先要素のcss_selectorを入力ください',
                                                                   3: '複写先要素のxPathを入力ください',
                                                                 }[
-                                                                  dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number_fukushashiki_search_mode']
+                                                                  dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number_fukushashiki_search_mode']
                                                                 ] || ''} placement="top">
                                                                   <div style={{ flex: '80%' }}>
                                                                     <InputCustom
                                                                       styleLabel={{ width: '100%' }}
                                                                       style={{ width: '100%' }}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number_fukushashiki_search_value', value)}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number_fukushashiki_search_value']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number_fukushashiki_search_value', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number_fukushashiki_search_value']}
                                                                       placeholder={{
                                                                         1: '複写先要素のIDを入力ください',
                                                                         2: '複写先要素のcss_selectorを入力ください',
                                                                         3: '複写先要素のxPathを入力ください',
                                                                       }[
-                                                                        dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number_fukushashiki_search_value']
+                                                                        dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number_fukushashiki_search_value']
                                                                       ] || ''}
                                                                     />
                                                                   </div>
@@ -10518,8 +10518,8 @@ const Scenario = () => {
                                                                       <SelectCustom
                                                                         id="title"
                                                                         style={{ width: '100%' }}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_mode']}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number1_fukushashiki_search_mode', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number1_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number1_fukushashiki_search_mode', value)}
                                                                         data={[
                                                                           { key: 1, value: 'id' },
                                                                           { key: 2, value: 'css_selector' },
@@ -10535,20 +10535,20 @@ const Scenario = () => {
                                                                     2: '複写先要素のcss_selectorを入力ください',
                                                                     3: '複写先要素のxPathを入力ください',
                                                                   }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_mode']
+                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number1_fukushashiki_search_mode']
                                                                   ] || ''} placement="top">
                                                                     <div style={{ flex: '80%' }}>
                                                                       <InputCustom
                                                                         styleLabel={{ width: '100%' }}
                                                                         style={{ width: '100%' }}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number1_fukushashiki_search_value', value)}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_value']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number1_fukushashiki_search_value', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number1_fukushashiki_search_value']}
                                                                         placeholder={{
                                                                           1: '複写先要素のIDを入力ください',
                                                                           2: '複写先要素のcss_selectorを入力ください',
                                                                           3: '複写先要素のxPathを入力ください',
                                                                         }[
-                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number1_fukushashiki_search_value']
+                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number1_fukushashiki_search_value']
                                                                         ] || ''}
                                                                       />
                                                                     </div>
@@ -10569,8 +10569,8 @@ const Scenario = () => {
                                                                       <SelectCustom
                                                                         id="title"
                                                                         style={{ width: '100%' }}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_mode']}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number2_fukushashiki_search_mode', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number2_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number2_fukushashiki_search_mode', value)}
                                                                         data={[
                                                                           { key: 1, value: 'id' },
                                                                           { key: 2, value: 'css_selector' },
@@ -10586,20 +10586,20 @@ const Scenario = () => {
                                                                     2: '複写先要素のcss_selectorを入力ください',
                                                                     3: '複写先要素のxPathを入力ください',
                                                                   }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_mode']
+                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number2_fukushashiki_search_mode']
                                                                   ] || ''} placement="top">
                                                                     <div style={{ flex: '80%' }}>
                                                                       <InputCustom
                                                                         styleLabel={{ width: '100%' }}
                                                                         style={{ width: '100%' }}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number2_fukushashiki_search_value', value)}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_value']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number2_fukushashiki_search_value', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number2_fukushashiki_search_value']}
                                                                         placeholder={{
                                                                           1: '複写先要素のIDを入力ください',
                                                                           2: '複写先要素のcss_selectorを入力ください',
                                                                           3: '複写先要素のxPathを入力ください',
                                                                         }[
-                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number2_fukushashiki_search_value']
+                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number2_fukushashiki_search_value']
                                                                         ] || ''}
                                                                       />
                                                                     </div>
@@ -10620,8 +10620,8 @@ const Scenario = () => {
                                                                       <SelectCustom
                                                                         id="title"
                                                                         style={{ width: '100%' }}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_mode']}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number3_fukushashiki_search_mode', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number3_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number3_fukushashiki_search_mode', value)}
                                                                         data={[
                                                                           { key: 1, value: 'id' },
                                                                           { key: 2, value: 'css_selector' },
@@ -10637,20 +10637,20 @@ const Scenario = () => {
                                                                     2: '複写先要素のcss_selectorを入力ください',
                                                                     3: '複写先要素のxPathを入力ください',
                                                                   }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_mode']
+                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number3_fukushashiki_search_mode']
                                                                   ] || ''} placement="top">
                                                                     <div style={{ flex: '80%' }}>
                                                                       <InputCustom
                                                                         styleLabel={{ width: '100%' }}
                                                                         style={{ width: '100%' }}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number3_fukushashiki_search_value', value)}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_value']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number3_fukushashiki_search_value', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number3_fukushashiki_search_value']}
                                                                         placeholder={{
                                                                           1: '複写先要素のIDを入力ください',
                                                                           2: '複写先要素のcss_selectorを入力ください',
                                                                           3: '複写先要素のxPathを入力ください',
                                                                         }[
-                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number3_fukushashiki_search_value']
+                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number3_fukushashiki_search_value']
                                                                         ] || ''}
                                                                       />
                                                                     </div>
@@ -10671,8 +10671,8 @@ const Scenario = () => {
                                                                       <SelectCustom
                                                                         id="title"
                                                                         style={{ width: '100%' }}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number4_fukushashiki_search_mode']}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number4_fukushashiki_search_mode', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number4_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number4_fukushashiki_search_mode', value)}
                                                                         data={[
                                                                           { key: 1, value: 'id' },
                                                                           { key: 2, value: 'css_selector' },
@@ -10688,20 +10688,20 @@ const Scenario = () => {
                                                                     2: '複写先要素のcss_selectorを入力ください',
                                                                     3: '複写先要素のxPathを入力ください',
                                                                   }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number4_fukushashiki_search_mode']
+                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number4_fukushashiki_search_mode']
                                                                   ] || ''} placement="top">
                                                                     <div style={{ flex: '80%' }}>
                                                                       <InputCustom
                                                                         styleLabel={{ width: '100%' }}
                                                                         style={{ width: '100%' }}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'number4_fukushashiki_search_value', value)}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number4_fukushashiki_search_value']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_number4_fukushashiki_search_value', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number4_fukushashiki_search_value']}
                                                                         placeholder={{
                                                                           1: '複写先要素のIDを入力ください',
                                                                           2: '複写先要素のcss_selectorを入力ください',
                                                                           3: '複写先要素のxPathを入力ください',
                                                                         }[
-                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['number4_fukushashiki_search_value']
+                                                                          dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_number4_fukushashiki_search_value']
                                                                         ] || ''}
                                                                       />
                                                                     </div>
@@ -10729,8 +10729,8 @@ const Scenario = () => {
                                                                   <SelectCustom
                                                                     id="title"
                                                                     style={{ width: '100%' }}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['holder_fukushashiki_search_mode']}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'holder_fukushashiki_search_mode', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_holder_fukushashiki_search_mode']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_holder_fukushashiki_search_mode', value)}
                                                                     data={[
                                                                       { key: 1, value: 'id' },
                                                                       { key: 2, value: 'css_selector' },
@@ -10746,20 +10746,20 @@ const Scenario = () => {
                                                                 2: '複写先要素のcss_selectorを入力ください',
                                                                 3: '複写先要素のxPathを入力ください',
                                                               }[
-                                                                dataMessages[indexMessageSelect]?.message_content[indexContent]?.['holder_fukushashiki_search_mode']
+                                                                dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_holder_fukushashiki_search_mode']
                                                               ] || ''} placement="top">
                                                                 <div style={{ flex: '80%' }}>
                                                                   <InputCustom
                                                                     styleLabel={{ width: '100%' }}
                                                                     style={{ width: '100%' }}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'holder_fukushashiki_search_value', value)}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['holder_fukushashiki_search_value']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'card_holder_fukushashiki_search_value', value)}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_holder_fukushashiki_search_value']}
                                                                     placeholder={{
                                                                       1: '複写先要素のIDを入力ください',
                                                                       2: '複写先要素のcss_selectorを入力ください',
                                                                       3: '複写先要素のxPathを入力ください',
                                                                     }[
-                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['holder_fukushashiki_search_value']
+                                                                      dataMessages[indexMessageSelect]?.message_content[indexContent]?.['card_holder_fukushashiki_search_value']
                                                                     ] || ''}
                                                                   />
                                                                 </div>
