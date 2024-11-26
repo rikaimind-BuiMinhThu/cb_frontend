@@ -198,6 +198,19 @@ async function displayPopup() {
               fillDataWithXPath(item.bindingAddress, item.bindingValue)
             }
           }
+
+        case "zip_code_address":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+          }
         default:
           return;
 
