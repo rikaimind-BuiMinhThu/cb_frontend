@@ -2280,7 +2280,7 @@ function Preview() {
         switch (message.type) {
           case 'text_input':
             {
-              if (Object.keys(message.text_input.text).length != 0 && message.text_input.text.value != undefined) {
+              if (Object.keys(message.text_input.text).length != 0) {
                 if (message.text_input.text.isSplitInput == true) {
                   const fukuObjectLeft = {
                     type: message.type,
@@ -2380,8 +2380,53 @@ function Preview() {
                 bindingValue: message.agree_term.isAgree,
               };
               listFukuObject.push(fukuObject);
+
               break;
             }
+
+          case "pull_down":
+            {
+              const userInputData = Object.fromEntries(
+                Object.entries(message.pull_down?.date_md || {}).filter(([key, value]) => key.includes("value"))
+              );
+
+              const additionalKeys = [
+                'time_hm',
+                'date_ymd',
+                'date_ym',
+                'date_ymd_hm',
+                'dob_ymd',
+                'dob_ym',
+                'timezone_from_to',
+                'period_from_to',
+                'up_to_municipality',
+                'prefectures'
+              ];
+
+              additionalKeys.forEach(key => {
+                const entries = Object.entries(message.pull_down?.[key] || {}).filter(([k, v]) => k.includes("value"));
+                Object.assign(userInputData, Object.fromEntries(entries));
+              });
+
+              const dataInforFukushashiki = Object.fromEntries(
+                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+              );
+              
+              const types = ["day", "month", "year", "hour", "minute", "Day", "Month", "Year", "Hour", "Minute", "valueDay", "valueMonth", "valueYear", "valueHour", "valueMinute"];
+              const result = types
+                .filter(type => `${type}` in userInputData)
+                .map(type => ({
+                  type: "pull_down",
+                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
+                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                  bindingValue: userInputData[`${type}`],
+                }));
+
+              listFukuObject.push(...result);
+
+              break;
+            }
+
           case 'zip_code_address':
             {
               const userInputData = Object.fromEntries(
@@ -2437,6 +2482,27 @@ function Preview() {
                   bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
                   bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
                   bindingValue: userInputData[`${type}`]
+                }));
+              listFukuObject.push(...result);
+            }
+
+          case 'card_payment_radio_button':
+            {
+              const userInputData = Object.fromEntries(
+                Object.entries(message.card_payment_radio_button).filter(([key, value]) => key.includes("value_"))
+              );
+              console.log(userInputData);
+              const dataInforFukushashiki = Object.fromEntries(
+                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+              );
+              const types = ["card_number", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4"];
+              const result = types
+                .filter(type => `value_${type}` in userInputData)
+                .map(type => ({
+                  type: "zip_code_address",
+                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
+                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                  bindingValue: userInputData[`value_${type}`]
                 }));
               listFukuObject.push(...result);
             }
