@@ -198,6 +198,19 @@ async function displayPopup() {
               fillDataWithXPath(item.bindingAddress, item.bindingValue)
             }
           }
+
+        case "zip_code_address":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+          }
         case "agree_term":
           {
             if (item.bindingMode == 1) {
@@ -223,6 +236,18 @@ async function displayPopup() {
               }
             }
   
+        case "pull_down":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+          }
           break;
         default:
           return;
