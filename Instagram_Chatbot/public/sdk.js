@@ -210,6 +210,19 @@ async function displayPopup() {
               fillDataAgreementWithXPath(item.bindingAddress, item.bindingValue)
             }
           }
+          case "slider":
+            {
+              if (item.bindingMode == 1) {
+                fillDataWithId(item.bindingAddress, item.bindingValue)
+              }
+              else if (item.bindingMode == 2) {
+                fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+              }
+              else {
+                fillDataWithXPath(item.bindingAddress, item.bindingValue)
+              }
+            }
+  
           break;
         default:
           return;
