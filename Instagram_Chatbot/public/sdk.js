@@ -186,6 +186,7 @@ async function displayPopup() {
   function fillDataFromMessage(obj) {
     obj.forEach((item) => {
       switch (item.type) {
+        case "card_payment_radio_button":
         case "text_input":
           {
             if (item.bindingMode == 1) {
@@ -197,7 +198,14 @@ async function displayPopup() {
             else {
               fillDataWithXPath(item.bindingAddress, item.bindingValue)
             }
+            break;
           }
+        
+        case 'dropdown_prefecture':
+        {
+          fillDataWithTextInSelector(item.bindingMode, item.bindingAddress, item.bindingValue)
+          break;
+        }
 
         case "zip_code_address":
           {
@@ -210,6 +218,7 @@ async function displayPopup() {
             else {
               fillDataWithXPath(item.bindingAddress, item.bindingValue)
             }
+            break;
           }
         case "agree_term":
           {
@@ -222,6 +231,7 @@ async function displayPopup() {
             else {
               fillDataAgreementWithXPath(item.bindingAddress, item.bindingValue)
             }
+            break;
           }
           case "slider":
             {
@@ -247,13 +257,41 @@ async function displayPopup() {
             else {
               fillDataWithXPath(item.bindingAddress, item.bindingValue)
             }
+            break;
           }
-          break;
         default:
           return;
 
       }
     })
+  }
+
+  function getElementByAddress(mode, address)
+  {    
+    if(mode==1)
+      {
+        const element = document.getElementById(address);
+        return element;
+      }
+      else if(mode==2)
+      {
+        const element = document.querySelector(address);
+        return element;
+      }
+      else
+      {
+       const element = document.evaluate(address, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        return element;
+      }
+  }
+
+  function fillDataWithTextInSelector(mode,address, value)
+  {
+    const element = getElementByAddress(mode,address);
+    const optionToSelect = Array.from(element.options).find(option => option.text === value);
+    if (optionToSelect) {    
+      element.value = optionToSelect.value;
+}
   }
 
   function fillDataWithId(id, value) {

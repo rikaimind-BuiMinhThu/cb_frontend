@@ -2268,6 +2268,12 @@ function Preview() {
     }
   }
 
+  function removeLeadingZero(value) {
+        let strValue = value.toString();
+        let result = strValue.replace(/^0+/, '');
+        return typeof value === 'number' ? Number(result) : result;
+}
+
   function getObjectFukushashiki(obj) {
     if (
       obj &&
@@ -2280,7 +2286,7 @@ function Preview() {
         switch (message.type) {
           case 'text_input':
             {
-              if (Object.keys(message.text_input.text).length != 0) {
+              if (message.text_input?.text.value != undefined || message.text_input?.text.valueLeft != undefined|| message.text_input?.text.valueRight != undefined) {
                 if (message.text_input.text.isSplitInput == true) {
                   const fukuObjectLeft = {
                     type: message.type,
@@ -2295,7 +2301,6 @@ function Preview() {
                     bindingAddress: message.right_fukushashiki_search_value,
                     bindingValue: message.text_input.text.valueRight,
                   };
-
                   listFukuObject.push(fukuObjectLeft);
                   listFukuObject.push(fukuObjectRight);
                 }
@@ -2320,7 +2325,10 @@ function Preview() {
                 listFukuObject.push(fukuObject);
               }
 
-              if (Object.keys(message.text_input.phone_number).length != 0) {
+              if (message.text_input?.phone_number.value != undefined||
+                 message.text_input?.phone_number.value1 != undefined||
+                 message.text_input?.phone_number.value2 != undefined||
+                 message.text_input?.phone_number.value3 != undefined) {
 
                 if (message.text_input.phone_number.withHyphen == false) {
                   const fukuObject = {
@@ -2335,13 +2343,9 @@ function Preview() {
                   const userInputData = Object.fromEntries(
                     Object.entries(message.text_input.phone_number).filter(([key, value]) => key.includes("value"))
                   );
-                  console.log('alo123')
-                  console.log(userInputData);
                   const dataInforFukushashiki = Object.fromEntries(
                     Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
                   );
-                  console.log('ping')
-                  console.log(dataInforFukushashiki)
                   const types = ["value1", "value2", "value3"];
                   const result = types
                     .filter(type => `${type}` in userInputData)
@@ -2351,9 +2355,7 @@ function Preview() {
                       bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
                       bindingValue: userInputData[`${type}`]
                     }));
-                  console.log(result)
                   listFukuObject.push(...result);
-                  break;
                 }
 
               }
@@ -2397,6 +2399,32 @@ function Preview() {
 
           case "pull_down":
             {
+
+              if(message.pull_down?.customization.length!=0)
+              {
+                const textInDropdown = message.pull_down.customization.value
+                if(message.pull_down.customization.is_comment == true)
+                {
+
+                }
+                else
+                {
+                  message.pull_down.customization.options_without_comment.forEach((item) => {
+                    if(item.text == textInDropdown)
+                    {
+                      const fukuObject = {
+                        type: message.type,
+                        bindingMode: message.fukushashiki_search_mode,
+                        bindingAddress: message.fukushashiki_search_value,
+                        bindingValue: item.value
+                      };
+                      listFukuObject.push(fukuObject);
+                    }
+
+                  })
+                }
+              }
+
               const userInputData = Object.fromEntries(
                 Object.entries(message.pull_down?.date_md || {}).filter(([key, value]) => key.includes("value"))
               );
@@ -2430,9 +2458,8 @@ function Preview() {
                   type: "pull_down",
                   bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
                   bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                  bindingValue: userInputData[`${type}`],
+                  bindingValue: removeLeadingZero(userInputData[`${type}`]),
                 }));
-
               listFukuObject.push(...result);
 
               break;
@@ -2443,7 +2470,6 @@ function Preview() {
               const userInputData = Object.fromEntries(
                 Object.entries(message.zip_code_address).filter(([key, value]) => key.includes("value_"))
               );
-              console.log(userInputData);
               const dataInforFukushashiki = Object.fromEntries(
                 Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
               );
@@ -2451,7 +2477,7 @@ function Preview() {
               const result = types
                 .filter(type => `value_${type}` in userInputData)
                 .map(type => ({
-                  type: "zip_code_address",
+                  type: message.zip_code_address.is_use_dropdown ? "dropdown_prefecture" : "zip_code_address",
                   bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
                   bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
                   bindingValue: userInputData[`value_${type}`]
@@ -2480,8 +2506,6 @@ function Preview() {
                 }
                 return result;
               }, {});
-              console.log('User data')
-              console.log(userInputData);
               const dataInforFukushashiki = Object.fromEntries(
                 Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
               );
@@ -2489,51 +2513,10 @@ function Preview() {
               const result = types
                 .filter(type => `${type}` in userInputData)
                 .map(type => ({
-                  type: "zip_code_address",
+                  type: "card_payment_radio_button",
                   bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
                   bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
                   bindingValue: userInputData[`${type}`]
-                }));
-              listFukuObject.push(...result);
-            }
-
-          case 'card_payment_radio_button':
-            {
-              const userInputData = Object.fromEntries(
-                Object.entries(message.card_payment_radio_button).filter(([key, value]) => key.includes("value_"))
-              );
-              console.log(userInputData);
-              const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
-              );
-              const types = ["card_number", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4"];
-              const result = types
-                .filter(type => `value_${type}` in userInputData)
-                .map(type => ({
-                  type: "zip_code_address",
-                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                  bindingValue: userInputData[`value_${type}`]
-                }));
-              listFukuObject.push(...result);
-            }
-          case 'card_payment_radio_button':
-            {
-              const userInputData = Object.fromEntries(
-                Object.entries(message.card_payment_radio_button).filter(([key, value]) => key.includes("value_"))
-              );
-              console.log(userInputData);
-              const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
-              );
-              const types = ["card_number", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4"];
-              const result = types
-                .filter(type => `value_${type}` in userInputData)
-                .map(type => ({
-                  type: "zip_code_address",
-                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                  bindingValue: userInputData[`value_${type}`]
                 }));
               listFukuObject.push(...result);
             }
