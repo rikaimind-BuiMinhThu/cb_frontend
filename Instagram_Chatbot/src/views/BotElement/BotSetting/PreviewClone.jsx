@@ -2382,6 +2382,17 @@ function Preview() {
                 bindingValue: message.agree_term.isAgree,
               };
               listFukuObject.push(fukuObject);
+              break;
+            }
+          case 'slider':
+            {
+              const fukuObject = {
+                type: message.type,
+                bindingMode: message.fukushashiki_search_mode,
+                bindingAddress: message.fukushashiki_search_value,
+                bindingValue: message.slider.value,
+              };
+              listFukuObject.push(fukuObject);
 
               break;
             }
