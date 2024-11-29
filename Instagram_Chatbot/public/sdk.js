@@ -266,11 +266,16 @@ async function displayPopup() {
 
   function fillDataWithTextInSelector(mode, address, value) {
     const element = getElementByAddress(mode, address);
-    const optionToSelect = Array.from(element.options).find(option => option.text === value);
-    if (optionToSelect) {
-      fillDataToElement(element,value)
+    if (element.tagName === 'SELECT') {
+        const optionToSelect = Array.from(element.options).find(option => option.text === value);
+        if (optionToSelect) {
+            fillDataToElement(element, optionToSelect.value);
+        }
     }
-  }
+    else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {        
+            fillDataToElement(element, value);        
+    }
+}
 
   function fillDataWithId(id, value) {
     let element = document.getElementById(id);
