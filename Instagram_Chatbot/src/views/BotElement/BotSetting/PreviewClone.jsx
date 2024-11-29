@@ -2360,7 +2360,7 @@ function Preview() {
 
               }
 
-              if (Object.keys(message.text_input.email_address).length != 0 && message.text_input.urls.email_address != undefined) {
+              if (Object.keys(message.text_input.email_address).length != 0 && message.text_input.email_address != undefined) {
                 const fukuObject = {
                   type: message.type,
                   bindingMode: message.fukushashiki_search_mode,
@@ -2499,7 +2499,6 @@ function Preview() {
                 "month",
                 "cvc"
               ];
-
               const userInputData = keysToExtract.reduce((result, key) => {
                 if (message.card_payment_radio_button[key] !== undefined) {
                   result[key] = message.card_payment_radio_button[key];
@@ -2511,14 +2510,23 @@ function Preview() {
               );
               const types = ["card_number", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4"];
               const result = types
-                .filter(type => `${type}` in userInputData)
-                .map(type => ({
-                  type: "card_payment_radio_button",
-                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                  bindingValue: userInputData[`${type}`]
-                }));
-              listFukuObject.push(...result);
+              .filter(type => `${type}` in userInputData)
+              .map(type => {
+                const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
+                const bindingValue = userInputData[`${type}`];
+                if (bindingMode !== undefined && bindingValue !== undefined) {
+                  return {
+                    type: "card_payment_radio_button",
+                    bindingMode,
+                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                    bindingValue
+                  };
+                } else {
+                  return null; 
+                }
+              })
+              .filter(item => item !== null);
+            listFukuObject.push(...result);
             }
           default:
             {

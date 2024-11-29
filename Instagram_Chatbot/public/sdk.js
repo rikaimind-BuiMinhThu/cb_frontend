@@ -200,12 +200,12 @@ async function displayPopup() {
             }
             break;
           }
-        
+
         case 'dropdown_prefecture':
-        {
-          fillDataWithTextInSelector(item.bindingMode, item.bindingAddress, item.bindingValue)
-          break;
-        }
+          {
+            fillDataWithTextInSelector(item.bindingMode, item.bindingAddress, item.bindingValue)
+            break;
+          }
 
         case "zip_code_address":
           {
@@ -233,19 +233,19 @@ async function displayPopup() {
             }
             break;
           }
-          case "slider":
-            {
-              if (item.bindingMode == 1) {
-                fillDataWithId(item.bindingAddress, item.bindingValue)
-              }
-              else if (item.bindingMode == 2) {
-                fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-              }
-              else {
-                fillDataWithXPath(item.bindingAddress, item.bindingValue)
-              }
+        case "slider":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
             }
-  
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+          }
+
         case "pull_down":
           {
             if (item.bindingMode == 1) {
@@ -261,58 +261,82 @@ async function displayPopup() {
           }
         default:
           return;
-
       }
     })
   }
 
-  function getElementByAddress(mode, address)
-  {    
-    if(mode==1)
-      {
-        const element = document.getElementById(address);
-        return element;
-      }
-      else if(mode==2)
-      {
-        const element = document.querySelector(address);
-        return element;
-      }
-      else
-      {
-       const element = document.evaluate(address, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        return element;
-      }
+  function getElementByAddress(mode, address) {
+    if (mode == 1) {
+      const element = document.getElementById(address);
+      return element;
+    }
+    else if (mode == 2) {
+      const element = document.querySelector(address);
+      return element;
+    }
+    else {
+      const element = document.evaluate(address, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      return element;
+    }
   }
 
-  function fillDataWithTextInSelector(mode,address, value)
-  {
-    const element = getElementByAddress(mode,address);
+  function fillDataWithTextInSelector(mode, address, value) {
+    const element = getElementByAddress(mode, address);
     const optionToSelect = Array.from(element.options).find(option => option.text === value);
-    if (optionToSelect) {    
-      element.value = optionToSelect.value;
-}
+    if (optionToSelect) {
+      fillDataToElement(element,value)
+    }
   }
 
   function fillDataWithId(id, value) {
     let element = document.getElementById(id);
     if (element) {
-      element.value = value;
+      fillDataToElement(element,value)
     }
+
+  }
+
+  function removeLeadingZero(value) {
+    let strValue = value.toString();
+    let result = strValue.replace(/^0+/, '');
+    return typeof value === 'number' ? Number(result) : result;
+  }
+
+  function removeFirstTwoChars(input) {
+    const str = input.toString();
+    if (str.length > 2) {
+      return str.slice(2);
+    } else {
+      return '';
+    }
+  }
+
+  function fillDataToElement(element, value)
+  {
+    element.value = value;
+    if (element.value == undefined || element.value == "") {
+      element.value = removeLeadingZero(value);
+    }
+    if (element.value == undefined || element.value == "") {
+      element.value = removeFirstTwoChars(value);
+    }
+
   }
 
   function fillDataWithCssSelector(cssSelector, value) {
     let element = document.querySelector(cssSelector);
     if (element) {
-      element.value = value;
+      fillDataToElement(element,value)
     }
+
   }
 
   function fillDataWithXPath(xpathElement, value) {
     let element = document.evaluate(xpathElement, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     if (element) {
-      element.value = value;
+      fillDataToElement(element,value)
     }
+
   }
 
   function fillDataAgreementWithId(id, value) {
