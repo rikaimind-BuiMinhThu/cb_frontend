@@ -69,8 +69,8 @@ async function displayPopup() {
     !tabletCheck() && !mobileCheck()
       ? "pc"
       : tabletCheck()
-      ? "tablet"
-      : "smartphone";
+        ? "tablet"
+        : "smartphone";
   const response = await fetch(
     `${getEcChatBotApiServerBaseUrl()}/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
     // `https://ec-chatbot-test1.com/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
@@ -117,13 +117,10 @@ async function displayPopup() {
   iframe.style.borderRadius = "0px";
   // iframe.style.display = "none";
   iframe.style.zIndex = "999999";
-  iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${
-    window.location.origin
-  }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}`;
+  iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
+    }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}`;
 
   body.appendChild(iframe);
-
- let chatbotOpenedBefore = false;
 
   window.addEventListener(
     "message",
@@ -133,24 +130,13 @@ async function displayPopup() {
       chatbotRight = e.data.chatbotRight
       chatbotBottom = e.data.chatbotBottom
 
-      let firstOpen;
-
-      if (!chatbotOpenedBefore && !e.data.isOpen) {
-        firstOpen = true;
-        chatbotOpenedBefore = true;
-      } else {
-        firstOpen = false;
-      }    
-      if (
-        (firstOpen && mobileCheck()) ||
-        (e.data.isOpen && !firstOpen && mobileCheck())
-      ) {
+      if (e.data.isOpen && mobileCheck()) {
         iframe.width = "100%";
         // iframe.height = "620px";
         iframe.height = "100%";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
-      } else if (firstOpen || (e.data.isOpen && !firstOpen)) {
+      } else if (e.data.isOpen) {
         iframe.width =
           chatbotW && (chatbotRight !== null)
             ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
@@ -161,15 +147,12 @@ async function displayPopup() {
             : "700px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
-        // let add = { scenario_data: `${device}_open_chatbot_window` };
-        // // submitForm(url, add)
-        // getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
-      } else if (!e.data.isOpen && !firstOpen && mobileCheck() === true) {
+      } else if (!e.data.isOpen && mobileCheck()) {
         iframe.width = "250px";
         iframe.height = "58px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
-      } else if (!e.data.isOpen && !firstOpen) {
+      } else if (!e.data.isOpen) {
         iframe.width =
           chatbotRight
             ? `${parseInt(chatbotRight) + 360}px`
