@@ -45,6 +45,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
+import { func } from "prop-types";
 
 const _ = require("lodash");
 sessionStorage.setItem("prevOpenStatus", "0");
@@ -251,19 +252,19 @@ function Preview() {
   function handleStyleModal() {
 
     if (mobileCheck()) {
-       return {
-          bottom: "0px",
-          right: "0px",
-          width: widthSp ? `${widthSp}%` : "100%%",
-          height: heightSp ? `${heightSp}%` : "100%"
-       }
+      return {
+        bottom: "0px",
+        right: "0px",
+        width: widthSp ? `${widthSp}%` : "100%%",
+        height: heightSp ? `${heightSp}%` : "100%"
+      }
     } else {
       return {
         bottom: bottomMarginPc ? `${bottomMarginPc}px` : "0px",
         right: rightMarginPc ? `${rightMarginPc}px` : "30px",
         width: widthPc ? `${widthPc}px` : "450px",
         height: heightPc ? `${heightPc}px` : "700px"
-     }
+      }
     }
   }
 
@@ -293,26 +294,26 @@ function Preview() {
         setActivePopupCloseBot(result?.popup_close_bot ? true : false);
         setTitleBubble(result?.title_bubble ? result?.title_bubble : "簡単90秒で注文完了");
         setDisplayType(result?.display_type);
-        setWidthPc(result?.width_pc? result?.width_pc: 450);
-        setHeightPc(result?.height_pc? result?.height_pc:700);
-        setWidthSp(result?.width_sp?result?.width_sp:100);
-        setHeightSp(result?.height_sp?result?.height_sp:100);
+        setWidthPc(result?.width_pc ? result?.width_pc : 450);
+        setHeightPc(result?.height_pc ? result?.height_pc : 700);
+        setWidthSp(result?.width_sp ? result?.width_sp : 100);
+        setHeightSp(result?.height_sp ? result?.height_sp : 100);
         setPositionPc(result?.position_pc ? result?.position_pc : "1");
-        if (result?.display_type && Number(result?.display_type) === 1){
+        if (result?.display_type && Number(result?.display_type) === 1) {
           setIsOpen(true)
         } else {
           setIsOpen(false)
         }
-        sessionStorage.setItem("chatbotH", result?.height_pc? result?.height_pc: 700);
-        sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc? result?.bottom_margin_pc:10);
-        sessionStorage.setItem("chatbotW", result?.width_pc? result?.width_pc:450);
-        sessionStorage.setItem("chatbotRight", result?.right_margin_pc? result?.right_margin_pc : 30);
+        sessionStorage.setItem("chatbotH", result?.height_pc ? result?.height_pc : 700);
+        sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc ? result?.bottom_margin_pc : 10);
+        sessionStorage.setItem("chatbotW", result?.width_pc ? result?.width_pc : 450);
+        sessionStorage.setItem("chatbotRight", result?.right_margin_pc ? result?.right_margin_pc : 30);
         setRightPcTitle(result?.right_position_pc_title);
-        setButtonTypePc(result?.button_type_pc? result?.button_type_pc: "1");
-        setRightMarginPc(result?.right_margin_pc?result?.right_margin_pc:10);
-        setBottomMarginPc(result?.bottom_margin_pc?result?.bottom_margin_pc:0);
-        setPositionSp(result?.position_sp? result?.position_sp:"1");
-        setButtonTypeSp(result?.button_type_sp?result?.button_type_sp:"1");
+        setButtonTypePc(result?.button_type_pc ? result?.button_type_pc : "1");
+        setRightMarginPc(result?.right_margin_pc ? result?.right_margin_pc : 10);
+        setBottomMarginPc(result?.bottom_margin_pc ? result?.bottom_margin_pc : 0);
+        setPositionSp(result?.position_sp ? result?.position_sp : "1");
+        setButtonTypeSp(result?.button_type_sp ? result?.button_type_sp : "1");
         setRightSpTitle(
           JSON.parse(response.data.data?.design_settings)
             ?.right_position_sp_title
@@ -351,6 +352,9 @@ function Preview() {
         if (event.data === 'openPreview' && isOpen !== true) {
           onOpenPreview(true)
         }
+
+        const { key, value } = event.data;
+        console.log(`Key: ${key}, Value: ${value}`);
       },
       false,
     );
@@ -451,7 +455,7 @@ function Preview() {
     } else {
       setIsOpen(!isOpen);
     }
-    const prevOpenStatus  = sessionStorage.getItem("prevOpenStatus");
+    const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
     if (prevOpenStatus == "0" && opening) {
       sessionStorage.setItem("prevOpenStatus", "1");
       const openChatbotCountApiParams = {
@@ -460,8 +464,8 @@ function Preview() {
       const apiUrl = `/api/v1/analytics/scenario_counts/${scenarioId}`;
       api.patch(apiUrl, openChatbotCountApiParams)
         .catch(err => {
-        console.log(err)
-      })
+          console.log(err)
+        })
     }
 
     if (document.getElementById("sp-container1")) {
@@ -498,8 +502,8 @@ function Preview() {
         document.getElementById("sp-process-bar").style.marginTop = "1px";
 
         document.getElementById("sp-body").style.display = "block";
-      } 
       }
+    }
   }
 
   function lightenColor(hex, opacity) {
@@ -561,8 +565,8 @@ function Preview() {
               const apiUrl = `/api/v1/analytics/scenario_counts/${scenarioId}`;
               api.patch(apiUrl, openChatbotCountApiParams)
                 .catch(err => {
-                console.log(err)
-              })
+                  console.log(err)
+                })
             }
             let messageArr = [];
             if (res.data.data?.conversation?.messages?.length > 0) {
@@ -687,7 +691,7 @@ function Preview() {
                         checked =
                           checked &&
                           objParam[conditionItem.nameCondition] ==
-                            conditionItem.inputCondition;
+                          conditionItem.inputCondition;
                       } else if (conditionItem.condition === "not_include") {
                         checked =
                           checked &&
@@ -698,7 +702,7 @@ function Preview() {
                         checked =
                           checked &&
                           objParam[conditionItem.nameCondition] !=
-                            conditionItem.inputCondition;
+                          conditionItem.inputCondition;
                       }
                     } else if (conditionItem?.linkCondition === "or") {
                       if (conditionItem.condition === "include") {
@@ -711,7 +715,7 @@ function Preview() {
                         checked =
                           checked ||
                           objParam[conditionItem.nameCondition] ==
-                            conditionItem.inputCondition;
+                          conditionItem.inputCondition;
                       } else if (conditionItem.condition === "not_include") {
                         checked =
                           checked ||
@@ -722,7 +726,7 @@ function Preview() {
                         checked =
                           checked ||
                           objParam[conditionItem.nameCondition] !=
-                            conditionItem.inputCondition;
+                          conditionItem.inputCondition;
                       }
                     }
                   }
@@ -814,7 +818,7 @@ function Preview() {
                         `/api/v1/managements/emails/${emailId}/send_email`,
                         data
                       )
-                      .then((res) => {})
+                      .then((res) => { })
                       .catch((error) => {
                         console.log(error);
                         if (error.response?.data.code === 0) {
@@ -888,20 +892,17 @@ function Preview() {
                           ) {
                             api
                               .get(
-                                `https://svg-captcha-nodejs.vercel.app/captcha?size=${
-                                  messageArr[i].message_content[j][
-                                    messageArr[i].message_content[j].type
-                                  ].length
-                                }${
-                                  messageArr[i].message_content[j][
-                                    messageArr[i].message_content[j].type
-                                  ].colour
-                                    ? "&color=true"
-                                    : ""
-                                }&charPreset=${
-                                  messageArr[i].message_content[j][
-                                    messageArr[i].message_content[j].type
-                                  ].type
+                                `https://svg-captcha-nodejs.vercel.app/captcha?size=${messageArr[i].message_content[j][
+                                  messageArr[i].message_content[j].type
+                                ].length
+                                }${messageArr[i].message_content[j][
+                                  messageArr[i].message_content[j].type
+                                ].colour
+                                  ? "&color=true"
+                                  : ""
+                                }&charPreset=${messageArr[i].message_content[j][
+                                  messageArr[i].message_content[j].type
+                                ].type
                                 }`
                               )
                               .then((res) => {
@@ -949,7 +950,7 @@ function Preview() {
                       return (delayRender = setTimeout(() => {
                         if (
                           messageArr[i].message_content[0]?.type ===
-                            "text_input" &&
+                          "text_input" &&
                           messageArr[i].message_content[0].text_input.content
                         ) {
                           messageArr[i].message_content[0].text_input.content =
@@ -1050,20 +1051,17 @@ function Preview() {
                         ) {
                           api
                             .get(
-                              `https://svg-captcha-nodejs.vercel.app/captcha?size=${
-                                messageArr[i].message_content[j][
-                                  messageArr[i].message_content[j].type
-                                ].length
-                              }${
-                                messageArr[i].message_content[j][
-                                  messageArr[i].message_content[j].type
-                                ].colour
-                                  ? "&color=true"
-                                  : ""
-                              }&charPreset=${
-                                messageArr[i].message_content[j][
-                                  messageArr[i].message_content[j].type
-                                ].type
+                              `https://svg-captcha-nodejs.vercel.app/captcha?size=${messageArr[i].message_content[j][
+                                messageArr[i].message_content[j].type
+                              ].length
+                              }${messageArr[i].message_content[j][
+                                messageArr[i].message_content[j].type
+                              ].colour
+                                ? "&color=true"
+                                : ""
+                              }&charPreset=${messageArr[i].message_content[j][
+                                messageArr[i].message_content[j].type
+                              ].type
                               }`
                             )
                             .then((res) => {
@@ -1391,7 +1389,7 @@ function Preview() {
             } else if (
               contentType.selection_limit_from &&
               contentType.checkedValue.length <
-                parseInt(contentType.selection_limit_from)
+              parseInt(contentType.selection_limit_from)
             ) {
               errorsMess[
                 `message${index}_content${i}_${contentArr[i].type}`
@@ -1400,7 +1398,7 @@ function Preview() {
             } else if (
               contentType.selection_limit_to &&
               contentType.checkedValue.length >
-                parseInt(contentType.selection_limit_to)
+              parseInt(contentType.selection_limit_to)
             ) {
               errorsMess[
                 `message${index}_content${i}_${contentArr[i].type}`
@@ -1419,7 +1417,7 @@ function Preview() {
             } else if (
               contentType.selection_limit_from &&
               contentType.initial_selection_picture.length <
-                parseInt(contentType.selection_limit_from)
+              parseInt(contentType.selection_limit_from)
             ) {
               errorsMess[
                 `message${index}_content${i}_${contentArr[i].type}`
@@ -1428,7 +1426,7 @@ function Preview() {
             } else if (
               contentType.selection_limit_to &&
               contentType.initial_selection_picture.length >
-                parseInt(contentType.selection_limit_to)
+              parseInt(contentType.selection_limit_to)
             ) {
               errorsMess[
                 `message${index}_content${i}_${contentArr[i].type}`
@@ -1487,7 +1485,7 @@ function Preview() {
           if (stringNullOrEmpty(contentType.value)) {
             errorsMess[
               `message${index}_content${i}_${contentArr[i].type}`
-              ] = messageError;
+            ] = messageError;
             isValid = false;
           }
         } else if (contentArr[i].type === "card_payment_radio_button") {
@@ -1542,7 +1540,7 @@ function Preview() {
             contentType.type !== "checkbox_img" &&
             contentType.selection_limit_to &&
             contentType.checkedValue.length >
-              parseInt(contentType.selection_limit_to)
+            parseInt(contentType.selection_limit_to)
           ) {
             errorsMess[
               `message${index}_content${i}_${contentArr[i].type}`
@@ -1552,7 +1550,7 @@ function Preview() {
             contentType.type === "checkbox_img" &&
             contentType.selection_limit_to &&
             contentType.initial_selection_picture.length >
-              parseInt(contentType.selection_limit_to)
+            parseInt(contentType.selection_limit_to)
           ) {
             errorsMess[
               `message${index}_content${i}_${contentArr[i].type}`
@@ -1807,7 +1805,7 @@ function Preview() {
           !stringNullOrEmpty(contentType[contentType.type].value) &&
           !stringNullOrEmpty(contentType[contentType.type].valueConfirm) &&
           contentType[contentType.type].value !==
-            contentType[contentType.type].valueConfirm
+          contentType[contentType.type].valueConfirm
         ) {
           errorsMess[
             `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
@@ -1838,17 +1836,17 @@ function Preview() {
       } else if (contentArr[i].type === "zip_code_address") {
         if (
           errors[
-            `message${index}_content${i}_${contentArr[i].type}`
+          `message${index}_content${i}_${contentArr[i].type}`
           ] &&
           errors[
-            `message${index}_content${i}_${contentArr[i].type}`
+          `message${index}_content${i}_${contentArr[i].type}`
           ] !== messageError
         ) {
           errorsMess[
             `message${index}_content${i}_${contentArr[i].type}`
           ] =
             errors[
-              `message${index}_content${i}_${contentArr[i].type}`
+            `message${index}_content${i}_${contentArr[i].type}`
             ];
           isValid = false;
         } else {
@@ -1862,7 +1860,7 @@ function Preview() {
                 ) {
                   isValidZipCode = false;
                 }
-              } else if (stringNullOrEmpty(contentType.value_post_code) ) {
+              } else if (stringNullOrEmpty(contentType.value_post_code)) {
                 isValidZipCode = false;
               }
             }
@@ -1914,7 +1912,7 @@ function Preview() {
       } else if (
         contentType.type === "phone_number" &&
         !errorsMess[
-          `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
+        `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
         ]
       ) {
         let REGEX_PHONE = /^0\d{9}$|^0\d{10}$/;
@@ -1924,8 +1922,7 @@ function Preview() {
             !stringNullOrEmpty(contentType[contentType.type].value2) &&
             !stringNullOrEmpty(contentType[contentType.type].value3) &&
             !REGEX_PHONE.test(
-              `${contentType[contentType.type].value1}${
-                contentType[contentType.type].value2
+              `${contentType[contentType.type].value1}${contentType[contentType.type].value2
               }${contentType[contentType.type].value3}`
             )
           ) {
@@ -1986,7 +1983,7 @@ function Preview() {
           !stringNullOrEmpty(contentType[contentType.type].value) &&
           !stringNullOrEmpty(contentType[contentType.type].valueConfirm) &&
           contentType[contentType.type].value !==
-            contentType[contentType.type].valueConfirm
+          contentType[contentType.type].valueConfirm
         ) {
           errorsMess[
             `message${index}_content${i}_${contentArr[i].type}_${contentType.type}`
@@ -2001,7 +1998,7 @@ function Preview() {
           `message${index}_content${i}_${contentArr[i].type}`
         ] =
           errors[
-            `message${index}_content${i}_${contentArr[i].type}`
+          `message${index}_content${i}_${contentArr[i].type}`
           ];
         isValid = false;
       } else if (contentArr[i].type === "credit_card_payment") {
@@ -2057,16 +2054,16 @@ function Preview() {
       } else if (
         contentArr[i].type === "card_payment_radio_button" &&
         errorsMess[
-          `message${index}_content${i}_${contentArr[i].type}`
+        `message${index}_content${i}_${contentArr[i].type}`
         ] !== messageError &&
         (((contentType?.initial_selection ||
           contentType?.card_linked_setting.length > 0) &&
           contentType?.card_linked_setting.includes(contentType?.initial_selection)
-            ) ||
+        ) ||
           ((contentType?.initial_selection_picture ||
             contentType?.card_linked_setting_picture) &&
             contentType?.initial_selection_picture ===
-              contentType?.card_linked_setting_picture))
+            contentType?.card_linked_setting_picture))
       ) {
         if (
           (contentType.is_hide_card_name !== true &&
@@ -2237,9 +2234,9 @@ function Preview() {
     if (product && quantity && user_name && user_name_kana && email && zip_code_address) {
       let phoneNumber;
       try {
-          phoneNumber = `${JSON.parse(phone)?.value1 || ""}${JSON.parse(phone)?.value2 || ""}${JSON.parse(phone)?.value3 || ""}`
+        phoneNumber = `${JSON.parse(phone)?.value1 || ""}${JSON.parse(phone)?.value2 || ""}${JSON.parse(phone)?.value3 || ""}`
       } catch (e) {
-         phoneNumber = phone || ""
+        phoneNumber = phone || ""
       }
       await api
         .post('/api/v1/shopify/cart_create', {
@@ -2268,6 +2265,276 @@ function Preview() {
         .catch(e => {
           console.log(e)
         })
+    }
+  }
+
+  function removeLeadingZero(value) {
+        let strValue = value.toString();
+        let result = strValue.replace(/^0+/, '');
+        return typeof value === 'number' ? Number(result) : result;
+}
+
+  function getObjectFukushashiki(obj) {
+    if (
+      obj &&
+      obj.message.message_content &&
+      obj.message.message_content.length > 0
+    ) {
+      const messageArray = obj.message.message_content;
+      const listFukuObject = [];
+      messageArray.forEach((message) => {
+        switch (message.type) {
+          case 'text_input':
+            {
+              if (message.text_input?.text.value != undefined || message.text_input?.text.valueLeft != undefined|| message.text_input?.text.valueRight != undefined) {
+                if (message.text_input.text.isSplitInput == true) {
+                  const fukuObjectLeft = {
+                    type: message.type,
+                    bindingMode: message.left_fukushashiki_search_mode,
+                    bindingAddress: message.left_fukushashiki_search_value,
+                    bindingValue: message.text_input.text.valueLeft,
+                  };
+
+                  const fukuObjectRight = {
+                    type: message.type,
+                    bindingMode: message.right_fukushashiki_search_mode,
+                    bindingAddress: message.right_fukushashiki_search_value,
+                    bindingValue: message.text_input.text.valueRight,
+                  };
+                  listFukuObject.push(fukuObjectLeft);
+                  listFukuObject.push(fukuObjectRight);
+                }
+                else {
+                  const fukuObject = {
+                    type: message.type,
+                    bindingMode: message.fukushashiki_search_mode,
+                    bindingAddress: message.fukushashiki_search_value,
+                    bindingValue: message.text_input.text.value,
+                  };
+                  listFukuObject.push(fukuObject);
+                }
+              }
+
+              if (Object.keys(message.text_input.urls).length != 0 && message.text_input.urls.value != undefined) {
+                const fukuObject = {
+                  type: message.type,
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.text_input.urls.value,
+                };
+                listFukuObject.push(fukuObject);
+              }
+
+              if (message.text_input?.phone_number.value != undefined||
+                 message.text_input?.phone_number.value1 != undefined||
+                 message.text_input?.phone_number.value2 != undefined||
+                 message.text_input?.phone_number.value3 != undefined) {
+
+                if (message.text_input.phone_number.withHyphen == false) {
+                  const fukuObject = {
+                    type: message.type,
+                    bindingMode: message.fukushashiki_search_mode,
+                    bindingAddress: message.fukushashiki_search_value,
+                    bindingValue: message.text_input.phone_number.value,
+                  };
+                  listFukuObject.push(fukuObject);
+                }
+                else {
+                  const userInputData = Object.fromEntries(
+                    Object.entries(message.text_input.phone_number).filter(([key, value]) => key.includes("value"))
+                  );
+                  const dataInforFukushashiki = Object.fromEntries(
+                    Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+                  );
+                  const types = ["value1", "value2", "value3"];
+                  const result = types
+                    .filter(type => `${type}` in userInputData)
+                    .map(type => ({
+                      type: message.type,
+                      bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
+                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                      bindingValue: userInputData[`${type}`]
+                    }));
+                  listFukuObject.push(...result);
+                }
+
+              }
+
+              if (Object.keys(message.text_input.email_address).length != 0 && message.text_input.email_address != undefined) {
+                const fukuObject = {
+                  type: message.type,
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.text_input.email_address.value,
+                };
+                listFukuObject.push(fukuObject);
+              }
+
+              break;
+
+            }
+          case 'agree_term':
+            {
+              const fukuObject = {
+                type: message.type,
+                bindingMode: message.fukushashiki_search_mode,
+                bindingAddress: message.fukushashiki_search_value,
+                bindingValue: message.agree_term.isAgree,
+              };
+              listFukuObject.push(fukuObject);
+              break;
+            }
+          case 'slider':
+            {
+              const fukuObject = {
+                type: message.type,
+                bindingMode: message.fukushashiki_search_mode,
+                bindingAddress: message.fukushashiki_search_value,
+                bindingValue: message.slider.value,
+              };
+              listFukuObject.push(fukuObject);
+
+              break;
+            }
+
+          case "pull_down":
+            {
+
+              if(message.pull_down?.customization.length!=0)
+              {
+                const textInDropdown = message.pull_down.customization.value
+                if(message.pull_down.customization.is_comment == true)
+                {
+
+                }
+                else
+                {
+                  message.pull_down.customization.options_without_comment.forEach((item) => {
+                    if(item.text == textInDropdown)
+                    {
+                      const fukuObject = {
+                        type: message.type,
+                        bindingMode: message.fukushashiki_search_mode,
+                        bindingAddress: message.fukushashiki_search_value,
+                        bindingValue: item.value
+                      };
+                      listFukuObject.push(fukuObject);
+                    }
+
+                  })
+                }
+              }
+
+              const userInputData = Object.fromEntries(
+                Object.entries(message.pull_down?.date_md || {}).filter(([key, value]) => key.includes("value"))
+              );
+
+              const additionalKeys = [
+                'time_hm',
+                'date_ymd',
+                'date_ym',
+                'date_ymd_hm',
+                'dob_ymd',
+                'dob_ym',
+                'timezone_from_to',
+                'period_from_to',
+                'up_to_municipality',
+                'prefectures'
+              ];
+
+              additionalKeys.forEach(key => {
+                const entries = Object.entries(message.pull_down?.[key] || {}).filter(([k, v]) => k.includes("value"));
+                Object.assign(userInputData, Object.fromEntries(entries));
+              });
+
+              const dataInforFukushashiki = Object.fromEntries(
+                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+              );
+              
+              const types = ["day", "month", "year", "hour", "minute", "Day", "Month", "Year", "Hour", "Minute", "valueDay", "valueMonth", "valueYear", "valueHour", "valueMinute"];
+              const result = types
+                .filter(type => `${type}` in userInputData)
+                .map(type => ({
+                  type: "pull_down",
+                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
+                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                  bindingValue: removeLeadingZero(userInputData[`${type}`]),
+                }));
+              listFukuObject.push(...result);
+
+              break;
+            }
+
+          case 'zip_code_address':
+            {
+              const userInputData = Object.fromEntries(
+                Object.entries(message.zip_code_address).filter(([key, value]) => key.includes("value_"))
+              );
+              const dataInforFukushashiki = Object.fromEntries(
+                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+              );
+              const types = ["building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right"];
+              const result = types
+                .filter(type => `value_${type}` in userInputData)
+                .map(type => ({
+                  type: message.zip_code_address.is_use_dropdown ? "dropdown_prefecture" : "zip_code_address",
+                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
+                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                  bindingValue: userInputData[`value_${type}`]
+                }));
+              listFukuObject.push(...result);
+              break;
+            }
+          case 'card_payment_radio_button':
+            {
+              const keysToExtract = [
+                "initial_selection",
+                "card_number1",
+                "card_number2",
+                "card_number3",
+                "card_number4",
+                "card_holder",
+                "card_number",
+                "year",
+                "month",
+                "cvc"
+              ];
+              const userInputData = keysToExtract.reduce((result, key) => {
+                if (message.card_payment_radio_button[key] !== undefined) {
+                  result[key] = message.card_payment_radio_button[key];
+                }
+                return result;
+              }, {});
+              const dataInforFukushashiki = Object.fromEntries(
+                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+              );
+              const types = ["card_number", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4"];
+              const result = types
+              .filter(type => `${type}` in userInputData)
+              .map(type => {
+                const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
+                const bindingValue = userInputData[`${type}`];
+                if (bindingMode !== undefined && bindingValue !== undefined) {
+                  return {
+                    type: "card_payment_radio_button",
+                    bindingMode,
+                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                    bindingValue
+                  };
+                } else {
+                  return null; 
+                }
+              })
+              .filter(item => item !== null);
+            listFukuObject.push(...result);
+            }
+          default:
+            {
+              return;
+            }
+        }
+      })
+      return listFukuObject;
     }
   }
 
@@ -2339,6 +2606,16 @@ function Preview() {
         api
           .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
           .then(async (res) => {
+            window.parent.postMessage({
+              isOpen: true,
+              widthPc: widthPc,
+              heightPc: heightPc,
+              widthSp: widthSp,
+              heightSp: heightSp,
+              chatbotRight: rightMarginPc,
+              chatbotBottom: bottomMarginPc,
+              fukushashikiResponse: getObjectFukushashiki(data_submit)
+            }, '*');
             setMessagesSessionStorage(renderMessageArr[indexMessage])
             await createOrAddLinesCart(res)
             resolve();
@@ -2395,6 +2672,16 @@ function Preview() {
       .post(`/api/v1/scenario_users/scenario_user_responses`, data_submit)
       .then(async (res) => {
         setMessagesSessionStorage(renderMessageArr[indexMessage])
+        window.parent.postMessage({
+          isOpen: true,
+          widthPc: widthPc,
+          heightPc: heightPc,
+          widthSp: widthSp,
+          heightSp: heightSp,
+          chatbotRight: rightMarginPc,
+          chatbotBottom: bottomMarginPc,
+          fukushashikiResponse: getObjectFukushashiki(data_submit)
+        }, '*');
         await createOrAddLinesCart(res)
       })
       .catch((error) => {
@@ -2446,7 +2733,7 @@ function Preview() {
                   checked =
                     checked &&
                     objParam[conditionItem.nameCondition] ==
-                      conditionItem.inputCondition;
+                    conditionItem.inputCondition;
                 } else if (conditionItem.condition === "not_include") {
                   checked =
                     checked &&
@@ -2457,7 +2744,7 @@ function Preview() {
                   checked =
                     checked &&
                     objParam[conditionItem.nameCondition] !=
-                      conditionItem.inputCondition;
+                    conditionItem.inputCondition;
                 }
               } else if (conditionItem?.linkCondition === "or") {
                 if (conditionItem.condition === "include") {
@@ -2470,7 +2757,7 @@ function Preview() {
                   checked =
                     checked ||
                     objParam[conditionItem.nameCondition] ==
-                      conditionItem.inputCondition;
+                    conditionItem.inputCondition;
                 } else if (conditionItem.condition === "not_include") {
                   checked =
                     checked ||
@@ -2481,7 +2768,7 @@ function Preview() {
                   checked =
                     checked ||
                     objParam[conditionItem.nameCondition] !=
-                      conditionItem.inputCondition;
+                    conditionItem.inputCondition;
                 }
               }
             }
@@ -2572,7 +2859,7 @@ function Preview() {
 
               api
                 .post(`/api/v1/managements/emails/${emailId}/send_email`, data)
-                .then((res) => {})
+                .then((res) => { })
                 .catch((error) => {
                   console.log(error);
                   if (error.response?.data.code === 0) {
@@ -2689,7 +2976,7 @@ function Preview() {
                         `/api/v1/scenario_users/scenario_user_responses/create_order`,
                         data_submit
                       )
-                      .then((res) => {})
+                      .then((res) => { })
                       .catch((error) => {
                         console.log(error);
                         if (error.response?.data.code === 0) {
@@ -2750,20 +3037,17 @@ function Preview() {
                   if (dataMessages[i].message_content[j].type === "capture") {
                     api
                       .get(
-                        `https://svg-captcha-nodejs.vercel.app/captcha?size=${
-                          dataMessages[i].message_content[j][
-                            dataMessages[i].message_content[j].type
-                          ].length
-                        }${
-                          dataMessages[i].message_content[j][
-                            dataMessages[i].message_content[j].type
-                          ].colour
-                            ? "&color=true"
-                            : ""
-                        }&charPreset=${
-                          dataMessages[i].message_content[j][
-                            dataMessages[i].message_content[j].type
-                          ].type
+                        `https://svg-captcha-nodejs.vercel.app/captcha?size=${dataMessages[i].message_content[j][
+                          dataMessages[i].message_content[j].type
+                        ].length
+                        }${dataMessages[i].message_content[j][
+                          dataMessages[i].message_content[j].type
+                        ].colour
+                          ? "&color=true"
+                          : ""
+                        }&charPreset=${dataMessages[i].message_content[j][
+                          dataMessages[i].message_content[j].type
+                        ].type
                         }`
                       )
                       .then((res) => {
@@ -2849,23 +3133,20 @@ function Preview() {
               ) {
                 api
                   .get(
-                    `https://svg-captcha-nodejs.vercel.app/captcha?size=${
-                      dataMessages[indexMessageRender + 1].message_content[j][
-                        dataMessages[indexMessageRender + 1].message_content[j]
-                          .type
-                      ].length
-                    }${
-                      dataMessages[indexMessageRender + 1].message_content[j][
-                        dataMessages[indexMessageRender + 1].message_content[j]
-                          .type
-                      ].colour
-                        ? "&color=true"
-                        : ""
-                    }&charPreset=${
-                      dataMessages[indexMessageRender + 1].message_content[j][
-                        dataMessages[indexMessageRender + 1].message_content[j]
-                          .type
-                      ].type
+                    `https://svg-captcha-nodejs.vercel.app/captcha?size=${dataMessages[indexMessageRender + 1].message_content[j][
+                      dataMessages[indexMessageRender + 1].message_content[j]
+                        .type
+                    ].length
+                    }${dataMessages[indexMessageRender + 1].message_content[j][
+                      dataMessages[indexMessageRender + 1].message_content[j]
+                        .type
+                    ].colour
+                      ? "&color=true"
+                      : ""
+                    }&charPreset=${dataMessages[indexMessageRender + 1].message_content[j][
+                      dataMessages[indexMessageRender + 1].message_content[j]
+                        .type
+                    ].type
                     }`
                   )
                   .then((res) => {
@@ -2886,66 +3167,66 @@ function Preview() {
             }
             function replaceVariable(content) {
               content = content.replaceAll(SCAN_REGEX, (text, variable) => {
-                  if (variables.length !== 0) {
-                      let valueVar = "";
-                      for (let j = 0; j < variables.length; j++) {
-                          if (variables[j].variable_name === variable) {
-                              valueVar = variables[j].default_value;
-                          }
-                      }
-                      return valueVar;
-                  } else {
-                      return "";
+                if (variables.length !== 0) {
+                  let valueVar = "";
+                  for (let j = 0; j < variables.length; j++) {
+                    if (variables[j].variable_name === variable) {
+                      valueVar = variables[j].default_value;
+                    }
                   }
+                  return valueVar;
+                } else {
+                  return "";
+                }
               })
               return content;
             }
             dataMessages[indexMessageRender + 1].message_content.forEach((item, index) => {
               const dataMessageType = item.type;
               if (dataMessageType == 'label' && item.label && item.label.lbl_content) {
-                  item.label.lbl_content = replaceVariable(item.label.lbl_content);
+                item.label.lbl_content = replaceVariable(item.label.lbl_content);
               }
               if (dataMessageType == 'textarea' && item.textarea && item.textarea.invalid_input && item.textarea.invalid_input.content) {
-                  item.textarea.invalid_input.content = replaceVariable(item.textarea.invalid_input.content);
+                item.textarea.invalid_input.content = replaceVariable(item.textarea.invalid_input.content);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.urls && item.text_input.urls.placeholder) {
-                  item.text_input.urls.placeholder = replaceVariable(item.text_input.urls.placeholder);
+                item.text_input.urls.placeholder = replaceVariable(item.text_input.urls.placeholder);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.text && item.text_input.text.placeholderLeft) {
-                  item.text_input.text.placeholderLeft = replaceVariable(item.text_input.text.placeholderLeft);
+                item.text_input.text.placeholderLeft = replaceVariable(item.text_input.text.placeholderLeft);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.text && item.text_input.text.placeholderRight) {
-                  item.text_input.text.placeholderRight = replaceVariable(item.text_input.text.placeholderRight);
+                item.text_input.text.placeholderRight = replaceVariable(item.text_input.text.placeholderRight);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_address && item.text_input.email_address.placeholder) {
-                  item.text_input.email_address.placeholder = replaceVariable(item.text_input.email_address.placeholder);
+                item.text_input.email_address.placeholder = replaceVariable(item.text_input.email_address.placeholder);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_confirmation && item.text_input.email_confirmation.cfEmlAdd_confirm_email) {
-                  item.text_input.email_confirmation.cfEmlAdd_confirm_email = replaceVariable(item.text_input.email_confirmation.cfEmlAdd_confirm_email);
+                item.text_input.email_confirmation.cfEmlAdd_confirm_email = replaceVariable(item.text_input.email_confirmation.cfEmlAdd_confirm_email);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_confirmation && item.text_input.email_confirmation.cfEmlAdd_email) {
-                  item.text_input.email_confirmation.cfEmlAdd_email = replaceVariable(item.text_input.email_confirmation.cfEmlAdd_email);
+                item.text_input.email_confirmation.cfEmlAdd_email = replaceVariable(item.text_input.email_confirmation.cfEmlAdd_email);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number) {
-                  item.text_input.phone_number.number = replaceVariable(item.text_input.phone_number.number);
+                item.text_input.phone_number.number = replaceVariable(item.text_input.phone_number.number);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number1) {
-                  item.text_input.phone_number.number1 = replaceVariable(item.text_input.phone_number.number1);
+                item.text_input.phone_number.number1 = replaceVariable(item.text_input.phone_number.number1);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number2) {
-                  item.text_input.phone_number.number2 = replaceVariable(item.text_input.phone_number.number2);
+                item.text_input.phone_number.number2 = replaceVariable(item.text_input.phone_number.number2);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number3) {
-                  item.text_input.phone_number.number3 = replaceVariable(item.text_input.phone_number.number3);
+                item.text_input.phone_number.number3 = replaceVariable(item.text_input.phone_number.number3);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.password && item.text_input.password.password) {
-                  item.text_input.password.password = replaceVariable(item.text_input.password.password);
+                item.text_input.password.password = replaceVariable(item.text_input.password.password);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.password_confirmation && item.text_input.password_confirmation.password) {
-                  item.text_input.password_confirmation.password = replaceVariable(item.text_input.password_confirmation.password);
+                item.text_input.password_confirmation.password = replaceVariable(item.text_input.password_confirmation.password);
               }
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.password_confirmation && item.text_input.password_confirmation.confirm_password) {
-                  item.text_input.password_confirmation.confirm_password = replaceVariable(item.text_input.password_confirmation.confirm_password);
+                item.text_input.password_confirmation.confirm_password = replaceVariable(item.text_input.password_confirmation.confirm_password);
               }
               dataMessages[indexMessageRender + 1].message_content[index] = item;
             })
@@ -2981,20 +3262,17 @@ function Preview() {
                     if (dataMessages[i].message_content[j].type === "capture") {
                       api
                         .get(
-                          `https://svg-captcha-nodejs.vercel.app/captcha?size=${
-                            dataMessages[i].message_content[j][
-                              dataMessages[i].message_content[j].type
-                            ].length
-                          }${
-                            dataMessages[i].message_content[j][
-                              dataMessages[i].message_content[j].type
-                            ].colour
-                              ? "&color=true"
-                              : ""
-                          }&charPreset=${
-                            dataMessages[i].message_content[j][
-                              dataMessages[i].message_content[j].type
-                            ].type
+                          `https://svg-captcha-nodejs.vercel.app/captcha?size=${dataMessages[i].message_content[j][
+                            dataMessages[i].message_content[j].type
+                          ].length
+                          }${dataMessages[i].message_content[j][
+                            dataMessages[i].message_content[j].type
+                          ].colour
+                            ? "&color=true"
+                            : ""
+                          }&charPreset=${dataMessages[i].message_content[j][
+                            dataMessages[i].message_content[j].type
+                          ].type
                           }`
                         )
                         .then((res) => {
@@ -3085,7 +3363,7 @@ function Preview() {
                     `/api/v1/managements/emails/${emailId}/send_email`,
                     data
                   )
-                  .then((res) => {})
+                  .then((res) => { })
                   .catch((error) => {
                     console.log(error);
                     if (error.response?.data.code === 0) {
@@ -3155,7 +3433,7 @@ function Preview() {
                   return (delayRender = setTimeout(() => {
                     if (
                       dataMessages[i].message_content[0].type ===
-                        "text_input" &&
+                      "text_input" &&
                       dataMessages[i].message_content[0].text_input.content
                     ) {
                       dataMessages[i].message_content[0].text_input.content =
@@ -3228,7 +3506,7 @@ function Preview() {
     if (name) {
       if (
         dataMessages[index].message_content[indexContent][
-          contentType
+        contentType
         ][field][subFiled] === undefined
       ) {
         dataMessages[index].message_content[indexContent][
@@ -3241,7 +3519,7 @@ function Preview() {
     } else if (subFiled) {
       if (
         dataMessages[index].message_content[indexContent][
-          contentType
+        contentType
         ][field] === undefined
       ) {
         dataMessages[index].message_content[indexContent][
@@ -3254,7 +3532,7 @@ function Preview() {
     } else if (field) {
       if (
         dataMessages[index].message_content[indexContent][
-          contentType
+        contentType
         ] === undefined
       ) {
         dataMessages[index].message_content[indexContent][
@@ -3273,7 +3551,7 @@ function Preview() {
     ) {
       let dataContentType = {
         ...dataMessages[index].message_content[indexContent][
-          contentType
+        contentType
         ],
       };
 
@@ -3325,7 +3603,7 @@ function Preview() {
     ) {
       let dataContentType = {
         ...dataMessages[index].message_content[indexContent][
-          contentType
+        contentType
         ],
       };
 
@@ -3371,7 +3649,7 @@ function Preview() {
       variables.forEach((item) => {
         let dataContentType = {
           ...dataMessages[index].message_content[indexContent][
-            contentType
+          contentType
           ],
         };
         if (
@@ -3383,19 +3661,16 @@ function Preview() {
             let dataPostCode = !dataContentType.split_postal_code
               ? dataContentType?.value_post_code
               : `${dataContentType.value_post_code_left}${dataContentType.value_post_code_right}`;
-            item.default_value = `〒${dataPostCode} ${
-              dataContentType?.value_prefecture || ""
-            }${dataContentType?.value_municipality || ""} ${
-              dataContentType?.value_address || ""
-            }${dataContentType?.value_building_name || ""}`;
+            item.default_value = `〒${dataPostCode} ${dataContentType?.value_prefecture || ""
+              }${dataContentType?.value_municipality || ""} ${dataContentType?.value_address || ""
+              }${dataContentType?.value_building_name || ""}`;
             isSaveParam = true;
           } else if (
             field === "start_date_select" ||
             field === "end_date_select"
           ) {
-            item.default_value = `${
-              dataContentType?.start_date_select || "start date"
-            } ~ ${dataContentType?.end_date_select || "end date"}`;
+            item.default_value = `${dataContentType?.start_date_select || "start date"
+              } ~ ${dataContentType?.end_date_select || "end date"}`;
             isSaveParam = true;
           } else if (contentType === "radio_button") {
             item.default_value =
@@ -3475,18 +3750,16 @@ function Preview() {
               item.default_value = `${dataContentType[field]?.valueYear1}-${dataContentType[field]?.valueMonth1}-${dataContentType[field]?.valueDay1} ~ ${dataContentType[field]?.valueYear2}-${dataContentType[field]?.valueMonth2}-${dataContentType[field]?.valueDay2}`;
               isSaveParam = true;
             } else {
-              item.default_value = `${
-                dataContentType[field]?.valueYear ||
+              item.default_value = `${dataContentType[field]?.valueYear ||
                 dataContentType[field]?.valueMonth ||
                 dataContentType[field]?.valueDay
-                  ? `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}-${dataContentType[field]?.valueDay}`
-                  : ""
-              } ${
-                dataContentType[field]?.valueHour ||
-                dataContentType[field]?.valueMinute
+                ? `${dataContentType[field]?.valueYear}-${dataContentType[field]?.valueMonth}-${dataContentType[field]?.valueDay}`
+                : ""
+                } ${dataContentType[field]?.valueHour ||
+                  dataContentType[field]?.valueMinute
                   ? `${dataContentType[field]?.valueHour}:${dataContentType[field]?.valueMinute}`
                   : ""
-              }`;
+                }`;
               isSaveParam = true;
             }
           } else if (dataContentType.type === "embedded") {
@@ -3504,8 +3777,8 @@ function Preview() {
             ].contents.find((item) => item.id === value).title;
             isSaveParam = true;
           } else if (field === 'text' && contentType === 'text_input' && dataContentType[field].isSplitInput) {
-              item.default_value = `${dataContentType[field]?.valueLeft} ${dataContentType[field]?.valueRight}`
-              isSaveParam = true;
+            item.default_value = `${dataContentType[field]?.valueLeft} ${dataContentType[field]?.valueRight}`
+            isSaveParam = true;
           } else if (contentType !== "credit_card_payment") {
             item.default_value = value;
             isSaveParam = true;
@@ -3526,8 +3799,8 @@ function Preview() {
     setMessagesSessionStorage(dataMessages[index])
     setDataMessages([...dataMessages]);
     setRenderMessageArr(renderMessageArr.map(x => {
-      if (x?.id === dataMessages[index]?.id) return {...dataMessages[index]}
-      return {...x}
+      if (x?.id === dataMessages[index]?.id) return { ...dataMessages[index] }
+      return { ...x }
     }))
   };
 
@@ -3610,384 +3883,384 @@ function Preview() {
   };
 
   ///body container
-if (scenarioId && botInfor && isOpen  ){
-  return  (
-    <div
-      ref={containerRef}
-      id="sp-container1"
-      className={`sp-container1 ${mobileCheck() ? 'slideUpSp' : 'slideUp'}`}
-      style={{
-        position:'fixed',
-        bottom: "0px",
-        right: mobileCheck()===true ? isOpen ? 0 : `${rightMarginSp}px`: `${rightMarginPc}px`,
-        width: mobileCheck()===true ? `${widthSp}%` : `${widthPc}px`,
-        height: mobileCheck()===true ? `${heightSp}%` :  `${heightPc}px`,
-        zIndex: 999,
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: "white"
-      }}
-    >
+  if (scenarioId && botInfor && isOpen) {
+    return (
       <div
-        id="sp-withdrawal-container"
-        className="sp-withdrawal-container"
-      ></div>
-      <div id="sp-withdrawal-content" className="sp-withdrawal-content">
-        <div className="sp-withdrawal-content-body">
-          {botInfor &&
-            botInfor.withdrawal_prevention_status === "standard_exit_popup" && (
-              <div>ウィンドウを閉じますか。</div>
-            )}
-          {botInfor && botInfor.withdrawal_prevention_status === "image_popup" && (
-            <a
-              href={botInfor.withdrawal_prevention_link_url || ""}
-              target="_blank" rel="noreferrer"
-            >
-              <img
-                src={botInfor.withdrawal_prevention_image_url}
-                style={{ maxHeight: "217px", width: "100%" }}
-              />
-            </a>
-          )}
-        </div>
-        <div className="sp-withdrawal-content-footer">
-          <div
-            className="sp-withdrawal-content-footer-button sp-withdrawal-content-footer-button-back"
-            onClick={() => {
-              document.getElementById("sp-withdrawal-container").style.display =
-                "none";
-              document.getElementById("sp-withdrawal-content").style.display =
-                "none";
-            }}
-          >
-            チャットに戻る
-          </div>
-          <div
-            className="sp-withdrawal-content-footer-button sp-withdrawal-content-footer-button-exit"
-            onClick={() => {
-              document.getElementById("sp-withdrawal-container").style.display =
-                "none";
-              document.getElementById("sp-withdrawal-content").style.display =
-                "none";
-              setIndexUser(0);
-              let i;
-              for (i = indexMessageRender; i < dataMessages.length; i++) {
-                if (
-                  dataMessages[i].belong_to === "user" ||
-                  i === dataMessages.length - 1
-                )
-                  break;
-              }
-              setScenarioId(null);
-              setTimeout(() => {
-                setScenarioId(params.get("scenario_id"));
-                setRenderMessageArr([]);
-                if (document.getElementById("action-bd")) {
-                  document.getElementById("action-bd").click();
-                  let withdrawal = {
-                    scenario_data: `${deviceReceive}_close_chatbot_window`,
-                  };
-                  api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
-                  }).catch(err => {
-                    console.log(err)
-                  })
-                } else {
-                  let withdrawal = {
-                    scenario_data: `${deviceReceive}_close_chatbot_window`,
-                  };
-                  api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
-                  }).catch(err => {
-                    console.log(err)
-                  })
-                  onOpenPreview(false);
-                }
-              }, (i - indexMessageRender) * 1000);
-            }}
-          >
-            閉じる
-          </div>
-        </div>
-      </div>
-      <div id="sp-popup-zip-code-address" className="sp-popup-zip-code-address">
-        <div className="sp-popup-zip-code-address-header">
-          <div className="sp-popup-zip-code-address-header-left">
-            住所で郵便番号を検索する
-          </div>
-          <div className="sp-popup-zip-code-address-header-right">
-            <MDBIcon
-              style={{ width: "5%", marginLeft: "3px", cursor: "pointer" }}
-              fas
-              onClick={() => isPopUpZipCode(false)}
-              icon="times"
-              className={"sp-plus-circle-option-icon-times-custom"}
-            />
-          </div>
-        </div>
-        <div className="sp-popup-zip-code-address-body">
-          <div className="sp-popup-zip-code-address-body-form">
-            <SelectCustom
-              style={{ width: "100%", marginBottom: "7px" }}
-              keyValue="name"
-              nameValue="name"
-              placeholder="都道府県を選択してください"
-              data={dataPrefectures}
-              onChange={async (value) => {
-                setPrefectures(value);
-                setCities(null);
-                setTowns(null);
-                setZipcode(null);
-                if (value) {
-                  let prefecture_jis_code = dataPrefectures.find(
-                    (item) => item.name === value
-                  ).prefecture_jis_code;
-                  api
-                    .get(
-                      `/api/v1/cities?prefecture_jis_code=${prefecture_jis_code}`
-                    )
-                    .then((res) => {
-                      if (res.data.code === 1) {
-                        setDataCities(res.data.data);
-                      }
-                    })
-                    .catch((error) => {
-                      console.log(error);
-                      if (error.response?.data.code === 0) {
-                        tokenExpired();
-                      }
-                    });
-                }
-              }}
-              value={prefectures}
-            />
-            <SelectCustom
-              style={{ width: "100%", marginBottom: "7px" }}
-              keyValue="city_name"
-              nameValue="city_name"
-              placeholder="市区を選択してください"
-              data={dataCities || []}
-              onChange={async (value) => {
-                setCities(value);
-                setTowns(null);
-                setZipcode(null);
-
-                if (value) {
-                  let city_jis_code = dataCities.find(
-                    (item) => item.city_name === value
-                  ).city_jis_code;
-                  api
-                    .get(`/api/v1/towns?city_jis_code=${city_jis_code}`)
-                    .then((res) => {
-                      if (res.data.code === 1) {
-                        setDataTowns(res.data.data);
-                      }
-                    })
-                    .catch((error) => {
-                      console.log(error);
-                      if (error.response?.data.code === 0) {
-                        tokenExpired();
-                      }
-                    });
-                }
-              }}
-              value={cities}
-            />
-            <SelectCustom
-              style={{ width: "100%", marginBottom: "7px" }}
-              keyValue="town_name"
-              nameValue="town_name"
-              placeholder="町村を選択してください"
-              data={dataTowns || []}
-              onChange={(value) => {
-                setTowns(value);
-                if (value) {
-                  let zipcode = dataTowns.find(
-                    (item) => item.town_name === value
-                  ).zip_code;
-                  setZipcode(zipcode);
-                } else {
-                  setZipcode(null);
-                }
-              }}
-              value={towns}
-            />
-            {zipcode && (
-              <div className="sp-popup-zip-code-address-body-form-content">
-                〒{zipcode}
-              </div>
+        ref={containerRef}
+        id="sp-container1"
+        className={`sp-container1 ${mobileCheck() ? 'slideUpSp' : 'slideUp'}`}
+        style={{
+          position: 'fixed',
+          bottom: "0px",
+          right: mobileCheck() === true ? isOpen ? 0 : `${rightMarginSp}px` : `${rightMarginPc}px`,
+          width: mobileCheck() === true ? `${widthSp}%` : `${widthPc}px`,
+          height: mobileCheck() === true ? `${heightSp}%` : `${heightPc}px`,
+          zIndex: 999,
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: "white"
+        }}
+      >
+        <div
+          id="sp-withdrawal-container"
+          className="sp-withdrawal-container"
+        ></div>
+        <div id="sp-withdrawal-content" className="sp-withdrawal-content">
+          <div className="sp-withdrawal-content-body">
+            {botInfor &&
+              botInfor.withdrawal_prevention_status === "standard_exit_popup" && (
+                <div>ウィンドウを閉じますか。</div>
+              )}
+            {botInfor && botInfor.withdrawal_prevention_status === "image_popup" && (
+              <a
+                href={botInfor.withdrawal_prevention_link_url || ""}
+                target="_blank" rel="noreferrer"
+              >
+                <img
+                  src={botInfor.withdrawal_prevention_image_url}
+                  style={{ maxHeight: "217px", width: "100%" }}
+                />
+              </a>
             )}
           </div>
-          <div className="sp-popup-zip-code-address-body-button">
+          <div className="sp-withdrawal-content-footer">
             <div
-              className="sp-popup-zip-code-address-body-button-cancel"
-              onClick={() => isPopUpZipCode(false)}
-            >
-              キャンセル
-            </div>
-            <div
-              className="sp-popup-zip-code-address-body-button-selection"
-              style={zipcode ? {} : { opacity: "0.5" }}
+              className="sp-withdrawal-content-footer-button sp-withdrawal-content-footer-button-back"
               onClick={() => {
-                if (
-                  zipcode &&
-                  indexContentZipcode !== undefined &&
-                  !dataMessages[indexMessageRender].message_content[
-                    indexContentZipcode
-                  ].zip_code_address.split_postal_code
-                ) {
-                  onChangeValue(
-                    indexContentZipcode,
-                    "zip_code_address",
-                    zipcode,
-                    "value_post_code"
-                  );
-                  onChangeValue(
-                    indexContentZipcode,
-                    "zip_code_address",
-                    prefectures,
-                    "value_prefecture"
-                  );
-                  onChangeValue(
-                    indexContentZipcode,
-                    "zip_code_address",
-                    `${cities}${towns}`,
-                    "value_municipality"
-                  );
-                  errors[
-                    `message${indexMessageRender}_content${indexContentZipcode}_zip_code_address`
-                  ] = "";
-                  setErrors({ ...errors });
-                  document.getElementById(
-                    "sp-withdrawal-container"
-                  ).style.display = "none";
-                  document.getElementById(
-                    "sp-popup-zip-code-address"
-                  ).style.display = "none";
-                } else if (
-                  zipcode &&
-                  indexContentZipcode !== undefined &&
-                  dataMessages[indexMessageRender].message_content[
-                    indexContentZipcode
-                  ].zip_code_address.split_postal_code
-                ) {
-                  onChangeValue(
-                    indexContentZipcode,
-                    "zip_code_address",
-                    zipcode.slice(0, 3),
-                    "value_post_code_left"
-                  );
-                  onChangeValue(
-                    indexContentZipcode,
-                    "zip_code_address",
-                    zipcode.slice(3),
-                    "value_post_code_right"
-                  );
-                  onChangeValue(
-                    indexContentZipcode,
-                    "zip_code_address",
-                    prefectures,
-                    "value_prefecture"
-                  );
-                  onChangeValue(
-                    indexContentZipcode,
-                    "zip_code_address",
-                    `${cities}${towns}`,
-                    "value_municipality"
-                  );
-                  errors[
-                    `message${indexMessageRender}_content${indexContentZipcode}_zip_code_address`
-                  ] = "";
-                  setErrors({ ...errors });
-                  document.getElementById(
-                    "sp-withdrawal-container"
-                  ).style.display = "none";
-                  document.getElementById(
-                    "sp-popup-zip-code-address"
-                  ).style.display = "none";
-                }
-                document.getElementById("ss-user-input-address").focus();
-                document.getElementById("ss-user-input-address").select();
+                document.getElementById("sp-withdrawal-container").style.display =
+                  "none";
+                document.getElementById("sp-withdrawal-content").style.display =
+                  "none";
               }}
             >
-              選択
+              チャットに戻る
+            </div>
+            <div
+              className="sp-withdrawal-content-footer-button sp-withdrawal-content-footer-button-exit"
+              onClick={() => {
+                document.getElementById("sp-withdrawal-container").style.display =
+                  "none";
+                document.getElementById("sp-withdrawal-content").style.display =
+                  "none";
+                setIndexUser(0);
+                let i;
+                for (i = indexMessageRender; i < dataMessages.length; i++) {
+                  if (
+                    dataMessages[i].belong_to === "user" ||
+                    i === dataMessages.length - 1
+                  )
+                    break;
+                }
+                setScenarioId(null);
+                setTimeout(() => {
+                  setScenarioId(params.get("scenario_id"));
+                  setRenderMessageArr([]);
+                  if (document.getElementById("action-bd")) {
+                    document.getElementById("action-bd").click();
+                    let withdrawal = {
+                      scenario_data: `${deviceReceive}_close_chatbot_window`,
+                    };
+                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+                    }).catch(err => {
+                      console.log(err)
+                    })
+                  } else {
+                    let withdrawal = {
+                      scenario_data: `${deviceReceive}_close_chatbot_window`,
+                    };
+                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+                    }).catch(err => {
+                      console.log(err)
+                    })
+                    onOpenPreview(false);
+                  }
+                }, (i - indexMessageRender) * 1000);
+              }}
+            >
+              閉じる
             </div>
           </div>
         </div>
-      </div>
-      <div
-        id="sp-header"
-        style={
+        <div id="sp-popup-zip-code-address" className="sp-popup-zip-code-address">
+          <div className="sp-popup-zip-code-address-header">
+            <div className="sp-popup-zip-code-address-header-left">
+              住所で郵便番号を検索する
+            </div>
+            <div className="sp-popup-zip-code-address-header-right">
+              <MDBIcon
+                style={{ width: "5%", marginLeft: "3px", cursor: "pointer" }}
+                fas
+                onClick={() => isPopUpZipCode(false)}
+                icon="times"
+                className={"sp-plus-circle-option-icon-times-custom"}
+              />
+            </div>
+          </div>
+          <div className="sp-popup-zip-code-address-body">
+            <div className="sp-popup-zip-code-address-body-form">
+              <SelectCustom
+                style={{ width: "100%", marginBottom: "7px" }}
+                keyValue="name"
+                nameValue="name"
+                placeholder="都道府県を選択してください"
+                data={dataPrefectures}
+                onChange={async (value) => {
+                  setPrefectures(value);
+                  setCities(null);
+                  setTowns(null);
+                  setZipcode(null);
+                  if (value) {
+                    let prefecture_jis_code = dataPrefectures.find(
+                      (item) => item.name === value
+                    ).prefecture_jis_code;
+                    api
+                      .get(
+                        `/api/v1/cities?prefecture_jis_code=${prefecture_jis_code}`
+                      )
+                      .then((res) => {
+                        if (res.data.code === 1) {
+                          setDataCities(res.data.data);
+                        }
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                      });
+                  }
+                }}
+                value={prefectures}
+              />
+              <SelectCustom
+                style={{ width: "100%", marginBottom: "7px" }}
+                keyValue="city_name"
+                nameValue="city_name"
+                placeholder="市区を選択してください"
+                data={dataCities || []}
+                onChange={async (value) => {
+                  setCities(value);
+                  setTowns(null);
+                  setZipcode(null);
+
+                  if (value) {
+                    let city_jis_code = dataCities.find(
+                      (item) => item.city_name === value
+                    ).city_jis_code;
+                    api
+                      .get(`/api/v1/towns?city_jis_code=${city_jis_code}`)
+                      .then((res) => {
+                        if (res.data.code === 1) {
+                          setDataTowns(res.data.data);
+                        }
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                      });
+                  }
+                }}
+                value={cities}
+              />
+              <SelectCustom
+                style={{ width: "100%", marginBottom: "7px" }}
+                keyValue="town_name"
+                nameValue="town_name"
+                placeholder="町村を選択してください"
+                data={dataTowns || []}
+                onChange={(value) => {
+                  setTowns(value);
+                  if (value) {
+                    let zipcode = dataTowns.find(
+                      (item) => item.town_name === value
+                    ).zip_code;
+                    setZipcode(zipcode);
+                  } else {
+                    setZipcode(null);
+                  }
+                }}
+                value={towns}
+              />
+              {zipcode && (
+                <div className="sp-popup-zip-code-address-body-form-content">
+                  〒{zipcode}
+                </div>
+              )}
+            </div>
+            <div className="sp-popup-zip-code-address-body-button">
+              <div
+                className="sp-popup-zip-code-address-body-button-cancel"
+                onClick={() => isPopUpZipCode(false)}
+              >
+                キャンセル
+              </div>
+              <div
+                className="sp-popup-zip-code-address-body-button-selection"
+                style={zipcode ? {} : { opacity: "0.5" }}
+                onClick={() => {
+                  if (
+                    zipcode &&
+                    indexContentZipcode !== undefined &&
+                    !dataMessages[indexMessageRender].message_content[
+                      indexContentZipcode
+                    ].zip_code_address.split_postal_code
+                  ) {
+                    onChangeValue(
+                      indexContentZipcode,
+                      "zip_code_address",
+                      zipcode,
+                      "value_post_code"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "zip_code_address",
+                      prefectures,
+                      "value_prefecture"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "zip_code_address",
+                      `${cities}${towns}`,
+                      "value_municipality"
+                    );
+                    errors[
+                      `message${indexMessageRender}_content${indexContentZipcode}_zip_code_address`
+                    ] = "";
+                    setErrors({ ...errors });
+                    document.getElementById(
+                      "sp-withdrawal-container"
+                    ).style.display = "none";
+                    document.getElementById(
+                      "sp-popup-zip-code-address"
+                    ).style.display = "none";
+                  } else if (
+                    zipcode &&
+                    indexContentZipcode !== undefined &&
+                    dataMessages[indexMessageRender].message_content[
+                      indexContentZipcode
+                    ].zip_code_address.split_postal_code
+                  ) {
+                    onChangeValue(
+                      indexContentZipcode,
+                      "zip_code_address",
+                      zipcode.slice(0, 3),
+                      "value_post_code_left"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "zip_code_address",
+                      zipcode.slice(3),
+                      "value_post_code_right"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "zip_code_address",
+                      prefectures,
+                      "value_prefecture"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "zip_code_address",
+                      `${cities}${towns}`,
+                      "value_municipality"
+                    );
+                    errors[
+                      `message${indexMessageRender}_content${indexContentZipcode}_zip_code_address`
+                    ] = "";
+                    setErrors({ ...errors });
+                    document.getElementById(
+                      "sp-withdrawal-container"
+                    ).style.display = "none";
+                    document.getElementById(
+                      "sp-popup-zip-code-address"
+                    ).style.display = "none";
+                  }
+                  document.getElementById("ss-user-input-address").focus();
+                  document.getElementById("ss-user-input-address").select();
+                }}
+              >
+                選択
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          id="sp-header"
+          style={
             (botInfor?.main_color || botInfor?.main_color_other) &&
             {
               backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
               borderTopLeftRadius: mobileCheck() ? "0px" : "5px",
               borderTopRightRadius: mobileCheck() ? "0px" : "5px",
             }
-        }
-        className="sp-header"
-      >
-        <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
-          <div className="sp-header-left-avatar sp-avatar">
-            <img
-              src={
-                botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
-              }
-            />
-          </div>
-          <div className="sp-header-left-label">
-            <div className="sp-header-left-label-sub-title">
-              {botInfor?.subtitle}
-            </div>
-            <div className="sp-header-left-label-title">{botInfor?.title}</div>
-          </div>
-        </div>
-        <div
-          className="sp-header-right"
-          onClick={() => {
-            isOpen ? handleOpenWithDrawal() : onOpenPreview(true);
-          }}
+          }
+          className="sp-header"
         >
-          <div className="sp-header-right-arrow">
-            {isOpen ? (
-              <MDBIcon fas icon="chevron-circle-down" />
-            ) : (
-              <MDBIcon fas icon="chevron-circle-up" />
-            )}
+          <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
+            <div className="sp-header-left-avatar sp-avatar">
+              <img
+                src={
+                  botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
+                }
+              />
+            </div>
+            <div className="sp-header-left-label">
+              <div className="sp-header-left-label-sub-title">
+                {botInfor?.subtitle}
+              </div>
+              <div className="sp-header-left-label-title">{botInfor?.title}</div>
+            </div>
+          </div>
+          <div
+            className="sp-header-right"
+            onClick={() => {
+              isOpen ? handleOpenWithDrawal() : onOpenPreview(true);
+            }}
+          >
+            <div className="sp-header-right-arrow">
+              {isOpen ? (
+                <MDBIcon fas icon="chevron-circle-down" />
+              ) : (
+                <MDBIcon fas icon="chevron-circle-up" />
+              )}
+            </div>
           </div>
         </div>
-      </div>
-      
-      {activePopupCloseBot ? 
-        <ModalPreviewBot
-        isMobile={mobileCheck()}
-        styleBot={handleStyleModal()}
-        open={showPopupCloseBot} isAdmin={false} onClose={() => setShowPopupCloseBot(false)}>
+
+        {activePopupCloseBot ?
+          <ModalPreviewBot
+            isMobile={mobileCheck()}
+            styleBot={handleStyleModal()}
+            open={showPopupCloseBot} isAdmin={false} onClose={() => setShowPopupCloseBot(false)}>
             <Row>
-              <Col md="12"> 
+              <Col md="12">
                 <span className="title-bot-modal">本当に閉じますか？</span>
               </Col>
             </Row>
-            
+
             <Row className="justify-content-around">
-              <Col md="6"> 
+              <Col md="6">
                 <Button
-                    className="btn-cancel__modal-bot"
-                    onClick={() => setShowPopupCloseBot(false)}
-                  >
+                  className="btn-cancel__modal-bot"
+                  onClick={() => setShowPopupCloseBot(false)}
+                >
                   チャットに戻る
                 </Button>
               </Col>
-              <Col md="6"> 
+              <Col md="6">
                 <Button
-                    className="btn-close__modal-bot"
-                    onClick={() => handleCloseBot()}
-                  >
+                  className="btn-close__modal-bot"
+                  onClick={() => handleCloseBot()}
+                >
                   閉じる
                 </Button>
               </Col>
             </Row>
-        </ModalPreviewBot>
-      : "" }
-      <div
+          </ModalPreviewBot>
+          : ""}
+        <div
           id="sp-process-bar"
           className="sp-process-bar"
           style={{ backgroundColor: botInfor?.opacity_color }}
@@ -3996,10 +4269,9 @@ if (scenarioId && botInfor && isOpen  ){
             className="sp-process-bar-color animation"
             style={{
               width: indexUser
-                ? `${
-                    ((indexUser - 1 < 0 ? 0 : indexUser - 1) * 100) /
-                    messageUser.length
-                  }%`
+                ? `${((indexUser - 1 < 0 ? 0 : indexUser - 1) * 100) /
+                messageUser.length
+                }%`
                 : "100%",
               ...((botInfor?.main_color || botInfor?.main_color_other) && {
                 backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
@@ -4080,23 +4352,23 @@ if (scenarioId && botInfor && isOpen  ){
                         variables={variables}
                       />
                       {(dataMessages[indexMessage].is_display_button_next !==
-                      undefined
+                        undefined
                         ? dataMessages[indexMessage].is_display_button_next
                         : true) && (
-                        <div className="sp-user-message-button-action">
-                          <Button
-                            disabled={message.disabled}
-                            style={{
-                              backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
-                              borderRadius: "25px",
-                            }}
-                            className="ss-user-message__action-btn"
-                            onClick={() => onClickNext(indexMessage, message)}
-                          >
-                            {message.buttonName || (indexMessage >= indexMessageRender ? "次へ" : "更新")}
-                          </Button>
-                        </div>
-                      )}
+                          <div className="sp-user-message-button-action">
+                            <Button
+                              disabled={message.disabled}
+                              style={{
+                                backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
+                                borderRadius: "25px",
+                              }}
+                              className="ss-user-message__action-btn"
+                              onClick={() => onClickNext(indexMessage, message)}
+                            >
+                              {message.buttonName || (indexMessage >= indexMessageRender ? "次へ" : "更新")}
+                            </Button>
+                          </div>
+                        )}
                     </div>
                   </div>
                 )}
@@ -4105,30 +4377,33 @@ if (scenarioId && botInfor && isOpen  ){
           })}
         </div>
       </div>
-  ) } else if (isOpen===false &&mobileCheck()===false && Number(positionPc) === 1 && Number(buttonTypePc) === 2){ return (
-    <div
-      onClick={() => onOpenPreview(!isOpen)}
+    )
+  } else if (isOpen === false && mobileCheck() === false && Number(positionPc) === 1 && Number(buttonTypePc) === 2) {
+    return (
+      <div
+        onClick={() => onOpenPreview(!isOpen)}
         style={{
-        backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-        width: "56px",
-        height: "56px",
-        borderRadius: "30px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        position:'fixed',
-        bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
-        right:rightMarginPc? `${rightMarginPc}px`: '0px',
-      }}
-  >
-    <img
-      style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-      src={
-        botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
-      }
-    />
-  </div>
-  )} else if (isOpen===false && mobileCheck()===false && Number(positionPc) === 1 && Number(buttonTypePc) === 1) {
+          backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+          width: "56px",
+          height: "56px",
+          borderRadius: "30px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          position: 'fixed',
+          bottom: bottomMarginPc ? `${bottomMarginPc}px` : '10px',
+          right: rightMarginPc ? `${rightMarginPc}px` : '0px',
+        }}
+      >
+        <img
+          style={{ width: "96%", height: "96%", borderRadius: "30px" }}
+          src={
+            botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
+          }
+        />
+      </div>
+    )
+  } else if (isOpen === false && mobileCheck() === false && Number(positionPc) === 1 && Number(buttonTypePc) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!isOpen)}
@@ -4137,19 +4412,19 @@ if (scenarioId && botInfor && isOpen  ){
           // width: `${widthPc}px`,
           width: `360px`,
           height: "66px",
-          borderRadius:'35px',
+          borderRadius: '35px',
           display: "flex",
           justifyContent: 'space-between',
-          alignItems:'center',
-          paddingLeft:'3px',
-          paddingRight:'3px',
-          position:'fixed',
-          padding:'auto',
-          bottom:bottomMarginPc? `${bottomMarginPc}px`: '10px',
-          right:rightMarginPc? `${rightMarginPc}px`: '0px',
+          alignItems: 'center',
+          paddingLeft: '3px',
+          paddingRight: '3px',
+          position: 'fixed',
+          padding: 'auto',
+          bottom: bottomMarginPc ? `${bottomMarginPc}px` : '10px',
+          right: rightMarginPc ? `${rightMarginPc}px` : '0px',
         }}
-  >
-     <div className="sp-header-left-bt" onClick={() => onOpenPreview(!isOpen)}>
+      >
+        <div className="sp-header-left-bt" onClick={() => onOpenPreview(!isOpen)}>
           <div className="sp-header-left-avatar sp-avatar-bt">
             <img
               src={
@@ -4158,38 +4433,38 @@ if (scenarioId && botInfor && isOpen  ){
             />
           </div>
         </div>
-        <div style={{ alignItems:'center', justifyContent:"center", padding:'auto'}}>
-            {/* <div className="sp-header-left-label-sub-title">
+        <div style={{ alignItems: 'center', justifyContent: "center", padding: 'auto' }}>
+          {/* <div className="sp-header-left-label-sub-title">
               {botInfor?.subtitle}
             </div>
             <div className="sp-header-left-label-title">{botInfor?.title}</div> */}
-            <div id="comment_bubble" style={{display:'flex', alignItems:'center', paddingLeft:'20px', paddingTop: '3px'}}>
-              <span style={{ fontSize:'18px', fontWeight:900}}>{titleBubble}</span>
-            </div>
+          <div id="comment_bubble" style={{ display: 'flex', alignItems: 'center', paddingLeft: '20px', paddingTop: '3px' }}>
+            <span style={{ fontSize: '18px', fontWeight: 900 }}>{titleBubble}</span>
           </div>
-          <div className="sp-header-right-arrow" style={{marginRight:'8px'}}>
-              <MDBIcon fas icon="chevron-circle-up" />
-          </div>
-  </div>
+        </div>
+        <div className="sp-header-right-arrow" style={{ marginRight: '8px' }}>
+          <MDBIcon fas icon="chevron-circle-up" />
+        </div>
+      </div>
     )
-  } else if (isOpen===false &&mobileCheck()===false && Number(positionPc) === 2){
+  } else if (isOpen === false && mobileCheck() === false && Number(positionPc) === 2) {
     return (
-    <div
-      onClick={() => onOpenPreview(!isOpen)}
-      style={{
-        backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-        width:'300px',
-        height: "65px",
-        borderRadius: "0px",
-        display: "flex",
-        justifyContent: "left",
-        position:'fixed',
-        transform:' rotate(-90deg)',
-        bottom: bottomMarginPc ? `${parseInt(bottomMarginPc) + widthPc/2}px`: '20px',
-        right: `${-120}px`,
-      }}
-  >
-     <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
+      <div
+        onClick={() => onOpenPreview(!isOpen)}
+        style={{
+          backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+          width: '300px',
+          height: "65px",
+          borderRadius: "0px",
+          display: "flex",
+          justifyContent: "left",
+          position: 'fixed',
+          transform: ' rotate(-90deg)',
+          bottom: bottomMarginPc ? `${parseInt(bottomMarginPc) + widthPc / 2}px` : '20px',
+          right: `${-120}px`,
+        }}
+      >
+        <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
           <div className="sp-header-left-avatar sp-avatar">
             <img
               src={
@@ -4198,104 +4473,106 @@ if (scenarioId && botInfor && isOpen  ){
             />
           </div>
           <div className="sp-header-left-label">
-           
+
             <div className="sp-header-left-label-title">{rightPcTitle}</div>
           </div>
         </div>
-  </div>)
-  } else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 1 && Number(buttonTypeSp) === 2){ return (
-    <div
-      onClick={() => onOpenPreview(!isOpen)}
-      style={{
-        backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-        width: "56px",
-        height: "56px",
-        borderRadius: "30px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        position:'fixed',
-        bottom:bottomMarginSp? `${bottomMarginSp}px`: '20px',
-        right:rightMarginSp? `${rightMarginSp}px`: '20px',
-      }}
-    >
-      <img
-        style={{ width: "96%", height: "96%", borderRadius: "30px" }}
-        src={
-          botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
-        }
-      />
-    </div>
-)} else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 1 && Number(buttonTypeSp) === 1) {
-  return (
-    <div
-      onClick={() => onOpenPreview(!isOpen)}
-      style={{
-        backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-        width: '240px',
-        height: "48px",
-        borderRadius:'35px',
-        display: "flex",
-        justifyContent: "left",
-        position:'fixed',
-        bottom:bottomMarginSp? `${bottomMarginSp}px`: '10px',
-        right: rightMarginSp? `${rightMarginSp}px`: '10px'
-      }}
-    >
-      <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)} style={{width: '100%', padding: '4px'}}>
-        <div className="sp-header-left-avatar sp-avatar" style={{width: '38px'}}>
-          <img
-            src={
-              botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
-            }
-            alt="bot-avatar"
-          />
-        </div>
-        <div>
-          <div id="comment_bubble" className="sp-bubble">
-            <span style={{ fontSize:'14px', fontWeight:700}}>{titleBubble}</span>
+      </div>)
+  } else if (isOpen === false && mobileCheck() === true && Number(positionSp) === 1 && Number(buttonTypeSp) === 2) {
+    return (
+      <div
+        onClick={() => onOpenPreview(!isOpen)}
+        style={{
+          backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+          width: "56px",
+          height: "56px",
+          borderRadius: "30px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          position: 'fixed',
+          bottom: bottomMarginSp ? `${bottomMarginSp}px` : '20px',
+          right: rightMarginSp ? `${rightMarginSp}px` : '20px',
+        }}
+      >
+        <img
+          style={{ width: "96%", height: "96%", borderRadius: "30px" }}
+          src={
+            botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
+          }
+        />
+      </div>
+    )
+  } else if (isOpen === false && mobileCheck() === true && Number(positionSp) === 1 && Number(buttonTypeSp) === 1) {
+    return (
+      <div
+        onClick={() => onOpenPreview(!isOpen)}
+        style={{
+          backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+          width: '240px',
+          height: "48px",
+          borderRadius: '35px',
+          display: "flex",
+          justifyContent: "left",
+          position: 'fixed',
+          bottom: bottomMarginSp ? `${bottomMarginSp}px` : '10px',
+          right: rightMarginSp ? `${rightMarginSp}px` : '10px'
+        }}
+      >
+        <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)} style={{ width: '100%', padding: '4px' }}>
+          <div className="sp-header-left-avatar sp-avatar" style={{ width: '38px' }}>
+            <img
+              src={
+                botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
+              }
+              alt="bot-avatar"
+            />
+          </div>
+          <div>
+            <div id="comment_bubble" className="sp-bubble">
+              <span style={{ fontSize: '14px', fontWeight: 700 }}>{titleBubble}</span>
+            </div>
+          </div>
+          <div className="sp-header-right-arrow" style={{ marginLeft: 'auto' }}>
+            <MDBIcon fas icon="chevron-circle-up" />
           </div>
         </div>
-        <div className="sp-header-right-arrow" style={{marginLeft: 'auto'}}>
-            <MDBIcon fas icon="chevron-circle-up" />
-        </div>
       </div>
-    </div>
-  )
-}else if (isOpen===false && mobileCheck()===true && Number(positionSp) === 2){
-  return (
-  <div
-    onClick={() => onOpenPreview(!isOpen)}
-    style={{
-      backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
-      width:'300px',
-      height: "60px",
-      borderRadius: "0px",
-      display: "flex",
-      justifyContent: "left",
-      position:'fixed',
-      transform:' rotate(-90deg)',
-      bottom: bottomMarginSp ? `${parseInt(bottomMarginSp) + widthPc/2}px`: '20px',
-      right: `${-120}px`,
-    }}
->
-   <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
-        <div className="sp-header-left-avatar sp-avatar">
-          <img
-            src={
-              botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
-            }
-          />
-        </div>
-        <div className="sp-header-left-label">
-         
-          <div className="sp-header-left-label-title">{rightSpTitle}</div>
-        </div>
-      </div>
-</div>)
-}
+    )
+  } else if (isOpen === false && mobileCheck() === true && Number(positionSp) === 2) {
+    return (
+      <div
+        onClick={() => onOpenPreview(!isOpen)}
+        style={{
+          backgroundColor: (botInfor?.main_color || botInfor?.main_color_other) && (botInfor?.main_color || botInfor?.main_color_other),
+          width: '300px',
+          height: "60px",
+          borderRadius: "0px",
+          display: "flex",
+          justifyContent: "left",
+          position: 'fixed',
+          transform: ' rotate(-90deg)',
+          bottom: bottomMarginSp ? `${parseInt(bottomMarginSp) + widthPc / 2}px` : '20px',
+          right: `${-120}px`,
+        }}
+      >
+        <div className="sp-header-left" onClick={() => onOpenPreview(!isOpen)}>
+          <div className="sp-header-left-avatar sp-avatar">
+            <img
+              src={
+                botInfor?.icon?.url && EC_CHATBOT_URL + "" + botInfor?.icon?.url
+              }
+            />
+          </div>
+          <div className="sp-header-left-label">
 
-    return (<div></div>)
+            <div className="sp-header-left-label-title">{rightSpTitle}</div>
+          </div>
+        </div>
+      </div>)
+  }
+
+  return (<div></div>)
 }
 
 const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
@@ -4336,7 +4613,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
 
     let result = content[content.type]?.content;
     result = result?.replace("{checkoutUrl}",
-        `<a href="${url}" target="_blank" style="color: ${botInfor?.font_color}">${url}</a>`)
+      `<a href="${url}" target="_blank" style="color: ${botInfor?.font_color}">${url}</a>`)
     result = result?.replace("{checkoutUrlBtn}",
       `<a href="${url}" target="_blank" class="sp-user-message-button-action underline-none">
         <button
@@ -4365,21 +4642,21 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
   }
 
   return (
-      <div key={index} className="sp-body-bot-side slideRight">
-        {(content.type === "text_input" ||
-            content.type === "file" ||
-            content.type === "delay") && (
-            <div className="sp-body-bot-side-avatar sp-avatar">
-              <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url}/>
-            </div>
+    <div key={index} className="sp-body-bot-side slideRight">
+      {(content.type === "text_input" ||
+        content.type === "file" ||
+        content.type === "delay") && (
+          <div className="sp-body-bot-side-avatar sp-avatar">
+            <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} />
+          </div>
         )}
-        <div className="sp-body-bot-side-messages">
-          {/* <img className="ss-bot-ava" src={icon} alt="" /> */}
-          {content && (
-              <React.Fragment>
-                {/* bot: type == 'text_input' */}
-                {content.type === "text_input" && (
-                    <div className="position-relative">
+      <div className="sp-body-bot-side-messages">
+        {/* <img className="ss-bot-ava" src={icon} alt="" /> */}
+        {content && (
+          <React.Fragment>
+            {/* bot: type == 'text_input' */}
+            {content.type === "text_input" && (
+              <div className="position-relative">
                 <div
                   className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value position-relative`}
                   style={{
@@ -4394,8 +4671,8 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
                   dangerouslySetInnerHTML={{
                     __html: formatResult()
                   }}
-                  // value={content[content.type]?.content || ''}
-                  // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
+                // value={content[content.type]?.content || ''}
+                // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
                 >
                   {/* {content[content.type]?.content || ''} */}
                   {/* <div
@@ -4404,29 +4681,29 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
                     }}
                   /> */}
                 </div>
-              <div
-                style={{
-                  content: " ",
-                  display: "flex",
-                  position: "absolute",
-                  bottom: 1,
-                  left: "-3px",
-                  width: "12px",
-                  height: "18px",
-                  backgroundColor: botInfor?.message_color,
-                  background: `url(${botInfor?.icon_mess})`,
-                  backgroundSize: "contain",
-                  backgroundRepeat: "no-repeat",
-                }}
-              >
-                {!botInfor?.icon_mess && (
+                <div
+                  style={{
+                    content: " ",
+                    display: "flex",
+                    position: "absolute",
+                    bottom: 1,
+                    left: "-3px",
+                    width: "12px",
+                    height: "18px",
+                    backgroundColor: botInfor?.message_color,
+                    background: `url(${botInfor?.icon_mess})`,
+                    backgroundSize: "contain",
+                    backgroundRepeat: "no-repeat",
+                  }}
+                >
+                  {!botInfor?.icon_mess && (
                     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="12" height="18" viewBox="0 0 37 54">
                       <path
-                          d="M0 0 C7.59 0 15.18 0 23 0 C23.18 6.32 23.34 12.63 23.44 18.95 C23.48 21.1 23.53 23.25 23.6 25.4 C23.7 28.49 23.75 31.58 23.78 34.67 C23.82 35.63 23.86 36.58 23.91 37.57 C23.91 40.27 23.83 42.43 23 45 C20.61 47.35 18.05 48.68 15 50 C13.61 50.67 13.61 50.67 12.19 51.36 C3.42 54.53 -4.81 54.39 -14 54 C-14 53.34 -14 52.68 -14 52 C-13.31 51.7 -12.63 51.39 -11.92 51.08 C-11.02 50.66 -10.12 50.24 -9.19 49.81 C-8.29 49.41 -7.4 49 -6.48 48.58 C-3.39 46.61 -2.53 45.34 -1 42 C-0.54 38.78 -0.51 35.58 -0.49 32.32 C-0.47 31.4 -0.45 30.47 -0.43 29.52 C-0.38 26.58 -0.35 23.63 -0.31 20.69 C-0.28 18.69 -0.24 16.69 -0.21 14.69 C-0.12 9.79 -0.06 4.9 0 0 Z "
-                          fill={botInfor?.message_color} transform="translate(14,0)" />
+                        d="M0 0 C7.59 0 15.18 0 23 0 C23.18 6.32 23.34 12.63 23.44 18.95 C23.48 21.1 23.53 23.25 23.6 25.4 C23.7 28.49 23.75 31.58 23.78 34.67 C23.82 35.63 23.86 36.58 23.91 37.57 C23.91 40.27 23.83 42.43 23 45 C20.61 47.35 18.05 48.68 15 50 C13.61 50.67 13.61 50.67 12.19 51.36 C3.42 54.53 -4.81 54.39 -14 54 C-14 53.34 -14 52.68 -14 52 C-13.31 51.7 -12.63 51.39 -11.92 51.08 C-11.02 50.66 -10.12 50.24 -9.19 49.81 C-8.29 49.41 -7.4 49 -6.48 48.58 C-3.39 46.61 -2.53 45.34 -1 42 C-0.54 38.78 -0.51 35.58 -0.49 32.32 C-0.47 31.4 -0.45 30.47 -0.43 29.52 C-0.38 26.58 -0.35 23.63 -0.31 20.69 C-0.28 18.69 -0.24 16.69 -0.21 14.69 C-0.12 9.79 -0.06 4.9 0 0 Z "
+                        fill={botInfor?.message_color} transform="translate(14,0)" />
                     </svg>
-                )}
-              </div>
+                  )}
+                </div>
               </div>
             )}
             {content.type === "file" &&
@@ -4435,12 +4712,12 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
                   {(content[content.type]?.content.includes("jpeg") ||
                     content[content.type]?.content.includes("png") ||
                     content[content.type]?.content.includes("jpg")) && (
-                    <img
-                      src={content[content.type]?.content}
-                      alt=""
-                      style={{ width: "100%" }}
-                    />
-                  )}
+                      <img
+                        src={content[content.type]?.content}
+                        alt=""
+                        style={{ width: "100%" }}
+                      />
+                    )}
                   {content[content.type]?.content.includes("pdf") && (
                     <span
                       style={{
@@ -4567,12 +4844,12 @@ const UserMessage = ({
         (message.type === "card_payment_radio_button" &&
           (message?.[message.type].type !== "picture_radio"
             ? stringNullOrEmpty(message?.[message.type]?.initial_selection) &&
-              !message?.[message.type]?.card_linked_setting.includes(message?.[message.type]?.initial_selection)
+            !message?.[message.type]?.card_linked_setting.includes(message?.[message.type]?.initial_selection)
             : stringNullOrEmpty(
-                message?.[message.type]?.initial_selection_picture
-              ) &&
-              message?.[message.type]?.card_linked_setting_picture !==
-                message?.[message.type]?.initial_selection_picture)) ||
+              message?.[message.type]?.initial_selection_picture
+            ) &&
+            message?.[message.type]?.card_linked_setting_picture !==
+            message?.[message.type]?.initial_selection_picture)) ||
         (message.type === "carousel" && message?.[message.type].require) ||
         (message.type === "radio_button" &&
           !message[message.type].initial_selection)
@@ -4787,9 +5064,9 @@ const UserMessage = ({
     ) {
       return (
         moment(current, "YYYY-MM-DD") >=
-          moment(calendar.end_date, "YYYY-MM-DD").add(1, "days") ||
+        moment(calendar.end_date, "YYYY-MM-DD").add(1, "days") ||
         moment(current, "YYYY-MM-DD") <
-          moment(calendar.start_date, "YYYY-MM-DD") ||
+        moment(calendar.start_date, "YYYY-MM-DD") ||
         (calendar.type === "start_end_date" &&
           moment(current, "YYYY-MM-DD").isSameOrAfter(
             moment(calendar.end_date_select, "YYYY-MM-DD")
@@ -4798,14 +5075,14 @@ const UserMessage = ({
           (date) => date === moment(current).format("YYYY-MM-DD")
         ) ||
         moment(current) <
-          (calendar.aggregation_target_period_from !== null &&
+        (calendar.aggregation_target_period_from !== null &&
           calendar.aggregation_target_period_from !== undefined
-            ? moment().add(calendar.aggregation_target_period_from - 1, "days")
-            : moment(undefined, "YYYY-MM-DD")) ||
+          ? moment().add(calendar.aggregation_target_period_from - 1, "days")
+          : moment(undefined, "YYYY-MM-DD")) ||
         moment(current) >
-          (calendar.aggregation_target_period_to
-            ? moment().add(calendar.aggregation_target_period_to, "days")
-            : moment(undefined, "YYYY-MM-DD")) ||
+        (calendar.aggregation_target_period_to
+          ? moment().add(calendar.aggregation_target_period_to, "days")
+          : moment(undefined, "YYYY-MM-DD")) ||
         calendar.non_select_date_time?.find((type) => {
           if (type === "today") {
             return (
@@ -4869,7 +5146,7 @@ const UserMessage = ({
           moment(calendar.end_date, "YYYY-MM-DD").add(1, "days")
         ) ||
         moment(current, "YYYY-MM-DD") <
-          moment(calendar.start_date, "YYYY-MM-DD") ||
+        moment(calendar.start_date, "YYYY-MM-DD") ||
         (calendar.type === "start_end_date" &&
           moment(current, "YYYY-MM-DD").isSameOrBefore(
             moment(calendar.start_date_select, "YYYY-MM-DD")
@@ -4878,28 +5155,28 @@ const UserMessage = ({
           (date) => date === moment(current).format("YYYY-MM-DD")
         ) ||
         moment(current) <
-          (calendar.aggregation_target_period_from !== null &&
+        (calendar.aggregation_target_period_from !== null &&
           calendar.aggregation_target_period_from !== undefined
-            ? moment().add(calendar.aggregation_target_period_from - 1, "days")
-            : moment(undefined, "YYYY-MM-DD")) ||
+          ? moment().add(calendar.aggregation_target_period_from - 1, "days")
+          : moment(undefined, "YYYY-MM-DD")) ||
         moment(current) >
-          (calendar.aggregation_target_period_to
-            ? moment().add(calendar.aggregation_target_period_to, "days")
-            : moment(undefined, "YYYY-MM-DD")) ||
+        (calendar.aggregation_target_period_to
+          ? moment().add(calendar.aggregation_target_period_to, "days")
+          : moment(undefined, "YYYY-MM-DD")) ||
         moment(current, "YYYY-MM-DD") <
-          (calendar[calendar.type].specified_period_from
-            ? moment(calendar.start_date_select, "YYYY-MM-DD").add(
-                calendar[calendar.type].specified_period_from,
-                "days"
-              )
-            : moment(undefined, "YYYY-MM-DD")) ||
+        (calendar[calendar.type].specified_period_from
+          ? moment(calendar.start_date_select, "YYYY-MM-DD").add(
+            calendar[calendar.type].specified_period_from,
+            "days"
+          )
+          : moment(undefined, "YYYY-MM-DD")) ||
         moment(current, "YYYY-MM-DD") >
-          (calendar[calendar.type].specified_period_to
-            ? moment(calendar.start_date_select, "YYYY-MM-DD").add(
-                calendar[calendar.type].specified_period_to,
-                "days"
-              )
-            : moment(undefined, "YYYY-MM-DD")) ||
+        (calendar[calendar.type].specified_period_to
+          ? moment(calendar.start_date_select, "YYYY-MM-DD").add(
+            calendar[calendar.type].specified_period_to,
+            "days"
+          )
+          : moment(undefined, "YYYY-MM-DD")) ||
         calendar.non_select_date_time?.find((type) => {
           if (type === "today") {
             return (
@@ -4992,15 +5269,15 @@ const UserMessage = ({
   function replaceVariable(content) {
     content = content.replaceAll(SCAN_REGEX, (text, variable) => {
       if (variables.length !== 0) {
-          let valueVar = "";
-          for (let j = 0; j < variables.length; j++) {
-            if (variables[j].variable_name === variable) {
-              valueVar = variables[j].default_value;
-            }
+        let valueVar = "";
+        for (let j = 0; j < variables.length; j++) {
+          if (variables[j].variable_name === variable) {
+            valueVar = variables[j].default_value;
           }
-          return valueVar;
+        }
+        return valueVar;
       } else {
-          return "";
+        return "";
       }
     })
     return content;
@@ -5033,7 +5310,7 @@ const UserMessage = ({
         let labelNoTransition = content.label_no_transition;
 
         if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
-            content.textarea.invalid_input.content = replaceVariable(content.textarea.invalid_input.content);
+          content.textarea.invalid_input.content = replaceVariable(content.textarea.invalid_input.content);
         }
 
         return (
@@ -5258,25 +5535,25 @@ const UserMessage = ({
                 )}
                 {(textInput.type === "urls" ||
                   textInput.type === "email_address") && (
-                  <React.Fragment>
-                    <InputCustom
-                      disabled={disabled}
-                      // className="ss-message__content--user-text-input ss-input-value"
-                      style={{ marginBottom: "0px" }}
-                      placeholder={textInput[textInput.type].placeholder}
-                      onChange={(value) =>
-                        onChangeValue(
-                          indexContent,
-                          content.type,
-                          value,
-                          textInput.type,
-                          "value"
-                        )
-                      }
-                      value={textInput[textInput.type]?.value}
-                    ></InputCustom>
-                  </React.Fragment>
-                )}
+                    <React.Fragment>
+                      <InputCustom
+                        disabled={disabled}
+                        // className="ss-message__content--user-text-input ss-input-value"
+                        style={{ marginBottom: "0px" }}
+                        placeholder={textInput[textInput.type].placeholder}
+                        onChange={(value) =>
+                          onChangeValue(
+                            indexContent,
+                            content.type,
+                            value,
+                            textInput.type,
+                            "value"
+                          )
+                        }
+                        value={textInput[textInput.type]?.value}
+                      ></InputCustom>
+                    </React.Fragment>
+                  )}
                 {textInput.type === "email_confirmation" && (
                   <>
                     <InputCustom
@@ -5350,14 +5627,14 @@ const UserMessage = ({
                 {errors?.[
                   `message${indexMessage}_content${indexContent}_${content.type}_${textInput.type}`
                 ] && (
-                  <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                    {
-                      errors?.[
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
                         `message${indexMessage}_content${indexContent}_${content.type}_${textInput.type}`
-                      ]
-                    }
-                  </div>
-                )}
+                        ]
+                      }
+                    </div>
+                  )}
               </div>
             )}
             {/* type == 'label' */}
@@ -5398,38 +5675,38 @@ const UserMessage = ({
                 )}
                 {(textarea?.type === "text_input" ||
                   textarea?.type === "invalid_input") && (
-                  <textarea
-                    disabled={disabled || textarea?.type === "invalid_input"}
-                    className="ss-message__content--user-textarea ss-input-value"
-                    placeholder={textarea[textarea.type]?.content}
-                    rows={3}
-                    onChange={(e) =>
-                      onChangeValue(
-                        indexContent,
-                        content.type,
-                        e.target.value,
-                        textarea?.type,
-                        "value"
-                      )
-                    }
-                    value={
-                      textarea?.type === "invalid_input"
-                        ? textarea[textarea.type]?.content
-                        : textarea[textarea.type]?.value
-                    }
-                  ></textarea>
-                )}
+                    <textarea
+                      disabled={disabled || textarea?.type === "invalid_input"}
+                      className="ss-message__content--user-textarea ss-input-value"
+                      placeholder={textarea[textarea.type]?.content}
+                      rows={3}
+                      onChange={(e) =>
+                        onChangeValue(
+                          indexContent,
+                          content.type,
+                          e.target.value,
+                          textarea?.type,
+                          "value"
+                        )
+                      }
+                      value={
+                        textarea?.type === "invalid_input"
+                          ? textarea[textarea.type]?.content
+                          : textarea[textarea.type]?.value
+                      }
+                    ></textarea>
+                  )}
                 {errors?.[
                   `message${indexMessage}_content${indexContent}_${content.type}`
                 ] && (
-                  <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                    {
-                      errors?.[
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
                         `message${indexMessage}_content${indexContent}_${content.type}`
-                      ]
-                    }
-                  </div>
-                )}
+                        ]
+                      }
+                    </div>
+                  )}
               </div>
             )}
             {/* type == 'radio_button' */}
@@ -5557,8 +5834,8 @@ const UserMessage = ({
                                   ? "#347AED"
                                   : ""
                                 : radioButton.initial_selection === item.id
-                                ? "#347AED"
-                                : "",
+                                  ? "#347AED"
+                                  : "",
                             }}
                             key={index}
                             className="ss-message__content--user-radio_button--block_style"
@@ -5581,14 +5858,14 @@ const UserMessage = ({
                 {errors?.[
                   `message${indexMessage}_content${indexContent}_${content.type}`
                 ] && (
-                  <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                    {
-                      errors?.[
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
                         `message${indexMessage}_content${indexContent}_${content.type}`
-                      ]
-                    }
-                  </div>
-                )}
+                        ]
+                      }
+                    </div>
+                  )}
               </div>
             )}
             {/* type == 'checkbox' */}
@@ -5741,70 +6018,70 @@ const UserMessage = ({
                 {errors?.[
                   `message${indexMessage}_content${indexContent}_${content.type}`
                 ] && (
-                  <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                    {
-                      errors?.[
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
                         `message${indexMessage}_content${indexContent}_${content.type}`
-                      ]
-                    }
-                  </div>
-                )}
+                        ]
+                      }
+                    </div>
+                  )}
               </div>
             )}
             {/* type == 'product_purchase_select_option */}
             {
-                content.type === 'product_purchase_select_option' &&
-                <div style={{marginBottom: '10px'}}>
-                  {(productPurchaseSelectOption.title_require || productPurchaseSelectOption.require) &&
-                      <div className="ss-message__content--user-pull_down-top"
-                           style={{marginBottom: '0px'}}>
-                        {productPurchaseSelectOption.title_require &&
-                            <span className="ss-message__content--user-pull_down-title">
-                              {productPurchaseSelectOption.title}
-                            </span>
-                        }
-                        {productPurchaseSelectOption.require === true &&
-                            <span className="ss-message__content--user-text-input-required">
-                              ※必須
-                            </span>
-                        }
-                      </div>
-                  }
-                  <div className="ss-message__content--user-pull_down-wrapper">
-                    {productPurchaseSelectOption.type === 'text_with_thumbnail_image' && (
-                        <>
-                          <div className="ss-message__content--user-pull_down--customization">
-                            <div className="">
-                              <div className="ss-message__content--user-pull_down-col col-12"
-                                   style={{padding: '0'}}>
-                                <SelectCustom
-                                    showSearch={false}
-                                    data={productPurchaseSelectOption.products}
-                                    style={{width: '100%'}}
-                                    placeholder={productPurchaseSelectOption.display_unselected}
-                                    keyValue="productVariantId"
-                                    nameValue="title"
-                                    onChange={(value) => onChangeValue(indexContent, content.type, value, 'value')}
-                                    value={productPurchaseSelectOption.value}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </>
-                    )}
+              content.type === 'product_purchase_select_option' &&
+              <div style={{ marginBottom: '10px' }}>
+                {(productPurchaseSelectOption.title_require || productPurchaseSelectOption.require) &&
+                  <div className="ss-message__content--user-pull_down-top"
+                    style={{ marginBottom: '0px' }}>
+                    {productPurchaseSelectOption.title_require &&
+                      <span className="ss-message__content--user-pull_down-title">
+                        {productPurchaseSelectOption.title}
+                      </span>
+                    }
+                    {productPurchaseSelectOption.require === true &&
+                      <span className="ss-message__content--user-text-input-required">
+                        ※必須
+                      </span>
+                    }
                   </div>
-                  {errors?.[
-                      `message${indexMessage}_content${indexContent}_${content.type}`
-                      ] && (
-                      <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                        {
-                          errors?.[
-                              `message${indexMessage}_content${indexContent}_${content.type}`
-                              ]
-                        }
+                }
+                <div className="ss-message__content--user-pull_down-wrapper">
+                  {productPurchaseSelectOption.type === 'text_with_thumbnail_image' && (
+                    <>
+                      <div className="ss-message__content--user-pull_down--customization">
+                        <div className="">
+                          <div className="ss-message__content--user-pull_down-col col-12"
+                            style={{ padding: '0' }}>
+                            <SelectCustom
+                              showSearch={false}
+                              data={productPurchaseSelectOption.products}
+                              style={{ width: '100%' }}
+                              placeholder={productPurchaseSelectOption.display_unselected}
+                              keyValue="productVariantId"
+                              nameValue="title"
+                              onChange={(value) => onChangeValue(indexContent, content.type, value, 'value')}
+                              value={productPurchaseSelectOption.value}
+                            />
+                          </div>
+                        </div>
                       </div>
+                    </>
                   )}
                 </div>
+                {errors?.[
+                  `message${indexMessage}_content${indexContent}_${content.type}`
+                ] && (
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
+                        `message${indexMessage}_content${indexContent}_${content.type}`
+                        ]
+                      }
+                    </div>
+                  )}
+              </div>
             }
             {/* type == 'pull_down' */}
             {content.type === "pull_down" && (
@@ -5942,11 +6219,11 @@ const UserMessage = ({
                             data={dataHour.filter(
                               (item) =>
                                 parseInt(item.value) >=
-                                  (parseInt(pullDown[pullDown.type].start_at) ||
-                                    "0") &&
+                                (parseInt(pullDown[pullDown.type].start_at) ||
+                                  "0") &&
                                 parseInt(item.value) <=
-                                  (parseInt(pullDown[pullDown.type].end_at) ||
-                                    "23")
+                                (parseInt(pullDown[pullDown.type].end_at) ||
+                                  "23")
                             )}
                             placeholder="時"
                             style={{ width: "32%" }}
@@ -5989,83 +6266,83 @@ const UserMessage = ({
                   )}
                   {(pullDown.type === "date_ymd" ||
                     pullDown.type === "dob_ymd") && (
-                    <React.Fragment>
-                      <div className="ss-message__content--user-pull_down--time_hm">
-                        <div
-                          className=""
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          <SelectCustom
-                            disabled={disabled}
-                            data={dataYear.filter(
-                              (item) =>
-                                parseInt(item.value) >=
+                      <React.Fragment>
+                        <div className="ss-message__content--user-pull_down--time_hm">
+                          <div
+                            className=""
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            <SelectCustom
+                              disabled={disabled}
+                              data={dataYear.filter(
+                                (item) =>
+                                  parseInt(item.value) >=
                                   (parseInt(
                                     pullDown[pullDown.type].start_year
                                   ) || "1935") &&
-                                parseInt(item.value) <=
+                                  parseInt(item.value) <=
                                   (parseInt(pullDown[pullDown.type].end_year) ||
                                     "2072")
-                            )}
-                            placeholder="年"
-                            style={{ width: "32%" }}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                pullDown.type,
-                                "valueYear"
-                              )
-                            }
-                            value={pullDown[pullDown.type].valueYear}
-                          />
-                          <SelectCustom
-                            disabled={disabled}
-                            data={dataMonth}
-                            placeholder="月"
-                            style={{ width: "32%" }}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                pullDown.type,
-                                "valueMonth"
-                              )
-                            }
-                            value={pullDown[pullDown.type].valueMonth}
-                          />
-                          <SelectCustom
-                            disabled={disabled}
-                            data={dataDay}
-                            placeholder="日"
-                            style={{ width: "32%" }}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                pullDown.type,
-                                "valueDay"
-                              )
-                            }
-                            value={pullDown[pullDown.type].valueDay}
-                          />
-                          <div
-                            className="ss-message__content--user-pull_down-comment"
-                            style={{ marginTop: "4px", width: "32%" }}
-                          >
-                            <span>{pullDown[pullDown.type].comment}</span>
+                              )}
+                              placeholder="年"
+                              style={{ width: "32%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  pullDown.type,
+                                  "valueYear"
+                                )
+                              }
+                              value={pullDown[pullDown.type].valueYear}
+                            />
+                            <SelectCustom
+                              disabled={disabled}
+                              data={dataMonth}
+                              placeholder="月"
+                              style={{ width: "32%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  pullDown.type,
+                                  "valueMonth"
+                                )
+                              }
+                              value={pullDown[pullDown.type].valueMonth}
+                            />
+                            <SelectCustom
+                              disabled={disabled}
+                              data={dataDay}
+                              placeholder="日"
+                              style={{ width: "32%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  pullDown.type,
+                                  "valueDay"
+                                )
+                              }
+                              value={pullDown[pullDown.type].valueDay}
+                            />
+                            <div
+                              className="ss-message__content--user-pull_down-comment"
+                              style={{ marginTop: "4px", width: "32%" }}
+                            >
+                              <span>{pullDown[pullDown.type].comment}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </React.Fragment>
-                  )}
+                      </React.Fragment>
+                    )}
                   {pullDown.type === "date_md" && (
                     <React.Fragment>
                       <div className="ss-message__content--user-pull_down--time_hm">
@@ -6120,66 +6397,66 @@ const UserMessage = ({
                   )}
                   {(pullDown.type === "date_ym" ||
                     pullDown.type === "dob_ym") && (
-                    <React.Fragment>
-                      <div className="ss-message__content--user-pull_down--time_hm">
-                        <div
-                          className=""
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <SelectCustom
-                            disabled={disabled}
-                            data={dataYear.filter(
-                              (item) =>
-                                parseInt(item.value) >=
+                      <React.Fragment>
+                        <div className="ss-message__content--user-pull_down--time_hm">
+                          <div
+                            className=""
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <SelectCustom
+                              disabled={disabled}
+                              data={dataYear.filter(
+                                (item) =>
+                                  parseInt(item.value) >=
                                   (parseInt(
                                     pullDown[pullDown.type].start_year
                                   ) || "1935") &&
-                                parseInt(item.value) <=
+                                  parseInt(item.value) <=
                                   (parseInt(pullDown[pullDown.type].end_year) ||
                                     "2072")
-                            )}
-                            placeholder="年"
-                            style={{ width: "32%" }}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                pullDown.type,
-                                "valueYear"
-                              )
-                            }
-                            value={pullDown[pullDown.type].valueYear}
-                          />
-                          <SelectCustom
-                            disabled={disabled}
-                            data={dataMonth}
-                            placeholder="月"
-                            style={{ width: "32%" }}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                pullDown.type,
-                                "valueMonth"
-                              )
-                            }
-                            value={pullDown[pullDown.type].valueMonth}
-                          />
-                          <div
-                            className="ss-message__content--user-pull_down-comment"
-                            style={{ marginTop: "4px", width: "32%" }}
-                          >
-                            <span>{pullDown[pullDown.type].comment}</span>
+                              )}
+                              placeholder="年"
+                              style={{ width: "32%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  pullDown.type,
+                                  "valueYear"
+                                )
+                              }
+                              value={pullDown[pullDown.type].valueYear}
+                            />
+                            <SelectCustom
+                              disabled={disabled}
+                              data={dataMonth}
+                              placeholder="月"
+                              style={{ width: "32%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  pullDown.type,
+                                  "valueMonth"
+                                )
+                              }
+                              value={pullDown[pullDown.type].valueMonth}
+                            />
+                            <div
+                              className="ss-message__content--user-pull_down-comment"
+                              style={{ marginTop: "4px", width: "32%" }}
+                            >
+                              <span>{pullDown[pullDown.type].comment}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </React.Fragment>
-                  )}
+                      </React.Fragment>
+                    )}
                   {pullDown.type === "date_ymd_hm" && (
                     <React.Fragment>
                       <div className="ss-message__content--user-pull_down--time_hm">
@@ -6196,12 +6473,12 @@ const UserMessage = ({
                             data={dataYear.filter(
                               (item) =>
                                 parseInt(item.value) >=
-                                  (parseInt(
-                                    pullDown[pullDown.type].start_year
-                                  ) || "1935") &&
+                                (parseInt(
+                                  pullDown[pullDown.type].start_year
+                                ) || "1935") &&
                                 parseInt(item.value) <=
-                                  (parseInt(pullDown[pullDown.type].end_year) ||
-                                    "2072")
+                                (parseInt(pullDown[pullDown.type].end_year) ||
+                                  "2072")
                             )}
                             placeholder="年"
                             style={{ width: "32%" }}
@@ -6253,11 +6530,11 @@ const UserMessage = ({
                             data={dataHour.filter(
                               (item) =>
                                 parseInt(item.value) >=
-                                  (parseInt(pullDown[pullDown.type].start_at) ||
-                                    "0") &&
+                                (parseInt(pullDown[pullDown.type].start_at) ||
+                                  "0") &&
                                 parseInt(item.value) <=
-                                  (parseInt(pullDown[pullDown.type].end_at) ||
-                                    "23")
+                                (parseInt(pullDown[pullDown.type].end_at) ||
+                                  "23")
                             )}
                             placeholder="時"
                             style={{ width: "32%" }}
@@ -6313,11 +6590,11 @@ const UserMessage = ({
                             data={dataHour.filter(
                               (item) =>
                                 parseInt(item.value) >=
-                                  (parseInt(pullDown[pullDown.type].start_at) ||
-                                    "0") &&
+                                (parseInt(pullDown[pullDown.type].start_at) ||
+                                  "0") &&
                                 parseInt(item.value) <=
-                                  (parseInt(pullDown[pullDown.type].end_at) ||
-                                    "23")
+                                (parseInt(pullDown[pullDown.type].end_at) ||
+                                  "23")
                             )}
                             placeholder="時"
                             style={{ width: "49%" }}
@@ -6362,11 +6639,11 @@ const UserMessage = ({
                             data={dataHour.filter(
                               (item) =>
                                 parseInt(item.value) >=
-                                  (parseInt(pullDown[pullDown.type].start_at) ||
-                                    "0") &&
+                                (parseInt(pullDown[pullDown.type].start_at) ||
+                                  "0") &&
                                 parseInt(item.value) <=
-                                  (parseInt(pullDown[pullDown.type].end_at) ||
-                                    "23")
+                                (parseInt(pullDown[pullDown.type].end_at) ||
+                                  "23")
                             )}
                             placeholder="時"
                             style={{ width: "49%" }}
@@ -6422,12 +6699,12 @@ const UserMessage = ({
                             data={dataYear.filter(
                               (item) =>
                                 parseInt(item.value) >=
-                                  (parseInt(
-                                    pullDown[pullDown.type].start_year
-                                  ) || "1935") &&
+                                (parseInt(
+                                  pullDown[pullDown.type].start_year
+                                ) || "1935") &&
                                 parseInt(item.value) <=
-                                  (parseInt(pullDown[pullDown.type].end_year) ||
-                                    "2072")
+                                (parseInt(pullDown[pullDown.type].end_year) ||
+                                  "2072")
                             )}
                             placeholder="年"
                             style={{ width: "32%" }}
@@ -6488,12 +6765,12 @@ const UserMessage = ({
                             data={dataYear.filter(
                               (item) =>
                                 parseInt(item.value) >=
-                                  (parseInt(
-                                    pullDown[pullDown.type].start_year
-                                  ) || "1935") &&
+                                (parseInt(
+                                  pullDown[pullDown.type].start_year
+                                ) || "1935") &&
                                 parseInt(item.value) <=
-                                  (parseInt(pullDown[pullDown.type].end_year) ||
-                                    "2072")
+                                (parseInt(pullDown[pullDown.type].end_year) ||
+                                  "2072")
                             )}
                             placeholder="年"
                             style={{ width: "32%" }}
@@ -6659,14 +6936,14 @@ const UserMessage = ({
                 {errors?.[
                   `message${indexMessage}_content${indexContent}_${content.type}_${pullDown.type}`
                 ] && (
-                  <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                    {
-                      errors?.[
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
                         `message${indexMessage}_content${indexContent}_${content.type}_${pullDown.type}`
-                      ]
-                    }
-                  </div>
-                )}
+                        ]
+                      }
+                    </div>
+                  )}
               </div>
             )}
             {/* type == 'zip_code_address' */}
@@ -6691,23 +6968,23 @@ const UserMessage = ({
                 </div>
                 {(zipCodeAddress.title_require ||
                   zipCodeAddress.isCheckRequire) && (
-                  <div
-                    className="ss-message__content--user-pull_down-top"
-                    style={{ marginBottom: "0px" }}
-                  >
-                    {zipCodeAddress.title_require && (
-                      <span className="ss-message__content--user-pull_down-title">
-                        {zipCodeAddress.title}
-                      </span>
-                    )}
-                    {(zipCodeAddress.isCheckRequire === "all_items_require" ||
-                      zipCodeAddress.isCheckRequire === "require") && (
-                      <span className="ss-message__content--user-text-input-required">
-                        ※必須
-                      </span>
-                    )}
-                  </div>
-                )}
+                    <div
+                      className="ss-message__content--user-pull_down-top"
+                      style={{ marginBottom: "0px" }}
+                    >
+                      {zipCodeAddress.title_require && (
+                        <span className="ss-message__content--user-pull_down-title">
+                          {zipCodeAddress.title}
+                        </span>
+                      )}
+                      {(zipCodeAddress.isCheckRequire === "all_items_require" ||
+                        zipCodeAddress.isCheckRequire === "require") && (
+                          <span className="ss-message__content--user-text-input-required">
+                            ※必須
+                          </span>
+                        )}
+                    </div>
+                  )}
                 {zipCodeAddress.post_code !== undefined && (
                   <div className="ss-user-setting__item-bottom">
                     <div
@@ -7106,17 +7383,17 @@ const UserMessage = ({
                       id="ss-user-input-building"
                       disabled={disabled}
                       style={{ width: "100%" }}
-                      onChange={(value) =>{
+                      onChange={(value) => {
                         onChangeValue(
                           indexContent,
                           content.type,
                           value,
                           "value_building_name"
                         );
-                        
+
                       }
                       }
-                      
+
                       value={zipCodeAddress.value_building_name}
                     />
                   </div>
@@ -7124,14 +7401,14 @@ const UserMessage = ({
                 {errors?.[
                   `message${indexMessage}_content${indexContent}_${content.type}`
                 ] && (
-                  <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                    {
-                      errors?.[
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
                         `message${indexMessage}_content${indexContent}_${content.type}`
-                      ]
-                    }
-                  </div>
-                )}
+                        ]
+                      }
+                    </div>
+                  )}
               </div>
             )}
             {/* type == 'attaching_file' */}
@@ -7155,9 +7432,8 @@ const UserMessage = ({
                     <MDBIcon
                       fas
                       icon="times-circle"
-                      className={`ss-message-custom-icon-times ${
-                        disabled && "ss-message-custom-icon-times-disabled"
-                      }`}
+                      className={`ss-message-custom-icon-times ${disabled && "ss-message-custom-icon-times-disabled"
+                        }`}
                       onClick={() => {
                         if (!disabled) {
                           onChangeValue(
@@ -7194,14 +7470,14 @@ const UserMessage = ({
                 {errors?.[
                   `message${indexMessage}_content${indexContent}_${content.type}`
                 ] && (
-                  <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                    {
-                      errors?.[
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
                         `message${indexMessage}_content${indexContent}_${content.type}`
-                      ]
-                    }
-                  </div>
-                )}
+                        ]
+                      }
+                    </div>
+                  )}
               </div>
             )}
             {/* type == 'calendar' */}
@@ -7434,14 +7710,14 @@ const UserMessage = ({
                 {errors?.[
                   `message${indexMessage}_content${indexContent}_${content.type}`
                 ] && (
-                  <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                    {
-                      errors?.[
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
                         `message${indexMessage}_content${indexContent}_${content.type}`
-                      ]
-                    }
-                  </div>
-                )}
+                        ]
+                      }
+                    </div>
+                  )}
               </div>
             )}
             {/* type == 'agree_term' */}
@@ -7533,14 +7809,14 @@ const UserMessage = ({
                 {errors?.[
                   `message${indexMessage}_content${indexContent}_${content.type}`
                 ] && (
-                  <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                    {
-                      errors?.[
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
                         `message${indexMessage}_content${indexContent}_${content.type}`
-                      ]
-                    }
-                  </div>
-                )}
+                        ]
+                      }
+                    </div>
+                  )}
               </div>
             )}
             {/* type == 'carousel' */}
@@ -7602,13 +7878,13 @@ const UserMessage = ({
                                   carousel.initial_selection === itemCarousel.id
                                     ? { backgroundColor: "white" }
                                     : disabled
-                                    ? { backgroundColor: "#B2B0AE" }
-                                    : {}
+                                      ? { backgroundColor: "#B2B0AE" }
+                                      : {}
                                 }
                                 onClick={() => {
                                   if (
                                     carousel.initial_selection !==
-                                      itemCarousel.id &&
+                                    itemCarousel.id &&
                                     !disabled
                                   ) {
                                     onChangeValue(
@@ -7636,14 +7912,14 @@ const UserMessage = ({
                 {errors?.[
                   `message${indexMessage}_content${indexContent}_${content.type}`
                 ] && (
-                  <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                    {
-                      errors?.[
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
                         `message${indexMessage}_content${indexContent}_${content.type}`
-                      ]
-                    }
-                  </div>
-                )}
+                        ]
+                      }
+                    </div>
+                  )}
               </div>
             )}
             {/* type == 'credit_card_payment' */}
@@ -7651,22 +7927,22 @@ const UserMessage = ({
               <div style={{ marginBottom: "10px" }}>
                 {(creditCardPayment.title_require ||
                   creditCardPayment.require) && (
-                  <div
-                    className="ss-message__content--user-pull_down-top"
-                    style={{ marginBottom: "0px" }}
-                  >
-                    {creditCardPayment.title_require && (
-                      <span className="ss-message__content--user-pull_down-title">
-                        {creditCardPayment.title}
-                      </span>
-                    )}
-                    {creditCardPayment.require && (
-                      <span className="ss-message__content--user-text-input-required">
-                        ※必須
-                      </span>
-                    )}
-                  </div>
-                )}
+                    <div
+                      className="ss-message__content--user-pull_down-top"
+                      style={{ marginBottom: "0px" }}
+                    >
+                      {creditCardPayment.title_require && (
+                        <span className="ss-message__content--user-pull_down-title">
+                          {creditCardPayment.title}
+                        </span>
+                      )}
+                      {creditCardPayment.require && (
+                        <span className="ss-message__content--user-text-input-required">
+                          ※必須
+                        </span>
+                      )}
+                    </div>
+                  )}
                 {creditCardPayment.payment_method.length > 0 && (
                   <div
                     style={{
@@ -7987,14 +8263,14 @@ const UserMessage = ({
                 {errors?.[
                   `message${indexMessage}_content${indexContent}_${content.type}`
                 ] && (
-                  <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                    {
-                      errors?.[
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
                         `message${indexMessage}_content${indexContent}_${content.type}`
-                      ]
-                    }
-                  </div>
-                )}
+                        ]
+                      }
+                    </div>
+                  )}
               </div>
             )}
             {/* type == 'capture' */}
@@ -8035,14 +8311,14 @@ const UserMessage = ({
                 {errors?.[
                   `message${indexMessage}_content${indexContent}_${content.type}`
                 ] && (
-                  <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                    {
-                      errors?.[
+                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                      {
+                        errors?.[
                         `message${indexMessage}_content${indexContent}_${content.type}`
-                      ]
-                    }
-                  </div>
-                )}
+                        ]
+                      }
+                    </div>
+                  )}
               </div>
             )}
             {/* type == 'product_purchase' */}
@@ -8118,205 +8394,205 @@ const UserMessage = ({
                                       {(productPurchase.product_name_display ||
                                         productPurchase.price_display ||
                                         productPurchase.product_number_display) && (
-                                        <div className="ss-user-preivew-product-purchase-infor">
-                                          {productPurchase.product_name_display &&
-                                            itemProduct.title && (
-                                              <div className="ss-user-overview-product-purchase-infor-title">
-                                                {itemProduct.title}
-                                              </div>
-                                            )}
-                                          {productPurchase.product_number_display &&
-                                            itemProduct.item_number && (
-                                              <div className="ss-user-overview-product-purchase-infor-item-number">
-                                                商品番号:{" "}
-                                                {itemProduct.item_number}
-                                              </div>
-                                            )}
-                                          {itemProduct.price_display_custom ? (
-                                            <div className="ss-user-overview-product-purchase-infor-price">
-                                              {itemProduct.price_display_custom}
-                                            </div>
-                                          ) : (
-                                            productPurchase.price_display &&
-                                            itemProduct.item_price && (
+                                          <div className="ss-user-preivew-product-purchase-infor">
+                                            {productPurchase.product_name_display &&
+                                              itemProduct.title && (
+                                                <div className="ss-user-overview-product-purchase-infor-title">
+                                                  {itemProduct.title}
+                                                </div>
+                                              )}
+                                            {productPurchase.product_number_display &&
+                                              itemProduct.item_number && (
+                                                <div className="ss-user-overview-product-purchase-infor-item-number">
+                                                  商品番号:{" "}
+                                                  {itemProduct.item_number}
+                                                </div>
+                                              )}
+                                            {itemProduct.price_display_custom ? (
                                               <div className="ss-user-overview-product-purchase-infor-price">
-                                                値段: {itemProduct.item_price}{" "}
-                                                円
+                                                {itemProduct.price_display_custom}
                                               </div>
-                                            )
-                                          )}
-                                          {(productPurchase.quantity_designation_all ||
-                                            itemProduct.is_quantity_designation) &&
-                                          itemProduct.quantity_limit ? (
-                                            <div className="ss-user-overview-product-purchase-infor-price">
-                                              数量：最大
-                                              {itemProduct.quantity_limit}個まで
-                                            </div>
-                                          ) : (
-                                            ""
-                                          )}
-                                        </div>
-                                      )}
+                                            ) : (
+                                              productPurchase.price_display &&
+                                              itemProduct.item_price && (
+                                                <div className="ss-user-overview-product-purchase-infor-price">
+                                                  値段: {itemProduct.item_price}{" "}
+                                                  円
+                                                </div>
+                                              )
+                                            )}
+                                            {(productPurchase.quantity_designation_all ||
+                                              itemProduct.is_quantity_designation) &&
+                                              itemProduct.quantity_limit ? (
+                                              <div className="ss-user-overview-product-purchase-infor-price">
+                                                数量：最大
+                                                {itemProduct.quantity_limit}個まで
+                                              </div>
+                                            ) : (
+                                              ""
+                                            )}
+                                          </div>
+                                        )}
                                     </div>
                                   </Checkbox>
                                   {(productPurchase.quantity_designation_all ||
                                     itemProduct.is_quantity_designation) && (
-                                    <div>
-                                      <InputNum
-                                        className="sp-product-purchase-custom-input-quantity"
-                                        style={{
-                                          width: "46%",
-                                          marginLeft: "177px",
-                                        }}
-                                        value={itemProduct.quantity_select}
-                                        onChange={(value) => {
-                                          let selectArr = [
-                                            ...productPurchase.initial_selection,
-                                          ];
-                                          if (
-                                            !selectArr.includes(
-                                              itemProduct.id
-                                            ) &&
-                                            value
-                                          ) {
-                                            selectArr.push(itemProduct.id);
+                                      <div>
+                                        <InputNum
+                                          className="sp-product-purchase-custom-input-quantity"
+                                          style={{
+                                            width: "46%",
+                                            marginLeft: "177px",
+                                          }}
+                                          value={itemProduct.quantity_select}
+                                          onChange={(value) => {
+                                            let selectArr = [
+                                              ...productPurchase.initial_selection,
+                                            ];
+                                            if (
+                                              !selectArr.includes(
+                                                itemProduct.id
+                                              ) &&
+                                              value
+                                            ) {
+                                              selectArr.push(itemProduct.id);
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                selectArr,
+                                                "initial_selection"
+                                              );
+                                            }
                                             onChangeValue(
                                               indexContent,
                                               content.type,
-                                              selectArr,
-                                              "initial_selection"
+                                              value,
+                                              "products",
+                                              indexProduct,
+                                              "quantity_select"
                                             );
-                                          }
-                                          onChangeValue(
-                                            indexContent,
-                                            content.type,
-                                            value,
-                                            "products",
-                                            indexProduct,
-                                            "quantity_select"
-                                          );
-                                        }}
-                                        controls={false}
-                                        min={1}
-                                        disabled={disabled}
-                                        max={
-                                          itemProduct.quantity_limit ||
-                                          Number.MAX_SAFE_INTEGER
-                                        }
-                                        addonAfter={
-                                          <div
-                                            style={{
-                                              padding: "4px 11px",
-                                              cursor: "pointer",
-                                            }}
-                                            onClick={() => {
-                                              if (!disabled) {
-                                                if (
-                                                  itemProduct.quantity_select <
-                                                  (itemProduct.quantity_limit ||
-                                                    Number.MAX_SAFE_INTEGER)
-                                                ) {
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    itemProduct.quantity_select +
-                                                      1,
-                                                    "products",
-                                                    indexProduct,
-                                                    "quantity_select"
-                                                  );
-                                                }
-                                                let selectArr = [
-                                                  ...productPurchase.initial_selection,
-                                                ];
-                                                if (
-                                                  !selectArr.includes(
-                                                    itemProduct.id
-                                                  )
-                                                ) {
-                                                  selectArr.push(
-                                                    itemProduct.id
-                                                  );
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    selectArr,
-                                                    "initial_selection"
-                                                  );
-                                                }
-                                              }
-                                            }}
-                                          >
-                                            +
-                                          </div>
-                                        }
-                                        addonBefore={
-                                          <div
-                                            style={{
-                                              padding: "4px 11px",
-                                              cursor: "pointer",
-                                            }}
-                                            onClick={() => {
-                                              if (!disabled) {
-                                                if (
-                                                  itemProduct.quantity_select >
-                                                  1
-                                                ) {
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    itemProduct.quantity_select -
-                                                      1,
-                                                    "products",
-                                                    indexProduct,
-                                                    "quantity_select"
-                                                  );
-                                                }
-                                                let selectArr = [
-                                                  ...productPurchase.initial_selection,
-                                                ];
-                                                if (
-                                                  !selectArr.includes(
-                                                    itemProduct.id
-                                                  )
-                                                ) {
-                                                  selectArr.push(
-                                                    itemProduct.id
-                                                  );
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    selectArr,
-                                                    "initial_selection"
-                                                  );
-                                                }
-                                              }
-                                            }}
-                                          >
-                                            -
-                                          </div>
-                                        }
-                                      />
-                                      {errors?.[
-                                        `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
-                                      ] && (
-                                        <div
-                                          style={{
-                                            color: "#FF7E00",
-                                            fontSize: "11px",
-                                            width: "46%",
-                                            marginLeft: "137px",
                                           }}
-                                        >
-                                          {
-                                            errors?.[
-                                              `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
-                                            ]
+                                          controls={false}
+                                          min={1}
+                                          disabled={disabled}
+                                          max={
+                                            itemProduct.quantity_limit ||
+                                            Number.MAX_SAFE_INTEGER
                                           }
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
+                                          addonAfter={
+                                            <div
+                                              style={{
+                                                padding: "4px 11px",
+                                                cursor: "pointer",
+                                              }}
+                                              onClick={() => {
+                                                if (!disabled) {
+                                                  if (
+                                                    itemProduct.quantity_select <
+                                                    (itemProduct.quantity_limit ||
+                                                      Number.MAX_SAFE_INTEGER)
+                                                  ) {
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      itemProduct.quantity_select +
+                                                      1,
+                                                      "products",
+                                                      indexProduct,
+                                                      "quantity_select"
+                                                    );
+                                                  }
+                                                  let selectArr = [
+                                                    ...productPurchase.initial_selection,
+                                                  ];
+                                                  if (
+                                                    !selectArr.includes(
+                                                      itemProduct.id
+                                                    )
+                                                  ) {
+                                                    selectArr.push(
+                                                      itemProduct.id
+                                                    );
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      selectArr,
+                                                      "initial_selection"
+                                                    );
+                                                  }
+                                                }
+                                              }}
+                                            >
+                                              +
+                                            </div>
+                                          }
+                                          addonBefore={
+                                            <div
+                                              style={{
+                                                padding: "4px 11px",
+                                                cursor: "pointer",
+                                              }}
+                                              onClick={() => {
+                                                if (!disabled) {
+                                                  if (
+                                                    itemProduct.quantity_select >
+                                                    1
+                                                  ) {
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      itemProduct.quantity_select -
+                                                      1,
+                                                      "products",
+                                                      indexProduct,
+                                                      "quantity_select"
+                                                    );
+                                                  }
+                                                  let selectArr = [
+                                                    ...productPurchase.initial_selection,
+                                                  ];
+                                                  if (
+                                                    !selectArr.includes(
+                                                      itemProduct.id
+                                                    )
+                                                  ) {
+                                                    selectArr.push(
+                                                      itemProduct.id
+                                                    );
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      selectArr,
+                                                      "initial_selection"
+                                                    );
+                                                  }
+                                                }
+                                              }}
+                                            >
+                                              -
+                                            </div>
+                                          }
+                                        />
+                                        {errors?.[
+                                          `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                        ] && (
+                                            <div
+                                              style={{
+                                                color: "#FF7E00",
+                                                fontSize: "11px",
+                                                width: "46%",
+                                                marginLeft: "137px",
+                                              }}
+                                            >
+                                              {
+                                                errors?.[
+                                                `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                                ]
+                                              }
+                                            </div>
+                                          )}
+                                      </div>
+                                    )}
                                 </div>
                               );
                             }
@@ -8370,203 +8646,203 @@ const UserMessage = ({
                                       {(productPurchase.product_name_display ||
                                         productPurchase.price_display ||
                                         productPurchase.product_number_display) && (
-                                        <div className="ss-user-preivew-product-purchase-infor">
-                                          {productPurchase.product_name_display &&
-                                            itemProduct.title && (
-                                              <div className="ss-user-overview-product-purchase-infor-title">
-                                                {itemProduct.title}
-                                              </div>
-                                            )}
-                                          {productPurchase.product_number_display &&
-                                            itemProduct.item_number && (
-                                              <div className="ss-user-overview-product-purchase-infor-item-number">
-                                                商品番号:{" "}
-                                                {itemProduct.item_number}
-                                              </div>
-                                            )}
-                                          {itemProduct.price_display_custom ? (
-                                            <div className="ss-user-overview-product-purchase-infor-price">
-                                              {itemProduct.price_display_custom}
-                                            </div>
-                                          ) : (
-                                            productPurchase.price_display &&
-                                            itemProduct.item_price && (
+                                          <div className="ss-user-preivew-product-purchase-infor">
+                                            {productPurchase.product_name_display &&
+                                              itemProduct.title && (
+                                                <div className="ss-user-overview-product-purchase-infor-title">
+                                                  {itemProduct.title}
+                                                </div>
+                                              )}
+                                            {productPurchase.product_number_display &&
+                                              itemProduct.item_number && (
+                                                <div className="ss-user-overview-product-purchase-infor-item-number">
+                                                  商品番号:{" "}
+                                                  {itemProduct.item_number}
+                                                </div>
+                                              )}
+                                            {itemProduct.price_display_custom ? (
                                               <div className="ss-user-overview-product-purchase-infor-price">
-                                                値段: {itemProduct.item_price}{" "}
-                                                円
+                                                {itemProduct.price_display_custom}
                                               </div>
-                                            )
-                                          )}
-                                          {(productPurchase.quantity_designation_all ||
-                                            itemProduct.is_quantity_designation) &&
-                                          itemProduct.quantity_limit ? (
-                                            <div className="ss-user-overview-product-purchase-infor-price">
-                                              数量：最大
-                                              {itemProduct.quantity_limit}個まで
-                                            </div>
-                                          ) : (
-                                            ""
-                                          )}
-                                          {/* {productPurchase.multiple_item_purchase &&
+                                            ) : (
+                                              productPurchase.price_display &&
+                                              itemProduct.item_price && (
+                                                <div className="ss-user-overview-product-purchase-infor-price">
+                                                  値段: {itemProduct.item_price}{" "}
+                                                  円
+                                                </div>
+                                              )
+                                            )}
+                                            {(productPurchase.quantity_designation_all ||
+                                              itemProduct.is_quantity_designation) &&
+                                              itemProduct.quantity_limit ? (
+                                              <div className="ss-user-overview-product-purchase-infor-price">
+                                                数量：最大
+                                                {itemProduct.quantity_limit}個まで
+                                              </div>
+                                            ) : (
+                                              ""
+                                            )}
+                                            {/* {productPurchase.multiple_item_purchase &&
                                         <div className="ss-user-overview-product-purchase-infor-price">
                                           Multiple item purchase
                                         </div>
                                       } */}
-                                        </div>
-                                      )}
+                                          </div>
+                                        )}
                                     </div>
                                   </Radio>
                                   {(productPurchase.quantity_designation_all ||
                                     itemProduct.is_quantity_designation) && (
-                                    <div>
-                                      <InputNum
-                                        className="sp-product-purchase-custom-input-quantity"
-                                        style={{
-                                          width: "46%",
-                                          marginLeft: "177px",
-                                        }}
-                                        value={itemProduct.quantity_select}
-                                        onChange={(value) => {
-                                          let selectArr = [
-                                            ...productPurchase.initial_selection,
-                                          ];
-                                          if (
-                                            !selectArr.includes(
-                                              itemProduct.id
-                                            ) &&
-                                            value
-                                          ) {
+                                      <div>
+                                        <InputNum
+                                          className="sp-product-purchase-custom-input-quantity"
+                                          style={{
+                                            width: "46%",
+                                            marginLeft: "177px",
+                                          }}
+                                          value={itemProduct.quantity_select}
+                                          onChange={(value) => {
+                                            let selectArr = [
+                                              ...productPurchase.initial_selection,
+                                            ];
+                                            if (
+                                              !selectArr.includes(
+                                                itemProduct.id
+                                              ) &&
+                                              value
+                                            ) {
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                [itemProduct.id],
+                                                "initial_selection"
+                                              );
+                                            }
                                             onChangeValue(
                                               indexContent,
                                               content.type,
-                                              [itemProduct.id],
-                                              "initial_selection"
+                                              value,
+                                              "products",
+                                              indexProduct,
+                                              "quantity_select"
                                             );
-                                          }
-                                          onChangeValue(
-                                            indexContent,
-                                            content.type,
-                                            value,
-                                            "products",
-                                            indexProduct,
-                                            "quantity_select"
-                                          );
-                                        }}
-                                        controls={false}
-                                        disabled={disabled}
-                                        min={1}
-                                        max={
-                                          itemProduct.quantity_limit ||
-                                          Number.MAX_SAFE_INTEGER
-                                        }
-                                        addonAfter={
-                                          <div
-                                            style={{
-                                              padding: "4px 11px",
-                                              cursor: "pointer",
-                                            }}
-                                            onClick={() => {
-                                              if (!disabled) {
-                                                if (
-                                                  itemProduct.quantity_select <
-                                                  (itemProduct.quantity_limit ||
-                                                    Number.MAX_SAFE_INTEGER)
-                                                ) {
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    itemProduct.quantity_select +
-                                                      1,
-                                                    "products",
-                                                    indexProduct,
-                                                    "quantity_select"
-                                                  );
-                                                }
-                                                let selectArr = [
-                                                  ...productPurchase.initial_selection,
-                                                ];
-                                                if (
-                                                  !selectArr.includes(
-                                                    itemProduct.id
-                                                  )
-                                                ) {
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    [itemProduct.id],
-                                                    "initial_selection"
-                                                  );
-                                                }
-                                              }
-                                            }}
-                                          >
-                                            +
-                                          </div>
-                                        }
-                                        addonBefore={
-                                          <div
-                                            style={{
-                                              padding: "4px 11px",
-                                              cursor: "pointer",
-                                            }}
-                                            onClick={() => {
-                                              if (!disabled) {
-                                                if (
-                                                  itemProduct.quantity_select >
-                                                  1
-                                                ) {
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    itemProduct.quantity_select -
-                                                      1,
-                                                    "products",
-                                                    indexProduct,
-                                                    "quantity_select"
-                                                  );
-                                                }
-                                                let selectArr = [
-                                                  ...productPurchase.initial_selection,
-                                                ];
-                                                if (
-                                                  !selectArr.includes(
-                                                    itemProduct.id
-                                                  )
-                                                ) {
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    [itemProduct.id],
-                                                    "initial_selection"
-                                                  );
-                                                }
-                                              }
-                                            }}
-                                          >
-                                            -
-                                          </div>
-                                        }
-                                      />
-                                      {errors?.[
-                                        `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
-                                      ] && (
-                                        <div
-                                          style={{
-                                            color: "#FF7E00",
-                                            fontSize: "11px",
-                                            width: "46%",
-                                            marginLeft: "137px",
                                           }}
-                                        >
-                                          {
-                                            errors?.[
-                                              `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
-                                            ]
+                                          controls={false}
+                                          disabled={disabled}
+                                          min={1}
+                                          max={
+                                            itemProduct.quantity_limit ||
+                                            Number.MAX_SAFE_INTEGER
                                           }
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
+                                          addonAfter={
+                                            <div
+                                              style={{
+                                                padding: "4px 11px",
+                                                cursor: "pointer",
+                                              }}
+                                              onClick={() => {
+                                                if (!disabled) {
+                                                  if (
+                                                    itemProduct.quantity_select <
+                                                    (itemProduct.quantity_limit ||
+                                                      Number.MAX_SAFE_INTEGER)
+                                                  ) {
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      itemProduct.quantity_select +
+                                                      1,
+                                                      "products",
+                                                      indexProduct,
+                                                      "quantity_select"
+                                                    );
+                                                  }
+                                                  let selectArr = [
+                                                    ...productPurchase.initial_selection,
+                                                  ];
+                                                  if (
+                                                    !selectArr.includes(
+                                                      itemProduct.id
+                                                    )
+                                                  ) {
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      [itemProduct.id],
+                                                      "initial_selection"
+                                                    );
+                                                  }
+                                                }
+                                              }}
+                                            >
+                                              +
+                                            </div>
+                                          }
+                                          addonBefore={
+                                            <div
+                                              style={{
+                                                padding: "4px 11px",
+                                                cursor: "pointer",
+                                              }}
+                                              onClick={() => {
+                                                if (!disabled) {
+                                                  if (
+                                                    itemProduct.quantity_select >
+                                                    1
+                                                  ) {
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      itemProduct.quantity_select -
+                                                      1,
+                                                      "products",
+                                                      indexProduct,
+                                                      "quantity_select"
+                                                    );
+                                                  }
+                                                  let selectArr = [
+                                                    ...productPurchase.initial_selection,
+                                                  ];
+                                                  if (
+                                                    !selectArr.includes(
+                                                      itemProduct.id
+                                                    )
+                                                  ) {
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      [itemProduct.id],
+                                                      "initial_selection"
+                                                    );
+                                                  }
+                                                }
+                                              }}
+                                            >
+                                              -
+                                            </div>
+                                          }
+                                        />
+                                        {errors?.[
+                                          `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                        ] && (
+                                            <div
+                                              style={{
+                                                color: "#FF7E00",
+                                                fontSize: "11px",
+                                                width: "46%",
+                                                marginLeft: "137px",
+                                              }}
+                                            >
+                                              {
+                                                errors?.[
+                                                `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                                ]
+                                              }
+                                            </div>
+                                          )}
+                                      </div>
+                                    )}
                                 </div>
                               );
                             }
@@ -8626,26 +8902,26 @@ const UserMessage = ({
                                       {(productPurchase.product_name_display ||
                                         productPurchase.price_display ||
                                         productPurchase.product_number_display) && (
-                                        <div className="ss-user-overview-product-purchase-infor-type-text_image">
-                                          {productPurchase.product_name_display &&
-                                          itemProduct.title
-                                            ? itemProduct.title
-                                            : ""}{" "}
-                                          {productPurchase.product_number_display &&
-                                          itemProduct.item_number
-                                            ? itemProduct.item_number
-                                            : ""}{" "}
-                                          {itemProduct.price_display_custom
-                                            ? itemProduct.price_display_custom
-                                            : productPurchase.price_display &&
-                                              itemProduct.item_price
-                                            ? `${itemProduct.item_price} 円`
-                                            : ""}
-                                        </div>
-                                      )}
+                                          <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                            {productPurchase.product_name_display &&
+                                              itemProduct.title
+                                              ? itemProduct.title
+                                              : ""}{" "}
+                                            {productPurchase.product_number_display &&
+                                              itemProduct.item_number
+                                              ? itemProduct.item_number
+                                              : ""}{" "}
+                                            {itemProduct.price_display_custom
+                                              ? itemProduct.price_display_custom
+                                              : productPurchase.price_display &&
+                                                itemProduct.item_price
+                                                ? `${itemProduct.item_price} 円`
+                                                : ""}
+                                          </div>
+                                        )}
                                       {(productPurchase.quantity_designation_all ||
                                         itemProduct.is_quantity_designation) &&
-                                      itemProduct.quantity_limit ? (
+                                        itemProduct.quantity_limit ? (
                                         <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                           数量：最大{itemProduct.quantity_limit}
                                           個まで
@@ -8657,157 +8933,157 @@ const UserMessage = ({
                                   </Checkbox>
                                   {(productPurchase.quantity_designation_all ||
                                     itemProduct.is_quantity_designation) && (
-                                    <div>
-                                      <InputNum
-                                        className="sp-product-purchase-custom-input-quantity"
-                                        value={itemProduct.quantity_select}
-                                        onChange={(value) => {
-                                          let selectArr = [
-                                            ...productPurchase.initial_selection,
-                                          ];
-                                          if (
-                                            !selectArr.includes(
-                                              itemProduct.id
-                                            ) &&
-                                            value
-                                          ) {
-                                            selectArr.push(itemProduct.id);
+                                      <div>
+                                        <InputNum
+                                          className="sp-product-purchase-custom-input-quantity"
+                                          value={itemProduct.quantity_select}
+                                          onChange={(value) => {
+                                            let selectArr = [
+                                              ...productPurchase.initial_selection,
+                                            ];
+                                            if (
+                                              !selectArr.includes(
+                                                itemProduct.id
+                                              ) &&
+                                              value
+                                            ) {
+                                              selectArr.push(itemProduct.id);
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                selectArr,
+                                                "initial_selection"
+                                              );
+                                            }
                                             onChangeValue(
                                               indexContent,
                                               content.type,
-                                              selectArr,
-                                              "initial_selection"
+                                              value,
+                                              "products",
+                                              indexProduct,
+                                              "quantity_select"
                                             );
-                                          }
-                                          onChangeValue(
-                                            indexContent,
-                                            content.type,
-                                            value,
-                                            "products",
-                                            indexProduct,
-                                            "quantity_select"
-                                          );
-                                        }}
-                                        controls={false}
-                                        min={1}
-                                        disabled={disabled}
-                                        style={{ width: "46%" }}
-                                        max={
-                                          itemProduct.quantity_limit ||
-                                          Number.MAX_SAFE_INTEGER
-                                        }
-                                        addonAfter={
-                                          <div
-                                            style={{
-                                              padding: "4px 11px",
-                                              cursor: "pointer",
-                                            }}
-                                            onClick={() => {
-                                              if (!disabled) {
-                                                if (
-                                                  itemProduct.quantity_select <
-                                                  (itemProduct.quantity_limit ||
-                                                    Number.MAX_SAFE_INTEGER)
-                                                ) {
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    itemProduct.quantity_select +
-                                                      1,
-                                                    "products",
-                                                    indexProduct,
-                                                    "quantity_select"
-                                                  );
-                                                }
-                                                let selectArr = [
-                                                  ...productPurchase.initial_selection,
-                                                ];
-                                                if (
-                                                  !selectArr.includes(
-                                                    itemProduct.id
-                                                  )
-                                                ) {
-                                                  selectArr.push(
-                                                    itemProduct.id
-                                                  );
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    selectArr,
-                                                    "initial_selection"
-                                                  );
-                                                }
-                                              }
-                                            }}
-                                          >
-                                            +
-                                          </div>
-                                        }
-                                        addonBefore={
-                                          <div
-                                            style={{
-                                              padding: "4px 11px",
-                                              cursor: "pointer",
-                                            }}
-                                            onClick={() => {
-                                              if (!disabled) {
-                                                if (
-                                                  itemProduct.quantity_select >
-                                                  1
-                                                ) {
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    itemProduct.quantity_select -
-                                                      1,
-                                                    "products",
-                                                    indexProduct,
-                                                    "quantity_select"
-                                                  );
-                                                }
-                                                let selectArr = [
-                                                  ...productPurchase.initial_selection,
-                                                ];
-                                                if (
-                                                  !selectArr.includes(
-                                                    itemProduct.id
-                                                  )
-                                                ) {
-                                                  selectArr.push(
-                                                    itemProduct.id
-                                                  );
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    selectArr,
-                                                    "initial_selection"
-                                                  );
-                                                }
-                                              }
-                                            }}
-                                          >
-                                            -
-                                          </div>
-                                        }
-                                      />
-                                      {errors?.[
-                                        `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
-                                      ] && (
-                                        <div
-                                          style={{
-                                            color: "#FF7E00",
-                                            fontSize: "11px",
                                           }}
-                                        >
-                                          {
-                                            errors?.[
-                                              `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
-                                            ]
+                                          controls={false}
+                                          min={1}
+                                          disabled={disabled}
+                                          style={{ width: "46%" }}
+                                          max={
+                                            itemProduct.quantity_limit ||
+                                            Number.MAX_SAFE_INTEGER
                                           }
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
+                                          addonAfter={
+                                            <div
+                                              style={{
+                                                padding: "4px 11px",
+                                                cursor: "pointer",
+                                              }}
+                                              onClick={() => {
+                                                if (!disabled) {
+                                                  if (
+                                                    itemProduct.quantity_select <
+                                                    (itemProduct.quantity_limit ||
+                                                      Number.MAX_SAFE_INTEGER)
+                                                  ) {
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      itemProduct.quantity_select +
+                                                      1,
+                                                      "products",
+                                                      indexProduct,
+                                                      "quantity_select"
+                                                    );
+                                                  }
+                                                  let selectArr = [
+                                                    ...productPurchase.initial_selection,
+                                                  ];
+                                                  if (
+                                                    !selectArr.includes(
+                                                      itemProduct.id
+                                                    )
+                                                  ) {
+                                                    selectArr.push(
+                                                      itemProduct.id
+                                                    );
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      selectArr,
+                                                      "initial_selection"
+                                                    );
+                                                  }
+                                                }
+                                              }}
+                                            >
+                                              +
+                                            </div>
+                                          }
+                                          addonBefore={
+                                            <div
+                                              style={{
+                                                padding: "4px 11px",
+                                                cursor: "pointer",
+                                              }}
+                                              onClick={() => {
+                                                if (!disabled) {
+                                                  if (
+                                                    itemProduct.quantity_select >
+                                                    1
+                                                  ) {
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      itemProduct.quantity_select -
+                                                      1,
+                                                      "products",
+                                                      indexProduct,
+                                                      "quantity_select"
+                                                    );
+                                                  }
+                                                  let selectArr = [
+                                                    ...productPurchase.initial_selection,
+                                                  ];
+                                                  if (
+                                                    !selectArr.includes(
+                                                      itemProduct.id
+                                                    )
+                                                  ) {
+                                                    selectArr.push(
+                                                      itemProduct.id
+                                                    );
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      selectArr,
+                                                      "initial_selection"
+                                                    );
+                                                  }
+                                                }
+                                              }}
+                                            >
+                                              -
+                                            </div>
+                                          }
+                                        />
+                                        {errors?.[
+                                          `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                        ] && (
+                                            <div
+                                              style={{
+                                                color: "#FF7E00",
+                                                fontSize: "11px",
+                                              }}
+                                            >
+                                              {
+                                                errors?.[
+                                                `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                                ]
+                                              }
+                                            </div>
+                                          )}
+                                      </div>
+                                    )}
                                 </div>
                               );
                             }
@@ -8861,26 +9137,26 @@ const UserMessage = ({
                                       {(productPurchase.product_name_display ||
                                         productPurchase.price_display ||
                                         productPurchase.product_number_display) && (
-                                        <div className="ss-user-overview-product-purchase-infor-type-text_image">
-                                          {productPurchase.product_name_display &&
-                                          itemProduct.title
-                                            ? itemProduct.title
-                                            : ""}{" "}
-                                          {productPurchase.product_number_display &&
-                                          itemProduct.item_number
-                                            ? itemProduct.item_number
-                                            : ""}{" "}
-                                          {itemProduct.price_display_custom
-                                            ? itemProduct.price_display_custom
-                                            : productPurchase.price_display &&
-                                              itemProduct.item_price
-                                            ? `${itemProduct.item_price} 円`
-                                            : ""}
-                                        </div>
-                                      )}
+                                          <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                            {productPurchase.product_name_display &&
+                                              itemProduct.title
+                                              ? itemProduct.title
+                                              : ""}{" "}
+                                            {productPurchase.product_number_display &&
+                                              itemProduct.item_number
+                                              ? itemProduct.item_number
+                                              : ""}{" "}
+                                            {itemProduct.price_display_custom
+                                              ? itemProduct.price_display_custom
+                                              : productPurchase.price_display &&
+                                                itemProduct.item_price
+                                                ? `${itemProduct.item_price} 円`
+                                                : ""}
+                                          </div>
+                                        )}
                                       {(productPurchase.quantity_designation_all ||
                                         itemProduct.is_quantity_designation) &&
-                                      itemProduct.quantity_limit ? (
+                                        itemProduct.quantity_limit ? (
                                         <div className="ss-user-overview-product-purchase-infor-type-text_image">
                                           数量：最大{itemProduct.quantity_limit}
                                           個まで
@@ -8892,150 +9168,150 @@ const UserMessage = ({
                                   </Radio>
                                   {(productPurchase.quantity_designation_all ||
                                     itemProduct.is_quantity_designation) && (
-                                    <div>
-                                      <InputNum
-                                        className="sp-product-purchase-custom-input-quantity"
-                                        style={{ width: "46%" }}
-                                        disabled={disabled}
-                                        value={itemProduct.quantity_select}
-                                        onChange={(value) => {
-                                          let selectArr = [
-                                            ...productPurchase.initial_selection,
-                                          ];
-                                          if (
-                                            !selectArr.includes(
-                                              itemProduct.id
-                                            ) &&
-                                            value
-                                          ) {
+                                      <div>
+                                        <InputNum
+                                          className="sp-product-purchase-custom-input-quantity"
+                                          style={{ width: "46%" }}
+                                          disabled={disabled}
+                                          value={itemProduct.quantity_select}
+                                          onChange={(value) => {
+                                            let selectArr = [
+                                              ...productPurchase.initial_selection,
+                                            ];
+                                            if (
+                                              !selectArr.includes(
+                                                itemProduct.id
+                                              ) &&
+                                              value
+                                            ) {
+                                              onChangeValue(
+                                                indexContent,
+                                                content.type,
+                                                [itemProduct.id],
+                                                "initial_selection"
+                                              );
+                                            }
                                             onChangeValue(
                                               indexContent,
                                               content.type,
-                                              [itemProduct.id],
-                                              "initial_selection"
+                                              value,
+                                              "products",
+                                              indexProduct,
+                                              "quantity_select"
                                             );
-                                          }
-                                          onChangeValue(
-                                            indexContent,
-                                            content.type,
-                                            value,
-                                            "products",
-                                            indexProduct,
-                                            "quantity_select"
-                                          );
-                                        }}
-                                        controls={false}
-                                        min={1}
-                                        max={
-                                          itemProduct.quantity_limit ||
-                                          Number.MAX_SAFE_INTEGER
-                                        }
-                                        addonAfter={
-                                          <div
-                                            style={{
-                                              padding: "4px 11px",
-                                              cursor: "pointer",
-                                            }}
-                                            onClick={() => {
-                                              if (!disabled) {
-                                                if (
-                                                  itemProduct.quantity_select <
-                                                  (itemProduct.quantity_limit ||
-                                                    Number.MAX_SAFE_INTEGER)
-                                                ) {
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    itemProduct.quantity_select +
-                                                      1,
-                                                    "products",
-                                                    indexProduct,
-                                                    "quantity_select"
-                                                  );
-                                                }
-                                                let selectArr = [
-                                                  ...productPurchase.initial_selection,
-                                                ];
-                                                if (
-                                                  !selectArr.includes(
-                                                    itemProduct.id
-                                                  )
-                                                ) {
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    [itemProduct.id],
-                                                    "initial_selection"
-                                                  );
-                                                }
-                                              }
-                                            }}
-                                          >
-                                            +
-                                          </div>
-                                        }
-                                        addonBefore={
-                                          <div
-                                            style={{
-                                              padding: "4px 11px",
-                                              cursor: "pointer",
-                                            }}
-                                            onClick={() => {
-                                              if (!disabled) {
-                                                if (
-                                                  itemProduct.quantity_select >
-                                                  1
-                                                ) {
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    itemProduct.quantity_select -
-                                                      1,
-                                                    "products",
-                                                    indexProduct,
-                                                    "quantity_select"
-                                                  );
-                                                }
-                                                let selectArr = [
-                                                  ...productPurchase.initial_selection,
-                                                ];
-                                                if (
-                                                  !selectArr.includes(
-                                                    itemProduct.id
-                                                  )
-                                                ) {
-                                                  onChangeValue(
-                                                    indexContent,
-                                                    content.type,
-                                                    [itemProduct.id],
-                                                    "initial_selection"
-                                                  );
-                                                }
-                                              }
-                                            }}
-                                          >
-                                            -
-                                          </div>
-                                        }
-                                      />
-                                      {errors?.[
-                                        `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
-                                      ] && (
-                                        <div
-                                          style={{
-                                            color: "#FF7E00",
-                                            fontSize: "11px",
                                           }}
-                                        >
-                                          {
-                                            errors?.[
-                                              `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
-                                            ]
+                                          controls={false}
+                                          min={1}
+                                          max={
+                                            itemProduct.quantity_limit ||
+                                            Number.MAX_SAFE_INTEGER
                                           }
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
+                                          addonAfter={
+                                            <div
+                                              style={{
+                                                padding: "4px 11px",
+                                                cursor: "pointer",
+                                              }}
+                                              onClick={() => {
+                                                if (!disabled) {
+                                                  if (
+                                                    itemProduct.quantity_select <
+                                                    (itemProduct.quantity_limit ||
+                                                      Number.MAX_SAFE_INTEGER)
+                                                  ) {
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      itemProduct.quantity_select +
+                                                      1,
+                                                      "products",
+                                                      indexProduct,
+                                                      "quantity_select"
+                                                    );
+                                                  }
+                                                  let selectArr = [
+                                                    ...productPurchase.initial_selection,
+                                                  ];
+                                                  if (
+                                                    !selectArr.includes(
+                                                      itemProduct.id
+                                                    )
+                                                  ) {
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      [itemProduct.id],
+                                                      "initial_selection"
+                                                    );
+                                                  }
+                                                }
+                                              }}
+                                            >
+                                              +
+                                            </div>
+                                          }
+                                          addonBefore={
+                                            <div
+                                              style={{
+                                                padding: "4px 11px",
+                                                cursor: "pointer",
+                                              }}
+                                              onClick={() => {
+                                                if (!disabled) {
+                                                  if (
+                                                    itemProduct.quantity_select >
+                                                    1
+                                                  ) {
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      itemProduct.quantity_select -
+                                                      1,
+                                                      "products",
+                                                      indexProduct,
+                                                      "quantity_select"
+                                                    );
+                                                  }
+                                                  let selectArr = [
+                                                    ...productPurchase.initial_selection,
+                                                  ];
+                                                  if (
+                                                    !selectArr.includes(
+                                                      itemProduct.id
+                                                    )
+                                                  ) {
+                                                    onChangeValue(
+                                                      indexContent,
+                                                      content.type,
+                                                      [itemProduct.id],
+                                                      "initial_selection"
+                                                    );
+                                                  }
+                                                }
+                                              }}
+                                            >
+                                              -
+                                            </div>
+                                          }
+                                        />
+                                        {errors?.[
+                                          `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                        ] && (
+                                            <div
+                                              style={{
+                                                color: "#FF7E00",
+                                                fontSize: "11px",
+                                              }}
+                                            >
+                                              {
+                                                errors?.[
+                                                `message${indexMessage}_content${indexContent}_${content.type}_${indexProduct}`
+                                                ]
+                                              }
+                                            </div>
+                                          )}
+                                      </div>
+                                    )}
                                 </div>
                               );
                             }
@@ -9047,14 +9323,14 @@ const UserMessage = ({
                   {errors?.[
                     `message${indexMessage}_content${indexContent}_${content.type}`
                   ] && (
-                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                      {
-                        errors?.[
+                      <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                        {
+                          errors?.[
                           `message${indexMessage}_content${indexContent}_${content.type}`
-                        ]
-                      }
-                    </div>
-                  )}
+                          ]
+                        }
+                      </div>
+                    )}
                 </div>
               </div>
             )}
@@ -9063,47 +9339,47 @@ const UserMessage = ({
               <div style={{ marginBottom: "10px" }}>
                 {(productPurchaseRadioButton.title_require ||
                   productPurchaseRadioButton.require) && (
-                  <div
-                    className="ss-message__content--user-checkbox-top"
-                    style={{ marginBottom: "0px" }}
-                  >
-                    {productPurchaseRadioButton.title_require && (
-                      <span className="ss-message__content--user-checkbox-title">
-                        {productPurchaseRadioButton.title}
-                      </span>
-                    )}
-                    {productPurchaseRadioButton.require === true && (
-                      <span className="ss-message__content--user-text-input-required">
-                        ※必須
-                      </span>
-                    )}
-                  </div>
-                )}
+                    <div
+                      className="ss-message__content--user-checkbox-top"
+                      style={{ marginBottom: "0px" }}
+                    >
+                      {productPurchaseRadioButton.title_require && (
+                        <span className="ss-message__content--user-checkbox-title">
+                          {productPurchaseRadioButton.title}
+                        </span>
+                      )}
+                      {productPurchaseRadioButton.require === true && (
+                        <span className="ss-message__content--user-text-input-required">
+                          ※必須
+                        </span>
+                      )}
+                    </div>
+                  )}
                 <div>
                   {productPurchaseRadioButton.type ===
                     "text_with_thumbnail_image" && (
-                    <React.Fragment>
-                      <Radio.Group
-                        className="ss-user-preivew-product-purchase-radio-group ss-user-preivew-product-purchase-style-width"
-                        style={{ width: "100%" }}
-                        disabled={disabled}
-                        onChange={(value) => {
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value.target.value,
-                            "initial_selection"
-                          );
-                          if (messageContent.length === 1) onClickNext();
-                        }}
-                        value={productPurchaseRadioButton.initial_selection}
-                      >
-                        {productPurchaseRadioButton.products.map(
-                          (itemProduct, indexProduct) => {
-                            return (
-                              <Radio
-                                value={itemProduct.id}
-                                key={indexProduct}
+                      <React.Fragment>
+                        <Radio.Group
+                          className="ss-user-preivew-product-purchase-radio-group ss-user-preivew-product-purchase-style-width"
+                          style={{ width: "100%" }}
+                          disabled={disabled}
+                          onChange={(value) => {
+                            onChangeValue(
+                              indexContent,
+                              content.type,
+                              value.target.value,
+                              "initial_selection"
+                            );
+                            if (messageContent.length === 1) onClickNext();
+                          }}
+                          value={productPurchaseRadioButton.initial_selection}
+                        >
+                          {productPurchaseRadioButton.products.map(
+                            (itemProduct, indexProduct) => {
+                              return (
+                                <Radio
+                                  value={itemProduct.id}
+                                  key={indexProduct}
                                 // onChange={() => {
                                 //   let selectArr = [...productPurchaseRadioButton.initial_selection];
                                 //   let dataValue;
@@ -9115,54 +9391,54 @@ const UserMessage = ({
                                 //   onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
                                 //   onClickNext();
                                 // }}
-                              >
-                                <div className="ss-user-overview-product-purchase-container">
-                                  <div className="ss-user-preivew-product-purchase-img">
-                                    <img src={itemProduct.img_url} />
-                                  </div>
-                                  {(productPurchaseRadioButton.product_name_display ||
-                                    productPurchaseRadioButton.price_display ||
-                                    productPurchaseRadioButton.product_number_display) && (
-                                    <div className="ss-user-preivew-product-purchase-infor">
-                                      {productPurchaseRadioButton.product_name_display &&
-                                        itemProduct.title && (
-                                          <div className="ss-user-overview-product-purchase-infor-title">
-                                            {itemProduct.title}
-                                          </div>
-                                        )}
-                                      {productPurchaseRadioButton.product_number_display &&
-                                        itemProduct.item_number && (
-                                          <div className="ss-user-overview-product-purchase-infor-item-number">
-                                            商品番号: {itemProduct.item_number}
-                                          </div>
-                                        )}
-                                      {itemProduct.price_display_custom ? (
-                                        <div className="ss-user-overview-product-purchase-infor-price">
-                                          {itemProduct.price_display_custom}
-                                        </div>
-                                      ) : (
-                                        productPurchaseRadioButton.price_display &&
-                                        itemProduct.item_price && (
-                                          <div className="ss-user-overview-product-purchase-infor-price">
-                                            値段: {itemProduct.item_price} 円
-                                          </div>
-                                        )
-                                      )}
-                                      {/* {productPurchaseRadioButton.multiple_item_purchase &&
+                                >
+                                  <div className="ss-user-overview-product-purchase-container">
+                                    <div className="ss-user-preivew-product-purchase-img">
+                                      <img src={itemProduct.img_url} />
+                                    </div>
+                                    {(productPurchaseRadioButton.product_name_display ||
+                                      productPurchaseRadioButton.price_display ||
+                                      productPurchaseRadioButton.product_number_display) && (
+                                        <div className="ss-user-preivew-product-purchase-infor">
+                                          {productPurchaseRadioButton.product_name_display &&
+                                            itemProduct.title && (
+                                              <div className="ss-user-overview-product-purchase-infor-title">
+                                                {itemProduct.title}
+                                              </div>
+                                            )}
+                                          {productPurchaseRadioButton.product_number_display &&
+                                            itemProduct.item_number && (
+                                              <div className="ss-user-overview-product-purchase-infor-item-number">
+                                                商品番号: {itemProduct.item_number}
+                                              </div>
+                                            )}
+                                          {itemProduct.price_display_custom ? (
+                                            <div className="ss-user-overview-product-purchase-infor-price">
+                                              {itemProduct.price_display_custom}
+                                            </div>
+                                          ) : (
+                                            productPurchaseRadioButton.price_display &&
+                                            itemProduct.item_price && (
+                                              <div className="ss-user-overview-product-purchase-infor-price">
+                                                値段: {itemProduct.item_price} 円
+                                              </div>
+                                            )
+                                          )}
+                                          {/* {productPurchaseRadioButton.multiple_item_purchase &&
                                         <div className="ss-user-overview-product-purchase-infor-price">
                                           Multiple item purchase
                                         </div>
                                       } */}
-                                    </div>
-                                  )}
-                                </div>
-                              </Radio>
-                            );
-                          }
-                        )}
-                      </Radio.Group>
-                    </React.Fragment>
-                  )}
+                                        </div>
+                                      )}
+                                  </div>
+                                </Radio>
+                              );
+                            }
+                          )}
+                        </Radio.Group>
+                      </React.Fragment>
+                    )}
                   {productPurchaseRadioButton.type === "text_with_image" && (
                     <React.Fragment>
                       <Radio.Group
@@ -9186,17 +9462,17 @@ const UserMessage = ({
                               <Radio
                                 value={itemProduct.id}
                                 key={indexProduct}
-                                // onChange={() => {
-                                //   let selectArr = [...productPurchaseRadioButton.initial_selection];
-                                //   let dataValue;
-                                //   if (selectArr.includes(itemProduct.id)) {
-                                //     dataValue = [];
-                                //   } else {
-                                //     dataValue = [itemProduct.id];
-                                //   }
-                                //   onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
-                                //   onClickNext();
-                                // }}
+                              // onChange={() => {
+                              //   let selectArr = [...productPurchaseRadioButton.initial_selection];
+                              //   let dataValue;
+                              //   if (selectArr.includes(itemProduct.id)) {
+                              //     dataValue = [];
+                              //   } else {
+                              //     dataValue = [itemProduct.id];
+                              //   }
+                              //   onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
+                              //   onClickNext();
+                              // }}
                               >
                                 <div className="ss-user-overview-product-purchase-container-type-text_image">
                                   <div className="ss-user-overview-product-purchase-img-type-text_image">
@@ -9205,23 +9481,23 @@ const UserMessage = ({
                                   {(productPurchaseRadioButton.product_name_display ||
                                     productPurchaseRadioButton.price_display ||
                                     productPurchaseRadioButton.product_number_display) && (
-                                    <div className="ss-user-overview-product-purchase-infor-type-text_image">
-                                      {productPurchaseRadioButton.product_name_display &&
-                                      itemProduct.title
-                                        ? itemProduct.title
-                                        : ""}{" "}
-                                      {productPurchaseRadioButton.product_number_display &&
-                                      itemProduct.item_number
-                                        ? itemProduct.item_number
-                                        : ""}{" "}
-                                      {itemProduct.price_display_custom
-                                        ? itemProduct.price_display_custom
-                                        : productPurchaseRadioButton.price_display &&
-                                          itemProduct.item_price
-                                        ? `${itemProduct.item_price} 円`
-                                        : ""}
-                                    </div>
-                                  )}
+                                      <div className="ss-user-overview-product-purchase-infor-type-text_image">
+                                        {productPurchaseRadioButton.product_name_display &&
+                                          itemProduct.title
+                                          ? itemProduct.title
+                                          : ""}{" "}
+                                        {productPurchaseRadioButton.product_number_display &&
+                                          itemProduct.item_number
+                                          ? itemProduct.item_number
+                                          : ""}{" "}
+                                        {itemProduct.price_display_custom
+                                          ? itemProduct.price_display_custom
+                                          : productPurchaseRadioButton.price_display &&
+                                            itemProduct.item_price
+                                            ? `${itemProduct.item_price} 円`
+                                            : ""}
+                                      </div>
+                                    )}
                                 </div>
                               </Radio>
                             );
@@ -9235,14 +9511,14 @@ const UserMessage = ({
                   {errors?.[
                     `message${indexMessage}_content${indexContent}_${content.type}`
                   ] && (
-                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                      {
-                        errors?.[
+                      <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                        {
+                          errors?.[
                           `message${indexMessage}_content${indexContent}_${content.type}`
-                        ]
-                      }
-                    </div>
-                  )}
+                          ]
+                        }
+                      </div>
+                    )}
                 </div>
               </div>
             )}
@@ -9289,26 +9565,26 @@ const UserMessage = ({
                     marks={
                       slider.type === "discrete_type"
                         ? {
-                            [slider.min_value]: slider.min_label,
-                            [slider.max_value]: slider.max_label,
-                          }
+                          [slider.min_value]: slider.min_label,
+                          [slider.max_value]: slider.max_label,
+                        }
                         : {
-                            0: slider.min_label,
-                            100: slider.max_label,
-                          }
+                          0: slider.min_label,
+                          100: slider.max_label,
+                        }
                     }
                   />
                   {errors?.[
                     `message${indexMessage}_content${indexContent}_${content.type}`
                   ] && (
-                    <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                      {
-                        errors?.[
+                      <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                        {
+                          errors?.[
                           `message${indexMessage}_content${indexContent}_${content.type}`
-                        ]
-                      }
-                    </div>
-                  )}
+                          ]
+                        }
+                      </div>
+                    )}
                 </div>
               </div>
             )}
@@ -9317,22 +9593,22 @@ const UserMessage = ({
               <div style={{ marginBottom: "10px" }}>
                 {(cardPaymentRadioButton.title_require ||
                   cardPaymentRadioButton.require) && (
-                  <div
-                    className="ss-message__content--user-text-input-top"
-                    style={{ marginBottom: "0px" }}
-                  >
-                    {cardPaymentRadioButton.title_require && (
-                      <span className="ss-message__content--user-text-input-title">
-                        {cardPaymentRadioButton.title}
-                      </span>
-                    )}
-                    {cardPaymentRadioButton.require === true && (
-                      <span className="ss-message__content--user-text-input-required">
-                        ※必須
-                      </span>
-                    )}
-                  </div>
-                )}
+                    <div
+                      className="ss-message__content--user-text-input-top"
+                      style={{ marginBottom: "0px" }}
+                    >
+                      {cardPaymentRadioButton.title_require && (
+                        <span className="ss-message__content--user-text-input-title">
+                          {cardPaymentRadioButton.title}
+                        </span>
+                      )}
+                      {cardPaymentRadioButton.require === true && (
+                        <span className="ss-message__content--user-text-input-required">
+                          ※必須
+                        </span>
+                      )}
+                    </div>
+                  )}
                 {cardPaymentRadioButton.type === "default" && (
                   <Radio.Group
                     style={{ width: "100%", fontSize: "14px" }}
@@ -9563,44 +9839,44 @@ const UserMessage = ({
                   )}
                 {(cardPaymentRadioButton.type !== "picture_radio"
                   ? cardPaymentRadioButton.card_linked_setting.length > 0 &&
-                    cardPaymentRadioButton.card_linked_setting.includes(cardPaymentRadioButton.initial_selection)
+                  cardPaymentRadioButton.card_linked_setting.includes(cardPaymentRadioButton.initial_selection)
                   : cardPaymentRadioButton.card_linked_setting_picture &&
-                    cardPaymentRadioButton.card_linked_setting_picture ===
-                      cardPaymentRadioButton.initial_selection_picture) && (
-                  <React.Fragment>
-                    {cardPaymentRadioButton.payment_method.length !== 0 && (
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "flex-start",
-                          margin: "5px 0px",
-                        }}
-                      >
-                        {cardPaymentRadioButton.payment_method.map(
-                          (itemPayment, index) => {
-                            return (
-                              <div
-                                key={index}
-                                style={{
-                                  width: `${15.6667}%`,
-                                  marginRight: "1%",
-                                }}
-                                className="ss-img-list-bank"
-                              >
-                                {
-                                  dataPaymentMethod.find(
-                                    (item) => item.key === itemPayment
-                                  ).value
-                                }
-                              </div>
-                            );
-                          }
-                        )}
-                      </div>
-                    )}
-                    {cardPaymentRadioButton.separate_type === false ? (
-                      <div className="ss-user-setting__item-bottom">
-                        {/* <InputNum
+                  cardPaymentRadioButton.card_linked_setting_picture ===
+                  cardPaymentRadioButton.initial_selection_picture) && (
+                    <React.Fragment>
+                      {cardPaymentRadioButton.payment_method.length !== 0 && (
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "flex-start",
+                            margin: "5px 0px",
+                          }}
+                        >
+                          {cardPaymentRadioButton.payment_method.map(
+                            (itemPayment, index) => {
+                              return (
+                                <div
+                                  key={index}
+                                  style={{
+                                    width: `${15.6667}%`,
+                                    marginRight: "1%",
+                                  }}
+                                  className="ss-img-list-bank"
+                                >
+                                  {
+                                    dataPaymentMethod.find(
+                                      (item) => item.key === itemPayment
+                                    ).value
+                                  }
+                                </div>
+                              );
+                            }
+                          )}
+                        </div>
+                      )}
+                      {cardPaymentRadioButton.separate_type === false ? (
+                        <div className="ss-user-setting__item-bottom">
+                          {/* <InputNum
                             styleLabel={{ width: '100%' }}
                             className="ss-user-setting-input-limit-character"
                             label="カード番号"
@@ -9622,325 +9898,325 @@ const UserMessage = ({
                             placeholder={cardPaymentRadioButton.card_number_placeholder}
                             onChange={value => onChangeValue(indexContent, content.type, value, 'card_number')}
                           /> */}
-                        <InputCustom
-                          styleLabel={{ width: "100%" }}
-                          id="sp_credit_card_payment"
-                          label="カード番号"
-                          type="number"
-                          onKeyPress={(e) => {
-                            if (e.target.value.length >= 16) e.preventDefault();
-                          }}
-                          disabled={disabled}
-                          onPaste={(e) => {
-                            // Get the pasted value and remove all white space
-                            const value = e.clipboardData
-                              .getData("text")
-                              .replace(/[^0-9]/g, "")
-                              .slice(0, 16);
-                            setTimeout(() => {
-                              document.getElementById(
-                                "sp_credit_card_payment"
-                              ).value = value;
+                          <InputCustom
+                            styleLabel={{ width: "100%" }}
+                            id="sp_credit_card_payment"
+                            label="カード番号"
+                            type="number"
+                            onKeyPress={(e) => {
+                              if (e.target.value.length >= 16) e.preventDefault();
+                            }}
+                            disabled={disabled}
+                            onPaste={(e) => {
+                              // Get the pasted value and remove all white space
+                              const value = e.clipboardData
+                                .getData("text")
+                                .replace(/[^0-9]/g, "")
+                                .slice(0, 16);
+                              setTimeout(() => {
+                                document.getElementById(
+                                  "sp_credit_card_payment"
+                                ).value = value;
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "card_number"
+                                );
+                              }, 10);
+                              // Set the value of the input to the pasted value
+                              // return value;
+                            }}
+                            // max={9999999999999999}
+                            style={{ width: "100%", marginLeft: "0px" }}
+                            value={cardPaymentRadioButton.card_number}
+                            placeholder={
+                              cardPaymentRadioButton.card_number_placeholder
+                            }
+                            onChange={(value) =>
                               onChangeValue(
                                 indexContent,
                                 content.type,
                                 value,
                                 "card_number"
-                              );
-                            }, 10);
-                            // Set the value of the input to the pasted value
-                            // return value;
-                          }}
-                          // max={9999999999999999}
-                          style={{ width: "100%", marginLeft: "0px" }}
-                          value={cardPaymentRadioButton.card_number}
-                          placeholder={
-                            cardPaymentRadioButton.card_number_placeholder
-                          }
-                          onChange={(value) =>
-                            onChangeValue(
-                              indexContent,
-                              content.type,
-                              value,
-                              "card_number"
-                            )
-                          }
-                        />
-                      </div>
-                    ) : (
+                              )
+                            }
+                          />
+                        </div>
+                      ) : (
+                        <div className="ss-user-setting__item-bottom">
+                          <div style={{ width: "100%" }}>カード番号</div>
+                          <div
+                            style={{ width: "100%" }}
+                            className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type"
+                          >
+                            <InputNum
+                              max={9999}
+                              controls={false}
+                              style={{ marginLeft: "0px" }}
+                              disabled={disabled}
+                              maxLength={4}
+                              className="ss-user-setting-input-limit-character"
+                              value={cardPaymentRadioButton.card_number1}
+                              placeholder={
+                                cardPaymentRadioButton.card_number_placeholder1
+                              }
+                              onChange={(value) => {
+                                if ((value + "").length === 4) {
+                                  document
+                                    .getElementById(
+                                      "ss-user-card-number-radio-input2"
+                                    )
+                                    .focus();
+                                  document
+                                    .getElementById(
+                                      "ss-user-card-number-radio-input2"
+                                    )
+                                    .select();
+                                }
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "card_number1"
+                                );
+                              }}
+                            />
+                            <InputNum
+                              max={9999}
+                              id="ss-user-card-number-radio-input2"
+                              controls={false}
+                              style={{ marginLeft: "7px" }}
+                              disabled={disabled}
+                              maxLength={4}
+                              className="ss-user-setting-input-limit-character"
+                              value={cardPaymentRadioButton.card_number2}
+                              placeholder={
+                                cardPaymentRadioButton.card_number_placeholder2
+                              }
+                              onChange={(value) => {
+                                if ((value + "").length === 4) {
+                                  document
+                                    .getElementById(
+                                      "ss-user-card-number-radio-input3"
+                                    )
+                                    .focus();
+                                  document
+                                    .getElementById(
+                                      "ss-user-card-number-radio-input3"
+                                    )
+                                    .select();
+                                }
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "card_number2"
+                                );
+                              }}
+                            />
+                            <InputNum
+                              id="ss-user-card-number-radio-input3"
+                              max={9999}
+                              controls={false}
+                              style={{ marginLeft: "7px" }}
+                              disabled={disabled}
+                              maxLength={4}
+                              className="ss-user-setting-input-limit-character"
+                              value={cardPaymentRadioButton.card_number3}
+                              placeholder={
+                                cardPaymentRadioButton.card_number_placeholder3
+                              }
+                              onChange={(value) => {
+                                if ((value + "").length === 4) {
+                                  document
+                                    .getElementById(
+                                      "ss-user-card-number-radio-input4"
+                                    )
+                                    .focus();
+                                  document
+                                    .getElementById(
+                                      "ss-user-card-number-radio-input4"
+                                    )
+                                    .select();
+                                }
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "card_number3"
+                                );
+                              }}
+                            />
+                            <InputNum
+                              id="ss-user-card-number-radio-input4"
+                              max={9999}
+                              controls={false}
+                              style={{ marginLeft: "7px" }}
+                              disabled={disabled}
+                              maxLength={4}
+                              className="ss-user-setting-input-limit-character"
+                              value={cardPaymentRadioButton.card_number4}
+                              placeholder={
+                                cardPaymentRadioButton.card_number_placeholder4
+                              }
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "card_number4"
+                                )
+                              }
+                            />
+                          </div>
+                        </div>
+                      )}
+                      {cardPaymentRadioButton.is_hide_card_name === false && (
+                        <div className="ss-user-setting__item-bottom">
+                          <InputCustom
+                            className="ss-user-setting-input-overview"
+                            styleLabel={{ width: "100%" }}
+                            label="カード名義"
+                            inline={false}
+                            disabled={disabled}
+                            value={cardPaymentRadioButton.card_holder}
+                            onChange={(value) =>
+                              onChangeValue(
+                                indexContent,
+                                content.type,
+                                value,
+                                "card_holder"
+                              )
+                            }
+                            placeholder={
+                              cardPaymentRadioButton.card_holder_placeholder
+                            }
+                          />
+                        </div>
+                      )}
                       <div className="ss-user-setting__item-bottom">
-                        <div style={{ width: "100%" }}>カード番号</div>
+                        <div style={{ width: "100%" }}>有効期限</div>
+                        {cardPaymentRadioButton.type_date_of_expiry === "ym" && (
+                          <div style={{ display: "flex", width: "100%" }}>
+                            <SelectCustom
+                              style={{ width: "33%" }}
+                              value={cardPaymentRadioButton.year}
+                              disabled={disabled}
+                              placeholder={"年"}
+                              data={dataYearFixed.filter(
+                                (item) =>
+                                  item.key >= new Date().getFullYear() &&
+                                  item.key <= new Date().getFullYear() + 10
+                              )}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "year"
+                                )
+                              }
+                            />
+                            <SelectCustom
+                              style={{ width: "33%", marginLeft: "10px" }}
+                              value={cardPaymentRadioButton.month}
+                              placeholder={"月"}
+                              data={dataMonth}
+                              disabled={disabled}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "month"
+                                )
+                              }
+                            />
+                          </div>
+                        )}
+                        {cardPaymentRadioButton.type_date_of_expiry === "my" && (
+                          <div style={{ display: "flex", width: "100%" }}>
+                            <SelectCustom
+                              style={{ width: "33%" }}
+                              value={cardPaymentRadioButton.month}
+                              placeholder={"月"}
+                              data={dataMonth}
+                              disabled={disabled}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "month"
+                                )
+                              }
+                            />
+                            <SelectCustom
+                              style={{ width: "33%", marginLeft: "10px" }}
+                              value={cardPaymentRadioButton.year}
+                              disabled={disabled}
+                              placeholder={"年"}
+                              data={dataYearFixed.filter(
+                                (item) =>
+                                  item.key >= new Date().getFullYear() &&
+                                  item.key <= new Date().getFullYear() + 10
+                              )}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "year"
+                                )
+                              }
+                            />
+                          </div>
+                        )}
+                      </div>
+                      {cardPaymentRadioButton.is_hide_cvc === false && (
                         <div
-                          style={{ width: "100%" }}
-                          className="ss-user-setting__item-select-bottom-wrapper-flex ss-user-setting-card-number-separate-type"
+                          className="ss-user-setting__item-bottom"
+                          style={{ display: "block" }}
                         >
                           <InputNum
-                            max={9999}
-                            controls={false}
-                            style={{ marginLeft: "0px" }}
-                            disabled={disabled}
-                            maxLength={4}
+                            style={{ marginLeft: "0px", width: "33%" }}
                             className="ss-user-setting-input-limit-character"
-                            value={cardPaymentRadioButton.card_number1}
-                            placeholder={
-                              cardPaymentRadioButton.card_number_placeholder1
-                            }
-                            onChange={(value) => {
-                              if ((value + "").length === 4) {
-                                document
-                                  .getElementById(
-                                    "ss-user-card-number-radio-input2"
-                                  )
-                                  .focus();
-                                document
-                                  .getElementById(
-                                    "ss-user-card-number-radio-input2"
-                                  )
-                                  .select();
-                              }
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                "card_number1"
-                              );
-                            }}
-                          />
-                          <InputNum
                             max={9999}
-                            id="ss-user-card-number-radio-input2"
-                            controls={false}
-                            style={{ marginLeft: "7px" }}
-                            disabled={disabled}
                             maxLength={4}
-                            className="ss-user-setting-input-limit-character"
-                            value={cardPaymentRadioButton.card_number2}
-                            placeholder={
-                              cardPaymentRadioButton.card_number_placeholder2
-                            }
-                            onChange={(value) => {
-                              if ((value + "").length === 4) {
-                                document
-                                  .getElementById(
-                                    "ss-user-card-number-radio-input3"
-                                  )
-                                  .focus();
-                                document
-                                  .getElementById(
-                                    "ss-user-card-number-radio-input3"
-                                  )
-                                  .select();
-                              }
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                "card_number2"
-                              );
-                            }}
-                          />
-                          <InputNum
-                            id="ss-user-card-number-radio-input3"
-                            max={9999}
-                            controls={false}
-                            style={{ marginLeft: "7px" }}
                             disabled={disabled}
-                            maxLength={4}
-                            className="ss-user-setting-input-limit-character"
-                            value={cardPaymentRadioButton.card_number3}
-                            placeholder={
-                              cardPaymentRadioButton.card_number_placeholder3
-                            }
-                            onChange={(value) => {
-                              if ((value + "").length === 4) {
-                                document
-                                  .getElementById(
-                                    "ss-user-card-number-radio-input4"
-                                  )
-                                  .focus();
-                                document
-                                  .getElementById(
-                                    "ss-user-card-number-radio-input4"
-                                  )
-                                  .select();
-                              }
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                "card_number3"
-                              );
-                            }}
-                          />
-                          <InputNum
-                            id="ss-user-card-number-radio-input4"
-                            max={9999}
                             controls={false}
-                            style={{ marginLeft: "7px" }}
-                            disabled={disabled}
-                            maxLength={4}
-                            className="ss-user-setting-input-limit-character"
-                            value={cardPaymentRadioButton.card_number4}
-                            placeholder={
-                              cardPaymentRadioButton.card_number_placeholder4
+                            label={
+                              <span style={{ fontWeight: "400" }}>
+                                CVC <img style={{ width: "8%" }} src={cvcIcon} />
+                              </span>
                             }
+                            value={cardPaymentRadioButton.cvc}
+                            placeholder={cardPaymentRadioButton.cvc_placeholder}
                             onChange={(value) =>
                               onChangeValue(
                                 indexContent,
                                 content.type,
                                 value,
-                                "card_number4"
-                              )
-                            }
-                          />
-                        </div>
-                      </div>
-                    )}
-                    {cardPaymentRadioButton.is_hide_card_name === false && (
-                      <div className="ss-user-setting__item-bottom">
-                        <InputCustom
-                          className="ss-user-setting-input-overview"
-                          styleLabel={{ width: "100%" }}
-                          label="カード名義"
-                          inline={false}
-                          disabled={disabled}
-                          value={cardPaymentRadioButton.card_holder}
-                          onChange={(value) =>
-                            onChangeValue(
-                              indexContent,
-                              content.type,
-                              value,
-                              "card_holder"
-                            )
-                          }
-                          placeholder={
-                            cardPaymentRadioButton.card_holder_placeholder
-                          }
-                        />
-                      </div>
-                    )}
-                    <div className="ss-user-setting__item-bottom">
-                      <div style={{ width: "100%" }}>有効期限</div>
-                      {cardPaymentRadioButton.type_date_of_expiry === "ym" && (
-                        <div style={{ display: "flex", width: "100%" }}>
-                          <SelectCustom
-                            style={{ width: "33%" }}
-                            value={cardPaymentRadioButton.year}
-                            disabled={disabled}
-                            placeholder={"年"}
-                            data={dataYearFixed.filter(
-                              (item) =>
-                                item.key >= new Date().getFullYear() &&
-                                item.key <= new Date().getFullYear() + 10
-                            )}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                "year"
-                              )
-                            }
-                          />
-                          <SelectCustom
-                            style={{ width: "33%", marginLeft: "10px" }}
-                            value={cardPaymentRadioButton.month}
-                            placeholder={"月"}
-                            data={dataMonth}
-                            disabled={disabled}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                "month"
+                                "cvc"
                               )
                             }
                           />
                         </div>
                       )}
-                      {cardPaymentRadioButton.type_date_of_expiry === "my" && (
-                        <div style={{ display: "flex", width: "100%" }}>
-                          <SelectCustom
-                            style={{ width: "33%" }}
-                            value={cardPaymentRadioButton.month}
-                            placeholder={"月"}
-                            data={dataMonth}
-                            disabled={disabled}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                "month"
-                              )
+                      {errors?.[
+                        `message${indexMessage}_content${indexContent}_${content.type}`
+                      ] && (
+                          <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                            {
+                              errors?.[
+                              `message${indexMessage}_content${indexContent}_${content.type}`
+                              ]
                             }
-                          />
-                          <SelectCustom
-                            style={{ width: "33%", marginLeft: "10px" }}
-                            value={cardPaymentRadioButton.year}
-                            disabled={disabled}
-                            placeholder={"年"}
-                            data={dataYearFixed.filter(
-                              (item) =>
-                                item.key >= new Date().getFullYear() &&
-                                item.key <= new Date().getFullYear() + 10
-                            )}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                "year"
-                              )
-                            }
-                          />
-                        </div>
-                      )}
-                    </div>
-                    {cardPaymentRadioButton.is_hide_cvc === false && (
-                      <div
-                        className="ss-user-setting__item-bottom"
-                        style={{ display: "block" }}
-                      >
-                        <InputNum
-                          style={{ marginLeft: "0px", width: "33%" }}
-                          className="ss-user-setting-input-limit-character"
-                          max={9999}
-                          maxLength={4}
-                          disabled={disabled}
-                          controls={false}
-                          label={
-                            <span style={{ fontWeight: "400" }}>
-                              CVC <img style={{ width: "8%" }} src={cvcIcon} />
-                            </span>
-                          }
-                          value={cardPaymentRadioButton.cvc}
-                          placeholder={cardPaymentRadioButton.cvc_placeholder}
-                          onChange={(value) =>
-                            onChangeValue(
-                              indexContent,
-                              content.type,
-                              value,
-                              "cvc"
-                            )
-                          }
-                        />
-                      </div>
-                    )}
-                    {errors?.[
-                      `message${indexMessage}_content${indexContent}_${content.type}`
-                    ] && (
-                      <div style={{ color: "#FF7E00", fontSize: "12px" }}>
-                        {
-                          errors?.[
-                            `message${indexMessage}_content${indexContent}_${content.type}`
-                          ]
-                        }
-                      </div>
-                    )}
-                  </React.Fragment>
-                )}
+                          </div>
+                        )}
+                    </React.Fragment>
+                  )}
               </div>
             )}
             {/* type == 'label_no_transition' */}
