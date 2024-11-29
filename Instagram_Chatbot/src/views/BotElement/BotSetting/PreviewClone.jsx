@@ -2269,10 +2269,10 @@ function Preview() {
   }
 
   function removeLeadingZero(value) {
-        let strValue = value.toString();
-        let result = strValue.replace(/^0+/, '');
-        return typeof value === 'number' ? Number(result) : result;
-}
+    let strValue = value.toString();
+    let result = strValue.replace(/^0+/, '');
+    return typeof value === 'number' ? Number(result) : result;
+  }
 
   function getObjectFukushashiki(obj) {
     if (
@@ -2286,7 +2286,7 @@ function Preview() {
         switch (message.type) {
           case 'text_input':
             {
-              if (message.text_input?.text.value != undefined || message.text_input?.text.valueLeft != undefined|| message.text_input?.text.valueRight != undefined) {
+              if (message.text_input?.text.value != undefined || message.text_input?.text.valueLeft != undefined || message.text_input?.text.valueRight != undefined) {
                 if (message.text_input.text.isSplitInput == true) {
                   const fukuObjectLeft = {
                     type: message.type,
@@ -2325,10 +2325,10 @@ function Preview() {
                 listFukuObject.push(fukuObject);
               }
 
-              if (message.text_input?.phone_number.value != undefined||
-                 message.text_input?.phone_number.value1 != undefined||
-                 message.text_input?.phone_number.value2 != undefined||
-                 message.text_input?.phone_number.value3 != undefined) {
+              if (message.text_input?.phone_number.value != undefined ||
+                message.text_input?.phone_number.value1 != undefined ||
+                message.text_input?.phone_number.value2 != undefined ||
+                message.text_input?.phone_number.value3 != undefined) {
 
                 if (message.text_input.phone_number.withHyphen == false) {
                   const fukuObject = {
@@ -2400,18 +2400,14 @@ function Preview() {
           case "pull_down":
             {
 
-              if(message.pull_down?.customization.length!=0)
-              {
+              if (message.pull_down?.customization.length != 0) {
                 const textInDropdown = message.pull_down.customization.value
-                if(message.pull_down.customization.is_comment == true)
-                {
+                if (message.pull_down.customization.is_comment == true) {
 
                 }
-                else
-                {
+                else {
                   message.pull_down.customization.options_without_comment.forEach((item) => {
-                    if(item.text == textInDropdown)
-                    {
+                    if (item.text == textInDropdown) {
                       const fukuObject = {
                         type: message.type,
                         bindingMode: message.fukushashiki_search_mode,
@@ -2450,7 +2446,7 @@ function Preview() {
               const dataInforFukushashiki = Object.fromEntries(
                 Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
               );
-              
+
               const types = ["day", "month", "year", "hour", "minute", "Day", "Month", "Year", "Hour", "Minute", "valueDay", "valueMonth", "valueYear", "valueHour", "valueMinute"];
               const result = types
                 .filter(type => `${type}` in userInputData)
@@ -2476,12 +2472,20 @@ function Preview() {
               const types = ["building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right"];
               const result = types
                 .filter(type => `value_${type}` in userInputData)
-                .map(type => ({
-                  type: message.zip_code_address.is_use_dropdown ? "dropdown_prefecture" : "zip_code_address",
-                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
-                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                  bindingValue: userInputData[`value_${type}`]
-                }));
+                .map(type => {
+                  const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
+                  if (bindingMode === undefined) {
+                    return null;
+                  }
+                  return {
+                    type: message.zip_code_address.is_use_dropdown ? "dropdown_prefecture" : "zip_code_address",
+                    bindingMode: bindingMode,
+                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                    bindingValue: userInputData[`value_${type}`]
+                  };
+                })
+                .filter(item => item !== null);
+
               listFukuObject.push(...result);
               break;
             }
@@ -2510,23 +2514,23 @@ function Preview() {
               );
               const types = ["card_number", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4"];
               const result = types
-              .filter(type => `${type}` in userInputData)
-              .map(type => {
-                const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
-                const bindingValue = userInputData[`${type}`];
-                if (bindingMode !== undefined && bindingValue !== undefined) {
-                  return {
-                    type: "card_payment_radio_button",
-                    bindingMode,
-                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                    bindingValue
-                  };
-                } else {
-                  return null; 
-                }
-              })
-              .filter(item => item !== null);
-            listFukuObject.push(...result);
+                .filter(type => `${type}` in userInputData)
+                .map(type => {
+                  const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
+                  const bindingValue = userInputData[`${type}`];
+                  if (bindingMode !== undefined && bindingValue !== undefined) {
+                    return {
+                      type: "card_payment_radio_button",
+                      bindingMode,
+                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                      bindingValue
+                    };
+                  } else {
+                    return null;
+                  }
+                })
+                .filter(item => item !== null);
+              listFukuObject.push(...result);
             }
           default:
             {
