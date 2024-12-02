@@ -2325,6 +2325,26 @@ function Preview() {
                 listFukuObject.push(fukuObject);
               }
 
+              if(Object.keys(message.text_input.email_confirmation).length != 0 && message.text_input.email_confirmation != undefined)
+              {
+                const userInputData = Object.fromEntries(
+                  Object.entries(message.text_input.email_confirmation).filter(([key, value]) => key.includes("value"))
+                );
+                const dataInforFukushashiki = Object.fromEntries(
+                  Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+                );
+                const types = ["value", "valueConfirm"];
+                const result = types
+                  .filter(type => `${type}` in userInputData)
+                  .map(type => ({
+                    type: message.type,
+                    bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
+                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                    bindingValue: userInputData[`${type}`]
+                  }));
+                listFukuObject.push(...result);
+              }
+
               if (message.text_input?.phone_number.value != undefined ||
                 message.text_input?.phone_number.value1 != undefined ||
                 message.text_input?.phone_number.value2 != undefined ||
