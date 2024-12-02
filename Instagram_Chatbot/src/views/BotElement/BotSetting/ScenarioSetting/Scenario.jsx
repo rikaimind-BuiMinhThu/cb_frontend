@@ -2338,7 +2338,17 @@ const Scenario = () => {
                       checked={isUseOnlyRegularOrder}
                     />
                     <label>定期注文のみ</label>
-                  </div>                  
+                  </div>
+                  <div>
+                    <input
+                      type="checkbox"
+                      className="ss-user-setting-checkbox-custom"
+                      onChange={(value) => setIsUseFukushashiki(!isUseFukushashiki)}
+                      checked={isUseFukushashiki}
+                    />
+                    <label>複写式利用フラグ</label>
+                  </div>
+                  {/* Overview scenario */}
                   <div style={{ height:`calc(80% - ${errorScenarioName ? '30':'10'}px)`, backgroundColor: '#f6fbff' }}>
                     <div className="ss-overview-detail">
                       {(!dataMessages || dataMessages.length === 0) &&
