@@ -2,7 +2,7 @@ import React from 'react';
 import { MDBIcon } from 'mdbreact';
 import CheckboxCustom from './CheckboxCustom';
 
-const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false, style, classLabel, disabled = false, styleLabel, inline = true, onKeyPress, pattern, onPaste, readOnly = false }) => {
+const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false, style, classLabel, disabled = false, styleLabel, inline = true, onKeyPress, pattern, onPaste, readOnly = false, useFukushashiki = false }) => {
 
     return (
         <React.Fragment>
@@ -15,7 +15,7 @@ const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, plac
                 pattern={pattern}
                 onKeyPress={onKeyPress}
                 name="ss-user-setting__item-text_input-use-api"
-                className={`ss-input-value ss-user-setting-item ${className ? className : ''}`}
+                className={`ss-input-value ${!useFukushashiki ? 'ss-user-setting-item' : ''} ${className || ''}`}
                 placeholder={placeholder}
                 disabled={disabled}
                 value={value}

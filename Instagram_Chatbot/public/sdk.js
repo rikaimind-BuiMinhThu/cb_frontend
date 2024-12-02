@@ -69,8 +69,8 @@ async function displayPopup() {
     !tabletCheck() && !mobileCheck()
       ? "pc"
       : tabletCheck()
-      ? "tablet"
-      : "smartphone";
+        ? "tablet"
+        : "smartphone";
   const response = await fetch(
     `${getEcChatBotApiServerBaseUrl()}/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
     // `https://ec-chatbot-test1.com/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
@@ -117,13 +117,10 @@ async function displayPopup() {
   iframe.style.borderRadius = "0px";
   // iframe.style.display = "none";
   iframe.style.zIndex = "999999";
-  iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${
-    window.location.origin
-  }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}`;
+  iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
+    }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}`;
 
   body.appendChild(iframe);
-
- let chatbotOpenedBefore = false;
 
   window.addEventListener(
     "message",
@@ -132,25 +129,16 @@ async function displayPopup() {
       chatbotH = e.data.heightPc
       chatbotRight = e.data.chatbotRight
       chatbotBottom = e.data.chatbotBottom
-
-      let firstOpen;
-
-      if (!chatbotOpenedBefore && !e.data.isOpen) {
-        firstOpen = true;
-        chatbotOpenedBefore = true;
-      } else {
-        firstOpen = false;
-      }    
-      if (
-        (firstOpen && mobileCheck()) ||
-        (e.data.isOpen && !firstOpen && mobileCheck())
-      ) {
+      if (e.data.fukushashikiResponse) {
+        fillDataFromMessage(e.data.fukushashikiResponse)
+      }      
+      if (e.data.isOpen && mobileCheck()) {
         iframe.width = "100%";
         // iframe.height = "620px";
         iframe.height = "100%";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
-      } else if (firstOpen || (e.data.isOpen && !firstOpen)) {
+      } else if (e.data.isOpen) {
         iframe.width =
           chatbotW && (chatbotRight !== null)
             ? `${parseInt(chatbotW) + parseInt(chatbotRight)}px`
@@ -161,15 +149,12 @@ async function displayPopup() {
             : "700px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
-        // let add = { scenario_data: `${device}_open_chatbot_window` };
-        // // submitForm(url, add)
-        // getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, add)
-      } else if (!e.data.isOpen && !firstOpen && mobileCheck() === true) {
+      } else if (!e.data.isOpen && mobileCheck()) {
         iframe.width = "250px";
         iframe.height = "58px";
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
-      } else if (!e.data.isOpen && !firstOpen) {
+      } else if (!e.data.isOpen) {
         iframe.width =
           chatbotRight
             ? `${parseInt(chatbotRight) + 360}px`
@@ -181,6 +166,188 @@ async function displayPopup() {
     },
     false
   );
+
+  function fillDataFromMessage(obj) {
+    obj.forEach((item) => {
+      switch (item.type) {
+        case "card_payment_radio_button":
+        case "text_input":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+            break;
+          }
+
+        case 'dropdown_prefecture':
+          {
+            fillDataWithTextInSelector(item.bindingMode, item.bindingAddress, item.bindingValue)
+            break;
+          }
+
+        case "zip_code_address":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+            break;
+          }
+        case "agree_term":
+          {
+            if (item.bindingMode == 1) {
+              fillDataAgreementWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataAgreementWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataAgreementWithXPath(item.bindingAddress, item.bindingValue)
+            }
+            break;
+          }
+        case "slider":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+          }
+
+        case "pull_down":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+            break;
+          }
+        default:
+          return;
+      }
+    })
+  }
+
+  function getElementByAddress(mode, address) {
+    if (mode == 1) {
+      const element = document.getElementById(address);
+      return element;
+    }
+    else if (mode == 2) {
+      const element = document.querySelector(address);
+      return element;
+    }
+    else {
+      const element = document.evaluate(address, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      return element;
+    }
+  }
+
+  function fillDataWithTextInSelector(mode, address, value) {
+    const element = getElementByAddress(mode, address);
+    if (element.tagName === 'SELECT') {
+        const optionToSelect = Array.from(element.options).find(option => option.text === value);
+        if (optionToSelect) {
+            fillDataToElement(element, optionToSelect.value);
+        }
+    }
+    else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {        
+            fillDataToElement(element, value);        
+    }
+}
+
+  function fillDataWithId(id, value) {
+    let element = document.getElementById(id);
+    if (element) {
+      fillDataToElement(element,value)
+    }
+
+  }
+
+  function removeLeadingZero(value) {
+    let strValue = value.toString();
+    let result = strValue.replace(/^0+/, '');
+    return typeof value === 'number' ? Number(result) : result;
+  }
+
+  function removeFirstTwoChars(input) {
+    const str = input.toString();
+    if (str.length > 2) {
+      return str.slice(2);
+    } else {
+      return '';
+    }
+  }
+
+  function fillDataToElement(element, value)
+  {
+    element.value = value;
+    if (element.value == undefined || element.value == "") {
+      element.value = removeLeadingZero(value);
+    }
+    if (element.value == undefined || element.value == "") {
+      element.value = removeFirstTwoChars(value);
+    }
+
+  }
+
+  function fillDataWithCssSelector(cssSelector, value) {
+    let element = document.querySelector(cssSelector);
+    if (element) {
+      fillDataToElement(element,value)
+    }
+
+  }
+
+  function fillDataWithXPath(xpathElement, value) {
+    let element = document.evaluate(xpathElement, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    if (element) {
+      fillDataToElement(element,value)
+    }
+
+  }
+
+  function fillDataAgreementWithId(id, value) {
+    let element = document.getElementById(id);
+    if (element && element.type === 'checkbox') {
+      element.checked = value === true;
+    }
+  }
+
+  function fillDataAgreementWithCssSelector(cssSelector, value) {
+    let element = document.querySelector(cssSelector);
+    if (element && element.type === 'checkbox') {
+      element.checked = value === true;
+    }
+  }
+
+  function fillDataAgreementWithXPath(xpathElement, value) {
+    let element = document.evaluate(xpathElement, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    if (element && element.type === 'checkbox') {
+      element.checked = value === true;
+    }
+  }
 
   log("device: ", device);
   setTimeout(() => {
