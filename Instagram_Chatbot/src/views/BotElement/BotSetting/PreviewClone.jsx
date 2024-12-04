@@ -2480,7 +2480,19 @@ function Preview() {
 
               break;
             }
-
+          case 'textarea':
+            {
+              const fukuObject = {
+                type: message.type,
+                bindingMode: message.fukushashiki_search_mode,
+                bindingAddress: message.fukushashiki_search_value,
+                bindingValue: message.textarea.text_input.value,
+              };
+              listFukuObject.push(fukuObject);
+              console.log(fukuObject);
+              
+              break;
+            }
           case 'zip_code_address':
             {
               const userInputData = Object.fromEntries(
