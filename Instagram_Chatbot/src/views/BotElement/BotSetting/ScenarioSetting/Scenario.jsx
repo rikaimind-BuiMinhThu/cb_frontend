@@ -831,7 +831,6 @@ const Scenario = () => {
     api.get(`/api/v1/managements/emails?page=all&chatbot_id=${botId}`).then(res => {
       setDataEmail(res.data.data);
     }).catch((error) => {
-      console.log(error);
       if (error.response?.data.code === 0) {
         tokenExpired()
       }
@@ -840,10 +839,8 @@ const Scenario = () => {
 
   useEffect(() => {
     api.get(`/api/v1/prefectures`).then((res) => {
-      // console.log(res.data.data);
       setDataPrefectures(res.data.data);
     }).catch((error) => {
-      console.log(error);
       if (error.response?.data.code === 0) {
         tokenExpired()
       }
@@ -870,7 +867,6 @@ const Scenario = () => {
       setIsUseOnlyRegularOrder(res.data.data?.isUseOnlyRegularOrder || false);
       setIsUseFukushashiki(res.data.data?.isUseFukushashiki || false);
     }).catch((error) => {
-      console.log(error);
       if (error.response?.data.code === 0) {
         tokenExpired()
       }
@@ -894,7 +890,6 @@ const Scenario = () => {
       const endCursor = res?.data?.data?.productVariants?.pageInfo?.endCursor;
       if (next) setTimeout(() => getListProductVariants(endCursor), 1000);
     }).catch((error) => {
-      console.log(error);
       if (error.response?.data.code === 0) {
         tokenExpired();
       }
@@ -941,10 +936,7 @@ const Scenario = () => {
         // video.appendChild(source);
         // document.getElementById("check-append-vid").appendChild(video);
         // var dura = document.getElementById('checkDurationVid')
-        // console.log('duration: ', video.duration);
-        // console.log(fileInput);
         let duration = await nanoMetadata.video.duration(fileInput);
-        console.log(duration);
         if (duration > 15) {
           setFileError(`15秒以下のビデオをアップロードしてください。`);
           return;
@@ -957,7 +949,6 @@ const Scenario = () => {
       api
         .post(`/api/v1/managements/file/upload`, file)
         .then((res) => {
-          console.log('res upload file type: ', res);
           const urlFile = res.data.data.url;
           let filePost = { user_file: { file_type: type, file_url: res.data.data.path } };
           let typeUpload = ''
@@ -977,7 +968,6 @@ const Scenario = () => {
                 },
               })
             .then((res) => {
-              console.log('response`: ', res);
               api
                 .post(`/api/v1/managements/file`, filePost)
                 .then((res) => {
@@ -1004,14 +994,12 @@ const Scenario = () => {
                   }
                 })
                 .catch((err) => {
-                  console.log(err);
                   if (err.response?.data.code === 0) {
                     tokenExpired();
                   }
                 });
             })
             .catch((err) => {
-              console.log("err: ", err);
               if (err.response?.data.code === 0) {
                 tokenExpired();
               }
@@ -1019,7 +1007,6 @@ const Scenario = () => {
 
         })
         .catch((err) => {
-          console.log(err);
           if (err.response?.data.code === 0) {
             tokenExpired();
           }
@@ -1036,7 +1023,6 @@ const Scenario = () => {
 
   // handle select message
   const handleSelectMessage = (index, belongTo, type) => {
-    console.log(index, type, 'check type');
     if (type) {
       Array.isArray(type) ? setMessageType(type[type.length - 1]?.type) : setMessageType(type);
     };
@@ -1091,7 +1077,6 @@ const Scenario = () => {
   }
 
   const handleSelectContentMessage = (indexContent, contentType) => {
-    console.log(indexContent, contentType);
     // setIndexMessageContentSelect(indexContent);
     setMessageType(contentType);
     document.querySelectorAll('.ss-user-setting__item').forEach((ele) => {
@@ -1118,7 +1103,6 @@ const Scenario = () => {
   const handleChangeBotStatementType = (value) => {
     setMessageType(value);
     // dataMessages && dataMessages.forEach((message, index) => {
-    //   console.log(index, indexMessageSelect, value, message, 'checklkkkkasdlahjs');
     //   if (indexMessageSelect && index === indexMessageSelect) {
     //     message.message_content[0].type = value;
     //   }
@@ -1127,12 +1111,10 @@ const Scenario = () => {
     if (data) {
       for (let i = 0; i < data.length; i++) {
         if (indexMessageSelect !== undefined && i === indexMessageSelect) {
-          console.log(i, indexMessageSelect, value, 'checklkkkkasdlahjs');
           data[i].message_content[0].type = value;
         }
       }
     }
-    console.log(data, 'chekckkkajsdlajsld');
     // setDataMessages([...data]);
   };
 
@@ -1145,7 +1127,6 @@ const Scenario = () => {
       idMax = 1;
     }
     let subType;
-    console.log(arrMess, idMax, messageType);
     if (messageType === 'zip_code_address') {
       dataMessages[indexMessageSelect].message_content.push(
         {
@@ -1506,29 +1487,24 @@ const Scenario = () => {
   }
 
   const handleCopyMessage = (index) => {
-    console.log(index);
     let idMax = Math.max(...dataMessages.map(item => item.id)) + 1;
     let arrMessage = _.cloneDeep(dataMessages[index]);
     arrMessage.id = idMax;
 
     dataMessages.splice(index, 0, arrMessage);
-    console.log(arrMessage, dataMessages[index]);
     setDataMessages([...dataMessages]);
 
   }
 
   const handleDeleteMessageContent = (indexMessage, indexContent) => {
-    // console.log(dataMessages[indexMessage].message_content.splice(indexContent, 1), indexMessage, indexContent);
     let arrMessage = [...dataMessages[indexMessage].message_content];
     let startArr = arrMessage.slice(0, indexContent);
     let lastArr = arrMessage.slice(indexContent + 1, arrMessage.length);
-    console.log(arrMessage, [...startArr, ...lastArr]);
     for (let i = 0; i < dataMessages.length; i++) {
       if (indexMessage === i) {
         dataMessages[i].message_content = [...startArr, ...lastArr];
       }
     }
-    console.log(arrMessage);
     setDataMessages([...dataMessages]);
   }
 
@@ -1541,13 +1517,11 @@ const Scenario = () => {
 
     let startArr = dataMessages.slice(0, index);
     let lastArr = dataMessages.slice(index + 1, dataMessages.length);
-    console.log(dataMessages[index])
     setDataMessages([...startArr, ...lastArr]);
   }
 
   const handleAddItemRadioCheckbox = (indexMessage, indexContent, type, contentType) => {
     let arr = dataMessages[indexMessage].message_content[indexContent][type][contentType];
-    console.log(arr, contentType);
     if (arr === undefined || arr === null) {
       dataMessages[indexMessage].message_content[indexContent][type][contentType] = [];
       arr = dataMessages[indexMessage].message_content[indexContent][type][contentType];
@@ -1575,7 +1549,6 @@ const Scenario = () => {
 
   const handleAddItemCustomizePullDown = (indexMessage, indexContent, contentType, pullDownType, name) => {
     let arr = dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name];
-    console.log(arr, contentType);
     if (arr === undefined || arr === null) {
       dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name] = [];
       arr = dataMessages[indexMessage].message_content[indexContent][contentType][pullDownType][name];
@@ -1671,7 +1644,6 @@ const Scenario = () => {
   }
 
   const handleDragEndPullDown = (result, idContent, type, contentType, subContentType) => {
-    console.log(result)
     if (!result.destination) return;
     // let messageArr = dataMessages.filter((message, index) => message.belong_to === 'user' && index === indexMessageSelect)[0].message_content
     //   .filter(content => content.id === idContent)[0][type][contentType];
@@ -1711,7 +1683,6 @@ const Scenario = () => {
   const onChangeTimePullDown = (indexMessage, indexContent, type, value, name, subField, typeData) => {
     onChangeValueMessageContent(indexMessage, indexContent, type, value, name, subField);
     let field = dataMessages[indexMessage].message_content[indexContent][type][name];
-    console.log(field, 'checkkk');
     if (typeData === 'dataHour') {
       if (subField === 'start_at') {
         setDataHour(dataHourFixed.filter(item => (parseInt(item.key) >= parseInt(value || 0) && parseInt(item.key) <= parseInt(field.end_at || 24))));
@@ -1728,7 +1699,6 @@ const Scenario = () => {
   }
 
   const onChangeValueMessageContent = (indexMessage, indexContent, type, value, name, subField, indexSubField, subName, variable) => {
-    console.log(indexMessage, indexContent, type, name, subField, indexSubField, value);
     if (variable !== undefined) {
       if (dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField][subName] === undefined) {
         dataMessages[indexMessage].message_content[indexContent][type][name][subField][indexSubField][subName] = {};
@@ -1748,7 +1718,6 @@ const Scenario = () => {
       if (dataMessages[indexMessage].message_content[indexContent][type][name] === undefined) {
         dataMessages[indexMessage].message_content[indexContent][type][name] = {};
       }
-      console.log(dataMessages[indexMessage].message_content[indexContent])
       dataMessages[indexMessage].message_content[indexContent][type][name][subField] = value;
     } else if (name !== undefined) {
       if (name === 'card_linked_setting') {
@@ -1761,7 +1730,6 @@ const Scenario = () => {
           dataMessages[indexMessage].message_content[indexContent][type][name] = []
           dataMessages[indexMessage].message_content[indexContent][type][name].push(check_box_value)
         }
-        console.log(dataMessages[indexMessage].message_content[indexContent][type][name])
         if(dataMessages[indexMessage].message_content[indexContent][type][name].includes(value))
           dataMessages[indexMessage].message_content[indexContent][type][name] = dataMessages[indexMessage].message_content[indexContent][type][name].filter((el) => el !== value);
         else
@@ -1775,7 +1743,6 @@ const Scenario = () => {
     } else {
       dataMessages[indexMessage].message_content[indexContent][type] = value;
     }
-    console.log(dataMessages, 'checkkk message onCHange')
     setDataMessages([...dataMessages]);
    
   }
@@ -1784,7 +1751,6 @@ const Scenario = () => {
 
   
   const onChangeFixedDate = (indexMessage, indexContent, type, value, name) => {
-    console.log(value);
     if (value) {
       dataMessages[indexMessage].message_content[indexContent][type][name].push(moment(value, "YYYY-MM-DD").format("YYYY-MM-DD"));
     }
@@ -1793,7 +1759,6 @@ const Scenario = () => {
   }
 
   const handleChangeValueRequireZipCode = (indexMessage, indexContent, type, value, name) => {
-    console.log(indexMessage, indexContent, type, value, name);
     if (value === true && name === 'require') {
       onChangeValueMessageContent(indexMessage, indexContent, type, false, 'all_items_require');
       onChangeValueMessageContent(indexMessage, indexContent, type, value, 'require');
@@ -1824,10 +1789,8 @@ const Scenario = () => {
   }
 
   const handleRemoveItemZipCodeAddress = (indexMessage, indexContent, contentType, field) => {
-    console.log(indexMessage, indexContent, contentType, field);
     let newArr = dataMessages[indexMessage].message_content[indexContent][contentType];
     delete newArr[field];
-    console.log(newArr);
     dataMessages[indexMessage].message_content[indexContent][contentType] = newArr;
     setDataMessages([...dataMessages]);
   }
@@ -1839,7 +1802,6 @@ const Scenario = () => {
 
   const getListVariable = () => {
     api.get(`/api/v1/managements/chatbots/${botId}/variables?page=all`).then(res => {
-      console.log(res.data);
       if (res.data.code === 1) {
         setDataCondition([
           ...dataConditionFixed,
@@ -1848,7 +1810,6 @@ const Scenario = () => {
         setDataInputVar(res.data.data);
       }
     }).catch((error) => {
-      console.log(error);
       if (error.response?.data.code === 0) {
         tokenExpired()
       }
@@ -1867,7 +1828,6 @@ const Scenario = () => {
       }
     }
     api.post(`/api/v1/managements/chatbots/${botId}/variables`, data).then(res => {
-      console.log(res.data);
       setIsOpenAddVariable(false);
       setIsOpenNoti(true);
       if (res.data.code === 1) {
@@ -1881,7 +1841,6 @@ const Scenario = () => {
         setMessageNoti('');
       }, 2000);
     }).catch((error) => {
-      console.log(error);
       if (error.response?.data.code === 0) {
         tokenExpired()
       }
@@ -1908,7 +1867,6 @@ const Scenario = () => {
       is_used_fukushashiki: isUseFukushashiki,
     }
     api.post(`/api/v1/managements/chatbots/${botId}/scenarios/${scenarioId}/conversation`, data).then(res => {
-      console.log(res.data);
       setIsOpenNoti(true);
       if (res.data.code === 1) {
         setMessageNoti('シナリオを保存しました。');
@@ -1926,7 +1884,6 @@ const Scenario = () => {
 
       }, 2000);
     }).catch((error) => {
-      console.log(error);
       if (error?.response?.data?.code === 0) {
         tokenExpired()
       }
@@ -1973,7 +1930,6 @@ const Scenario = () => {
 
   const onClickCreateStatement = async (belongTo, indexMessage) => {
     let dataMessagesClone = [...dataMessages];
-    console.log(dataMessagesClone, indexMessage);
     if (indexMessage === undefined && belongTo === 'bot') {
       dataMessagesClone = [
         {
@@ -2063,14 +2019,12 @@ const Scenario = () => {
         }
       )
     }
-    console.log(dataMessagesClone)
 
     setBelongTo('');
     setDataMessages([...dataMessagesClone]);
   }
 
   const handlePannelCondition = (isUpCondition, role = 'bot') => {
-    console.log(isUpCondition);
     setIsConditionUp(isUpCondition);
     if (role === 'bot') {
       if (isUpCondition) {
@@ -2093,7 +2047,6 @@ const Scenario = () => {
   }
 
   const onClickAddCondition = () => {
-    console.log('onClickAddCondition')
     dataMessages[indexMessageSelect].conditions.push({
       linkCondition: 'and',
       condition: 'is',
@@ -2111,7 +2064,6 @@ const Scenario = () => {
   }
 
   const handleDownloadFile = (file) => {
-    console.log(file);
     let link = document.createElement('a');
     link.href = file;
     link.download = "file"
@@ -2204,7 +2156,6 @@ const Scenario = () => {
   }
 
   const handleDisableEndDateCalendar = (current, calendar) => {
-    console.log(calendar.start_date_test, calendar[calendar.type].specified_period_from, calendar[calendar.type].specified_period_to)
     if (calendar.end_date || calendar.start_date
       || calendar.fixed_date || calendar.non_select_date_time
       || calendar.start_date_test || calendar.specified_period_from
@@ -2385,7 +2336,6 @@ const Scenario = () => {
                                   content = message.message_content[0];
                                   if (content.type === 'file') {
                                     type = content[content.type]?.content?.slice(content[content.type]?.content.lastIndexOf('.') + 1) || "";
-                                    console.log(type, 'checkkk type');
                                   }
                                 }
                                 let titleMessage = "";
@@ -2527,7 +2477,6 @@ const Scenario = () => {
                                                     <div style={{ backgroundColor: 'white', ...message.hidden === true ? { opacity: '0.4' } : {} }} className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}
                                                     >
                                                       <ul>
-                                                        {console.log(content[content.type]?.variables)}
                                                         {content[content.type]?.variables.length !== 0 && content[content.type]?.variables.map((item, index) => {
                                                           return <li key={index}>
                                                             {item}
@@ -2542,7 +2491,6 @@ const Scenario = () => {
                                                     <div style={{ backgroundColor: 'white', ...message.hidden === true ? { opacity: '0.4' } : {} }}
                                                       className={`ss-bot-chat-overview-${index} ss-bot-chat-detail-content ss-message__content--bot-text ss-input-value`}>
                                                       <ul>
-                                                        {console.log(content[content.type]?.variables)}
                                                         {content[content.type]?.variables.length !== 0 && content[content.type]?.variables.map((item, index) => {
                                                           return <li key={index}>
                                                             {item.key} : {item.value}
@@ -3614,7 +3562,6 @@ const Scenario = () => {
                                                                         const start = 0;
                                                                         const end = 12;
                                                                         const monthOptions = [];
-                                                                        console.log(value)
                                                                         value = value ? value : moment();
                                                                         let current = value.clone();
                                                                         const localeData = value.localeData();
@@ -4319,7 +4266,6 @@ const Scenario = () => {
                                                                   }
                                                                 </div>
                                                               }
-                                                              {console.log(cardPaymentRadioButton, 'checkkkkk')}
                                                               {cardPaymentRadioButton.type === 'default' &&
                                                                 <Radio.Group
                                                                   style={{ width: "100%", fontSize: '14px' }}
@@ -4327,7 +4273,7 @@ const Scenario = () => {
                                                                   value={cardPaymentRadioButton.initial_selection}
                                                                 >
                                                                   {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
-                                                                    console.log(itemPayment)
+                                                               
                                                                     return <Radio value={itemPayment.id} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%' }}>
                                                                       {itemPayment.text}
                                                                     </Radio>
@@ -4342,7 +4288,7 @@ const Scenario = () => {
                                                                   buttonStyle="solid"
                                                                 >
                                                                   {cardPaymentRadioButton.radio_contents && cardPaymentRadioButton.radio_contents.map((itemPayment, indexPayment) => {
-                                                                    console.log(itemPayment)
+                                                                 
                                                                     return <Radio.Button value={itemPayment.id} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%', textAlign: 'center', lineHeight: '22px' }}>
                                                                       {itemPayment.text}
                                                                     </Radio.Button>
@@ -4785,7 +4731,6 @@ const Scenario = () => {
                               {/* type: clear_variable */}
                               {messageType === 'clear_variable' && (
                                 <div className="ss-bot-statement-wrapper" style={{ marginTop: '15px' }}>
-                                  {console.log(dataMessages[indexMessageSelect].message_content[0][messageType]?.variables)}
                                   <span style={{ fontWeight: '400' }}>変数</span>
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.variables &&
                                     dataMessages[indexMessageSelect].message_content[0][messageType]?.variables
@@ -4822,7 +4767,6 @@ const Scenario = () => {
                               {/* type: variable_set */}
                               {messageType === 'variable_set' && (
                                 <div className="ss-bot-statement-wrapper" style={{ marginTop: '15px' }}>
-                                  {console.log(dataMessages[indexMessageSelect].message_content[0][messageType]?.variables)}
                                   <span>※直後の条件分岐に変数を使用したい場合、ユーザー側の変数セットブロックをご利用ください。</span>
                                   <span style={{ fontWeight: '400', marginTop: '15px', display: 'block' }}>変数</span>
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.variables &&
@@ -5801,6 +5745,7 @@ const Scenario = () => {
                                                         </div>
                                                       )}
                                                       {/* textarea: type = text_input || invalid_input */}
+                                                      {/* text_input: type = textarea  ADD_FUKU*/}
                                                       {(textarea.type === 'text_input' || textarea.type === 'invalid_input') && (
                                                         <div className="ss-user-setting__item-bottom">
                                                           <textarea
@@ -5813,6 +5758,43 @@ const Scenario = () => {
                                                           ></textarea>
                                                         </div>
                                                       )}
+                                                      {isUseFukushashiki && (
+                                                            <div className='ss-user-setting__item-bottom' style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                              <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                                <div style={{ flexBasis: '22%', maxWidth: '22%' }}>
+                                                                  <SelectCustom
+                                                                    id="title"
+                                                                    style={{ width: '100%' }}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_mode', value)}
+                                                                    data={[
+                                                                      { key: 1, value: 'id' },
+                                                                      { key: 2, value: 'css_selector' },
+                                                                      { key: 3, value: 'xpath' }
+                                                                    ]}
+                                                                    keyValue="key"
+                                                                    placeholder="複写先要素の取得方法をお選びください"
+                                                                  />
+                                                                </div>
+                                                              </Tooltip>
+                                                              <div style={{ flexBasis: '67%', maxWidth: '67%' }}>
+                                                                <InputCustom
+                                                                  styleLabel={{ width: '100%' }}
+                                                                  maxLength={250}
+                                                                  useFukushashiki={true}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'fukushashiki_search_value', value)}
+                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_value']}
+                                                                  placeholder={{
+                                                                    1: '複写先要素のIDを入力ください',
+                                                                    2: '複写先要素のcss_selectorを入力ください',
+                                                                    3: '複写先要素のxPathを入力ください',
+                                                                  }[
+                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['fukushashiki_search_mode']
+                                                                  ] || ''}
+                                                                />
+                                                              </div>
+                                                            </div>
+                                                          )}
                                                       {/* textarea: type = consume_api_response */}
                                                       {(textarea.type === 'consume_api_response') && (
                                                         <div className="ss-user-setting__item-bottom">
@@ -7025,7 +7007,6 @@ const Scenario = () => {
                                                           />
                                                         </div>
                                                         <div className="ss-user-setting__item-bottom">
-                                                          {console.log(calendar.fixed_date)}
                                                           <SelectCustom
                                                             mode="multiple"
                                                             style={{ width: '99%', minHeight: '20px' }}
@@ -7070,7 +7051,6 @@ const Scenario = () => {
                                                           </div>
                                                         }
                                                         {/* calendar: type = embedded */}
-                                                        {console.log(calendar.date_selection_test, "checkkkk data test")}
                                                         {calendar.type === 'embedded' &&
                                                           <div className="ss-user-setting__item-bottom-flex-start" style={{ height: '380px' }}>
                                                             <Calendar
@@ -7081,7 +7061,6 @@ const Scenario = () => {
                                                                 const start = 0;
                                                                 const end = 12;
                                                                 const monthOptions = [];
-                                                                console.log(value)
                                                                 value = value ? value : moment();
                                                                 let current = value.clone();
                                                                 const localeData = value.localeData();
@@ -8799,7 +8778,6 @@ const Scenario = () => {
                                                                   let arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type][carousel.type].contents];
                                                                   let startArr = arrMessage.slice(0, indexCarouselSlide);
                                                                   let lastArr = arrMessage.slice(indexCarouselSlide + 1, arrMessage.length);
-                                                                  console.log(arrMessage, [...startArr, ...lastArr]);
                                                                   dataMessages[indexMessageSelect].message_content[indexContent][content.type][carousel.type].contents = [...startArr, ...lastArr];
                                                                   setDataMessages([...dataMessages]);
                                                                   // carouselSlide.current.goTo(indexMessageSelect)
@@ -9330,7 +9308,6 @@ const Scenario = () => {
                                                                                               if (productPurchase.multiple_item_purchase) {
                                                                                                 if (selectArr.includes(itemProduct.id)) {
                                                                                                   selectArr = [...selectArr.filter(item => item !== itemProduct.id)];
-                                                                                                  console.log(selectArr, itemProduct.id, 'cehckkkkk');
                                                                                                 } else {
                                                                                                   selectArr.push(itemProduct.id);
                                                                                                 }
@@ -9369,7 +9346,6 @@ const Scenario = () => {
                                                                                                      let arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].products];
                                                                                                      let startArr = arrMessage.slice(0, indexProduct);
                                                                                                      let lastArr = arrMessage.slice(indexProduct + 1, arrMessage.length);
-                                                                                                     console.log(arrMessage, [...startArr, ...lastArr]);
                                                                                                      dataMessages[indexMessageSelect].message_content[indexContent][content.type].products = [...startArr, ...lastArr];
                                                                                                      dataMessages[indexMessageSelect].message_content[indexContent][content.type].initial_selection = dataMessages[indexMessageSelect].message_content[indexContent][content.type].initial_selection.filter(item => item !== itemProduct.id);
                                                                                                      setDataMessages([...dataMessages]);
@@ -9632,7 +9608,6 @@ const Scenario = () => {
                                                                                                      let arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].products];
                                                                                                      let startArr = arrMessage.slice(0, indexProduct);
                                                                                                      let lastArr = arrMessage.slice(indexProduct + 1, arrMessage.length);
-                                                                                                     console.log(arrMessage, [...startArr, ...lastArr]);
                                                                                                      dataMessages[indexMessageSelect].message_content[indexContent][content.type].products = [...startArr, ...lastArr];
                                                                                                      dataMessages[indexMessageSelect].message_content[indexContent][content.type].initial_selection = dataMessages[indexMessageSelect].message_content[indexContent][content.type].initial_selection.filter(item => item !== itemProduct.id);
                                                                                                      setDataMessages([...dataMessages]);
@@ -10233,7 +10208,6 @@ const Scenario = () => {
                                                                                             let arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents];
                                                                                             let startArr = arrMessage.slice(0, indexPaymentRadio);
                                                                                             let lastArr = arrMessage.slice(indexPaymentRadio + 1, arrMessage.length);
-                                                                                            console.log(arrMessage, [...startArr, ...lastArr]);
                                                                                             dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents = [...startArr, ...lastArr];
                                                                                             setDataMessages([...dataMessages]);
                                                                                           }} />
@@ -10361,7 +10335,6 @@ const Scenario = () => {
                                                                                               let arrMessage = [...dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img];
                                                                                               let startArr = arrMessage.slice(0, indexPaymentRadioImg);
                                                                                               let lastArr = arrMessage.slice(indexPaymentRadioImg + 1, arrMessage.length);
-                                                                                              console.log(arrMessage, [...startArr, ...lastArr]);
                                                                                               dataMessages[indexMessageSelect].message_content[indexContent][content.type].radio_contents_img = [...startArr, ...lastArr];
                                                                                               setDataMessages([...dataMessages]);
                                                                                             }} />
@@ -10417,6 +10390,43 @@ const Scenario = () => {
                                                               }}
                                                             >追加</Button>
                                                           </div>
+                                                          {isUseFukushashiki && (
+                                                            <div className='ss-user-setting__item-bottom' style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px',marginTop:'10px' }}>
+                                                              <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                                <div style={{ flexBasis: '22%', maxWidth: '22%' }}>
+                                                                  <SelectCustom
+                                                                    id="title"
+                                                                    style={{ width: '100%' }}
+                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['initial_selection_fukushashiki_search_mode']}
+                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'initial_selection_fukushashiki_search_mode', value)}
+                                                                    data={[
+                                                                      { key: 1, value: 'id' },
+                                                                      { key: 2, value: 'css_selector' },
+                                                                      { key: 3, value: 'xpath' }
+                                                                    ]}
+                                                                    keyValue="key"
+                                                                    placeholder="複写先要素の取得方法をお選びください"
+                                                                  />
+                                                                </div>
+                                                              </Tooltip>
+                                                              <div style={{ flexBasis: '67%', maxWidth: '67%' }}>
+                                                                <InputCustom
+                                                                  styleLabel={{ width: '100%' }}
+                                                                  maxLength={250}
+                                                                  useFukushashiki={true}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'initial_selection_fukushashiki_search_value', value)}
+                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['initial_selection_fukushashiki_search_value']}
+                                                                  placeholder={{
+                                                                    1: '複写先要素のIDを入力ください',
+                                                                    2: '複写先要素のcss_selectorを入力ください',
+                                                                    3: '複写先要素のxPathを入力ください',
+                                                                  }[
+                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['initial_selection_fukushashiki_search_mode']
+                                                                  ] || ''}
+                                                                />
+                                                              </div>
+                                                            </div>
+                                                          )}
                                                         </div>
                                                         <div className="ss-user-setting__item-bottom">
                                                           <div style={{ width: '95%', height: '1px', backgroundColor: 'black' }}></div>
