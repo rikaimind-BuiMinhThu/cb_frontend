@@ -5834,6 +5834,13 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                 </div>
                             )
                         }
+                        {/* user: type = 'button_submit' */}
+                        {content.type === 'button_submit' &&
+                            <>
+                                <div className="ss-user-setting__item-text_input-top">
+                                    <Button className="ss-user-setting__select-btn-add" style={{ padding: '5px 0', background: 'green', width: '100%', marginBottom: '10px' }} onClick={() => handleAddItemSetting(messageType || 'text_input')}>{content.button_submit_name}</Button>
+                                </div>
+                            </>}
                         {/* type == 'label_no_transition' */}
                         {
                             content.type === 'label_no_transition' && (
