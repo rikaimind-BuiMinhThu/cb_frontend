@@ -168,6 +168,11 @@ let dataPaymentMethod = [
   },
 ];
 
+const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
+  key: i + 2,
+  value: `${i + 2}`,
+}));
+
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
 var url = new URL(window.location.href);
@@ -9753,7 +9758,7 @@ const UserMessage = ({
                                 //   onClickNext();
                                 // }
                                 if (
-                                  cardPaymentRadioButton.card_linked_setting(dataValue)
+                                  cardPaymentRadioButton.card_linked_setting.includes(dataValue)
                                 ) {
                                   onChangeValue(
                                     indexContent,
@@ -10108,69 +10113,87 @@ const UserMessage = ({
                           </div>
                         </div>
                       )}
-                      {cardPaymentRadioButton.is_hide_card_name === false && (
-                        <div className="ss-user-setting__item-bottom">
-                          <InputCustom
-                            className="ss-user-setting-input-overview"
-                            styleLabel={{ width: "100%" }}
-                            label="カード名義"
-                            inline={false}
+                    {cardPaymentRadioButton.is_hide_card_name === false && (
+                      <div className="ss-user-setting__item-bottom">
+                        <InputCustom
+                          className="ss-user-setting-input-overview"
+                          styleLabel={{ width: "100%" }}
+                          label="カード名義"
+                          inline={false}
+                          disabled={disabled}
+                          value={cardPaymentRadioButton.card_holder}
+                          onChange={(value) =>
+                            onChangeValue(
+                              indexContent,
+                              content.type,
+                              value,
+                              "card_holder"
+                            )
+                          }
+                          placeholder={
+                            cardPaymentRadioButton.card_holder_placeholder
+                          }
+                        />
+                      </div>
+                    )}
+                    {Array.isArray(cardPaymentRadioButton.is_use_installment) &&
+                      cardPaymentRadioButton.is_use_installment.length > 0 && (
+                        cardPaymentRadioButton.is_use_installment
+                          .filter(installmentValue => installmentValue === cardPaymentRadioButton.initial_selection)
+                          .map((installmentValue, index) => (
+                            <div className="ss-user-setting__item-bottom" key={index} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                              <div style={{ width: '100%' }}>お支払い回数</div>
+                              <SelectCustom
+                                style={{ width: '33%', textAlign: 'left' }}
+                                value={cardPaymentRadioButton.installment}
+                                disabled={disabled}
+                                placeholder={"--"}
+                                data={installmentOptions}
+                                onChange={value => onChangeValue(indexContent, content.type, value, 'installment')}
+                              />
+                            </div>
+                          ))
+                      )}
+                    <div className="ss-user-setting__item-bottom">
+                      <div style={{ width: "100%" }}>有効期限</div>
+                      {cardPaymentRadioButton.type_date_of_expiry === "ym" && (
+                        <div style={{ display: "flex", width: "100%" }}>
+                          <SelectCustom
+                            style={{ width: "33%" }}
+                            value={cardPaymentRadioButton.year}
                             disabled={disabled}
-                            value={cardPaymentRadioButton.card_holder}
+                            placeholder={"年"}
+                            data={dataYearFixed.filter(
+                              (item) =>
+                                item.key >= new Date().getFullYear() &&
+                                item.key <= new Date().getFullYear() + 10
+                            )}
                             onChange={(value) =>
                               onChangeValue(
                                 indexContent,
                                 content.type,
                                 value,
-                                "card_holder"
+                                "year"
                               )
                             }
-                            placeholder={
-                              cardPaymentRadioButton.card_holder_placeholder
+                          />
+                          <SelectCustom
+                            style={{ width: "33%", marginLeft: "10px" }}
+                            value={cardPaymentRadioButton.month}
+                            placeholder={"月"}
+                            data={dataMonth}
+                            disabled={disabled}
+                            onChange={(value) =>
+                              onChangeValue(
+                                indexContent,
+                                content.type,
+                                value,
+                                "month"
+                              )
                             }
                           />
                         </div>
                       )}
-                      <div className="ss-user-setting__item-bottom">
-                        <div style={{ width: "100%" }}>有効期限</div>
-                        {cardPaymentRadioButton.type_date_of_expiry === "ym" && (
-                          <div style={{ display: "flex", width: "100%" }}>
-                            <SelectCustom
-                              style={{ width: "33%" }}
-                              value={cardPaymentRadioButton.year}
-                              disabled={disabled}
-                              placeholder={"年"}
-                              data={dataYearFixed.filter(
-                                (item) =>
-                                  item.key >= new Date().getFullYear() &&
-                                  item.key <= new Date().getFullYear() + 10
-                              )}
-                              onChange={(value) =>
-                                onChangeValue(
-                                  indexContent,
-                                  content.type,
-                                  value,
-                                  "year"
-                                )
-                              }
-                            />
-                            <SelectCustom
-                              style={{ width: "33%", marginLeft: "10px" }}
-                              value={cardPaymentRadioButton.month}
-                              placeholder={"月"}
-                              data={dataMonth}
-                              disabled={disabled}
-                              onChange={(value) =>
-                                onChangeValue(
-                                  indexContent,
-                                  content.type,
-                                  value,
-                                  "month"
-                                )
-                              }
-                            />
-                          </div>
-                        )}
                         {cardPaymentRadioButton.type_date_of_expiry === "my" && (
                           <div style={{ display: "flex", width: "100%" }}>
                             <SelectCustom

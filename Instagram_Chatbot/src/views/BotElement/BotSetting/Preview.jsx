@@ -162,6 +162,11 @@ let dataPaymentMethod = [
 
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
+const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
+    key: i + 2,
+    value: `${i + 2}`,
+}));
+
 function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
     const [botId, setBotId] = useState(Cookies.get('bot_id'));
     const [scenarioId, setScenarioId] = useState(scenarioIdProps || Cookies.get('scenario_id'));
@@ -5742,6 +5747,24 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                                     />
                                                 </div>
                                             }
+                                            {Array.isArray(cardPaymentRadioButton.is_use_installment) &&
+                                                cardPaymentRadioButton.is_use_installment.length > 0 && (
+                                                    cardPaymentRadioButton.is_use_installment
+                                                        .filter(installmentValue => installmentValue === cardPaymentRadioButton.initial_selection)
+                                                        .map((installmentValue, index) => (
+                                                            <div className="ss-user-setting__item-bottom" key={index} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                                                <div style={{ width: '100%' }}>お支払い回数</div>
+                                                                <SelectCustom
+                                                                    style={{ width: '33%', textAlign: 'left' }}
+                                                                    value={cardPaymentRadioButton.installment}
+                                                                    disabled={disabled}
+                                                                    placeholder={"月"}
+                                                                    data={installmentOptions}
+                                                                    onChange={value => onChangeValue(indexContent, content.type, value, 'installment')}
+                                                                />
+                                                            </div>
+                                                        ))
+                                            )}
                                             <div className="ss-user-setting__item-bottom">
                                                 <div style={{ width: '100%' }}>有効期限</div>
                                                 {cardPaymentRadioButton.type_date_of_expiry === 'ym' &&
