@@ -4380,7 +4380,7 @@ function Preview() {
                         }
                         variables={variables}
                       />
-                      {(dataMessages[indexMessage].is_display_button_next !==
+                      {dataMessages[indexMessage].message_content[0]?.type !== "button_submit" &&(dataMessages[indexMessage].is_display_button_next !==
                         undefined
                         ? dataMessages[indexMessage].is_display_button_next
                         : true) && (

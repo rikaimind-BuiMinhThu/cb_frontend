@@ -4429,8 +4429,8 @@ const Scenario = () => {
                                                     )
                                                   })}
                                                 </div>
-                                                {message?.message_content.length !== 0 &&
-                                                  ((message?.message_content.length === 1 &&
+                                                {message.message_content[0]?.type !== 'button_submit'&& message?.message_content.length !== 0 &&
+                                                  ((message?.message_content.length === 1 && 
                                                     !(message.message_content[0].type === 'product_purchase_radio_button'
                                                       || (message.message_content[0].type === 'carousel' && message.message_content[0]?.[message.message_content[0].type].require)
                                                       || (message.message_content[0].type === 'radio_button' && !message.message_content[0][message.message_content[0].type].initial_selection))
