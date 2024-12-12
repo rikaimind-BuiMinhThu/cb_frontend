@@ -5758,7 +5758,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                                                     style={{ width: '33%', textAlign: 'left' }}
                                                                     value={cardPaymentRadioButton.installment}
                                                                     disabled={disabled}
-                                                                    placeholder={"月"}
+                                                                    placeholder={"--"}
                                                                     data={installmentOptions}
                                                                     onChange={value => onChangeValue(indexContent, content.type, value, 'installment')}
                                                                 />

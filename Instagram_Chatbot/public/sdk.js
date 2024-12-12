@@ -131,7 +131,7 @@ async function displayPopup() {
       chatbotBottom = e.data.chatbotBottom
       if (e.data.fukushashikiResponse) {
         fillDataFromMessage(e.data.fukushashikiResponse)
-      }      
+      }
       if (e.data.isOpen && mobileCheck()) {
         iframe.width = "100%";
         // iframe.height = "620px";
@@ -175,9 +175,18 @@ async function displayPopup() {
   );
 
   function fillDataFromMessage(obj) {
+    const initialSelectionItem = obj.find((item) => item.type === "initial_selection");
+    if(initialSelectionItem!=undefined)
+    {
+      var typeElementSelector =  getElementByAddress(initialSelectionItem.bindingMode,initialSelectionItem.bindingAddress)
+            typeElementSelector.value = initialSelectionItem.bindingValue; 
+            const event = new Event('change', { bubbles: true });
+            typeElementSelector.dispatchEvent(event);
+    }
+
     obj.forEach((item) => {
-      switch (item.type) {
-        case "card_payment_radio_button":
+      switch (item.type) {       
+        case "card_payment_radio_button":      
         case "text_input":
           {
             if (item.bindingMode == 1) {
@@ -250,9 +259,24 @@ async function displayPopup() {
             }
             break;
           }
+
+        case "textarea":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+            break;
+          }
         default:
           return;
       }
+
     })
   }
 
@@ -274,20 +298,20 @@ async function displayPopup() {
   function fillDataWithTextInSelector(mode, address, value) {
     const element = getElementByAddress(mode, address);
     if (element.tagName === 'SELECT') {
-        const optionToSelect = Array.from(element.options).find(option => option.text === value);
-        if (optionToSelect) {
-            fillDataToElement(element, optionToSelect.value);
-        }
+      const optionToSelect = Array.from(element.options).find(option => option.text === value);
+      if (optionToSelect) {
+        fillDataToElement(element, optionToSelect.value);
+      }
     }
-    else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {        
-            fillDataToElement(element, value);        
+    else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+      fillDataToElement(element, value);
     }
-}
+  }
 
   function fillDataWithId(id, value) {
     let element = document.getElementById(id);
     if (element) {
-      fillDataToElement(element,value)
+      fillDataToElement(element, value)
     }
 
   }
@@ -307,8 +331,7 @@ async function displayPopup() {
     }
   }
 
-  function fillDataToElement(element, value)
-  {
+  function fillDataToElement(element, value) {
     element.value = value;
     if (element.value == undefined || element.value == "") {
       element.value = removeLeadingZero(value);
@@ -322,7 +345,7 @@ async function displayPopup() {
   function fillDataWithCssSelector(cssSelector, value) {
     let element = document.querySelector(cssSelector);
     if (element) {
-      fillDataToElement(element,value)
+      fillDataToElement(element, value)
     }
 
   }
@@ -330,7 +353,7 @@ async function displayPopup() {
   function fillDataWithXPath(xpathElement, value) {
     let element = document.evaluate(xpathElement, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     if (element) {
-      fillDataToElement(element,value)
+      fillDataToElement(element, value)
     }
 
   }
