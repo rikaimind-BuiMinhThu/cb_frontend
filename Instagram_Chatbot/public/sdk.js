@@ -168,9 +168,18 @@ async function displayPopup() {
   );
 
   function fillDataFromMessage(obj) {
+    const initialSelectionItem = obj.find((item) => item.type === "initial_selection");
+    if(initialSelectionItem!=undefined)
+    {
+      var typeElementSelector =  getElementByAddress(initialSelectionItem.bindingMode,initialSelectionItem.bindingAddress)
+            typeElementSelector.value = initialSelectionItem.bindingValue; 
+            const event = new Event('change', { bubbles: true });
+            typeElementSelector.dispatchEvent(event);
+    }
+
     obj.forEach((item) => {
-      switch (item.type) {
-        case "card_payment_radio_button":
+      switch (item.type) {       
+        case "card_payment_radio_button":      
         case "text_input":
           {
             if (item.bindingMode == 1) {

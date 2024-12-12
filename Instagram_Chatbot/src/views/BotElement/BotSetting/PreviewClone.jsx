@@ -2538,7 +2538,8 @@ function Preview() {
                 "card_number",
                 "year",
                 "month",
-                "cvc"
+                "cvc",
+                "installment"
               ];
               const userInputData = keysToExtract.reduce((result, key) => {
                 if (message.card_payment_radio_button[key] !== undefined) {
@@ -2549,12 +2550,21 @@ function Preview() {
               const dataInforFukushashiki = Object.fromEntries(
                 Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
               );
-              const types = ["card_number", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4"];
+              const types = ["card_number", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4","installment","initial_selection"];
               const result = types
                 .filter(type => `${type}` in userInputData)
                 .map(type => {
                   const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
                   const bindingValue = userInputData[`${type}`];
+                  if(type=="initial_selection")
+                  {
+                    return {
+                      type: "initial_selection",
+                      bindingMode,
+                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                      bindingValue
+                    };
+                  }
                   if (bindingMode !== undefined && bindingValue !== undefined) {
                     return {
                       type: "card_payment_radio_button",

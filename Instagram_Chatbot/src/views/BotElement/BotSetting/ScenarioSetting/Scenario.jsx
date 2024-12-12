@@ -4359,7 +4359,7 @@ const Scenario = () => {
                                                                   <div style={{ width: '100%' }}>お支払い回数</div>
                                                                     <SelectCustom
                                                                       style={{ width: '100%' }}
-                                                                      placeholder="月"
+                                                                      placeholder="--"
                                                                       value={cardPaymentRadioButton.installment_placeholder}
                                                                       disabled={true}
                                                                     />
