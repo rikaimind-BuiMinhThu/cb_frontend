@@ -2615,7 +2615,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                                     variables={variables}
                                                 />
 
-                                                {(dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
+                                                {dataMessages[indexMessage].message_content[0]?.type !== "button_submit" && (dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
                                                     && <div className="sp-user-message-button-action">
                                                         <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color || botInfor?.main_color_other, borderRadius: '25px' }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage, message)}>
                                                             {message.buttonName || (indexMessage >= indexMessageRender ? "次へ" : "更新")}
@@ -5834,6 +5834,13 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                 </div>
                             )
                         }
+                        {/* user: type = 'button_submit' */}
+                        {content.type === 'button_submit' &&
+                            <>
+                                <div className="ss-user-setting__item-text_input-top">
+                                    <Button className="ss-user-setting__select-btn-add" style={{ padding: '5px 0', background: 'green', width: '100%', marginBottom: '10px' }} onClick={() => handleAddItemSetting(messageType || 'text_input')}>{content.button_submit_name}</Button>
+                                </div>
+                            </>}
                         {/* type == 'label_no_transition' */}
                         {
                             content.type === 'label_no_transition' && (

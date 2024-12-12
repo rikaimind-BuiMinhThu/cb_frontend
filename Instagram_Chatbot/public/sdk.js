@@ -163,6 +163,13 @@ async function displayPopup() {
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       }
+
+      if (e.data.action === 'clickButton') {
+        var button = document.getElementById(e.data.id_value);
+        if (button) {
+          button.click(); 
+        }
+      }
     },
     false
   );
