@@ -4410,6 +4410,15 @@ const Scenario = () => {
                                                             </div>
                                                           )
                                                         }
+                                                        {/* type == 'button_submit' */}
+                                                        {content.type === 'button_submit' &&
+                                                          <>
+                                                            <div className="ss-user-setting__item-text_input-top">
+                                                              <Button data-id={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['button_submit_id'] ?? content.button_submit_id} className="ss-user-setting__select-btn-add" style={{ padding: '9px 23px', background: 'green' }} onClick={(e) => {
+                                                                e.stopPropagation()
+                                                              }}>{dataMessages[indexMessageSelect]?.message_content[indexContent]?.['button_submit_name'] ?? content.button_submit_name}</Button>
+                                                            </div>
+                                                          </>}
                                                         {/* type == 'label_no_transition' */}
                                                         {content.type === 'label_no_transition' && (
                                                           <div style={{ marginBottom: '10px' }}>
@@ -4420,8 +4429,8 @@ const Scenario = () => {
                                                     )
                                                   })}
                                                 </div>
-                                                {message?.message_content.length !== 0 &&
-                                                  ((message?.message_content.length === 1 &&
+                                                {message.message_content[0]?.type !== 'button_submit'&& message?.message_content.length !== 0 &&
+                                                  ((message?.message_content.length === 1 && 
                                                     !(message.message_content[0].type === 'product_purchase_radio_button'
                                                       || (message.message_content[0].type === 'carousel' && message.message_content[0]?.[message.message_content[0].type].require)
                                                       || (message.message_content[0].type === 'radio_button' && !message.message_content[0][message.message_content[0].type].initial_selection))
@@ -11098,6 +11107,32 @@ const Scenario = () => {
                                                       
                                                     </>
                                                   )}
+                                                  {/* user: type = 'button_submit' */}
+                                                  {content.type === 'button_submit' &&
+                                                    <>
+                                                      <div className="ss-user-setting__item-text_input-top" style={{ margin: '30px 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                                        <InputCustom
+                                                          className="ss-user-setting-input-overview"
+                                                          styleLabel={{ width: '90%' }}
+                                                          style={{ width: '90%' }}
+                                                          label="IDボタン"
+                                                          inline={false}
+                                                          placeholder={'IDボタン'}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_id', value)}
+                                                          value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['button_submit_id']}
+                                                        />
+                                                        <InputCustom
+                                                          className="ss-user-setting-input-overview"
+                                                          styleLabel={{ width: '90%', marginTop: '10px' }}
+                                                          style={{ width: '90%' }}
+                                                          label="名前ボタン"
+                                                          inline={false}
+                                                          placeholder={'名前ボタン'}
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_name', value)}
+                                                          value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['button_submit_name']}
+                                                        />
+                                                      </div>
+                                                    </>}
                                                   {/* user: type = 'label_no_transition' */}
                                                   {content.type === 'label_no_transition' && (
                                                     <React.Fragment>
@@ -11156,6 +11191,7 @@ const Scenario = () => {
                                   <option value="AFTEE_payment_module">AFTEE決済モジュール</option>
                                   <option value="slider">スライダー</option>
                                   <option value="card_payment_radio_button">ラジオボタン付きカード決済</option>
+                                  <option value="button_submit">確認する</option>
                                   <option value="variable_set" style={{ display: 'none' }}>変数セット</option>
                                   <option
                                     style={dataMessages[indexMessageSelect].message_content.length > 0 && messageType !== 'label_no_transition' ? { display: 'none' } : {}}

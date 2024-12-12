@@ -4380,7 +4380,7 @@ function Preview() {
                         }
                         variables={variables}
                       />
-                      {(dataMessages[indexMessage].is_display_button_next !==
+                      {dataMessages[indexMessage].message_content[0]?.type !== "button_submit" &&(dataMessages[indexMessage].is_display_button_next !==
                         undefined
                         ? dataMessages[indexMessage].is_display_button_next
                         : true) && (
@@ -10266,6 +10266,27 @@ const UserMessage = ({
                   )}
               </div>
             )}
+             {/* user: type = 'button_submit' */}
+             {content.type === 'button_submit' &&
+              <>
+                <div className="ss-user-setting__item-text_input-top">
+                  <Button className="ss-user-setting__select-btn-add" style={{ padding: '9px 0', width: '100%', background: 'green', marginBottom: '10px' }} onClick={() => {
+                    window.parent.postMessage({
+                      isOpen: true,
+                      widthPc: 450,
+                      heightPc: 700,
+                      widthSp: 100,
+                      heightSp: 100,
+                      chatbotRight: 10,
+                      chatbotBottom: 10,
+                      // fukushashikiResponse: getObjectFsukushashiki(data_submit),
+                      action: 'clickButton',
+                      id_value: content.button_submit_id
+                    }, '*');
+
+                  }}>{content.button_submit_name}</Button>
+                </div>
+              </>}
             {/* type == 'label_no_transition' */}
             {content.type === "label_no_transition" && (
               <div style={{ marginBottom: "10px" }}>
