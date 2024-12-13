@@ -339,6 +339,8 @@ async function displayPopup() {
     if (element.value == undefined || element.value == "") {
       element.value = removeFirstTwoChars(value);
     }
+    const event = new Event('change', { bubbles: true });
+    element.dispatchEvent(event);
 
   }
 
