@@ -2566,6 +2566,15 @@ function Preview() {
                       bindingValue
                     };
                   }
+                  if(type=="card_number")
+                    {
+                      return {
+                        type: "card_number",
+                        bindingMode,
+                        bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                        bindingValue
+                      };
+                    }
                   if (bindingMode !== undefined && bindingValue !== undefined) {
                     return {
                       type: "card_payment_radio_button",
