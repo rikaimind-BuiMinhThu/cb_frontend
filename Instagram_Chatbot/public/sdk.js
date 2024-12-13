@@ -186,7 +186,27 @@ async function displayPopup() {
 
     obj.forEach((item) => {
       switch (item.type) {       
-        case "card_payment_radio_button":      
+        case "card_payment_radio_button":
+          {
+            const event = new Event('change', { bubbles: true });
+            
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue);
+             var elementReload = document.getElementById(item.bindingAddress);
+             elementReload.dispatchEvent(event)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+              let elementReload = document.querySelector(cssSelector);
+              elementReload.dispatchEvent(event)             
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+              var elementReload = document.evaluate(item.bindingAddress, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+              elementReload.dispatchEvent(event)
+            }
+            break;
+          } 
         case "text_input":
           {
             if (item.bindingMode == 1) {
@@ -339,9 +359,6 @@ async function displayPopup() {
     if (element.value == undefined || element.value == "") {
       element.value = removeFirstTwoChars(value);
     }
-    const event = new Event('change', { bubbles: true });
-    element.dispatchEvent(event);
-
   }
 
   function fillDataWithCssSelector(cssSelector, value) {
