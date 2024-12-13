@@ -166,10 +166,7 @@ async function displayPopup() {
 
       if (e.data.action === 'clickButton') {
         var button = document.getElementById(e.data.id_value);
-        if (button) {
-          const event = new Event('change', { bubbles: true });
-          var elementNumber = document.getElementById('input-cc-number')
-          elementNumber.dispatchEvent(event)
+        if (button) {          
           button.click(); 
         }
       }
@@ -181,15 +178,28 @@ async function displayPopup() {
     const initialSelectionItem = obj.find((item) => item.type === "initial_selection");
     if(initialSelectionItem!=undefined)
     {
-      var typeElementSelector =  getElementByAddress(initialSelectionItem.bindingMode,initialSelectionItem.bindingAddress)
-            typeElementSelector.value = initialSelectionItem.bindingValue; 
-            const event = new Event('change', { bubbles: true });
-            typeElementSelector.dispatchEvent(event);
+      try
+      {
+        var typeElementSelector =  getElementByAddress(initialSelectionItem.bindingMode,initialSelectionItem.bindingAddress)
+        typeElementSelector.value = initialSelectionItem.bindingValue; 
+        const event = new Event('change', { bubbles: true });
+        typeElementSelector.dispatchEvent(event);
+      }
+      catch (e)
+      {
+        console.log(e)
+      }
     }
 
+    var inputCardNumber;
+
     obj.forEach((item) => {
-      switch (item.type) {       
-        case "card_payment_radio_button":        
+      switch (item.type) {
+        case "card_number":
+          {
+            inputCardNumber = getElementByAddress(item.bindingMode, item.bindingAddress);
+          }
+        case "card_payment_radio_button":     
         case "text_input":
           {
             if (item.bindingMode == 1) {
@@ -281,6 +291,19 @@ async function displayPopup() {
       }
 
     })
+
+    if(inputCardNumber)
+    {
+
+      try {
+        const event = new Event('change', { bubbles: true });
+        inputCardNumber.dispatchEvent(event);
+      }
+      catch (e) {
+        console.log(e)
+      }
+
+    }
 
   }
 
