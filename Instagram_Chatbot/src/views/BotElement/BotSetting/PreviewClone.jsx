@@ -10289,27 +10289,65 @@ const UserMessage = ({
                   )}
               </div>
             )}
-             {/* user: type = 'button_submit' */}
-             {content.type === 'button_submit' &&
+            {/* user: type = 'button_submit' */}
+            {content.type === 'button_submit' &&
               <>
                 <div className="ss-user-setting__item-text_input-top">
-                  <Button className="ss-user-setting__select-btn-add" style={{ padding: '9px 0', width: '100%', background: 'green', marginBottom: '10px' }} onClick={() => {
-                    window.parent.postMessage({
-                      isOpen: true,
-                      widthPc: 450,
-                      heightPc: 700,
-                      widthSp: 100,
-                      heightSp: 100,
-                      chatbotRight: 10,
-                      chatbotBottom: 10,
-                      // fukushashikiResponse: getObjectFsukushashiki(data_submit),
-                      action: 'clickButton',
-                      id_value: content.button_submit_id
-                    }, '*');
+                  <button
+                    style={{
+                      background: "linear-gradient(135deg, #4caf50, #43a047)",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "25px",
+                      padding: "15px 30px",
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                      transition: "all 0.3s ease",
+                      width: "85%",
+                      alignContent: 'center',
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = "linear-gradient(135deg, #43a047, #4caf50)";
+                      e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
+                      e.target.style.transform = "translateY(-2px)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = "linear-gradient(135deg, #4caf50, #43a047)";
+                      e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+                      e.target.style.transform = "translateY(0)";
+                    }}
+                    onMouseDown={(e) => {
+                      e.target.style.transform = "translateY(1px)";
+                      e.target.style.boxShadow = "0 3px 8px rgba(0, 0, 0, 0.1)";
+                    }}
+                    onMouseUp={(e) => {
+                      e.target.style.transform = "translateY(-2px)";
+                      e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
+                    }}
+                    onClick={() => {
+                      window.parent.postMessage({
+                        isOpen: true,
+                        widthPc: 450,
+                        heightPc: 700,
+                        widthSp: 100,
+                        heightSp: 100,
+                        chatbotRight: 10,
+                        chatbotBottom: 10,
+                        // fukushashikiResponse: getObjectFsukushashiki(data_submit),
+                        action: 'clickButton',
+                        id_value: content.button_submit_id
+                      }, '*');
 
-                  }}>{content.button_submit_name}</Button>
+                    }}
+                  >
+                    {content.button_submit_name}
+                  </button>
                 </div>
-              </>}
+
+              </>
+            }
             {/* type == 'label_no_transition' */}
             {content.type === "label_no_transition" && (
               <div style={{ marginBottom: "10px" }}>
