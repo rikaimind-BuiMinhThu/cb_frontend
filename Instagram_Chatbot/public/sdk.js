@@ -176,134 +176,136 @@ async function displayPopup() {
 
   function fillDataFromMessage(obj) {
     const initialSelectionItem = obj.find((item) => item.type === "initial_selection");
-    if(initialSelectionItem!=undefined)
-    {
-      try
-      {
-        var typeElementSelector =  getElementByAddress(initialSelectionItem.bindingMode,initialSelectionItem.bindingAddress)
-        typeElementSelector.value = initialSelectionItem.bindingValue; 
+    if (initialSelectionItem != undefined) {
+      try {
+        var typeElementSelector = getElementByAddress(initialSelectionItem.bindingMode, initialSelectionItem.bindingAddress)
+        typeElementSelector.value = initialSelectionItem.bindingValue;
         const event = new Event('change', { bubbles: true });
         typeElementSelector.dispatchEvent(event);
-      }
-      catch (e)
-      {
-        console.log(e)
-      }
-    }
 
-    var inputCardNumber;
+        try {
+          setTimeout(() => {
+            const cardNumberItem = obj.find((item) => item.type === "card_number");
+            if (cardNumberItem) {
+              const inputCardNumber = getElementByAddress(cardNumberItem.bindingMode, cardNumberItem.bindingAddress);
+              if (inputCardNumber) {
+                inputCardNumber.focus();
+                inputCardNumber.value = cardNumberItem.bindingValue;
+                const inputEvent = new Event('input', { bubbles: true });
+                const changeEvent = new Event('change', { bubbles: true });
+                inputCardNumber.dispatchEvent(inputEvent);
+                inputCardNumber.dispatchEvent(changeEvent);
+                inputCardNumber.blur();
+              }
+            }            
 
-    obj.forEach((item) => {
-      switch (item.type) {
-        case "card_number":
-          {
-            inputCardNumber = getElementByAddress(item.bindingMode, item.bindingAddress);
-          }
-        case "card_payment_radio_button":     
-        case "text_input":
-          {
-            if (item.bindingMode == 1) {
-              fillDataWithId(item.bindingAddress, item.bindingValue)
-            }
-            else if (item.bindingMode == 2) {
-              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-            }
-            else {
-              fillDataWithXPath(item.bindingAddress, item.bindingValue)
-            }
-            break;
-          }
+          }, 2000);
+        }
+        catch (e) {
+          console.log(e)
+        }
 
-        case 'dropdown_prefecture':
-          {
-            fillDataWithTextInSelector(item.bindingMode, item.bindingAddress, item.bindingValue)
-            break;
-          }
-
-        case "zip_code_address":
-          {
-            if (item.bindingMode == 1) {
-              fillDataWithId(item.bindingAddress, item.bindingValue)
-            }
-            else if (item.bindingMode == 2) {
-              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-            }
-            else {
-              fillDataWithXPath(item.bindingAddress, item.bindingValue)
-            }
-            break;
-          }
-        case "agree_term":
-          {
-            if (item.bindingMode == 1) {
-              fillDataAgreementWithId(item.bindingAddress, item.bindingValue)
-            }
-            else if (item.bindingMode == 2) {
-              fillDataAgreementWithCssSelector(item.bindingAddress, item.bindingValue)
-            }
-            else {
-              fillDataAgreementWithXPath(item.bindingAddress, item.bindingValue)
-            }
-            break;
-          }
-        case "slider":
-          {
-            if (item.bindingMode == 1) {
-              fillDataWithId(item.bindingAddress, item.bindingValue)
-            }
-            else if (item.bindingMode == 2) {
-              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-            }
-            else {
-              fillDataWithXPath(item.bindingAddress, item.bindingValue)
-            }
-          }
-
-        case "pull_down":
-          {
-            if (item.bindingMode == 1) {
-              fillDataWithId(item.bindingAddress, item.bindingValue)
-            }
-            else if (item.bindingMode == 2) {
-              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-            }
-            else {
-              fillDataWithXPath(item.bindingAddress, item.bindingValue)
-            }
-            break;
-          }
-
-        case "textarea":
-          {
-            if (item.bindingMode == 1) {
-              fillDataWithId(item.bindingAddress, item.bindingValue)
-            }
-            else if (item.bindingMode == 2) {
-              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-            }
-            else {
-              fillDataWithXPath(item.bindingAddress, item.bindingValue)
-            }
-            break;
-          }
-        default:
-          return;
-      }
-
-    })
-
-    if(inputCardNumber)
-    {
-
-      try {
-        const event = new Event('change', { bubbles: true });
-        inputCardNumber.dispatchEvent(event);
       }
       catch (e) {
         console.log(e)
       }
-
     }
+   
+      obj.forEach((item) => {
+        switch (item.type) {
+          case "card_payment_radio_button":     
+          case "text_input":
+            {
+              if (item.bindingMode == 1) {
+                fillDataWithId(item.bindingAddress, item.bindingValue)
+              }
+              else if (item.bindingMode == 2) {
+                fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+              }
+              else {
+                fillDataWithXPath(item.bindingAddress, item.bindingValue)
+              }
+              break;
+            }
+  
+          case 'dropdown_prefecture':
+            {
+              fillDataWithTextInSelector(item.bindingMode, item.bindingAddress, item.bindingValue)
+              break;
+            }
+  
+          case "zip_code_address":
+            {
+              if (item.bindingMode == 1) {
+                fillDataWithId(item.bindingAddress, item.bindingValue)
+              }
+              else if (item.bindingMode == 2) {
+                fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+              }
+              else {
+                fillDataWithXPath(item.bindingAddress, item.bindingValue)
+              }
+              break;
+            }
+          case "agree_term":
+            {
+              if (item.bindingMode == 1) {
+                fillDataAgreementWithId(item.bindingAddress, item.bindingValue)
+              }
+              else if (item.bindingMode == 2) {
+                fillDataAgreementWithCssSelector(item.bindingAddress, item.bindingValue)
+              }
+              else {
+                fillDataAgreementWithXPath(item.bindingAddress, item.bindingValue)
+              }
+              break;
+            }
+          case "slider":
+            {
+              if (item.bindingMode == 1) {
+                fillDataWithId(item.bindingAddress, item.bindingValue)
+              }
+              else if (item.bindingMode == 2) {
+                fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+              }
+              else {
+                fillDataWithXPath(item.bindingAddress, item.bindingValue)
+              }
+            }
+  
+          case "pull_down":
+            {
+              if (item.bindingMode == 1) {
+                fillDataWithId(item.bindingAddress, item.bindingValue)
+              }
+              else if (item.bindingMode == 2) {
+                fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+              }
+              else {
+                fillDataWithXPath(item.bindingAddress, item.bindingValue)
+              }
+              break;
+            }
+  
+          case "textarea":
+            {
+              if (item.bindingMode == 1) {
+                fillDataWithId(item.bindingAddress, item.bindingValue)
+              }
+              else if (item.bindingMode == 2) {
+                fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+              }
+              else {
+                fillDataWithXPath(item.bindingAddress, item.bindingValue)
+              }
+              break;
+            }
+          default:
+            return;
+        }
+  
+      })
+    
 
   }
 
