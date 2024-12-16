@@ -199,7 +199,7 @@ async function displayPopup() {
               }
             }            
 
-          }, 2000);
+          }, 4000);
         }
         catch (e) {
           console.log(e)
