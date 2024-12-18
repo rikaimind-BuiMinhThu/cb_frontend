@@ -5368,6 +5368,7 @@ const UserMessage = ({
         let slider = content.slider;
         let cardPaymentRadioButton = content.card_payment_radio_button;
         let variableSet = content.variable_set;
+        let buttonSubmit = content.button_submit;
         let labelNoTransition = content.label_no_transition;
 
         if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
@@ -10301,6 +10302,24 @@ const UserMessage = ({
             {/* user: type = 'button_submit' */}
             {content.type === 'button_submit' &&
               <>
+                {buttonSubmit.is_display_error_message &&
+                  <div id="error-message" className="ss-user-setting__item-text_input-top">
+                    <div style={{
+                      width: "95%",
+                      padding: "5px",
+                      border: "1px solid #f44336",
+                      backgroundColor: "#ffebee",
+                      color: "#d32f2f",
+                      borderRadius: "5px",
+                      fontFamily: "Arial, sans-serif",
+                      boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+                      margin: "10px",
+                    }}
+                    >
+                      {"error messages"}
+                    </div>
+                  </div>
+                }
                 <div className="ss-user-setting__item-text_input-top">
                   <button
                     style={{

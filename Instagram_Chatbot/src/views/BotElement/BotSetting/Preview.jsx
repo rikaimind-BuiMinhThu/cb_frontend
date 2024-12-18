@@ -3083,6 +3083,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                 let slider = content.slider;
                 let cardPaymentRadioButton = content.card_payment_radio_button;
                 let variableSet = content.variable_set;
+                let buttonSubmit = content.button_submit;
                 let labelNoTransition = content.label_no_transition;
                 if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
                     content.textarea.invalid_input.content = replaceVariable(content.textarea.invalid_input.content);
@@ -5837,6 +5838,24 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                         {/* user: type = 'button_submit' */}
                         {content.type === 'button_submit' &&
                             <>
+                                {buttonSubmit.is_display_error_message &&
+                                    <div className="ss-user-setting__item-text_input-top">
+                                        <div style={{
+                                            width: "95%",
+                                            padding: "5px",
+                                            border: "1px solid #f44336",
+                                            backgroundColor: "#ffebee",
+                                            color: "#d32f2f",
+                                            borderRadius: "5px",
+                                            fontFamily: "Arial, sans-serif",
+                                            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+                                            margin: "10px",
+                                        }}
+                                        >
+                                            {"エラーが発生しました。もう一度お試しください。 入力が正しくありません。再度確認してください。 サーバーエラーが発生しました。管理者にお問い合わせください。 この操作を実行する権限がありません。"}
+                                        </div>
+                                    </div>
+                                }
                                 <div className="ss-user-setting__item-text_input-top">
                                     <button
                                         style={{
