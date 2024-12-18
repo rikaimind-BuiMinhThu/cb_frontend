@@ -2689,6 +2689,7 @@ const Scenario = () => {
                                                     let slider = content.slider;
                                                     let cardPaymentRadioButton = content.card_payment_radio_button;
                                                     let variableSet = content.variable_set;
+                                                    let buttonSubmit = content.button_submit;
                                                     let labelNoTransition = content.label_no_transition;
                                                     return (
                                                       <React.Fragment key={indexContent}>
@@ -4425,12 +4426,52 @@ const Scenario = () => {
                                                         {/* type == 'button_submit' */}
                                                         {content.type === 'button_submit' &&
                                                           <>
+                                                            {buttonSubmit.is_display_error_message &&
+                                                              <div className="ss-user-setting__item-text_input-top">
+                                                                <div style={{
+                                                                  width: "92%",
+                                                                  padding: "5px",
+                                                                  border: "1px solid #f44336",
+                                                                  backgroundColor: "#ffebee",
+                                                                  color: "#d32f2f",
+                                                                  borderRadius: "5px",
+                                                                  fontFamily: "Arial, sans-serif",
+                                                                  boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+                                                                  margin: "8px",
+                                                                }}
+                                                                >
+                                                                  {"エラーが発生しました。もう一度お試しください。"}
+                                                                </div>
+                                                              </div>
+                                                            }
                                                             <div className="ss-user-setting__item-text_input-top">
-                                                              <Button data-id={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['button_submit_id'] ?? content.button_submit_id} className="ss-user-setting__select-btn-add" style={{ padding: '9px 23px', background: 'green' }} onClick={(e) => {
-                                                                e.stopPropagation()
-                                                              }}>{dataMessages[indexMessageSelect]?.message_content[indexContent]?.['button_submit_name'] ?? content.button_submit_name}</Button>
+                                                              <Button
+                                                                data-id={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['button_submit_id'] ?? content.button_submit_id}
+                                                                className="ss-user-setting__select-btn-add"
+                                                                style={{
+                                                                  background: "linear-gradient(135deg, #4caf50, #43a047)",
+                                                                  color: "#fff",
+                                                                  border: "none",
+                                                                  borderRadius: "25px",
+                                                                  padding: "15px 30px",
+                                                                  fontSize: "16px",
+                                                                  fontWeight: "bold",
+                                                                  cursor: "pointer",
+                                                                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                                                                  transition: "all 0.3s ease",
+                                                                  margin: '5px',
+                                                                  width: "95%",
+                                                                  alignContent: "center",
+                                                                }}
+                                                                onClick={(e) => {
+                                                                  e.stopPropagation();
+                                                                }}
+                                                              >
+                                                                {dataMessages[indexMessageSelect]?.message_content[indexContent]?.['button_submit_name'] ?? content.button_submit_name}
+                                                              </Button>
                                                             </div>
-                                                          </>}
+                                                          </>
+                                                        }
                                                         {/* type == 'label_no_transition' */}
                                                         {content.type === 'label_no_transition' && (
                                                           <div style={{ marginBottom: '10px' }}>
