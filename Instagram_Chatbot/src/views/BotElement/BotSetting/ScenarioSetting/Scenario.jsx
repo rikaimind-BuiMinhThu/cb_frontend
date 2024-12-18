@@ -11174,9 +11174,10 @@ const Scenario = () => {
                                                         <>
                                                           <div className='ss-user-setting__item-bottom' style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                               <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                                <div style={{ flexBasis: '22%', maxWidth: '22%' }}>
+                                                                <div style={{ flexBasis: '26%', maxWidth: '26%' }}>
                                                                   <SelectCustom
                                                                     id="title"
+                                                                    label="エラーメッセージ"
                                                                     style={{ width: '100%' }}
                                                                     value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['error_message_display_element_search_type']}
                                                                     onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'error_message_display_element_search_type', value)}
@@ -11190,7 +11191,7 @@ const Scenario = () => {
                                                                   />
                                                                 </div>
                                                               </Tooltip>
-                                                              <div style={{ flexBasis: '67%', maxWidth: '67%' }}>
+                                                              <div style={{ flexBasis: '63%', maxWidth: '63%', marginTop:'22px' }}>
                                                                 <InputCustom
                                                                   styleLabel={{ width: '100%' }}
                                                                   maxLength={250}

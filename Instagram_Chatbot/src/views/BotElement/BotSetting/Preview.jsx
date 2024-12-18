@@ -5848,11 +5848,17 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                             color: "#d32f2f",
                                             borderRadius: "5px",
                                             fontFamily: "Arial, sans-serif",
+                                            fontSize: "13px",
                                             boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
                                             margin: "10px",
                                         }}
                                         >
-                                            {"エラーが発生しました。もう一度お試しください。 入力が正しくありません。再度確認してください。 サーバーエラーが発生しました。管理者にお問い合わせください。 この操作を実行する権限がありません。"}
+                                            {<p>
+                                                エラーが発生しました。もう一度お試しください。<br />
+                                                入力が正しくありません。再度確認してください。<br />
+                                                サーバーエラーが発生しました。管理者にお問い合わせください
+                                            </p>
+                                            }
                                         </div>
                                     </div>
                                 }
