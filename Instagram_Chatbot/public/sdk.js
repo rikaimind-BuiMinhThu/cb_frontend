@@ -277,12 +277,15 @@ async function displayPopup() {
             {
               if (item.bindingMode == 1) {
                 fillDataWithId(item.bindingAddress, item.bindingValue)
+                element.dispatchEvent(new Event('change', { bubbles: true }));
               }
               else if (item.bindingMode == 2) {
                 fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+                element.dispatchEvent(new Event('change', { bubbles: true }));
               }
               else {
                 fillDataWithXPath(item.bindingAddress, item.bindingValue)
+                element.dispatchEvent(new Event('change', { bubbles: true }));
               }
               break;
             }
