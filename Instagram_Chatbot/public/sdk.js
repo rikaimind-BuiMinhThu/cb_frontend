@@ -330,6 +330,7 @@ async function displayPopup() {
       const optionToSelect = Array.from(element.options).find(option => option.text === value);
       if (optionToSelect) {
         fillDataToElement(element, optionToSelect.value);
+        element.dispatchEvent(new Event('change', { bubbles: true }));
       }
     }
     else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
