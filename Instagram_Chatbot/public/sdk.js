@@ -275,7 +275,7 @@ async function displayPopup() {
   
           case "pull_down":
             {
-              let element = document.getElementByAddress(item.bindingAddress);
+              let element = getElementByAddress(item.bindingAddress);
               if (item.bindingMode == 1) {
                 fillDataWithId(item.bindingAddress, item.bindingValue)
                 element.dispatchEvent(new Event('change', { bubbles: true }));
