@@ -3222,13 +3222,22 @@ function Preview() {
                 const temp = dataSessionStorage.find(x => x.id === data.id)
                 if (temp) data.message_content = [...temp.message_content]
               }
+             try
+             {
               renderMessage[indexMessage].disabled = false;
               renderMessageArr[indexMessage].disabled = false;
+              const isIdExist = renderMessageArr.some((message) => message.id === data.id);
+
+              if (isIdExist) {
+               return;
+              } 
               renderMessage.push(data);
               setRenderMessageArr([...renderMessage]);
               if (isPauseScroll === false) {
                 scrollToBottom();
               }
+             }
+             catch {}
             });
             index = i;
             break;
@@ -4419,7 +4428,7 @@ function Preview() {
           {renderMessageArr.map((message, indexMessage) => {
             return (
               <React.Fragment key={indexMessage}>
-                {message.belong_to === "bot" &&
+                {message.belong_to === "bot" && Array.isArray(message?.message_content) &&
                   message?.message_content.map((content, index) => {
                     return (
                       <BotMessage
@@ -4431,15 +4440,19 @@ function Preview() {
                       />
                     );
                   })}
-                {message.belong_to === "user" && (
+                {message &&
+                  message.belong_to === "user" &&
+                  message.message_content &&
+                  message.message_content.length > 0 &&
+                  (
                   <div
                     // id={`sp-body-user-side-${indexMessage}`}
                     className="sp-body-user-side slideLeft"
                   >
-                    <div className="sp-body-user-side-messages">
+                    <div className="sp-body-user-side-messages">                
                       <UserMessage
                         captcha={captcha}
-                        messageContentProps={message.message_content}
+                        messageContentProps={message?.message_content}
                         disabled={message.disabled}
                         onChangeValue={(
                           indexContent,
