@@ -49,7 +49,8 @@ import { func } from "prop-types";
 
 const _ = require("lodash");
 sessionStorage.setItem("prevOpenStatus", "0");
-
+let errorMessageSubmit='';
+let isDisplayErrorMessage = false;
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
   if (i < 10) {
@@ -64,7 +65,6 @@ for (let i = 0; i <= 23; i++) {
     });
   }
 }
-
 let dataMinutes = [];
 for (let i = 0; i <= 59; i++) {
   if (i < 10) {
@@ -230,7 +230,11 @@ function Preview() {
   const [activePopupCloseBot, setActivePopupCloseBot] = useState(true);
   const [titleBubble, setTitleBubble] = useState("");
   const [styleModal, setStyleModal] = useState({});
-
+  const [displayErrorMessage, setDisplayErrorMessage] = useState({
+    isDisplay:"true",
+    address:"1",
+    messageContent:""
+  });
   const [scenarioUserResponses, setScenarioUserResponses] = useState([])
   const [checkoutUrl, setCheckoutUrl] = useState("")
 
@@ -252,7 +256,7 @@ function Preview() {
       dataObj.start_datetime = new Date();
     });
     return dataObj;
-  });
+  }); 
 
   function handleStyleModal() {
 
@@ -357,6 +361,18 @@ function Preview() {
         if (event.data === 'openPreview' && isOpen !== true) {
           onOpenPreview(true)
         }
+        if(event.data.text!=undefined && event.data.text.length>0)
+        {
+          if(isDisplayErrorMessage)
+          {
+
+            errorMessageSubmit = event.data.text;
+          }
+          else
+          {
+            errorMessageSubmit = '';
+          }
+        }
 
         const { key, value } = event.data;
         console.log(`Key: ${key}, Value: ${value}`);
@@ -444,7 +460,7 @@ function Preview() {
     if (isOpen && activePopupCloseBot) {
       setShowPopupCloseBot(true)
       return;
-    }
+    } 
 
     if (isOpen && !activePopupCloseBot) {
       const element = document.getElementById('sp-container1');
@@ -508,7 +524,7 @@ function Preview() {
 
         document.getElementById("sp-body").style.display = "block";
       }
-    }
+    }   
   }
 
   function lightenColor(hex, opacity) {
@@ -562,6 +578,45 @@ function Preview() {
         )
         .then(async (res) => {
           if (res.data.code == 1) {
+
+            var listMessage = res.data.data.conversation.messages
+            if(listMessage.length>0)
+              {
+                for (const item of listMessage) {
+                  if (item?.message_content) {                 
+                    for(const itemTwo of item.message_content)
+                    {
+                      if(itemTwo.type=="button_submit")
+                      {
+                        const errorObject = {
+                          isDisplay: itemTwo.button_submit.is_display_error_message,
+                          seachMode: itemTwo.error_message_display_element_search_type,
+                          searchValue: itemTwo.error_message_display_element_search_value,
+                        };  
+                        isDisplayErrorMessage = itemTwo.button_submit.is_display_error_message; 
+                        window.parent.postMessage(
+                          {
+                            isOpen: true,
+                            widthPc: widthPc,
+                            heightPc: heightPc,
+                            widthSp: widthSp,
+                            heightSp: heightSp,
+                            chatbotRight: rightMarginPc,
+                            chatbotBottom: bottomMarginPc,
+                            fukushashikiResponse: undefined,
+                            getErrorMessage: errorObject,
+                          },
+                          '*'
+                        );              
+                        break;
+                      }
+                    }
+  
+                  }
+                }
+                
+              }
+
             if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
               sessionStorage.setItem("prevOpenStatus", "1");
               const openChatbotCountApiParams = {
@@ -1104,6 +1159,18 @@ function Preview() {
             }
             // setIndexMessageRender(index);
             // setRenderMessageArr(renderMessage);
+            try {      
+              var dataMessageInLocalStorage = getMessagesSessionStorage();        
+              if (dataMessageInLocalStorage) {
+                setRenderMessageArr(dataMessageInLocalStorage)
+                setIsOpen(true)  
+               
+              }
+            }
+            catch {
+        
+            }
+            scrollToBottom();
           }
         })
         .catch((error) => {
@@ -2612,7 +2679,14 @@ function Preview() {
       return;
     }
     let renderMessage = [...renderMessageArr];
-    renderMessageArr[indexMessage].disabled = true;
+    if(errorMessageSubmit.length>0)
+      {
+        renderMessageArr[indexMessage].disabled = false;
+      }
+      else
+      {
+        renderMessageArr[indexMessage].disabled = true;
+      }
     setRenderMessageArr(renderMessageArr)
     let index;
     let isPauseScroll = false;
@@ -3157,13 +3231,22 @@ function Preview() {
                 const temp = dataSessionStorage.find(x => x.id === data.id)
                 if (temp) data.message_content = [...temp.message_content]
               }
+             try
+             {
               renderMessage[indexMessage].disabled = false;
               renderMessageArr[indexMessage].disabled = false;
+              const isIdExist = renderMessageArr.some((message) => message.id === data.id);
+
+              if (isIdExist) {
+               return;
+              } 
               renderMessage.push(data);
               setRenderMessageArr([...renderMessage]);
               if (isPauseScroll === false) {
                 scrollToBottom();
               }
+             }
+             catch {}
             });
             index = i;
             break;
@@ -4354,7 +4437,7 @@ function Preview() {
           {renderMessageArr.map((message, indexMessage) => {
             return (
               <React.Fragment key={indexMessage}>
-                {message.belong_to === "bot" &&
+                {message.belong_to === "bot" && Array.isArray(message?.message_content) &&
                   message?.message_content.map((content, index) => {
                     return (
                       <BotMessage
@@ -4366,15 +4449,19 @@ function Preview() {
                       />
                     );
                   })}
-                {message.belong_to === "user" && (
+                {message &&
+                  message.belong_to === "user" &&
+                  message.message_content &&
+                  message.message_content.length > 0 &&
+                  (
                   <div
                     // id={`sp-body-user-side-${indexMessage}`}
                     className="sp-body-user-side slideLeft"
                   >
-                    <div className="sp-body-user-side-messages">
+                    <div className="sp-body-user-side-messages">                
                       <UserMessage
                         captcha={captcha}
-                        messageContentProps={message.message_content}
+                        messageContentProps={message?.message_content}
                         disabled={message.disabled}
                         onChangeValue={(
                           indexContent,
@@ -10302,9 +10389,10 @@ const UserMessage = ({
             {/* user: type = 'button_submit' */}
             {content.type === 'button_submit' &&
               <>
-                {buttonSubmit.is_display_error_message &&
-                  <div id="error-message" className="ss-user-setting__item-text_input-top">
-                    <div style={{
+              {buttonSubmit.is_display_error_message && errorMessageSubmit.length>0 && (
+                <div id="error-message" className="ss-user-setting__item-text_input-top">
+                  <div
+                    style={{
                       width: "95%",
                       padding: "5px",
                       border: "1px solid #f44336",
@@ -10315,11 +10403,11 @@ const UserMessage = ({
                       boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
                       margin: "10px",
                     }}
-                    >
-                      {"error messages"}
-                    </div>
+                  >
+                    {errorMessageSubmit}
                   </div>
-                }
+                </div>
+              )}
                 <div className="ss-user-setting__item-text_input-top">
                   <button
                     style={{

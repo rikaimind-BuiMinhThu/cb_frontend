@@ -4,6 +4,13 @@ let chatbotH = sessionStorage.getItem("chatbotH");
 let chatbotRight = sessionStorage.getItem("chatbotRight");
 let chatbotW = sessionStorage.getItem("chatbotW");
 let scenarioId = "";
+let displayErrorMessage = {
+ 
+  isDisplay: "false",
+  seachMode: "",
+  searchValue: ""
+
+}
 let head = document.getElementsByTagName("head")[0];
 let script = document.createElement("script");
 script.type = "text/javascript";
@@ -63,6 +70,12 @@ function getEcChatBotFrontEndBaseUrl() {
       return "http://localhost:3001";
   }
 }
+let globalIframe
+function sendMessageToChatbot(mm)
+{
+  const message = { text: String(mm) };
+  globalIframe.contentWindow.postMessage(message, "*");
+}
 
 async function displayPopup() {
   const device =
@@ -119,7 +132,7 @@ async function displayPopup() {
   iframe.style.zIndex = "999999";
   iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
     }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}`;
-
+  currentIframe = iframe
   body.appendChild(iframe);
 
   window.addEventListener(
@@ -131,6 +144,10 @@ async function displayPopup() {
       chatbotBottom = e.data.chatbotBottom
       if (e.data.fukushashikiResponse) {
         fillDataFromMessage(e.data.fukushashikiResponse)
+      }
+      if(e.data.getErrorMessage)
+      {
+        processErrorMessage(e.data.getErrorMessage)
       }
       if (e.data.isOpen && mobileCheck()) {
         iframe.width = "100%";
@@ -163,6 +180,7 @@ async function displayPopup() {
         iframe.style.bottom = "0px";
         iframe.style.right = "0px";
       }
+      globalIframe = iframe;
 
       if (e.data.action === 'clickButton') {
         var button = document.getElementById(e.data.id_value);
@@ -173,6 +191,36 @@ async function displayPopup() {
     },
     false
   );
+
+  function processErrorMessage(obj)
+  {
+    displayErrorMessage.isDisplay = obj.isDisplay
+    displayErrorMessage.searchValue = obj.searchValue
+    displayErrorMessage.seachMode = obj.seachMode
+    if(displayErrorMessage.isDisplay)
+    {
+      var element = getElementByAddress(displayErrorMessage.seachMode, displayErrorMessage.searchValue)
+      if(element)
+      {
+        var contentMessage = element.innerText;
+        sendMessageToChatbot(contentMessage);
+        // const iframe = document.getElementById('previewSdk');
+        // if (iframe) {
+        //   const currentIframe = iframe.contentWindow;
+        //   if (currentIframe) {
+        //     currentIframe.postMessage(
+        //       { errorMessageContent: "Hello from parent!" },
+        //       '*'
+        //     );
+        //   } else {
+        //     console.error('Iframe contentWindow is null.');
+        //   }
+        // } else {
+        //   console.error('Iframe not found!');
+        // }
+      }
+    }
+  }
 
   function fillDataFromMessage(obj) {
     const initialSelectionItem = obj.find((item) => item.type === "initial_selection");
