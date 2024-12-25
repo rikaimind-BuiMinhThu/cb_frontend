@@ -460,17 +460,7 @@ function Preview() {
     if (isOpen && activePopupCloseBot) {
       setShowPopupCloseBot(true)
       return;
-    }
-
-    try {
-      var dataMessageInLocalStorage = getMessagesSessionStorage();
-      if (dataMessageInLocalStorage) {
-        setRenderMessageArr(dataMessageInLocalStorage)
-      }
-    }
-    catch {
-
-    }
+    } 
 
     if (isOpen && !activePopupCloseBot) {
       const element = document.getElementById('sp-container1');
@@ -534,7 +524,7 @@ function Preview() {
 
         document.getElementById("sp-body").style.display = "block";
       }
-    }
+    }   
   }
 
   function lightenColor(hex, opacity) {
@@ -1169,6 +1159,18 @@ function Preview() {
             }
             // setIndexMessageRender(index);
             // setRenderMessageArr(renderMessage);
+            try {      
+              var dataMessageInLocalStorage = getMessagesSessionStorage();        
+              if (dataMessageInLocalStorage) {
+                setRenderMessageArr(dataMessageInLocalStorage)
+                setIsOpen(true)  
+               
+              }
+            }
+            catch {
+        
+            }
+            scrollToBottom();
           }
         })
         .catch((error) => {
@@ -2677,7 +2679,14 @@ function Preview() {
       return;
     }
     let renderMessage = [...renderMessageArr];
-    renderMessageArr[indexMessage].disabled = true;
+    if(errorMessageSubmit.length>0)
+      {
+        renderMessageArr[indexMessage].disabled = false;
+      }
+      else
+      {
+        renderMessageArr[indexMessage].disabled = true;
+      }
     setRenderMessageArr(renderMessageArr)
     let index;
     let isPauseScroll = false;
