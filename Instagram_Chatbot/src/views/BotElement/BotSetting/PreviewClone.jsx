@@ -614,8 +614,13 @@ function Preview() {
   
                   }
                 }
+
+              if(errorMessageSubmit.trim().length>0 && isDisplayErrorMessage==true)
+                {
+                  res.data.design_settings.display_type = 1;
+                }
                 
-              }
+              }          
 
             if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
               sessionStorage.setItem("prevOpenStatus", "1");
@@ -1160,11 +1165,12 @@ function Preview() {
             // setIndexMessageRender(index);
             // setRenderMessageArr(renderMessage);
             try {      
-              var dataMessageInLocalStorage = getMessagesSessionStorage();        
-              if (dataMessageInLocalStorage) {
-                setRenderMessageArr(dataMessageInLocalStorage)
-                setIsOpen(true)  
-               
+              if (isDisplayErrorMessage==true && errorMessageSubmit.trim().length>0) {
+                var dataMessageInLocalStorage = getMessagesSessionStorage();
+                if (dataMessageInLocalStorage) {
+                  setRenderMessageArr(dataMessageInLocalStorage)
+                  setIsOpen(true)
+                }
               }
             }
             catch {
