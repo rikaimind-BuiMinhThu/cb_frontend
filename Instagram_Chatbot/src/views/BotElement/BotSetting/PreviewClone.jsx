@@ -361,7 +361,7 @@ function Preview() {
         if (event.data === 'openPreview' && isOpen !== true) {
           onOpenPreview(true)
         }
-        if(event.data.text!=undefined && event.data.text.length>0)
+        if(event.data.text!=undefined && event.data.text.trim().length>0)
         {
           if(isDisplayErrorMessage)
           {
@@ -371,9 +371,12 @@ function Preview() {
           else
           {
             errorMessageSubmit = '';
-          }
+          }         
         }
-
+        else
+        {
+          errorMessageSubmit = '';
+        }
         const { key, value } = event.data;
         console.log(`Key: ${key}, Value: ${value}`);
       },
@@ -2686,13 +2689,13 @@ function Preview() {
     }
     let renderMessage = [...renderMessageArr];
     if(errorMessageSubmit.length>0)
-      {
+    {
         renderMessageArr[indexMessage].disabled = false;
-      }
+    }
       else
-      {
+    {
         renderMessageArr[indexMessage].disabled = true;
-      }
+    }
     setRenderMessageArr(renderMessageArr)
     let index;
     let isPauseScroll = false;
@@ -2802,7 +2805,13 @@ function Preview() {
       }
 
       for (let i = 0; i < renderMessage.length; i++) {
-        renderMessage[i].disabled = true;
+        if (errorMessageSubmit.length > 0) {
+          renderMessage[i].disabled = false;
+        }
+        else {
+          renderMessage[i].disabled = true;
+        }
+
       }
       return setRenderMessageArr(renderMessage)
       // renderMessage[indexMessage].disabled = false
