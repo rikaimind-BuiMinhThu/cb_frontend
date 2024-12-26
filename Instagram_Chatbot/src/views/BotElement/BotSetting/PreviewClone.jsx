@@ -623,8 +623,7 @@ function Preview() {
                   res.data.design_settings.display_type = 1;
                 }
                 
-              }          
-
+              }
             if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
               sessionStorage.setItem("prevOpenStatus", "1");
               const openChatbotCountApiParams = {
@@ -4477,7 +4476,7 @@ function Preview() {
                       <UserMessage
                         captcha={captcha}
                         messageContentProps={message?.message_content}
-                        disabled={message.disabled}
+                        disabled={errorMessageSubmit.length > 0 ? false : message.disabled}
                         onChangeValue={(
                           indexContent,
                           contentType,
@@ -4520,7 +4519,7 @@ function Preview() {
                         : true) && (
                           <div className="sp-user-message-button-action">
                             <Button
-                              disabled={message.disabled}
+                              disabled={errorMessageSubmit.length > 0 ? false : message.disabled}
                               style={{
                                 backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
                                 borderRadius: "25px",
