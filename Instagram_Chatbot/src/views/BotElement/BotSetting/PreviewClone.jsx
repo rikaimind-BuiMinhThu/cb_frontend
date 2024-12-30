@@ -1171,6 +1171,7 @@ function Preview() {
                   setRenderMessageArr(dataMessageInLocalStorage)
                   const filteredMessages = dataMessageInLocalStorage.filter(x => x.belongto === 'user' && x.hidden!==true);
                   setMessageUser(filteredMessages)
+                  setIndexUser(filteredMessages.length)
                   setIsOpen(true)
                 }
               }
