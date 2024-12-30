@@ -9,6 +9,7 @@ import InputCustom from "./ScenarioSetting/scenarioComon/InputCustom";
 import { Button } from "reactstrap";
 import ModalNoti from "../../../views/Popup/ModalNoti";
 import ModalPreviewBot from '../../../views/Popup/ModalPreviewBot';
+import CustomButton from "./CustomButton";
 import {
   Checkbox,
   Radio,
@@ -362,7 +363,7 @@ function Preview() {
           onOpenPreview(true)
         }
         if(event.data.text!=undefined && event.data.text.trim().length>0)
-        {
+        { 
           if(isDisplayErrorMessage)
           {
 
@@ -581,7 +582,6 @@ function Preview() {
         )
         .then(async (res) => {
           if (res.data.code == 1) {
-
             var listMessage = res.data.data.conversation.messages
             if(listMessage.length>0)
               {
@@ -617,11 +617,10 @@ function Preview() {
   
                   }
                 }
-
               if(errorMessageSubmit.trim().length>0 && isDisplayErrorMessage==true)
                 {
                   res.data.design_settings.display_type = 1;
-                }
+                }              
                 
               }
             if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
@@ -643,8 +642,7 @@ function Preview() {
 
             let variablesAll = res.data?.all_variables || [];
             setDataVariables(variablesAll);
-
-            setDataMessages(messageArr);
+            setDataMessages(messageArr);       
             setUrlThanksPage(urlThanks);
             if (res.data.chatbot) {
               let opacity_color, message_color, font_color, icon_mess;
@@ -1171,6 +1169,8 @@ function Preview() {
                 var dataMessageInLocalStorage = getMessagesSessionStorage();
                 if (dataMessageInLocalStorage) {
                   setRenderMessageArr(dataMessageInLocalStorage)
+                  const filteredMessages = dataMessageInLocalStorage.filter(x => x.belongto === 'user' && x.hidden!==true);
+                  setMessageUser(filteredMessages)
                   setIsOpen(true)
                 }
               }
@@ -3255,7 +3255,7 @@ function Preview() {
                return;
               } 
               renderMessage.push(data);
-              setRenderMessageArr([...renderMessage]);
+                 setRenderMessageArr([...renderMessage]);
               if (isPauseScroll === false) {
                 scrollToBottom();
               }
@@ -4449,7 +4449,7 @@ function Preview() {
           style={{ backgroundColor: botInfor?.opacity_color, flex: 1 }}
         >
           {renderMessageArr.map((message, indexMessage) => {
-            return (
+            return (            
               <React.Fragment key={indexMessage}>
                 {message.belong_to === "bot" && Array.isArray(message?.message_content) &&
                   message?.message_content.map((content, index) => {
@@ -4518,21 +4518,23 @@ function Preview() {
                         ? dataMessages[indexMessage].is_display_button_next
                         : true) && (
                           <div className="sp-user-message-button-action">
-                            <Button
-                              disabled={errorMessageSubmit.length > 0 ? false : message.disabled}
-                              style={{
-                                backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
-                                borderRadius: "25px",
-                              }}
-                              className="ss-user-message__action-btn"
-                              onClick={() => onClickNext(indexMessage, message)}
-                            >
-                              {message.buttonName || (indexMessage >= indexMessageRender ? "次へ" : "更新")}
-                            </Button>
+                          <CustomButton
+                            disabled={errorMessageSubmit.length > 0 ? false : message.disabled}
+                            style={{
+                              backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
+                              borderRadius: "25px",
+                            }}
+                            className="ss-user-message__action-btn"
+                            onClick={() => onClickNext(indexMessage, message)}
+                            autoClick = {errorMessageSubmit.trim().length > 0 ? true : false}
+                            messsagetype={dataMessages[indexMessage].message_content[0]?.type}
+                          >
+                            {message.buttonName || (indexMessage >= indexMessageRender ? "次へ" : "更新")}
+                          </CustomButton>
                           </div>
                         )}
                     </div>
-                  </div>
+                  </div>  
                 )}
               </React.Fragment>
             );
@@ -5030,7 +5032,7 @@ const UserMessage = ({
   }, [errorsProps]);
 
   useEffect(() => {
-    setMessageContent(messageContentProps);
+      setMessageContent(messageContentProps);
   }, [messageContentProps]);
 
   useEffect(() => {
