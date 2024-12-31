@@ -10421,7 +10421,7 @@ const UserMessage = ({
             {/* user: type = 'button_submit' */}
             {content.type === 'button_submit' &&
               <>
-              {buttonSubmit.is_display_error_message && errorMessageSubmit.length>0 && (
+              {buttonSubmit.is_display_error_message && errorMessageSubmit.length > 0 && (
                 <div className="ss-user-setting__item-text_input-top">
                   <div
                     style={{
@@ -10436,13 +10436,12 @@ const UserMessage = ({
                       margin: "10px",
                     }}
                     id="error-message"
-                  >
-                    {errorMessageSubmit}
-                  </div>
+                    dangerouslySetInnerHTML={{ __html: errorMessageSubmit }}
+                  />
                 </div>
               )}
-                <div className="ss-user-setting__item-text_input-top">
-                  <button
+              <div className="ss-user-setting__item-text_input-top">
+                <button
                     style={{
                       background: "linear-gradient(135deg, #4caf50, #43a047)",
                       color: "#fff",
