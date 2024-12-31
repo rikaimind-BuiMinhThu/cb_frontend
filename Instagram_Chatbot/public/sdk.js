@@ -202,7 +202,7 @@ async function displayPopup() {
       var element = getElementByAddress(displayErrorMessage.seachMode, displayErrorMessage.searchValue)
       if(element)
       {
-        var contentMessage = element.innerText;
+        var contentMessage = element.innerHTML;
         sendMessageToChatbot(contentMessage);
         // const iframe = document.getElementById('previewSdk');
         // if (iframe) {

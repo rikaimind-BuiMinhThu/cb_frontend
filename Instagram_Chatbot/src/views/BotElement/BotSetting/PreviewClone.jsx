@@ -2476,13 +2476,28 @@ function Preview() {
             }
           case 'agree_term':
             {
-              const fukuObject = {
-                type: message.type,
-                bindingMode: message.fukushashiki_search_mode,
-                bindingAddress: message.fukushashiki_search_value,
-                bindingValue: message.agree_term.isAgree,
-              };
-              listFukuObject.push(fukuObject);
+              let searchValue = message.fukushashiki_search_value;
+              if (searchValue.includes(',')) {
+                let values = searchValue.split(',');
+                values.forEach(value => {
+                  let trimmedValue = value.trim();
+                  const fukuObject = {
+                    type: message.type,
+                    bindingMode: message.fukushashiki_search_mode,
+                    bindingAddress: trimmedValue,
+                    bindingValue: message.agree_term.isAgree,
+                  };
+                  listFukuObject.push(fukuObject);
+                });
+              } else {
+                const fukuObject = {
+                  type: message.type,
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.agree_term.isAgree,
+                };
+                listFukuObject.push(fukuObject);
+              }
               break;
             }
           case 'slider':
@@ -10407,7 +10422,7 @@ const UserMessage = ({
             {content.type === 'button_submit' &&
               <>
               {buttonSubmit.is_display_error_message && errorMessageSubmit.length>0 && (
-                <div id="error-message" className="ss-user-setting__item-text_input-top">
+                <div className="ss-user-setting__item-text_input-top">
                   <div
                     style={{
                       width: "95%",
@@ -10420,6 +10435,7 @@ const UserMessage = ({
                       boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
                       margin: "10px",
                     }}
+                    id="error-message"
                   >
                     {errorMessageSubmit}
                   </div>
