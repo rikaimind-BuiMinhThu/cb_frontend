@@ -4033,6 +4033,26 @@ function Preview() {
     }
   };
 
+  const isPopUpZipCodeShippingAddress = (isOpen, indexContent) => {
+    if (isOpen === true) {
+      setPrefectures(null);
+      setCities(null);
+      setTowns(null);
+      setZipcode(null);
+      document.getElementById("sp-withdrawal-container").style.display =
+        "block";
+      document.getElementById("sp-popup-zip-code-address2").style.display =
+        "block";
+    } else {
+      document.getElementById("sp-withdrawal-container").style.display = "none";
+      document.getElementById("sp-popup-zip-code-address2").style.display =
+        "none";
+    }
+    if (indexContent !== undefined) {
+      setContentZipcode(indexContent);
+    }
+  };
+
   const onChangeErrors = (field, value) => {
     errors[field] = value;
     setErrors({
@@ -4344,6 +4364,204 @@ function Preview() {
             </div>
           </div>
         </div>
+        {/*For shipping address */}
+        <div id="sp-popup-zip-code-address2" className="sp-popup-zip-code-address">
+          <div className="sp-popup-zip-code-address-header">
+            <div className="sp-popup-zip-code-address-header-left">
+              住所で郵便番号を検索する
+            </div>
+            <div className="sp-popup-zip-code-address-header-right">
+              <MDBIcon
+                style={{ width: "5%", marginLeft: "3px", cursor: "pointer" }}
+                fas
+                onClick={() => isPopUpZipCodeShippingAddress(false)}
+                icon="times"
+                className={"sp-plus-circle-option-icon-times-custom"}
+              />
+            </div>
+          </div>
+          <div className="sp-popup-zip-code-address-body">
+            <div className="sp-popup-zip-code-address-body-form">
+              <SelectCustom
+                style={{ width: "100%", marginBottom: "7px" }}
+                keyValue="name"
+                nameValue="name"
+                placeholder="都道府県を選択してください"
+                data={dataPrefectures}
+                onChange={async (value) => {
+                  setPrefectures(value);
+                  setCities(null);
+                  setTowns(null);
+                  setZipcode(null);
+                  if (value) {
+                    let prefecture_jis_code = dataPrefectures.find(
+                      (item) => item.name === value
+                    ).prefecture_jis_code;
+                    api
+                      .get(
+                        `/api/v1/cities?prefecture_jis_code=${prefecture_jis_code}`
+                      )
+                      .then((res) => {
+                        if (res.data.code === 1) {
+                          setDataCities(res.data.data);
+                        }
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                      });
+                  }
+                }}
+                value={prefectures}
+              />
+              <SelectCustom
+                style={{ width: "100%", marginBottom: "7px" }}
+                keyValue="city_name"
+                nameValue="city_name"
+                placeholder="市区を選択してください"
+                data={dataCities || []}
+                onChange={async (value) => {
+                  setCities(value);
+                  setTowns(null);
+                  setZipcode(null);
+
+                  if (value) {
+                    let city_jis_code = dataCities.find(
+                      (item) => item.city_name === value
+                    ).city_jis_code;
+                    api
+                      .get(`/api/v1/towns?city_jis_code=${city_jis_code}`)
+                      .then((res) => {
+                        if (res.data.code === 1) {
+                          setDataTowns(res.data.data);
+                        }
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                      });
+                  }
+                }}
+                value={cities}
+              />
+              <SelectCustom
+                style={{ width: "100%", marginBottom: "7px" }}
+                keyValue="town_name"
+                nameValue="town_name"
+                placeholder="町村を選択してください"
+                data={dataTowns || []}
+                onChange={(value) => {
+                  setTowns(value);
+                  if (value) {
+                    let zipcode = dataTowns.find(
+                      (item) => item.town_name === value
+                    ).zip_code;
+                    setZipcode(zipcode);
+                  } else {
+                    setZipcode(null);
+                  }
+                }}
+                value={towns}
+              />
+              {zipcode && (
+                <div className="sp-popup-zip-code-address-body-form-content">
+                  〒{zipcode}
+                </div>
+              )}
+            </div>
+            <div className="sp-popup-zip-code-address-body-button">
+              <div
+                className="sp-popup-zip-code-address-body-button-cancel"
+                onClick={() => isPopUpZipCodeShippingAddress(false)}
+              >
+                キャンセル
+              </div>
+              <div
+                className="sp-popup-zip-code-address-body-button-selection"
+                style={zipcode ? {} : { opacity: "0.5" }}
+                onClick={() => {
+                  if (
+                    zipcode &&
+                    indexContentZipcode !== undefined &&
+                    !dataMessages[indexMessageRender].message_content[
+                      indexContentZipcode
+                    ].shipping_address.split_postal_code
+                  ) {
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      zipcode,
+                      "value_post_code"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      prefectures,
+                      "value_prefecture"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      `${cities}${towns}`,
+                      "value_municipality"
+                    );
+                    document.getElementById(
+                      "sp-withdrawal-container"
+                    ).style.display = "none";
+                    document.getElementById(
+                      "sp-popup-zip-code-address2"
+                    ).style.display = "none";
+                  } else if (
+                    zipcode &&
+                    indexContentZipcode !== undefined &&
+                    dataMessages[indexMessageRender].message_content[
+                      indexContentZipcode
+                    ].shipping_address.split_postal_code
+                  ) {
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      zipcode.slice(0, 3),
+                      "value_post_code_left"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      zipcode.slice(3),
+                      "value_post_code_right"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      prefectures,
+                      "value_prefecture"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      `${cities}${towns}`,
+                      "value_municipality"
+                    );
+                    document.getElementById(
+                      "sp-withdrawal-container"
+                    ).style.display = "none";
+                    document.getElementById(
+                      "sp-popup-zip-code-address2"
+                    ).style.display = "none";
+                  }
+                  document.getElementById("ss-user-input-address").focus();
+                  document.getElementById("ss-user-input-address").select();
+                }}
+              >
+                選択
+              </div>
+            </div>
+          </div>
+        </div>
         <div
           id="sp-header"
           style={
@@ -4386,7 +4604,6 @@ function Preview() {
             </div>
           </div>
         </div>
-
         {activePopupCloseBot ?
           <ModalPreviewBot
             isMobile={mobileCheck()}
@@ -4507,6 +4724,9 @@ function Preview() {
                         dataPrefectures={[...dataPrefectures]}
                         isPopUpZipCode={(isOpen, indexContent) =>
                           isPopUpZipCode(isOpen, indexContent)
+                        }
+                        isPopUpZipCodeShippingAddress={(isOpen, indexContent) =>
+                          isPopUpZipCodeShippingAddress(isOpen, indexContent)
                         }
                         onChangeErrors={(field, value) =>
                           onChangeErrors(field, value)
@@ -4952,6 +5172,7 @@ const UserMessage = ({
   onClickNext,
   displayButtonNext,
   isPopUpZipCode,
+  isPopUpZipCodeShippingAddress,
   onChangeErrors,
   dataPrefectures,
   variables
@@ -6013,7 +6234,7 @@ const UserMessage = ({
                           <span
                             style={!disabled ? { cursor: "pointer" } : {}}
                             onClick={() => {
-                              if (disabled !== true) isPopUpZipCode(true, indexContent);
+                              if (disabled !== true) isPopUpZipCodeShippingAddress(true, indexContent);
                             }}
                           >
                             〒検索はこちら
