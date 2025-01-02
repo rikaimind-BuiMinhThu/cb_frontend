@@ -2858,6 +2858,11 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                 } else if (cardPaymentRadioButton.initial_selection_picture) {
                     onChangeValue(indexContent, content.type, cardPaymentRadioButton.initial_selection_picture, 'initial_selection_picture');
                 }
+            } else if (content.type === "shipping_address") {
+                let shippingAddress = content.shipping_address;
+                if (shippingAddress.initial_selection) {
+                    onChangeValue(indexContent, content.type, shippingAddress.initial_selection, 'initial_selection');
+                }
             } else if (content.type === 'product_purchase') {
                 let productPurchase = content.product_purchase;
                 onChangeValue(indexContent, content.type, productPurchase.initial_selection, 'initial_selection');
@@ -3082,6 +3087,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                 let afteePaymentModule = content.AFTEE_payment_module;
                 let slider = content.slider;
                 let cardPaymentRadioButton = content.card_payment_radio_button;
+                let shippingAddress = content.shipping_address;
                 let variableSet = content.variable_set;
                 let buttonSubmit = content.button_submit;
                 let labelNoTransition = content.label_no_transition;
@@ -5825,6 +5831,204 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                                     />
                                                 </div>
                                             }
+                                            {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
+                                                <div style={{ color: '#FF7E00', fontSize: '12px' }}>
+                                                    {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
+                                                </div>
+                                            }
+                                        </React.Fragment>
+                                    }
+                                </div>
+                            )
+                        }
+                        {/* type == 'shipping_address' */}
+                        {
+                            content.type === 'shipping_address' && (
+                                <div style={{ marginBottom: '10px' }}>
+                                    {(shippingAddress.title_require || shippingAddress.require) &&
+                                        <div className="ss-message__content--user-text-input-top" style={{ marginBottom: '0px' }}>
+                                            {shippingAddress.title_require &&
+                                                <span className="ss-message__content--user-text-input-title">
+                                                    {shippingAddress.title}
+                                                </span>
+                                            }
+                                            {shippingAddress.require === true &&
+                                                <span className="ss-message__content--user-text-input-required">
+                                                    ※必須
+                                                </span>
+                                            }
+                                        </div>
+                                    }
+                                    {<Radio.Group
+                                            style={{ width: "100%", fontSize: '14px' }}
+                                            disabled={disabled}
+                                            value={shippingAddress.initial_selection}
+                                        >
+                                            {shippingAddress.radio_contents && shippingAddress.radio_contents.map((itemPayment, indexPayment) => {
+                                                return <Radio value={itemPayment.value} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%' }}
+                                                    onChange={() => {
+                                                        let dataValue;
+                                                        if (shippingAddress.initial_selection !== itemPayment.value) {
+                                                            dataValue = itemPayment.value;
+                                                        } else {
+                                                            dataValue = "";
+                                                        }
+                                                        onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
+
+                                                        if (shippingAddress.card_linked_setting.includes( dataValue)) {
+                                                            onChangeValue(indexContent, content.type, true, 'is_display_card_payment');
+                                                            displayButtonNext(true);
+                                                        } else {
+                                                            displayButtonNext(false);
+                                                            onChangeValue(indexContent, content.type, false, 'is_display_card_payment');
+                                                            if (messageContent.length === 1) onClickNext();
+                                                        }
+                                                    }}>
+                                                    {itemPayment.text}
+                                                </Radio>
+                                            })}
+                                        </Radio.Group>
+                                    }
+                                    {(shippingAddress.card_linked_setting.length > 0 && shippingAddress.card_linked_setting.includes(shippingAddress.initial_selection)) &&
+                                        <React.Fragment>
+                                            {shippingAddress.text.isSplitInput ? (
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        justifyContent: "space-between",
+                                                    }}
+                                                >
+                                                    <InputCustom
+                                                        disabled={disabled}
+                                                        placeholder={shippingAddress.text?.placeholderLeft}
+                                                        style={{ width: "49%", marginBottom: "0px" }}
+                                                        onChange={(value) =>
+                                                            onChangeValue(
+                                                                indexContent,
+                                                                content.type,
+                                                                value,
+                                                                shippingAddress.type,
+                                                                "name_valueLeft"
+                                                            )
+                                                        }
+                                                        value={shippingAddress.text?.name_valueLeft}
+                                                    ></InputCustom>
+                                                    <InputCustom
+                                                        disabled={disabled}
+                                                        placeholder={shippingAddress.text?.placeholderRight}
+                                                        style={{ width: "49%" }}
+                                                        onChange={(value) =>
+                                                            onChangeValue(
+                                                                indexContent,
+                                                                content.type,
+                                                                value,
+                                                                shippingAddress.type,
+                                                                "name_valueRight"
+                                                            )
+                                                        }
+                                                        value={shippingAddress.text?.name_valueRight}
+                                                    ></InputCustom>
+                                                </div>
+                                            ) : (
+                                                <React.Fragment>
+                                                    <InputCustom
+                                                        disabled={disabled}
+                                                        style={{ marginBottom: "0px" }}
+                                                        placeholder={shippingAddress.text?.placeholderLeft}
+                                                        onChange={(value) =>
+                                                            onChangeValue(
+                                                                indexContent,
+                                                                content.type,
+                                                                value,
+                                                                shippingAddress.text,
+                                                                "name_value"
+                                                            )
+                                                        }
+                                                        value={shippingAddress.text.name_value}
+                                                    ></InputCustom>
+                                                    {shippingAddress.text?.placeholderRight && (
+                                                        <span
+                                                            style={{
+                                                                fontWeight: "400",
+                                                                color: "black",
+                                                                fontSize: "12px",
+                                                                marginLeft: "18px",
+                                                            }}
+                                                        >
+                                                            {shippingAddress.text?.placeholderRight}
+                                                        </span>
+                                                    )}
+                                                </React.Fragment>
+                                            )}
+                                            {shippingAddress.text.isSplitInput ? (
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        justifyContent: "space-between",
+                                                    }}
+                                                >
+                                                    <InputCustom
+                                                        disabled={disabled}
+                                                        placeholder={shippingAddress.text?.placeholderLeft}
+                                                        style={{ width: "49%", marginTop: "8px" }}
+                                                        onChange={(value) =>
+                                                            onChangeValue(
+                                                                indexContent,
+                                                                content.type,
+                                                                value,
+                                                                shippingAddress.type,
+                                                                "kana_name_valueLeft"
+                                                            )
+                                                        }
+                                                        value={shippingAddress.text?.kana_name_valueLeft}
+                                                    ></InputCustom>
+                                                    <InputCustom
+                                                        disabled={disabled}
+                                                        placeholder={shippingAddress.text?.placeholderRight}
+                                                        style={{ width: "49%", marginTop: "8px" }}
+                                                        onChange={(value) =>
+                                                            onChangeValue(
+                                                                indexContent,
+                                                                content.type,
+                                                                value,
+                                                                shippingAddress.type,
+                                                                "kana_name_valueRight"
+                                                            )
+                                                        }
+                                                        value={shippingAddress.text?.kana_name_valueRight}
+                                                    ></InputCustom>
+                                                </div>
+                                            ) : (
+                                                <React.Fragment>
+                                                    <InputCustom
+                                                        disabled={disabled}
+                                                        style={{ marginTop: "10px" }}
+                                                        placeholder={shippingAddress.text?.placeholderLeft}
+                                                        onChange={(value) =>
+                                                            onChangeValue(
+                                                                indexContent,
+                                                                content.type,
+                                                                value,
+                                                                shippingAddress.text,
+                                                                "kana_name_value"
+                                                            )
+                                                        }
+                                                        value={shippingAddress.text.kana_name_value}
+                                                    ></InputCustom>
+                                                    {shippingAddress.text?.placeholderRight && (
+                                                        <span
+                                                            style={{
+                                                                fontWeight: "400",
+                                                                color: "black",
+                                                                fontSize: "12px",
+                                                                marginLeft: "18px",
+                                                            }}
+                                                        >
+                                                            {shippingAddress.text?.placeholderRight}
+                                                        </span>
+                                                    )}
+                                                </React.Fragment>
+                                            )}
                                             {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`] &&
                                                 <div style={{ color: '#FF7E00', fontSize: '12px' }}>
                                                     {errors?.[`message${indexMessage}_content${indexContent}_${content.type}`]}
