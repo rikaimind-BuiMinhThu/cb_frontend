@@ -2602,6 +2602,44 @@ function Preview() {
               listFukuObject.push(...result);
               break;
             }
+          case 'shipping_address':
+            {
+              const userInputData = Object.fromEntries(
+                Object.entries(message.shipping_address).filter(([key, value]) => key.includes("value_"))
+              );
+              const dataInforFukushashiki = Object.fromEntries(
+                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+              );
+              const types = ["number1","number2","number3","number","name_left","name_right","kana_left","kana_right","building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right","initial_selection"];
+              const result = types
+                .filter(type => `value_${type}` in userInputData)
+                .map(type => {
+                  const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
+                  const bindingValue = dataInforFukushashiki[`${type}_fukushashiki_search_value`];
+                  if (bindingMode === undefined || bindingValue == undefined || bindingValue.length==0) {
+                    return null;
+                  }
+                  if(type=="initial_selection")
+                    {
+                     const objA = {
+                        type: "initial_selection",
+                        bindingMode,
+                        bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                        bindingValue:userInputData[`value_${type}`]
+                      };
+                      listFukuObject.push(objA)
+                    }           
+                  return {
+                    type: message.shipping_address.is_use_dropdown ? "dropdown_prefecture" : "shipping_address",
+                    bindingMode: bindingMode,
+                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                    bindingValue: userInputData[`value_${type}`]
+                  };
+                })
+                .filter(item => item !== null);
+              listFukuObject.push(...result);
+              break;
+            }
           case 'card_payment_radio_button':
             {
               const keysToExtract = [
