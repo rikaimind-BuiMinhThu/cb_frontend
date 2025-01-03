@@ -1265,7 +1265,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 .ss-user-setting-double-input {
   display: flex;
   align-items: center;
-  width: 90%;
+  width: 100%;
 }
 
 .ss-user-setting-double-input input:first-child {

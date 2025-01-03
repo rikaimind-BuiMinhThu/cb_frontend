@@ -2618,6 +2618,44 @@ function Preview() {
               listFukuObject.push(...result);
               break;
             }
+          case 'shipping_address':
+            {
+              const userInputData = Object.fromEntries(
+                Object.entries(message.shipping_address).filter(([key, value]) => key.includes("value_"))
+              );
+              const dataInforFukushashiki = Object.fromEntries(
+                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+              );
+              const types = ["number1","number2","number3","number","name_left","name_right","kana_left","kana_right","building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right","initial_selection"];
+              const result = types
+                .filter(type => `value_${type}` in userInputData)
+                .map(type => {
+                  const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
+                  const bindingValue = dataInforFukushashiki[`${type}_fukushashiki_search_value`];
+                  if (bindingMode === undefined || bindingValue == undefined || bindingValue.length==0) {
+                    return null;
+                  }
+                  if(type=="initial_selection")
+                    {
+                     const objA = {
+                        type: "initial_selection",
+                        bindingMode,
+                        bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                        bindingValue:userInputData[`value_${type}`]
+                      };
+                      listFukuObject.push(objA)
+                    }           
+                  return {
+                    type: message.shipping_address.is_use_dropdown ? "dropdown_prefecture" : "shipping_address",
+                    bindingMode: bindingMode,
+                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                    bindingValue: userInputData[`value_${type}`]
+                  };
+                })
+                .filter(item => item !== null);
+              listFukuObject.push(...result);
+              break;
+            }
           case 'card_payment_radio_button':
             {
               const keysToExtract = [
@@ -4049,6 +4087,26 @@ function Preview() {
     }
   };
 
+  const isPopUpZipCodeShippingAddress = (isOpen, indexContent) => {
+    if (isOpen === true) {
+      setPrefectures(null);
+      setCities(null);
+      setTowns(null);
+      setZipcode(null);
+      document.getElementById("sp-withdrawal-container").style.display =
+        "block";
+      document.getElementById("sp-popup-zip-code-address2").style.display =
+        "block";
+    } else {
+      document.getElementById("sp-withdrawal-container").style.display = "none";
+      document.getElementById("sp-popup-zip-code-address2").style.display =
+        "none";
+    }
+    if (indexContent !== undefined) {
+      setContentZipcode(indexContent);
+    }
+  };
+
   const onChangeErrors = (field, value) => {
     errors[field] = value;
     setErrors({
@@ -4360,6 +4418,204 @@ function Preview() {
             </div>
           </div>
         </div>
+        {/*For shipping address */}
+        <div id="sp-popup-zip-code-address2" className="sp-popup-zip-code-address">
+          <div className="sp-popup-zip-code-address-header">
+            <div className="sp-popup-zip-code-address-header-left">
+              住所で郵便番号を検索する
+            </div>
+            <div className="sp-popup-zip-code-address-header-right">
+              <MDBIcon
+                style={{ width: "5%", marginLeft: "3px", cursor: "pointer" }}
+                fas
+                onClick={() => isPopUpZipCodeShippingAddress(false)}
+                icon="times"
+                className={"sp-plus-circle-option-icon-times-custom"}
+              />
+            </div>
+          </div>
+          <div className="sp-popup-zip-code-address-body">
+            <div className="sp-popup-zip-code-address-body-form">
+              <SelectCustom
+                style={{ width: "100%", marginBottom: "7px" }}
+                keyValue="name"
+                nameValue="name"
+                placeholder="都道府県を選択してください"
+                data={dataPrefectures}
+                onChange={async (value) => {
+                  setPrefectures(value);
+                  setCities(null);
+                  setTowns(null);
+                  setZipcode(null);
+                  if (value) {
+                    let prefecture_jis_code = dataPrefectures.find(
+                      (item) => item.name === value
+                    ).prefecture_jis_code;
+                    api
+                      .get(
+                        `/api/v1/cities?prefecture_jis_code=${prefecture_jis_code}`
+                      )
+                      .then((res) => {
+                        if (res.data.code === 1) {
+                          setDataCities(res.data.data);
+                        }
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                      });
+                  }
+                }}
+                value={prefectures}
+              />
+              <SelectCustom
+                style={{ width: "100%", marginBottom: "7px" }}
+                keyValue="city_name"
+                nameValue="city_name"
+                placeholder="市区を選択してください"
+                data={dataCities || []}
+                onChange={async (value) => {
+                  setCities(value);
+                  setTowns(null);
+                  setZipcode(null);
+
+                  if (value) {
+                    let city_jis_code = dataCities.find(
+                      (item) => item.city_name === value
+                    ).city_jis_code;
+                    api
+                      .get(`/api/v1/towns?city_jis_code=${city_jis_code}`)
+                      .then((res) => {
+                        if (res.data.code === 1) {
+                          setDataTowns(res.data.data);
+                        }
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                      });
+                  }
+                }}
+                value={cities}
+              />
+              <SelectCustom
+                style={{ width: "100%", marginBottom: "7px" }}
+                keyValue="town_name"
+                nameValue="town_name"
+                placeholder="町村を選択してください"
+                data={dataTowns || []}
+                onChange={(value) => {
+                  setTowns(value);
+                  if (value) {
+                    let zipcode = dataTowns.find(
+                      (item) => item.town_name === value
+                    ).zip_code;
+                    setZipcode(zipcode);
+                  } else {
+                    setZipcode(null);
+                  }
+                }}
+                value={towns}
+              />
+              {zipcode && (
+                <div className="sp-popup-zip-code-address-body-form-content">
+                  〒{zipcode}
+                </div>
+              )}
+            </div>
+            <div className="sp-popup-zip-code-address-body-button">
+              <div
+                className="sp-popup-zip-code-address-body-button-cancel"
+                onClick={() => isPopUpZipCodeShippingAddress(false)}
+              >
+                キャンセル
+              </div>
+              <div
+                className="sp-popup-zip-code-address-body-button-selection"
+                style={zipcode ? {} : { opacity: "0.5" }}
+                onClick={() => {
+                  if (
+                    zipcode &&
+                    indexContentZipcode !== undefined &&
+                    !dataMessages[indexMessageRender].message_content[
+                      indexContentZipcode
+                    ].shipping_address.split_postal_code
+                  ) {
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      zipcode,
+                      "value_post_code"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      prefectures,
+                      "value_prefecture"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      `${cities}${towns}`,
+                      "value_municipality"
+                    );
+                    document.getElementById(
+                      "sp-withdrawal-container"
+                    ).style.display = "none";
+                    document.getElementById(
+                      "sp-popup-zip-code-address2"
+                    ).style.display = "none";
+                  } else if (
+                    zipcode &&
+                    indexContentZipcode !== undefined &&
+                    dataMessages[indexMessageRender].message_content[
+                      indexContentZipcode
+                    ].shipping_address.split_postal_code
+                  ) {
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      zipcode.slice(0, 3),
+                      "value_post_code_left"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      zipcode.slice(3),
+                      "value_post_code_right"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      prefectures,
+                      "value_prefecture"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      `${cities}${towns}`,
+                      "value_municipality"
+                    );
+                    document.getElementById(
+                      "sp-withdrawal-container"
+                    ).style.display = "none";
+                    document.getElementById(
+                      "sp-popup-zip-code-address2"
+                    ).style.display = "none";
+                  }
+                  document.getElementById("ss-user-input-address").focus();
+                  document.getElementById("ss-user-input-address").select();
+                }}
+              >
+                選択
+              </div>
+            </div>
+          </div>
+        </div>
         <div
           id="sp-header"
           style={
@@ -4402,7 +4658,6 @@ function Preview() {
             </div>
           </div>
         </div>
-
         {activePopupCloseBot ?
           <ModalPreviewBot
             isMobile={mobileCheck()}
@@ -4523,6 +4778,9 @@ function Preview() {
                         dataPrefectures={[...dataPrefectures]}
                         isPopUpZipCode={(isOpen, indexContent) =>
                           isPopUpZipCode(isOpen, indexContent)
+                        }
+                        isPopUpZipCodeShippingAddress={(isOpen, indexContent) =>
+                          isPopUpZipCodeShippingAddress(isOpen, indexContent)
                         }
                         onChangeErrors={(field, value) =>
                           onChangeErrors(field, value)
@@ -4970,6 +5228,7 @@ const UserMessage = ({
   onClickNext,
   displayButtonNext,
   isPopUpZipCode,
+  isPopUpZipCodeShippingAddress,
   onChangeErrors,
   dataPrefectures,
   variables
@@ -5150,6 +5409,16 @@ const UserMessage = ({
             "initial_selection_picture"
           );
         }
+      } else if (content.type === "shipping_address") {
+        let shippingAddress = content.shipping_address;
+        if (shippingAddress.value_initial_selection) {
+          onChangeValue(
+            indexContent,
+            content.type,
+            shippingAddress.value_initial_selection,
+            "value_initial_selection"
+          );
+        } 
       } else if (content.type === "product_purchase") {
         let productPurchase = content.product_purchase;
         onChangeValue(
@@ -5486,6 +5755,7 @@ const UserMessage = ({
         let afteePaymentModule = content.AFTEE_payment_module;
         let slider = content.slider;
         let cardPaymentRadioButton = content.card_payment_radio_button;
+        let shippingAddress = content.shipping_address;
         let variableSet = content.variable_set;
         let buttonSubmit = content.button_submit;
         let labelNoTransition = content.label_no_transition;
@@ -5818,6 +6088,790 @@ const UserMessage = ({
                   )}
               </div>
             )}
+            {/* type == 'shipping_address' */}
+            {
+              content.type === "shipping_address" && (
+
+                <div style={{ marginBottom: "10px" }}>
+                  {
+                    <Radio.Group
+                      style={{ width: "100%", fontSize: "14px" }}
+                      disabled={disabled}
+                      value={shippingAddress.value_initial_selection}
+                    >
+                      {shippingAddress.radio_contents &&
+                        shippingAddress.radio_contents.map(
+                          (itemPayment, indexPayment) => {
+                            return (
+                              <Radio
+                                value={itemPayment.value}
+                                key={indexPayment}
+                                style={{
+                                  backgroundColor: "#ECF5FA",
+                                  marginBottom: "5px",
+                                  padding: "5px",
+                                  width: "100%",
+                                }}
+                                onChange={() => {
+                                  let dataValue;
+                                  if (
+                                    shippingAddress.value_initial_selection !==
+                                    itemPayment.value
+                                  ) {
+                                    dataValue = itemPayment.value;
+                                  } else {
+                                    dataValue = "";
+                                  }
+                                  onChangeValue(
+                                    indexContent,
+                                    content.type,
+                                    dataValue,
+                                    "value_initial_selection"
+                                  );
+
+                                  if (
+                                    shippingAddress.card_linked_setting.includes(dataValue)
+                                  ) {
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      true,
+                                      "is_display_card_payment"
+                                    );
+                                    displayButtonNext(true);
+                                  } else {
+                                    displayButtonNext(false);
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      false,
+                                      "is_display_card_payment"
+                                    );
+                                    if (messageContent.length === 1)
+                                      onClickNext();
+                                  }
+                                }}
+                              >
+                                {itemPayment.text}
+                              </Radio>
+                            );
+                          }
+                        )}
+                    </Radio.Group>
+                  }
+                  {(shippingAddress.card_linked_setting.length > 0 && shippingAddress.card_linked_setting.includes(shippingAddress.value_initial_selection)) &&
+                    <React.Fragment>
+                      {(shippingAddress.title_require || shippingAddress.require) && (
+                        <div
+                          className="ss-message__content--user-text-input-top"
+                          style={{ marginBottom: "0px" }}
+                        >
+                          {shippingAddress.title_require && (
+                            <span className="ss-message__content--user-text-input-title">
+                              {shippingAddress.title}
+                            </span>
+                          )}
+                          {shippingAddress.require === true && (
+                            <span className="ss-message__content--user-text-input-required">
+                              ※必須
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {shippingAddress.name !== undefined && (
+                        <React.Fragment>
+                          <div
+                            style={{
+                              fontWeight: "400",
+                              fontSize: "12px",
+                              color:'black',
+                              width: "100%",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            お名前
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <InputCustom
+                              disabled={disabled}
+                              placeholder={shippingAddress.text?.placeholderLeft}
+                              style={{ width: "49%", marginBottom: "0px" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_name_left"
+                                )
+                              }
+                              value={shippingAddress.text?.name_valueLeft}
+                            ></InputCustom>
+                            <InputCustom
+                              disabled={disabled}
+                              placeholder={shippingAddress.text?.placeholderRight}
+                              style={{ width: "49%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_name_right"
+                                )
+                              }
+                              value={shippingAddress.text?.name_valueRight}
+                            ></InputCustom>
+                          </div>
+                        </React.Fragment>
+                      )}
+                      {shippingAddress.kana_name !== undefined &&
+                        <>
+                          <div
+                            style={{
+                              fontWeight: "400",
+                              fontSize: "12px",
+                              width: "100%",
+                              marginBottom: "5px",
+                              marginTop: "5px"
+                            }}
+                          >
+                            フリガナ
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <InputCustom
+                              disabled={disabled}
+                              placeholder={shippingAddress.text?.placeholderLeft}
+                              style={{ width: "49%", marginBottom: "0px" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_kana_left"
+                                )
+                              }
+                              value={shippingAddress.text?.kana_name_valueLeft}
+                            ></InputCustom>
+                            <InputCustom
+                              disabled={disabled}
+                              placeholder={shippingAddress.text?.placeholderRight}
+                              style={{ width: "49%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_kana_right"
+                                )
+                              }
+                              value={shippingAddress.text?.kana_name_valueRight}
+                            ></InputCustom>
+                          </div>
+                        </>
+                      }
+                      <div style={{ marginBottom: "10px" }}>
+                        <div
+                          style={{
+                            marginTop: '5px',
+                            textDecoration: "underline",
+                            ...(!disabled ? { color: "#2c76f0" } : { color: "gray" }),
+                            textAlign: "right",
+                          }}
+                        >
+                          <span
+                            style={!disabled ? { cursor: "pointer" } : {}}
+                            onClick={() => {
+                              if (disabled !== true) isPopUpZipCodeShippingAddress(true, indexContent);
+                            }}
+                          >
+                            〒検索はこちら
+                          </span>
+                        </div>
+                        {(shippingAddress.title_require ||
+                          shippingAddress.isCheckRequire) && (
+                            <div
+                              className="ss-message__content--user-pull_down-top"
+                              style={{ marginBottom: "0px" }}
+                            >
+                              {shippingAddress.title_require && (
+                                <span className="ss-message__content--user-pull_down-title">
+                                  {shippingAddress.title}
+                                </span>
+                              )}
+                              {(shippingAddress.isCheckRequire === "all_items_require" ||
+                                shippingAddress.isCheckRequire === "require") && (
+                                  <span className="ss-message__content--user-text-input-required">
+                                    ※必須
+                                  </span>
+                                )}
+                            </div>
+                          )}
+                        {shippingAddress.post_code !== undefined && (
+                          <div className="ss-user-setting__item-bottom">
+                            <div
+                              style={{
+                                fontWeight: "400",
+                                fontSize: "12px",
+                                width: "100%",
+                                marginBottom: "5px",
+                              }}
+                            >
+                              郵便番号
+                            </div>
+                            {shippingAddress.split_postal_code !== true ? (
+                              <InputCustom
+                                type="number"
+                                placeholder={shippingAddress.post_code}
+                                disabled={disabled}
+                                // controls={false}
+                                // className="ss-user-setting-input-limit-character"
+                                // maxLength={7}
+                                onKeyPress={(e) => {
+                                  if (e.target.value.length >= 7) e.preventDefault();
+                                }}
+                                style={{ width: "100%", marginLeft: "0px" }}
+                                onChange={async (value) => {
+                                  onChangeValue(
+                                    indexContent,
+                                    content.type,
+                                    value,
+                                    "value_post_code"
+                                  );
+                                  if ((value + "").length === 7) {
+                                    api
+                                      .get(
+                                        `/api/v1/get_address_from_zip_code?zip_code=${value}`
+                                      )
+                                      .then((res) => {
+                                        if (res.data && res.data.code === 1) {
+                                          onChangeValue(
+                                            indexContent,
+                                            content.type,
+                                            res.data.data.prefecture_name,
+                                            "value_prefecture"
+                                          );
+                                          onChangeValue(
+                                            indexContent,
+                                            content.type,
+                                            `${res.data.data.city_name}${res.data.data.town_name}`,
+                                            "value_municipality"
+                                          );
+                                          onChangeErrors(
+                                            `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                            ""
+                                          );
+                                          document
+                                            .getElementById("ss-user-input-address")
+                                            .focus();
+                                          document
+                                            .getElementById("ss-user-input-address")
+                                            .select();
+                                        } else {
+                                          onChangeErrors(
+                                            `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                            "無効な郵便番号です。"
+                                          );
+                                        }
+                                      })
+                                      .catch((error) => {
+                                        onChangeErrors(
+                                          `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                          "無効な郵便番号です。"
+                                        );
+                                        if (error.response?.data.code === 0) {
+                                          tokenExpired();
+                                        }
+                                      });
+                                  } else if ((value + "").length !== 0) {
+                                    onChangeErrors(
+                                      `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                      "無効な郵便番号です。"
+                                    );
+                                  } else {
+                                    onChangeErrors(
+                                      `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                      ""
+                                    );
+                                  }
+                                }}
+                                value={shippingAddress.value_post_code}
+                              />
+                            ) : (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  width: "100%",
+                                }}
+                              >
+                                <InputCustom
+                                  type="number"
+                                  placeholder={shippingAddress.post_code_left}
+                                  disabled={disabled}
+                                  style={{ width: "49%" }}
+                                  onKeyPress={(e) => {
+                                    if (e.target.value.length >= 3) e.preventDefault();
+                                  }}
+                                  onChange={async (value) => {
+                                    if ((value + "").length === 3) {
+                                      document
+                                        .getElementById("ss-user-post-code-right-input")
+                                        .focus();
+                                      document
+                                        .getElementById("ss-user-post-code-right-input")
+                                        .select();
+                                    }
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      value,
+                                      "value_post_code_left"
+                                    );
+                                    if (
+                                      (value + "").length === 3 &&
+                                      shippingAddress.value_post_code_right &&
+                                      (shippingAddress.value_post_code_right + "")
+                                        .length === 4
+                                    ) {
+                                      api
+                                        .get(
+                                          `/api/v1/get_address_from_zip_code?zip_code=${value}${shippingAddress.value_post_code_right}`
+                                        )
+                                        .then((res) => {
+                                          if (res.data && res.data.code === 1) {
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              res.data.data.prefecture_name,
+                                              "value_prefecture"
+                                            );
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              `${res.data.data.city_name}${res.data.data.town_name}`,
+                                              "value_municipality"
+                                            );
+                                            onChangeErrors(
+                                              `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                              ""
+                                            );
+                                            document
+                                              .getElementById("ss-user-input-address")
+                                              .focus();
+                                            document
+                                              .getElementById("ss-user-input-address")
+                                              .select();
+                                          } else {
+                                            onChangeErrors(
+                                              `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                              "無効な郵便番号です。"
+                                            );
+                                          }
+                                        })
+                                        .catch((error) => {
+                                          onChangeErrors(
+                                            `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                            "無効な郵便番号です。"
+                                          );
+                                          if (error.response?.data.code === 0) {
+                                            tokenExpired();
+                                          }
+                                        });
+                                    } else if (
+                                      (value + "").length !== 0 ||
+                                      (shippingAddress.value_post_code_right + "")
+                                        .length !== 0
+                                    ) {
+                                      onChangeErrors(
+                                        `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                        "無効な郵便番号です。"
+                                      );
+                                    } else {
+                                      onChangeErrors(
+                                        `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                        ""
+                                      );
+                                    }
+                                  }}
+                                  value={shippingAddress.value_post_code_left}
+                                />
+                                <InputCustom
+                                  type="number"
+                                  placeholder={shippingAddress.post_code_right}
+                                  disabled={disabled}
+                                  id="ss-user-post-code-right-input"
+                                  style={{ width: "49%" }}
+                                  onKeyPress={(e) => {
+                                    if (e.target.value.length >= 4) e.preventDefault();
+                                  }}
+                                  onChange={async (value) => {
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      value,
+                                      "value_post_code_right"
+                                    );
+                                    if (
+                                      (value + "").length === 4 &&
+                                      shippingAddress.value_post_code_left &&
+                                      (shippingAddress.value_post_code_left + "")
+                                        .length === 3
+                                    ) {
+                                      api
+                                        .get(
+                                          `/api/v1/get_address_from_zip_code?zip_code=${shippingAddress.value_post_code_left}${value}`
+                                        )
+                                        .then((res) => {
+                                          if (res.data && res.data.code === 1) {
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              res.data.data.prefecture_name,
+                                              "value_prefecture"
+                                            );
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              `${res.data.data.city_name}${res.data.data.town_name}`,
+                                              "value_municipality"
+                                            );
+                                            onChangeErrors(
+                                              `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                              ""
+                                            );
+                                            document
+                                              .getElementById("ss-user-input-address")
+                                              .focus();
+                                            document
+                                              .getElementById("ss-user-input-address")
+                                              .select();
+                                          } else {
+                                            onChangeErrors(
+                                              `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                              "無効な郵便番号です。"
+                                            );
+                                          }
+                                        })
+                                        .catch((error) => {
+                                          onChangeErrors(
+                                            `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                            "無効な郵便番号です。"
+                                          );
+                                          if (error.response?.data.code === 0) {
+                                            tokenExpired();
+                                          }
+                                        });
+                                    } else if (
+                                      (value + "").length !== 0 ||
+                                      (shippingAddress.value_post_code_left + "")
+                                        .length !== 0
+                                    ) {
+                                      onChangeErrors(
+                                        `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                        "無効な郵便番号です。"
+                                      );
+                                    } else {
+                                      onChangeErrors(
+                                        `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                        ""
+                                      );
+                                    }
+                                  }}
+                                  value={shippingAddress.value_post_code_right}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {shippingAddress.prefecture !== undefined && (
+                          <div className="ss-user-setting__item-bottom">
+                            <div
+                              style={{
+                                fontWeight: "400",
+                                fontSize: "12px",
+                                width: "100%",
+                                marginBottom: "3px",
+                              }}
+                            >
+                              都道府県
+                            </div>
+                            {shippingAddress.is_use_dropdown ? (
+                              <SelectCustom
+                                style={{ width: "100%" }}
+                                value={shippingAddress?.value_prefecture}
+                                data={dataPrefectures}
+                                keyValue="name"
+                                nameValue="name"
+                                placeholder={shippingAddress.prefecture}
+                                onChange={(value) =>
+                                  onChangeValue(
+                                    indexContent,
+                                    content.type,
+                                    value,
+                                    "value_prefecture"
+                                  )
+                                }
+                              />
+                            ) : (
+                              <InputCustom
+                                placeholder={shippingAddress.prefecture}
+                                disabled={disabled}
+                                style={{ width: "100%" }}
+                                onChange={(value) =>
+                                  onChangeValue(
+                                    indexContent,
+                                    content.type,
+                                    value,
+                                    "value_prefecture"
+                                  )
+                                }
+                                value={shippingAddress.value_prefecture}
+                              />
+                            )}
+                          </div>
+                        )}
+                        {shippingAddress.municipality !== undefined && (
+                          <div className="ss-user-setting__item-bottom">
+                            <div
+                              style={{
+                                fontWeight: "400",
+                                fontSize: "10px",
+                                width: "100%",
+                                marginBottom: "3px",
+                              }}
+                            >
+                              市区町村
+                            </div>
+                            <InputCustom
+                              placeholder={shippingAddress.municipality}
+                              disabled={disabled}
+                              style={{ width: "100%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_municipality"
+                                )
+                              }
+                              value={shippingAddress.value_municipality}
+                            />
+                          </div>
+                        )}
+                        {shippingAddress.address !== undefined && (
+                          <div className="ss-user-setting__item-bottom">
+                            <div
+                              style={{
+                                fontWeight: "400",
+                                fontSize: "12px",
+                                width: "100%",
+                                marginBottom: "3px",
+                              }}
+                            >
+                              番地
+                            </div>
+                            <InputCustom
+                              placeholder={shippingAddress.address}
+                              id="ss-user-input-address"
+                              disabled={disabled}
+                              style={{ width: "100%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_address"
+                                )
+                              }
+                              value={shippingAddress.value_address}
+                            />
+                          </div>
+                        )}
+                        {shippingAddress.building_name !== undefined && (
+                          <div className="ss-user-setting__item-bottom">
+                            <div
+                              style={{
+                                fontWeight: "400",
+                                fontSize: "12px",
+                                width: "100%",
+                                marginBottom: "3px",
+                              }}
+                            >
+                              建物名
+                            </div>
+                            <InputCustom
+                              placeholder={shippingAddress.building_name}
+                              id="ss-user-input-building"
+                              disabled={disabled}
+                              style={{ width: "100%" }}
+                              onChange={(value) => {
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_building_name"
+                                );
+
+                              }
+                              }
+                              value={shippingAddress.value_building_name}
+                            />
+                          </div>
+                        )}
+                        {
+                          shippingAddress.number !== undefined &&
+                          <React.Fragment>
+                            {shippingAddress.withHyphen === false ? (
+                              <>
+                                <div
+                                  style={{
+                                    fontWeight: "400",
+                                    fontSize: "12px",
+                                    width: "100%",
+                                    marginBottom: "5px",
+                                  }}
+                                >
+                                  電話番号
+                                </div>
+                                <InputCustom
+                                  disabled={disabled}
+                                  // className="ss-message__content--user-text-input ss-input-value"
+                                  style={{ marginBottom: "0px" }}
+                                  placeholder={shippingAddress.text?.number_placeholder}
+                                  onChange={(value) =>
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      value,
+                                      "value_number"
+                                    )
+                                  }
+                                  value={shippingAddress.value_number}
+                                ></InputCustom>
+                              </>
+                            ) : (
+                              <>
+                                <div
+                                  style={{
+                                    fontWeight: "400",
+                                    fontSize: "12px",
+                                    width: "100%",
+                                    marginBottom: "5px",
+                                  }}
+                                >
+                                  電話番号
+                                </div>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <InputCustom
+                                    disabled={disabled}
+                                    className="ss-message__content--user-text-input ss-input-value"
+                                    maxLength={3}
+                                    style={{ marginBottom: "0px", width: "32%" }}
+                                    placeholder={shippingAddress.text?.number1_placeholder}
+                                    onChange={(value) => {
+                                      if (value.length === 3) {
+                                        document
+                                          .getElementById(
+                                            "ss-user-message-phone_number_2"
+                                          )
+                                          .focus();
+                                        document
+                                          .getElementById(
+                                            "ss-user-message-phone_number_2"
+                                          )
+                                          .select();
+                                      }
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        value,
+                                        "value_number1"
+                                      );
+                                    }}
+                                    value={shippingAddress.value_number1}
+                                  ></InputCustom>
+                                  <InputCustom
+                                    id="ss-user-message-phone_number_2"
+                                    disabled={disabled}
+                                    className="ss-message__content--user-text-input ss-input-value"
+                                    style={{ marginBottom: "0px", width: "32%" }}
+                                    maxLength={4}
+                                    placeholder={shippingAddress.text?.number2_placeholder}
+                                    onChange={(value) => {
+                                      if (value.length === 4) {
+                                        document
+                                          .getElementById(
+                                            "ss-user-message-phone_number_3"
+                                          )
+                                          .focus();
+                                        document
+                                          .getElementById(
+                                            "ss-user-message-phone_number_3"
+                                          )
+                                          .select();
+                                      }
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        value,
+                                        "value_number2"
+                                      );
+                                    }}
+                                    value={shippingAddress.value_number2}
+                                  ></InputCustom>
+                                  <InputCustom
+                                    id="ss-user-message-phone_number_3"
+                                    disabled={disabled}
+                                    // className="ss-message__content--user-text-input ss-input-value"
+                                    style={{ marginBottom: "0px", width: "32%" }}
+                                    placeholder={shippingAddress.text?.number3_placeholder}
+                                    maxLength={4}
+                                    onChange={(value) =>
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        value,
+                                        "value_number3"
+                                      )
+                                    }
+                                    value={shippingAddress.value_number3}
+                                  ></InputCustom>
+                                </div>
+                              </>
+                            )}
+                          </React.Fragment>
+                        }
+                        {errors?.[
+                          `message${indexMessage}_content${indexContent}_${content.type}`
+                        ] && (
+                            <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                              {
+                                errors?.[
+                                `message${indexMessage}_content${indexContent}_${content.type}`
+                                ]
+                              }
+                            </div>
+                          )}
+                      </div>
+                    </React.Fragment>
+                  }
+                </div>
+              )
+            }
             {/* type == 'label' */}
             {content.type === "label" && label.lbl_content && (
               <div style={{ marginBottom: "10px" }}>
@@ -7132,7 +8186,7 @@ const UserMessage = ({
               <div style={{ marginBottom: "10px" }}>
                 <div
                   style={{
-                    marginBottom: "10px",
+                    marginBottom: "5px",
                     textDecoration: "underline",
                     ...(!disabled ? { color: "#2c76f0" } : { color: "gray" }),
                     textAlign: "right",

@@ -261,7 +261,8 @@ async function displayPopup() {
    
       obj.forEach((item) => {
         switch (item.type) {
-          case "card_payment_radio_button":     
+          case "card_payment_radio_button":
+          case "shipping_address":
           case "text_input":
             {
               if (item.bindingMode == 1) {
