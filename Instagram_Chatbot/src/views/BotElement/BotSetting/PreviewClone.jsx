@@ -6786,12 +6786,12 @@ const UserMessage = ({
                                       if (value.length === 3) {
                                         document
                                           .getElementById(
-                                            "ss-user-message-phone_number_2"
+                                            "ss-user-message-phone_number_22"
                                           )
                                           .focus();
                                         document
                                           .getElementById(
-                                            "ss-user-message-phone_number_2"
+                                            "ss-user-message-phone_number_22"
                                           )
                                           .select();
                                       }
@@ -6805,7 +6805,7 @@ const UserMessage = ({
                                     value={shippingAddress.value_number1}
                                   ></InputCustom>
                                   <InputCustom
-                                    id="ss-user-message-phone_number_2"
+                                    id="ss-user-message-phone_number_22"
                                     disabled={disabled}
                                     className="ss-message__content--user-text-input ss-input-value"
                                     style={{ marginBottom: "0px", width: "32%" }}
@@ -6815,12 +6815,12 @@ const UserMessage = ({
                                       if (value.length === 4) {
                                         document
                                           .getElementById(
-                                            "ss-user-message-phone_number_3"
+                                            "ss-user-message-phone_number_33"
                                           )
                                           .focus();
                                         document
                                           .getElementById(
-                                            "ss-user-message-phone_number_3"
+                                            "ss-user-message-phone_number_33"
                                           )
                                           .select();
                                       }
@@ -6834,7 +6834,7 @@ const UserMessage = ({
                                     value={shippingAddress.value_number2}
                                   ></InputCustom>
                                   <InputCustom
-                                    id="ss-user-message-phone_number_3"
+                                    id="ss-user-message-phone_number_33"
                                     disabled={disabled}
                                     // className="ss-message__content--user-text-input ss-input-value"
                                     style={{ marginBottom: "0px", width: "32%" }}
