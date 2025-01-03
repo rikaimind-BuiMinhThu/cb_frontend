@@ -6165,7 +6165,8 @@ const UserMessage = ({
                           <div
                             style={{
                               fontWeight: "400",
-                              fontSize: "10px",
+                              fontSize: "12px",
+                              color:'black',
                               width: "100%",
                               marginBottom: "5px",
                             }}
@@ -6214,13 +6215,13 @@ const UserMessage = ({
                           <div
                             style={{
                               fontWeight: "400",
-                              fontSize: "10px",
+                              fontSize: "12px",
                               width: "100%",
                               marginBottom: "5px",
                               marginTop: "5px"
                             }}
                           >
-                            郵便番号
+                            フリガナ
                           </div>
                           <div
                             style={{
@@ -6262,7 +6263,6 @@ const UserMessage = ({
                       <div style={{ marginBottom: "10px" }}>
                         <div
                           style={{
-                            marginBottom: "5px",
                             marginTop: '5px',
                             textDecoration: "underline",
                             ...(!disabled ? { color: "#2c76f0" } : { color: "gray" }),
@@ -6302,7 +6302,7 @@ const UserMessage = ({
                             <div
                               style={{
                                 fontWeight: "400",
-                                fontSize: "10px",
+                                fontSize: "12px",
                                 width: "100%",
                                 marginBottom: "5px",
                               }}
@@ -6579,7 +6579,7 @@ const UserMessage = ({
                             <div
                               style={{
                                 fontWeight: "400",
-                                fontSize: "10px",
+                                fontSize: "12px",
                                 width: "100%",
                                 marginBottom: "3px",
                               }}
@@ -6654,7 +6654,7 @@ const UserMessage = ({
                             <div
                               style={{
                                 fontWeight: "400",
-                                fontSize: "10px",
+                                fontSize: "12px",
                                 width: "100%",
                                 marginBottom: "3px",
                               }}
@@ -6683,7 +6683,7 @@ const UserMessage = ({
                             <div
                               style={{
                                 fontWeight: "400",
-                                fontSize: "10px",
+                                fontSize: "12px",
                                 width: "100%",
                                 marginBottom: "3px",
                               }}
@@ -6713,103 +6713,127 @@ const UserMessage = ({
                           shippingAddress.number !== undefined &&
                           <React.Fragment>
                             {shippingAddress.withHyphen === false ? (
-                              <InputCustom
-                                disabled={disabled}
-                                // className="ss-message__content--user-text-input ss-input-value"
-                                style={{ marginBottom: "0px" }}
-                                placeholder={shippingAddress.text?.number_placeholder}
-                                onChange={(value) =>
-                                  onChangeValue(
-                                    indexContent,
-                                    content.type,
-                                    value,
-                                    "value_number"
-                                  )
-                                }
-                                value={shippingAddress.value_number}
-                              ></InputCustom>
-                            ) : (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                }}
-                              >
-                                <InputCustom
-                                  disabled={disabled}
-                                  className="ss-message__content--user-text-input ss-input-value"
-                                  maxLength={3}
-                                  style={{ marginBottom: "0px", width: "32%" }}
-                                  placeholder={shippingAddress.text?.number1_placeholder}
-                                  onChange={(value) => {
-                                    if (value.length === 3) {
-                                      document
-                                        .getElementById(
-                                          "ss-user-message-phone_number_2"
-                                        )
-                                        .focus();
-                                      document
-                                        .getElementById(
-                                          "ss-user-message-phone_number_2"
-                                        )
-                                        .select();
-                                    }
-                                    onChangeValue(
-                                      indexContent,
-                                      content.type,
-                                      value,
-                                      "value_number1"
-                                    );
+                              <>
+                                <div
+                                  style={{
+                                    fontWeight: "400",
+                                    fontSize: "12px",
+                                    width: "100%",
+                                    marginBottom: "5px",
                                   }}
-                                  value={shippingAddress.value_number1}
-                                ></InputCustom>
+                                >
+                                  電話番号
+                                </div>
                                 <InputCustom
-                                  id="ss-user-message-phone_number_2"
-                                  disabled={disabled}
-                                  className="ss-message__content--user-text-input ss-input-value"
-                                  style={{ marginBottom: "0px", width: "32%" }}
-                                  maxLength={4}
-                                  placeholder={shippingAddress.text?.number2_placeholder}
-                                  onChange={(value) => {
-                                    if (value.length === 4) {
-                                      document
-                                        .getElementById(
-                                          "ss-user-message-phone_number_3"
-                                        )
-                                        .focus();
-                                      document
-                                        .getElementById(
-                                          "ss-user-message-phone_number_3"
-                                        )
-                                        .select();
-                                    }
-                                    onChangeValue(
-                                      indexContent,
-                                      content.type,
-                                      value,
-                                      "value_number2"
-                                    );
-                                  }}
-                                  value={shippingAddress.value_number2}
-                                ></InputCustom>
-                                <InputCustom
-                                  id="ss-user-message-phone_number_3"
                                   disabled={disabled}
                                   // className="ss-message__content--user-text-input ss-input-value"
-                                  style={{ marginBottom: "0px", width: "32%" }}
-                                  placeholder={shippingAddress.text?.number3_placeholder}
-                                  maxLength={4}
+                                  style={{ marginBottom: "0px" }}
+                                  placeholder={shippingAddress.text?.number_placeholder}
                                   onChange={(value) =>
                                     onChangeValue(
                                       indexContent,
                                       content.type,
                                       value,
-                                      "value_number3"
+                                      "value_number"
                                     )
                                   }
-                                  value={shippingAddress.value_number3}
+                                  value={shippingAddress.value_number}
                                 ></InputCustom>
-                              </div>
+                              </>
+                            ) : (
+                              <>
+                                <div
+                                  style={{
+                                    fontWeight: "400",
+                                    fontSize: "12px",
+                                    width: "100%",
+                                    marginBottom: "5px",
+                                  }}
+                                >
+                                  電話番号
+                                </div>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <InputCustom
+                                    disabled={disabled}
+                                    className="ss-message__content--user-text-input ss-input-value"
+                                    maxLength={3}
+                                    style={{ marginBottom: "0px", width: "32%" }}
+                                    placeholder={shippingAddress.text?.number1_placeholder}
+                                    onChange={(value) => {
+                                      if (value.length === 3) {
+                                        document
+                                          .getElementById(
+                                            "ss-user-message-phone_number_2"
+                                          )
+                                          .focus();
+                                        document
+                                          .getElementById(
+                                            "ss-user-message-phone_number_2"
+                                          )
+                                          .select();
+                                      }
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        value,
+                                        "value_number1"
+                                      );
+                                    }}
+                                    value={shippingAddress.value_number1}
+                                  ></InputCustom>
+                                  <InputCustom
+                                    id="ss-user-message-phone_number_2"
+                                    disabled={disabled}
+                                    className="ss-message__content--user-text-input ss-input-value"
+                                    style={{ marginBottom: "0px", width: "32%" }}
+                                    maxLength={4}
+                                    placeholder={shippingAddress.text?.number2_placeholder}
+                                    onChange={(value) => {
+                                      if (value.length === 4) {
+                                        document
+                                          .getElementById(
+                                            "ss-user-message-phone_number_3"
+                                          )
+                                          .focus();
+                                        document
+                                          .getElementById(
+                                            "ss-user-message-phone_number_3"
+                                          )
+                                          .select();
+                                      }
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        value,
+                                        "value_number2"
+                                      );
+                                    }}
+                                    value={shippingAddress.value_number2}
+                                  ></InputCustom>
+                                  <InputCustom
+                                    id="ss-user-message-phone_number_3"
+                                    disabled={disabled}
+                                    // className="ss-message__content--user-text-input ss-input-value"
+                                    style={{ marginBottom: "0px", width: "32%" }}
+                                    placeholder={shippingAddress.text?.number3_placeholder}
+                                    maxLength={4}
+                                    onChange={(value) =>
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        value,
+                                        "value_number3"
+                                      )
+                                    }
+                                    value={shippingAddress.value_number3}
+                                  ></InputCustom>
+                                </div>
+                              </>
                             )}
                           </React.Fragment>
                         }

@@ -2887,9 +2887,23 @@ const Scenario = () => {
                                                                   }
                                                                 </div>
                                                               }
+                                                              {
+                                                                <Radio.Group
+                                                                  style={{ width: "100%", fontSize: '14px' }}
+                                                                  onChange={(value) => console.log(value)}
+                                                                  value={shippingAddress.value_initial_selection}
+                                                                >
+                                                                  {shippingAddress.radio_contents && shippingAddress.radio_contents.map((itemPayment, indexPayment) => {
+
+                                                                    return <Radio value={itemPayment.id} key={indexPayment} style={{ backgroundColor: '#ECF5FA', marginBottom: '5px', padding: '5px', width: '100%' }}>
+                                                                      {itemPayment.text}
+                                                                    </Radio>
+                                                                  })}
+                                                                </Radio.Group>
+                                                              }
                                                               {shippingAddress.name !== undefined && (
                                                                   <>
-                                                                    <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '5px' }}>
+                                                                    <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '5px' }}>
                                                                       お名前
                                                                     </div>
                                                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -2913,7 +2927,7 @@ const Scenario = () => {
                                                               }
                                                               {shippingAddress.kana_name !== undefined && (
                                                                   <>
-                                                                    <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '5px' }}>
+                                                                    <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '5px' }}>
                                                                       フリガナ
                                                                     </div>
                                                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -2954,7 +2968,7 @@ const Scenario = () => {
                                                                 }
                                                                 {shippingAddress.post_code !== undefined && (
                                                                   <div className="ss-user-setting__item-bottom">
-                                                                    <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '5px', marginTop:'5px' }}>
+                                                                    <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '5px', marginTop:'5px' }}>
                                                                       郵便番号
                                                                     </div>
                                                                     {shippingAddress.split_postal_code !== true ?
@@ -2980,7 +2994,7 @@ const Scenario = () => {
                                                                 )}
                                                                 {shippingAddress.prefecture !== undefined &&
                                                                   <div className="ss-user-setting__item-bottom">
-                                                                    <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                    <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
                                                                       都道府県
                                                                     </div>
                                                                     <InputCustom
@@ -2992,7 +3006,7 @@ const Scenario = () => {
                                                                 }
                                                                 {shippingAddress.municipality !== undefined &&
                                                                   <div className="ss-user-setting__item-bottom">
-                                                                    <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                    <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
                                                                       市区町村
                                                                     </div>
                                                                     <InputCustom
@@ -3004,7 +3018,7 @@ const Scenario = () => {
                                                                 }
                                                                 {shippingAddress.address !== undefined &&
                                                                   <div className="ss-user-setting__item-bottom">
-                                                                    <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                    <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
                                                                       番地
                                                                     </div>
                                                                     <InputCustom
@@ -3016,7 +3030,7 @@ const Scenario = () => {
                                                                 }
                                                                 {shippingAddress.building_name !== undefined &&
                                                                   <div className="ss-user-setting__item-bottom">
-                                                                    <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                    <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
                                                                       建物名
                                                                     </div>
                                                                     <InputCustom
@@ -3032,7 +3046,7 @@ const Scenario = () => {
                                                                 <React.Fragment>
                                                                   {shippingAddress.withHyphen === false ?
                                                                     <>
-                                                                      <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                      <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
                                                                         電話番号
                                                                       </div>
                                                                       <input
@@ -3045,7 +3059,7 @@ const Scenario = () => {
                                                                     </>
                                                                     :
                                                                     <>
-                                                                      <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                                                      <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
                                                                         電話番号
                                                                       </div>
                                                                       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -11482,7 +11496,7 @@ const Scenario = () => {
                                                                                                                         }}
                                                                                                                     />
                                                                                                                     <CheckboxCustom
-                                                                                                                        label="カード決済連動設定"
+                                                                                                                        label="配送先を入力する"
                                                                                                                         value={shippingAddress.card_linked_setting.includes(itemPaymentRadio.value)}
                                                                                                                         onChange={() => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'card_linked_setting')}
                                                                                                                     />
@@ -11507,7 +11521,7 @@ const Scenario = () => {
                                                                                                           </div>
                                                                                                           <div className="ss-user-setting__item-bottom">
                                                                                                             <div style={{ width: '95%' }}>
-                                                                                                              <span>カード決済連動設定</span>
+                                                                                                              <span>配送先住所</span>
                                                                                                             </div>
                                                                                                           </div>
                                                                                                           <div className="ss-user-setting__item-text_input-top">
