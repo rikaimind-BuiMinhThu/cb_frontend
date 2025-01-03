@@ -5355,12 +5355,12 @@ const UserMessage = ({
         }
       } else if (content.type === "shipping_address") {
         let shippingAddress = content.shipping_address;
-        if (shippingAddress.initial_selection) {
+        if (shippingAddress.value_initial_selection) {
           onChangeValue(
             indexContent,
             content.type,
-            shippingAddress.initial_selection,
-            "initial_selection"
+            shippingAddress.value_initial_selection,
+            "value_initial_selection"
           );
         } 
       } else if (content.type === "product_purchase") {
@@ -6041,7 +6041,7 @@ const UserMessage = ({
                     <Radio.Group
                       style={{ width: "100%", fontSize: "14px" }}
                       disabled={disabled}
-                      value={shippingAddress.initial_selection}
+                      value={shippingAddress.value_initial_selection}
                     >
                       {shippingAddress.radio_contents &&
                         shippingAddress.radio_contents.map(
@@ -6059,7 +6059,7 @@ const UserMessage = ({
                                 onChange={() => {
                                   let dataValue;
                                   if (
-                                    shippingAddress.initial_selection !==
+                                    shippingAddress.value_initial_selection !==
                                     itemPayment.value
                                   ) {
                                     dataValue = itemPayment.value;
@@ -6070,7 +6070,7 @@ const UserMessage = ({
                                     indexContent,
                                     content.type,
                                     dataValue,
-                                    "initial_selection"
+                                    "value_initial_selection"
                                   );
 
                                   if (
@@ -6103,7 +6103,7 @@ const UserMessage = ({
                         )}
                     </Radio.Group>
                   }
-                  {(shippingAddress.card_linked_setting.length > 0 && shippingAddress.card_linked_setting.includes(shippingAddress.initial_selection)) &&
+                  {(shippingAddress.card_linked_setting.length > 0 && shippingAddress.card_linked_setting.includes(shippingAddress.value_initial_selection)) &&
                     <React.Fragment>
                       {(shippingAddress.title_require || shippingAddress.require) && (
                         <div

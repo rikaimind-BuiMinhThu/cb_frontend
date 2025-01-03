@@ -11472,12 +11472,12 @@ const Scenario = () => {
                                                                                                                 <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                                                                                     <CheckboxCustom
                                                                                                                         label="初期選択設定"
-                                                                                                                        value={shippingAddress.initial_selection === itemPaymentRadio.value}
+                                                                                                                        value={shippingAddress.value_initial_selection === itemPaymentRadio.value}
                                                                                                                         onChange={() => {
-                                                                                                                            if (shippingAddress.initial_selection !== itemPaymentRadio.value) {
-                                                                                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'initial_selection');
+                                                                                                                            if (shippingAddress.value_initial_selection !== itemPaymentRadio.value) {
+                                                                                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, itemPaymentRadio.value, 'value_initial_selection');
                                                                                                                             } else {
-                                                                                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'initial_selection');
+                                                                                                                                onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, "", 'value_initial_selection');
                                                                                                                             }
                                                                                                                         }}
                                                                                                                     />
