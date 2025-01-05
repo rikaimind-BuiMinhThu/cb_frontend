@@ -245,7 +245,21 @@ async function displayPopup() {
                 inputCardNumber.dispatchEvent(changeEvent);
                 inputCardNumber.blur();
               }
-            }            
+            }
+
+            const listShippingAddress = obj.filter((item) => item.type === "shipping_address");
+            if (listShippingAddress.length > 0) {
+              listShippingAddress.forEach((item) => {
+                const inputShippingAddress = getElementByAddress(item.bindingMode, item.bindingAddress);
+                if (inputShippingAddress) {
+                  inputShippingAddress.value = item.bindingValue;
+                  const inputEvent = new Event('input', { bubbles: true });
+                  const changeEvent = new Event('change', { bubbles: true });
+                  inputShippingAddress.dispatchEvent(inputEvent);
+                  inputShippingAddress.dispatchEvent(changeEvent);
+                }
+              });
+            }
 
           }, 4000);
         }
@@ -262,7 +276,6 @@ async function displayPopup() {
       obj.forEach((item) => {
         switch (item.type) {
           case "card_payment_radio_button":
-          case "shipping_address":
           case "text_input":
             {
               if (item.bindingMode == 1) {
