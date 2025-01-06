@@ -12,7 +12,7 @@ const CustomButton = ({
 }) => {
   useEffect(() => {
     if (autoClick && typeof onClick === "function") {
-        if(messsagetype=='pull_down' || messsagetype=='agree_term')
+        if(messsagetype=='pull_down' || messsagetype=='agree_term'||messsagetype=='card_payment_radio_button')
         {
             onClick();
         }
