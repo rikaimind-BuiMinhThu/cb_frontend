@@ -1989,6 +1989,91 @@ function Preview() {
             isValid = false;
           }
         }
+      } else if (contentArr[i].type === "shipping_address") {
+        if (
+          errors[
+          `message${index}_content${i}_${contentArr[i].type}`
+          ] &&
+          errors[
+          `message${index}_content${i}_${contentArr[i].type}`
+          ] !== messageError
+        ) {
+          errorsMess[
+            `message${index}_content${i}_${contentArr[i].type}`
+          ] =
+            errors[
+            `message${index}_content${i}_${contentArr[i].type}`
+            ];
+          isValid = false;
+        } else {
+          let isValidShippingAddress = true;
+          if (contentType.isCheckRequire === "all_items_require") {
+            if (
+              contentType.name !== undefined &&
+              stringNullOrEmpty(contentType.value_name_left) ||
+              stringNullOrEmpty(contentType.value_name_right)
+            ) {
+              isValidShippingAddress = false;
+            }
+            if (
+              contentType.kana_name !== undefined &&
+              stringNullOrEmpty(contentType.value_kana_left) ||
+              stringNullOrEmpty(contentType.value_kana_right)
+            ) {
+              isValidShippingAddress = false;
+            }
+            if (contentType.post_code !== undefined) {
+              if (contentType.split_postal_code) {
+                if (
+                  stringNullOrEmpty(contentType.value_post_code_left) ||
+                  stringNullOrEmpty(contentType.value_post_code_right)
+                ) {
+                  isValidShippingAddress = false;
+                }
+              } else if (stringNullOrEmpty(contentType.value_post_code)) {
+                isValidShippingAddress = false;
+              }
+            }
+            if (
+              contentType.prefecture !== undefined &&
+              stringNullOrEmpty(contentType.value_prefecture)
+            ) {
+              isValidShippingAddress = false;
+            }
+            if (
+              contentType.municipality !== undefined &&
+              stringNullOrEmpty(contentType.value_municipality)
+            ) {
+              isValidShippingAddress = false;
+            }
+            if (
+              contentType.address !== undefined &&
+              stringNullOrEmpty(contentType.value_address)
+            ) {
+              isValidShippingAddress = false;
+            }
+            if (
+              contentType.address !== undefined &&
+              stringNullOrEmpty(contentType.value_building_name)
+            ) {
+              isValidShippingAddress = false;
+            }
+            if (
+              contentType.number !== undefined &&
+              (stringNullOrEmpty(contentType.value_number1) ||
+              stringNullOrEmpty(contentType.value_number2) ||
+              stringNullOrEmpty(contentType.value_number3))
+            ) {
+              isValidShippingAddress = false
+            }
+          }
+          if (isValidShippingAddress === false) {
+            errorsMess[
+              `message${index}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        }
       } else if (
         contentType.type === "phone_number" &&
         !errorsMess[
@@ -4599,8 +4684,8 @@ function Preview() {
                       "sp-popup-zip-code-address2"
                     ).style.display = "none";
                   }
-                  document.getElementById("ss-user-input-address").focus();
-                  document.getElementById("ss-user-input-address").select();
+                  document.getElementById("ss-user-input-address2").focus();
+                  document.getElementById("ss-user-input-address2").select();
                 }}
               >
                 選択
@@ -6360,10 +6445,10 @@ const UserMessage = ({
                                             ""
                                           );
                                           document
-                                            .getElementById("ss-user-input-address")
+                                            .getElementById("ss-user-input-address2")
                                             .focus();
                                           document
-                                            .getElementById("ss-user-input-address")
+                                            .getElementById("ss-user-input-address2")
                                             .select();
                                         } else {
                                           onChangeErrors(
@@ -6455,10 +6540,10 @@ const UserMessage = ({
                                               ""
                                             );
                                             document
-                                              .getElementById("ss-user-input-address")
+                                              .getElementById("ss-user-input-address2")
                                               .focus();
                                             document
-                                              .getElementById("ss-user-input-address")
+                                              .getElementById("ss-user-input-address2")
                                               .select();
                                           } else {
                                             onChangeErrors(
@@ -6539,10 +6624,10 @@ const UserMessage = ({
                                               ""
                                             );
                                             document
-                                              .getElementById("ss-user-input-address")
+                                              .getElementById("ss-user-input-address2")
                                               .focus();
                                             document
-                                              .getElementById("ss-user-input-address")
+                                              .getElementById("ss-user-input-address2")
                                               .select();
                                           } else {
                                             onChangeErrors(
@@ -6671,7 +6756,7 @@ const UserMessage = ({
                             </div>
                             <InputCustom
                               placeholder={shippingAddress.address}
-                              id="ss-user-input-address"
+                              id="ss-user-input-address2"
                               disabled={disabled}
                               style={{ width: "100%" }}
                               onChange={(value) =>
