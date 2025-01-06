@@ -6161,70 +6161,83 @@ const UserMessage = ({
 
                 <div style={{ marginBottom: "10px" }}>
                   {
-                    <Radio.Group
-                      style={{ width: "100%", fontSize: "14px" }}
-                      disabled={disabled}
-                      value={shippingAddress.value_initial_selection}
-                    >
-                      {shippingAddress.radio_contents &&
-                        shippingAddress.radio_contents.map(
-                          (itemPayment, indexPayment) => {
-                            return (
-                              <Radio
-                                value={itemPayment.value}
-                                key={indexPayment}
-                                style={{
-                                  backgroundColor: "#ECF5FA",
-                                  marginBottom: "5px",
-                                  padding: "5px",
-                                  width: "100%",
-                                }}
-                                onChange={() => {
-                                  let dataValue;
-                                  if (
-                                    shippingAddress.value_initial_selection !==
-                                    itemPayment.value
-                                  ) {
-                                    dataValue = itemPayment.value;
-                                  } else {
-                                    dataValue = "";
-                                  }
-                                  onChangeValue(
-                                    indexContent,
-                                    content.type,
-                                    dataValue,
-                                    "value_initial_selection"
-                                  );
+                    <>
+                      <div
+                        style={{
+                          fontWeight: "400",
+                          fontSize: "12px",
+                          color: 'black',
+                          width: "100%",
+                          marginBottom: "5px",
+                        }}
+                      >
+                        お届け先住所
+                      </div>
+                      <Radio.Group
+                        style={{ width: "100%", fontSize: "14px" }}
+                        disabled={disabled}
+                        value={shippingAddress.value_initial_selection}
+                      >
+                        {shippingAddress.radio_contents &&
+                          shippingAddress.radio_contents.map(
+                            (itemPayment, indexPayment) => {
+                              return (
+                                <Radio
+                                  value={itemPayment.value}
+                                  key={indexPayment}
+                                  style={{
+                                    backgroundColor: "#ECF5FA",
+                                    marginBottom: "5px",
+                                    padding: "5px",
+                                    width: "100%",
+                                  }}
+                                  onChange={() => {
+                                    let dataValue;
+                                    if (
+                                      shippingAddress.value_initial_selection !==
+                                      itemPayment.value
+                                    ) {
+                                      dataValue = itemPayment.value;
+                                    } else {
+                                      dataValue = "";
+                                    }
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      dataValue,
+                                      "value_initial_selection"
+                                    );
 
-                                  if (
-                                    shippingAddress.card_linked_setting.includes(dataValue)
-                                  ) {
-                                    onChangeValue(
-                                      indexContent,
-                                      content.type,
-                                      true,
-                                      "is_display_card_payment"
-                                    );
-                                    displayButtonNext(true);
-                                  } else {
-                                    displayButtonNext(false);
-                                    onChangeValue(
-                                      indexContent,
-                                      content.type,
-                                      false,
-                                      "is_display_card_payment"
-                                    );
-                                    if (messageContent.length === 1)
-                                      onClickNext();
-                                  }
-                                }}
-                              >
-                                {itemPayment.text}
-                              </Radio>
-                            );
-                          }
-                        )}
-                    </Radio.Group>
+                                    if (
+                                      shippingAddress.card_linked_setting.includes(dataValue)
+                                    ) {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        true,
+                                        "is_display_card_payment"
+                                      );
+                                      displayButtonNext(true);
+                                    } else {
+                                      displayButtonNext(false);
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        false,
+                                        "is_display_card_payment"
+                                      );
+                                      if (messageContent.length === 1)
+                                        onClickNext();
+                                    }
+                                  }}
+                                >
+                                  {itemPayment.text}
+                                </Radio>
+                              );
+                            }
+                          )}
+                      </Radio.Group>
+                    </>
                   }
                   {(shippingAddress.card_linked_setting.length > 0 && shippingAddress.card_linked_setting.includes(shippingAddress.value_initial_selection)) &&
                     <React.Fragment>
@@ -6491,10 +6504,10 @@ const UserMessage = ({
                                   onChange={async (value) => {
                                     if ((value + "").length === 3) {
                                       document
-                                        .getElementById("ss-user-post-code-right-input")
+                                        .getElementById("ss-user-post-code-right-input2")
                                         .focus();
                                       document
-                                        .getElementById("ss-user-post-code-right-input")
+                                        .getElementById("ss-user-post-code-right-input2")
                                         .select();
                                     }
                                     onChangeValue(
@@ -6575,7 +6588,7 @@ const UserMessage = ({
                                   type="number"
                                   placeholder={shippingAddress.post_code_right}
                                   disabled={disabled}
-                                  id="ss-user-post-code-right-input"
+                                  id="ss-user-post-code-right-input2"
                                   style={{ width: "49%" }}
                                   onKeyPress={(e) => {
                                     if (e.target.value.length >= 4) e.preventDefault();
@@ -6711,7 +6724,7 @@ const UserMessage = ({
                             <div
                               style={{
                                 fontWeight: "400",
-                                fontSize: "10px",
+                                fontSize: "12px",
                                 width: "100%",
                                 marginBottom: "3px",
                               }}
@@ -6744,7 +6757,7 @@ const UserMessage = ({
                                 marginBottom: "3px",
                               }}
                             >
-                              番地
+                              丁目・番地等
                             </div>
                             <InputCustom
                               placeholder={shippingAddress.address}
@@ -8292,7 +8305,7 @@ const UserMessage = ({
                     <div
                       style={{
                         fontWeight: "400",
-                        fontSize: "10px",
+                        fontSize: "12px",
                         width: "100%",
                         marginBottom: "5px",
                       }}
@@ -8569,7 +8582,7 @@ const UserMessage = ({
                     <div
                       style={{
                         fontWeight: "400",
-                        fontSize: "10px",
+                        fontSize: "12px",
                         width: "100%",
                         marginBottom: "3px",
                       }}
@@ -8616,7 +8629,7 @@ const UserMessage = ({
                     <div
                       style={{
                         fontWeight: "400",
-                        fontSize: "10px",
+                        fontSize: "12px",
                         width: "100%",
                         marginBottom: "3px",
                       }}
@@ -8644,12 +8657,12 @@ const UserMessage = ({
                     <div
                       style={{
                         fontWeight: "400",
-                        fontSize: "10px",
+                        fontSize: "12px",
                         width: "100%",
                         marginBottom: "3px",
                       }}
                     >
-                      番地
+                      丁目・番地等
                     </div>
                     <InputCustom
                       placeholder={zipCodeAddress.address}
@@ -8673,7 +8686,7 @@ const UserMessage = ({
                     <div
                       style={{
                         fontWeight: "400",
-                        fontSize: "10px",
+                        fontSize: "12px",
                         width: "100%",
                         marginBottom: "3px",
                       }}

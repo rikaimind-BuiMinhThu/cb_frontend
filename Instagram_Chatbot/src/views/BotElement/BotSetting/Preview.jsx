@@ -4079,7 +4079,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     }
                                     {zipCodeAddress.post_code !== undefined && (
                                         <div className="ss-user-setting__item-bottom">
-                                            <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '5px' }}>
+                                            <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '5px' }}>
                                                 郵便番号
                                             </div>
                                             {zipCodeAddress.split_postal_code !== true ?
@@ -4200,7 +4200,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     )}
                                     {zipCodeAddress.prefecture !== undefined &&
                                         <div className="ss-user-setting__item-bottom">
-                                            <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                            <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
                                                 都道府県
                                             </div>
                                             {zipCodeAddress.is_use_dropdown ?
@@ -4226,7 +4226,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     }
                                     {zipCodeAddress.municipality !== undefined &&
                                         <div className="ss-user-setting__item-bottom">
-                                            <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                            <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
                                                 市区町村
                                             </div>
                                             <InputCustom
@@ -4240,8 +4240,8 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     }
                                     {zipCodeAddress.address !== undefined &&
                                         <div className="ss-user-setting__item-bottom">
-                                            <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                番地
+                                            <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
+                                            丁目・番地等
                                             </div>
                                             <InputCustom
                                                 placeholder={zipCodeAddress.address}
@@ -4255,7 +4255,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     }
                                     {zipCodeAddress.building_name !== undefined &&
                                         <div className="ss-user-setting__item-bottom">
-                                            <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
+                                            <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
                                                 建物名
                                             </div>
                                             <InputCustom
@@ -6374,7 +6374,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                             <div
                               style={{
                                 fontWeight: "400",
-                                fontSize: "10px",
+                                fontSize: "12px",
                                 width: "100%",
                                 marginBottom: "3px",
                               }}
@@ -6407,7 +6407,7 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                 marginBottom: "3px",
                               }}
                             >
-                              番地
+                              丁目・番地等
                             </div>
                             <InputCustom
                               placeholder={shippingAddress.address}
