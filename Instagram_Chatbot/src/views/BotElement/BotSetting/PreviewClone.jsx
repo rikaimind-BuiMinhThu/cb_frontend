@@ -2717,19 +2717,27 @@ function Preview() {
                 .map(type => {
                   const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
                   const bindingValue = dataInforFukushashiki[`${type}_fukushashiki_search_value`];
-                  if (bindingMode === undefined || bindingValue == undefined || bindingValue.length==0) {
+                  if (bindingMode === undefined || bindingValue == undefined || bindingValue.length == 0) {
                     return null;
                   }
-                  if(type=="initial_selection")
-                    {
-                     const objA = {
-                        type: "initial_selection",
-                        bindingMode,
-                        bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                        bindingValue:userInputData[`value_${type}`]
-                      };
-                      listFukuObject.push(objA)
-                    }           
+                  if (type == "initial_selection") {
+                    const objA = {
+                      type: "initial_selection",
+                      bindingMode,
+                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                      bindingValue: userInputData[`value_${type}`]
+                    };
+                    listFukuObject.push(objA)
+                  }
+                  if (type == "address") {
+                    const objA = {
+                      type: "zip_code_address",
+                      bindingMode,
+                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                      bindingValue: userInputData[`value_${type}`]
+                    };
+                    listFukuObject.push(objA)
+                  }
                   return {
                     type: message.shipping_address.is_use_dropdown ? "dropdown_prefecture" : "shipping_address",
                     bindingMode: bindingMode,
