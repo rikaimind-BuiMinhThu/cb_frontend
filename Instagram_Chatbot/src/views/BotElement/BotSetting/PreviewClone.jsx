@@ -4896,7 +4896,11 @@ function Preview() {
                             autoClick = {errorMessageSubmit.trim().length > 0 ? true : false}
                             messsagetype={dataMessages[indexMessage].message_content[0]?.type}
                           >
-                            {message.buttonName || (indexMessage >= indexMessageRender ? "次へ" : "更新")}
+                            {message.buttonName || (
+                               errorMessageSubmit.length > 0
+                                ? "更新"
+                                : (indexMessage >= indexMessageRender ? "次へ" : "更新")
+                            )}
                           </CustomButton>
                           </div>
                         )}
