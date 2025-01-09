@@ -1144,7 +1144,12 @@ const Scenario = () => {
             municipality: '',
             address: '',
             building_name: '',
-            split_postal_code: false
+            split_postal_code: false,
+            post_code_label: '郵便番号',
+            prefecture_label: '都道府県',
+            municipality_label: '市区町村',
+            address_label: '番地',
+            building_name_label: '建物名',
           }
         }
       );
@@ -3699,8 +3704,8 @@ const Scenario = () => {
                                                               }
                                                               {zipCodeAddress.post_code !== undefined && (
                                                                 <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '5px' }}>
-                                                                    郵便番号
+                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '5px' }}>
+                                                                    {zipCodeAddress.post_code_label || '郵便番号'}
                                                                   </div>
                                                                   {zipCodeAddress.split_postal_code !== true ?
                                                                     <InputCustom
@@ -3725,8 +3730,8 @@ const Scenario = () => {
                                                               )}
                                                               {zipCodeAddress.prefecture !== undefined &&
                                                                 <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                                    都道府県
+                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
+                                                                    {zipCodeAddress.prefecture_label || '都道府県'}
                                                                   </div>
                                                                   <InputCustom
                                                                     placeholder={zipCodeAddress.prefecture}
@@ -3737,8 +3742,8 @@ const Scenario = () => {
                                                               }
                                                               {zipCodeAddress.municipality !== undefined &&
                                                                 <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                                    市区町村
+                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
+                                                                    {zipCodeAddress.municipality_label || '市区町村' }
                                                                   </div>
                                                                   <InputCustom
                                                                     placeholder={zipCodeAddress.municipality}
@@ -3749,8 +3754,8 @@ const Scenario = () => {
                                                               }
                                                               {zipCodeAddress.address !== undefined &&
                                                                 <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                                    番地
+                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
+                                                                    {zipCodeAddress.address_label || '番地'}
                                                                   </div>
                                                                   <InputCustom
                                                                     placeholder={zipCodeAddress.address}
@@ -3761,8 +3766,8 @@ const Scenario = () => {
                                                               }
                                                               {zipCodeAddress.building_name !== undefined &&
                                                                 <div className="ss-user-setting__item-bottom">
-                                                                  <div style={{ fontWeight: '400', fontSize: '10px', width: '100%', marginBottom: '3px' }}>
-                                                                    建物名
+                                                                  <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
+                                                                    {zipCodeAddress.building_name_label || '建物名'}
                                                                   </div>
                                                                   <InputCustom
                                                                     placeholder={zipCodeAddress.building_name}
@@ -6673,10 +6678,12 @@ const Scenario = () => {
                                                       {zipCodeAddress.post_code !== undefined && (
                                                         zipCodeAddress.split_postal_code === false ?
                                                           <>
-                                                            <div className="ss-user-setting__item-bottom">
+                                                            <div className="ss-user-setting__item-bottom" style={{gap:'1%'}}>
                                                               <InputCustom
                                                                 classLabel="ss-custom-label-zip-code"
-                                                                label="郵便番号"
+                                                                labelValue={zipCodeAddress.post_code_label}
+                                                                onLabelChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code_label')}
+                                                                editableLabel={true}
                                                                 className={"ss-user-setting__item-input-zip-code"}
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code')}
                                                                 onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'post_code')}
@@ -6692,7 +6699,7 @@ const Scenario = () => {
                                                                 <div style={{ width: '16%' }}>
 
                                                                 </div>
-                                                                <div style={{ width: '75%', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                                   <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
                                                                     <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
                                                                       <SelectCustom
@@ -6734,10 +6741,12 @@ const Scenario = () => {
                                                           </>
                                                           :
                                                           <>
-                                                            <div className="ss-user-setting__item-bottom">
+                                                            <div className="ss-user-setting__item-bottom" style={{gap:'1%'}}>
                                                               <InputCustom
                                                                 classLabel="ss-custom-label-zip-code"
-                                                                label="郵便番号"
+                                                                labelValue={zipCodeAddress.post_code_label}
+                                                                onLabelChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code_label')}
+                                                                editableLabel={true}
                                                                 className={"ss-user-setting__item-input-zip-code"}
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code_left')}
                                                                 value={zipCodeAddress.post_code_left}
@@ -6749,7 +6758,7 @@ const Scenario = () => {
                                                                 onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'post_code_right')}
                                                                 value={zipCodeAddress.post_code_right}
                                                                 placeholder="0000"
-                                                                style={{ width: '20%', marginRight: '34%' }}
+                                                                style={{ width: '20%', marginRight: '31%' }}
                                                               />
                                                               <MDBIcon
                                                                 style={{ width: '6%' }}
@@ -6766,7 +6775,7 @@ const Scenario = () => {
                                                                   <div style={{ width: '16%' }}>
 
                                                                   </div>
-                                                                  <div style={{ width: '75%', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                  <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                                     <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
                                                                       <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
                                                                         <SelectCustom
@@ -6808,7 +6817,7 @@ const Scenario = () => {
                                                                   <div style={{ width: '16%' }}>
 
                                                                   </div>
-                                                                  <div style={{ width: '75%', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                                  <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                                     <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
                                                                       <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
                                                                         <SelectCustom
@@ -6853,9 +6862,14 @@ const Scenario = () => {
                                                       )}
                                                       {zipCodeAddress.prefecture !== undefined &&
                                                         <>
-                                                          <div className="ss-user-setting__item-bottom" style={{ flexWrap: 'nowrap', alignItems: 'center' }}>
-                                                            <span style={{ fontSize: '14px', fontWeight: '400' }}
-                                                              className="ss-custom-label-zip-code">都道府県</span>
+                                                          <div className="ss-user-setting__item-bottom" style={{ flexWrap: 'nowrap', alignItems: 'center', gap: '1%' }}>
+                                                            <input
+                                                              type="text"
+                                                              value={zipCodeAddress.prefecture_label}
+                                                              onChange={(e) => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.value, 'prefecture_label')}
+                                                              className={'ss-editable-label'}
+                                                              style={{ borderRadius: '5px', border: '1px solid gray', padding: '5px', fontSize: '14px', fontWeight: '400', width: '18.5%' }}
+                                                            />
                                                             {zipCodeAddress.is_use_dropdown ?
                                                               <SelectCustom
                                                                 style={{ width: '40%' }}
@@ -6911,7 +6925,7 @@ const Scenario = () => {
                                                               <div style={{ width: '16%' }}>
 
                                                               </div>
-                                                              <div style={{ width: '75%', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                              <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                                 <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
                                                                   <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
                                                                     <SelectCustom
@@ -6954,10 +6968,12 @@ const Scenario = () => {
                                                       }
                                                       {zipCodeAddress.municipality !== undefined &&
                                                         <div>
-                                                          <div className="ss-user-setting__item-bottom">
+                                                          <div className="ss-user-setting__item-bottom" style={{gap:'1%'}}>
                                                             <InputCustom
                                                               classLabel="ss-custom-label-zip-code"
-                                                              label="市区町村"
+                                                              labelValue={zipCodeAddress.municipality_label}
+                                                              onLabelChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'municipality_label')}
+                                                              editableLabel={true}
                                                               className={"ss-user-setting__item-input-zip-code"}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'municipality')}
                                                               onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'municipality')}
@@ -6972,7 +6988,7 @@ const Scenario = () => {
                                                               <div style={{ width: '16%' }}>
 
                                                               </div>
-                                                              <div style={{ width: '75%', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                              <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                                 <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
                                                                   <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
                                                                     <SelectCustom
@@ -7015,10 +7031,12 @@ const Scenario = () => {
                                                       }
                                                       {zipCodeAddress.address !== undefined &&
                                                         <>
-                                                          <div className="ss-user-setting__item-bottom">
+                                                          <div className="ss-user-setting__item-bottom" style={{gap: '1%'}}>
                                                             <InputCustom
                                                               classLabel="ss-custom-label-zip-code"
-                                                              label="番地"
+                                                              labelValue={zipCodeAddress.address_label}
+                                                              onLabelChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'address_label')}
+                                                              editableLabel={true}
                                                               className={"ss-user-setting__item-input-zip-code"}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'address')}
                                                               onClickIcon={() => handleRemoveItemZipCodeAddress(indexMessageSelect, indexContent, content.type, 'address')}
@@ -7033,7 +7051,7 @@ const Scenario = () => {
                                                               <div style={{ width: '16%' }}>
 
                                                               </div>
-                                                              <div style={{ width: '75%', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                              <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                                 <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
                                                                   <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
                                                                     <SelectCustom
@@ -7076,10 +7094,12 @@ const Scenario = () => {
                                                       }
                                                       {zipCodeAddress.building_name !== undefined &&
                                                         <>
-                                                          <div className="ss-user-setting__item-bottom">
+                                                          <div className="ss-user-setting__item-bottom" style ={{gap: '1%'}}>
                                                             <InputCustom
                                                               classLabel="ss-custom-label-zip-code"
-                                                              label="建物名"
+                                                              labelValue={zipCodeAddress.building_name_label}
+                                                              onLabelChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'building_name_label')}
+                                                              editableLabel={true}
                                                               className={"ss-user-setting__item-input-zip-code"}
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'building_name')}
                                                               value={zipCodeAddress.building_name}
@@ -7094,7 +7114,7 @@ const Scenario = () => {
                                                               <div style={{ width: '16%' }}>
 
                                                               </div>
-                                                              <div style={{ width: '75%', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                              <div style={{ width: '73%', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                                 <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
 
                                                                   <div style={{ flexBasis: '30%', maxWidth: '30%' }}>
