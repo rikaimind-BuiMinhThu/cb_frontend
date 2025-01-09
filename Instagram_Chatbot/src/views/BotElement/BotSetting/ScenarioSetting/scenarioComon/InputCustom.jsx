@@ -2,11 +2,30 @@ import React from 'react';
 import { MDBIcon } from 'mdbreact';
 import CheckboxCustom from './CheckboxCustom';
 
-const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false, style, classLabel, disabled = false, styleLabel, inline = true, onKeyPress, pattern, onPaste, readOnly = false, useFukushashiki = false }) => {
+const InputCustom = ({ id, type = "text", value, maxLength = 200, onChange, placeholder, className, label, icon, onClickIcon, classIcon, handleCheckBox, valueCheckbox = false, style, classLabel, disabled = false, styleLabel, inline = true, onKeyPress, pattern, onPaste, readOnly = false, useFukushashiki = false, editableLabel = false, 
+    onLabelChange, 
+    labelValue  }) => {
 
     return (
         <React.Fragment>
-            {label && <div className={classLabel} style={{ fontSize: '14px', fontWeight: '400', ...inline === false ? {width: '90%'}: {width: 'fit-content'}, ...styleLabel }}>{label}</div>}
+            {editableLabel ? (
+                <input
+                    type="text"
+                    value={labelValue}
+                    onChange={e => onLabelChange(e.target.value)}
+                    className={`ss-editable-label ${classLabel || ''}`}
+                    style={{ borderRadius: '5px', border: '1px solid gray',padding: '5px', fontSize: '14px', fontWeight: '400', width:'1%', ...styleLabel }}
+                />
+            ) : (
+                label && (
+                    <div 
+                        className={classLabel} 
+                        style={{ fontSize: '14px', fontWeight: '400', ...inline === false ? { width: '90%' } : { width: 'fit-content' }, ...styleLabel }}
+                    >
+                        {label}
+                    </div>
+                )
+            )}
             <input
                 id={id}
                 maxLength={maxLength}

@@ -4080,7 +4080,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     {zipCodeAddress.post_code !== undefined && (
                                         <div className="ss-user-setting__item-bottom">
                                             <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '5px' }}>
-                                                郵便番号
+                                                {zipCodeAddress.post_code_label && zipCodeAddress.post_code_label.trim() !== ""
+                                                    ? zipCodeAddress.post_code_label
+                                                    : '郵便番号'}
                                             </div>
                                             {zipCodeAddress.split_postal_code !== true ?
                                                 <InputCustom
@@ -4201,7 +4203,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     {zipCodeAddress.prefecture !== undefined &&
                                         <div className="ss-user-setting__item-bottom">
                                             <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-                                                都道府県
+                                                {zipCodeAddress.prefecture_label && zipCodeAddress.prefecture_label.trim() !== ""
+                                                    ? zipCodeAddress.prefecture_label
+                                                    : '都道府県'}
                                             </div>
                                             {zipCodeAddress.is_use_dropdown ?
                                                 <SelectCustom
@@ -4227,7 +4231,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     {zipCodeAddress.municipality !== undefined &&
                                         <div className="ss-user-setting__item-bottom">
                                             <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-                                                市区町村
+                                                {zipCodeAddress.municipality_label && zipCodeAddress.municipality_label.trim() !== ""
+                                                    ? zipCodeAddress.municipality_label
+                                                    : '市区町村'}
                                             </div>
                                             <InputCustom
                                                 placeholder={zipCodeAddress.municipality}
@@ -4241,7 +4247,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     {zipCodeAddress.address !== undefined &&
                                         <div className="ss-user-setting__item-bottom">
                                             <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-                                            丁目・番地等
+                                                {zipCodeAddress.address_label && zipCodeAddress.address_label.trim() !== ""
+                                                    ? zipCodeAddress.address_label
+                                                    : '番地'}
                                             </div>
                                             <InputCustom
                                                 placeholder={zipCodeAddress.address}
@@ -4256,7 +4264,9 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                     {zipCodeAddress.building_name !== undefined &&
                                         <div className="ss-user-setting__item-bottom">
                                             <div style={{ fontWeight: '400', fontSize: '12px', width: '100%', marginBottom: '3px' }}>
-                                                建物名
+                                                {zipCodeAddress.building_name_label && zipCodeAddress.building_name_label.trim() !== ""
+                                                    ? zipCodeAddress.building_name_label
+                                                    : '建物名'}
                                             </div>
                                             <InputCustom
                                                 placeholder={zipCodeAddress.building_name}
