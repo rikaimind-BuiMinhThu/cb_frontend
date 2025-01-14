@@ -2558,10 +2558,38 @@ function Preview() {
                 };
                 listFukuObject.push(fukuObject);
               }
+              if(Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined)
+              {
+                const fukuObject = {
+                  type: 'password',
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.text_input.password.value,
+                };
+                listFukuObject.push(fukuObject);
+              }
 
-              break;
+              if (Object.keys(message.text_input.password_confirmation).length != 0 && message.text_input.password_confirmation != undefined) {
+                const fukuObject1 = {
+                  type: 'password_confirmation',
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.text_input.password_confirmation.value,
+                };
 
+                const fukuObject2 = {
+                  type: 'password_confirmation',
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.text_input.password_confirmation.valueConfirm,
+                };
+                listFukuObject.push(fukuObject1);
+                listFukuObject.push(fukuObject2);
+                
+              }
+              
             }
+            break;
           case 'agree_term':
             {
               let searchValue = message.fukushashiki_search_value;
@@ -2752,10 +2780,25 @@ function Preview() {
               listFukuObject.push(...result);
               break;
             }
+
+          case 'radio_button':
+            {
+              const fukuObject = {
+                type: message.type,
+                bindingMode: message.initial_selection_fukushashiki_search_mode,
+                bindingAddress: message.initial_selection_fukushashiki_search_value,
+                bindingValue: message.radio_button.initial_selection.toString()
+              };
+              listFukuObject.push(fukuObject);
+              break;
+            }
+
           case 'card_payment_radio_button':
             {
               const keysToExtract = [
                 "initial_selection",
+                "card_holder1",
+                "card_holder2",
                 "card_number1",
                 "card_number2",
                 "card_number3",
@@ -2776,7 +2819,7 @@ function Preview() {
               const dataInforFukushashiki = Object.fromEntries(
                 Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
               );
-              const types = ["card_number", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4","installment","initial_selection"];
+              const types = ["card_number","card_holder1","card_holder2", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4","installment","initial_selection"];
               const result = types
                 .filter(type => `${type}` in userInputData)
                 .map(type => {

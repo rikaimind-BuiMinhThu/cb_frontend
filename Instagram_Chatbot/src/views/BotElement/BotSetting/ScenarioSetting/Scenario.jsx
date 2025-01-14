@@ -6301,8 +6301,8 @@ const Scenario = () => {
                                                                       <SelectCustom
                                                                         id="title"
                                                                         style={{ width: '100%' }}
-                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['post_code_fukushashiki_search_mode']}
-                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'post_code_fukushashiki_search_mode', value)}
+                                                                        value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['initial_selection_fukushashiki_search_mode']}
+                                                                        onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'initial_selection_fukushashiki_search_mode', value)}
                                                                         data={[
                                                                           { key: 1, value: 'id' },
                                                                           { key: 2, value: 'css_selector' },
@@ -6318,14 +6318,14 @@ const Scenario = () => {
                                                                       styleLabel={{ width: '100%' }}
                                                                       maxLength={250}
                                                                       useFukushashiki={true}
-                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'post_code_fukushashiki_search_value', value)}
-                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['post_code_fukushashiki_search_value']}
+                                                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'initial_selection_fukushashiki_search_value', value)}
+                                                                      value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['initial_selection_fukushashiki_search_value']}
                                                                       placeholder={{
                                                                         1: '複写先要素のIDを入力ください',
                                                                         2: '複写先要素のcss_selectorを入力ください',
                                                                         3: '複写先要素のxPathを入力ください',
                                                                       }[
-                                                                        dataMessages[indexMessageSelect]?.message_content[indexContent]?.['post_code_fukushashiki_search_mode']
+                                                                        dataMessages[indexMessageSelect]?.message_content[indexContent]?.['initial_selection_fukushashiki_search_mode']
                                                                       ] || ''}
                                                                     />
                                                                   </div>
