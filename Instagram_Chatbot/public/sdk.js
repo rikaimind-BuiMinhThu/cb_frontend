@@ -356,7 +356,29 @@ async function displayPopup() {
               }
               break;
             }
-  
+
+          case "radio_button":
+            {
+              elementContain = getElementByAddress(item.bindingMode, item.bindingAddress);
+              if (elementContain) {
+                const radioButtons = elementContain.querySelectorAll('input[type="radio"]');
+                radioButtons.forEach(radio => {
+                  if (radio.value == item.bindingValue) {
+                    radio.checked = true;
+                    const changeEvent = new Event('change', { bubbles: true });
+                    radio.dispatchEvent(changeEvent);
+                  }
+                });
+              }
+              break;
+            }
+
+          case "password":
+            {
+              const passwordInput = getElementByAddress(item.bindingMode, item.bindingAddress)
+              if(passwordInput)
+                passwordInput.setRangeText(item.bindingValue)
+            }
           case "textarea":
             {
               if (item.bindingMode == 1) {
