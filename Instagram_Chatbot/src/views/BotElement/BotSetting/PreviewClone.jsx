@@ -2232,8 +2232,11 @@ function Preview() {
             contentType?.card_linked_setting_picture))
       ) {
         if (
-          (contentType.is_hide_card_name !== true &&
-            stringNullOrEmpty(contentType.card_holder)) ||
+          contentType.is_hide_card_name !== true &&
+          (contentType.separate_name === false
+            ? stringNullOrEmpty(contentType.card_holder)
+            : (stringNullOrEmpty(contentType.card_holder1),
+              stringNullOrEmpty(contentType.card_holder2))) ||
           (contentType.is_hide_cvc !== true &&
             stringNullOrEmpty(contentType.cvc)) ||
           (contentType.separate_type === true &&
@@ -11438,27 +11441,68 @@ const UserMessage = ({
                         </div>
                       )}
                     {cardPaymentRadioButton.is_hide_card_name === false && (
-                      <div className="ss-user-setting__item-bottom">
-                        <InputCustom
-                          className="ss-user-setting-input-overview"
-                          styleLabel={{ width: "100%" }}
-                          label="カード名義"
-                          inline={false}
-                          disabled={disabled}
-                          value={cardPaymentRadioButton.card_holder}
-                          onChange={(value) =>
-                            onChangeValue(
-                              indexContent,
-                              content.type,
-                              value,
-                              "card_holder"
-                            )
-                          }
-                          placeholder={
-                            cardPaymentRadioButton.card_holder_placeholder
-                          }
-                        />
-                      </div>
+                      cardPaymentRadioButton.separate_name === false ?
+                        <div className="ss-user-setting__item-bottom">
+                          <InputCustom
+                            className="ss-user-setting-input-overview"
+                            styleLabel={{ width: "100%" }}
+                            label="カード名義"
+                            inline={false}
+                            disabled={disabled}
+                            value={cardPaymentRadioButton.card_holder}
+                            onChange={(value) =>
+                              onChangeValue(
+                                indexContent,
+                                content.type,
+                                value,
+                                "card_holder"
+                              )
+                            }
+                            placeholder={
+                              cardPaymentRadioButton.card_holder_placeholder
+                            }
+                          />
+                        </div> :
+                        <>
+                        <div style={{ width: "100%" }}>カード名義</div>
+
+                        
+                        <div className="ss-user-setting__item-bottom">
+                          <div style={{ display: 'flex', width: '100%', gap: '10px' }}>
+                            <InputCustom
+                              className="ss-user-setting-input-overview"
+                              inline={false}
+                              disabled={disabled}
+                              value={cardPaymentRadioButton.card_holder1}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "card_holder1"
+                                )
+                              }
+                              placeholder={cardPaymentRadioButton.card_holder_placeholder1}
+                            />
+                            <InputCustom
+                              className="ss-user-setting-input-overview"
+                              styleLabel={{ width: "100%" }}
+                              inline={false}
+                              disabled={disabled}
+                              value={cardPaymentRadioButton.card_holder2}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "card_holder2"
+                                )
+                              }
+                              placeholder={cardPaymentRadioButton.card_holder_placeholder2}
+                            />
+                          </div>
+                        </div>
+                        </>
                     )}
                     {Array.isArray(cardPaymentRadioButton.is_use_installment) &&
                       cardPaymentRadioButton.is_use_installment.length > 0 && (
