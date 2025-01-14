@@ -2783,13 +2783,20 @@ function Preview() {
 
           case 'radio_button':
             {
-              const fukuObject = {
-                type: message.type,
-                bindingMode: message.initial_selection_fukushashiki_search_mode,
-                bindingAddress: message.initial_selection_fukushashiki_search_value,
-                bindingValue: message.radio_button.initial_selection.toString()
-              };
-              listFukuObject.push(fukuObject);
+              const initialSelection = message.radio_button.initial_selection;
+              const selectedElement = message.radio_button.default.find(item => item.id === initialSelection);
+              if (selectedElement) 
+              {
+                const value = selectedElement.value;
+                const fukuObject = {
+                  type: message.type,
+                  bindingMode: message.initial_selection_fukushashiki_search_mode,
+                  bindingAddress: message.initial_selection_fukushashiki_search_value,
+                  bindingValue: value.toString()
+                };
+                listFukuObject.push(fukuObject);
+              }
+              
               break;
             }
 
