@@ -4641,8 +4641,9 @@ const Scenario = () => {
                                                                 </div>
                                                               }
                                                               
-                                                              {cardPaymentRadioButton.is_hide_card_name === false &&
-                                                                <div className="ss-user-setting__item-bottom">
+                                                              {cardPaymentRadioButton.is_hide_card_name === false && 
+                                                                (cardPaymentRadioButton.separate_name === false ?
+                                                                  <div className="ss-user-setting__item-bottom">
                                                                   <InputCustom
                                                                     className="ss-user-setting-input-overview"
                                                                     styleLabel={{ width: '100%' }}
@@ -4652,6 +4653,33 @@ const Scenario = () => {
                                                                     placeholder={cardPaymentRadioButton.card_holder_placeholder}
                                                                   />
                                                                 </div>
+                                                                :
+                                                                <>
+                                                                  <div style={{ width: "100%" }}>カード名義</div>
+                                                                  <div style={{ display: 'flex', width: '100%', gap: '10px' }}>
+                                                                    <InputCustom
+                                                                      className="ss-user-setting-input-overview"
+                                                                      inline={false}
+                                                                      disabled={true}
+                                                                      value={cardPaymentRadioButton.card_holder1}
+                                                                      placeholder={
+                                                                        cardPaymentRadioButton.card_holder_placeholder1
+                                                                      }
+                                                                    />
+                                                                    <InputCustom
+                                                                      className="ss-user-setting-input-overview"
+                                                                      styleLabel={{ width: "100%" }}
+                                                                      inline={false}
+                                                                      disabled={true}
+                                                                      value={cardPaymentRadioButton.card_holder2}
+                                                                      placeholder={
+                                                                        cardPaymentRadioButton.card_holder_placeholder2
+                                                                      }
+                                                                    />
+                                                                  </div>
+                                                                </>
+                                                                )
+                                                                
                                                               }
                                                               <div className="ss-user-setting__item-bottom">
                                                                 <div style={{ width: '100%' }}>有効期限</div>
@@ -11120,7 +11148,7 @@ const Scenario = () => {
                                                                                                   inline={false}
                                                                                                   placeholder="プレースホルダ"
                                                                                                   value={cardPaymentRadioButton.card_holder_placeholder1}
-                                                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_holder1_placeholder')}
+                                                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_holder_placeholder1')}
                                                                                                 />
                                                                                               </div>
                                                                                               <div style={{ width: '100%' }}>
@@ -11129,7 +11157,7 @@ const Scenario = () => {
                                                                                                   inline={false}
                                                                                                   placeholder="プレースホルダ"
                                                                                                   value={cardPaymentRadioButton.card_holder_placeholder2}
-                                                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_holder2_placeholder')}
+                                                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'card_holder_placeholder2')}
                                                                                                 />
                                                                                               </div>
                                                                                             </div>

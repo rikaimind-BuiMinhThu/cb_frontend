@@ -11469,7 +11469,6 @@ const UserMessage = ({
                         
                         <div className="ss-user-setting__item-bottom">
                           <div style={{ display: 'flex', width: '100%', gap: '10px' }}>
-
                             <InputCustom
                               className="ss-user-setting-input-overview"
                               inline={false}
@@ -11483,9 +11482,7 @@ const UserMessage = ({
                                   "card_holder1"
                                 )
                               }
-                              placeholder={
-                                cardPaymentRadioButton.card_holder_placeholder1
-                              }
+                              placeholder={cardPaymentRadioButton.card_holder_placeholder1}
                             />
                             <InputCustom
                               className="ss-user-setting-input-overview"
@@ -11501,9 +11498,7 @@ const UserMessage = ({
                                   "card_holder2"
                                 )
                               }
-                              placeholder={
-                                cardPaymentRadioButton.card_holder_placeholder
-                              }
+                              placeholder={cardPaymentRadioButton.card_holder_placeholder2}
                             />
                           </div>
                         </div>
