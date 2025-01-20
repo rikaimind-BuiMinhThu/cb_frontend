@@ -1513,6 +1513,8 @@ const Scenario = () => {
             title_require: false,
             require: false,
             is_display_error_message: false,
+            is_use_js: false,
+            use_for_confirm_order: false,
           }
         }
       );
@@ -12580,54 +12582,86 @@ const Scenario = () => {
                                                   {/* user: type = 'button_submit' */}
                                                   {content.type === 'button_submit' &&
                                                     <>
-                                                      <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px' }}>
-                                                        <div style={{ width: '90%' }}>
+                                                      <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px', display: 'flex' }}>
+                                                        <div style={{ width: '45%' }}>
                                                           <CheckboxCustom
-                                                            label="エラーメッセージを表示する
-"
+                                                            label="エラーメッセージを表示する"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_display_error_message')}
                                                             value={buttonSubmit.is_display_error_message}
+                                                          />
+                                                        </div>
+                                                        <div style={{ width: '45%' }}>
+                                                          <CheckboxCustom
+                                                            label="use javasrip"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_use_js')}
+                                                            value={buttonSubmit.is_use_js}
+                                                          />
+                                                        </div>
+                                                      </div>
+                                                      <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px', display: 'flex' }}>
+                                                        <div style={{ width: '90%' }}>
+                                                          <CheckboxCustom
+                                                            label="Use for comfirm order"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_for_confirm_order')}
+                                                            value={buttonSubmit.use_for_confirm_order}
                                                           />
                                                         </div>
                                                       </div>
                                                       {buttonSubmit.is_display_error_message &&
                                                         <>
                                                           <div className='ss-user-setting__item-bottom' style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                              <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
-                                                                <div style={{ flexBasis: '26%', maxWidth: '26%' }}>
-                                                                  <SelectCustom
-                                                                    id="title"
-                                                                    label="エラーメッセージ"
-                                                                    style={{ width: '100%' }}
-                                                                    value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['error_message_display_element_search_type']}
-                                                                    onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'error_message_display_element_search_type', value)}
-                                                                    data={[
-                                                                      { key: 1, value: 'id' },
-                                                                      { key: 2, value: 'css_selector' },
-                                                                      { key: 3, value: 'xpath' }
-                                                                    ]}
-                                                                    keyValue="key"
-                                                                    placeholder="複写先要素の取得方法をお選びください"
-                                                                  />
-                                                                </div>
-                                                              </Tooltip>
-                                                              <div style={{ flexBasis: '63%', maxWidth: '63%', marginTop:'22px' }}>
-                                                                <InputCustom
-                                                                  styleLabel={{ width: '100%' }}
-                                                                  maxLength={250}
-                                                                  useFukushashiki={true}
-                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'error_message_display_element_search_value', value)}
-                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['error_message_display_element_search_value']}
-                                                                  placeholder={{
-                                                                    1: '複写先要素のIDを入力ください',
-                                                                    2: '複写先要素のcss_selectorを入力ください',
-                                                                    3: '複写先要素のxPathを入力ください',
-                                                                  }[
-                                                                    dataMessages[indexMessageSelect]?.message_content[indexContent]?.['error_message_display_element_search_type']
-                                                                  ] || ''}
+                                                            <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                              <div style={{ flexBasis: '26%', maxWidth: '26%' }}>
+                                                                <SelectCustom
+                                                                  id="title"
+                                                                  label="エラーメッセージ"
+                                                                  style={{ width: '100%' }}
+                                                                  value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['error_message_display_element_search_type']}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'error_message_display_element_search_type', value)}
+                                                                  data={[
+                                                                    { key: 1, value: 'id' },
+                                                                    { key: 2, value: 'css_selector' },
+                                                                    { key: 3, value: 'xpath' }
+                                                                  ]}
+                                                                  keyValue="key"
+                                                                  placeholder="複写先要素の取得方法をお選びください"
                                                                 />
                                                               </div>
+                                                            </Tooltip>
+                                                            <div style={{ flexBasis: '63%', maxWidth: '63%', marginTop: '22px' }}>
+                                                              <InputCustom
+                                                                styleLabel={{ width: '100%' }}
+                                                                maxLength={250}
+                                                                useFukushashiki={true}
+                                                                onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'error_message_display_element_search_value', value)}
+                                                                value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['error_message_display_element_search_value']}
+                                                                placeholder={{
+                                                                  1: '複写先要素のIDを入力ください',
+                                                                  2: '複写先要素のcss_selectorを入力ください',
+                                                                  3: '複写先要素のxPathを入力ください',
+                                                                }[
+                                                                  dataMessages[indexMessageSelect]?.message_content[indexContent]?.['error_message_display_element_search_type']
+                                                                ] || ''}
+                                                              />
                                                             </div>
+                                                          </div>
+                                                        </>
+                                                      }
+                                                      {buttonSubmit.is_use_js &&
+                                                        <>
+                                                          <div className='ss-user-setting__item-bottom' style={{ width: '18%', fontSize: '14px', fontWeight: '400', marginBottom: '5px' }}>
+                                                            jscode
+                                                          </div>
+                                                          <div className="ss-user-setting__item-bottom">
+                                                            <textarea
+                                                              style={{ width: '90%' }}
+                                                              className="ss-user-setting-item-textarea-label ss-input-value"
+                                                              placeholder="テキスト"
+                                                              rows="8"
+                                                              value={buttonSubmit.jscode}
+                                                              onChange={e => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.value, 'jscode')}
+                                                            />
+                                                          </div>
                                                         </>
                                                       }
                                                       <div className="ss-user-setting__item-text_input-top" style={{ margin: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
