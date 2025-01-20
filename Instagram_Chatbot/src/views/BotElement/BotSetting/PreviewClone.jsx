@@ -2232,8 +2232,11 @@ function Preview() {
             contentType?.card_linked_setting_picture))
       ) {
         if (
-          (contentType.is_hide_card_name !== true &&
-            stringNullOrEmpty(contentType.card_holder)) ||
+          contentType.is_hide_card_name !== true &&
+          (contentType.separate_name === false
+            ? stringNullOrEmpty(contentType.card_holder)
+            : (stringNullOrEmpty(contentType.card_holder1),
+              stringNullOrEmpty(contentType.card_holder2))) ||
           (contentType.is_hide_cvc !== true &&
             stringNullOrEmpty(contentType.cvc)) ||
           (contentType.separate_type === true &&
@@ -2555,10 +2558,38 @@ function Preview() {
                 };
                 listFukuObject.push(fukuObject);
               }
+              if(Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined)
+              {
+                const fukuObject = {
+                  type: 'password',
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.text_input.password.value,
+                };
+                listFukuObject.push(fukuObject);
+              }
 
-              break;
+              if (Object.keys(message.text_input.password_confirmation).length != 0 && message.text_input.password_confirmation != undefined) {
+                const fukuObject1 = {
+                  type: 'password_confirmation',
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.text_input.password_confirmation.value,
+                };
 
+                const fukuObject2 = {
+                  type: 'password_confirmation',
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.text_input.password_confirmation.valueConfirm,
+                };
+                listFukuObject.push(fukuObject1);
+                listFukuObject.push(fukuObject2);
+                
+              }
+              
             }
+            break;
           case 'agree_term':
             {
               let searchValue = message.fukushashiki_search_value;
@@ -2749,10 +2780,32 @@ function Preview() {
               listFukuObject.push(...result);
               break;
             }
+
+          case 'radio_button':
+            {
+              const initialSelection = message.radio_button.initial_selection;
+              const selectedElement = message.radio_button.default.find(item => item.id === initialSelection);
+              if (selectedElement) 
+              {
+                const value = selectedElement.value;
+                const fukuObject = {
+                  type: message.type,
+                  bindingMode: message.initial_selection_fukushashiki_search_mode,
+                  bindingAddress: message.initial_selection_fukushashiki_search_value,
+                  bindingValue: value.toString()
+                };
+                listFukuObject.push(fukuObject);
+              }
+              
+              break;
+            }
+
           case 'card_payment_radio_button':
             {
               const keysToExtract = [
                 "initial_selection",
+                "card_holder1",
+                "card_holder2",
                 "card_number1",
                 "card_number2",
                 "card_number3",
@@ -2773,7 +2826,7 @@ function Preview() {
               const dataInforFukushashiki = Object.fromEntries(
                 Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
               );
-              const types = ["card_number", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4","installment","initial_selection"];
+              const types = ["card_number","card_holder1","card_holder2", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4","installment","initial_selection"];
               const result = types
                 .filter(type => `${type}` in userInputData)
                 .map(type => {
@@ -2830,7 +2883,9 @@ function Preview() {
       }
     }
 
-    if (!handleValidateField(indexClickLocation)) {
+    let realIndex = indexMessage;
+
+    if (!handleValidateField(realIndex)) {
       return;
     }
     let renderMessage = [...renderMessageArr];
@@ -4864,7 +4919,7 @@ function Preview() {
                         indexMessage={indexMessage}
                         errorsProps={errors}
                         displayButtonNext={(value) => {
-                          dataMessages[indexMessage].is_display_button_next =
+                          dataMessages[indexMessageRender].is_display_button_next =
                             value;
                           setDataMessages([...dataMessages]);
                         }}
@@ -4880,9 +4935,9 @@ function Preview() {
                         }
                         variables={variables}
                       />
-                      {dataMessages[indexMessage].message_content[0]?.type !== "button_submit" &&(dataMessages[indexMessage].is_display_button_next !==
+                      {dataMessages[indexMessageRender].message_content[0]?.type !== "button_submit" &&(dataMessages[indexMessageRender].is_display_button_next !==
                         undefined
-                        ? dataMessages[indexMessage].is_display_button_next
+                        ? dataMessages[indexMessageRender].is_display_button_next
                         : true) && (
                           <div className="sp-user-message-button-action">
                           <CustomButton
@@ -11438,27 +11493,68 @@ const UserMessage = ({
                         </div>
                       )}
                     {cardPaymentRadioButton.is_hide_card_name === false && (
-                      <div className="ss-user-setting__item-bottom">
-                        <InputCustom
-                          className="ss-user-setting-input-overview"
-                          styleLabel={{ width: "100%" }}
-                          label="カード名義"
-                          inline={false}
-                          disabled={disabled}
-                          value={cardPaymentRadioButton.card_holder}
-                          onChange={(value) =>
-                            onChangeValue(
-                              indexContent,
-                              content.type,
-                              value,
-                              "card_holder"
-                            )
-                          }
-                          placeholder={
-                            cardPaymentRadioButton.card_holder_placeholder
-                          }
-                        />
-                      </div>
+                      cardPaymentRadioButton.separate_name === false ?
+                        <div className="ss-user-setting__item-bottom">
+                          <InputCustom
+                            className="ss-user-setting-input-overview"
+                            styleLabel={{ width: "100%" }}
+                            label="カード名義"
+                            inline={false}
+                            disabled={disabled}
+                            value={cardPaymentRadioButton.card_holder}
+                            onChange={(value) =>
+                              onChangeValue(
+                                indexContent,
+                                content.type,
+                                value,
+                                "card_holder"
+                              )
+                            }
+                            placeholder={
+                              cardPaymentRadioButton.card_holder_placeholder
+                            }
+                          />
+                        </div> :
+                        <>
+                        <div style={{ width: "100%" }}>カード名義</div>
+
+                        
+                        <div className="ss-user-setting__item-bottom">
+                          <div style={{ display: 'flex', width: '100%', gap: '10px' }}>
+                            <InputCustom
+                              className="ss-user-setting-input-overview"
+                              inline={false}
+                              disabled={disabled}
+                              value={cardPaymentRadioButton.card_holder1}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "card_holder1"
+                                )
+                              }
+                              placeholder={cardPaymentRadioButton.card_holder_placeholder1}
+                            />
+                            <InputCustom
+                              className="ss-user-setting-input-overview"
+                              styleLabel={{ width: "100%" }}
+                              inline={false}
+                              disabled={disabled}
+                              value={cardPaymentRadioButton.card_holder2}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "card_holder2"
+                                )
+                              }
+                              placeholder={cardPaymentRadioButton.card_holder_placeholder2}
+                            />
+                          </div>
+                        </div>
+                        </>
                     )}
                     {Array.isArray(cardPaymentRadioButton.is_use_installment) &&
                       cardPaymentRadioButton.is_use_installment.length > 0 && (
