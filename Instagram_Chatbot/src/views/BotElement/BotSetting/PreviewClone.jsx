@@ -2883,7 +2883,9 @@ function Preview() {
       }
     }
 
-    if (!handleValidateField(indexClickLocation)) {
+    let realIndex = indexMessage;
+
+    if (!handleValidateField(realIndex)) {
       return;
     }
     let renderMessage = [...renderMessageArr];
@@ -4917,7 +4919,7 @@ function Preview() {
                         indexMessage={indexMessage}
                         errorsProps={errors}
                         displayButtonNext={(value) => {
-                          dataMessages[indexMessage].is_display_button_next =
+                          dataMessages[indexMessageRender].is_display_button_next =
                             value;
                           setDataMessages([...dataMessages]);
                         }}
@@ -4933,9 +4935,9 @@ function Preview() {
                         }
                         variables={variables}
                       />
-                      {dataMessages[indexMessage].message_content[0]?.type !== "button_submit" &&(dataMessages[indexMessage].is_display_button_next !==
+                      {dataMessages[indexMessageRender].message_content[0]?.type !== "button_submit" &&(dataMessages[indexMessageRender].is_display_button_next !==
                         undefined
-                        ? dataMessages[indexMessage].is_display_button_next
+                        ? dataMessages[indexMessageRender].is_display_button_next
                         : true) && (
                           <div className="sp-user-message-button-action">
                           <CustomButton
