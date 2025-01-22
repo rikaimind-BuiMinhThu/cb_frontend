@@ -1515,8 +1515,9 @@ const Scenario = () => {
             require: false,
             is_display_error_message: false,
             is_use_js: false,
-            use_for_confirm_order: false,
-          }
+            use_for_confirm_order: false, 
+          },
+          button_submit_name:''
         }
       );
     } else {
@@ -4759,7 +4760,7 @@ const Scenario = () => {
                                                                   e.stopPropagation();
                                                                 }}
                                                               >
-                                                                {dataMessages[indexMessageSelect]?.message_content[indexContent]?.['button_submit_name'] ?? content.button_submit_name}
+                                                                {content.button_submit_name}
                                                               </Button>
                                                             </div>
                                                           </>
@@ -12824,7 +12825,7 @@ const Scenario = () => {
                                                         </div>
                                                         <div style={{ width: '45%' }}>
                                                           <CheckboxCustom
-                                                            label="use javasrip"
+                                                            label="JavaScriptの利用"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_use_js')}
                                                             value={buttonSubmit.is_use_js}
                                                           />
@@ -12833,7 +12834,7 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px', display: 'flex' }}>
                                                         <div style={{ width: '90%' }}>
                                                           <CheckboxCustom
-                                                            label="Use for comfirm order"
+                                                            label="確認メッセージ用"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_for_confirm_order')}
                                                             value={buttonSubmit.use_for_confirm_order}
                                                           />
@@ -12915,7 +12916,8 @@ const Scenario = () => {
                                                           inline={false}
                                                           placeholder={'名前ボタン'}
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_name', value)}
-                                                          value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['button_submit_name']}
+                                                          
+                                                          value={content.button_submit_name}
                                                         />
                                                       </div>
                                                     </>}
