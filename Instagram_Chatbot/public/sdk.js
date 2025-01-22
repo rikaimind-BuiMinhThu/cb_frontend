@@ -5,7 +5,7 @@ let chatbotRight = sessionStorage.getItem("chatbotRight");
 let chatbotW = sessionStorage.getItem("chatbotW");
 let scenarioId = "";
 let displayErrorMessage = {
- 
+
   isDisplay: "false",
   seachMode: "",
   searchValue: ""
@@ -71,10 +71,16 @@ function getEcChatBotFrontEndBaseUrl() {
   }
 }
 let globalIframe
-function sendMessageToChatbot(mm)
-{
-  const message = { text: String(mm) };
-  globalIframe.contentWindow.postMessage(message, "*");
+function sendMessageToChatbot(mm, type) {
+  if (type == "text") {
+    const message = { text: String(mm) };
+    globalIframe.contentWindow.postMessage(message, "*");
+  }
+  if (type == "previewObject") {
+    const message = { objectSend: mm };
+    globalIframe.contentWindow.postMessage(message, "*");
+  }
+
 }
 
 async function displayPopup() {
@@ -145,8 +151,7 @@ async function displayPopup() {
       if (e.data.fukushashikiResponse) {
         fillDataFromMessage(e.data.fukushashikiResponse)
       }
-      if(e.data.getErrorMessage)
-      {
+      if (e.data.getErrorMessage) {
         processErrorMessage(e.data.getErrorMessage)
       }
       if (e.data.isOpen && mobileCheck()) {
@@ -184,40 +189,28 @@ async function displayPopup() {
 
       if (e.data.action === 'clickButton') {
         var button = document.getElementById(e.data.id_value);
-        if (button) {          
-          button.click(); 
+        if (button) {
+          button.click();
+          if (e.data.jscode.length > 0 && e.data.is_use_js==true) {            
+            eval(e.data.jscode.length)
+            const executeCode = new Function(e.data.jscode);
+            executeCode();
+          }
         }
       }
     },
     false
   );
 
-  function processErrorMessage(obj)
-  {
+  function processErrorMessage(obj) {
     displayErrorMessage.isDisplay = obj.isDisplay
     displayErrorMessage.searchValue = obj.searchValue
     displayErrorMessage.seachMode = obj.seachMode
-    if(displayErrorMessage.isDisplay)
-    {
+    if (displayErrorMessage.isDisplay) {
       var element = getElementByAddress(displayErrorMessage.seachMode, displayErrorMessage.searchValue)
-      if(element)
-      {
+      if (element) {
         var contentMessage = element.innerHTML;
-        sendMessageToChatbot(contentMessage);
-        // const iframe = document.getElementById('previewSdk');
-        // if (iframe) {
-        //   const currentIframe = iframe.contentWindow;
-        //   if (currentIframe) {
-        //     currentIframe.postMessage(
-        //       { errorMessageContent: "Hello from parent!" },
-        //       '*'
-        //     );
-        //   } else {
-        //     console.error('Iframe contentWindow is null.');
-        //   }
-        // } else {
-        //   console.error('Iframe not found!');
-        // }
+        sendMessageToChatbot(contentMessage, "text");
       }
     }
   }
@@ -272,132 +265,132 @@ async function displayPopup() {
         console.log(e)
       }
     }
-   
-      obj.forEach((item) => {
-        switch (item.type) {
-          case "card_payment_radio_button":
-          case "text_input":
-            {
-              if (item.bindingMode == 1) {
-                fillDataWithId(item.bindingAddress, item.bindingValue)
-              }
-              else if (item.bindingMode == 2) {
-                fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-              }
-              else {
-                fillDataWithXPath(item.bindingAddress, item.bindingValue)
-              }
-              break;
-            }
-  
-          case 'dropdown_prefecture':
-            {
-              fillDataWithTextInSelector(item.bindingMode, item.bindingAddress, item.bindingValue)
-              break;
-            }
-  
-          case "zip_code_address":
-            {
-              if (item.bindingMode == 1) {
-                fillDataWithId(item.bindingAddress, item.bindingValue)
-              }
-              else if (item.bindingMode == 2) {
-                fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-              }
-              else {
-                fillDataWithXPath(item.bindingAddress, item.bindingValue)
-              }
-              break;
-            }
-          case "agree_term":
-            {
-              if (item.bindingMode == 1) {
-                fillDataAgreementWithId(item.bindingAddress, item.bindingValue)
-              }
-              else if (item.bindingMode == 2) {
-                fillDataAgreementWithCssSelector(item.bindingAddress, item.bindingValue)
-              }
-              else {
-                fillDataAgreementWithXPath(item.bindingAddress, item.bindingValue)
-              }
-              break;
-            }
-          case "slider":
-            {
-              if (item.bindingMode == 1) {
-                fillDataWithId(item.bindingAddress, item.bindingValue)
-              }
-              else if (item.bindingMode == 2) {
-                fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-              }
-              else {
-                fillDataWithXPath(item.bindingAddress, item.bindingValue)
-              }
-            }
-  
-          case "pull_down":
-            {
-              if (item.bindingMode !== undefined) {
-                if (item.bindingMode == 1) {
-                  let element = document.getElementById(item.bindingAddress);
-                  fillDataWithId(item.bindingAddress, item.bindingValue)
-                  element.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-                else if (item.bindingMode == 2) {
-                  let element = document.querySelector(item.bindingAddress);
-                  fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-                  element.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-                else {
-                  let element = document.evaluate(item.bindingAddress, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                  fillDataWithXPath(item.bindingAddress, item.bindingValue)
-                  element.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-              }
-              break;
-            }
 
-          case "radio_button":
-            {
-              elementContain = getElementByAddress(item.bindingMode, item.bindingAddress);
-              if (elementContain) {
-                const radioButtons = elementContain.querySelectorAll('input[type="radio"]');
-                radioButtons.forEach(radio => {
-                  if (radio.value == item.bindingValue) {
-                    radio.checked = true;
-                    const changeEvent = new Event('change', { bubbles: true });
-                    radio.dispatchEvent(changeEvent);
-                  }
-                });
-              }
-              break;
+    obj.forEach((item) => {
+      switch (item.type) {
+        case "card_payment_radio_button":
+        case "text_input":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
             }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+            break;
+          }
 
-          case "password":
-            {
-              const passwordInput = getElementByAddress(item.bindingMode, item.bindingAddress)
-              if(passwordInput)
-                passwordInput.setRangeText(item.bindingValue)
+        case 'dropdown_prefecture':
+          {
+            fillDataWithTextInSelector(item.bindingMode, item.bindingAddress, item.bindingValue)
+            break;
+          }
+
+        case "zip_code_address":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
             }
-          case "textarea":
-            {
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+            break;
+          }
+        case "agree_term":
+          {
+            if (item.bindingMode == 1) {
+              fillDataAgreementWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataAgreementWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataAgreementWithXPath(item.bindingAddress, item.bindingValue)
+            }
+            break;
+          }
+        case "slider":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+          }
+
+        case "pull_down":
+          {
+            if (item.bindingMode !== undefined) {
               if (item.bindingMode == 1) {
+                let element = document.getElementById(item.bindingAddress);
                 fillDataWithId(item.bindingAddress, item.bindingValue)
+                element.dispatchEvent(new Event('change', { bubbles: true }));
               }
               else if (item.bindingMode == 2) {
+                let element = document.querySelector(item.bindingAddress);
                 fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+                element.dispatchEvent(new Event('change', { bubbles: true }));
               }
               else {
+                let element = document.evaluate(item.bindingAddress, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
                 fillDataWithXPath(item.bindingAddress, item.bindingValue)
+                element.dispatchEvent(new Event('change', { bubbles: true }));
               }
-              break;
             }
-          default:
-            return;
-        }
-  
-      })
-    
+            break;
+          }
+
+        case "radio_button":
+          {
+            elementContain = getElementByAddress(item.bindingMode, item.bindingAddress);
+            if (elementContain) {
+              const radioButtons = elementContain.querySelectorAll('input[type="radio"]');
+              radioButtons.forEach(radio => {
+                if (radio.value == item.bindingValue) {
+                  radio.checked = true;
+                  const changeEvent = new Event('change', { bubbles: true });
+                  radio.dispatchEvent(changeEvent);
+                }
+              });
+            }
+            break;
+          }
+
+        case "password":
+          {
+            const passwordInput = getElementByAddress(item.bindingMode, item.bindingAddress)
+            if (passwordInput)
+              passwordInput.setRangeText(item.bindingValue)
+          }
+        case "textarea":
+          {
+            if (item.bindingMode == 1) {
+              fillDataWithId(item.bindingAddress, item.bindingValue)
+            }
+            else if (item.bindingMode == 2) {
+              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
+            }
+            else {
+              fillDataWithXPath(item.bindingAddress, item.bindingValue)
+            }
+            break;
+          }
+        default:
+          return;
+      }
+
+    })
+
 
   }
 

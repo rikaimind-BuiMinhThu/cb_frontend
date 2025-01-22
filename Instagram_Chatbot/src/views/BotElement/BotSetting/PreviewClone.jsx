@@ -51,6 +51,9 @@ import { func } from "prop-types";
 const _ = require("lodash");
 sessionStorage.setItem("prevOpenStatus", "0");
 let errorMessageSubmit='';
+let previewOrderInfor = {};
+let isDisplayOrderPreview = false;
+let previewContent = ``
 let isDisplayErrorMessage = false;
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
@@ -377,6 +380,17 @@ function Preview() {
         else
         {
           errorMessageSubmit = '';
+        }
+
+        if(event.data.objectSend!=undefined )
+        {
+          try {
+            console.log(event.data.objectSend);
+            previewOrderInfor = event.data.objectSend;
+            previewContent = event.data.objectSend;
+            isDisplayOrderPreview=true;  
+          }
+          catch {}
         }
         const { key, value } = event.data;
         console.log(`Key: ${key}, Value: ${value}`);
@@ -4870,10 +4884,16 @@ function Preview() {
               <React.Fragment key={indexMessage}>
                 {message.belong_to === "bot" && Array.isArray(message?.message_content) &&
                   message?.message_content.map((content, index) => {
+                    const customPreview = content;
+                 if(isDisplayOrderPreview)
+                 {
+                   customPreview.text_input.content = previewContent;
+                 }
+                 isDisplayOrderPreview=false;
                     return (
                       <BotMessage
                         key={index}
-                        content={content}
+                        content={customPreview}
                         index={index}
                         botInfor={botInfor}
                         checkoutUrl={checkoutUrl}
@@ -4886,7 +4906,6 @@ function Preview() {
                   message.message_content.length > 0 &&
                   (
                   <div
-                    // id={`sp-body-user-side-${indexMessage}`}
                     className="sp-body-user-side slideLeft"
                   >
                     <div className="sp-body-user-side-messages">                
@@ -11757,7 +11776,7 @@ const UserMessage = ({
                       e.target.style.transform = "translateY(-2px)";
                       e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
                     }}
-                    onClick={() => {
+                    onClick={() => {                     
                       window.parent.postMessage({
                         isOpen: true,
                         widthPc: 450,
@@ -11766,12 +11785,14 @@ const UserMessage = ({
                         heightSp: 100,
                         chatbotRight: 10,
                         chatbotBottom: 10,
-                        // fukushashikiResponse: getObjectFsukushashiki(data_submit),
                         action: 'clickButton',
-                        id_value: content.button_submit_id
+                        id_value: content.button_submit_id,
+                        jscode: content.button_submit.jscode,
+                        is_use_js:content.button_submit.is_use_js
                       }, '*');
 
-                    }}
+                    onClickNext(indexMessage, messageContent) }
+                  }
                   >
                     {content.button_submit_name}
                   </button>
