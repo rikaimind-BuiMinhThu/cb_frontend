@@ -475,21 +475,27 @@ async function displayPopup() {
   function fillDataAgreementWithId(id, value) {
     let element = document.getElementById(id);
     if (element && element.type === 'checkbox') {
+      const changeEvent = new Event('change', { bubbles: true });
       element.checked = value === true;
+      element.dispatchEvent(changeEvent)
     }
   }
 
   function fillDataAgreementWithCssSelector(cssSelector, value) {
     let element = document.querySelector(cssSelector);
     if (element && element.type === 'checkbox') {
+      const changeEvent = new Event('change', { bubbles: true });
       element.checked = value === true;
+      element.dispatchEvent(changeEvent)
     }
   }
 
   function fillDataAgreementWithXPath(xpathElement, value) {
     let element = document.evaluate(xpathElement, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     if (element && element.type === 'checkbox') {
+      const changeEvent = new Event('change', { bubbles: true });
       element.checked = value === true;
+      element.dispatchEvent(changeEvent)
     }
   }
 
