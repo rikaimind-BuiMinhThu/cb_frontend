@@ -1515,8 +1515,9 @@ const Scenario = () => {
             require: false,
             is_display_error_message: false,
             is_use_js: false,
-            use_for_confirm_order: false,
-          }
+            use_for_confirm_order: false, 
+          },
+          button_submit_name:''
         }
       );
     } else {
@@ -1997,7 +1998,9 @@ const Scenario = () => {
           message_content: [
             {
               type: 'text_input',
-              text_input: {},
+              text_input: {
+                use_for_confirm_message: false,
+              },
               email: {},
               file: {},
               script: {},
@@ -2042,7 +2045,9 @@ const Scenario = () => {
           message_content: [
             {
               type: 'text_input',
-              text_input: {},
+              text_input: {
+                use_for_confirm_message: false,
+              },
               email: {},
               file: {},
               script: {},
@@ -4759,7 +4764,7 @@ const Scenario = () => {
                                                                   e.stopPropagation();
                                                                 }}
                                                               >
-                                                                {dataMessages[indexMessageSelect]?.message_content[indexContent]?.['button_submit_name'] ?? content.button_submit_name}
+                                                                {content.button_submit_name}
                                                               </Button>
                                                             </div>
                                                           </>
@@ -4948,6 +4953,30 @@ const Scenario = () => {
                                       value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['scroll_auto'] || ''}
                                     />
                                   </div>
+                                  <div className="ss-bot-checkbox-scroll-auto">
+                                    <CheckboxCustom
+                                      label="確認メッセージに使用"
+                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'use_for_confirm_message')}
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] || ''}
+                                    />
+                                  </div>
+                                  {dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] && (
+                                    <div
+                                    id="ss-bot-statement-type-text"
+                                    className="ss-bot-statement-type-text ss-bot-statement-type"
+                                  >
+                                    <textarea
+                                      name="bot-statement-type-text-content"
+                                      id="bot-statement-type-text-content"
+                                      className="ss-bot-statement-type-text-content ss-input-value"
+                                      rows={5}
+                                      placeholder="入力"
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['jscode'] || ''}
+                                      onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'jscode')}
+                                    >
+                                    </textarea>
+                                  </div>
+                                  )}
                                 </div>
                               )}
 
@@ -12824,7 +12853,7 @@ const Scenario = () => {
                                                         </div>
                                                         <div style={{ width: '45%' }}>
                                                           <CheckboxCustom
-                                                            label="use javasrip"
+                                                            label="JavaScriptの利用"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_use_js')}
                                                             value={buttonSubmit.is_use_js}
                                                           />
@@ -12833,7 +12862,7 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px', display: 'flex' }}>
                                                         <div style={{ width: '90%' }}>
                                                           <CheckboxCustom
-                                                            label="Use for comfirm order"
+                                                            label="確認メッセージ用"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_for_confirm_order')}
                                                             value={buttonSubmit.use_for_confirm_order}
                                                           />
@@ -12915,7 +12944,8 @@ const Scenario = () => {
                                                           inline={false}
                                                           placeholder={'名前ボタン'}
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_name', value)}
-                                                          value={dataMessages[indexMessageSelect]?.message_content[indexContent]?.['button_submit_name']}
+                                                          
+                                                          value={content.button_submit_name}
                                                         />
                                                       </div>
                                                     </>}

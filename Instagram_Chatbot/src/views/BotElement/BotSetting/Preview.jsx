@@ -1366,8 +1366,9 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 break
             }
         }
+        let realIndex = indexMessage
 
-        if (!handleValidateField(indexClickLocation)) {
+        if (!handleValidateField(realIndex)) {
             return;
         }
         renderMessageArr[indexMessage].disabled = true;
@@ -2606,7 +2607,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                                     indexMessage={indexMessage}
                                                     errorsProps={errors}
                                                     displayButtonNext={(value) => {
-                                                        dataMessages[indexMessage].is_display_button_next = value;
+                                                        dataMessages[indexMessageRender].is_display_button_next = value;
                                                         setDataMessages([...dataMessages]);
                                                     }}
                                                     dataPrefectures={[...dataPrefectures]}
@@ -2615,7 +2616,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                                                     variables={variables}
                                                 />
 
-                                                {dataMessages[indexMessage].message_content[0]?.type !== "button_submit" && (dataMessages[indexMessage].is_display_button_next !== undefined ? dataMessages[indexMessage].is_display_button_next : true)
+                                                {dataMessages[indexMessageRender].message_content[0]?.type !== "button_submit" && (dataMessages[indexMessageRender].is_display_button_next !== undefined ? dataMessages[indexMessageRender].is_display_button_next : true)
                                                     && <div className="sp-user-message-button-action">
                                                         <Button disabled={message.disabled} style={{ backgroundColor: botInfor?.main_color || botInfor?.main_color_other, borderRadius: '25px' }} className="ss-user-message__action-btn" onClick={() => onClickNext(indexMessage, message)}>
                                                             {message.buttonName || (indexMessage >= indexMessageRender ? "次へ" : "更新")}
