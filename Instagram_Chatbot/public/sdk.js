@@ -198,6 +198,13 @@ async function displayPopup() {
           }
         }
       }
+
+      if (e.data.action === 'excuteJS') {       
+        if (e.data.jscode && e.data.is_use_js == true) {         
+          const executeCode = new Function(e.data.jscode);
+          executeCode();
+        }
+      }
     },
     false
   );
