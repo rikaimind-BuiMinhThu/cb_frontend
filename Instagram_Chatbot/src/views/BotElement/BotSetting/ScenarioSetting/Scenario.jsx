@@ -1998,7 +1998,9 @@ const Scenario = () => {
           message_content: [
             {
               type: 'text_input',
-              text_input: {},
+              text_input: {
+                use_for_confirm_message: false,
+              },
               email: {},
               file: {},
               script: {},
@@ -2043,7 +2045,9 @@ const Scenario = () => {
           message_content: [
             {
               type: 'text_input',
-              text_input: {},
+              text_input: {
+                use_for_confirm_message: false,
+              },
               email: {},
               file: {},
               script: {},
@@ -4949,6 +4953,30 @@ const Scenario = () => {
                                       value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['scroll_auto'] || ''}
                                     />
                                   </div>
+                                  <div className="ss-bot-checkbox-scroll-auto">
+                                    <CheckboxCustom
+                                      label="確認メッセージに使用"
+                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'use_for_confirm_message')}
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] || ''}
+                                    />
+                                  </div>
+                                  {dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] && (
+                                    <div
+                                    id="ss-bot-statement-type-text"
+                                    className="ss-bot-statement-type-text ss-bot-statement-type"
+                                  >
+                                    <textarea
+                                      name="bot-statement-type-text-content"
+                                      id="bot-statement-type-text-content"
+                                      className="ss-bot-statement-type-text-content ss-input-value"
+                                      rows={5}
+                                      placeholder="入力"
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['jscode'] || ''}
+                                      onChange={(e) => onChangeValueMessageContent(indexMessageSelect, 0, messageType, e.target.value, 'jscode')}
+                                    >
+                                    </textarea>
+                                  </div>
+                                  )}
                                 </div>
                               )}
 
