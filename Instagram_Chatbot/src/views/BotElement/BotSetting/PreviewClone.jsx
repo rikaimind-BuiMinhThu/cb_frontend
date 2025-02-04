@@ -11794,12 +11794,10 @@ const UserMessage = ({
                         chatbotRight: 10,
                         chatbotBottom: 10,
                         action: 'clickButton',
-                        id_value: content.button_submit_id,
-                        jscode: content.button_submit.jscode,
-                        is_use_js:content.button_submit.is_use_js
+                        id_value: content.button_submit_id
                       }, '*');
 
-                    onClickNext(indexMessage, messageContent) }
+                     }
                   }
                   >
                     {content.button_submit_name}
