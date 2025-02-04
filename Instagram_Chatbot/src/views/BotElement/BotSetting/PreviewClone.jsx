@@ -385,7 +385,6 @@ function Preview() {
         if(event.data.objectSend!=undefined )
         {
           try {
-            console.log(event.data.objectSend);
             previewOrderInfor = event.data.objectSend;
             previewContent = event.data.objectSend;
             isDisplayOrderPreview=true;  
@@ -4886,12 +4885,7 @@ function Preview() {
               <React.Fragment key={indexMessage}>
                 {message.belong_to === "bot" && Array.isArray(message?.message_content) &&
                   message?.message_content.map((content, index) => {
-                    const customPreview = content;
-                 if(isDisplayOrderPreview)
-                 {
-                   customPreview.text_input.content = previewContent;
-                 }
-                 isDisplayOrderPreview=false;
+                    const customPreview = content;               
                     return (
                       <BotMessage
                         key={index}
@@ -5191,10 +5185,27 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     link.download = "file";
     link.target = "_blank";
     document.body.appendChild(link);
-
     link.click();
     link.remove();
   };
+
+  if (content.text_input?.use_for_confirm_message == true && content.text_input?.jscode?.length != 0) {
+    if (content.text_input.jscode.trim().length > 0) {
+      window.parent.postMessage({
+        isOpen: true,
+        widthPc: 450,
+        heightPc: 700,
+        widthSp: 100,
+        heightSp: 100,
+        chatbotRight: 10,
+        chatbotBottom: 10,
+        action: 'excuteJS',
+        jscode: content.text_input.jscode,
+        is_use_js: true
+      }, '*');
+      content.text_input.content = previewContent;
+    }
+  }
 
   const formatResult = () => {
     const cart = JSON.parse(sessionStorage.getItem("cart") || null)
@@ -5246,7 +5257,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     result = result?.replace("{zip}", zip)
     result = result?.replace("{province}", province)
     result = result?.replace("{city}", city)
-
+    result.replace(/\n/g, "<br>");
     return result;
   }
 
