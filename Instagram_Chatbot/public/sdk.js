@@ -190,12 +190,7 @@ async function displayPopup() {
       if (e.data.action === 'clickButton') {
         var button = document.getElementById(e.data.id_value);
         if (button) {
-          button.click();
-          if (e.data.jscode.length > 0 && e.data.is_use_js==true) {            
-            eval(e.data.jscode.length)
-            const executeCode = new Function(e.data.jscode);
-            executeCode();
-          }
+          button.click();          
         }
       }
 
