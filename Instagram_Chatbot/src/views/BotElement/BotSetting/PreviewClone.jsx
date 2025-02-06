@@ -4948,11 +4948,8 @@ function Preview() {
                         }
                         variables={variables}
                       />
-                      {dataMessages[indexMessageRender].message_content[0]?.type !== "button_submit" &&(dataMessages[indexMessageRender].is_display_button_next !==
-                        undefined
-                        ? dataMessages[indexMessageRender].is_display_button_next
-                        : true) && (
-                          <div className="sp-user-message-button-action">
+                      {message.message_content[0]?.type !== "button_submit" && (
+                        <div className="sp-user-message-button-action">
                           <CustomButton
                             disabled={errorMessageSubmit.length > 0 ? false : message.disabled}
                             style={{
@@ -4961,17 +4958,17 @@ function Preview() {
                             }}
                             className="ss-user-message__action-btn"
                             onClick={() => onClickNext(indexMessage, message)}
-                            autoClick = {errorMessageSubmit.trim().length > 0 ? true : false}
-                            messsagetype={dataMessages[indexMessage].message_content[0]?.type}
+                            autoClick={errorMessageSubmit.trim().length > 0 ? true : false}
+                            messsagetype={message.message_content[0]?.type}
                           >
                             {message.buttonName || (
-                               errorMessageSubmit.length > 0
+                              errorMessageSubmit.length > 0
                                 ? "更新"
                                 : (indexMessage >= indexMessageRender ? "次へ" : "更新")
                             )}
                           </CustomButton>
-                          </div>
-                        )}
+                        </div>
+                      )}
                     </div>
                   </div>  
                 )}
