@@ -137,7 +137,7 @@ async function displayPopup() {
   // iframe.style.display = "none";
   iframe.style.zIndex = "999999";
   iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
-    }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}`;
+    }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
   currentIframe = iframe
   body.appendChild(iframe);
 
