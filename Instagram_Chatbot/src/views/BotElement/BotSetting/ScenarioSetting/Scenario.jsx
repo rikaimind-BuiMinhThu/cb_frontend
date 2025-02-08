@@ -858,12 +858,6 @@ const Scenario = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  // useEffect(() => {
-  //   if (dataMessages[indexMessageSelect]?.button_jscode) {
-  //     handlePannelCondition(true, 'user');
-  //   }
-  // }, [indexMessageSelect, dataMessages]);
-
   useEffect(() => {
     handleOpenPreview(isOpenPreview);
   }, [])
