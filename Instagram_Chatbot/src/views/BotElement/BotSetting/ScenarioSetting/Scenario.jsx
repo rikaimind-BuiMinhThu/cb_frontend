@@ -4962,6 +4962,13 @@ const Scenario = () => {
                                       value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] || ''}
                                     />
                                   </div>
+                                  <div className="ss-bot-checkbox-scroll-auto">
+                                    <CheckboxCustom
+                                      label="ログイン済み時に表示しない"
+                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'not_display_when_logged_in')}
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['not_display_when_logged_in'] || ''}
+                                    />
+                                  </div>
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] && (
                                     <div
                                     id="ss-bot-statement-type-text"
@@ -6111,6 +6118,11 @@ const Scenario = () => {
                                                       {/* textarea: type = text */}
                                                       {textarea.type === 'text_input' && (
                                                         <div className="ss-user-setting__item-text_input-top">
+                                                          <CheckboxCustom
+                                                            label="ログイン済み時に表示しない"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                            value={textarea.not_display_when_logged_in}
+                                                          />
                                                           <CheckboxCustom
                                                             label="入力された内容を変数に保存する。"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'textarea', value, 'is_save_input_content')}
@@ -7709,6 +7721,11 @@ const Scenario = () => {
                                                   {content.type === 'agree_term' && (
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-bottom">
+                                                        <CheckboxCustom
+                                                          label="ログイン済み時に表示しない"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                          value={agreeTerm.not_display_when_logged_in}
+                                                        />
                                                         <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                           <SelectCustom
                                                             style={{ width: '49%' }}
@@ -10436,6 +10453,12 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px' }}>
                                                         <div style={{ width: '90%' }}>
                                                           <CheckboxCustom
+                                                            label="ログイン済み時に表示しない"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                            value={slider.not_display_when_logged_in}
+                                                            isOnChange={false}
+                                                          />
+                                                          <CheckboxCustom
                                                             label="入力された内容を変数に保存する。"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
                                                             value={slider.is_save_input_content}
@@ -10614,6 +10637,12 @@ const Scenario = () => {
                                                   {content.type === 'card_payment_radio_button' && (
                                                     <>
                                                       <div className="ss-user-setting__item-text_input-top">
+                                                        <CheckboxCustom
+                                                          label="ログイン済み時に表示しない"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                          value={cardPaymentRadioButton.not_display_when_logged_in}
+                                                          isOnChange={false}
+                                                        />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -11727,6 +11756,11 @@ const Scenario = () => {
                                                   {content.type === 'shipping_address' && (
                                                     <>
                                                     <div className="ss-user-setting__item-text_input-top">
+                                                    <CheckboxCustom
+                                                          label="ログイン済み時に表示しない"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                          value={shippingAddress.not_display_when_logged_in}
+                                                        />
                                                         <div className="ss-user-setting__item-bottom" style={{ position: 'relative' }}>
                                                             {shippingAddress.type !== "picture_radio" &&
                                                                 <DragDropContext onDragEnd={result => handleDragEndRadioCheckbox(result, content.id, content.type, 'radio_contents')}>
@@ -12886,11 +12920,19 @@ const Scenario = () => {
                                                         </div>
                                                       </div>
                                                       <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px', display: 'flex' }}>
-                                                        <div style={{ width: '90%' }}>
+                                                        <div style={{ width: '45%' }}>
                                                           <CheckboxCustom
                                                             label="確認メッセージ用"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_for_confirm_order')}
                                                             value={buttonSubmit.use_for_confirm_order}
+                                                          />
+                                                        </div>
+                                                        <div style={{ width: '45%' }}>
+                                                          <CheckboxCustom
+                                                            label="ログイン済み時に表示しない"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                            value={buttonSubmit.not_display_when_logged_in}
+                                                            isOnChange={false}
                                                           />
                                                         </div>
                                                       </div>
@@ -12970,7 +13012,7 @@ const Scenario = () => {
                                                           inline={false}
                                                           placeholder={'名前ボタン'}
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_name', value)}
-                                                          
+
                                                           value={content.button_submit_name}
                                                         />
                                                       </div>
