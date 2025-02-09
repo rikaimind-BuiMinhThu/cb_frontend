@@ -2097,8 +2097,10 @@ const Scenario = () => {
     } else if (role === 'user') {
       if (isUpCondition) {
         document.querySelector('.ss-user-setting__main').style.height = '25%';
+        document.querySelector('.ss-user-setting__bottom').style.maxHeight = '460px';
       } else {
         document.querySelector('.ss-user-setting__main').style.height = '57%';
+        document.querySelector('.ss-user-setting__bottom').style.maxHeight = '220px';
       }
     }
   }
@@ -4960,6 +4962,13 @@ const Scenario = () => {
                                       value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] || ''}
                                     />
                                   </div>
+                                  <div className="ss-bot-checkbox-scroll-auto">
+                                    <CheckboxCustom
+                                      label="ログイン済み時に表示しない"
+                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'not_display_when_logged_in')}
+                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['not_display_when_logged_in'] || ''}
+                                    />
+                                  </div>
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] && (
                                     <div
                                     id="ss-bot-statement-type-text"
@@ -5371,6 +5380,12 @@ const Scenario = () => {
                                                   {content.type === 'text_input' && (
                                                     <>
                                                       <div className="ss-user-setting__item-text_input-top">
+                                                        <CheckboxCustom
+                                                          label="ログイン済み時に表示しない"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                          value={textInput.not_display_when_logged_in}
+                                                          isOnChange={false}
+                                                        />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -6104,6 +6119,11 @@ const Scenario = () => {
                                                       {textarea.type === 'text_input' && (
                                                         <div className="ss-user-setting__item-text_input-top">
                                                           <CheckboxCustom
+                                                            label="ログイン済み時に表示しない"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                            value={textarea.not_display_when_logged_in}
+                                                          />
+                                                          <CheckboxCustom
                                                             label="入力された内容を変数に保存する。"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'textarea', value, 'is_save_input_content')}
                                                             value={textarea.is_save_input_content}
@@ -6253,6 +6273,12 @@ const Scenario = () => {
                                                   {content.type === 'radio_button' && (
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-text_input-top">
+                                                        <CheckboxCustom
+                                                          label="ログイン済み時に表示しない"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                          value={radioButton.not_display_when_logged_in}
+                                                          isOnChange={false}
+                                                        />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -6749,6 +6775,12 @@ const Scenario = () => {
                                                   {content.type === 'zip_code_address' && (
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-text_input-top">
+                                                        <CheckboxCustom
+                                                          label="ログイン済み時に表示しない"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                          value={zipCodeAddress.not_display_when_logged_in}
+                                                          isOnChange={false}
+                                                        />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -7689,6 +7721,11 @@ const Scenario = () => {
                                                   {content.type === 'agree_term' && (
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-bottom">
+                                                        <CheckboxCustom
+                                                          label="ログイン済み時に表示しない"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                          value={agreeTerm.not_display_when_logged_in}
+                                                        />
                                                         <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                           <SelectCustom
                                                             style={{ width: '49%' }}
@@ -7843,6 +7880,12 @@ const Scenario = () => {
                                                   {content.type === 'pull_down' && (
                                                     <React.Fragment>
                                                       <div className="ss-user-setting__item-text_input-top">
+                                                        <CheckboxCustom
+                                                          label="ログイン済み時に表示しない"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                          value={pullDown.not_display_when_logged_in}
+                                                          isOnChange={false}
+                                                        />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -10410,6 +10453,12 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px' }}>
                                                         <div style={{ width: '90%' }}>
                                                           <CheckboxCustom
+                                                            label="ログイン済み時に表示しない"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                            value={slider.not_display_when_logged_in}
+                                                            isOnChange={false}
+                                                          />
+                                                          <CheckboxCustom
                                                             label="入力された内容を変数に保存する。"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
                                                             value={slider.is_save_input_content}
@@ -10588,6 +10637,12 @@ const Scenario = () => {
                                                   {content.type === 'card_payment_radio_button' && (
                                                     <>
                                                       <div className="ss-user-setting__item-text_input-top">
+                                                        <CheckboxCustom
+                                                          label="ログイン済み時に表示しない"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                          value={cardPaymentRadioButton.not_display_when_logged_in}
+                                                          isOnChange={false}
+                                                        />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_save_input_content')}
@@ -11701,6 +11756,11 @@ const Scenario = () => {
                                                   {content.type === 'shipping_address' && (
                                                     <>
                                                     <div className="ss-user-setting__item-text_input-top">
+                                                    <CheckboxCustom
+                                                          label="ログイン済み時に表示しない"
+                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                          value={shippingAddress.not_display_when_logged_in}
+                                                        />
                                                         <div className="ss-user-setting__item-bottom" style={{ position: 'relative' }}>
                                                             {shippingAddress.type !== "picture_radio" &&
                                                                 <DragDropContext onDragEnd={result => handleDragEndRadioCheckbox(result, content.id, content.type, 'radio_contents')}>
@@ -12860,11 +12920,19 @@ const Scenario = () => {
                                                         </div>
                                                       </div>
                                                       <div className="ss-user-setting__item-bottom" style={{ marginBottom: '0px', display: 'flex' }}>
-                                                        <div style={{ width: '90%' }}>
+                                                        <div style={{ width: '45%' }}>
                                                           <CheckboxCustom
                                                             label="確認メッセージ用"
                                                             onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'use_for_confirm_order')}
                                                             value={buttonSubmit.use_for_confirm_order}
+                                                          />
+                                                        </div>
+                                                        <div style={{ width: '45%' }}>
+                                                          <CheckboxCustom
+                                                            label="ログイン済み時に表示しない"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
+                                                            value={buttonSubmit.not_display_when_logged_in}
+                                                            isOnChange={false}
                                                           />
                                                         </div>
                                                       </div>
@@ -12944,7 +13012,7 @@ const Scenario = () => {
                                                           inline={false}
                                                           placeholder={'名前ボタン'}
                                                           onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, 'button_submit_name', value)}
-                                                          
+
                                                           value={content.button_submit_name}
                                                         />
                                                       </div>
@@ -13024,8 +13092,56 @@ const Scenario = () => {
                               <span>先頭に揃えて停止する</span>
                               <MDBIcon fas icon="question-circle" style={{ color: '#347AED', fontSize: '12px', marginLeft: '5px' }} />
                             </div>
-                            <div className="ss-user-setting-condition-container">
+                            <div className="ss-user-setting-condition-footer-button">
+                              <div className="ss-user-setting-condition-bottom-button">
+                                <InputCustom
+                                  style={{ height: '38.2px', margin: '10px', width: '25%' }}
+                                  label="登録ボタン名称"
+                                  value={dataMessages[indexMessageSelect].buttonName}
+                                  maxLength={30}
+                                  onChange={(value) => {
+                                    dataMessages[indexMessageSelect].buttonName = value;
+                                    setDataMessages([...dataMessages]);
+                                  }}
+                                />
+                                <div style={{ width: '25%' }}>
+                                  <CheckboxCustom
+                                    label="JavaScriptの利用"
+                                    onChange={(value) => {
+                                      dataMessages[indexMessageSelect].button_jscode = value;
+                                      setDataMessages([...dataMessages]);
+                                    }}
+                                    value={dataMessages[indexMessageSelect].button_jscode}
 
+                                  />
+                                </div>
+                                {/* <Button className="ss-bot-setting-condition-keep-button">
+                                    keep
+                                  </Button> */
+                                }
+                              </div>
+                              {dataMessages[indexMessageSelect].button_jscode &&
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                  <div className='ss-user-setting__item-bottom' style={{ width: '18%', fontSize: '14px', fontWeight: '400', marginBottom: '5px' }}>
+                                    jscode
+                                  </div>
+                                  <div className="ss-user-setting__item-bottom">
+                                    <textarea
+                                      style={{ width: '95%' }}
+                                      className="ss-user-setting-item-textarea-label ss-input-value"
+                                      placeholder="テキスト"
+                                      rows="5"
+                                      value={dataMessages[indexMessageSelect].jscode}
+                                      onChange={(e) => {
+                                        dataMessages[indexMessageSelect].jscode = e.target.value;
+                                        setDataMessages([...dataMessages]);
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              }
+                            </div>
+                            <div className="ss-user-setting-condition-container">
                               <div className="ss-bot-setting-condition-header">
                                 <div className="ss-bot-setting-condition-header-left">
                                   <span style={{ fontWeight: '400' }}>表示対象者の条件設定</span>
@@ -13080,32 +13196,15 @@ const Scenario = () => {
                                         </div>
                                       </div>
                                     })}
-                                </div>
-                              }
-                              <div className="ss-user-setting-condition-footer-button">
-                                {isConditionUp &&
+                                    {isConditionUp &&
                                   <div className="ss-bot-setting-condition-add-condition-button">
                                     <Button onClick={() => onClickAddCondition()} className="ss-bot-setting-add-condition-button" style={{ backgroundColor: '#347AED' }}>
                                       条件追加
                                     </Button>
                                   </div>
                                 }
-                                <div className="ss-user-setting-condition-bottom-button">
-                                  <InputCustom
-                                    style={{ height: '38.2px', margin: '10px', width: '22%' }}
-                                    label="登録ボタン名称"
-                                    value={dataMessages[indexMessageSelect].buttonName}
-                                    maxLength={30}
-                                    onChange={(value) => {
-                                      dataMessages[indexMessageSelect].buttonName = value;
-                                      setDataMessages([...dataMessages]);
-                                    }}
-                                  />
-                                  {/* <Button className="ss-bot-setting-condition-keep-button">
-                                    keep
-                                  </Button> */}
                                 </div>
-                              </div>
+                              }
                             </div>
                           </div>
 
