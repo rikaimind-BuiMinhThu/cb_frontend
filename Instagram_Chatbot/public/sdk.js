@@ -367,6 +367,17 @@ async function displayPopup() {
             }
             break;
           }
+        case 'checkbox':
+          {
+            const elementToCheck = getElementByAddress(item.bindingMode,item.bindingAddress)
+            if (elementToCheck)
+            {
+              elementToCheck.checked=item.bindingValue;
+              const changeEvent = new Event('change', { bubbles: true });
+              elementToCheck.dispatchEvent(changeEvent);
+            }      
+            break;
+          }
 
         case "password":
           {
