@@ -54,6 +54,6 @@ export const getEcChatBotFrontEndBaseUrl = () => {
 };
 
 export const S3_UPLOAD_URL= "https://ec-chatbot.s3.ap-northeast-1.amazonaws.com/";
-export const SHORTEN_URL = `http://localhost:3000/s/`;
-export const EC_CHATBOT_URL = `http://localhost:3000`;
+export const SHORTEN_URL = `${getEcChatBotApiServerBaseUrl()}/s/`;
+export const EC_CHATBOT_URL = `${getEcChatBotApiServerBaseUrl()}`;
 export const FACEBOOK_APP_ID = `${process.env.REACT_APP_FACEBOOK_APP_ID}`;
