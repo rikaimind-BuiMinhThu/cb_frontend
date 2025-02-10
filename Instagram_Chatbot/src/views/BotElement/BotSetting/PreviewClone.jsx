@@ -2818,6 +2818,20 @@ function Preview() {
               
               break;
             }
+          case 'checkbox':
+            {
+              if(message.checkbox.checkedValue.length>0)
+              {
+                const fukuObject = {
+                  type: message.type,
+                  bindingMode: message.checkedValue_fukushashiki_search_mode,
+                  bindingAddress: message.checkedValue_fukushashiki_search_value,
+                  bindingValue: message.checkbox.checkedValue[0]
+                };
+                listFukuObject.push(fukuObject);
+              }
+              break;
+            }
 
           case 'card_payment_radio_button':
             {
