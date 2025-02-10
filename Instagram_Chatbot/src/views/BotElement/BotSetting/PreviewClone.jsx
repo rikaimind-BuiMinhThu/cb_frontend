@@ -652,9 +652,7 @@ function Preview() {
               messageArr = [...res.data.data?.conversation?.messages.filter(x => !x.hidden)];
               if(isLoggedIn==true)
               {
-                messageArr = messageArr.filter(
-                  x => x.not_display_when_logged_in !== true
-                );
+                messageArr = messageArr.filter(x => !(x.not_display_when_logged_in === true));
               }
             }
             let urlThanks = res.data.data?.conversation?.urlThanksPage || "";
