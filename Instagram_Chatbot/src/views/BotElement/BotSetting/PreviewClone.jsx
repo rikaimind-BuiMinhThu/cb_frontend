@@ -652,7 +652,7 @@ function Preview() {
               messageArr = [...res.data.data?.conversation?.messages.filter(x => !x.hidden)];
               if(isLoggedIn)
               {
-                messageArr = [...res.data.data?.conversation?.messages.filter(x => !x.hidden && x.not_display_when_logged_in==false)]
+                messageArr = [...res.data.data?.conversation?.messages.filter(x => !x.hidden || x.not_display_when_logged_in==false || x.not_display_when_logged_in==undefined)]
               }
             }
             let urlThanks = res.data.data?.conversation?.urlThanksPage || "";
