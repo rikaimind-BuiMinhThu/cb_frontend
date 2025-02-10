@@ -4965,8 +4965,11 @@ const Scenario = () => {
                                   <div className="ss-bot-checkbox-scroll-auto">
                                     <CheckboxCustom
                                       label="ログイン済み時に表示しない"
-                                      onChange={value => onChangeValueMessageContent(indexMessageSelect, 0, messageType, value, 'not_display_when_logged_in')}
-                                      value={dataMessages[indexMessageSelect].message_content[0][messageType]?.['not_display_when_logged_in'] || ''}
+                                      onChange={(value) => {
+                                        dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                        setDataMessages([...dataMessages]);
+                                      }}
+                                      value={dataMessages[indexMessageSelect].not_display_when_logged_in}
                                     />
                                   </div>
                                   {dataMessages[indexMessageSelect].message_content[0][messageType]?.['use_for_confirm_message'] && (
@@ -5382,9 +5385,11 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
                                                           label="ログイン済み時に表示しない"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
-                                                          value={textInput.not_display_when_logged_in}
-                                                          isOnChange={false}
+                                                          onChange={(value) => {
+                                                            dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                                            setDataMessages([...dataMessages]);
+                                                          }}
+                                                          value={dataMessages[indexMessageSelect].not_display_when_logged_in}
                                                         />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
@@ -6120,8 +6125,11 @@ const Scenario = () => {
                                                         <div className="ss-user-setting__item-text_input-top">
                                                           <CheckboxCustom
                                                             label="ログイン済み時に表示しない"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
-                                                            value={textarea.not_display_when_logged_in}
+                                                            onChange={(value) => {
+                                                              dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                                              setDataMessages([...dataMessages]);
+                                                            }}
+                                                            value={dataMessages[indexMessageSelect].not_display_when_logged_in}
                                                           />
                                                           <CheckboxCustom
                                                             label="入力された内容を変数に保存する。"
@@ -6275,9 +6283,11 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
                                                           label="ログイン済み時に表示しない"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
-                                                          value={radioButton.not_display_when_logged_in}
-                                                          isOnChange={false}
+                                                          onChange={(value) => {
+                                                            dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                                            setDataMessages([...dataMessages]);
+                                                          }}
+                                                          value={dataMessages[indexMessageSelect].not_display_when_logged_in}
                                                         />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
@@ -6777,9 +6787,11 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
                                                           label="ログイン済み時に表示しない"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
-                                                          value={zipCodeAddress.not_display_when_logged_in}
-                                                          isOnChange={false}
+                                                          onChange={(value) => {
+                                                            dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                                            setDataMessages([...dataMessages]);
+                                                          }}
+                                                          value={dataMessages[indexMessageSelect].not_display_when_logged_in}
                                                         />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
@@ -7723,8 +7735,11 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-bottom">
                                                         <CheckboxCustom
                                                           label="ログイン済み時に表示しない"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
-                                                          value={agreeTerm.not_display_when_logged_in}
+                                                          onChange={(value) => {
+                                                            dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                                            setDataMessages([...dataMessages]);
+                                                          }}
+                                                          value={dataMessages[indexMessageSelect].not_display_when_logged_in}
                                                         />
                                                         <div className="ss-user-setting__item-select-bottom-wrapper-flex">
                                                           <SelectCustom
@@ -7882,9 +7897,11 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
                                                           label="ログイン済み時に表示しない"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
-                                                          value={pullDown.not_display_when_logged_in}
-                                                          isOnChange={false}
+                                                          onChange={(value) => {
+                                                            dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                                            setDataMessages([...dataMessages]);
+                                                          }}
+                                                          value={dataMessages[indexMessageSelect].not_display_when_logged_in}
                                                         />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
@@ -10454,9 +10471,11 @@ const Scenario = () => {
                                                         <div style={{ width: '90%' }}>
                                                           <CheckboxCustom
                                                             label="ログイン済み時に表示しない"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
-                                                            value={slider.not_display_when_logged_in}
-                                                            isOnChange={false}
+                                                            onChange={(value) => {
+                                                              dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                                              setDataMessages([...dataMessages]);
+                                                            }}
+                                                            value={dataMessages[indexMessageSelect].not_display_when_logged_in}
                                                           />
                                                           <CheckboxCustom
                                                             label="入力された内容を変数に保存する。"
@@ -10639,9 +10658,11 @@ const Scenario = () => {
                                                       <div className="ss-user-setting__item-text_input-top">
                                                         <CheckboxCustom
                                                           label="ログイン済み時に表示しない"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
-                                                          value={cardPaymentRadioButton.not_display_when_logged_in}
-                                                          isOnChange={false}
+                                                          onChange={(value) => {
+                                                            dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                                            setDataMessages([...dataMessages]);
+                                                          }}
+                                                          value={dataMessages[indexMessageSelect].not_display_when_logged_in}
                                                         />
                                                         <CheckboxCustom
                                                           label="入力された内容を変数に保存する。"
@@ -11756,10 +11777,13 @@ const Scenario = () => {
                                                   {content.type === 'shipping_address' && (
                                                     <>
                                                     <div className="ss-user-setting__item-text_input-top">
-                                                    <CheckboxCustom
+                                                        <CheckboxCustom
                                                           label="ログイン済み時に表示しない"
-                                                          onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
-                                                          value={shippingAddress.not_display_when_logged_in}
+                                                          onChange={(value) => {
+                                                            dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                                            setDataMessages([...dataMessages]);
+                                                          }}
+                                                          value={dataMessages[indexMessageSelect].not_display_when_logged_in}
                                                         />
                                                         <div className="ss-user-setting__item-bottom" style={{ position: 'relative' }}>
                                                             {shippingAddress.type !== "picture_radio" &&
@@ -12930,9 +12954,11 @@ const Scenario = () => {
                                                         <div style={{ width: '45%' }}>
                                                           <CheckboxCustom
                                                             label="ログイン済み時に表示しない"
-                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'not_display_when_logged_in')}
-                                                            value={buttonSubmit.not_display_when_logged_in}
-                                                            isOnChange={false}
+                                                            onChange={(value) => {
+                                                              dataMessages[indexMessageSelect].not_display_when_logged_in = value;
+                                                              setDataMessages([...dataMessages]);
+                                                            }}
+                                                            value={dataMessages[indexMessageSelect].not_display_when_logged_in}
                                                           />
                                                         </div>
                                                       </div>
@@ -13328,4 +13354,3 @@ const Scenario = () => {
 };
 
 export default Scenario;
-
