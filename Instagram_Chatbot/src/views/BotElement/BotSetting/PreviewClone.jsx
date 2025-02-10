@@ -181,7 +181,7 @@ let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
-
+let isLoggedIn =  params.get('isLoggedIn')
 function Preview() {
   const containerRef = useRef(null);
 
@@ -2888,12 +2888,27 @@ function Preview() {
   }
 
   const onClickNext = async (indexMessage, message) => {
+    
     let indexClickLocation = indexMessageRender
     for (let i = 0; i < dataMessages.length; i++) {
       if (dataMessages[i]?.id === message?.id) {
         indexClickLocation = i
         break
       }
+    }
+    if (message.button_jscode == true && message.jscode?.length > 0) {
+      window.parent.postMessage({
+        isOpen: true,
+        widthPc: 450,
+        heightPc: 700,
+        widthSp: 100,
+        heightSp: 100,
+        chatbotRight: 10,
+        chatbotBottom: 10,
+        action: 'excuteJS',
+        jscode: message.jscode,
+        is_use_js: true
+      }, '*');
     }
 
     let realIndex = indexMessage;
