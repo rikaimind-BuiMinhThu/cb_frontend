@@ -650,7 +650,7 @@ function Preview() {
             let messageArr = [];
             if (res.data.data?.conversation?.messages?.length > 0) {
               messageArr = [...res.data.data?.conversation?.messages.filter(x => !x.hidden)];
-              if(isLoggedIn)
+              if(isLoggedIn==true)
               {
                 messageArr = messageArr.filter(
                   x => x.not_display_when_logged_in !== true
