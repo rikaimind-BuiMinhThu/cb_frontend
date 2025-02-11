@@ -8318,6 +8318,25 @@ const UserMessage = ({
                       />
                     </React.Fragment>
                   )}
+                  {pullDown.type === "lp_integration_option" && (
+                    <React.Fragment>
+                      <SelectCustom
+                        disabled={disabled}
+                        placeholder="選択してください。"
+                        style={{ width: "100%" }}
+                        onChange={(value) =>
+                          onChangeValue(
+                            indexContent,
+                            content.type,
+                            value,
+                            pullDown.type,
+                            "value"
+                          )
+                        }
+                        value={pullDown[pullDown.type]?.value}
+                      />
+                    </React.Fragment>
+                  )}
                   {pullDown.type === "up_to_municipality" && (
                     <div>
                       <div style={{ fontWeight: "400", fontSize: "12px" }}>

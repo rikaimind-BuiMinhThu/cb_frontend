@@ -531,6 +531,10 @@ let dataTypePullDown = [
   {
     key: 'comsume_api_response',
     value: 'API応答を利用する'
+  },
+  {
+    key: 'lp_integration_option',
+    value: 'LP一体型フォームの選択肢を利用する'
   }
 ];
 
@@ -1266,7 +1270,8 @@ const Scenario = () => {
             timezone_from_to: {},
             period_from_to: {},
             up_to_municipality: {},
-            prefectures: {}
+            prefectures: {},
+            lp_integration_option: {},
           }
         }
       );
@@ -9279,6 +9284,50 @@ const Scenario = () => {
                                                           </div>
                                                         </React.Fragment>
                                                       }
+                                                      {/* pull_down: type = lp_integration_option */}
+                                                      {pullDown.type === 'lp_integration_option' &&
+                                                        <React.Fragment>
+                                                          {<div className='ss-user-setting__item-row' style={{ display: 'flex', gap: '10px', marginLeft: '35px', width: '90%' }}>
+                                                            <Tooltip title="複写先要素の取得方法をお選びください" placement="top">
+                                                              <div style={{ width: '25%' }}>
+                                                                <SelectCustom
+                                                                  id="title"
+                                                                  style={{ width: '100%' }}
+                                                                  value={pullDown[pullDown.type]?.lp_element_search_mode}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'lp_element_search_mode')}
+                                                                  data={[
+                                                                    { key: 1, value: 'id' },
+                                                                    { key: 2, value: 'css_selector' },
+                                                                    { key: 3, value: 'xpath' }
+                                                                   ]}
+                                                                  keyValue="key"
+                                                                  placeholder="複写先要素の取得方法をお選びください"
+                                                                />
+                                                              </div>
+                                                            </Tooltip>
+                                                            <Tooltip title={{
+                                                              1: '複写先要素のIDを入力ください',
+                                                              2: '複写先要素のcss_selectorを入力ください',
+                                                              3: '複写先要素のxPathを入力ください',
+                                                            }[pullDown[pullDown.type]?.lp_element_search_mode] || ''} placement="top">
+                                                              <div style={{ flex: '75%' }}>
+                                                                <InputCustom
+                                                                  styleLabel={{ width: '100%' }}
+                                                                  style={{ width: '100%' }}
+                                                                  onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'lp_element_search_value')}
+                                                                  value={pullDown[pullDown.type]?.lp_element_search_value}
+                                                                  placeholder={{
+                                                                    1: '複写先要素のIDを入力ください',
+                                                                    2: '複写先要素のcss_selectorを入力ください',
+                                                                    3: '複写先要素のxPathを入力ください',
+                                                                  }[pullDown[pullDown.type]?.lp_element_search_mode] || ''}
+                                                                />
+                                                              </div>
+                                                            </Tooltip>
+                                                          </div>}
+                                                        </React.Fragment>
+                                                      }
+                                                      
                                                     </React.Fragment>
                                                   )}
                                                   {/* user: type = 'carousel' ADD_FUKU */}
