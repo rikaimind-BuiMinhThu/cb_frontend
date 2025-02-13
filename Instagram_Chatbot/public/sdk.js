@@ -71,13 +71,21 @@ function getEcChatBotFrontEndBaseUrl() {
   }
 }
 let globalIframe
-function sendMessageToChatbot(mm, type) {
+function sendMessageToChatbot(contentMessage, type) {
   if (type == "text") {
-    const message = { text: String(mm) };
+    const message = { text: String(contentMessage) };
     globalIframe.contentWindow.postMessage(message, "*");
   }
   if (type == "previewObject") {
-    const message = { objectSend: mm };
+    const message = { objectSend: contentMessage };
+    globalIframe.contentWindow.postMessage(message, "*");
+  }
+  if (type == "crawJsonObject") {
+    const message = {
+      crawJsonObject: contentMessage,
+      type: "date"
+
+    };
     globalIframe.contentWindow.postMessage(message, "*");
   }
 
@@ -154,6 +162,20 @@ async function displayPopup() {
       if (e.data.getErrorMessage) {
         processErrorMessage(e.data.getErrorMessage)
       }
+      if(e.data.actionSDK)
+      {
+        if(e.data.actionSDK.searchAddress!= undefined && e.data.actionSDK.searchMode!= undefined)
+        {
+          const selectElement = getElementByAddress(e.data.actionSDK.searchMode,e.data.actionSDK.searchAddress)
+          const crawlOption = {
+            search_value: e.data.actionSDK.searchAddress,
+            search_mode: e.data.actionSDK.searchMode
+          }
+          const crawJsonData = extractSelectOptions(selectElement,crawlOption);
+          sendMessageToChatbot(crawJsonData,"crawJsonObject")
+        }
+
+      }
       if (e.data.isOpen && mobileCheck()) {
         iframe.width = "100%";
         // iframe.height = "620px";
@@ -203,6 +225,20 @@ async function displayPopup() {
     },
     false
   );
+
+  function extractSelectOptions(selectElement,crawlOption) {
+    if (!selectElement || selectElement.tagName !== "SELECT") return null;
+    const options = Array.from(selectElement.options)
+      .map((option, index) => ({
+        id: index + 1,
+        text: option.innerText,
+        value: option.innerText
+      }));
+
+    return { dates: options,
+              options:crawlOption
+     };
+  }
 
   function processErrorMessage(obj) {
     displayErrorMessage.isDisplay = obj.isDisplay
