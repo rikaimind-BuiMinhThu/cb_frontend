@@ -3671,6 +3671,15 @@ const Scenario = () => {
                                                                     />
                                                                   </React.Fragment>
                                                                 )}
+                                                                {pullDown.type === 'lp_integration_option' && (
+                                                                  <React.Fragment>
+                                                                    <SelectCustom
+                                                                      data={dataPrefectures}
+                                                                      placeholder="選択してください。"
+                                                                      style={{ width: '100%' }}
+                                                                    />
+                                                                  </React.Fragment>
+                                                                )}
                                                                 {pullDown.type === 'up_to_municipality' && (
                                                                   <div>
                                                                     <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].prefecture_comment}</div>
@@ -9293,7 +9302,7 @@ const Scenario = () => {
                                                                 <SelectCustom
                                                                   id="title"
                                                                   style={{ width: '100%' }}
-                                                                  value={pullDown[pullDown.type]?.lp_element_search_mode}
+                                                                  value={pullDown.lp_element_search_mode}
                                                                   onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'lp_element_search_mode')}
                                                                   data={[
                                                                     { key: 1, value: 'id' },
@@ -9315,7 +9324,7 @@ const Scenario = () => {
                                                                   styleLabel={{ width: '100%' }}
                                                                   style={{ width: '100%' }}
                                                                   onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'lp_element_search_value')}
-                                                                  value={pullDown[pullDown.type]?.lp_element_search_value}
+                                                                  value={pullDown.lp_element_search_value}
                                                                   placeholder={{
                                                                     1: '複写先要素のIDを入力ください',
                                                                     2: '複写先要素のcss_selectorを入力ください',

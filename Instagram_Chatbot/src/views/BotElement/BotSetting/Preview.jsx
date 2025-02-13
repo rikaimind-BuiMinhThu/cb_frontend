@@ -3998,6 +3998,20 @@ const UserMessage = ({ messageContentProps, onChangeValue, disabled = false, ind
                                                 />
                                             </React.Fragment>
                                         )}
+                                        {pullDown.type === 'lp_integration_option' && (
+                                            <React.Fragment>
+                                                <SelectCustom
+                                                    disabled={disabled}
+                                                    data={dataPrefectures}
+                                                    placeholder="選択してください。"
+                                                    style={{ width: '100%' }}
+                                                    keyValue="name"
+                                                    nameValue="name"
+                                                    onChange={value => onChangeValue(indexContent, content.type, value, pullDown.type, 'value')}
+                                                    value={pullDown.value}
+                                                />
+                                            </React.Fragment>
+                                        )}
                                         {pullDown.type === 'up_to_municipality' && (
                                             <div>
                                                 <div style={{ fontWeight: '400', fontSize: '12px' }}>{pullDown[pullDown.type].prefecture_comment}</div>
