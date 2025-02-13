@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, use } from "react";
 import "../../../assets/css/bot/preview-chat-bot.css";
 import api from "../../../api/api-management";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import SelectCustom from "./ScenarioSetting/scenarioComon/SelectCustom";
+import LPIntegrationOptionPullDown from "./ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
 import CheckboxCustom from "./ScenarioSetting/scenarioComon/CheckboxCustom";
 import InputCustom from "./ScenarioSetting/scenarioComon/InputCustom";
 import { Button } from "reactstrap";
@@ -176,7 +177,6 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
   key: i + 2,
   value: `${i + 2}`,
 }));
-
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
 var url = new URL(window.location.href);
@@ -241,6 +241,7 @@ function Preview() {
   });
   const [scenarioUserResponses, setScenarioUserResponses] = useState([])
   const [checkoutUrl, setCheckoutUrl] = useState("")
+  const [lpOptionData, setLpOptionData] = useState({});
 
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
@@ -390,13 +391,20 @@ function Preview() {
             isDisplayOrderPreview=true;  
           }
           catch {}
+        }        
+        if (event.data.crawJsonObject)
+        {
+          let receiveOptionData = {};
+          receiveOptionData[event.data.crawJsonObject.options.search_value] = event.data.crawJsonObject.dates;
+          const newLpOptionData = Object.assign({}, lpOptionData, receiveOptionData)
+          setLpOptionData(newLpOptionData);
+          return;
         }
-        const { key, value } = event.data;
-        console.log(`Key: ${key}, Value: ${value}`);
       },
       false,
     );
   }, [])
+
 
   useEffect(() => {
     if (mobileCheck()) {
@@ -655,7 +663,6 @@ function Preview() {
               }
             }
             let urlThanks = res.data.data?.conversation?.urlThanksPage || "";
-
             let variablesAll = res.data?.all_variables || [];
             setDataVariables(variablesAll);
             setDataMessages(messageArr);       
@@ -2647,7 +2654,6 @@ function Preview() {
 
           case "pull_down":
             {
-
               if (message.pull_down?.customization.length != 0) {
                 const textInDropdown = message.pull_down.customization.value
                 if (message.pull_down.customization.is_comment == true) {
@@ -2666,6 +2672,19 @@ function Preview() {
                     }
 
                   })
+                }
+              }
+
+              if(message.pull_down?.type=="lp_integration_option")
+              {
+                if (message.pull_down.lp_integration_option.value !="") {
+                  const fukuObject = {
+                    type: message.type,
+                    bindingMode: message.pull_down.lp_element_search_mode,
+                    bindingAddress: message.pull_down.lp_element_search_value,
+                    bindingValue: message.pull_down.lp_integration_option.value
+                  };
+                  listFukuObject.push(fukuObject);
                 }
               }
 
@@ -4989,6 +5008,7 @@ function Preview() {
                           onChangeErrors(field, value)
                         }
                         variables={variables}
+                        lpOptionData={lpOptionData}
                       />
                       {message.message_content[0]?.type !== "button_submit" && (
                         <div className="sp-user-message-button-action">
@@ -5452,7 +5472,8 @@ const UserMessage = ({
   isPopUpZipCodeShippingAddress,
   onChangeErrors,
   dataPrefectures,
-  variables
+  variables,
+  lpOptionData = {}
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -5465,6 +5486,10 @@ const UserMessage = ({
   const [bot_id, setBotId] = useState(Cookies.get("bot_id"));
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
+
+  const getLPOptionData = (search_element_value) => {
+    return lpOptionData[search_element_value];
+  }
 
   function loadCaptcha(indexContent) {
     if (
@@ -5480,6 +5505,9 @@ const UserMessage = ({
         )?.[0]?.data || "";
   }
 
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
   const stringNullOrEmpty = (string) => {
     if (
       string === undefined ||
@@ -5984,7 +6012,7 @@ const UserMessage = ({
         if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
           content.textarea.invalid_input.content = replaceVariable(content.textarea.invalid_input.content);
         }
-
+        
         return (
           <React.Fragment key={indexContent}>
             {/* type == 'text_input' */}
@@ -6025,7 +6053,7 @@ const UserMessage = ({
                             content.type,
                             value,
                             textInput.type,
-                            "valueLeft"
+                            "valueLeft",
                           )
                         }
                         value={textInput[textInput.type]?.valueLeft}
@@ -7583,7 +7611,7 @@ const UserMessage = ({
                           <span>{pullDown[pullDown.type].title_comment}</span>
                         </div>
                         <div className="">
-                          {pullDown[pullDown.type].is_comment === false ? (
+                          {pullDown[pullDown.type].is_comment === false ? (                            
                             <div className="ss-message__content--user-pull_down-col col-12">
                               <SelectCustom
                                 disabled={disabled}
@@ -8318,24 +8346,25 @@ const UserMessage = ({
                       />
                     </React.Fragment>
                   )}
-                  {pullDown.type === "lp_integration_option" && (
-                    <React.Fragment>
-                      <SelectCustom
-                        disabled={disabled}
-                        placeholder="選択してください。"
-                        style={{ width: "100%" }}
-                        onChange={(value) =>
-                          onChangeValue(
-                            indexContent,
-                            content.type,
-                            value,
-                            pullDown.type,
-                            "value"
-                          )
-                        }
-                        value={pullDown[pullDown.type]?.value}
-                      />
-                    </React.Fragment>
+                  {pullDown.type === "lp_integration_option" && (                    
+                    <LPIntegrationOptionPullDown
+                     search_element_type={pullDown.lp_element_search_mode}
+                     search_element_value={pullDown.lp_element_search_value}
+                     disabled={disabled}
+                     pullDown = {pullDown}
+                     indexContent =  {indexContent}
+                     content = {content}
+                     data={getLPOptionData(pullDown.lp_element_search_value)}
+                     onChange={(value) =>
+                      onChangeValue(
+                        indexContent,
+                        content.type,
+                        value,
+                        pullDown.type,
+                        "value"
+                      )
+                    }
+                    />               
                   )}
                   {pullDown.type === "up_to_municipality" && (
                     <div>
