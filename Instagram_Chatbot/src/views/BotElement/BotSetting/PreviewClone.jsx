@@ -4336,6 +4336,7 @@ function Preview() {
     });
   };
 
+  const userMessageArray = renderMessageArr.filter(x => x.belong_to === 'user');
   ///body container
   if (scenarioId && botInfor && isOpen) {
     return (
@@ -5026,7 +5027,7 @@ function Preview() {
                             {message.buttonName || (
                               errorMessageSubmit.length > 0
                                 ? "更新"
-                                : (indexMessage >= indexMessageRender ? "次へ" : "更新")
+                                : (indexMessage >= userMessageArray.length ? "次へ" : "更新")
                             )}
                           </CustomButton>
                         </div>
