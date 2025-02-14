@@ -18,9 +18,7 @@ import {
   Calendar,
   Row,
   Select,
-  Typography,
-  Col,
-  Input,
+  Col
 } from "antd";
 import moment from "moment";
 import cvcIcon from "../../../assets/img/cvc-icon.png";
@@ -47,11 +45,9 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { func } from "prop-types";
 
 const _ = require("lodash");
 sessionStorage.setItem("prevOpenStatus", "0");
-let errorMessageSubmit='';
 let previewOrderInfor = {};
 let isDisplayOrderPreview = false;
 let previewContent = ``
@@ -181,10 +177,10 @@ let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
-let isLoggedIn =  params.get('isLoggedIn')
+let isLoggedIn = params.get('isLoggedIn')
 function Preview() {
   const containerRef = useRef(null);
-
+  const [confirmErrorMessage, setConfirmErrorMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [urlSend, setUrlSend] = useState();
   const [urlReceive, setUrlReceive] = useState();
@@ -234,11 +230,6 @@ function Preview() {
   const [activePopupCloseBot, setActivePopupCloseBot] = useState(true);
   const [titleBubble, setTitleBubble] = useState("");
   const [styleModal, setStyleModal] = useState({});
-  const [displayErrorMessage, setDisplayErrorMessage] = useState({
-    isDisplay:"true",
-    address:"1",
-    messageContent:""
-  });
   const [scenarioUserResponses, setScenarioUserResponses] = useState([])
   const [checkoutUrl, setCheckoutUrl] = useState("")
   const [lpOptionData, setLpOptionData] = useState({});
@@ -261,7 +252,7 @@ function Preview() {
       dataObj.start_datetime = new Date();
     });
     return dataObj;
-  }); 
+  });
 
   function handleStyleModal() {
 
@@ -364,36 +355,28 @@ function Preview() {
       "message",
       (event) => {
         if (event.data === 'openPreview' && isOpen !== true) {
-          onOpenPreview(true)
+          onOpenPreview(true) 
         }
-        if(event.data.text!=undefined && event.data.text.trim().length>0)
-        { 
-          if(isDisplayErrorMessage)
-          {
-
-            errorMessageSubmit = event.data.text;
+        if (event.data.text != undefined && event.data.text.trim().length > 0) {
+          if (isDisplayErrorMessage) { 
+            setConfirmErrorMessage(event.data.text);
+            if(!isOpen)
+            {
+              document.querySelector('.sp-header-right-arrow').click();
+            }
+            return;
           }
-          else
-          {
-            errorMessageSubmit = '';
-          }         
-        }
-        else
-        {
-          errorMessageSubmit = '';
         }
 
-        if(event.data.objectSend!=undefined )
-        {
+        if (event.data.objectSend != undefined) {
           try {
             previewOrderInfor = event.data.objectSend;
             previewContent = event.data.objectSend;
-            isDisplayOrderPreview=true;  
+            isDisplayOrderPreview = true;
           }
-          catch {}
-        }        
-        if (event.data.crawJsonObject)
-        {
+          catch { }
+        }
+        if (event.data.crawJsonObject) {
           let receiveOptionData = {};
           receiveOptionData[event.data.crawJsonObject.options.search_value] = event.data.crawJsonObject.dates;
           const newLpOptionData = Object.assign({}, lpOptionData, receiveOptionData)
@@ -485,7 +468,7 @@ function Preview() {
     if (isOpen && activePopupCloseBot) {
       setShowPopupCloseBot(true)
       return;
-    } 
+    }
 
     if (isOpen && !activePopupCloseBot) {
       const element = document.getElementById('sp-container1');
@@ -549,7 +532,7 @@ function Preview() {
 
         document.getElementById("sp-body").style.display = "block";
       }
-    }   
+    }
   }
 
   function lightenColor(hex, opacity) {
@@ -604,46 +587,42 @@ function Preview() {
         .then(async (res) => {
           if (res.data.code == 1) {
             var listMessage = res.data.data.conversation.messages
-            if(listMessage.length>0)
-              {
-                for (const item of listMessage) {
-                  if (item?.message_content) {                 
-                    for(const itemTwo of item.message_content)
-                    {
-                      if(itemTwo.type=="button_submit")
-                      {
-                        const errorObject = {
-                          isDisplay: itemTwo.button_submit.is_display_error_message,
-                          seachMode: itemTwo.error_message_display_element_search_type,
-                          searchValue: itemTwo.error_message_display_element_search_value,
-                        };  
-                        isDisplayErrorMessage = itemTwo.button_submit.is_display_error_message; 
-                        window.parent.postMessage(
-                          {
-                            isOpen: true,
-                            widthPc: widthPc,
-                            heightPc: heightPc,
-                            widthSp: widthSp,
-                            heightSp: heightSp,
-                            chatbotRight: rightMarginPc,
-                            chatbotBottom: bottomMarginPc,
-                            fukushashikiResponse: undefined,
-                            getErrorMessage: errorObject,
-                          },
-                          '*'
-                        );              
-                        break;
-                      }
+            if (listMessage.length > 0) {
+              for (const item of listMessage) {
+                if (item?.message_content) {
+                  for (const itemTwo of item.message_content) {
+                    if (itemTwo.type == "button_submit") {
+                      const errorObject = {
+                        isDisplay: itemTwo.button_submit.is_display_error_message,
+                        seachMode: itemTwo.error_message_display_element_search_type,
+                        searchValue: itemTwo.error_message_display_element_search_value,
+                      };
+                      isDisplayErrorMessage = itemTwo.button_submit.is_display_error_message;
+                      window.parent.postMessage(
+                        {
+                          isOpen: true,
+                          widthPc: widthPc,
+                          heightPc: heightPc,
+                          widthSp: widthSp,
+                          heightSp: heightSp,
+                          chatbotRight: rightMarginPc,
+                          chatbotBottom: bottomMarginPc,
+                          fukushashikiResponse: undefined,
+                          getErrorMessage: errorObject,
+                        },
+                        '*'
+                      );
+                      break;
                     }
-  
                   }
+
                 }
-              if(errorMessageSubmit.trim().length>0 && isDisplayErrorMessage==true)
-                {
-                  res.data.design_settings.display_type = 1;
-                }              
-                
               }
+              if (isDisplayErrorMessage == true && confirmErrorMessage != '') {
+                setDisplayType(1);
+                res.data.design_settings.display_type = displayType;
+              }
+            }
             if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
               sessionStorage.setItem("prevOpenStatus", "1");
               const openChatbotCountApiParams = {
@@ -665,7 +644,7 @@ function Preview() {
             let urlThanks = res.data.data?.conversation?.urlThanksPage || "";
             let variablesAll = res.data?.all_variables || [];
             setDataVariables(variablesAll);
-            setDataMessages(messageArr);       
+            setDataMessages(messageArr);
             setUrlThanksPage(urlThanks);
             if (res.data.chatbot) {
               let opacity_color, message_color, font_color, icon_mess;
@@ -1187,12 +1166,13 @@ function Preview() {
             }
             // setIndexMessageRender(index);
             // setRenderMessageArr(renderMessage);
-            try {      
-              if (isDisplayErrorMessage==true && errorMessageSubmit.trim().length>0) {
+            try {
+              if (isDisplayErrorMessage == true && confirmErrorMessage.trim().length > 0) {
                 var dataMessageInLocalStorage = getMessagesSessionStorage();
                 if (dataMessageInLocalStorage) {
                   setRenderMessageArr(dataMessageInLocalStorage)
-                  const filteredMessages = dataMessageInLocalStorage.filter(x => x.belongto === 'user' && x.hidden!==true);
+                  const filteredMessages = dataMessageInLocalStorage.filter(x => x.belongto === 'user' && x.hidden !== true);
+                  filteredMessages = filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
                   setMessageUser(filteredMessages)
                   setIndexUser(filteredMessages.length)
                   setIsOpen(true)
@@ -1200,7 +1180,7 @@ function Preview() {
               }
             }
             catch {
-        
+
             }
             scrollToBottom();
           }
@@ -2085,8 +2065,8 @@ function Preview() {
             if (
               contentType.number !== undefined &&
               (stringNullOrEmpty(contentType.value_number1) ||
-              stringNullOrEmpty(contentType.value_number2) ||
-              stringNullOrEmpty(contentType.value_number3))
+                stringNullOrEmpty(contentType.value_number2) ||
+                stringNullOrEmpty(contentType.value_number3))
             ) {
               isValidShippingAddress = false
             }
@@ -2517,8 +2497,7 @@ function Preview() {
                 listFukuObject.push(fukuObject);
               }
 
-              if(Object.keys(message.text_input.email_confirmation).length != 0 && message.text_input.email_confirmation != undefined)
-              {
+              if (Object.keys(message.text_input.email_confirmation).length != 0 && message.text_input.email_confirmation != undefined) {
                 const userInputData = Object.fromEntries(
                   Object.entries(message.text_input.email_confirmation).filter(([key, value]) => key.includes("value"))
                 );
@@ -2581,8 +2560,7 @@ function Preview() {
                 };
                 listFukuObject.push(fukuObject);
               }
-              if(Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined)
-              {
+              if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
                 const fukuObject = {
                   type: 'password',
                   bindingMode: message.fukushashiki_search_mode,
@@ -2608,9 +2586,9 @@ function Preview() {
                 };
                 listFukuObject.push(fukuObject1);
                 listFukuObject.push(fukuObject2);
-                
+
               }
-              
+
             }
             break;
           case 'agree_term':
@@ -2675,9 +2653,8 @@ function Preview() {
                 }
               }
 
-              if(message.pull_down?.type=="lp_integration_option")
-              {
-                if (message.pull_down.lp_integration_option.value !="") {
+              if (message.pull_down?.type == "lp_integration_option") {
+                if (message.pull_down.lp_integration_option.value != "") {
                   const fukuObject = {
                     type: message.type,
                     bindingMode: message.pull_down.lp_element_search_mode,
@@ -2729,8 +2706,7 @@ function Preview() {
             }
           case 'textarea':
             {
-              if(message.textarea.text_input.value!=undefined)
-              {
+              if (message.textarea.text_input.value != undefined) {
                 const fukuObject = {
                   type: message.type,
                   bindingMode: message.fukushashiki_search_mode,
@@ -2777,7 +2753,7 @@ function Preview() {
               const dataInforFukushashiki = Object.fromEntries(
                 Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
               );
-              const types = ["number1","number2","number3","number","name_left","name_right","kana_left","kana_right","building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right","initial_selection"];
+              const types = ["number1", "number2", "number3", "number", "name_left", "name_right", "kana_left", "kana_right", "building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right", "initial_selection"];
               const result = types
                 .filter(type => `value_${type}` in userInputData)
                 .map(type => {
@@ -2820,8 +2796,7 @@ function Preview() {
             {
               const initialSelection = message.radio_button.initial_selection;
               const selectedElement = message.radio_button.default.find(item => item.id === initialSelection);
-              if (selectedElement) 
-              {
+              if (selectedElement) {
                 const value = selectedElement.value;
                 const fukuObject = {
                   type: message.type,
@@ -2831,13 +2806,12 @@ function Preview() {
                 };
                 listFukuObject.push(fukuObject);
               }
-              
+
               break;
             }
           case 'checkbox':
             {
-              if(message.checkbox.checkedValue.length>0)
-              {
+              if (message.checkbox.checkedValue.length > 0) {
                 const fukuObject = {
                   type: message.type,
                   bindingMode: message.checkedValue_fukushashiki_search_mode,
@@ -2846,8 +2820,7 @@ function Preview() {
                 };
                 listFukuObject.push(fukuObject);
               }
-              else
-              {
+              else {
                 const fukuObject = {
                   type: message.type,
                   bindingMode: message.checkedValue_fukushashiki_search_mode,
@@ -2885,14 +2858,13 @@ function Preview() {
               const dataInforFukushashiki = Object.fromEntries(
                 Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
               );
-              const types = ["card_number","card_holder1","card_holder2", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4","installment","initial_selection"];
+              const types = ["card_number", "card_holder1", "card_holder2", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4", "installment", "initial_selection"];
               const result = types
                 .filter(type => `${type}` in userInputData)
                 .map(type => {
                   const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
                   const bindingValue = userInputData[`${type}`];
-                  if(type=="initial_selection")
-                  {
+                  if (type == "initial_selection") {
                     return {
                       type: "initial_selection",
                       bindingMode,
@@ -2900,15 +2872,14 @@ function Preview() {
                       bindingValue
                     };
                   }
-                  if(type=="card_number")
-                    {
-                      return {
-                        type: "card_number",
-                        bindingMode,
-                        bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                        bindingValue
-                      };
-                    }
+                  if (type == "card_number") {
+                    return {
+                      type: "card_number",
+                      bindingMode,
+                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                      bindingValue
+                    };
+                  }
                   if (bindingMode !== undefined && bindingValue !== undefined) {
                     return {
                       type: "card_payment_radio_button",
@@ -2934,7 +2905,25 @@ function Preview() {
   }
 
   const onClickNext = async (indexMessage, message) => {
-    
+    if (confirmErrorMessage.length > 0) {
+      try {
+
+        var dataMessageInLocalStorage = getMessagesSessionStorage();
+        if (dataMessageInLocalStorage) {
+          setRenderMessageArr(dataMessageInLocalStorage)
+          const filteredMessages = dataMessageInLocalStorage.filter(x => x.belongto === 'user' && x.hidden !== true);
+          filteredMessages = filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
+          setMessageUser(filteredMessages)
+          setIndexUser(filteredMessages.length)
+          setIsOpen(true)
+        }
+      }
+      catch {
+
+      }
+      scrollToBottom();
+      return;
+    }
     let indexClickLocation = indexMessageRender
     for (let i = 0; i < dataMessages.length; i++) {
       if (dataMessages[i]?.id === message?.id) {
@@ -2963,13 +2952,11 @@ function Preview() {
       return;
     }
     let renderMessage = [...renderMessageArr];
-    if(errorMessageSubmit.length>0)
-    {
-        renderMessageArr[indexMessage].disabled = false;
+    if (confirmErrorMessage.length > 0) {
+      renderMessageArr[indexMessage].disabled = false;
     }
-      else
-    {
-        renderMessageArr[indexMessage].disabled = true;
+    else {
+      renderMessageArr[indexMessage].disabled = true;
     }
     setRenderMessageArr(renderMessageArr)
     let index;
@@ -3080,7 +3067,7 @@ function Preview() {
       }
 
       for (let i = 0; i < renderMessage.length; i++) {
-        if (errorMessageSubmit.length > 0) {
+        if (confirmErrorMessage.length > 0) {
           renderMessage[i].disabled = false;
         }
         else {
@@ -3521,22 +3508,21 @@ function Preview() {
                 const temp = dataSessionStorage.find(x => x.id === data.id)
                 if (temp) data.message_content = [...temp.message_content]
               }
-             try
-             {
-              renderMessage[indexMessage].disabled = false;
-              renderMessageArr[indexMessage].disabled = false;
-              const isIdExist = renderMessageArr.some((message) => message.id === data.id);
+              try {
+                renderMessage[indexMessage].disabled = false;
+                renderMessageArr[indexMessage].disabled = false;
+                const isIdExist = renderMessageArr.some((message) => message.id === data.id);
 
-              if (isIdExist) {
-               return;
-              } 
-              renderMessage.push(data);
-                 setRenderMessageArr([...renderMessage]);
-              if (isPauseScroll === false) {
-                scrollToBottom();
+                if (isIdExist) {
+                  return;
+                }
+                renderMessage.push(data);
+                setRenderMessageArr([...renderMessage]);
+                if (isPauseScroll === false) {
+                  scrollToBottom();
+                }
               }
-             }
-             catch {}
+              catch { }
             });
             index = i;
             break;
@@ -4950,7 +4936,7 @@ function Preview() {
               <React.Fragment key={indexMessage}>
                 {message.belong_to === "bot" && Array.isArray(message?.message_content) &&
                   message?.message_content.map((content, index) => {
-                    const customPreview = content;               
+                    const customPreview = content;
                     return (
                       <BotMessage
                         key={index}
@@ -4966,78 +4952,79 @@ function Preview() {
                   message.message_content &&
                   message.message_content.length > 0 &&
                   (
-                  <div
-                    className="sp-body-user-side slideLeft"
-                  >
-                    <div className="sp-body-user-side-messages">                
-                      <UserMessage
-                        captcha={captcha}
-                        messageContentProps={message?.message_content}
-                        disabled={errorMessageSubmit.length > 0 ? false : message.disabled}
-                        onChangeValue={(
-                          indexContent,
-                          contentType,
-                          value,
-                          field,
-                          subFiled,
-                          name
-                        ) =>
-                          onChangeValue(
+                    <div
+                      className="sp-body-user-side slideLeft"
+                    >
+                      <div className="sp-body-user-side-messages">
+                        <UserMessage
+                          captcha={captcha}
+                          messageContentProps={message?.message_content}
+                          disabled={confirmErrorMessage.length > 0 ? false : message.disabled}
+                          onChangeValue={(
                             indexContent,
                             contentType,
                             value,
                             field,
                             subFiled,
-                            name,
-                            message
-                          )
-                        }
-                        indexMessageRender={indexMessageRender}
-                        onClickNext={() => onClickNext(indexMessage, message)}
-                        indexMessage={indexMessage}
-                        errorsProps={errors}
-                        displayButtonNext={(value) => {
-                          dataMessages[indexMessageRender].is_display_button_next =
-                            value;
-                          setDataMessages([...dataMessages]);
-                        }}
-                        dataPrefectures={[...dataPrefectures]}
-                        isPopUpZipCode={(isOpen, indexContent) =>
-                          isPopUpZipCode(isOpen, indexContent)
-                        }
-                        isPopUpZipCodeShippingAddress={(isOpen, indexContent) =>
-                          isPopUpZipCodeShippingAddress(isOpen, indexContent)
-                        }
-                        onChangeErrors={(field, value) =>
-                          onChangeErrors(field, value)
-                        }
-                        variables={variables}
-                        lpOptionData={lpOptionData}
-                      />
-                      {message.message_content[0]?.type !== "button_submit" && (
-                        <div className="sp-user-message-button-action">
-                          <CustomButton
-                            disabled={errorMessageSubmit.length > 0 ? false : message.disabled}
-                            style={{
-                              backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
-                              borderRadius: "25px",
-                            }}
-                            className="ss-user-message__action-btn"
-                            onClick={() => onClickNext(indexMessage, message)}
-                            autoClick={errorMessageSubmit.trim().length > 0 ? true : false}
-                            messsagetype={message.message_content[0]?.type}
-                          >
-                            {message.buttonName || (
-                              errorMessageSubmit.length > 0
-                                ? "更新"
-                                : (userIndexMessage >= userMessageArray.length ? "次へ" : "更新")
-                            )}
-                          </CustomButton>
-                        </div>
-                      )}
+                            name
+                          ) =>
+                            onChangeValue(
+                              indexContent,
+                              contentType,
+                              value,
+                              field,
+                              subFiled,
+                              name,
+                              message
+                            )
+                          }
+                          indexMessageRender={indexMessageRender}
+                          onClickNext={() => onClickNext(indexMessage, message)}
+                          indexMessage={indexMessage}
+                          errorsProps={errors}
+                          displayButtonNext={(value) => {
+                            dataMessages[indexMessageRender].is_display_button_next =
+                              value;
+                            setDataMessages([...dataMessages]);
+                          }}
+                          dataPrefectures={[...dataPrefectures]}
+                          isPopUpZipCode={(isOpen, indexContent) =>
+                            isPopUpZipCode(isOpen, indexContent)
+                          }
+                          isPopUpZipCodeShippingAddress={(isOpen, indexContent) =>
+                            isPopUpZipCodeShippingAddress(isOpen, indexContent)
+                          }
+                          onChangeErrors={(field, value) =>
+                            onChangeErrors(field, value)
+                          }
+                          variables={variables}
+                          lpOptionData={lpOptionData}
+                          confirmErrorMessage={confirmErrorMessage}
+                        />
+                        {message.message_content[0]?.type !== "button_submit" && (
+                          <div className="sp-user-message-button-action">
+                            <CustomButton
+                              disabled={confirmErrorMessage.length > 0 ? false : message.disabled}
+                              style={{
+                                backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
+                                borderRadius: "25px",
+                              }}
+                              className="ss-user-message__action-btn"
+                              onClick={() => onClickNext(indexMessage, message)}
+                              autoClick={confirmErrorMessage.trim().length > 0 ? true : false}
+                              messsagetype={message.message_content[0]?.type}
+                            >
+                              {message.buttonName || (
+                                confirmErrorMessage.length > 0
+                                  ? "更新"
+                                  : (indexMessage >= indexMessageRender ? "次へ" : "更新")
+                              )}
+                            </CustomButton>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>  
-                )}
+                  )}
               </React.Fragment>
             );
           })}
@@ -5477,7 +5464,8 @@ const UserMessage = ({
   onChangeErrors,
   dataPrefectures,
   variables,
-  lpOptionData = {}
+  lpOptionData = {},
+  confirmErrorMessage = ''
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -5511,7 +5499,7 @@ const UserMessage = ({
 
   function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-}
+  }
   const stringNullOrEmpty = (string) => {
     if (
       string === undefined ||
@@ -5560,7 +5548,7 @@ const UserMessage = ({
   }, [errorsProps]);
 
   useEffect(() => {
-      setMessageContent(messageContentProps);
+    setMessageContent(messageContentProps);
   }, [messageContentProps]);
 
   useEffect(() => {
@@ -5671,7 +5659,7 @@ const UserMessage = ({
             shippingAddress.value_initial_selection,
             "value_initial_selection"
           );
-        } 
+        }
       } else if (content.type === "product_purchase") {
         let productPurchase = content.product_purchase;
         onChangeValue(
@@ -6016,7 +6004,7 @@ const UserMessage = ({
         if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
           content.textarea.invalid_input.content = replaceVariable(content.textarea.invalid_input.content);
         }
-        
+
         return (
           <React.Fragment key={indexContent}>
             {/* type == 'text_input' */}
@@ -6450,7 +6438,7 @@ const UserMessage = ({
                             style={{
                               fontWeight: "400",
                               fontSize: "12px",
-                              color:'black',
+                              color: 'black',
                               width: "100%",
                               marginBottom: "5px",
                             }}
@@ -7615,7 +7603,7 @@ const UserMessage = ({
                           <span>{pullDown[pullDown.type].title_comment}</span>
                         </div>
                         <div className="">
-                          {pullDown[pullDown.type].is_comment === false ? (                            
+                          {pullDown[pullDown.type].is_comment === false ? (
                             <div className="ss-message__content--user-pull_down-col col-12">
                               <SelectCustom
                                 disabled={disabled}
@@ -8350,25 +8338,23 @@ const UserMessage = ({
                       />
                     </React.Fragment>
                   )}
-                  {pullDown.type === "lp_integration_option" && (                    
+                  {pullDown.type === "lp_integration_option" && (
                     <LPIntegrationOptionPullDown
-                     search_element_type={pullDown.lp_element_search_mode}
-                     search_element_value={pullDown.lp_element_search_value}
-                     disabled={disabled}
-                     pullDown = {pullDown}
-                     indexContent =  {indexContent}
-                     content = {content}
-                     data={getLPOptionData(pullDown.lp_element_search_value)}
-                     onChange={(value) =>
-                      onChangeValue(
-                        indexContent,
-                        content.type,
-                        value,
-                        pullDown.type,
-                        "value"
-                      )
-                    }
-                    />               
+                      search_element_type={pullDown.lp_element_search_mode}
+                      search_element_value={pullDown.lp_element_search_value}
+                      disabled={disabled}
+                      pullDown={pullDown}
+                      data={getLPOptionData(pullDown.lp_element_search_value)}
+                      onChange={(value) =>
+                        onChangeValue(
+                          indexContent,
+                          content.type,
+                          value,
+                          pullDown.type,
+                          "value"
+                        )
+                      }
+                    />
                   )}
                   {pullDown.type === "up_to_municipality" && (
                     <div>
@@ -11613,128 +11599,128 @@ const UserMessage = ({
                           </div>
                         </div>
                       )}
-                    {cardPaymentRadioButton.is_hide_card_name === false && (
-                      cardPaymentRadioButton.separate_name === false ?
-                        <div className="ss-user-setting__item-bottom">
-                          <InputCustom
-                            className="ss-user-setting-input-overview"
-                            styleLabel={{ width: "100%" }}
-                            label="カード名義"
-                            inline={false}
-                            disabled={disabled}
-                            value={cardPaymentRadioButton.card_holder}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                "card_holder"
-                              )
-                            }
-                            placeholder={
-                              cardPaymentRadioButton.card_holder_placeholder
-                            }
-                          />
-                        </div> :
-                        <>
-                        <div style={{ width: "100%" }}>カード名義</div>
-
-                        
-                        <div className="ss-user-setting__item-bottom">
-                          <div style={{ display: 'flex', width: '100%', gap: '10px' }}>
-                            <InputCustom
-                              className="ss-user-setting-input-overview"
-                              inline={false}
-                              disabled={disabled}
-                              value={cardPaymentRadioButton.card_holder1}
-                              onChange={(value) =>
-                                onChangeValue(
-                                  indexContent,
-                                  content.type,
-                                  value,
-                                  "card_holder1"
-                                )
-                              }
-                              placeholder={cardPaymentRadioButton.card_holder_placeholder1}
-                            />
+                      {cardPaymentRadioButton.is_hide_card_name === false && (
+                        cardPaymentRadioButton.separate_name === false ?
+                          <div className="ss-user-setting__item-bottom">
                             <InputCustom
                               className="ss-user-setting-input-overview"
                               styleLabel={{ width: "100%" }}
+                              label="カード名義"
                               inline={false}
                               disabled={disabled}
-                              value={cardPaymentRadioButton.card_holder2}
+                              value={cardPaymentRadioButton.card_holder}
                               onChange={(value) =>
                                 onChangeValue(
                                   indexContent,
                                   content.type,
                                   value,
-                                  "card_holder2"
+                                  "card_holder"
                                 )
                               }
-                              placeholder={cardPaymentRadioButton.card_holder_placeholder2}
+                              placeholder={
+                                cardPaymentRadioButton.card_holder_placeholder
+                              }
+                            />
+                          </div> :
+                          <>
+                            <div style={{ width: "100%" }}>カード名義</div>
+
+
+                            <div className="ss-user-setting__item-bottom">
+                              <div style={{ display: 'flex', width: '100%', gap: '10px' }}>
+                                <InputCustom
+                                  className="ss-user-setting-input-overview"
+                                  inline={false}
+                                  disabled={disabled}
+                                  value={cardPaymentRadioButton.card_holder1}
+                                  onChange={(value) =>
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      value,
+                                      "card_holder1"
+                                    )
+                                  }
+                                  placeholder={cardPaymentRadioButton.card_holder_placeholder1}
+                                />
+                                <InputCustom
+                                  className="ss-user-setting-input-overview"
+                                  styleLabel={{ width: "100%" }}
+                                  inline={false}
+                                  disabled={disabled}
+                                  value={cardPaymentRadioButton.card_holder2}
+                                  onChange={(value) =>
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      value,
+                                      "card_holder2"
+                                    )
+                                  }
+                                  placeholder={cardPaymentRadioButton.card_holder_placeholder2}
+                                />
+                              </div>
+                            </div>
+                          </>
+                      )}
+                      {Array.isArray(cardPaymentRadioButton.is_use_installment) &&
+                        cardPaymentRadioButton.is_use_installment.length > 0 && (
+                          cardPaymentRadioButton.is_use_installment
+                            .filter(installmentValue => installmentValue === cardPaymentRadioButton.initial_selection)
+                            .map((installmentValue, index) => (
+                              <div className="ss-user-setting__item-bottom" key={index} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                <div style={{ width: '100%' }}>お支払い回数</div>
+                                <SelectCustom
+                                  style={{ width: '33%', textAlign: 'left' }}
+                                  value={cardPaymentRadioButton.installment}
+                                  disabled={disabled}
+                                  placeholder={"--"}
+                                  data={installmentOptions}
+                                  onChange={value => onChangeValue(indexContent, content.type, value, 'installment')}
+                                />
+                              </div>
+                            ))
+                        )}
+                      <div className="ss-user-setting__item-bottom">
+                        <div style={{ width: "100%" }}>有効期限</div>
+                        {cardPaymentRadioButton.type_date_of_expiry === "ym" && (
+                          <div style={{ display: "flex", width: "100%" }}>
+                            <SelectCustom
+                              style={{ width: "33%" }}
+                              value={cardPaymentRadioButton.year}
+                              disabled={disabled}
+                              placeholder={"年"}
+                              data={dataYearFixed.filter(
+                                (item) =>
+                                  item.key >= new Date().getFullYear() &&
+                                  item.key <= new Date().getFullYear() + 10
+                              )}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "year"
+                                )
+                              }
+                            />
+                            <SelectCustom
+                              style={{ width: "33%", marginLeft: "10px" }}
+                              value={cardPaymentRadioButton.month}
+                              placeholder={"月"}
+                              data={dataMonth}
+                              disabled={disabled}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "month"
+                                )
+                              }
                             />
                           </div>
-                        </div>
-                        </>
-                    )}
-                    {Array.isArray(cardPaymentRadioButton.is_use_installment) &&
-                      cardPaymentRadioButton.is_use_installment.length > 0 && (
-                        cardPaymentRadioButton.is_use_installment
-                          .filter(installmentValue => installmentValue === cardPaymentRadioButton.initial_selection)
-                          .map((installmentValue, index) => (
-                            <div className="ss-user-setting__item-bottom" key={index} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
-                              <div style={{ width: '100%' }}>お支払い回数</div>
-                              <SelectCustom
-                                style={{ width: '33%', textAlign: 'left' }}
-                                value={cardPaymentRadioButton.installment}
-                                disabled={disabled}
-                                placeholder={"--"}
-                                data={installmentOptions}
-                                onChange={value => onChangeValue(indexContent, content.type, value, 'installment')}
-                              />
-                            </div>
-                          ))
-                      )}
-                    <div className="ss-user-setting__item-bottom">
-                      <div style={{ width: "100%" }}>有効期限</div>
-                      {cardPaymentRadioButton.type_date_of_expiry === "ym" && (
-                        <div style={{ display: "flex", width: "100%" }}>
-                          <SelectCustom
-                            style={{ width: "33%" }}
-                            value={cardPaymentRadioButton.year}
-                            disabled={disabled}
-                            placeholder={"年"}
-                            data={dataYearFixed.filter(
-                              (item) =>
-                                item.key >= new Date().getFullYear() &&
-                                item.key <= new Date().getFullYear() + 10
-                            )}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                "year"
-                              )
-                            }
-                          />
-                          <SelectCustom
-                            style={{ width: "33%", marginLeft: "10px" }}
-                            value={cardPaymentRadioButton.month}
-                            placeholder={"月"}
-                            data={dataMonth}
-                            disabled={disabled}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                "month"
-                              )
-                            }
-                          />
-                        </div>
-                      )}
+                        )}
                         {cardPaymentRadioButton.type_date_of_expiry === "my" && (
                           <div style={{ display: "flex", width: "100%" }}>
                             <SelectCustom
@@ -11822,27 +11808,27 @@ const UserMessage = ({
             {/* user: type = 'button_submit' */}
             {content.type === 'button_submit' &&
               <>
-              {buttonSubmit.is_display_error_message && errorMessageSubmit.length > 0 && (
+                {buttonSubmit.is_display_error_message && confirmErrorMessage.length > 0 && (
+                  <div className="ss-user-setting__item-text_input-top">
+                    <div
+                      style={{
+                        width: "95%",
+                        padding: "5px",
+                        border: "1px solid #f44336",
+                        backgroundColor: "#ffebee",
+                        color: "#d32f2f",
+                        borderRadius: "5px",
+                        fontFamily: "Arial, sans-serif",
+                        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+                        margin: "10px",
+                      }}
+                      id="error-message"
+                      dangerouslySetInnerHTML={{ __html: confirmErrorMessage }}
+                    />
+                  </div>
+                )}
                 <div className="ss-user-setting__item-text_input-top">
-                  <div
-                    style={{
-                      width: "95%",
-                      padding: "5px",
-                      border: "1px solid #f44336",
-                      backgroundColor: "#ffebee",
-                      color: "#d32f2f",
-                      borderRadius: "5px",
-                      fontFamily: "Arial, sans-serif",
-                      boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
-                      margin: "10px",
-                    }}
-                    id="error-message"
-                    dangerouslySetInnerHTML={{ __html: errorMessageSubmit }}
-                  />
-                </div>
-              )}
-              <div className="ss-user-setting__item-text_input-top">
-                <button
+                  <button
                     style={{
                       background: "linear-gradient(135deg, #4caf50, #43a047)",
                       color: "#fff",
@@ -11875,7 +11861,7 @@ const UserMessage = ({
                       e.target.style.transform = "translateY(-2px)";
                       e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
                     }}
-                    onClick={() => {                     
+                    onClick={() => {
                       window.parent.postMessage({
                         isOpen: true,
                         widthPc: 450,
@@ -11888,8 +11874,8 @@ const UserMessage = ({
                         id_value: content.button_submit_id
                       }, '*');
 
-                     }
-                  }
+                    }
+                    }
                   >
                     {content.button_submit_name}
                   </button>
