@@ -180,7 +180,7 @@ let params = new URLSearchParams(url.search);
 let isLoggedIn = params.get('isLoggedIn')
 function Preview() {
   const containerRef = useRef(null);
-  const [confirmErrorMessage, setConfirmErrorMessage] = useState('');
+  const [confirmErrorMessage, setConfirmErrorMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [urlSend, setUrlSend] = useState();
   const [urlReceive, setUrlReceive] = useState();
@@ -355,11 +355,15 @@ function Preview() {
       "message",
       (event) => {
         if (event.data === 'openPreview' && isOpen !== true) {
-          onOpenPreview(true)
+          onOpenPreview(true) 
         }
         if (event.data.text != undefined && event.data.text.trim().length > 0) {
-          if (isDisplayErrorMessage) {          
+          if (isDisplayErrorMessage) { 
             setConfirmErrorMessage(event.data.text);
+            if(!isOpen)
+            {
+              document.querySelector('.sp-header-right-arrow').click();
+            }
             return;
           }
         }
@@ -614,8 +618,9 @@ function Preview() {
 
                 }
               }
-              if (isDisplayErrorMessage == true && confirmErrorMessage.length > 0) {
-                res.data.design_settings.display_type = 1;
+              if (isDisplayErrorMessage == true && confirmErrorMessage != '') {
+                setDisplayType(1);
+                res.data.design_settings.display_type = displayType;
               }
             }
             if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
@@ -2900,7 +2905,25 @@ function Preview() {
   }
 
   const onClickNext = async (indexMessage, message) => {
+    if (confirmErrorMessage.length > 0) {
+      try {
 
+        var dataMessageInLocalStorage = getMessagesSessionStorage();
+        if (dataMessageInLocalStorage) {
+          setRenderMessageArr(dataMessageInLocalStorage)
+          const filteredMessages = dataMessageInLocalStorage.filter(x => x.belongto === 'user' && x.hidden !== true);
+          filteredMessages = filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
+          setMessageUser(filteredMessages)
+          setIndexUser(filteredMessages.length)
+          setIsOpen(true)
+        }
+      }
+      catch {
+
+      }
+      scrollToBottom();
+      return;
+    }
     let indexClickLocation = indexMessageRender
     for (let i = 0; i < dataMessages.length; i++) {
       if (dataMessages[i]?.id === message?.id) {
