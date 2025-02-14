@@ -6,8 +6,6 @@ const LPIntegrationOptionPullDown = ({
   search_element_value,
   disabled,
   pullDown,
-  indexContent,
-  content,
   onChange,
   data
 }) => {
