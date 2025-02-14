@@ -1193,6 +1193,7 @@ function Preview() {
                 if (dataMessageInLocalStorage) {
                   setRenderMessageArr(dataMessageInLocalStorage)
                   const filteredMessages = dataMessageInLocalStorage.filter(x => x.belongto === 'user' && x.hidden!==true);
+                  filteredMessages = filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
                   setMessageUser(filteredMessages)
                   setIndexUser(filteredMessages.length)
                   setIsOpen(true)
