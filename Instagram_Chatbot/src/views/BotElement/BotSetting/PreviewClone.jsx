@@ -7242,12 +7242,12 @@ const UserMessage = ({
                             disabled={disabled}
                             type="radio"
                             id="ss-message__content--user-radio_button"
-                            checked={radioButton.initial_selection === item.id}
+                            checked={radioButton.initial_selection === item.value}
                             onChange={() => {
                               onChangeValue(
                                 indexContent,
                                 content.type,
-                                item.id,
+                                item.value,
                                 "initial_selection"
                               );
                               if (messageContent.length === 1) onClickNext();
@@ -7273,12 +7273,12 @@ const UserMessage = ({
                             type="radio"
                             name="ss-message__content--user-radio_button--radio_button_img"
                             id="ss-message__content--user-radio_button--radio_button_img"
-                            checked={radioButton.initial_selection === item.id}
+                            checked={radioButton.initial_selection === item.value}
                             onChange={() => {
                               onChangeValue(
                                 indexContent,
                                 content.type,
-                                item.id,
+                                item.value,
                                 "initial_selection"
                               );
                               if (messageContent.length === 1) onClickNext();
@@ -7331,10 +7331,10 @@ const UserMessage = ({
                               marginBottom: "10px",
                               cursor: "pointer",
                               backgroundColor: radioButton.value
-                                ? radioButton.value === item.id
+                                ? radioButton.value === item.value
                                   ? "#347AED"
                                   : ""
-                                : radioButton.initial_selection === item.id
+                                : radioButton.initial_selection === item.value
                                   ? "#347AED"
                                   : "",
                             }}
@@ -7344,7 +7344,7 @@ const UserMessage = ({
                               onChangeValue(
                                 indexContent,
                                 content.type,
-                                item.id,
+                                item.value,
                                 "initial_selection"
                               );
                               if (messageContent.length === 1) onClickNext();
