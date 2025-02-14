@@ -4322,6 +4322,9 @@ function Preview() {
     });
   };
 
+  const userMessageArray = renderMessageArr.filter(x => x.belong_to === 'user');
+  let userIndexMessage = 0;
+
   ///body container
   if (scenarioId && botInfor && isOpen) {
     return (
@@ -4928,7 +4931,8 @@ function Preview() {
           style={{ backgroundColor: botInfor?.opacity_color, flex: 1 }}
         >
           {renderMessageArr.map((message, indexMessage) => {
-            return (
+            if (message.belong_to === "user") userIndexMessage++;
+            return (            
               <React.Fragment key={indexMessage}>
                 {message.belong_to === "bot" && Array.isArray(message?.message_content) &&
                   message?.message_content.map((content, index) => {
@@ -7226,12 +7230,12 @@ const UserMessage = ({
                             disabled={disabled}
                             type="radio"
                             id="ss-message__content--user-radio_button"
-                            checked={radioButton.initial_selection === item.id}
+                            checked={radioButton.initial_selection === item.value}
                             onChange={() => {
                               onChangeValue(
                                 indexContent,
                                 content.type,
-                                item.id,
+                                item.value,
                                 "initial_selection"
                               );
                               if (messageContent.length === 1) onClickNext();
@@ -7257,12 +7261,12 @@ const UserMessage = ({
                             type="radio"
                             name="ss-message__content--user-radio_button--radio_button_img"
                             id="ss-message__content--user-radio_button--radio_button_img"
-                            checked={radioButton.initial_selection === item.id}
+                            checked={radioButton.initial_selection === item.value}
                             onChange={() => {
                               onChangeValue(
                                 indexContent,
                                 content.type,
-                                item.id,
+                                item.value,
                                 "initial_selection"
                               );
                               if (messageContent.length === 1) onClickNext();
@@ -7315,10 +7319,10 @@ const UserMessage = ({
                               marginBottom: "10px",
                               cursor: "pointer",
                               backgroundColor: radioButton.value
-                                ? radioButton.value === item.id
+                                ? radioButton.value === item.value
                                   ? "#347AED"
                                   : ""
-                                : radioButton.initial_selection === item.id
+                                : radioButton.initial_selection === item.value
                                   ? "#347AED"
                                   : "",
                             }}
@@ -7328,7 +7332,7 @@ const UserMessage = ({
                               onChangeValue(
                                 indexContent,
                                 content.type,
-                                item.id,
+                                item.value,
                                 "initial_selection"
                               );
                               if (messageContent.length === 1) onClickNext();
