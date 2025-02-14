@@ -4337,6 +4337,8 @@ function Preview() {
   };
 
   const userMessageArray = renderMessageArr.filter(x => x.belong_to === 'user');
+  let userIndexMessage = 0;
+
   ///body container
   if (scenarioId && botInfor && isOpen) {
     return (
@@ -4943,6 +4945,7 @@ function Preview() {
           style={{ backgroundColor: botInfor?.opacity_color, flex: 1 }}
         >
           {renderMessageArr.map((message, indexMessage) => {
+            if (message.belong_to === "user") userIndexMessage++;
             return (            
               <React.Fragment key={indexMessage}>
                 {message.belong_to === "bot" && Array.isArray(message?.message_content) &&
@@ -5027,7 +5030,7 @@ function Preview() {
                             {message.buttonName || (
                               errorMessageSubmit.length > 0
                                 ? "更新"
-                                : (indexMessage >= userMessageArray.length ? "次へ" : "更新")
+                                : (userIndexMessage >= userMessageArray.length ? "次へ" : "更新")
                             )}
                           </CustomButton>
                         </div>
