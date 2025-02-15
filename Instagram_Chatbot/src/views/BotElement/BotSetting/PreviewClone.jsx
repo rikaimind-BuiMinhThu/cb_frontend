@@ -1166,19 +1166,20 @@ function Preview() {
             // setIndexMessageRender(index);
             // setRenderMessageArr(renderMessage);
             try {      
-              if (isDisplayErrorMessage==true && errorMessageSubmit.trim().length>0) {
+              if (isDisplayErrorMessage == true && errorMessageSubmit.trim().length > 0) {
                 var dataMessageInLocalStorage = getMessagesSessionStorage();
                 if (dataMessageInLocalStorage) {
-
-                  setRenderMessageArr(dataMessageInLocalStorage.filter(x => x.hidden!==true));
-                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden!==true);                             
-                  if(isLoggedIn=="true")
-                  {
-                  filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);      
-                  setRenderMessageArr(dataMessageInLocalStorage.filter(x => x.hidden!==true && !x.not_display_when_logged_in));
+                  let dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true)
+                  setRenderMessageArr(dataMesage);
+                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
+                  if (isLoggedIn == "true") {
+                    dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
+                    filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
+                    setRenderMessageArr(dataMesage);
                   }
+                  setIndexMessageRender(dataMesage.length - 1);
                   setMessageUser(filteredMessages)
-                  setIndexUser(filteredMessages.length) 
+                  setIndexUser(filteredMessages.length)
                   setIsOpen(true)
                 }
               }
