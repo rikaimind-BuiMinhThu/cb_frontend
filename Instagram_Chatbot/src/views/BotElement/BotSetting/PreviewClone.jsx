@@ -359,7 +359,7 @@ function Preview() {
         }
         if (event.data.text != undefined && event.data.text.trim().length > 0) {
           if (isDisplayErrorMessage) {
-            errorMessageSubmit = event.data.text;
+            errorMessageSubmit = event.data.text;           
            
           }
           else {
@@ -1170,8 +1170,8 @@ function Preview() {
                 var dataMessageInLocalStorage = getMessagesSessionStorage();
                 if (dataMessageInLocalStorage) {
                   setRenderMessageArr(dataMessageInLocalStorage)
-                  const filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden!==true);
-                  filteredMessages = filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
+                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden!==true);
+                  filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
                   setMessageUser(filteredMessages)
                   setIndexUser(filteredMessages.length)
                   setIsOpen(true)
