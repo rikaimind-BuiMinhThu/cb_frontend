@@ -1169,11 +1169,16 @@ function Preview() {
               if (isDisplayErrorMessage==true && errorMessageSubmit.trim().length>0) {
                 var dataMessageInLocalStorage = getMessagesSessionStorage();
                 if (dataMessageInLocalStorage) {
-                  setRenderMessageArr(dataMessageInLocalStorage)
-                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden!==true);
-                  filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
+
+                  setRenderMessageArr(dataMessageInLocalStorage.filter(x => x.hidden!==true));
+                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden!==true);                             
+                  if(isLoggedIn=="true")
+                  {
+                  filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);      
+                  setRenderMessageArr(dataMessageInLocalStorage.filter(x => x.hidden!==true && !x.not_display_when_logged_in));
+                  }
                   setMessageUser(filteredMessages)
-                  setIndexUser(filteredMessages.length)
+                  setIndexUser(filteredMessages.length) 
                   setIsOpen(true)
                 }
               }
