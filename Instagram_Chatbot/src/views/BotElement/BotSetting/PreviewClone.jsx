@@ -48,7 +48,7 @@ import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-wh
 
 const _ = require("lodash");
 sessionStorage.setItem("prevOpenStatus", "0");
-let errorMessageSubmit='';
+let errorMessageSubmit = '';
 let previewOrderInfor = {};
 let isDisplayOrderPreview = false;
 let previewContent = ``
@@ -359,8 +359,8 @@ function Preview() {
         }
         if (event.data.text != undefined && event.data.text.trim().length > 0) {
           if (isDisplayErrorMessage) {
-            errorMessageSubmit = event.data.text;           
-           
+            errorMessageSubmit = event.data.text;
+
           }
           else {
             errorMessageSubmit = '';
@@ -534,6 +534,23 @@ function Preview() {
     }
   }
 
+  function findFirstConfirmMessageObject(dataList) {
+    let result = null;
+
+    for (const data of dataList) {
+      if (data.message_content) {
+        for (const item of data.message_content) {
+          if (item.text_input && item.text_input.use_for_confirm_message === true) {
+            result = data;
+            return result;
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
   function lightenColor(hex, opacity) {
     let r = parseInt(hex.slice(1, 3), 16);
     let g = parseInt(hex.slice(3, 5), 16);
@@ -617,10 +634,9 @@ function Preview() {
 
                 }
               }
-              if(errorMessageSubmit.trim().length>0 && isDisplayErrorMessage==true)
-                {
-                  res.data.design_settings.display_type = 1;
-                }   
+              if (errorMessageSubmit.trim().length > 0 && isDisplayErrorMessage == true) {
+                res.data.design_settings.display_type = 1;
+              }
             }
             if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
               sessionStorage.setItem("prevOpenStatus", "1");
@@ -1165,11 +1181,16 @@ function Preview() {
             }
             // setIndexMessageRender(index);
             // setRenderMessageArr(renderMessage);
-            try {      
+            try {
               if (isDisplayErrorMessage == true && errorMessageSubmit.trim().length > 0) {
                 var dataMessageInLocalStorage = getMessagesSessionStorage();
                 if (dataMessageInLocalStorage) {
                   let dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true)
+                  dataMesage.forEach(data => {
+                    if (Array.isArray(data.message_content)) {
+                      data.message_content = data.message_content.filter(item => item.type !== "delay");
+                    }
+                  });
                   setRenderMessageArr(dataMesage);
                   let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
                   if (isLoggedIn == "true") {
@@ -1177,15 +1198,21 @@ function Preview() {
                     filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
                     setRenderMessageArr(dataMesage);
                   }
+                  let confirmObject = findFirstConfirmMessageObject(dataMesage);
                   setIndexMessageRender(dataMesage.length - 1);
                   setMessageUser(filteredMessages)
                   setIndexUser(filteredMessages.length)
                   setIsOpen(true)
+                  if (confirmObject) {
+                    setTimeout(() => {
+                      document.querySelector('button[messsagetype="text_input"]').click();
+                    }, 3000);
+                  }
                 }
               }
             }
             catch {
-        
+
             }
             scrollToBottom();
           }
