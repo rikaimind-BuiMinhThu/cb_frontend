@@ -48,6 +48,7 @@ import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-wh
 
 const _ = require("lodash");
 sessionStorage.setItem("prevOpenStatus", "0");
+let errorMessageSubmit='';
 let previewOrderInfor = {};
 let isDisplayOrderPreview = false;
 let previewContent = ``
@@ -180,7 +181,6 @@ let params = new URLSearchParams(url.search);
 let isLoggedIn = params.get('isLoggedIn')
 function Preview() {
   const containerRef = useRef(null);
-  const [confirmErrorMessage, setConfirmErrorMessage] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [urlSend, setUrlSend] = useState();
   const [urlReceive, setUrlReceive] = useState();
@@ -355,16 +355,15 @@ function Preview() {
       "message",
       (event) => {
         if (event.data === 'openPreview' && isOpen !== true) {
-          onOpenPreview(true) 
+          onOpenPreview(true)
         }
         if (event.data.text != undefined && event.data.text.trim().length > 0) {
-          if (isDisplayErrorMessage) { 
-            setConfirmErrorMessage(event.data.text);
-            if(!isOpen)
-            {
-              document.querySelector('.sp-header-right-arrow').click();
-            }
-            return;
+          if (isDisplayErrorMessage) {
+            errorMessageSubmit = event.data.text;
+           
+          }
+          else {
+            errorMessageSubmit = '';
           }
         }
 
@@ -618,10 +617,10 @@ function Preview() {
 
                 }
               }
-              if (isDisplayErrorMessage == true && confirmErrorMessage != '') {
-                setDisplayType(1);
-                res.data.design_settings.display_type = displayType;
-              }
+              if(errorMessageSubmit.trim().length>0 && isDisplayErrorMessage==true)
+                {
+                  res.data.design_settings.display_type = 1;
+                }   
             }
             if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
               sessionStorage.setItem("prevOpenStatus", "1");
@@ -1166,12 +1165,12 @@ function Preview() {
             }
             // setIndexMessageRender(index);
             // setRenderMessageArr(renderMessage);
-            try {
-              if (isDisplayErrorMessage == true && confirmErrorMessage.trim().length > 0) {
+            try {      
+              if (isDisplayErrorMessage==true && errorMessageSubmit.trim().length>0) {
                 var dataMessageInLocalStorage = getMessagesSessionStorage();
                 if (dataMessageInLocalStorage) {
                   setRenderMessageArr(dataMessageInLocalStorage)
-                  const filteredMessages = dataMessageInLocalStorage.filter(x => x.belongto === 'user' && x.hidden !== true);
+                  const filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden!==true);
                   filteredMessages = filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
                   setMessageUser(filteredMessages)
                   setIndexUser(filteredMessages.length)
@@ -1180,7 +1179,7 @@ function Preview() {
               }
             }
             catch {
-
+        
             }
             scrollToBottom();
           }
@@ -2905,25 +2904,6 @@ function Preview() {
   }
 
   const onClickNext = async (indexMessage, message) => {
-    if (confirmErrorMessage.length > 0) {
-      try {
-
-        var dataMessageInLocalStorage = getMessagesSessionStorage();
-        if (dataMessageInLocalStorage) {
-          setRenderMessageArr(dataMessageInLocalStorage)
-          const filteredMessages = dataMessageInLocalStorage.filter(x => x.belongto === 'user' && x.hidden !== true);
-          filteredMessages = filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
-          setMessageUser(filteredMessages)
-          setIndexUser(filteredMessages.length)
-          setIsOpen(true)
-        }
-      }
-      catch {
-
-      }
-      scrollToBottom();
-      return;
-    }
     let indexClickLocation = indexMessageRender
     for (let i = 0; i < dataMessages.length; i++) {
       if (dataMessages[i]?.id === message?.id) {
@@ -2952,7 +2932,7 @@ function Preview() {
       return;
     }
     let renderMessage = [...renderMessageArr];
-    if (confirmErrorMessage.length > 0) {
+    if (errorMessageSubmit.length > 0) {
       renderMessageArr[indexMessage].disabled = false;
     }
     else {
@@ -3067,7 +3047,7 @@ function Preview() {
       }
 
       for (let i = 0; i < renderMessage.length; i++) {
-        if (confirmErrorMessage.length > 0) {
+        if (errorMessageSubmit.length > 0) {
           renderMessage[i].disabled = false;
         }
         else {
@@ -4932,7 +4912,7 @@ function Preview() {
         >
           {renderMessageArr.map((message, indexMessage) => {
             if (message.belong_to === "user") userIndexMessage++;
-            return (            
+            return (
               <React.Fragment key={indexMessage}>
                 {message.belong_to === "bot" && Array.isArray(message?.message_content) &&
                   message?.message_content.map((content, index) => {
@@ -4959,7 +4939,7 @@ function Preview() {
                         <UserMessage
                           captcha={captcha}
                           messageContentProps={message?.message_content}
-                          disabled={confirmErrorMessage.length > 0 ? false : message.disabled}
+                          disabled={errorMessageSubmit.length > 0 ? false : message.disabled}
                           onChangeValue={(
                             indexContent,
                             contentType,
@@ -4999,23 +4979,23 @@ function Preview() {
                           }
                           variables={variables}
                           lpOptionData={lpOptionData}
-                          confirmErrorMessage={confirmErrorMessage}
+                          errorMessageSubmit={errorMessageSubmit}
                         />
                         {message.message_content[0]?.type !== "button_submit" && (
                           <div className="sp-user-message-button-action">
                             <CustomButton
-                              disabled={confirmErrorMessage.length > 0 ? false : message.disabled}
+                              disabled={errorMessageSubmit.length > 0 ? false : message.disabled}
                               style={{
                                 backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
                                 borderRadius: "25px",
                               }}
                               className="ss-user-message__action-btn"
                               onClick={() => onClickNext(indexMessage, message)}
-                              autoClick={confirmErrorMessage.trim().length > 0 ? true : false}
+                              autoClick={errorMessageSubmit.trim().length > 0 ? true : false}
                               messsagetype={message.message_content[0]?.type}
                             >
                               {message.buttonName || (
-                                confirmErrorMessage.length > 0
+                                errorMessageSubmit.length > 0
                                   ? "更新"
                                   : (indexMessage >= indexMessageRender ? "次へ" : "更新")
                               )}
@@ -5465,7 +5445,7 @@ const UserMessage = ({
   dataPrefectures,
   variables,
   lpOptionData = {},
-  confirmErrorMessage = ''
+  errorMessageSubmit = ''
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -11808,7 +11788,7 @@ const UserMessage = ({
             {/* user: type = 'button_submit' */}
             {content.type === 'button_submit' &&
               <>
-                {buttonSubmit.is_display_error_message && confirmErrorMessage.length > 0 && (
+                {buttonSubmit.is_display_error_message && errorMessageSubmit.length > 0 && (
                   <div className="ss-user-setting__item-text_input-top">
                     <div
                       style={{
@@ -11823,7 +11803,7 @@ const UserMessage = ({
                         margin: "10px",
                       }}
                       id="error-message"
-                      dangerouslySetInnerHTML={{ __html: confirmErrorMessage }}
+                      dangerouslySetInnerHTML={{ __html: errorMessageSubmit }}
                     />
                   </div>
                 )}
