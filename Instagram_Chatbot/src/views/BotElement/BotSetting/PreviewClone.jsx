@@ -1198,16 +1198,21 @@ function Preview() {
                     filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
                     setRenderMessageArr(dataMesage);
                   }
-                  let confirmObject = findFirstConfirmMessageObject(dataMesage);
                   setIndexMessageRender(dataMesage.length - 1);
                   setMessageUser(filteredMessages)
                   setIndexUser(filteredMessages.length)
                   setIsOpen(true)
-                  if (confirmObject) {
-                    setTimeout(() => {
-                      document.querySelector('button[messsagetype="text_input"]').click();
-                    }, 3000);
-                  }
+                  setTimeout(() => {
+                    const button = document.querySelector('button[messsagetype="text_input"]');
+                    if (button) {
+                      button.dispatchEvent(new MouseEvent("click", {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window
+                      }));
+                    }
+                  }, 3000);
+
                 }
               }
             }
@@ -4957,6 +4962,7 @@ function Preview() {
                         index={index}
                         botInfor={botInfor}
                         checkoutUrl={checkoutUrl}
+                        previewOrder={previewContent}
                       />
                     );
                   })}
