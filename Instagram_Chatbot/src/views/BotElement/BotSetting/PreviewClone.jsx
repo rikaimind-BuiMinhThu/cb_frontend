@@ -1203,9 +1203,10 @@ function Preview() {
                   setIndexUser(filteredMessages.length)
                   setIsOpen(true)
                   setTimeout(() => {
-                    const button = document.querySelector('button[messsagetype="text_input"]');
-                    if (button) {
-                      button.dispatchEvent(new MouseEvent("click", {
+                    const buttons = document.querySelectorAll('button.ss-user-message__action-btn.btn.btn-secondary');
+                    if (buttons.length > 0) {
+                      const lastButton = buttons[buttons.length - 1];
+                      lastButton.dispatchEvent(new MouseEvent("click", {
                         bubbles: true,
                         cancelable: true,
                         view: window
