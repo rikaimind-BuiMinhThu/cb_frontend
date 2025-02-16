@@ -1212,7 +1212,7 @@ function Preview() {
                         view: window
                       }));
                     }
-                  }, 3000);
+                  }, 8000);
 
                 }
               }
