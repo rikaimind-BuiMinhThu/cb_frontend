@@ -42,7 +42,7 @@ const SelectCustom = ({ id, allowClear = true, data, value, onChange, keyValue =
         optionFilterProp="children"
       >
         {
-          data && data.map((item, index) => {
+          data && data.map((item, index) => {            
             return (item[keyValue] || item[nameValue]) && <Option key={index} value={item[keyValue]}>{item[nameValue]}</Option>
           })
         }

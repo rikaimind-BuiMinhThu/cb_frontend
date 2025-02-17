@@ -11,11 +11,13 @@ let displayErrorMessage = {
   searchValue: ""
 
 }
-let head = document.getElementsByTagName("head")[0];
-let script = document.createElement("script");
-script.type = "text/javascript";
-script.src = "https://code.jquery.com/jquery-3.6.0.min.js";
-head.appendChild(script);
+if (typeof window.jQuery === 'undefined') {
+  let head = document.getElementsByTagName("head")[0];
+  let script = document.createElement("script");
+  script.type = "text/javascript";
+  script.src = "https://code.jquery.com/jquery-3.6.0.min.js";
+  head.appendChild(script);
+}
 
 function getEnvironment() {
   const params = new Proxy(new URLSearchParams(window.location.search), {
@@ -162,15 +164,17 @@ async function displayPopup() {
       if (e.data.getErrorMessage) {
         processErrorMessage(e.data.getErrorMessage)
       }
-      if (e.data.actionSDK) {
-        if (e.data.actionSDK.searchAddress != undefined && e.data.actionSDK.searchMode != undefined) {
-          const selectElement = getElementByAddress(e.data.actionSDK.searchMode, e.data.actionSDK.searchAddress)
+      if(e.data.actionSDK)
+      {
+        if(e.data.actionSDK.searchAddress!= undefined && e.data.actionSDK.searchMode!= undefined)
+        {
+          const selectElement = getElementByAddress(e.data.actionSDK.searchMode,e.data.actionSDK.searchAddress)
           const crawlOption = {
             search_value: e.data.actionSDK.searchAddress,
             search_mode: e.data.actionSDK.searchMode
           }
-          const crawJsonData = extractSelectOptions(selectElement, crawlOption);
-          sendMessageToChatbot(crawJsonData, "crawJsonObject")
+          const crawJsonData = extractSelectOptions(selectElement,crawlOption);
+          sendMessageToChatbot(crawJsonData,"crawJsonObject")
         }
 
       }
@@ -210,12 +214,12 @@ async function displayPopup() {
       if (e.data.action === 'clickButton') {
         var button = document.getElementById(e.data.id_value);
         if (button) {
-          button.click();
+          button.click();          
         }
       }
 
-      if (e.data.action === 'excuteJS') {
-        if (e.data.jscode && e.data.is_use_js == true) {
+      if (e.data.action === 'excuteJS') {       
+        if (e.data.jscode && e.data.is_use_js == true) {         
           const executeCode = new Function(e.data.jscode);
           executeCode();
         }
@@ -224,7 +228,7 @@ async function displayPopup() {
     false
   );
 
-  function extractSelectOptions(selectElement, crawlOption) {
+  function extractSelectOptions(selectElement,crawlOption) {
     if (!selectElement || selectElement.tagName !== "SELECT") return null;
     const options = Array.from(selectElement.options)
       .map((option, index) => ({
@@ -233,10 +237,9 @@ async function displayPopup() {
         value: option.innerText
       }));
 
-    return {
-      dates: options,
-      options: crawlOption
-    };
+    return { dates: options,
+              options:crawlOption
+     };
   }
 
   function processErrorMessage(obj) {
@@ -404,12 +407,13 @@ async function displayPopup() {
           }
         case 'checkbox':
           {
-            const elementToCheck = getElementByAddress(item.bindingMode, item.bindingAddress)
-            if (elementToCheck) {
-              elementToCheck.checked = item.bindingValue;
+            const elementToCheck = getElementByAddress(item.bindingMode,item.bindingAddress)
+            if (elementToCheck)
+            {
+              elementToCheck.checked=item.bindingValue;
               const changeEvent = new Event('change', { bubbles: true });
               elementToCheck.dispatchEvent(changeEvent);
-            }
+            }      
             break;
           }
 

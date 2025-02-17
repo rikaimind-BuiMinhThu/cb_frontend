@@ -547,7 +547,7 @@ function Sidebar(props) {
                 activeStyle={{ color: 'black' }}
               >
                 <MDBIcon fas icon="cogs" style={{ color: "black" }} />
-                <p style={{ color: 'black' }}>Plan Management</p>
+                <p style={{ color: 'black' }}>プラン管理</p>
               </NavLink>
             </li>
             <li

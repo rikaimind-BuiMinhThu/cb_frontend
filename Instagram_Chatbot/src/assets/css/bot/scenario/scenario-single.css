@@ -1061,7 +1061,15 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 /* user setting: bottom */
-.ss-user-setting__bottom {}
+.ss-user-setting__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 220px; 
+  overflow-y: auto;
+  overflow-x: hidden; 
+  box-sizing: border-box; 
+}
 
 .ss-user-setting__select-wrapper {
   display: flex;
@@ -1265,7 +1273,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 .ss-user-setting-double-input {
   display: flex;
   align-items: center;
-  width: 90%;
+  width: 100%;
 }
 
 .ss-user-setting-double-input input:first-child {
@@ -1293,7 +1301,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-setting__item-input-zip-code {
-  width: 75%;
+  width: 73%;
 }
 
 .ss-plus-circle-option-icon-times-custom {
@@ -1443,6 +1451,7 @@ input#ss-message__content--user-checkbox--checkbox_img {
   justify-content: center;
   align-items: center;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .ss-bot-setting-condition-keep-button {
@@ -1472,14 +1481,16 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-setting-condition-footer-button {
-  position: absolute;
-  bottom: 0;
+  position: relative;
   width: 97%;
+  display: flex;
+  flex-direction: column;
+  /* max-height: 220px;
+  overflow-y: auto; */
 }
 
 .ss-bot-setting-condition-contents {
   height: 212px;
-  overflow-y: auto;
 }
 
 .ss-bot-setting-condition-content-container {
@@ -1502,11 +1513,14 @@ input#ss-message__content--user-checkbox--checkbox_img {
 }
 
 .ss-user-setting-condition-container {
+  position: relative;
   margin-left: -10px;
   width: 103%;
   padding: 10px;
   border-top: 1px solid #E2E4E8;
   height: 20%;
+  display: 'block';
+  flex-direction: 'column';
 }
 
 .ss-user-setting-item-checkbox-button-drag {

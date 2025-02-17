@@ -1,14 +1,16 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, use } from "react";
 import "../../../assets/css/bot/preview-chat-bot.css";
 import api from "../../../api/api-management";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
 import SelectCustom from "./ScenarioSetting/scenarioComon/SelectCustom";
+import LPIntegrationOptionPullDown from "./ScenarioSetting/scenarioComon/LPIntegrationOptionPullDown";
 import CheckboxCustom from "./ScenarioSetting/scenarioComon/CheckboxCustom";
 import InputCustom from "./ScenarioSetting/scenarioComon/InputCustom";
 import { Button } from "reactstrap";
 import ModalNoti from "../../../views/Popup/ModalNoti";
 import ModalPreviewBot from '../../../views/Popup/ModalPreviewBot';
+import CustomButton from "./CustomButton";
 import {
   Checkbox,
   Radio,
@@ -16,9 +18,7 @@ import {
   Calendar,
   Row,
   Select,
-  Typography,
-  Col,
-  Input,
+  Col
 } from "antd";
 import moment from "moment";
 import cvcIcon from "../../../assets/img/cvc-icon.png";
@@ -45,11 +45,14 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { func } from "prop-types";
 
 const _ = require("lodash");
 sessionStorage.setItem("prevOpenStatus", "0");
-
+let errorMessageSubmit = '';
+let previewOrderInfor = {};
+let isDisplayOrderPreview = false;
+let previewContent = ``
+let isDisplayErrorMessage = false;
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
   if (i < 10) {
@@ -64,7 +67,6 @@ for (let i = 0; i <= 23; i++) {
     });
   }
 }
-
 let dataMinutes = [];
 for (let i = 0; i <= 59; i++) {
   if (i < 10) {
@@ -168,14 +170,17 @@ let dataPaymentMethod = [
   },
 ];
 
+const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
+  key: i + 2,
+  value: `${i + 2}`,
+}));
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
 
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
-
+let isLoggedIn = params.get('isLoggedIn')
 function Preview() {
   const containerRef = useRef(null);
-
   const [isOpen, setIsOpen] = useState(false);
   const [urlSend, setUrlSend] = useState();
   const [urlReceive, setUrlReceive] = useState();
@@ -225,9 +230,9 @@ function Preview() {
   const [activePopupCloseBot, setActivePopupCloseBot] = useState(true);
   const [titleBubble, setTitleBubble] = useState("");
   const [styleModal, setStyleModal] = useState({});
-
   const [scenarioUserResponses, setScenarioUserResponses] = useState([])
   const [checkoutUrl, setCheckoutUrl] = useState("")
+  const [lpOptionData, setLpOptionData] = useState({});
 
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
@@ -352,13 +357,36 @@ function Preview() {
         if (event.data === 'openPreview' && isOpen !== true) {
           onOpenPreview(true)
         }
+        if (event.data.text != undefined && event.data.text.trim().length > 0) {
+          if (isDisplayErrorMessage) {
+            errorMessageSubmit = event.data.text;
 
-        const { key, value } = event.data;
-        console.log(`Key: ${key}, Value: ${value}`);
+          }
+          else {
+            errorMessageSubmit = '';
+          }
+        }
+
+        if (event.data.objectSend != undefined) {
+          try {
+            previewOrderInfor = event.data.objectSend;
+            previewContent = event.data.objectSend;
+            isDisplayOrderPreview = true;
+          }
+          catch { }
+        }
+        if (event.data.crawJsonObject) {
+          let receiveOptionData = {};
+          receiveOptionData[event.data.crawJsonObject.options.search_value] = event.data.crawJsonObject.dates;
+          const newLpOptionData = Object.assign({}, lpOptionData, receiveOptionData)
+          setLpOptionData(newLpOptionData);
+          return;
+        }
       },
       false,
     );
   }, [])
+
 
   useEffect(() => {
     if (mobileCheck()) {
@@ -506,6 +534,23 @@ function Preview() {
     }
   }
 
+  function findFirstConfirmMessageObject(dataList) {
+    let result = null;
+
+    for (const data of dataList) {
+      if (data.message_content) {
+        for (const item of data.message_content) {
+          if (item.text_input && item.text_input.use_for_confirm_message === true) {
+            result = data;
+            return result;
+          }
+        }
+      }
+    }
+
+    return result;
+  }
+
   function lightenColor(hex, opacity) {
     let r = parseInt(hex.slice(1, 3), 16);
     let g = parseInt(hex.slice(3, 5), 16);
@@ -557,6 +602,42 @@ function Preview() {
         )
         .then(async (res) => {
           if (res.data.code == 1) {
+            var listMessage = res.data.data.conversation.messages
+            if (listMessage.length > 0) {
+              for (const item of listMessage) {
+                if (item?.message_content) {
+                  for (const itemTwo of item.message_content) {
+                    if (itemTwo.type == "button_submit") {
+                      const errorObject = {
+                        isDisplay: itemTwo.button_submit.is_display_error_message,
+                        seachMode: itemTwo.error_message_display_element_search_type,
+                        searchValue: itemTwo.error_message_display_element_search_value,
+                      };
+                      isDisplayErrorMessage = itemTwo.button_submit.is_display_error_message;
+                      window.parent.postMessage(
+                        {
+                          isOpen: true,
+                          widthPc: widthPc,
+                          heightPc: heightPc,
+                          widthSp: widthSp,
+                          heightSp: heightSp,
+                          chatbotRight: rightMarginPc,
+                          chatbotBottom: bottomMarginPc,
+                          fukushashikiResponse: undefined,
+                          getErrorMessage: errorObject,
+                        },
+                        '*'
+                      );
+                      break;
+                    }
+                  }
+
+                }
+              }
+              if (errorMessageSubmit.trim().length > 0 && isDisplayErrorMessage == true) {
+                res.data.design_settings.display_type = 1;
+              }
+            }
             if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
               sessionStorage.setItem("prevOpenStatus", "1");
               const openChatbotCountApiParams = {
@@ -571,12 +652,13 @@ function Preview() {
             let messageArr = [];
             if (res.data.data?.conversation?.messages?.length > 0) {
               messageArr = [...res.data.data?.conversation?.messages.filter(x => !x.hidden)];
+              if (isLoggedIn === "true") {
+                messageArr = messageArr.filter(x => !x.not_display_when_logged_in);
+              }
             }
             let urlThanks = res.data.data?.conversation?.urlThanksPage || "";
-
             let variablesAll = res.data?.all_variables || [];
             setDataVariables(variablesAll);
-
             setDataMessages(messageArr);
             setUrlThanksPage(urlThanks);
             if (res.data.chatbot) {
@@ -1099,6 +1181,46 @@ function Preview() {
             }
             // setIndexMessageRender(index);
             // setRenderMessageArr(renderMessage);
+            try {
+              if (isDisplayErrorMessage == true && errorMessageSubmit.trim().length > 0) {
+                var dataMessageInLocalStorage = getMessagesSessionStorage();
+                if (dataMessageInLocalStorage) {
+                  let dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true)
+                  dataMesage.forEach(data => {
+                    if (Array.isArray(data.message_content)) {
+                      data.message_content = data.message_content.filter(item => item.type !== "delay");
+                    }
+                  });
+                  setRenderMessageArr(dataMesage);
+                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
+                  if (isLoggedIn == "true") {
+                    dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
+                    filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
+                    setRenderMessageArr(dataMesage);
+                  }
+                  setIndexMessageRender(dataMesage.length - 1);
+                  setMessageUser(filteredMessages)
+                  setIndexUser(filteredMessages.length)
+                  setIsOpen(true)
+                  setTimeout(() => {
+                    const buttons = document.querySelectorAll('button.ss-user-message__action-btn.btn.btn-secondary');
+                    if (buttons.length > 0) {
+                      const lastButton = buttons[buttons.length - 1];
+                      lastButton.dispatchEvent(new MouseEvent("click", {
+                        bubbles: true,
+                        cancelable: true,
+                        view: window
+                      }));
+                    }
+                  }, 8000);
+
+                }
+              }
+            }
+            catch {
+
+            }
+            scrollToBottom();
           }
         })
         .catch((error) => {
@@ -1909,6 +2031,91 @@ function Preview() {
             isValid = false;
           }
         }
+      } else if (contentArr[i].type === "shipping_address") {
+        if (
+          errors[
+          `message${index}_content${i}_${contentArr[i].type}`
+          ] &&
+          errors[
+          `message${index}_content${i}_${contentArr[i].type}`
+          ] !== messageError
+        ) {
+          errorsMess[
+            `message${index}_content${i}_${contentArr[i].type}`
+          ] =
+            errors[
+            `message${index}_content${i}_${contentArr[i].type}`
+            ];
+          isValid = false;
+        } else {
+          let isValidShippingAddress = true;
+          if (contentType.isCheckRequire === "all_items_require") {
+            if (
+              contentType.name !== undefined &&
+              stringNullOrEmpty(contentType.value_name_left) ||
+              stringNullOrEmpty(contentType.value_name_right)
+            ) {
+              isValidShippingAddress = false;
+            }
+            if (
+              contentType.kana_name !== undefined &&
+              stringNullOrEmpty(contentType.value_kana_left) ||
+              stringNullOrEmpty(contentType.value_kana_right)
+            ) {
+              isValidShippingAddress = false;
+            }
+            if (contentType.post_code !== undefined) {
+              if (contentType.split_postal_code) {
+                if (
+                  stringNullOrEmpty(contentType.value_post_code_left) ||
+                  stringNullOrEmpty(contentType.value_post_code_right)
+                ) {
+                  isValidShippingAddress = false;
+                }
+              } else if (stringNullOrEmpty(contentType.value_post_code)) {
+                isValidShippingAddress = false;
+              }
+            }
+            if (
+              contentType.prefecture !== undefined &&
+              stringNullOrEmpty(contentType.value_prefecture)
+            ) {
+              isValidShippingAddress = false;
+            }
+            if (
+              contentType.municipality !== undefined &&
+              stringNullOrEmpty(contentType.value_municipality)
+            ) {
+              isValidShippingAddress = false;
+            }
+            if (
+              contentType.address !== undefined &&
+              stringNullOrEmpty(contentType.value_address)
+            ) {
+              isValidShippingAddress = false;
+            }
+            if (
+              contentType.address !== undefined &&
+              stringNullOrEmpty(contentType.value_building_name)
+            ) {
+              isValidShippingAddress = false;
+            }
+            if (
+              contentType.number !== undefined &&
+              (stringNullOrEmpty(contentType.value_number1) ||
+                stringNullOrEmpty(contentType.value_number2) ||
+                stringNullOrEmpty(contentType.value_number3))
+            ) {
+              isValidShippingAddress = false
+            }
+          }
+          if (isValidShippingAddress === false) {
+            errorsMess[
+              `message${index}_content${i}_${contentArr[i].type}`
+            ] = messageError;
+            isValid = false;
+          }
+        }
       } else if (
         contentType.type === "phone_number" &&
         !errorsMess[
@@ -2066,8 +2273,11 @@ function Preview() {
             contentType?.card_linked_setting_picture))
       ) {
         if (
-          (contentType.is_hide_card_name !== true &&
-            stringNullOrEmpty(contentType.card_holder)) ||
+          contentType.is_hide_card_name !== true &&
+          (contentType.separate_name === false
+            ? stringNullOrEmpty(contentType.card_holder)
+            : (stringNullOrEmpty(contentType.card_holder1),
+              stringNullOrEmpty(contentType.card_holder2))) ||
           (contentType.is_hide_cvc !== true &&
             stringNullOrEmpty(contentType.cvc)) ||
           (contentType.separate_type === true &&
@@ -2325,6 +2535,25 @@ function Preview() {
                 listFukuObject.push(fukuObject);
               }
 
+              if (Object.keys(message.text_input.email_confirmation).length != 0 && message.text_input.email_confirmation != undefined) {
+                const userInputData = Object.fromEntries(
+                  Object.entries(message.text_input.email_confirmation).filter(([key, value]) => key.includes("value"))
+                );
+                const dataInforFukushashiki = Object.fromEntries(
+                  Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+                );
+                const types = ["value", "valueConfirm"];
+                const result = types
+                  .filter(type => `${type}` in userInputData)
+                  .map(type => ({
+                    type: message.type,
+                    bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
+                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                    bindingValue: userInputData[`${type}`]
+                  }));
+                listFukuObject.push(...result);
+              }
+
               if (message.text_input?.phone_number.value != undefined ||
                 message.text_input?.phone_number.value1 != undefined ||
                 message.text_input?.phone_number.value2 != undefined ||
@@ -2369,19 +2598,61 @@ function Preview() {
                 };
                 listFukuObject.push(fukuObject);
               }
+              if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
+                const fukuObject = {
+                  type: 'password',
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.text_input.password.value,
+                };
+                listFukuObject.push(fukuObject);
+              }
 
-              break;
+              if (Object.keys(message.text_input.password_confirmation).length != 0 && message.text_input.password_confirmation != undefined) {
+                const fukuObject1 = {
+                  type: 'password_confirmation',
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.text_input.password_confirmation.value,
+                };
+
+                const fukuObject2 = {
+                  type: 'password_confirmation',
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.text_input.password_confirmation.valueConfirm,
+                };
+                listFukuObject.push(fukuObject1);
+                listFukuObject.push(fukuObject2);
+
+              }
 
             }
+            break;
           case 'agree_term':
             {
-              const fukuObject = {
-                type: message.type,
-                bindingMode: message.fukushashiki_search_mode,
-                bindingAddress: message.fukushashiki_search_value,
-                bindingValue: message.agree_term.isAgree,
-              };
-              listFukuObject.push(fukuObject);
+              let searchValue = message.fukushashiki_search_value;
+              if (searchValue.includes(',')) {
+                let values = searchValue.split(',');
+                values.forEach(value => {
+                  let trimmedValue = value.trim();
+                  const fukuObject = {
+                    type: message.type,
+                    bindingMode: message.fukushashiki_search_mode,
+                    bindingAddress: trimmedValue,
+                    bindingValue: message.agree_term.isAgree,
+                  };
+                  listFukuObject.push(fukuObject);
+                });
+              } else {
+                const fukuObject = {
+                  type: message.type,
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.agree_term.isAgree,
+                };
+                listFukuObject.push(fukuObject);
+              }
               break;
             }
           case 'slider':
@@ -2399,7 +2670,6 @@ function Preview() {
 
           case "pull_down":
             {
-
               if (message.pull_down?.customization.length != 0) {
                 const textInDropdown = message.pull_down.customization.value
                 if (message.pull_down.customization.is_comment == true) {
@@ -2418,6 +2688,18 @@ function Preview() {
                     }
 
                   })
+                }
+              }
+
+              if (message.pull_down?.type == "lp_integration_option") {
+                if (message.pull_down.lp_integration_option.value != "") {
+                  const fukuObject = {
+                    type: message.type,
+                    bindingMode: message.pull_down.lp_element_search_mode,
+                    bindingAddress: message.pull_down.lp_element_search_value,
+                    bindingValue: message.pull_down.lp_integration_option.value
+                  };
+                  listFukuObject.push(fukuObject);
                 }
               }
 
@@ -2460,7 +2742,19 @@ function Preview() {
 
               break;
             }
-
+          case 'textarea':
+            {
+              if (message.textarea.text_input.value != undefined) {
+                const fukuObject = {
+                  type: message.type,
+                  bindingMode: message.fukushashiki_search_mode,
+                  bindingAddress: message.fukushashiki_search_value,
+                  bindingValue: message.textarea.text_input.value,
+                };
+                listFukuObject.push(fukuObject);
+              }
+              break;
+            }
           case 'zip_code_address':
             {
               const userInputData = Object.fromEntries(
@@ -2489,10 +2783,99 @@ function Preview() {
               listFukuObject.push(...result);
               break;
             }
+          case 'shipping_address':
+            {
+              const userInputData = Object.fromEntries(
+                Object.entries(message.shipping_address).filter(([key, value]) => key.includes("value_"))
+              );
+              const dataInforFukushashiki = Object.fromEntries(
+                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+              );
+              const types = ["number1", "number2", "number3", "number", "name_left", "name_right", "kana_left", "kana_right", "building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right", "initial_selection"];
+              const result = types
+                .filter(type => `value_${type}` in userInputData)
+                .map(type => {
+                  const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
+                  const bindingValue = dataInforFukushashiki[`${type}_fukushashiki_search_value`];
+                  if (bindingMode === undefined || bindingValue == undefined || bindingValue.length == 0) {
+                    return null;
+                  }
+                  if (type == "initial_selection") {
+                    const objA = {
+                      type: "initial_selection",
+                      bindingMode,
+                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                      bindingValue: userInputData[`value_${type}`]
+                    };
+                    listFukuObject.push(objA)
+                  }
+                  if (type == "address") {
+                    const objA = {
+                      type: "zip_code_address",
+                      bindingMode,
+                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                      bindingValue: userInputData[`value_${type}`]
+                    };
+                    listFukuObject.push(objA)
+                  }
+                  return {
+                    type: message.shipping_address.is_use_dropdown ? "dropdown_prefecture" : "shipping_address",
+                    bindingMode: bindingMode,
+                    bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                    bindingValue: userInputData[`value_${type}`]
+                  };
+                })
+                .filter(item => item !== null);
+              listFukuObject.push(...result);
+              break;
+            }
+
+          case 'radio_button':
+            {
+              const initialSelection = message.radio_button.initial_selection;
+              const selectedElement = message.radio_button.default.find(item => item.id === initialSelection);
+              if (selectedElement) {
+                const value = selectedElement.value;
+                const fukuObject = {
+                  type: message.type,
+                  bindingMode: message.initial_selection_fukushashiki_search_mode,
+                  bindingAddress: message.initial_selection_fukushashiki_search_value,
+                  bindingValue: value.toString()
+                };
+                listFukuObject.push(fukuObject);
+              }
+
+              break;
+            }
+          case 'checkbox':
+            {
+              if (message.checkbox.checkedValue.length > 0) {
+                const fukuObject = {
+                  type: message.type,
+                  bindingMode: message.checkedValue_fukushashiki_search_mode,
+                  bindingAddress: message.checkedValue_fukushashiki_search_value,
+                  bindingValue: true
+                };
+                listFukuObject.push(fukuObject);
+              }
+              else {
+                const fukuObject = {
+                  type: message.type,
+                  bindingMode: message.checkedValue_fukushashiki_search_mode,
+                  bindingAddress: message.checkedValue_fukushashiki_search_value,
+                  bindingValue: false
+                };
+                listFukuObject.push(fukuObject);
+              }
+              break;
+            }
+
           case 'card_payment_radio_button':
             {
               const keysToExtract = [
                 "initial_selection",
+                "card_holder1",
+                "card_holder2",
                 "card_number1",
                 "card_number2",
                 "card_number3",
@@ -2501,7 +2884,8 @@ function Preview() {
                 "card_number",
                 "year",
                 "month",
-                "cvc"
+                "cvc",
+                "installment"
               ];
               const userInputData = keysToExtract.reduce((result, key) => {
                 if (message.card_payment_radio_button[key] !== undefined) {
@@ -2512,12 +2896,28 @@ function Preview() {
               const dataInforFukushashiki = Object.fromEntries(
                 Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
               );
-              const types = ["card_number", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4"];
+              const types = ["card_number", "card_holder1", "card_holder2", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4", "installment", "initial_selection"];
               const result = types
                 .filter(type => `${type}` in userInputData)
                 .map(type => {
                   const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
                   const bindingValue = userInputData[`${type}`];
+                  if (type == "initial_selection") {
+                    return {
+                      type: "initial_selection",
+                      bindingMode,
+                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                      bindingValue
+                    };
+                  }
+                  if (type == "card_number") {
+                    return {
+                      type: "card_number",
+                      bindingMode,
+                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                      bindingValue
+                    };
+                  }
                   if (bindingMode !== undefined && bindingValue !== undefined) {
                     return {
                       type: "card_payment_radio_button",
@@ -2550,12 +2950,33 @@ function Preview() {
         break
       }
     }
+    if (message.button_jscode == true && message.jscode?.length > 0) {
+      window.parent.postMessage({
+        isOpen: true,
+        widthPc: 450,
+        heightPc: 700,
+        widthSp: 100,
+        heightSp: 100,
+        chatbotRight: 10,
+        chatbotBottom: 10,
+        action: 'excuteJS',
+        jscode: message.jscode,
+        is_use_js: true
+      }, '*');
+    }
 
-    if (!handleValidateField(indexClickLocation)) {
+    let realIndex = indexMessage;
+
+    if (!handleValidateField(realIndex)) {
       return;
     }
     let renderMessage = [...renderMessageArr];
-    renderMessageArr[indexMessage].disabled = true;
+    if (errorMessageSubmit.length > 0) {
+      renderMessageArr[indexMessage].disabled = false;
+    }
+    else {
+      renderMessageArr[indexMessage].disabled = true;
+    }
     setRenderMessageArr(renderMessageArr)
     let index;
     let isPauseScroll = false;
@@ -2665,7 +3086,13 @@ function Preview() {
       }
 
       for (let i = 0; i < renderMessage.length; i++) {
-        renderMessage[i].disabled = true;
+        if (errorMessageSubmit.length > 0) {
+          renderMessage[i].disabled = false;
+        }
+        else {
+          renderMessage[i].disabled = true;
+        }
+
       }
       return setRenderMessageArr(renderMessage)
       // renderMessage[indexMessage].disabled = false
@@ -3100,13 +3527,21 @@ function Preview() {
                 const temp = dataSessionStorage.find(x => x.id === data.id)
                 if (temp) data.message_content = [...temp.message_content]
               }
-              renderMessage[indexMessage].disabled = false;
-              renderMessageArr[indexMessage].disabled = false;
-              renderMessage.push(data);
-              setRenderMessageArr([...renderMessage]);
-              if (isPauseScroll === false) {
-                scrollToBottom();
+              try {
+                renderMessage[indexMessage].disabled = false;
+                renderMessageArr[indexMessage].disabled = false;
+                const isIdExist = renderMessageArr.some((message) => message.id === data.id);
+
+                if (isIdExist) {
+                  return;
+                }
+                renderMessage.push(data);
+                setRenderMessageArr([...renderMessage]);
+                if (isPauseScroll === false) {
+                  scrollToBottom();
+                }
               }
+              catch { }
             });
             index = i;
             break;
@@ -3879,12 +4314,35 @@ function Preview() {
     }
   };
 
+  const isPopUpZipCodeShippingAddress = (isOpen, indexContent) => {
+    if (isOpen === true) {
+      setPrefectures(null);
+      setCities(null);
+      setTowns(null);
+      setZipcode(null);
+      document.getElementById("sp-withdrawal-container").style.display =
+        "block";
+      document.getElementById("sp-popup-zip-code-address2").style.display =
+        "block";
+    } else {
+      document.getElementById("sp-withdrawal-container").style.display = "none";
+      document.getElementById("sp-popup-zip-code-address2").style.display =
+        "none";
+    }
+    if (indexContent !== undefined) {
+      setContentZipcode(indexContent);
+    }
+  };
+
   const onChangeErrors = (field, value) => {
     errors[field] = value;
     setErrors({
       ...errors,
     });
   };
+
+  const userMessageArray = renderMessageArr.filter(x => x.belong_to === 'user');
+  let userIndexMessage = 0;
 
   ///body container
   if (scenarioId && botInfor && isOpen) {
@@ -4190,6 +4648,204 @@ function Preview() {
             </div>
           </div>
         </div>
+        {/*For shipping address */}
+        <div id="sp-popup-zip-code-address2" className="sp-popup-zip-code-address">
+          <div className="sp-popup-zip-code-address-header">
+            <div className="sp-popup-zip-code-address-header-left">
+              住所で郵便番号を検索する
+            </div>
+            <div className="sp-popup-zip-code-address-header-right">
+              <MDBIcon
+                style={{ width: "5%", marginLeft: "3px", cursor: "pointer" }}
+                fas
+                onClick={() => isPopUpZipCodeShippingAddress(false)}
+                icon="times"
+                className={"sp-plus-circle-option-icon-times-custom"}
+              />
+            </div>
+          </div>
+          <div className="sp-popup-zip-code-address-body">
+            <div className="sp-popup-zip-code-address-body-form">
+              <SelectCustom
+                style={{ width: "100%", marginBottom: "7px" }}
+                keyValue="name"
+                nameValue="name"
+                placeholder="都道府県を選択してください"
+                data={dataPrefectures}
+                onChange={async (value) => {
+                  setPrefectures(value);
+                  setCities(null);
+                  setTowns(null);
+                  setZipcode(null);
+                  if (value) {
+                    let prefecture_jis_code = dataPrefectures.find(
+                      (item) => item.name === value
+                    ).prefecture_jis_code;
+                    api
+                      .get(
+                        `/api/v1/cities?prefecture_jis_code=${prefecture_jis_code}`
+                      )
+                      .then((res) => {
+                        if (res.data.code === 1) {
+                          setDataCities(res.data.data);
+                        }
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                      });
+                  }
+                }}
+                value={prefectures}
+              />
+              <SelectCustom
+                style={{ width: "100%", marginBottom: "7px" }}
+                keyValue="city_name"
+                nameValue="city_name"
+                placeholder="市区を選択してください"
+                data={dataCities || []}
+                onChange={async (value) => {
+                  setCities(value);
+                  setTowns(null);
+                  setZipcode(null);
+
+                  if (value) {
+                    let city_jis_code = dataCities.find(
+                      (item) => item.city_name === value
+                    ).city_jis_code;
+                    api
+                      .get(`/api/v1/towns?city_jis_code=${city_jis_code}`)
+                      .then((res) => {
+                        if (res.data.code === 1) {
+                          setDataTowns(res.data.data);
+                        }
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                        if (error.response?.data.code === 0) {
+                          tokenExpired();
+                        }
+                      });
+                  }
+                }}
+                value={cities}
+              />
+              <SelectCustom
+                style={{ width: "100%", marginBottom: "7px" }}
+                keyValue="town_name"
+                nameValue="town_name"
+                placeholder="町村を選択してください"
+                data={dataTowns || []}
+                onChange={(value) => {
+                  setTowns(value);
+                  if (value) {
+                    let zipcode = dataTowns.find(
+                      (item) => item.town_name === value
+                    ).zip_code;
+                    setZipcode(zipcode);
+                  } else {
+                    setZipcode(null);
+                  }
+                }}
+                value={towns}
+              />
+              {zipcode && (
+                <div className="sp-popup-zip-code-address-body-form-content">
+                  〒{zipcode}
+                </div>
+              )}
+            </div>
+            <div className="sp-popup-zip-code-address-body-button">
+              <div
+                className="sp-popup-zip-code-address-body-button-cancel"
+                onClick={() => isPopUpZipCodeShippingAddress(false)}
+              >
+                キャンセル
+              </div>
+              <div
+                className="sp-popup-zip-code-address-body-button-selection"
+                style={zipcode ? {} : { opacity: "0.5" }}
+                onClick={() => {
+                  if (
+                    zipcode &&
+                    indexContentZipcode !== undefined &&
+                    !dataMessages[indexMessageRender].message_content[
+                      indexContentZipcode
+                    ].shipping_address.split_postal_code
+                  ) {
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      zipcode,
+                      "value_post_code"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      prefectures,
+                      "value_prefecture"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      `${cities}${towns}`,
+                      "value_municipality"
+                    );
+                    document.getElementById(
+                      "sp-withdrawal-container"
+                    ).style.display = "none";
+                    document.getElementById(
+                      "sp-popup-zip-code-address2"
+                    ).style.display = "none";
+                  } else if (
+                    zipcode &&
+                    indexContentZipcode !== undefined &&
+                    dataMessages[indexMessageRender].message_content[
+                      indexContentZipcode
+                    ].shipping_address.split_postal_code
+                  ) {
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      zipcode.slice(0, 3),
+                      "value_post_code_left"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      zipcode.slice(3),
+                      "value_post_code_right"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      prefectures,
+                      "value_prefecture"
+                    );
+                    onChangeValue(
+                      indexContentZipcode,
+                      "shipping_address",
+                      `${cities}${towns}`,
+                      "value_municipality"
+                    );
+                    document.getElementById(
+                      "sp-withdrawal-container"
+                    ).style.display = "none";
+                    document.getElementById(
+                      "sp-popup-zip-code-address2"
+                    ).style.display = "none";
+                  }
+                  document.getElementById("ss-user-input-address2").focus();
+                  document.getElementById("ss-user-input-address2").select();
+                }}
+              >
+                選択
+              </div>
+            </div>
+          </div>
+        </div>
         <div
           id="sp-header"
           style={
@@ -4232,7 +4888,6 @@ function Preview() {
             </div>
           </div>
         </div>
-
         {activePopupCloseBot ?
           <ModalPreviewBot
             isMobile={mobileCheck()}
@@ -4295,87 +4950,101 @@ function Preview() {
           style={{ backgroundColor: botInfor?.opacity_color, flex: 1 }}
         >
           {renderMessageArr.map((message, indexMessage) => {
+            if (message.belong_to === "user") userIndexMessage++;
             return (
               <React.Fragment key={indexMessage}>
-                {message.belong_to === "bot" &&
+                {message.belong_to === "bot" && Array.isArray(message?.message_content) &&
                   message?.message_content.map((content, index) => {
+                    const customPreview = content;
                     return (
                       <BotMessage
                         key={index}
-                        content={content}
+                        content={customPreview}
                         index={index}
                         botInfor={botInfor}
                         checkoutUrl={checkoutUrl}
+                        previewOrder={previewContent}
                       />
                     );
                   })}
-                {message.belong_to === "user" && (
-                  <div
-                    // id={`sp-body-user-side-${indexMessage}`}
-                    className="sp-body-user-side slideLeft"
-                  >
-                    <div className="sp-body-user-side-messages">
-                      <UserMessage
-                        captcha={captcha}
-                        messageContentProps={message.message_content}
-                        disabled={message.disabled}
-                        onChangeValue={(
-                          indexContent,
-                          contentType,
-                          value,
-                          field,
-                          subFiled,
-                          name
-                        ) =>
-                          onChangeValue(
+                {message &&
+                  message.belong_to === "user" &&
+                  message.message_content &&
+                  message.message_content.length > 0 &&
+                  (
+                    <div
+                      className="sp-body-user-side slideLeft"
+                    >
+                      <div className="sp-body-user-side-messages">
+                        <UserMessage
+                          captcha={captcha}
+                          messageContentProps={message?.message_content}
+                          disabled={errorMessageSubmit.length > 0 ? false : message.disabled}
+                          onChangeValue={(
                             indexContent,
                             contentType,
                             value,
                             field,
                             subFiled,
-                            name,
-                            message
-                          )
-                        }
-                        indexMessageRender={indexMessageRender}
-                        onClickNext={() => onClickNext(indexMessage, message)}
-                        indexMessage={indexMessage}
-                        errorsProps={errors}
-                        displayButtonNext={(value) => {
-                          dataMessages[indexMessage].is_display_button_next =
-                            value;
-                          setDataMessages([...dataMessages]);
-                        }}
-                        dataPrefectures={[...dataPrefectures]}
-                        isPopUpZipCode={(isOpen, indexContent) =>
-                          isPopUpZipCode(isOpen, indexContent)
-                        }
-                        onChangeErrors={(field, value) =>
-                          onChangeErrors(field, value)
-                        }
-                        variables={variables}
-                      />
-                      {(dataMessages[indexMessage].is_display_button_next !==
-                        undefined
-                        ? dataMessages[indexMessage].is_display_button_next
-                        : true) && (
+                            name
+                          ) =>
+                            onChangeValue(
+                              indexContent,
+                              contentType,
+                              value,
+                              field,
+                              subFiled,
+                              name,
+                              message
+                            )
+                          }
+                          indexMessageRender={indexMessageRender}
+                          onClickNext={() => onClickNext(indexMessage, message)}
+                          indexMessage={indexMessage}
+                          errorsProps={errors}
+                          displayButtonNext={(value) => {
+                            dataMessages[indexMessageRender].is_display_button_next =
+                              value;
+                            setDataMessages([...dataMessages]);
+                          }}
+                          dataPrefectures={[...dataPrefectures]}
+                          isPopUpZipCode={(isOpen, indexContent) =>
+                            isPopUpZipCode(isOpen, indexContent)
+                          }
+                          isPopUpZipCodeShippingAddress={(isOpen, indexContent) =>
+                            isPopUpZipCodeShippingAddress(isOpen, indexContent)
+                          }
+                          onChangeErrors={(field, value) =>
+                            onChangeErrors(field, value)
+                          }
+                          variables={variables}
+                          lpOptionData={lpOptionData}
+                          errorMessageSubmit={errorMessageSubmit}
+                        />
+                        {message.message_content[0]?.type !== "button_submit" && (
                           <div className="sp-user-message-button-action">
-                            <Button
-                              disabled={message.disabled}
+                            <CustomButton
+                              disabled={errorMessageSubmit.length > 0 ? false : message.disabled}
                               style={{
                                 backgroundColor: botInfor?.main_color || botInfor?.main_color_other,
                                 borderRadius: "25px",
                               }}
                               className="ss-user-message__action-btn"
                               onClick={() => onClickNext(indexMessage, message)}
+                              autoClick={errorMessageSubmit.trim().length > 0 ? true : false}
+                              messsagetype={message.message_content[0]?.type}
                             >
-                              {message.buttonName || (indexMessage >= indexMessageRender ? "次へ" : "更新")}
-                            </Button>
+                              {message.buttonName || (
+                                errorMessageSubmit.length > 0
+                                  ? "更新"
+                                  : (indexMessage >= indexMessageRender ? "次へ" : "更新")
+                              )}
+                            </CustomButton>
                           </div>
                         )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
               </React.Fragment>
             );
           })}
@@ -4586,10 +5255,27 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     link.download = "file";
     link.target = "_blank";
     document.body.appendChild(link);
-
     link.click();
     link.remove();
   };
+
+  if (content.text_input?.use_for_confirm_message == true && content.text_input?.jscode?.length != 0) {
+    if (content.text_input.jscode.trim().length > 0) {
+      window.parent.postMessage({
+        isOpen: true,
+        widthPc: 450,
+        heightPc: 700,
+        widthSp: 100,
+        heightSp: 100,
+        chatbotRight: 10,
+        chatbotBottom: 10,
+        action: 'excuteJS',
+        jscode: content.text_input.jscode,
+        is_use_js: true
+      }, '*');
+      content.text_input.content = previewContent;
+    }
+  }
 
   const formatResult = () => {
     const cart = JSON.parse(sessionStorage.getItem("cart") || null)
@@ -4641,7 +5327,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
     result = result?.replace("{zip}", zip)
     result = result?.replace("{province}", province)
     result = result?.replace("{city}", city)
-
+    result.replace(/\n/g, "<br>");
     return result;
   }
 
@@ -4794,9 +5480,12 @@ const UserMessage = ({
   onClickNext,
   displayButtonNext,
   isPopUpZipCode,
+  isPopUpZipCodeShippingAddress,
   onChangeErrors,
   dataPrefectures,
-  variables
+  variables,
+  lpOptionData = {},
+  errorMessageSubmit = ''
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -4809,6 +5498,10 @@ const UserMessage = ({
   const [bot_id, setBotId] = useState(Cookies.get("bot_id"));
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
+
+  const getLPOptionData = (search_element_value) => {
+    return lpOptionData[search_element_value];
+  }
 
   function loadCaptcha(indexContent) {
     if (
@@ -4824,6 +5517,9 @@ const UserMessage = ({
         )?.[0]?.data || "";
   }
 
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
   const stringNullOrEmpty = (string) => {
     if (
       string === undefined ||
@@ -4972,6 +5668,16 @@ const UserMessage = ({
             content.type,
             cardPaymentRadioButton.initial_selection_picture,
             "initial_selection_picture"
+          );
+        }
+      } else if (content.type === "shipping_address") {
+        let shippingAddress = content.shipping_address;
+        if (shippingAddress.value_initial_selection) {
+          onChangeValue(
+            indexContent,
+            content.type,
+            shippingAddress.value_initial_selection,
+            "value_initial_selection"
           );
         }
       } else if (content.type === "product_purchase") {
@@ -5310,7 +6016,9 @@ const UserMessage = ({
         let afteePaymentModule = content.AFTEE_payment_module;
         let slider = content.slider;
         let cardPaymentRadioButton = content.card_payment_radio_button;
+        let shippingAddress = content.shipping_address;
         let variableSet = content.variable_set;
+        let buttonSubmit = content.button_submit;
         let labelNoTransition = content.label_no_transition;
 
         if (content.type == 'textarea' && content.textarea && content.textarea.invalid_input && content.textarea.invalid_input.content) {
@@ -5357,7 +6065,7 @@ const UserMessage = ({
                             content.type,
                             value,
                             textInput.type,
-                            "valueLeft"
+                            "valueLeft",
                           )
                         }
                         value={textInput[textInput.type]?.valueLeft}
@@ -5641,6 +6349,803 @@ const UserMessage = ({
                   )}
               </div>
             )}
+            {/* type == 'shipping_address' */}
+            {
+              content.type === "shipping_address" && (
+
+                <div style={{ marginBottom: "10px" }}>
+                  {
+                    <>
+                      <div
+                        style={{
+                          fontWeight: "400",
+                          fontSize: "12px",
+                          color: 'black',
+                          width: "100%",
+                          marginBottom: "5px",
+                        }}
+                      >
+                        お届け先住所
+                      </div>
+                      <Radio.Group
+                        style={{ width: "100%", fontSize: "14px" }}
+                        disabled={disabled}
+                        value={shippingAddress.value_initial_selection}
+                      >
+                        {shippingAddress.radio_contents &&
+                          shippingAddress.radio_contents.map(
+                            (itemPayment, indexPayment) => {
+                              return (
+                                <Radio
+                                  value={itemPayment.value}
+                                  key={indexPayment}
+                                  style={{
+                                    backgroundColor: "#ECF5FA",
+                                    marginBottom: "5px",
+                                    padding: "5px",
+                                    width: "100%",
+                                  }}
+                                  onChange={() => {
+                                    let dataValue;
+                                    if (
+                                      shippingAddress.value_initial_selection !==
+                                      itemPayment.value
+                                    ) {
+                                      dataValue = itemPayment.value;
+                                    } else {
+                                      dataValue = "";
+                                    }
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      dataValue,
+                                      "value_initial_selection"
+                                    );
+
+                                    if (
+                                      shippingAddress.card_linked_setting.includes(dataValue)
+                                    ) {
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        true,
+                                        "is_display_card_payment"
+                                      );
+                                      displayButtonNext(true);
+                                    } else {
+                                      displayButtonNext(false);
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        false,
+                                        "is_display_card_payment"
+                                      );
+                                      if (messageContent.length === 1)
+                                        onClickNext();
+                                    }
+                                  }}
+                                >
+                                  {itemPayment.text}
+                                </Radio>
+                              );
+                            }
+                          )}
+                      </Radio.Group>
+                    </>
+                  }
+                  {(shippingAddress.card_linked_setting.length > 0 && shippingAddress.card_linked_setting.includes(shippingAddress.value_initial_selection)) &&
+                    <React.Fragment>
+                      {(shippingAddress.title_require || shippingAddress.require) && (
+                        <div
+                          className="ss-message__content--user-text-input-top"
+                          style={{ marginBottom: "0px" }}
+                        >
+                          {shippingAddress.title_require && (
+                            <span className="ss-message__content--user-text-input-title">
+                              {shippingAddress.title}
+                            </span>
+                          )}
+                          {shippingAddress.require === true && (
+                            <span className="ss-message__content--user-text-input-required">
+                              ※必須
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {shippingAddress.name !== undefined && (
+                        <React.Fragment>
+                          <div
+                            style={{
+                              fontWeight: "400",
+                              fontSize: "12px",
+                              color: 'black',
+                              width: "100%",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            お名前
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <InputCustom
+                              disabled={disabled}
+                              placeholder={shippingAddress.text?.placeholderLeft}
+                              style={{ width: "49%", marginBottom: "0px" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_name_left"
+                                )
+                              }
+                              value={shippingAddress.text?.name_valueLeft}
+                            ></InputCustom>
+                            <InputCustom
+                              disabled={disabled}
+                              placeholder={shippingAddress.text?.placeholderRight}
+                              style={{ width: "49%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_name_right"
+                                )
+                              }
+                              value={shippingAddress.text?.name_valueRight}
+                            ></InputCustom>
+                          </div>
+                        </React.Fragment>
+                      )}
+                      {shippingAddress.kana_name !== undefined &&
+                        <>
+                          <div
+                            style={{
+                              fontWeight: "400",
+                              fontSize: "12px",
+                              width: "100%",
+                              marginBottom: "5px",
+                              marginTop: "5px"
+                            }}
+                          >
+                            フリガナ
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <InputCustom
+                              disabled={disabled}
+                              placeholder={shippingAddress.text?.placeholderLeft}
+                              style={{ width: "49%", marginBottom: "0px" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_kana_left"
+                                )
+                              }
+                              value={shippingAddress.text?.kana_name_valueLeft}
+                            ></InputCustom>
+                            <InputCustom
+                              disabled={disabled}
+                              placeholder={shippingAddress.text?.placeholderRight}
+                              style={{ width: "49%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_kana_right"
+                                )
+                              }
+                              value={shippingAddress.text?.kana_name_valueRight}
+                            ></InputCustom>
+                          </div>
+                        </>
+                      }
+                      <div style={{ marginBottom: "10px" }}>
+                        <div
+                          style={{
+                            marginTop: '5px',
+                            textDecoration: "underline",
+                            ...(!disabled ? { color: "#2c76f0" } : { color: "gray" }),
+                            textAlign: "right",
+                          }}
+                        >
+                          <span
+                            style={!disabled ? { cursor: "pointer" } : {}}
+                            onClick={() => {
+                              if (disabled !== true) isPopUpZipCodeShippingAddress(true, indexContent);
+                            }}
+                          >
+                            〒検索はこちら
+                          </span>
+                        </div>
+                        {(shippingAddress.title_require ||
+                          shippingAddress.isCheckRequire) && (
+                            <div
+                              className="ss-message__content--user-pull_down-top"
+                              style={{ marginBottom: "0px" }}
+                            >
+                              {shippingAddress.title_require && (
+                                <span className="ss-message__content--user-pull_down-title">
+                                  {shippingAddress.title}
+                                </span>
+                              )}
+                              {(shippingAddress.isCheckRequire === "all_items_require" ||
+                                shippingAddress.isCheckRequire === "require") && (
+                                  <span className="ss-message__content--user-text-input-required">
+                                    ※必須
+                                  </span>
+                                )}
+                            </div>
+                          )}
+                        {shippingAddress.post_code !== undefined && (
+                          <div className="ss-user-setting__item-bottom">
+                            <div
+                              style={{
+                                fontWeight: "400",
+                                fontSize: "12px",
+                                width: "100%",
+                                marginBottom: "5px",
+                              }}
+                            >
+                              郵便番号
+                            </div>
+                            {shippingAddress.split_postal_code !== true ? (
+                              <InputCustom
+                                type="number"
+                                placeholder={shippingAddress.post_code}
+                                disabled={disabled}
+                                // controls={false}
+                                // className="ss-user-setting-input-limit-character"
+                                // maxLength={7}
+                                onKeyPress={(e) => {
+                                  if (e.target.value.length >= 7) e.preventDefault();
+                                }}
+                                style={{ width: "100%", marginLeft: "0px" }}
+                                onChange={async (value) => {
+                                  onChangeValue(
+                                    indexContent,
+                                    content.type,
+                                    value,
+                                    "value_post_code"
+                                  );
+                                  if ((value + "").length === 7) {
+                                    api
+                                      .get(
+                                        `/api/v1/get_address_from_zip_code?zip_code=${value}`
+                                      )
+                                      .then((res) => {
+                                        if (res.data && res.data.code === 1) {
+                                          onChangeValue(
+                                            indexContent,
+                                            content.type,
+                                            res.data.data.prefecture_name,
+                                            "value_prefecture"
+                                          );
+                                          onChangeValue(
+                                            indexContent,
+                                            content.type,
+                                            `${res.data.data.city_name}${res.data.data.town_name}`,
+                                            "value_municipality"
+                                          );
+                                          onChangeErrors(
+                                            `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                            ""
+                                          );
+                                          document
+                                            .getElementById("ss-user-input-address2")
+                                            .focus();
+                                          document
+                                            .getElementById("ss-user-input-address2")
+                                            .select();
+                                        } else {
+                                          onChangeErrors(
+                                            `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                            "無効な郵便番号です。"
+                                          );
+                                        }
+                                      })
+                                      .catch((error) => {
+                                        onChangeErrors(
+                                          `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                          "無効な郵便番号です。"
+                                        );
+                                        if (error.response?.data.code === 0) {
+                                          tokenExpired();
+                                        }
+                                      });
+                                  } else if ((value + "").length !== 0) {
+                                    onChangeErrors(
+                                      `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                      "無効な郵便番号です。"
+                                    );
+                                  } else {
+                                    onChangeErrors(
+                                      `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                      ""
+                                    );
+                                  }
+                                }}
+                                value={shippingAddress.value_post_code}
+                              />
+                            ) : (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  width: "100%",
+                                }}
+                              >
+                                <InputCustom
+                                  type="number"
+                                  placeholder={shippingAddress.post_code_left}
+                                  disabled={disabled}
+                                  style={{ width: "49%" }}
+                                  onKeyPress={(e) => {
+                                    if (e.target.value.length >= 3) e.preventDefault();
+                                  }}
+                                  onChange={async (value) => {
+                                    if ((value + "").length === 3) {
+                                      document
+                                        .getElementById("ss-user-post-code-right-input2")
+                                        .focus();
+                                      document
+                                        .getElementById("ss-user-post-code-right-input2")
+                                        .select();
+                                    }
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      value,
+                                      "value_post_code_left"
+                                    );
+                                    if (
+                                      (value + "").length === 3 &&
+                                      shippingAddress.value_post_code_right &&
+                                      (shippingAddress.value_post_code_right + "")
+                                        .length === 4
+                                    ) {
+                                      api
+                                        .get(
+                                          `/api/v1/get_address_from_zip_code?zip_code=${value}${shippingAddress.value_post_code_right}`
+                                        )
+                                        .then((res) => {
+                                          if (res.data && res.data.code === 1) {
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              res.data.data.prefecture_name,
+                                              "value_prefecture"
+                                            );
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              `${res.data.data.city_name}${res.data.data.town_name}`,
+                                              "value_municipality"
+                                            );
+                                            onChangeErrors(
+                                              `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                              ""
+                                            );
+                                            document
+                                              .getElementById("ss-user-input-address2")
+                                              .focus();
+                                            document
+                                              .getElementById("ss-user-input-address2")
+                                              .select();
+                                          } else {
+                                            onChangeErrors(
+                                              `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                              "無効な郵便番号です。"
+                                            );
+                                          }
+                                        })
+                                        .catch((error) => {
+                                          onChangeErrors(
+                                            `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                            "無効な郵便番号です。"
+                                          );
+                                          if (error.response?.data.code === 0) {
+                                            tokenExpired();
+                                          }
+                                        });
+                                    } else if (
+                                      (value + "").length !== 0 ||
+                                      (shippingAddress.value_post_code_right + "")
+                                        .length !== 0
+                                    ) {
+                                      onChangeErrors(
+                                        `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                        "無効な郵便番号です。"
+                                      );
+                                    } else {
+                                      onChangeErrors(
+                                        `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                        ""
+                                      );
+                                    }
+                                  }}
+                                  value={shippingAddress.value_post_code_left}
+                                />
+                                <InputCustom
+                                  type="number"
+                                  placeholder={shippingAddress.post_code_right}
+                                  disabled={disabled}
+                                  id="ss-user-post-code-right-input2"
+                                  style={{ width: "49%" }}
+                                  onKeyPress={(e) => {
+                                    if (e.target.value.length >= 4) e.preventDefault();
+                                  }}
+                                  onChange={async (value) => {
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      value,
+                                      "value_post_code_right"
+                                    );
+                                    if (
+                                      (value + "").length === 4 &&
+                                      shippingAddress.value_post_code_left &&
+                                      (shippingAddress.value_post_code_left + "")
+                                        .length === 3
+                                    ) {
+                                      api
+                                        .get(
+                                          `/api/v1/get_address_from_zip_code?zip_code=${shippingAddress.value_post_code_left}${value}`
+                                        )
+                                        .then((res) => {
+                                          if (res.data && res.data.code === 1) {
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              res.data.data.prefecture_name,
+                                              "value_prefecture"
+                                            );
+                                            onChangeValue(
+                                              indexContent,
+                                              content.type,
+                                              `${res.data.data.city_name}${res.data.data.town_name}`,
+                                              "value_municipality"
+                                            );
+                                            onChangeErrors(
+                                              `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                              ""
+                                            );
+                                            document
+                                              .getElementById("ss-user-input-address2")
+                                              .focus();
+                                            document
+                                              .getElementById("ss-user-input-address2")
+                                              .select();
+                                          } else {
+                                            onChangeErrors(
+                                              `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                              "無効な郵便番号です。"
+                                            );
+                                          }
+                                        })
+                                        .catch((error) => {
+                                          onChangeErrors(
+                                            `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                            "無効な郵便番号です。"
+                                          );
+                                          if (error.response?.data.code === 0) {
+                                            tokenExpired();
+                                          }
+                                        });
+                                    } else if (
+                                      (value + "").length !== 0 ||
+                                      (shippingAddress.value_post_code_left + "")
+                                        .length !== 0
+                                    ) {
+                                      onChangeErrors(
+                                        `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                        "無効な郵便番号です。"
+                                      );
+                                    } else {
+                                      onChangeErrors(
+                                        `message${indexMessageRender}_content${indexContent}_${messageContent[indexContent].type}`,
+                                        ""
+                                      );
+                                    }
+                                  }}
+                                  value={shippingAddress.value_post_code_right}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {shippingAddress.prefecture !== undefined && (
+                          <div className="ss-user-setting__item-bottom">
+                            <div
+                              style={{
+                                fontWeight: "400",
+                                fontSize: "12px",
+                                width: "100%",
+                                marginBottom: "3px",
+                              }}
+                            >
+                              都道府県
+                            </div>
+                            {shippingAddress.is_use_dropdown ? (
+                              <SelectCustom
+                                style={{ width: "100%" }}
+                                value={shippingAddress?.value_prefecture}
+                                data={dataPrefectures}
+                                keyValue="name"
+                                nameValue="name"
+                                placeholder={shippingAddress.prefecture}
+                                onChange={(value) =>
+                                  onChangeValue(
+                                    indexContent,
+                                    content.type,
+                                    value,
+                                    "value_prefecture"
+                                  )
+                                }
+                              />
+                            ) : (
+                              <InputCustom
+                                placeholder={shippingAddress.prefecture}
+                                disabled={disabled}
+                                style={{ width: "100%" }}
+                                onChange={(value) =>
+                                  onChangeValue(
+                                    indexContent,
+                                    content.type,
+                                    value,
+                                    "value_prefecture"
+                                  )
+                                }
+                                value={shippingAddress.value_prefecture}
+                              />
+                            )}
+                          </div>
+                        )}
+                        {shippingAddress.municipality !== undefined && (
+                          <div className="ss-user-setting__item-bottom">
+                            <div
+                              style={{
+                                fontWeight: "400",
+                                fontSize: "12px",
+                                width: "100%",
+                                marginBottom: "3px",
+                              }}
+                            >
+                              市区町村
+                            </div>
+                            <InputCustom
+                              placeholder={shippingAddress.municipality}
+                              disabled={disabled}
+                              style={{ width: "100%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_municipality"
+                                )
+                              }
+                              value={shippingAddress.value_municipality}
+                            />
+                          </div>
+                        )}
+                        {shippingAddress.address !== undefined && (
+                          <div className="ss-user-setting__item-bottom">
+                            <div
+                              style={{
+                                fontWeight: "400",
+                                fontSize: "12px",
+                                width: "100%",
+                                marginBottom: "3px",
+                              }}
+                            >
+                              丁目・番地等
+                            </div>
+                            <InputCustom
+                              placeholder={shippingAddress.address}
+                              id="ss-user-input-address2"
+                              disabled={disabled}
+                              style={{ width: "100%" }}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_address"
+                                )
+                              }
+                              value={shippingAddress.value_address}
+                            />
+                          </div>
+                        )}
+                        {shippingAddress.building_name !== undefined && (
+                          <div className="ss-user-setting__item-bottom">
+                            <div
+                              style={{
+                                fontWeight: "400",
+                                fontSize: "12px",
+                                width: "100%",
+                                marginBottom: "3px",
+                              }}
+                            >
+                              建物名
+                            </div>
+                            <InputCustom
+                              placeholder={shippingAddress.building_name}
+                              id="ss-user-input-building"
+                              disabled={disabled}
+                              style={{ width: "100%" }}
+                              onChange={(value) => {
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "value_building_name"
+                                );
+
+                              }
+                              }
+                              value={shippingAddress.value_building_name}
+                            />
+                          </div>
+                        )}
+                        {
+                          shippingAddress.number !== undefined &&
+                          <React.Fragment>
+                            {shippingAddress.withHyphen === false ? (
+                              <>
+                                <div
+                                  style={{
+                                    fontWeight: "400",
+                                    fontSize: "12px",
+                                    width: "100%",
+                                    marginBottom: "5px",
+                                  }}
+                                >
+                                  電話番号
+                                </div>
+                                <InputCustom
+                                  disabled={disabled}
+                                  // className="ss-message__content--user-text-input ss-input-value"
+                                  style={{ marginBottom: "0px" }}
+                                  placeholder={shippingAddress.text?.number_placeholder}
+                                  onChange={(value) =>
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      value,
+                                      "value_number"
+                                    )
+                                  }
+                                  value={shippingAddress.value_number}
+                                ></InputCustom>
+                              </>
+                            ) : (
+                              <>
+                                <div
+                                  style={{
+                                    fontWeight: "400",
+                                    fontSize: "12px",
+                                    width: "100%",
+                                    marginBottom: "5px",
+                                  }}
+                                >
+                                  電話番号
+                                </div>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <InputCustom
+                                    disabled={disabled}
+                                    className="ss-message__content--user-text-input ss-input-value"
+                                    maxLength={3}
+                                    style={{ marginBottom: "0px", width: "32%" }}
+                                    placeholder={shippingAddress.text?.number1_placeholder}
+                                    onChange={(value) => {
+                                      if (value.length === 3) {
+                                        document
+                                          .getElementById(
+                                            "ss-user-message-phone_number_22"
+                                          )
+                                          .focus();
+                                        document
+                                          .getElementById(
+                                            "ss-user-message-phone_number_22"
+                                          )
+                                          .select();
+                                      }
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        value,
+                                        "value_number1"
+                                      );
+                                    }}
+                                    value={shippingAddress.value_number1}
+                                  ></InputCustom>
+                                  <InputCustom
+                                    id="ss-user-message-phone_number_22"
+                                    disabled={disabled}
+                                    className="ss-message__content--user-text-input ss-input-value"
+                                    style={{ marginBottom: "0px", width: "32%" }}
+                                    maxLength={4}
+                                    placeholder={shippingAddress.text?.number2_placeholder}
+                                    onChange={(value) => {
+                                      if (value.length === 4) {
+                                        document
+                                          .getElementById(
+                                            "ss-user-message-phone_number_33"
+                                          )
+                                          .focus();
+                                        document
+                                          .getElementById(
+                                            "ss-user-message-phone_number_33"
+                                          )
+                                          .select();
+                                      }
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        value,
+                                        "value_number2"
+                                      );
+                                    }}
+                                    value={shippingAddress.value_number2}
+                                  ></InputCustom>
+                                  <InputCustom
+                                    id="ss-user-message-phone_number_33"
+                                    disabled={disabled}
+                                    // className="ss-message__content--user-text-input ss-input-value"
+                                    style={{ marginBottom: "0px", width: "32%" }}
+                                    placeholder={shippingAddress.text?.number3_placeholder}
+                                    maxLength={4}
+                                    onChange={(value) =>
+                                      onChangeValue(
+                                        indexContent,
+                                        content.type,
+                                        value,
+                                        "value_number3"
+                                      )
+                                    }
+                                    value={shippingAddress.value_number3}
+                                  ></InputCustom>
+                                </div>
+                              </>
+                            )}
+                          </React.Fragment>
+                        }
+                        {errors?.[
+                          `message${indexMessage}_content${indexContent}_${content.type}`
+                        ] && (
+                            <div style={{ color: "#FF7E00", fontSize: "12px" }}>
+                              {
+                                errors?.[
+                                `message${indexMessage}_content${indexContent}_${content.type}`
+                                ]
+                              }
+                            </div>
+                          )}
+                      </div>
+                    </React.Fragment>
+                  }
+                </div>
+              )
+            }
             {/* type == 'label' */}
             {content.type === "label" && label.lbl_content && (
               <div style={{ marginBottom: "10px" }}>
@@ -5745,12 +7250,12 @@ const UserMessage = ({
                             disabled={disabled}
                             type="radio"
                             id="ss-message__content--user-radio_button"
-                            checked={radioButton.initial_selection === item.id}
+                            checked={radioButton.initial_selection === item.value}
                             onChange={() => {
                               onChangeValue(
                                 indexContent,
                                 content.type,
-                                item.id,
+                                item.value,
                                 "initial_selection"
                               );
                               if (messageContent.length === 1) onClickNext();
@@ -5776,12 +7281,12 @@ const UserMessage = ({
                             type="radio"
                             name="ss-message__content--user-radio_button--radio_button_img"
                             id="ss-message__content--user-radio_button--radio_button_img"
-                            checked={radioButton.initial_selection === item.id}
+                            checked={radioButton.initial_selection === item.value}
                             onChange={() => {
                               onChangeValue(
                                 indexContent,
                                 content.type,
-                                item.id,
+                                item.value,
                                 "initial_selection"
                               );
                               if (messageContent.length === 1) onClickNext();
@@ -5834,10 +7339,10 @@ const UserMessage = ({
                               marginBottom: "10px",
                               cursor: "pointer",
                               backgroundColor: radioButton.value
-                                ? radioButton.value === item.id
+                                ? radioButton.value === item.value
                                   ? "#347AED"
                                   : ""
-                                : radioButton.initial_selection === item.id
+                                : radioButton.initial_selection === item.value
                                   ? "#347AED"
                                   : "",
                             }}
@@ -5847,7 +7352,7 @@ const UserMessage = ({
                               onChangeValue(
                                 indexContent,
                                 content.type,
-                                item.id,
+                                item.value,
                                 "initial_selection"
                               );
                               if (messageContent.length === 1) onClickNext();
@@ -6853,6 +8358,24 @@ const UserMessage = ({
                       />
                     </React.Fragment>
                   )}
+                  {pullDown.type === "lp_integration_option" && (
+                    <LPIntegrationOptionPullDown
+                      search_element_type={pullDown.lp_element_search_mode}
+                      search_element_value={pullDown.lp_element_search_value}
+                      disabled={disabled}
+                      pullDown={pullDown}
+                      data={getLPOptionData(pullDown.lp_element_search_value)}
+                      onChange={(value) =>
+                        onChangeValue(
+                          indexContent,
+                          content.type,
+                          value,
+                          pullDown.type,
+                          "value"
+                        )
+                      }
+                    />
+                  )}
                   {pullDown.type === "up_to_municipality" && (
                     <div>
                       <div style={{ fontWeight: "400", fontSize: "12px" }}>
@@ -6955,7 +8478,7 @@ const UserMessage = ({
               <div style={{ marginBottom: "10px" }}>
                 <div
                   style={{
-                    marginBottom: "10px",
+                    marginBottom: "5px",
                     textDecoration: "underline",
                     ...(!disabled ? { color: "#2c76f0" } : { color: "gray" }),
                     textAlign: "right",
@@ -6994,12 +8517,16 @@ const UserMessage = ({
                     <div
                       style={{
                         fontWeight: "400",
-                        fontSize: "10px",
+                        fontSize: "12px",
                         width: "100%",
                         marginBottom: "5px",
                       }}
                     >
-                      郵便番号
+                      {
+                        zipCodeAddress.post_code_label && zipCodeAddress.post_code_label.trim() !== ""
+                          ? zipCodeAddress.post_code_label
+                          : '郵便番号'
+                      }
                     </div>
                     {zipCodeAddress.split_postal_code !== true ? (
                       <InputCustom
@@ -7271,12 +8798,16 @@ const UserMessage = ({
                     <div
                       style={{
                         fontWeight: "400",
-                        fontSize: "10px",
+                        fontSize: "12px",
                         width: "100%",
                         marginBottom: "3px",
                       }}
                     >
-                      都道府県
+                      {
+                        zipCodeAddress.prefecture_label && zipCodeAddress.prefecture_label.trim() !== ""
+                          ? zipCodeAddress.prefecture_label
+                          : '都道府県'
+                      }
                     </div>
                     {zipCodeAddress.is_use_dropdown ? (
                       <SelectCustom
@@ -7318,12 +8849,16 @@ const UserMessage = ({
                     <div
                       style={{
                         fontWeight: "400",
-                        fontSize: "10px",
+                        fontSize: "12px",
                         width: "100%",
                         marginBottom: "3px",
                       }}
                     >
-                      市区町村
+                      {
+                        zipCodeAddress.municipality_label && zipCodeAddress.municipality_label.trim() !== ""
+                          ? zipCodeAddress.municipality_label
+                          : '市区町村'
+                      }
                     </div>
                     <InputCustom
                       placeholder={zipCodeAddress.municipality}
@@ -7346,12 +8881,16 @@ const UserMessage = ({
                     <div
                       style={{
                         fontWeight: "400",
-                        fontSize: "10px",
+                        fontSize: "12px",
                         width: "100%",
                         marginBottom: "3px",
                       }}
                     >
-                      番地
+                      {
+                        zipCodeAddress.address_label && zipCodeAddress.address_label.trim() !== ""
+                          ? zipCodeAddress.address_label
+                          : '番地'
+                      }
                     </div>
                     <InputCustom
                       placeholder={zipCodeAddress.address}
@@ -7375,12 +8914,16 @@ const UserMessage = ({
                     <div
                       style={{
                         fontWeight: "400",
-                        fontSize: "10px",
+                        fontSize: "12px",
                         width: "100%",
                         marginBottom: "3px",
                       }}
                     >
-                      建物名
+                      {
+                        zipCodeAddress.building_name_label && zipCodeAddress.building_name_label.trim() !== ""
+                          ? zipCodeAddress.building_name_label
+                          : '建物名'
+                      }
                     </div>
                     <InputCustom
                       placeholder={zipCodeAddress.building_name}
@@ -9721,7 +11264,7 @@ const UserMessage = ({
                                 //   onClickNext();
                                 // }
                                 if (
-                                  cardPaymentRadioButton.card_linked_setting(dataValue)
+                                  cardPaymentRadioButton.card_linked_setting.includes(dataValue)
                                 ) {
                                   onChangeValue(
                                     indexContent,
@@ -10077,28 +11620,87 @@ const UserMessage = ({
                         </div>
                       )}
                       {cardPaymentRadioButton.is_hide_card_name === false && (
-                        <div className="ss-user-setting__item-bottom">
-                          <InputCustom
-                            className="ss-user-setting-input-overview"
-                            styleLabel={{ width: "100%" }}
-                            label="カード名義"
-                            inline={false}
-                            disabled={disabled}
-                            value={cardPaymentRadioButton.card_holder}
-                            onChange={(value) =>
-                              onChangeValue(
-                                indexContent,
-                                content.type,
-                                value,
-                                "card_holder"
-                              )
-                            }
-                            placeholder={
-                              cardPaymentRadioButton.card_holder_placeholder
-                            }
-                          />
-                        </div>
+                        cardPaymentRadioButton.separate_name === false ?
+                          <div className="ss-user-setting__item-bottom">
+                            <InputCustom
+                              className="ss-user-setting-input-overview"
+                              styleLabel={{ width: "100%" }}
+                              label="カード名義"
+                              inline={false}
+                              disabled={disabled}
+                              value={cardPaymentRadioButton.card_holder}
+                              onChange={(value) =>
+                                onChangeValue(
+                                  indexContent,
+                                  content.type,
+                                  value,
+                                  "card_holder"
+                                )
+                              }
+                              placeholder={
+                                cardPaymentRadioButton.card_holder_placeholder
+                              }
+                            />
+                          </div> :
+                          <>
+                            <div style={{ width: "100%" }}>カード名義</div>
+
+
+                            <div className="ss-user-setting__item-bottom">
+                              <div style={{ display: 'flex', width: '100%', gap: '10px' }}>
+                                <InputCustom
+                                  className="ss-user-setting-input-overview"
+                                  inline={false}
+                                  disabled={disabled}
+                                  value={cardPaymentRadioButton.card_holder1}
+                                  onChange={(value) =>
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      value,
+                                      "card_holder1"
+                                    )
+                                  }
+                                  placeholder={cardPaymentRadioButton.card_holder_placeholder1}
+                                />
+                                <InputCustom
+                                  className="ss-user-setting-input-overview"
+                                  styleLabel={{ width: "100%" }}
+                                  inline={false}
+                                  disabled={disabled}
+                                  value={cardPaymentRadioButton.card_holder2}
+                                  onChange={(value) =>
+                                    onChangeValue(
+                                      indexContent,
+                                      content.type,
+                                      value,
+                                      "card_holder2"
+                                    )
+                                  }
+                                  placeholder={cardPaymentRadioButton.card_holder_placeholder2}
+                                />
+                              </div>
+                            </div>
+                          </>
                       )}
+                      {Array.isArray(cardPaymentRadioButton.is_use_installment) &&
+                        cardPaymentRadioButton.is_use_installment.length > 0 && (
+                          cardPaymentRadioButton.is_use_installment
+                            .filter(installmentValue => installmentValue === cardPaymentRadioButton.initial_selection)
+                            .map((installmentValue, index) => (
+                              <div className="ss-user-setting__item-bottom" key={index} style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                                <div style={{ width: '100%' }}>お支払い回数</div>
+                                <SelectCustom
+                                  style={{ width: '33%', textAlign: 'left' }}
+                                  value={cardPaymentRadioButton.installment}
+                                  disabled={disabled}
+                                  placeholder={"--"}
+                                  data={installmentOptions}
+                                  onChange={value => onChangeValue(indexContent, content.type, value, 'installment')}
+                                />
+                              </div>
+                            ))
+                        )}
                       <div className="ss-user-setting__item-bottom">
                         <div style={{ width: "100%" }}>有効期限</div>
                         {cardPaymentRadioButton.type_date_of_expiry === "ym" && (
@@ -10223,6 +11825,84 @@ const UserMessage = ({
                   )}
               </div>
             )}
+            {/* user: type = 'button_submit' */}
+            {content.type === 'button_submit' &&
+              <>
+                {buttonSubmit.is_display_error_message && errorMessageSubmit.length > 0 && (
+                  <div className="ss-user-setting__item-text_input-top">
+                    <div
+                      style={{
+                        width: "95%",
+                        padding: "5px",
+                        border: "1px solid #f44336",
+                        backgroundColor: "#ffebee",
+                        color: "#d32f2f",
+                        borderRadius: "5px",
+                        fontFamily: "Arial, sans-serif",
+                        boxShadow: "0 2px 5px rgba(0, 0, 0, 0.2)",
+                        margin: "10px",
+                      }}
+                      id="error-message"
+                      dangerouslySetInnerHTML={{ __html: errorMessageSubmit }}
+                    />
+                  </div>
+                )}
+                <div className="ss-user-setting__item-text_input-top">
+                  <button
+                    style={{
+                      background: "linear-gradient(135deg, #4caf50, #43a047)",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "25px",
+                      padding: "15px 30px",
+                      fontSize: "20px",
+                      fontWeight: "bold",
+                      cursor: "pointer",
+                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                      transition: "all 0.3s ease",
+                      width: "85%",
+                      alignContent: 'center',
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.background = "linear-gradient(135deg, #43a047, #4caf50)";
+                      e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
+                      e.target.style.transform = "translateY(-2px)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.background = "linear-gradient(135deg, #4caf50, #43a047)";
+                      e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+                      e.target.style.transform = "translateY(0)";
+                    }}
+                    onMouseDown={(e) => {
+                      e.target.style.transform = "translateY(1px)";
+                      e.target.style.boxShadow = "0 3px 8px rgba(0, 0, 0, 0.1)";
+                    }}
+                    onMouseUp={(e) => {
+                      e.target.style.transform = "translateY(-2px)";
+                      e.target.style.boxShadow = "0 6px 12px rgba(0, 0, 0, 0.15)";
+                    }}
+                    onClick={() => {
+                      window.parent.postMessage({
+                        isOpen: true,
+                        widthPc: 450,
+                        heightPc: 700,
+                        widthSp: 100,
+                        heightSp: 100,
+                        chatbotRight: 10,
+                        chatbotBottom: 10,
+                        action: 'clickButton',
+                        id_value: content.button_submit_id
+                      }, '*');
+
+                    }
+                    }
+                  >
+                    {content.button_submit_name}
+                  </button>
+                </div>
+
+              </>
+            }
             {/* type == 'label_no_transition' */}
             {content.type === "label_no_transition" && (
               <div style={{ marginBottom: "10px" }}>
