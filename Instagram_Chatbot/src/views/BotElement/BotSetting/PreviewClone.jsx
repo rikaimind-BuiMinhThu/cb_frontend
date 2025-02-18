@@ -5037,7 +5037,7 @@ function Preview() {
                               {message.buttonName || (
                                 errorMessageSubmit.length > 0
                                   ? "更新"
-                                  : (indexMessage >= indexMessageRender ? "次へ" : "更新")
+                                  : (userIndexMessage >= userMessageArray.length ? "次へ" : "更新")
                               )}
                             </CustomButton>
                           </div>
