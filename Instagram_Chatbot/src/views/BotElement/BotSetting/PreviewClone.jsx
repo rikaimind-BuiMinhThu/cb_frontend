@@ -7631,7 +7631,7 @@ const UserMessage = ({
                                   pullDown[pullDown.type]
                                     .options_without_comment
                                 }
-                                keyValue="text"
+                                keyValue="value"
                                 style={{ width: "100%" }}
                                 placeholder={
                                   pullDown[pullDown.type].display_unselected
@@ -7662,7 +7662,7 @@ const UserMessage = ({
                                 data={
                                   pullDown[pullDown.type].options_with_comment
                                 }
-                                keyValue="text"
+                                keyValue="value"
                                 style={{ width: "49%" }}
                                 placeholder={
                                   pullDown[pullDown.type].display_unselected
