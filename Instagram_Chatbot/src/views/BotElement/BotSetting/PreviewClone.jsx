@@ -2677,7 +2677,7 @@ function Preview() {
                 }
                 else {
                   message.pull_down.customization.options_without_comment.forEach((item) => {
-                    if (item.text == textInDropdown) {
+                    if (item.value == textInDropdown) {
                       const fukuObject = {
                         type: message.type,
                         bindingMode: message.fukushashiki_search_mode,
