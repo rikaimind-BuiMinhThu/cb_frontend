@@ -2515,13 +2515,28 @@ function Preview() {
                   listFukuObject.push(fukuObjectRight);
                 }
                 else {
-                  const fukuObject = {
-                    type: message.type,
-                    bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: message.fukushashiki_search_value,
-                    bindingValue: message.text_input.text.value,
-                  };
-                  listFukuObject.push(fukuObject);
+                  if (message.fukushashiki_search_value.includes(',')) {
+                    let address = message.fukushashiki_search_value.split(',');
+                    address.forEach(value => {
+                      const fukuObject = {
+                        type: message.type,
+                        bindingMode: message.fukushashiki_search_mode,
+                        bindingAddress: value,
+                        bindingValue: message.text_input.text.value,
+                      };
+                      listFukuObject.push(fukuObject);
+                    });
+                  }
+                  else 
+                  {
+                    const fukuObject = {
+                      type: message.type,
+                      bindingMode: message.fukushashiki_search_mode,
+                      bindingAddress: message.fukushashiki_search_value,
+                      bindingValue: message.text_input.text.value,
+                    };
+                    listFukuObject.push(fukuObject);
+                  }                 
                 }
               }
 
@@ -2599,13 +2614,28 @@ function Preview() {
                 listFukuObject.push(fukuObject);
               }
               if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
-                const fukuObject = {
-                  type: 'password',
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.text_input.password.value,
-                };
-                listFukuObject.push(fukuObject);
+                if(message.fukushashiki_search_value.includes(',')){
+                  let address = message.fukushashiki_search_value.split(',');
+                  address.forEach(value => {
+                    const fukuObject = {
+                      type: 'password',
+                      bindingMode: message.fukushashiki_search_mode,
+                      bindingAddress: value,
+                      bindingValue: message.text_input.password.value,
+                    };
+                    listFukuObject.push(fukuObject);
+                  });
+                }
+                else 
+                {
+                  const fukuObject = {
+                    type: 'password',
+                    bindingMode: message.fukushashiki_search_mode,
+                    bindingAddress: message.fukushashiki_search_value,
+                    bindingValue: message.text_input.password.value,
+                  };
+                  listFukuObject.push(fukuObject);
+                }
               }
 
               if (Object.keys(message.text_input.password_confirmation).length != 0 && message.text_input.password_confirmation != undefined) {
