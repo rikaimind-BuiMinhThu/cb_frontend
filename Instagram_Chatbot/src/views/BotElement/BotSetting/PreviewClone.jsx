@@ -4118,18 +4118,15 @@ function Preview() {
               )?.text || item.default_value;
             isSaveParam = true;
           } else if (contentType === "checkbox") {
-            let dataTextChecked;
-            if (
-              field === "checkedValue" &&
-              dataContentType.checkedValue.length > 0
-            ) {
-              dataTextChecked = dataContentType.checkedValue.map(
-                (itemChecked) => {
+            let dataTextChecked = [];
+            if (field === "checkedValue") {
+              if (dataContentType.checkedValue.length > 0) {
+                dataTextChecked = dataContentType.checkedValue.map((itemChecked) => {
                   return dataContentType[dataContentType.type].find(
                     (item) => itemChecked === item.id
                   )?.text;
-                }
-              );
+                });
+              }
               isSaveParam = true;
             } else if (
               field === "initial_selection_picture" &&
@@ -4152,8 +4149,7 @@ function Preview() {
             } else {
               dataTextChecked = [];
             }
-            item.default_value =
-              dataTextChecked.join(",") ?? item.default_value;
+            item.default_value = dataTextChecked.length > 0 ? dataTextChecked.join(",") : "";
           } else if (contentType === "card_payment_radio_button") {
             let dataTextChecked;
             if (field === "initial_selection") {
