@@ -462,6 +462,89 @@ function Preview() {
     }
   }
 
+  function checkMessageCondition (message,buildParam) {
+    debugger;
+    var checked = false;
+   if(message.conditions.length > 0){
+    for (let j = 0; j < message.conditions.length; j++) {
+      let conditionItem = message.conditions[j];
+      if (j === 0) {
+        if (conditionItem.condition === "include") {
+          checked = buildParam[
+            conditionItem.nameCondition
+          ].includes(conditionItem.inputCondition);
+        } else if (conditionItem.condition === "is") {
+          checked =
+          buildParam[conditionItem.nameCondition] ==
+            conditionItem.inputCondition;
+        } else if (conditionItem.condition === "not_include") {
+          checked = !buildParam[
+            conditionItem.nameCondition
+          ].includes(conditionItem.inputCondition);
+        } else if (conditionItem.condition === "is_not") {
+          checked =
+          buildParam[conditionItem.nameCondition] !=
+            conditionItem.inputCondition;
+        }
+      } else if (conditionItem?.linkCondition === "and") {
+        if (conditionItem.condition === "include") {
+          checked =
+            checked &&
+            buildParam[conditionItem.nameCondition].includes(
+              conditionItem.inputCondition
+            );
+        } else if (conditionItem.condition === "is") {
+          checked =
+            checked &&
+            buildParam[conditionItem.nameCondition] ==
+            conditionItem.inputCondition;
+        } else if (conditionItem.condition === "not_include") {
+          checked =
+            checked &&
+            !buildParam[conditionItem.nameCondition].includes(
+              conditionItem.inputCondition
+            );
+        } else if (conditionItem.condition === "is_not") {
+          checked =
+            checked &&
+            buildParam[conditionItem.nameCondition] !=
+            conditionItem.inputCondition;
+        }
+      } else if (conditionItem?.linkCondition === "or") {
+        if (conditionItem.condition === "include") {
+          checked =
+            checked ||
+            buildParam[conditionItem.nameCondition].includes(
+              conditionItem.inputCondition
+            );
+        } else if (conditionItem.condition === "is") {
+          checked =
+            checked ||
+            buildParam[conditionItem.nameCondition] ==
+            conditionItem.inputCondition;
+        } else if (conditionItem.condition === "not_include") {
+          checked =
+            checked ||
+            !buildParam[conditionItem.nameCondition].includes(
+              conditionItem.inputCondition
+            );
+        } else if (conditionItem.condition === "is_not") {
+          checked =
+            checked ||
+            buildParam[conditionItem.nameCondition] !=
+            conditionItem.inputCondition;
+        }
+      }
+    }
+   }
+   else 
+   {
+    checked = true;
+   }
+
+    return checked;
+  }
+
   function onOpenPreview(opening) {
     const receiveDeviceParam = params.get("deviceReceive");
     if (isOpen && activePopupCloseBot) {
@@ -559,6 +642,30 @@ function Preview() {
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
 
+  function createObjParamObject(dataMessage)
+  {
+    let result = {};
+    let contents = dataMessage.message_content;
+    contents.forEach((content) => {
+      switch (content.type) {
+        case "pull_down":
+          {
+            if(content.pull_down.is_save_input_content==true)
+            {
+              if(content.pull_down.type=="customization")
+              {
+                var variableName = content.pull_down.save_input_content
+                var variableValue = content.pull_down.customization.value
+                result[variableName]= variableValue
+              }    
+            }            
+          }
+      }
+    })
+
+    return result;
+  }
+
   // useEffect(() => {
   //   api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
   //     if (res.data.code == 1) {
@@ -580,6 +687,35 @@ function Preview() {
         }
       });
   }, []);
+
+  const buildObjParamFromDataMessage = (messsages) => {
+    let result = {
+      current_url: window.location.href,
+      current_url_param: getAllUrlParams(window.location.href),
+      current_url_title: document.title,
+      user_id: Cookies.get("user_id"),
+      bot_id: Cookies.get("bot_id"),
+    };
+
+    if (!result.user_agent) {
+      // $.getJSON("https://api.ipregistry.co/?key=tryout", function (data) {
+      //   result.user_ip_address = data.ip;
+      //   result.user_country = data.location.country.name;
+      //   result.user_city = data.location.city;
+      //   result.user_device = data.user_agent.device.type;
+      //   result.user_browser = data.user_agent.name;
+      //   result.user_agent = data.user_agent.header;
+      //   result.start_datetime = new Date();
+      // });
+    }
+
+    messsages.forEach(message => {
+      let builtParam = createObjParamObject(message);
+      result = { ...result, ...builtParam };
+    });
+
+    return result;
+  }
 
   useEffect(() => {
     let delayRender;
@@ -1194,7 +1330,17 @@ function Preview() {
                   
                   let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
                   dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
-                  filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);                    
+                  filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
+                  setObjParam(buildObjParamFromDataMessage(filteredMessages));
+                  filteredMessages.forEach(data => {
+                    let a = buildObjParamFromDataMessage(filteredMessages)
+                    let checkResult = checkMessageCondition(data,a)
+                    if(checkMessageCondition(data,buildObjParamFromDataMessage(filteredMessages))!=true)
+                    {
+                      filteredMessages.remove(data);
+                    }
+                  })
+
                   filteredMessages.forEach(data => {
                     let objSend = {
                       message: data
@@ -1208,8 +1354,10 @@ function Preview() {
                       chatbotRight: rightMarginPc,
                       chatbotBottom: bottomMarginPc,
                       fukushashikiResponse: getObjectFukushashiki(objSend)
-                    }, '*') ;
-                  })               
+                    }, '*');
+                  });
+
+                 
                   setRenderMessageArr(dataMesage);
 
                   setIndexMessageRender(dataMesage.length - 1);
