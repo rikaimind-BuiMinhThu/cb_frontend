@@ -1190,18 +1190,34 @@ function Preview() {
                     if (Array.isArray(data.message_content)) {
                       data.message_content = data.message_content.filter(item => item.type !== "delay");
                     }
-                  });
-                  setRenderMessageArr(dataMesage);
+                  }); 
+                  
                   let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
                   if (isLoggedIn == "true") {
                     dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
                     filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
-                    setRenderMessageArr(dataMesage);
-                  }
+                  }    
+                  filteredMessages.forEach(data => {
+                    let objSend = {
+                      message: data
+                    }
+                    window.parent.postMessage({
+                      isOpen: true,
+                      widthPc: widthPc,
+                      heightPc: heightPc,
+                      widthSp: widthSp,
+                      heightSp: heightSp,
+                      chatbotRight: rightMarginPc,
+                      chatbotBottom: bottomMarginPc,
+                      fukushashikiResponse: getObjectFukushashiki(objSend)
+                    }, '*');
+                  })               
+                  setRenderMessageArr(dataMesage);
+
                   setIndexMessageRender(dataMesage.length - 1);
                   setMessageUser(filteredMessages)
-                  setIndexUser(filteredMessages.length)
-                  setIsOpen(true)
+                  setIndexUser(filteredMessages.length)                
+                  setIsOpen(true)                         
                   setTimeout(() => {
                     const buttons = document.querySelectorAll('button.ss-user-message__action-btn.btn.btn-secondary');
                     if (buttons.length > 0) {
@@ -1212,7 +1228,7 @@ function Preview() {
                         view: window
                       }));
                     }
-                  }, 8000);
+                  }, 8000);       
 
                 }
               }
