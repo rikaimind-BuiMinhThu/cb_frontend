@@ -1190,18 +1190,32 @@ function Preview() {
                     if (Array.isArray(data.message_content)) {
                       data.message_content = data.message_content.filter(item => item.type !== "delay");
                     }
-                  });
-                  setRenderMessageArr(dataMesage);
+                  }); 
+                  
                   let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
-                  if (isLoggedIn == "true") {
-                    dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
-                    filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
-                    setRenderMessageArr(dataMesage);
-                  }
+                  dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
+                  filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);                    
+                  filteredMessages.forEach(data => {
+                    let objSend = {
+                      message: data
+                    }
+                    window.parent.postMessage({
+                      isOpen: true,
+                      widthPc: widthPc,
+                      heightPc: heightPc,
+                      widthSp: widthSp,
+                      heightSp: heightSp,
+                      chatbotRight: rightMarginPc,
+                      chatbotBottom: bottomMarginPc,
+                      fukushashikiResponse: getObjectFukushashiki(objSend)
+                    }, '*') ;
+                  })               
+                  setRenderMessageArr(dataMesage);
+
                   setIndexMessageRender(dataMesage.length - 1);
                   setMessageUser(filteredMessages)
-                  setIndexUser(filteredMessages.length)
-                  setIsOpen(true)
+                  setIndexUser(filteredMessages.length)                
+                  setIsOpen(true)                         
                   setTimeout(() => {
                     const buttons = document.querySelectorAll('button.ss-user-message__action-btn.btn.btn-secondary');
                     if (buttons.length > 0) {
@@ -1212,7 +1226,7 @@ function Preview() {
                         view: window
                       }));
                     }
-                  }, 8000);
+                  }, 8000);       
 
                 }
               }
@@ -2515,13 +2529,28 @@ function Preview() {
                   listFukuObject.push(fukuObjectRight);
                 }
                 else {
-                  const fukuObject = {
-                    type: message.type,
-                    bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: message.fukushashiki_search_value,
-                    bindingValue: message.text_input.text.value,
-                  };
-                  listFukuObject.push(fukuObject);
+                  if (message.fukushashiki_search_value.includes(',')) {
+                    let address = message.fukushashiki_search_value.split(',');
+                    address.forEach(value => {
+                      const fukuObject = {
+                        type: message.type,
+                        bindingMode: message.fukushashiki_search_mode,
+                        bindingAddress: value,
+                        bindingValue: message.text_input.text.value,
+                      };
+                      listFukuObject.push(fukuObject);
+                    });
+                  }
+                  else 
+                  {
+                    const fukuObject = {
+                      type: message.type,
+                      bindingMode: message.fukushashiki_search_mode,
+                      bindingAddress: message.fukushashiki_search_value,
+                      bindingValue: message.text_input.text.value,
+                    };
+                    listFukuObject.push(fukuObject);
+                  }                 
                 }
               }
 
@@ -2599,13 +2628,28 @@ function Preview() {
                 listFukuObject.push(fukuObject);
               }
               if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
-                const fukuObject = {
-                  type: 'password',
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.text_input.password.value,
-                };
-                listFukuObject.push(fukuObject);
+                if(message.fukushashiki_search_value.includes(',')){
+                  let address = message.fukushashiki_search_value.split(',');
+                  address.forEach(value => {
+                    const fukuObject = {
+                      type: 'password',
+                      bindingMode: message.fukushashiki_search_mode,
+                      bindingAddress: value,
+                      bindingValue: message.text_input.password.value,
+                    };
+                    listFukuObject.push(fukuObject);
+                  });
+                }
+                else 
+                {
+                  const fukuObject = {
+                    type: 'password',
+                    bindingMode: message.fukushashiki_search_mode,
+                    bindingAddress: message.fukushashiki_search_value,
+                    bindingValue: message.text_input.password.value,
+                  };
+                  listFukuObject.push(fukuObject);
+                }
               }
 
               if (Object.keys(message.text_input.password_confirmation).length != 0 && message.text_input.password_confirmation != undefined) {
@@ -2677,7 +2721,7 @@ function Preview() {
                 }
                 else {
                   message.pull_down.customization.options_without_comment.forEach((item) => {
-                    if (item.text == textInDropdown) {
+                    if (item.value == textInDropdown) {
                       const fukuObject = {
                         type: message.type,
                         bindingMode: message.fukushashiki_search_mode,
@@ -4118,18 +4162,15 @@ function Preview() {
               )?.text || item.default_value;
             isSaveParam = true;
           } else if (contentType === "checkbox") {
-            let dataTextChecked;
-            if (
-              field === "checkedValue" &&
-              dataContentType.checkedValue.length > 0
-            ) {
-              dataTextChecked = dataContentType.checkedValue.map(
-                (itemChecked) => {
+            let dataTextChecked = [];
+            if (field === "checkedValue") {
+              if (dataContentType.checkedValue.length > 0) {
+                dataTextChecked = dataContentType.checkedValue.map((itemChecked) => {
                   return dataContentType[dataContentType.type].find(
                     (item) => itemChecked === item.id
                   )?.text;
-                }
-              );
+                });
+              }
               isSaveParam = true;
             } else if (
               field === "initial_selection_picture" &&
@@ -4152,8 +4193,7 @@ function Preview() {
             } else {
               dataTextChecked = [];
             }
-            item.default_value =
-              dataTextChecked.join(",") ?? item.default_value;
+            item.default_value = dataTextChecked.length > 0 ? dataTextChecked.join(",") : "";
           } else if (contentType === "card_payment_radio_button") {
             let dataTextChecked;
             if (field === "initial_selection") {
