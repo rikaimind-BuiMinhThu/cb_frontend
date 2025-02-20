@@ -1193,10 +1193,8 @@ function Preview() {
                   }); 
                   
                   let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
-                  if (isLoggedIn == "true") {
-                    dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
-                    filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
-                  }    
+                  dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
+                  filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);                    
                   filteredMessages.forEach(data => {
                     let objSend = {
                       message: data
@@ -1210,7 +1208,7 @@ function Preview() {
                       chatbotRight: rightMarginPc,
                       chatbotBottom: bottomMarginPc,
                       fukushashikiResponse: getObjectFukushashiki(objSend)
-                    }, '*');
+                    }, '*') ;
                   })               
                   setRenderMessageArr(dataMesage);
 
