@@ -231,11 +231,11 @@
 .sp-carousel-container-preivew {
     display: flex;
     overflow-x: auto;
-    width: 262px;
+    width: '100%';
 }
 
 .sp-carousel-container-block-item {
-    width: 223px;
+    width: '100%';
     border: 1px solid #2C75F0;
     border-radius: 10px;
     margin-right: 10px;
@@ -258,7 +258,7 @@
 }
 
 .sp-carousel-preview-img {
-    height: 145px;
+    height: 185px;
 }
 
 .sp-carousel-preview-img img {
