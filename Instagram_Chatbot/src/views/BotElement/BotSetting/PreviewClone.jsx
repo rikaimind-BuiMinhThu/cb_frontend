@@ -46,13 +46,10 @@ import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-p
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
 
-const _ = require("lodash");
 sessionStorage.setItem("prevOpenStatus", "0");
-let errorMessageSubmit = '';
 let previewOrderInfor = {};
 let isDisplayOrderPreview = false;
 let previewContent = ``
-let isDisplayErrorMessage = false;
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
   if (i < 10) {
@@ -120,28 +117,6 @@ for (let i = 1; i <= 31; i++) {
   }
 }
 
-let dataEveryMinute = [
-  {
-    key: "00",
-    value: "00",
-  },
-  {
-    key: "05",
-    value: "05",
-  },
-  {
-    key: "10",
-    value: "10",
-  },
-  {
-    key: "15",
-    value: "15",
-  },
-  {
-    key: "30",
-    value: "30",
-  },
-];
 
 let dataPaymentMethod = [
   {
@@ -233,6 +208,8 @@ function Preview() {
   const [scenarioUserResponses, setScenarioUserResponses] = useState([])
   const [checkoutUrl, setCheckoutUrl] = useState("")
   const [lpOptionData, setLpOptionData] = useState({});
+  const [errorMessageSubmit, setErrorMessageSubmit] = useState('');
+  const [isDisplayErrorMessage, setIsDisplayErrorMessage] = useState(false);
 
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
@@ -289,7 +266,6 @@ function Preview() {
     return check;
   }
 
-  let socket;
   //get chat bot setting
   useEffect(() => {
     let botIdGet = params.get("bot_id");
@@ -358,13 +334,8 @@ function Preview() {
           onOpenPreview(true)
         }
         if (event.data.text != undefined && event.data.text.trim().length > 0) {
-          if (isDisplayErrorMessage) {
-            errorMessageSubmit = event.data.text;
-
-          }
-          else {
-            errorMessageSubmit = '';
-          }
+          setErrorMessageSubmit(event.data.text);
+          return;
         }
 
         if (event.data.objectSend != undefined) {
@@ -615,23 +586,6 @@ function Preview() {
     }
   }
 
-  function findFirstConfirmMessageObject(dataList) {
-    let result = null;
-
-    for (const data of dataList) {
-      if (data.message_content) {
-        for (const item of data.message_content) {
-          if (item.text_input && item.text_input.use_for_confirm_message === true) {
-            result = data;
-            return result;
-          }
-        }
-      }
-    }
-
-    return result;
-  }
-
   function lightenColor(hex, opacity) {
     let r = parseInt(hex.slice(1, 3), 16);
     let g = parseInt(hex.slice(3, 5), 16);
@@ -663,14 +617,6 @@ function Preview() {
 
     return result;
   }
-
-  // useEffect(() => {
-  //   api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
-  //     if (res.data.code == 1) {
-  //       setBotInfor(res.data.data);
-  //     }
-  //   }).catch(err => console.log(err));
-  // }, [])
 
   useEffect(() => {
     api
@@ -747,7 +693,6 @@ function Preview() {
                         seachMode: itemTwo.error_message_display_element_search_type,
                         searchValue: itemTwo.error_message_display_element_search_value,
                       };
-                      isDisplayErrorMessage = itemTwo.button_submit.is_display_error_message;
                       window.parent.postMessage(
                         {
                           isOpen: true,
@@ -762,14 +707,11 @@ function Preview() {
                         },
                         '*'
                       );
+                      setIsDisplayErrorMessage(itemTwo.button_submit.is_display_error_message);
                       break;
                     }
                   }
-
                 }
-              }
-              if (errorMessageSubmit.trim().length > 0 && isDisplayErrorMessage == true) {
-                res.data.design_settings.display_type = 1;
               }
             }
             if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
@@ -781,7 +723,7 @@ function Preview() {
               api.patch(apiUrl, openChatbotCountApiParams)
                 .catch(err => {
                   console.log(err)
-                })
+                });
             }
             let messageArr = [];
             if (res.data.data?.conversation?.messages?.length > 0) {
@@ -1034,7 +976,7 @@ function Preview() {
                         `/api/v1/managements/emails/${emailId}/send_email`,
                         data
                       )
-                      .then((res) => { })
+                      .then(() => { })
                       .catch((error) => {
                         console.log(error);
                         if (error.response?.data.code === 0) {
@@ -1310,62 +1252,8 @@ function Preview() {
                   index = i;
                   break;
                 }
-                // }
               }
             }
-            // setIndexMessageRender(index);
-            // setRenderMessageArr(renderMessage);
-            try {
-              if (isDisplayErrorMessage == true && errorMessageSubmit.trim().length > 0) {
-                var dataMessageInLocalStorage = getMessagesSessionStorage();
-                if (dataMessageInLocalStorage) {               
-                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);                 
-                  filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
-                  const builtObjParam = buildObjParamFromDataMessage(filteredMessages);
-                  filteredMessages = filteredMessages.filter(data => {
-                    return checkMessageCondition(data, builtObjParam);
-                  });
-
-                  filteredMessages.forEach(data => {
-                    let objSend = {
-                      message: data
-                    }
-                    window.parent.postMessage({
-                      isOpen: true,
-                      widthPc: widthPc,
-                      heightPc: heightPc,
-                      widthSp: widthSp,
-                      heightSp: heightSp,
-                      chatbotRight: rightMarginPc,
-                      chatbotBottom: bottomMarginPc,
-                      fukushashikiResponse: getObjectFukushashiki(objSend)
-                    }, '*');
-                  });
-                  setIsOpen(true);
-                  setObjParam(buildObjParamFromDataMessage(filteredMessages));
-                  setRenderMessageArr(filteredMessages);
-                  setIndexMessageRender(filteredMessages.length - 1);
-                  setMessageUser(filteredMessages.filter(x => x.belong_to === 'user'));
-                  setIndexUser(filteredMessages.filter(x => x.belong_to === 'user').length)
-                  setTimeout(() => {
-                    const buttons = document.querySelectorAll('button.ss-user-message__action-btn.btn.btn-secondary');
-                    if (buttons.length > 0) {
-                      const lastButton = buttons[buttons.length - 1];
-                      lastButton.dispatchEvent(new MouseEvent("click", {
-                        bubbles: true,
-                        cancelable: true,
-                        view: window
-                      }));
-                    }
-                  }, 8000);
-
-                }
-              }
-            }
-            catch {
-
-            }
-            scrollToBottom();
           }
         })
         .catch((error) => {
@@ -1379,6 +1267,62 @@ function Preview() {
       clearTimeout(delayRender);
     };
   }, [scenarioId]);
+
+  useEffect(() => {
+    try {
+      if (isDisplayErrorMessage == true && errorMessageSubmit.trim().length > 0) {
+        const dataMessageInLocalStorage = getMessagesSessionStorage();
+        if (dataMessageInLocalStorage) {
+          const builtObjParam = buildObjParamFromDataMessage(dataMessageInLocalStorage);
+          let filteredMessages = dataMessageInLocalStorage.filter(x => {
+            return x.hidden !== true && (isLoggedIn && !x.not_display_when_logged_in) &&
+              checkMessageCondition(x, builtObjParam);
+          });
+          // I want to remove all dupplicate data of filedredMessage by id then sort them
+          filteredMessages = filteredMessages.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i)
+            .sort((a, b) => a.id - b.id);
+          const userMessages = filteredMessages.filter(x => x.belong_to === 'user');
+
+          setTimeout(() => {
+            const buttons = document.querySelectorAll('button.ss-user-message__action-btn.btn.btn-secondary');
+            if (buttons.length > 0) {
+              const lastButton = buttons[buttons.length - 1];
+              lastButton.dispatchEvent(new MouseEvent("click", {
+                bubbles: true,
+                cancelable: true,
+                view: window
+              }));
+            }
+          }, 8000);
+          setTimeout(() => {
+            userMessages.forEach(data => {
+              window.parent.postMessage({
+                isOpen: true,
+                widthPc: widthPc,
+                heightPc: heightPc,
+                widthSp: widthSp,
+                heightSp: heightSp,
+                chatbotRight: rightMarginPc,
+                chatbotBottom: bottomMarginPc,
+                fukushashikiResponse: getObjectFukushashiki({message: data})
+              }, '*');
+            });
+          }, 1000);
+
+          setIsOpen(true);
+          setObjParam(builtObjParam);
+          setRenderMessageArr(filteredMessages);
+          setIndexMessageRender(filteredMessages.length - 1);
+          setMessageUser(userMessages);
+          setIndexUser(userMessages.length)
+        }
+      }
+    }
+    catch (ex) {
+      console.error(ex);
+    }
+    scrollToBottom();
+  }, [errorMessageSubmit, isDisplayErrorMessage]);
 
   // useEffect(() => {
   //   return () => {
@@ -2641,8 +2585,8 @@ function Preview() {
         switch (message.type) {
           case 'text_input':
             {
-              if (message.text_input?.text.value != undefined || message.text_input?.text.valueLeft != undefined || message.text_input?.text.valueRight != undefined) {
-                if (message.text_input.text.isSplitInput == true) {
+              if (message.text_input?.text?.value != undefined || message.text_input?.text?.valueLeft != undefined || message.text_input?.text?.valueRight != undefined) {
+                if (message.text_input?.text?.isSplitInput == true) {
                   const fukuObjectLeft = {
                     type: message.type,
                     bindingMode: message.left_fukushashiki_search_mode,
@@ -2697,10 +2641,10 @@ function Preview() {
 
               if (Object.keys(message.text_input.email_confirmation).length != 0 && message.text_input.email_confirmation != undefined) {
                 const userInputData = Object.fromEntries(
-                  Object.entries(message.text_input.email_confirmation).filter(([key, value]) => key.includes("value"))
+                  Object.entries(message.text_input.email_confirmation).filter(([key]) => key.includes("value"))
                 );
                 const dataInforFukushashiki = Object.fromEntries(
-                  Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+                  Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
                 );
                 const types = ["value", "valueConfirm"];
                 const result = types
@@ -2730,10 +2674,10 @@ function Preview() {
                 }
                 else {
                   const userInputData = Object.fromEntries(
-                    Object.entries(message.text_input.phone_number).filter(([key, value]) => key.includes("value"))
+                    Object.entries(message.text_input.phone_number).filter(([key]) => key.includes("value"))
                   );
                   const dataInforFukushashiki = Object.fromEntries(
-                    Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+                    Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
                   );
                   const types = ["value1", "value2", "value3"];
                   const result = types
@@ -2879,7 +2823,7 @@ function Preview() {
               }
 
               const userInputData = Object.fromEntries(
-                Object.entries(message.pull_down?.date_md || {}).filter(([key, value]) => key.includes("value"))
+                Object.entries(message.pull_down?.date_md || {}).filter(([key]) => key.includes("value"))
               );
 
               const additionalKeys = [
@@ -2896,12 +2840,12 @@ function Preview() {
               ];
 
               additionalKeys.forEach(key => {
-                const entries = Object.entries(message.pull_down?.[key] || {}).filter(([k, v]) => k.includes("value"));
+                const entries = Object.entries(message.pull_down?.[key] || {}).filter(([k]) => k.includes("value"));
                 Object.assign(userInputData, Object.fromEntries(entries));
               });
 
               const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+                Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
               );
 
               const types = ["day", "month", "year", "hour", "minute", "Day", "Month", "Year", "Hour", "Minute", "valueDay", "valueMonth", "valueYear", "valueHour", "valueMinute"];
@@ -2933,10 +2877,10 @@ function Preview() {
           case 'zip_code_address':
             {
               const userInputData = Object.fromEntries(
-                Object.entries(message.zip_code_address).filter(([key, value]) => key.includes("value_"))
+                Object.entries(message.zip_code_address).filter(([key]) => key.includes("value_"))
               );
               const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+                Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
               );
               const types = ["building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right"];
               const result = types
@@ -2961,10 +2905,10 @@ function Preview() {
           case 'shipping_address':
             {
               const userInputData = Object.fromEntries(
-                Object.entries(message.shipping_address).filter(([key, value]) => key.includes("value_"))
+                Object.entries(message.shipping_address).filter(([key]) => key.includes("value_"))
               );
               const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+                Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
               );
               const types = ["number1", "number2", "number3", "number", "name_left", "name_right", "kana_left", "kana_right", "building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right", "initial_selection"];
               const result = types
@@ -3069,7 +3013,7 @@ function Preview() {
                 return result;
               }, {});
               const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key, value]) => key.includes("fukushashiki"))
+                Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
               );
               const types = ["card_number", "card_holder1", "card_holder2", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4", "installment", "initial_selection"];
               const result = types
@@ -3152,7 +3096,8 @@ function Preview() {
     else {
       renderMessageArr[indexMessage].disabled = true;
     }
-    setRenderMessageArr(renderMessageArr)
+    const sortedMessages = renderMessageArr.sort((a, b) => a.id - b.id);
+    setRenderMessageArr(sortedMessages);
     let index;
     let isPauseScroll = false;
     let delayRender;
@@ -3184,7 +3129,7 @@ function Preview() {
             `/api/v1/scenario_users/scenario_user_responses/create_order`,
             data_submit
           )
-          .then((res) => {
+          .then(() => {
             if (params.get('cartSystem') === 'shopify') return;
             const conversion = {
               scenario_data: `${deviceReceive}_conversion`,
@@ -3232,7 +3177,7 @@ function Preview() {
             `/api/v1/scenario_users/scenario_user_responses/create_order`,
             data_submit
           )
-          .then((res) => {
+          .then(() => {
             if (params.get('cartSystem') === 'shopify') return;
             const conversion = {
               scenario_data: `${deviceReceive}_conversion`,
@@ -3465,7 +3410,7 @@ function Preview() {
 
               api
                 .post(`/api/v1/managements/emails/${emailId}/send_email`, data)
-                .then((res) => { })
+                .then(() => { })
                 .catch((error) => {
                   console.log(error);
                   if (error.response?.data.code === 0) {
@@ -3582,7 +3527,7 @@ function Preview() {
                         `/api/v1/scenario_users/scenario_user_responses/create_order`,
                         data_submit
                       )
-                      .then((res) => { })
+                      .then(() => { })
                       .catch((error) => {
                         console.log(error);
                         if (error.response?.data.code === 0) {
@@ -3601,7 +3546,7 @@ function Preview() {
                         `/api/v1/scenario_users/scenario_user_responses/create_order`,
                         data_submit
                       )
-                      .then((res) => {
+                      .then(() => {
                         // api.post(`/api/v1/managements/payment_histories`, data_submit).then((res)=>{}).catch((err) => {
                         //   console.log(err);
                         // if (err.response?.data.code === 0) {
@@ -3977,7 +3922,7 @@ function Preview() {
                     `/api/v1/managements/emails/${emailId}/send_email`,
                     data
                   )
-                  .then((res) => { })
+                  .then(() => { })
                   .catch((error) => {
                     console.log(error);
                     if (error.response?.data.code === 0) {
@@ -4450,7 +4395,7 @@ function Preview() {
         let withdrawal = {
           scenario_data: `${deviceReceive}_close_chatbot_window`,
         };
-        api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+        api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(() => {
         }).catch(err => {
           console.log(err)
         })
@@ -4517,6 +4462,7 @@ function Preview() {
 
   ///body container
   if (scenarioId && botInfor && isOpen) {
+    console.log(renderMessageArr)    
     return (
       <div
         ref={containerRef}
@@ -4593,7 +4539,7 @@ function Preview() {
                     let withdrawal = {
                       scenario_data: `${deviceReceive}_close_chatbot_window`,
                     };
-                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(() => {
                     }).catch(err => {
                       console.log(err)
                     })
@@ -4601,7 +4547,7 @@ function Preview() {
                     let withdrawal = {
                       scenario_data: `${deviceReceive}_close_chatbot_window`,
                     };
-                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(res => {
+                    api.patch(`/api/v1/analytics/scenario_counts/${scenarioId}`, withdrawal).then(() => {
                     }).catch(err => {
                       console.log(err)
                     })
@@ -5121,7 +5067,7 @@ function Preview() {
           style={{ backgroundColor: botInfor?.opacity_color, flex: 1 }}
         >
           {renderMessageArr.map((message, indexMessage) => {
-            if (message.belong_to === "user") userIndexMessage++;
+            if (message.belong_to === "user") userIndexMessage++;1
             return (
               <React.Fragment key={indexMessage}>
                 {message.belong_to === "bot" && Array.isArray(message?.message_content) &&
@@ -5419,7 +5365,7 @@ function Preview() {
   return (<div></div>)
 }
 
-const BotMessage = ({ content, index, botInfor, checkoutUrl }) => {
+const BotMessage = ({ content, index, botInfor }) => {
   const handleDownloadFile = (file) => {
     let link = document.createElement("a");
     link.href = file;
@@ -5688,9 +5634,6 @@ const UserMessage = ({
         )?.[0]?.data || "";
   }
 
-  function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
   const stringNullOrEmpty = (string) => {
     if (
       string === undefined ||
@@ -6138,14 +6081,6 @@ const UserMessage = ({
       });
   };
 
-  function checkLoadCalendar() {
-    // if (document.getElementsByClassName('ant-picker-calendar-year-select')) {
-    //   const divs = document.querySelectorAll('.ant-picker-calendar-year-select');
-    //   divs.forEach(el => el.addEventListener('click', event => {
-    //     alert('Please select')
-    //   }));
-    // }
-  }
 
   function replaceVariable(content) {
     content = content.replaceAll(SCAN_REGEX, (text, variable) => {
@@ -6183,12 +6118,9 @@ const UserMessage = ({
         let productPurchase = content.product_purchase;
         let productPurchaseRadioButton = content.product_purchase_radio_button;
         let productPurchaseSelectOption = content.product_purchase_select_option;
-        let smsVerify = content.sms_verify;
-        let afteePaymentModule = content.AFTEE_payment_module;
         let slider = content.slider;
         let cardPaymentRadioButton = content.card_payment_radio_button;
         let shippingAddress = content.shipping_address;
-        let variableSet = content.variable_set;
         let buttonSubmit = content.button_submit;
         let labelNoTransition = content.label_no_transition;
 
