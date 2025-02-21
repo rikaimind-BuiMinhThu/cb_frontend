@@ -2863,7 +2863,7 @@ function Preview() {
           case 'radio_button':
             {
               const initialSelection = message.radio_button.initial_selection;
-              const selectedElement = message.radio_button.default.find(item => item.id === initialSelection);
+              const selectedElement = message.radio_button.default.find(item => item.value === initialSelection);
               if (selectedElement) {
                 const value = selectedElement.value;
                 const fukuObject = {
