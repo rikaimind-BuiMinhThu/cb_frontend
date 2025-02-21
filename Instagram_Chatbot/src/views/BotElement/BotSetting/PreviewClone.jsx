@@ -1318,18 +1318,11 @@ function Preview() {
             try {
               if (isDisplayErrorMessage == true && errorMessageSubmit.trim().length > 0) {
                 var dataMessageInLocalStorage = getMessagesSessionStorage();
-                if (dataMessageInLocalStorage) {
-                  let dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true)
-                  dataMesage.forEach(data => {
-                    if (Array.isArray(data.message_content)) {
-                      data.message_content = data.message_content.filter(item => item.type !== "delay");
-                    }
-                  });
-                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
-                  dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
+                if (dataMessageInLocalStorage) {               
+                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);                 
                   filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
                   const builtObjParam = buildObjParamFromDataMessage(filteredMessages);
-                  dataMesage = dataMesage.filter(data => {
+                  filteredMessages = filteredMessages.filter(data => {
                     return checkMessageCondition(data, builtObjParam);
                   });
 
@@ -1350,10 +1343,10 @@ function Preview() {
                   });
                   setIsOpen(true);
                   setObjParam(buildObjParamFromDataMessage(filteredMessages));
-                  setRenderMessageArr(dataMesage);
-                  setIndexMessageRender(dataMesage.length - 1);
-                  setMessageUser(filteredMessages)
-                  setIndexUser(filteredMessages.length)
+                  setRenderMessageArr(filteredMessages);
+                  setIndexMessageRender(filteredMessages.length - 1);
+                  setMessageUser(filteredMessages.filter(x => x.belong_to === 'user'));
+                  setIndexUser(filteredMessages.filter(x => x.belong_to === 'user').length)
                   setTimeout(() => {
                     const buttons = document.querySelectorAll('button.ss-user-message__action-btn.btn.btn-secondary');
                     if (buttons.length > 0) {
