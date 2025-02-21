@@ -462,85 +462,83 @@ function Preview() {
     }
   }
 
-  function checkMessageCondition (message,buildParam) {
-    debugger;
-    var checked = false;
-   if(message.conditions.length > 0){
-    for (let j = 0; j < message.conditions.length; j++) {
-      let conditionItem = message.conditions[j];
-      if (j === 0) {
-        if (conditionItem.condition === "include") {
-          checked = buildParam[
-            conditionItem.nameCondition
-          ].includes(conditionItem.inputCondition);
-        } else if (conditionItem.condition === "is") {
-          checked =
-          buildParam[conditionItem.nameCondition] ==
-            conditionItem.inputCondition;
-        } else if (conditionItem.condition === "not_include") {
-          checked = !buildParam[
-            conditionItem.nameCondition
-          ].includes(conditionItem.inputCondition);
-        } else if (conditionItem.condition === "is_not") {
-          checked =
-          buildParam[conditionItem.nameCondition] !=
-            conditionItem.inputCondition;
-        }
-      } else if (conditionItem?.linkCondition === "and") {
-        if (conditionItem.condition === "include") {
-          checked =
-            checked &&
-            buildParam[conditionItem.nameCondition].includes(
-              conditionItem.inputCondition
-            );
-        } else if (conditionItem.condition === "is") {
-          checked =
-            checked &&
-            buildParam[conditionItem.nameCondition] ==
-            conditionItem.inputCondition;
-        } else if (conditionItem.condition === "not_include") {
-          checked =
-            checked &&
-            !buildParam[conditionItem.nameCondition].includes(
-              conditionItem.inputCondition
-            );
-        } else if (conditionItem.condition === "is_not") {
-          checked =
-            checked &&
-            buildParam[conditionItem.nameCondition] !=
-            conditionItem.inputCondition;
-        }
-      } else if (conditionItem?.linkCondition === "or") {
-        if (conditionItem.condition === "include") {
-          checked =
-            checked ||
-            buildParam[conditionItem.nameCondition].includes(
-              conditionItem.inputCondition
-            );
-        } else if (conditionItem.condition === "is") {
-          checked =
-            checked ||
-            buildParam[conditionItem.nameCondition] ==
-            conditionItem.inputCondition;
-        } else if (conditionItem.condition === "not_include") {
-          checked =
-            checked ||
-            !buildParam[conditionItem.nameCondition].includes(
-              conditionItem.inputCondition
-            );
-        } else if (conditionItem.condition === "is_not") {
-          checked =
-            checked ||
-            buildParam[conditionItem.nameCondition] !=
-            conditionItem.inputCondition;
+  function checkMessageCondition(message, buildParam) {
+    let checked = false;
+    if (message.conditions.length > 0) {
+      for (let j = 0; j < message.conditions.length; j++) {
+        let conditionItem = message.conditions[j];
+        if (j === 0) {
+          if (conditionItem.condition === "include") {
+            checked = buildParam[
+              conditionItem.nameCondition
+            ].includes(conditionItem.inputCondition);
+          } else if (conditionItem.condition === "is") {
+            checked =
+              buildParam[conditionItem.nameCondition] ==
+              conditionItem.inputCondition;
+          } else if (conditionItem.condition === "not_include") {
+            checked = !buildParam[
+              conditionItem.nameCondition
+            ].includes(conditionItem.inputCondition);
+          } else if (conditionItem.condition === "is_not") {
+            checked =
+              buildParam[conditionItem.nameCondition] !=
+              conditionItem.inputCondition;
+          }
+        } else if (conditionItem?.linkCondition === "and") {
+          if (conditionItem.condition === "include") {
+            checked =
+              checked &&
+              buildParam[conditionItem.nameCondition].includes(
+                conditionItem.inputCondition
+              );
+          } else if (conditionItem.condition === "is") {
+            checked =
+              checked &&
+              buildParam[conditionItem.nameCondition] ==
+              conditionItem.inputCondition;
+          } else if (conditionItem.condition === "not_include") {
+            checked =
+              checked &&
+              !buildParam[conditionItem.nameCondition].includes(
+                conditionItem.inputCondition
+              );
+          } else if (conditionItem.condition === "is_not") {
+            checked =
+              checked &&
+              buildParam[conditionItem.nameCondition] !=
+              conditionItem.inputCondition;
+          }
+        } else if (conditionItem?.linkCondition === "or") {
+          if (conditionItem.condition === "include") {
+            checked =
+              checked ||
+              buildParam[conditionItem.nameCondition].includes(
+                conditionItem.inputCondition
+              );
+          } else if (conditionItem.condition === "is") {
+            checked =
+              checked ||
+              buildParam[conditionItem.nameCondition] ==
+              conditionItem.inputCondition;
+          } else if (conditionItem.condition === "not_include") {
+            checked =
+              checked ||
+              !buildParam[conditionItem.nameCondition].includes(
+                conditionItem.inputCondition
+              );
+          } else if (conditionItem.condition === "is_not") {
+            checked =
+              checked ||
+              buildParam[conditionItem.nameCondition] !=
+              conditionItem.inputCondition;
+          }
         }
       }
     }
-   }
-   else 
-   {
-    checked = true;
-   }
+    else {
+      checked = true;
+    }
 
     return checked;
   }
@@ -1326,20 +1324,14 @@ function Preview() {
                     if (Array.isArray(data.message_content)) {
                       data.message_content = data.message_content.filter(item => item.type !== "delay");
                     }
-                  }); 
-                  
+                  });
                   let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
                   dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
                   filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
-                  setObjParam(buildObjParamFromDataMessage(filteredMessages));
-                  filteredMessages.forEach(data => {
-                    let a = buildObjParamFromDataMessage(filteredMessages)
-                    let checkResult = checkMessageCondition(data,a)
-                    if(checkMessageCondition(data,buildObjParamFromDataMessage(filteredMessages))!=true)
-                    {
-                      filteredMessages.remove(data);
-                    }
-                  })
+                  const builtObjParam = buildObjParamFromDataMessage(filteredMessages);
+                  filteredMessages = filteredMessages.filter(data => {
+                    return checkMessageCondition(data, builtObjParam);
+                  });
 
                   filteredMessages.forEach(data => {
                     let objSend = {
@@ -1356,14 +1348,12 @@ function Preview() {
                       fukushashikiResponse: getObjectFukushashiki(objSend)
                     }, '*');
                   });
-
-                 
-                  setRenderMessageArr(dataMesage);
-
-                  setIndexMessageRender(dataMesage.length - 1);
+                  setIsOpen(true);
+                  setObjParam(buildObjParamFromDataMessage(filteredMessages));
+                  setRenderMessageArr(filteredMessages);
+                  setIndexMessageRender(filteredMessages.length - 1);
                   setMessageUser(filteredMessages)
-                  setIndexUser(filteredMessages.length)                
-                  setIsOpen(true)                         
+                  setIndexUser(filteredMessages.length)
                   setTimeout(() => {
                     const buttons = document.querySelectorAll('button.ss-user-message__action-btn.btn.btn-secondary');
                     if (buttons.length > 0) {
@@ -1374,7 +1364,7 @@ function Preview() {
                         view: window
                       }));
                     }
-                  }, 8000);       
+                  }, 8000);
 
                 }
               }
