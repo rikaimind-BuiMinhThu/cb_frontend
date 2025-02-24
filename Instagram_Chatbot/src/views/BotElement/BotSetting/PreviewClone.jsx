@@ -380,7 +380,7 @@ function Preview() {
           let receiveOptionData = {};
           receiveOptionData[event.data.crawJsonObject.options.search_value] = event.data.crawJsonObject.dates;
           const newLpOptionData = Object.assign({}, globalLpOptionData, receiveOptionData);
-          globalLpOptionData = newLpOptionData;
+          globalLpOptionData = newLpOptionData;          
           setLpOptionData(newLpOptionData);
           return;
         }
@@ -5676,6 +5676,14 @@ const UserMessage = ({
     return lpOptionData[search_element_value];
   }
 
+  const moveToNext = (nextId) => {
+    const nextInput = document.getElementById(nextId);
+    if (nextInput) {
+      nextInput.focus();
+      nextInput.select();
+    }
+  };
+
   function loadCaptcha(indexContent) {
     if (
       document.getElementById(`captcha-${indexMessage}-${indexContent}`) &&
@@ -6323,20 +6331,9 @@ const UserMessage = ({
                           style={{ marginBottom: "0px", width: "32%" }}
                           placeholder={textInput[textInput.type]?.number1}
                           onChange={(value) => {
-                            setTimeOut(() => {
-                              if (value.length === 3) {
-                                document
-                                  .getElementById(
-                                    "ss-user-message-phone_number_2"
-                                  )
-                                  .focus();
-                                document
-                                  .getElementById(
-                                    "ss-user-message-phone_number_2"
-                                  )
-                                  .select();
-                              }
-                            },100)
+                            if (value.length === 3) {
+                              moveToNext("ss-user-message-phone_number_2");
+                            }
                             onChangeValue(
                               indexContent,
                               content.type,
@@ -6344,6 +6341,11 @@ const UserMessage = ({
                               textInput.type,
                               "value1"
                             );
+                          }}
+                          onCompositionEnd={(event) => {
+                            if (event.target.value.length === 3) {
+                              moveToNext("ss-user-message-phone_number_2");
+                            }
                           }}
                           value={textInput[textInput.type]?.value1}
                         ></InputCustom>
@@ -6356,16 +6358,7 @@ const UserMessage = ({
                           placeholder={textInput[textInput.type]?.number2}
                           onChange={(value) => {
                             if (value.length === 4) {
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_3"
-                                )
-                                .focus();
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_3"
-                                )
-                                .select();
+                              moveToNext("ss-user-message-phone_number_3");
                             }
                             onChangeValue(
                               indexContent,
@@ -6374,6 +6367,11 @@ const UserMessage = ({
                               textInput.type,
                               "value2"
                             );
+                          }}
+                          onCompositionEnd={(event) => {
+                            if (event.target.value.length === 4) {
+                              moveToNext("ss-user-message-phone_number_3");
+                            }
                           }}
                           value={textInput[textInput.type]?.value2}
                         ></InputCustom>
