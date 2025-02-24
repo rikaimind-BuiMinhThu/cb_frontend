@@ -150,6 +150,7 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
   value: `${i + 2}`,
 }));
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
+let globalLpOptionData = {};
 
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
@@ -349,7 +350,8 @@ function Preview() {
         if (event.data.crawJsonObject) {
           let receiveOptionData = {};
           receiveOptionData[event.data.crawJsonObject.options.search_value] = event.data.crawJsonObject.dates;
-          const newLpOptionData = Object.assign({}, lpOptionData, receiveOptionData)
+          const newLpOptionData = Object.assign({}, globalLpOptionData, receiveOptionData);
+          globalLpOptionData = newLpOptionData;          
           setLpOptionData(newLpOptionData);
           return;
         }
@@ -5620,6 +5622,16 @@ const UserMessage = ({
     return lpOptionData[search_element_value];
   }
 
+  const moveToNext = (nextId) => {
+    setTimeout(() => {
+      const nextInput = document.getElementById(nextId);
+      if (nextInput) {
+        nextInput.focus();
+        nextInput.select();
+      }
+    }, 50);
+  };
+
   function loadCaptcha(indexContent) {
     if (
       document.getElementById(`captcha-${indexMessage}-${indexContent}`) &&
@@ -6251,19 +6263,12 @@ const UserMessage = ({
                           className="ss-message__content--user-text-input ss-input-value"
                           maxLength={3}
                           style={{ marginBottom: "0px", width: "32%" }}
+                          type="tel"
+                          inputMode="numeric"
                           placeholder={textInput[textInput.type]?.number1}
                           onChange={(value) => {
                             if (value.length === 3) {
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_2"
-                                )
-                                .focus();
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_2"
-                                )
-                                .select();
+                              moveToNext("ss-user-message-phone_number_2");
                             }
                             onChangeValue(
                               indexContent,
@@ -6273,6 +6278,11 @@ const UserMessage = ({
                               "value1"
                             );
                           }}
+                          onCompositionEnd={(event) => {
+                            if (event.target.value.length === 3) {
+                              moveToNext("ss-user-message-phone_number_2");
+                            }
+                          }}
                           value={textInput[textInput.type]?.value1}
                         ></InputCustom>
                         <InputCustom
@@ -6280,20 +6290,13 @@ const UserMessage = ({
                           disabled={disabled}
                           className="ss-message__content--user-text-input ss-input-value"
                           style={{ marginBottom: "0px", width: "32%" }}
+                          type="tel"
+                          inputMode="numeric"
                           maxLength={4}
                           placeholder={textInput[textInput.type]?.number2}
                           onChange={(value) => {
                             if (value.length === 4) {
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_3"
-                                )
-                                .focus();
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_3"
-                                )
-                                .select();
+                              moveToNext("ss-user-message-phone_number_3");
                             }
                             onChangeValue(
                               indexContent,
@@ -6302,6 +6305,11 @@ const UserMessage = ({
                               textInput.type,
                               "value2"
                             );
+                          }}
+                          onCompositionEnd={(event) => {
+                            if (event.target.value.length === 4) {
+                              moveToNext("ss-user-message-phone_number_3");
+                            }
                           }}
                           value={textInput[textInput.type]?.value2}
                         ></InputCustom>
@@ -6312,6 +6320,8 @@ const UserMessage = ({
                           style={{ marginBottom: "0px", width: "32%" }}
                           placeholder={textInput[textInput.type]?.number3}
                           maxLength={4}
+                          type="tel"
+                          inputMode="numeric"
                           onChange={(value) =>
                             onChangeValue(
                               indexContent,
@@ -6800,12 +6810,7 @@ const UserMessage = ({
                                   }}
                                   onChange={async (value) => {
                                     if ((value + "").length === 3) {
-                                      document
-                                        .getElementById("ss-user-post-code-right-input2")
-                                        .focus();
-                                      document
-                                        .getElementById("ss-user-post-code-right-input2")
-                                        .select();
+                                      moveToNext("ss-user-post-code-right-input2");
                                     }
                                     onChangeValue(
                                       indexContent,
@@ -8633,7 +8638,8 @@ const UserMessage = ({
                     </div>
                     {zipCodeAddress.split_postal_code !== true ? (
                       <InputCustom
-                        type="number"
+                        type="tel"
+                        inputMode="numeric"
                         placeholder={zipCodeAddress.post_code}
                         disabled={disabled}
                         // controls={false}
@@ -8718,7 +8724,8 @@ const UserMessage = ({
                         }}
                       >
                         <InputCustom
-                          type="number"
+                          type="tel"
+                          inputMode="numeric"
                           placeholder={zipCodeAddress.post_code_left}
                           disabled={disabled}
                           style={{ width: "49%" }}
@@ -8809,7 +8816,8 @@ const UserMessage = ({
                           value={zipCodeAddress.value_post_code_left}
                         />
                         <InputCustom
-                          type="number"
+                          type="tel"
+                          inputMode="numeric"
                           placeholder={zipCodeAddress.post_code_right}
                           disabled={disabled}
                           id="ss-user-post-code-right-input"
