@@ -5683,7 +5683,7 @@ const UserMessage = ({
         nextInput.focus();
         nextInput.select();
       }
-    }, 100);
+    }, 50);
   };
 
   function loadCaptcha(indexContent) {
@@ -8706,7 +8706,8 @@ const UserMessage = ({
                     </div>
                     {zipCodeAddress.split_postal_code !== true ? (
                       <InputCustom
-                        type="number"
+                        type="tel"
+                        inputMode="numeric"
                         placeholder={zipCodeAddress.post_code}
                         disabled={disabled}
                         // controls={false}
@@ -8791,7 +8792,8 @@ const UserMessage = ({
                         }}
                       >
                         <InputCustom
-                          type="number"
+                          type="tel"
+                          inputMode="numeric"
                           placeholder={zipCodeAddress.post_code_left}
                           disabled={disabled}
                           style={{ width: "49%" }}
@@ -8882,7 +8884,8 @@ const UserMessage = ({
                           value={zipCodeAddress.value_post_code_left}
                         />
                         <InputCustom
-                          type="number"
+                          type="tel"
+                          inputMode="numeric"
                           placeholder={zipCodeAddress.post_code_right}
                           disabled={disabled}
                           id="ss-user-post-code-right-input"
