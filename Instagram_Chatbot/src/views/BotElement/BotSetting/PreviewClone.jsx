@@ -6331,6 +6331,8 @@ const UserMessage = ({
                           className="ss-message__content--user-text-input ss-input-value"
                           maxLength={3}
                           style={{ marginBottom: "0px", width: "32%" }}
+                          type="tel"
+                          inputMode="numeric"
                           placeholder={textInput[textInput.type]?.number1}
                           onChange={(value) => {
                             if (value.length === 3) {
@@ -6356,6 +6358,8 @@ const UserMessage = ({
                           disabled={disabled}
                           className="ss-message__content--user-text-input ss-input-value"
                           style={{ marginBottom: "0px", width: "32%" }}
+                          type="tel"
+                          inputMode="numeric"
                           maxLength={4}
                           placeholder={textInput[textInput.type]?.number2}
                           onChange={(value) => {
@@ -6384,6 +6388,8 @@ const UserMessage = ({
                           style={{ marginBottom: "0px", width: "32%" }}
                           placeholder={textInput[textInput.type]?.number3}
                           maxLength={4}
+                          type="tel"
+                          inputMode="numeric"
                           onChange={(value) =>
                             onChangeValue(
                               indexContent,
@@ -6872,12 +6878,7 @@ const UserMessage = ({
                                   }}
                                   onChange={async (value) => {
                                     if ((value + "").length === 3) {
-                                      document
-                                        .getElementById("ss-user-post-code-right-input2")
-                                        .focus();
-                                      document
-                                        .getElementById("ss-user-post-code-right-input2")
-                                        .select();
+                                      moveToNext("ss-user-post-code-right-input2");
                                     }
                                     onChangeValue(
                                       indexContent,
