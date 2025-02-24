@@ -175,6 +175,7 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
   value: `${i + 2}`,
 }));
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
+let globalLpOptionData = {};
 
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
@@ -378,7 +379,8 @@ function Preview() {
         if (event.data.crawJsonObject) {
           let receiveOptionData = {};
           receiveOptionData[event.data.crawJsonObject.options.search_value] = event.data.crawJsonObject.dates;
-          const newLpOptionData = Object.assign({}, lpOptionData, receiveOptionData)
+          const newLpOptionData = Object.assign({}, globalLpOptionData, receiveOptionData);
+          globalLpOptionData = newLpOptionData;
           setLpOptionData(newLpOptionData);
           return;
         }
