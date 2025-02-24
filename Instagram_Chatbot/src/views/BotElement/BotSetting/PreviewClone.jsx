@@ -5677,11 +5677,13 @@ const UserMessage = ({
   }
 
   const moveToNext = (nextId) => {
-    const nextInput = document.getElementById(nextId);
-    if (nextInput) {
-      nextInput.focus();
-      nextInput.select();
-    }
+    setTimeout(() => {
+      const nextInput = document.getElementById(nextId);
+      if (nextInput) {
+        nextInput.focus();
+        nextInput.select();
+      }
+    }, 100);
   };
 
   function loadCaptcha(indexContent) {
