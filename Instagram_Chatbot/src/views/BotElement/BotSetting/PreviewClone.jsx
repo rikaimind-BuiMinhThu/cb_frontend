@@ -175,6 +175,7 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
   value: `${i + 2}`,
 }));
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
+let globalLpOptionData = {};
 
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
@@ -378,7 +379,8 @@ function Preview() {
         if (event.data.crawJsonObject) {
           let receiveOptionData = {};
           receiveOptionData[event.data.crawJsonObject.options.search_value] = event.data.crawJsonObject.dates;
-          const newLpOptionData = Object.assign({}, lpOptionData, receiveOptionData)
+          const newLpOptionData = Object.assign({}, globalLpOptionData, receiveOptionData);
+          globalLpOptionData = newLpOptionData;          
           setLpOptionData(newLpOptionData);
           return;
         }
@@ -460,6 +462,87 @@ function Preview() {
         setIsOpen(false);
       }, 680)
     }
+  }
+
+  function checkMessageCondition(message, buildParam) {
+    let checked = false;
+    if (message.conditions.length > 0) {
+      for (let j = 0; j < message.conditions.length; j++) {
+        let conditionItem = message.conditions[j];
+        if (j === 0) {
+          if (conditionItem.condition === "include") {
+            checked = buildParam[
+              conditionItem.nameCondition
+            ].includes(conditionItem.inputCondition);
+          } else if (conditionItem.condition === "is") {
+            checked =
+              buildParam[conditionItem.nameCondition] ==
+              conditionItem.inputCondition;
+          } else if (conditionItem.condition === "not_include") {
+            checked = !buildParam[
+              conditionItem.nameCondition
+            ].includes(conditionItem.inputCondition);
+          } else if (conditionItem.condition === "is_not") {
+            checked =
+              buildParam[conditionItem.nameCondition] !=
+              conditionItem.inputCondition;
+          }
+        } else if (conditionItem?.linkCondition === "and") {
+          if (conditionItem.condition === "include") {
+            checked =
+              checked &&
+              buildParam[conditionItem.nameCondition].includes(
+                conditionItem.inputCondition
+              );
+          } else if (conditionItem.condition === "is") {
+            checked =
+              checked &&
+              buildParam[conditionItem.nameCondition] ==
+              conditionItem.inputCondition;
+          } else if (conditionItem.condition === "not_include") {
+            checked =
+              checked &&
+              !buildParam[conditionItem.nameCondition].includes(
+                conditionItem.inputCondition
+              );
+          } else if (conditionItem.condition === "is_not") {
+            checked =
+              checked &&
+              buildParam[conditionItem.nameCondition] !=
+              conditionItem.inputCondition;
+          }
+        } else if (conditionItem?.linkCondition === "or") {
+          if (conditionItem.condition === "include") {
+            checked =
+              checked ||
+              buildParam[conditionItem.nameCondition].includes(
+                conditionItem.inputCondition
+              );
+          } else if (conditionItem.condition === "is") {
+            checked =
+              checked ||
+              buildParam[conditionItem.nameCondition] ==
+              conditionItem.inputCondition;
+          } else if (conditionItem.condition === "not_include") {
+            checked =
+              checked ||
+              !buildParam[conditionItem.nameCondition].includes(
+                conditionItem.inputCondition
+              );
+          } else if (conditionItem.condition === "is_not") {
+            checked =
+              checked ||
+              buildParam[conditionItem.nameCondition] !=
+              conditionItem.inputCondition;
+          }
+        }
+      }
+    }
+    else {
+      checked = true;
+    }
+
+    return checked;
   }
 
   function onOpenPreview(opening) {
@@ -559,6 +642,30 @@ function Preview() {
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
 
+  function createObjParamObject(dataMessage)
+  {
+    let result = {};
+    let contents = dataMessage.message_content;
+    contents.forEach((content) => {
+      switch (content.type) {
+        case "pull_down":
+          {
+            if(content.pull_down.is_save_input_content==true)
+            {
+              if(content.pull_down.type=="customization")
+              {
+                var variableName = content.pull_down.save_input_content
+                var variableValue = content.pull_down.customization.value
+                result[variableName]= variableValue
+              }    
+            }            
+          }
+      }
+    })
+
+    return result;
+  }
+
   // useEffect(() => {
   //   api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
   //     if (res.data.code == 1) {
@@ -580,6 +687,35 @@ function Preview() {
         }
       });
   }, []);
+
+  const buildObjParamFromDataMessage = (messsages) => {
+    let result = {
+      current_url: window.location.href,
+      current_url_param: getAllUrlParams(window.location.href),
+      current_url_title: document.title,
+      user_id: Cookies.get("user_id"),
+      bot_id: Cookies.get("bot_id"),
+    };
+
+    if (!result.user_agent) {
+      // $.getJSON("https://api.ipregistry.co/?key=tryout", function (data) {
+      //   result.user_ip_address = data.ip;
+      //   result.user_country = data.location.country.name;
+      //   result.user_city = data.location.city;
+      //   result.user_device = data.user_agent.device.type;
+      //   result.user_browser = data.user_agent.name;
+      //   result.user_agent = data.user_agent.header;
+      //   result.start_datetime = new Date();
+      // });
+    }
+
+    messsages.forEach(message => {
+      let builtParam = createObjParamObject(message);
+      result = { ...result, ...builtParam };
+    });
+
+    return result;
+  }
 
   useEffect(() => {
     let delayRender;
@@ -1184,24 +1320,35 @@ function Preview() {
             try {
               if (isDisplayErrorMessage == true && errorMessageSubmit.trim().length > 0) {
                 var dataMessageInLocalStorage = getMessagesSessionStorage();
-                if (dataMessageInLocalStorage) {
-                  let dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true)
-                  dataMesage.forEach(data => {
-                    if (Array.isArray(data.message_content)) {
-                      data.message_content = data.message_content.filter(item => item.type !== "delay");
-                    }
+                if (dataMessageInLocalStorage) {               
+                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);                 
+                  filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
+                  const builtObjParam = buildObjParamFromDataMessage(filteredMessages);
+                  filteredMessages = filteredMessages.filter(data => {
+                    return checkMessageCondition(data, builtObjParam);
                   });
-                  setRenderMessageArr(dataMesage);
-                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
-                  if (isLoggedIn == "true") {
-                    dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
-                    filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
-                    setRenderMessageArr(dataMesage);
-                  }
-                  setIndexMessageRender(dataMesage.length - 1);
-                  setMessageUser(filteredMessages)
-                  setIndexUser(filteredMessages.length)
-                  setIsOpen(true)
+
+                  filteredMessages.forEach(data => {
+                    let objSend = {
+                      message: data
+                    }
+                    window.parent.postMessage({
+                      isOpen: true,
+                      widthPc: widthPc,
+                      heightPc: heightPc,
+                      widthSp: widthSp,
+                      heightSp: heightSp,
+                      chatbotRight: rightMarginPc,
+                      chatbotBottom: bottomMarginPc,
+                      fukushashikiResponse: getObjectFukushashiki(objSend)
+                    }, '*');
+                  });
+                  setIsOpen(true);
+                  setObjParam(buildObjParamFromDataMessage(filteredMessages));
+                  setRenderMessageArr(filteredMessages);
+                  setIndexMessageRender(filteredMessages.length - 1);
+                  setMessageUser(filteredMessages.filter(x => x.belong_to === 'user'));
+                  setIndexUser(filteredMessages.filter(x => x.belong_to === 'user').length)
                   setTimeout(() => {
                     const buttons = document.querySelectorAll('button.ss-user-message__action-btn.btn.btn-secondary');
                     if (buttons.length > 0) {
@@ -5529,6 +5676,16 @@ const UserMessage = ({
     return lpOptionData[search_element_value];
   }
 
+  const moveToNext = (nextId) => {
+    setTimeout(() => {
+      const nextInput = document.getElementById(nextId);
+      if (nextInput) {
+        nextInput.focus();
+        nextInput.select();
+      }
+    }, 50);
+  };
+
   function loadCaptcha(indexContent) {
     if (
       document.getElementById(`captcha-${indexMessage}-${indexContent}`) &&
@@ -6174,19 +6331,12 @@ const UserMessage = ({
                           className="ss-message__content--user-text-input ss-input-value"
                           maxLength={3}
                           style={{ marginBottom: "0px", width: "32%" }}
+                          type="tel"
+                          inputMode="numeric"
                           placeholder={textInput[textInput.type]?.number1}
                           onChange={(value) => {
                             if (value.length === 3) {
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_2"
-                                )
-                                .focus();
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_2"
-                                )
-                                .select();
+                              moveToNext("ss-user-message-phone_number_2");
                             }
                             onChangeValue(
                               indexContent,
@@ -6196,6 +6346,11 @@ const UserMessage = ({
                               "value1"
                             );
                           }}
+                          onCompositionEnd={(event) => {
+                            if (event.target.value.length === 3) {
+                              moveToNext("ss-user-message-phone_number_2");
+                            }
+                          }}
                           value={textInput[textInput.type]?.value1}
                         ></InputCustom>
                         <InputCustom
@@ -6203,20 +6358,13 @@ const UserMessage = ({
                           disabled={disabled}
                           className="ss-message__content--user-text-input ss-input-value"
                           style={{ marginBottom: "0px", width: "32%" }}
+                          type="tel"
+                          inputMode="numeric"
                           maxLength={4}
                           placeholder={textInput[textInput.type]?.number2}
                           onChange={(value) => {
                             if (value.length === 4) {
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_3"
-                                )
-                                .focus();
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_3"
-                                )
-                                .select();
+                              moveToNext("ss-user-message-phone_number_3");
                             }
                             onChangeValue(
                               indexContent,
@@ -6225,6 +6373,11 @@ const UserMessage = ({
                               textInput.type,
                               "value2"
                             );
+                          }}
+                          onCompositionEnd={(event) => {
+                            if (event.target.value.length === 4) {
+                              moveToNext("ss-user-message-phone_number_3");
+                            }
                           }}
                           value={textInput[textInput.type]?.value2}
                         ></InputCustom>
@@ -6235,6 +6388,8 @@ const UserMessage = ({
                           style={{ marginBottom: "0px", width: "32%" }}
                           placeholder={textInput[textInput.type]?.number3}
                           maxLength={4}
+                          type="tel"
+                          inputMode="numeric"
                           onChange={(value) =>
                             onChangeValue(
                               indexContent,
@@ -6723,12 +6878,7 @@ const UserMessage = ({
                                   }}
                                   onChange={async (value) => {
                                     if ((value + "").length === 3) {
-                                      document
-                                        .getElementById("ss-user-post-code-right-input2")
-                                        .focus();
-                                      document
-                                        .getElementById("ss-user-post-code-right-input2")
-                                        .select();
+                                      moveToNext("ss-user-post-code-right-input2");
                                     }
                                     onChangeValue(
                                       indexContent,
@@ -8556,7 +8706,8 @@ const UserMessage = ({
                     </div>
                     {zipCodeAddress.split_postal_code !== true ? (
                       <InputCustom
-                        type="number"
+                        type="tel"
+                        inputMode="numeric"
                         placeholder={zipCodeAddress.post_code}
                         disabled={disabled}
                         // controls={false}
@@ -8641,7 +8792,8 @@ const UserMessage = ({
                         }}
                       >
                         <InputCustom
-                          type="number"
+                          type="tel"
+                          inputMode="numeric"
                           placeholder={zipCodeAddress.post_code_left}
                           disabled={disabled}
                           style={{ width: "49%" }}
@@ -8732,7 +8884,8 @@ const UserMessage = ({
                           value={zipCodeAddress.value_post_code_left}
                         />
                         <InputCustom
-                          type="number"
+                          type="tel"
+                          inputMode="numeric"
                           placeholder={zipCodeAddress.post_code_right}
                           disabled={disabled}
                           id="ss-user-post-code-right-input"
