@@ -6323,18 +6323,20 @@ const UserMessage = ({
                           style={{ marginBottom: "0px", width: "32%" }}
                           placeholder={textInput[textInput.type]?.number1}
                           onChange={(value) => {
-                            if (value.length === 3) {
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_2"
-                                )
-                                .focus();
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_2"
-                                )
-                                .select();
-                            }
+                            setTimeOut(() => {
+                              if (value.length === 3) {
+                                document
+                                  .getElementById(
+                                    "ss-user-message-phone_number_2"
+                                  )
+                                  .focus();
+                                document
+                                  .getElementById(
+                                    "ss-user-message-phone_number_2"
+                                  )
+                                  .select();
+                              }
+                            },100)
                             onChangeValue(
                               indexContent,
                               content.type,
