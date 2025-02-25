@@ -155,9 +155,24 @@ const getTownsByCity = (cityJisCode) => {
   );
 };
 
+const getScenarioPreviewData = (botId, scenarioId) => {
+  return getToChatBotServer(
+    CHATBOT_SERVER.GET_SCENARIO_PREVIEW_DATA_PATH
+      .replace(":scenario_id", scenarioId)
+      .replace(":bot_id", botId)
+  );
+};
+
+const getChatBotSetting = (botId) => {
+  return getToChatBotServer(
+    CHATBOT_SERVER.GET_CHATBOT_SETTING_PATH.replace(":bot_id", botId)
+  );
+}
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
   sendCreateOrderData, sendCountRequest,
-  getCitiesByPrefecture, getTownsByCity, getPrefectures
+  getCitiesByPrefecture, getTownsByCity, getPrefectures,
+  getScenarioPreviewData, getChatBotSetting,
 };

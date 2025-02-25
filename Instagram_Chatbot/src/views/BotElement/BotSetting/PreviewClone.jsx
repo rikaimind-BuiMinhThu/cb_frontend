@@ -33,21 +33,17 @@ import {
   sendCountRequest,
   sendCreateOrderData,
   sendUserInteractionData,
-  getPrefectures
+  getPrefectures,
+  getScenarioPreviewData
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
 
 sessionStorage.setItem("prevOpenStatus", "0");
-let previewOrderInfor = {};
-let isDisplayOrderPreview = false;
-let previewContent = ``
-let globalLpOptionData = {};
-
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
-let isLoggedIn = params.get('isLoggedIn');
+let isLoggedIn = params.get('isLoggedIn') === "true";
 
 const previewInitialState = {
   isOpen: false,
@@ -108,7 +104,8 @@ const previewInitialState = {
     current_url_title: document.title,
     user_id: Cookies.get("user_id"),
     bot_id: Cookies.get("bot_id")
-  }
+  },
+  previewOrderContent: null,
 };
 
 const PREVIEW_ACTIONS = {
@@ -202,8 +199,10 @@ const Preview = () => {
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
       return;
     }
-    api.get(`/api/v1/managements/chatbots/${state.botId}`).then((response) => {
-      if (response.data.data) {
+    getChatBotSetting(state.botId)
+      .then((response) => {
+        if (!response.data.data) return;
+
         const result = JSON.parse(response.data.data?.design_settings);
         const newState = {
           activePopupCloseBot: result?.popup_close_bot ? true : false,
@@ -231,14 +230,15 @@ const Preview = () => {
         sessionStorage.setItem("chatbotW", result?.width_pc ? result?.width_pc : 450);
         sessionStorage.setItem("chatbotRight", result?.right_margin_pc ? result?.right_margin_pc : 30);
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
-      }
-    });
+      });
   }, [state.botId]);
 
   useEffect(() => {
     window.addEventListener(
       "message",
       (event) => {
+        if (!event.data) return;
+
         if (event.data === 'openPreview' && state.isOpen !== true) {
           onOpenPreview(true)
         }
@@ -247,17 +247,15 @@ const Preview = () => {
           return;
         }
 
-        if (event.data && event.data.objectSend) {
-          previewOrderInfor = event.data.objectSend;
-          previewContent = event.data.objectSend;
-          isDisplayOrderPreview = true;
+        if (event.data.objectSend) {
+          dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { previewOrderContent: event.data.objectSend } });
+          return;
         }
 
-        if (event.data && event.data.crawJsonObject) {
+        if (event.data.crawJsonObject) {
           let receiveOptionData = {};
           receiveOptionData[event.data.crawJsonObject.options.search_value] = event.data.crawJsonObject.dates;
-          const newLpOptionData = Object.assign({}, globalLpOptionData, receiveOptionData);
-          globalLpOptionData = newLpOptionData;
+          const newLpOptionData = { ...state.lpOptionData, ...receiveOptionData };
           dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { lpOptionData: newLpOptionData } });
           return;
         }
@@ -274,17 +272,9 @@ const Preview = () => {
   }, [])
 
   useEffect(() => {
-    if (!state.urlReceive || !window || !window.parent) return;
+    if (!state.urlReceive) return;
 
-    window.parent.postMessage({
-      isOpen: state.isOpen,
-      widthPc: state.widthPc,
-      heightPc: state.heightPc,
-      widthSp: state.widthSp,
-      heightSp: state.heightSp,
-      chatbotRight: state.rightMarginPc,
-      chatbotBottom: state.bottomMarginPc,
-    }, state.urlReceive);
+    postMessageToParent();
   }, [state.urlReceive])
 
 
@@ -393,17 +383,7 @@ const Preview = () => {
     }
 
     // post message to parent window
-    if (window && window.parent) {
-      window.parent.postMessage({
-        isOpen: true,
-        widthPc: state.widthPc,
-        heightPc: state.heightPc,
-        widthSp: state.widthSp,
-        heightSp: state.heightSp,
-        chatbotRight: state.rightMarginPc,
-        chatbotBottom: state.bottomMarginPc,
-      }, state.urlReceive);
-    }
+    postMessageToParent({isOpen: opening});
 
     if (state.isOpen && state.activePopupCloseBot) {
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: true } });
@@ -635,8 +615,6 @@ const Preview = () => {
       })
   }, []);
 
-
-
   useEffect(() => {
     let delayRender;
     if (!state.botId) {
@@ -664,72 +642,61 @@ const Preview = () => {
       return;
     }
 
-    api
-      .get(
-        `/api/v1/managements/chatbots/${state.botId}/scenarios/${state.scenarioId}/preview`
-      )
+    getScenarioPreviewData(state.botId, state.scenarioId)
       .then(async (res) => {
         if (!res || !res.data || res.data.code !== 1) return;
         let newState = {
           botInfor: getBotInforFromPreviewResponse(res)
         };
 
-        const messagesList = res.data.data.conversation.messages || [];
+        let messagesList = res.data.data?.conversation?.messages || [];
         const btnSubmitItem = messagesList.find(x => x.message_content.find(y => y.type == "button_submit"));
 
         if (btnSubmitItem) {
           const btnSubmitItemContent = btnSubmitItem.message_content[0];
-          const errorObject = {
+          const jsQueryErrorData = {
             isDisplay: btnSubmitItemContent.button_submit.is_display_error_message,
             seachMode: btnSubmitItemContent.error_message_display_element_search_type,
             searchValue: btnSubmitItemContent.error_message_display_element_search_value,
           };
-          window.parent.postMessage(
-            {
-              isOpen: true,
-              widthPc: state.widthPc,
-              heightPc: state.heightPc,
-              widthSp: state.widthSp,
-              heightSp: state.heightSp,
-              chatbotRight: state.rightMarginPc,
-              chatbotBottom: state.bottomMarginPc,
-              fukushashikiResponse: undefined,
-              getErrorMessage: errorObject,
-            },
-            '*'
-          );
+          postMessageToParent({
+            isOpen: true,
+            getErrorMessage: jsQueryErrorData
+          });
           newState.isDisplayErrorMessage = btnSubmitItemContent.button_submit.is_display_error_message;
         }
 
         if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
           sessionStorage.setItem("prevOpenStatus", "1");
           const openChatbotCountApiParams = {
-            scenario_data: `${receiveDeviceParam}_open_chatbot_window`,
+            scenario_data: `${state.deviceReceive}_open_chatbot_window`,
           };
-          const apiUrl = `/api/v1/analytics/scenario_counts/${state.scenarioId}`;
-          api.patch(apiUrl, openChatbotCountApiParams)
-            .catch(err => {
-              console.log(err)
-            });
+          sendCountRequest(state.scenarioId, openChatbotCountApiParams);
         }
-        let messageArr = [];
+        
+        messagesList = messagesList.filter(x => {
+          return x.hidden !== true && (isLoggedIn && !x.not_display_when_logged_in) &&
+            checkMessageCondition(x, builtObjParam);
+        });
         if (res.data.data?.conversation?.messages?.length > 0) {
-          messageArr = [...res.data.data?.conversation?.messages.filter(x => !x.hidden)];
-          if (isLoggedIn === "true") {
-            messageArr = messageArr.filter(x => !x.not_display_when_logged_in);
+          messagesList = [...res.data.data?.conversation?.messages.filter(x => !x.hidden)];
+          if (isLoggedIn) {
+            messagesList = messagesList.filter(x => !x.not_display_when_logged_in);
           }
         }
 
-        let urlThanks = res.data.data?.conversation?.urlThanksPage || "";
-        let variablesAll = res.data?.all_variables || [];
-        newState.dataVariables = variablesAll;
-        newState.dataMessages = messageArr;
-        newState.urlThanksPage = urlThanks;
+        newState.dataVariables = res.data?.all_variables || [];
+        newState.dataMessages = messagesList;
+        newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";;
 
         checkUpdateMessagesSessionStorage(res.data.data.updated_at)
 
         if (res.data.variables) {
-          newState.variables = [...res.data.variables, ...variablesAll];
+          newState.variables = [
+            ...res.data.variables,
+            ...newState.dataVariables
+          ];
+
           res.data.variables.forEach((item) => {
             objParam[item.variable_name] = item.default_value;
           });
@@ -737,7 +704,7 @@ const Preview = () => {
 
         newState.objParam = { ...objParam };
         let variables = [...res.data.variables];
-        let messageUserVar = messageArr.filter(
+        let messageUserVar = messagesList.filter(
           (item) =>
             item.belong_to === "user" && item.message_content.length > 0
         );
@@ -745,12 +712,12 @@ const Preview = () => {
         let renderMessage = [];
         let index;
         let isPauseScroll = false;
-        for (let i = 0; i < messageArr.length; i++) {
-          if (messageArr[i].hidden !== true) {
-            if (messageArr[i].conditions?.length > 0) {
-              const checked = checkMessageCondition(messageArr[i], objParam);
+        for (let i = 0; i < messagesList.length; i++) {
+          if (messagesList[i].hidden !== true) {
+            if (messagesList[i].conditions?.length > 0) {
+              const checked = checkMessageCondition(messagesList[i], objParam);
 
-              if (!checked && messageArr[i].belong_to === "user") {
+              if (!checked && messagesList[i].belong_to === "user") {
                 dispatch({
                   type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                   payload: { indexUser: state.indexUser + 1 }
@@ -759,13 +726,13 @@ const Preview = () => {
               }
             }
             if (
-              messageArr[0].belong_to === "bot" &&
-              messageArr[i].message_content.length > 0
+              messagesList[0].belong_to === "bot" &&
+              messagesList[i].message_content.length > 0
             ) {
-              if (messageArr[i]?.message_content[0]?.type === "delay") {
-                if (messageArr[i]?.message_content[0]?.delay.typing_on) {
+              if (messagesList[i]?.message_content[0]?.type === "delay") {
+                if (messagesList[i]?.message_content[0]?.delay.typing_on) {
                   await new Promise((resolve) => {
-                    renderMessage.push({ ...messageArr[i] });
+                    renderMessage.push({ ...messagesList[i] });
                     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { renderMessageArr: [...renderMessage] } });
                     resolve();
                   })
@@ -773,7 +740,7 @@ const Preview = () => {
                       await new Promise((resolve) => {
                         delayRender = setTimeout(() => {
                           resolve();
-                        }, messageArr[i]?.message_content[0].delay.content * 1000);
+                        }, messagesList[i]?.message_content[0].delay.content * 1000);
                       });
                     })
                     .then(() => {
@@ -787,7 +754,7 @@ const Preview = () => {
                       });
                     })
                     .then(() => {
-                      if (messageArr.length - 1 === i && state.urlThanks) {
+                      if (messagesList.length - 1 === i && state.urlThanks) {
                         let aTag = document.createElement("a");
                         aTag.href = state.urlThanks;
                         aTag.target = "_blank";
@@ -801,13 +768,13 @@ const Preview = () => {
                   await new Promise((resolve) => {
                     return (delayRender = setTimeout(() => {
                       resolve();
-                    }, messageArr[i]?.message_content[0]?.delay?.content * 1000));
+                    }, messagesList[i]?.message_content[0]?.delay?.content * 1000));
                   })
                     .then(() => {
                       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { indexMessageRender: i } });
                     })
                     .then(() => {
-                      if (messageArr.length - 1 === i && state.urlThanks) {
+                      if (messagesList.length - 1 === i && state.urlThanks) {
                         let aTag = document.createElement("a");
                         aTag.href = state.urlThanks;
                         aTag.target = "_blank";
@@ -820,14 +787,14 @@ const Preview = () => {
                 }
                 index = i;
               } else if (
-                messageArr[i]?.message_content[0]?.type === "email"
+                messagesList[i]?.message_content[0]?.type === "email"
               ) {
                 let emailId =
-                  messageArr[i]?.message_content[0][
-                    messageArr[i]?.message_content[0].type
+                  messagesList[i]?.message_content[0][
+                    messagesList[i]?.message_content[0].type
                   ].contentId;
                 let variablesData = {};
-                variablesAll.forEach((item) => {
+                newState.dataVariables.forEach((item) => {
                   variablesData[item.variable_name] = item.default_value;
                 });
 
@@ -861,12 +828,12 @@ const Preview = () => {
                 });
 
               } else if (
-                messageArr[i]?.message_content[0]?.type === "variable_set"
+                messagesList[i]?.message_content[0]?.type === "variable_set"
               ) {
                 if (variables.length !== 0) {
                   let dataVarExist =
-                    messageArr[i]?.message_content[0][
-                      messageArr[i]?.message_content[0].type
+                    messagesList[i]?.message_content[0][
+                      messagesList[i]?.message_content[0].type
                     ].variables;
                   variables.forEach((item) => {
                     for (let z = 0; z < dataVarExist.length; z++) {
@@ -882,12 +849,12 @@ const Preview = () => {
                 newState.indexMessageRender = i;
                 index = i;
               } else if (
-                messageArr[i]?.message_content[0]?.type === "clear_variable"
+                messagesList[i]?.message_content[0]?.type === "clear_variable"
               ) {
                 if (variables.length !== 0) {
                   let dataVarExist =
-                    messageArr[i]?.message_content[0][
-                      messageArr[i]?.message_content[0].type
+                    messagesList[i]?.message_content[0][
+                      messagesList[i]?.message_content[0].type
                     ].variables;
                   variables.forEach((item) => {
                     for (let z = 0; z < dataVarExist.length; z++) {
@@ -903,36 +870,36 @@ const Preview = () => {
                 newState.indexMessageRender = i;
                 index = i;
               } else if (
-                messageArr[i]?.message_content[0]?.type === "pause"
+                messagesList[i]?.message_content[0]?.type === "pause"
               ) {
                 renderMessage.push({});
                 newState.renderMessageArr = [...renderMessage];
                 newState.indexMessageRender = i;
                 index = i;
                 break;
-              } else if (messageArr[i].belong_to !== "bot") {
+              } else if (messagesList[i].belong_to !== "bot") {
                 await new Promise((resolve) => {
                   return (delayRender = setTimeout(() => {
                     for (
                       let j = 0;
-                      j < messageArr[i].message_content.length;
+                      j < messagesList[i].message_content.length;
                       j++
                     ) {
                       if (
-                        messageArr[i].message_content[j].type === "capture"
+                        messagesList[i].message_content[j].type === "capture"
                       ) {
                         api
                           .get(
-                            `https://svg-captcha-nodejs.vercel.app/captcha?size=${messageArr[i].message_content[j][
-                              messageArr[i].message_content[j].type
+                            `https://svg-captcha-nodejs.vercel.app/captcha?size=${messagesList[i].message_content[j][
+                              messagesList[i].message_content[j].type
                             ].length
-                            }${messageArr[i].message_content[j][
-                              messageArr[i].message_content[j].type
+                            }${messagesList[i].message_content[j][
+                              messagesList[i].message_content[j].type
                             ].colour
                               ? "&color=true"
                               : ""
-                            }&charPreset=${messageArr[i].message_content[j][
-                              messageArr[i].message_content[j].type
+                            }&charPreset=${messagesList[i].message_content[j][
+                              messagesList[i].message_content[j].type
                             ].type
                             }`
                           )
@@ -955,7 +922,7 @@ const Preview = () => {
                         // break;
                       }
                     }
-                    resolve({ ...messageArr[i] });
+                    resolve({ ...messagesList[i] });
                   }, 1000));
                 })
                   .then((data) => {
@@ -990,12 +957,12 @@ const Preview = () => {
                 await new Promise((resolve) => {
                   return (delayRender = setTimeout(() => {
                     if (
-                      messageArr[i].message_content[0]?.type ===
+                      messagesList[i].message_content[0]?.type ===
                       "text_input" &&
-                      messageArr[i].message_content[0].text_input.content
+                      messagesList[i].message_content[0].text_input.content
                     ) {
-                      messageArr[i].message_content[0].text_input.content =
-                        messageArr[
+                      messagesList[i].message_content[0].text_input.content =
+                        messagesList[
                           i
                         ].message_content[0].text_input.content.replaceAll(
                           SCAN_REGEX,
@@ -1016,7 +983,7 @@ const Preview = () => {
                           }
                         );
                     }
-                    resolve({ ...messageArr[i] });
+                    resolve({ ...messagesList[i] });
                   }, 1000));
                 })
                   .then((data) => {
@@ -1039,9 +1006,9 @@ const Preview = () => {
                     }
                   })
                   .then(() => {
-                    if (messageArr.length - 1 === i && urlThanks) {
+                    if (messagesList.length - 1 === i && newState.urlThanksPage) {
                       let aTag = document.createElement("a");
-                      aTag.href = urlThanks;
+                      aTag.href = newState.urlThanksPage;
                       aTag.target = "_blank";
 
                       setTimeout(() => {
@@ -1052,8 +1019,8 @@ const Preview = () => {
                 index = i;
               }
             } else if (
-              messageArr[0].belong_to === "user" &&
-              messageArr[i].message_content.length > 0
+              messagesList[0].belong_to === "user" &&
+              messagesList[i].message_content.length > 0
             ) {
               // if (messageArr[i].belong_to !== 'user') {
               //   await new Promise((resolve) => {
@@ -1088,24 +1055,24 @@ const Preview = () => {
                 return (delayRender = setTimeout(() => {
                   for (
                     let j = 0;
-                    j < messageArr[i].message_content.length;
+                    j < messagesList[i].message_content.length;
                     j++
                   ) {
                     if (
-                      messageArr[i].message_content[j].type === "capture"
+                      messagesList[i].message_content[j].type === "capture"
                     ) {
                       api
                         .get(
-                          `https://svg-captcha-nodejs.vercel.app/captcha?size=${messageArr[i].message_content[j][
-                            messageArr[i].message_content[j].type
+                          `https://svg-captcha-nodejs.vercel.app/captcha?size=${messagesList[i].message_content[j][
+                            messagesList[i].message_content[j].type
                           ].length
-                          }${messageArr[i].message_content[j][
-                            messageArr[i].message_content[j].type
+                          }${messagesList[i].message_content[j][
+                            messagesList[i].message_content[j].type
                           ].colour
                             ? "&color=true"
                             : ""
-                          }&charPreset=${messageArr[i].message_content[j][
-                            messageArr[i].message_content[j].type
+                          }&charPreset=${messagesList[i].message_content[j][
+                            messagesList[i].message_content[j].type
                           ].type
                           }`
                         )
@@ -1127,7 +1094,7 @@ const Preview = () => {
                         });
                     }
                   }
-                  resolve({ ...messageArr[i] });
+                  resolve({ ...messagesList[i] });
                 }, 1000));
               }).then((data) => {
                 renderMessage.push(data);
@@ -2929,32 +2896,36 @@ const Preview = () => {
   }
 
   const postMessageForRunJsCode = (jsCode) => {
-    window.parent.postMessage({
-      isOpen: true,
-      widthPc: 450,
-      heightPc: 700,
-      widthSp: 100,
-      heightSp: 100,
-      chatbotRight: 10,
-      chatbotBottom: 10,
+    postMessageToParent({
       action: 'excuteJS',
       jscode: jsCode,
       is_use_js: true
-    }, '*');
+    });
   }
 
   const fukushashikiToLP = (fukushashikiData) => {
-    window.parent.postMessage({
-      isOpen: true,
+    postMessageToParent({
+      action: 'fukushashiki',
+      fukushashiki: fukushashikiData
+    });
+  }
+
+  const postMessageToParent = (options) => {
+    if (!window || !window.parent) return;
+    const defaultOptions = {
+      isOpen: state.isOpen,
       widthPc: state.widthPc,
       heightPc: state.heightPc,
       widthSp: state.widthSp,
       heightSp: state.heightSp,
       chatbotRight: state.rightMarginPc,
-      chatbotBottom: state.bottom,
-      action: 'fukushashiki',
-      fukushashiki: fukushashikiData
-    }, '*');
+      chatbotBottom: state.bottomMarginPc,
+    };
+    
+    window.parent.postMessage({
+      ...defaultOptions,
+      ...options,
+    }, state.urlReceive);
   }
 
   const processClickCreateOrder = (data) => {
@@ -4133,7 +4104,7 @@ const Preview = () => {
         index={index}
         botInfor={state.botInfor}
         checkoutUrl={state.checkoutUrl}
-        previewOrder={previewContent}
+        previewOrder={previewOrderContent}
       />
     ));
   };
