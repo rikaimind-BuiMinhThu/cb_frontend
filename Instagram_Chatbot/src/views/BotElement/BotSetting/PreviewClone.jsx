@@ -1331,7 +1331,7 @@ function Preview() {
                   dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
                   filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
                   const builtObjParam = buildObjParamFromDataMessage(filteredMessages);
-                  dataMesage = dataMesage.filter(data => {
+                  filteredMessages = filteredMessages.filter(data => {
                     return checkMessageCondition(data, builtObjParam);
                   });
 
@@ -1352,8 +1352,8 @@ function Preview() {
                   });
                   setIsOpen(true);
                   setObjParam(buildObjParamFromDataMessage(filteredMessages));
-                  setRenderMessageArr(dataMesage);
-                  setIndexMessageRender(dataMesage.length - 1);
+                  setRenderMessageArr(filteredMessages);
+                  setIndexMessageRender(filteredMessages.length - 1);
                   setMessageUser(filteredMessages)
                   setIndexUser(filteredMessages.length)
                   setTimeout(() => {
