@@ -88,6 +88,7 @@ const CHATBOT_SERVER = {
   CONVERSION_PATH: '/api/v1/analytics/scenario_counts/:scenario_id',
   GET_CITIES_PATH: '/api/v1/cities?prefecture_jis_code=:prefecture_jis_code',
   GET_TOWNS_PATH: '/api/v1/towns?city_jis_code=:city_jis_code',
+  GET_PREFECTURES_PATH: '/api/v1/prefectures',
 };
 
 export {

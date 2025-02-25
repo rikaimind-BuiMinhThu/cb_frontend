@@ -3,7 +3,6 @@ import "../../../assets/css/bot/preview-chat-bot.css";
 import api from "../../../api/api-management";
 import Cookies from "js-cookie";
 import { MDBIcon } from "mdbreact";
-import SelectCustom from "./ScenarioSetting/scenarioComon/SelectCustom";
 import { Button } from "reactstrap";
 import ModalPreviewBot from '../../../views/Popup/ModalPreviewBot';
 import CustomButton from "./CustomButton";
@@ -26,7 +25,16 @@ import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-p
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
 import { SCAN_REGEX } from "./PreviewComponent/Constants";
-import { getAllUrlParams, lightenColor, mobileCheck, removeLeadingZero, sendConversionCountRequest, sendCreateOrderData, sendUserInteractionData } from "./PreviewComponent/Utils";
+import {
+  getAllUrlParams,
+  lightenColor,
+  mobileCheck,
+  removeLeadingZero,
+  sendCountRequest,
+  sendCreateOrderData,
+  sendUserInteractionData,
+  getPrefectures
+} from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
@@ -119,42 +127,8 @@ const PreviewReducer = (state, action) => {
 const Preview = () => {
   const [state, dispatch] = useReducer(PreviewReducer, previewInitialState);
   const containerRef = useRef(null);
-  const [variables, setVariables] = useState([]);
-  const [captcha, setCaptcha] = useState([]);
-  const [withdrawal, setWithdrawal] = useState({});
-  const [dataVariables, setDataVariables] = useState([]);
   const isFromScenario = false;
-  const [dataPrefectures, setDataPrefectures] = useState([]);
-  const [dataCities, setDataCities] = useState([]);
-  const [dataTowns, setDataTowns] = useState([]);
-  const [prefectures, setPrefectures] = useState();
-  const [cities, setCities] = useState();
-  const [towns, setTowns] = useState();
-  const [zipcode, setZipcode] = useState();
-  const [indexContentZipcode, setContentZipcode] = useState();
   //new
-  const [buttonTypePc, setButtonTypePc] = useState("1");
-  const [positionPc, setPositionPc] = useState("1");
-  const [widthPc, setWidthPc] = useState(450);
-  const [heightPc, setHeightPc] = useState(700);
-  const [widthSp, setWidthSp] = useState(100);
-  const [heightSp, setHeightSp] = useState(100);
-  const [rightPcTitle, setRightPcTitle] = useState("");
-  const [positionSp, setPositionSp] = useState("1");
-  const [buttonTypeSp, setButtonTypeSp] = useState("1");
-  const [rightMarginPc, setRightMarginPc] = useState(10);
-  const [bottomMarginPc, setBottomMarginPc] = useState(10);
-  const [displayType, setDisplayType] = useState(1);
-  const [rightSpTitle, setRightSpTitle] = useState("");
-  const [rightMarginSp, setRightMarginSp] = useState(10);
-  const [bottomMarginSp, setBottomMarginSp] = useState(10);
-  const [showPopupCloseBot, setShowPopupCloseBot] = useState(false);
-  const [activePopupCloseBot, setActivePopupCloseBot] = useState(true);
-  const [titleBubble, setTitleBubble] = useState("");
-  const [styleModal, setStyleModal] = useState({});
-  const [scenarioUserResponses, setScenarioUserResponses] = useState([])
-  const [checkoutUrl, setCheckoutUrl] = useState("")
-
   const [objParam, setObjParam] = useState(() => {
     let dataObj = {
       current_url: window.location.href,
@@ -175,22 +149,33 @@ const Preview = () => {
     return dataObj;
   });
 
-  function handleStyleModal() {
-    if (mobileCheck()) {
+  const setShowPopupCloseBot = (value) => {
+    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: value } });
+  };
+
+  const setCheckoutUrl = (value) => {
+    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { checkoutUrl: value } });
+  };
+
+  const setScenarioUserResponses = (sursArr) => {
+    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { scenarioUserResponses: sursArr } });
+  };
+
+  const getBotModalStyle = () => {
+    if (mobileCheck())
       return {
         bottom: "0px",
         right: "0px",
-        width: widthSp ? `${widthSp}%` : "100%%",
-        height: heightSp ? `${heightSp}%` : "100%"
+        width: `${state.widthSp || 100}%`,
+        height: `${state.heightSp || 100}%`,
       }
-    } else {
-      return {
-        bottom: bottomMarginPc ? `${bottomMarginPc}px` : "0px",
-        right: rightMarginPc ? `${rightMarginPc}px` : "30px",
-        width: widthPc ? `${widthPc}px` : "450px",
-        height: heightPc ? `${heightPc}px` : "700px"
-      }
-    }
+
+    return {
+      bottom: `${state.bottomMarginPc || 0}px`,
+      right: `${state.rightMarginPc || 30}px`,
+      width: `${state.widthPc || 450}px`,
+      height: `${state.heightPc || 700}px`,
+    };
   }
 
   const updateVariableValues = (variables, dataMessages, index, action = "") => {
@@ -220,7 +205,7 @@ const Preview = () => {
     api.get(`/api/v1/managements/chatbots/${state.botId}`).then((response) => {
       if (response.data.data) {
         const result = JSON.parse(response.data.data?.design_settings);
-        const newStateAttributes = {
+        const newState = {
           activePopupCloseBot: result?.popup_close_bot ? true : false,
           titleBubble: result?.title_bubble ? result?.title_bubble : "簡単90秒で注文完了",
           displayType: result?.display_type,
@@ -245,7 +230,7 @@ const Preview = () => {
         sessionStorage.setItem("chatbotBottom", result?.bottom_margin_pc ? result?.bottom_margin_pc : 10);
         sessionStorage.setItem("chatbotW", result?.width_pc ? result?.width_pc : 450);
         sessionStorage.setItem("chatbotRight", result?.right_margin_pc ? result?.right_margin_pc : 30);
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newStateAttributes });
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
       }
     });
   }, [state.botId]);
@@ -289,18 +274,18 @@ const Preview = () => {
   }, [])
 
   useEffect(() => {
-    if (window && window.parent) {
-      window.parent.postMessage({
-        isOpen: state.isOpen,
-        widthPc: widthPc,
-        heightPc: heightPc,
-        widthSp: widthSp,
-        heightSp: heightSp,
-        chatbotRight: rightMarginPc,
-        chatbotBottom: bottomMarginPc,
-      }, state.urlReceive);
-    }
-  }, [state.isOpen, state.urlReceive])
+    if (!state.urlReceive || !window || !window.parent) return;
+
+    window.parent.postMessage({
+      isOpen: state.isOpen,
+      widthPc: state.widthPc,
+      heightPc: state.heightPc,
+      widthSp: state.widthSp,
+      heightSp: state.heightSp,
+      chatbotRight: state.rightMarginPc,
+      chatbotBottom: state.bottomMarginPc,
+    }, state.urlReceive);
+  }, [state.urlReceive])
 
 
   function handleCloseBot() {
@@ -394,80 +379,41 @@ const Preview = () => {
     return checked;
   }
 
-  function onOpenPreview(opening) {
-    const receiveDeviceParam = params.get("deviceReceive");
-    if (state.isOpen && activePopupCloseBot) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: true } });
-      return;
-    }
+  const onOpenPreview = (opening) => {
+    if (!state.deviceReceive) return;
 
-    if (state.isOpen && !activePopupCloseBot) {
-      const element = document.getElementById('sp-container1');
-      if (mobileCheck()) {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { isOpen: !state.isOpen } });
-      } else {
-        element.classList.remove('slideUp');
-        element.classList.add('slideDown');
-        setTimeout(() => {
-          dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { isOpen: !state.isOpen } });
-        }, 680)
-      }
-    } else {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { isOpen: !state.isOpen } });
-    }
+    // Send data to count open chatbot window
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
     if (prevOpenStatus == "0" && opening) {
       sessionStorage.setItem("prevOpenStatus", "1");
       const openChatbotCountApiParams = {
-        scenario_data: `${receiveDeviceParam}_open_chatbot_window`,
+        scenario_data: `${state.deviceReceive}_open_chatbot_window`,
       };
-      const apiUrl = `/api/v1/analytics/scenario_counts/${state.scenarioId}`;
-      api.patch(apiUrl, openChatbotCountApiParams)
-        .catch(err => {
-          console.log(err)
-        })
+      sendCountRequest(state.scenarioId, openChatbotCountApiParams);
     }
 
-    if (document.getElementById("sp-container1")) {
-      if (state.isOpen && activePopupCloseBot) {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: true } });
-        return;
-      }
-      if (state.isOpen && !state.activePopupCloseBot) {
-        Cookies.set("openPre", true);
-        if (window && window.parent) {
-          window.parent.postMessage({
-            isOpen: true,
-            widthPc: widthPc,
-            heightPc: heightPc,
-            widthSp: widthSp,
-            heightSp: heightSp,
-            chatbotRight: rightMarginPc,
-            chatbotBottom: bottomMarginPc,
-          }, state.urlReceive);
-        }
-        document.getElementById("sp-container1").style.height = heightPc
-          ? `${heightPc}px`
-          : "600px";
-        document.getElementById("sp-header").style.position = "static";
-        document.getElementById("sp-header").style.borderBottomLeftRadius =
-          "0px";
-        document.getElementById("sp-header").style.borderBottomRightRadius =
-          "0px";
-        document.getElementById("sp-header").style.borderTopLeftRadius = mobileCheck() ? "0px" : "5px";
-        document.getElementById("sp-header").style.borderTopRightRadius = mobileCheck() ? "0px" : "5px";
+    // post message to parent window
+    if (window && window.parent) {
+      window.parent.postMessage({
+        isOpen: true,
+        widthPc: state.widthPc,
+        heightPc: state.heightPc,
+        widthSp: state.widthSp,
+        heightSp: state.heightSp,
+        chatbotRight: state.rightMarginPc,
+        chatbotBottom: state.bottomMarginPc,
+      }, state.urlReceive);
+    }
 
-        document.getElementById("sp-process-bar").style.display = "block";
-        document.getElementById("sp-process-bar").style.marginTop = "1px";
-
-        document.getElementById("sp-body").style.display = "block";
-      }
+    if (state.isOpen && state.activePopupCloseBot) {
+      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: true } });
+      return;
     }
   }
 
-  function createObjParamObject(dataMessage) {
+  const createObjParamObject = (message) => {
     let result = {};
-    let contents = dataMessage.message_content;
+    let contents = message.message_content;
 
     contents.forEach((content) => {
       switch (content.type) {
@@ -481,6 +427,35 @@ const Preview = () => {
           }
           break;
       }
+    });
+
+    return result;
+  }
+
+  const buildObjParamFromDataMessage = (messsages) => {
+    let result = {
+      current_url: window.location.href,
+      current_url_param: getAllUrlParams(window.location.href),
+      current_url_title: document.title,
+      user_id: Cookies.get("user_id"),
+      bot_id: Cookies.get("bot_id"),
+    };
+
+    if (!result.user_agent) {
+      // $.getJSON("https://api.ipregistry.co/?key=tryout", function (data) {
+      //   result.user_ip_address = data.ip;
+      //   result.user_country = data.location.country.name;
+      //   result.user_city = data.location.city;
+      //   result.user_device = data.user_agent.device.type;
+      //   result.user_browser = data.user_agent.name;
+      //   result.user_agent = data.user_agent.header;
+      //   result.start_datetime = new Date();
+      // });
+    }
+
+    messsages.forEach(message => {
+      const builtParam = createObjParamObject(message);
+      result = { ...result, ...builtParam };
     });
 
     return result;
@@ -589,49 +564,6 @@ const Preview = () => {
     }, 2000);
   }
 
-  useEffect(() => {
-    api
-      .get(`/api/v1/prefectures`)
-      .then((res) => {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { dataPrefectures: res.data.data } });
-      })
-      .catch((error) => {
-        console.log(error);
-        if (error.response?.data.code === 0) {
-          tokenExpired();
-        }
-      });
-  }, []);
-
-  const buildObjParamFromDataMessage = (messsages) => {
-    let result = {
-      current_url: window.location.href,
-      current_url_param: getAllUrlParams(window.location.href),
-      current_url_title: document.title,
-      user_id: Cookies.get("user_id"),
-      bot_id: Cookies.get("bot_id"),
-    };
-
-    if (!result.user_agent) {
-      // $.getJSON("https://api.ipregistry.co/?key=tryout", function (data) {
-      //   result.user_ip_address = data.ip;
-      //   result.user_country = data.location.country.name;
-      //   result.user_city = data.location.city;
-      //   result.user_device = data.user_agent.device.type;
-      //   result.user_browser = data.user_agent.name;
-      //   result.user_agent = data.user_agent.header;
-      //   result.start_datetime = new Date();
-      // });
-    }
-
-    messsages.forEach(message => {
-      const builtParam = createObjParamObject(message);
-      result = { ...result, ...builtParam };
-    });
-
-    return result;
-  }
-
   const getBotInforFromPreviewResponse = (res) => {
     if (!res || !res.data || !res.data.chatbot) return {};
 
@@ -696,6 +628,16 @@ const Preview = () => {
   }
 
   useEffect(() => {
+    getPrefectures()
+      .then((res) => {
+        console.log("getPrefectures", res);
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { dataPrefectures: res.data.data } });
+      })
+  }, []);
+
+
+
+  useEffect(() => {
     let delayRender;
     if (!state.botId) {
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
@@ -745,12 +687,12 @@ const Preview = () => {
           window.parent.postMessage(
             {
               isOpen: true,
-              widthPc: widthPc,
-              heightPc: heightPc,
-              widthSp: widthSp,
-              heightSp: heightSp,
-              chatbotRight: rightMarginPc,
-              chatbotBottom: bottomMarginPc,
+              widthPc: state.widthPc,
+              heightPc: state.heightPc,
+              widthSp: state.widthSp,
+              heightSp: state.heightSp,
+              chatbotRight: state.rightMarginPc,
+              chatbotBottom: state.bottomMarginPc,
               fukushashikiResponse: undefined,
               getErrorMessage: errorObject,
             },
@@ -995,12 +937,14 @@ const Preview = () => {
                             }`
                           )
                           .then((res) => {
-                            captcha.push({
-                              index: i,
-                              indexContent: j,
-                              ...res.data,
+                            let newCaptcha = [...state.captcha];
+                            newCaptcha.push({index: i, indexContent: j, ...res.data});
+                            dispatch({
+                              type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+                              payload: {
+                                captcha: [...newCaptcha]
+                              }
                             });
-                            setCaptcha([...captcha]);
                           })
                           .catch((error) => {
                             console.log(error);
@@ -1166,12 +1110,14 @@ const Preview = () => {
                           }`
                         )
                         .then((res) => {
-                          captcha.push({
-                            index: i,
-                            indexContent: j,
-                            ...res.data,
+                          let newCaptcha = [...state.captcha];
+                          newCaptcha.push({index: i, indexContent: j, ...res.data});
+                          dispatch({
+                            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+                            payload: {
+                              captcha: [...newCaptcha]
+                            }
                           });
-                          setCaptcha([...captcha]);
                         })
                         .catch((error) => {
                           console.log(error);
@@ -1249,12 +1195,12 @@ const Preview = () => {
             userMessages.forEach(data => {
               window.parent.postMessage({
                 isOpen: true,
-                widthPc: widthPc,
-                heightPc: heightPc,
-                widthSp: widthSp,
-                heightSp: heightSp,
-                chatbotRight: rightMarginPc,
-                chatbotBottom: bottomMarginPc,
+                widthPc: state.widthPc,
+                heightPc: state.heightPc,
+                widthSp: state.widthSp,
+                heightSp: state.heightSp,
+                chatbotRight: state.rightMarginPc,
+                chatbotBottom: state.bottomMarginPc,
                 fukushashikiResponse: getObjectFukushashiki({ message: data })
               }, '*');
             });
@@ -1591,12 +1537,9 @@ const Preview = () => {
             ] = messageError;
             isValid = false;
           } else if (
-            captcha
-              .filter(
-                (item) =>
-                  item.index === index && item.indexContent === i
-              )?.[0]
-              ?.text.toLowerCase() !== contentType.value.toLowerCase()
+            state.captcha.filter(
+              (item) => item.index === index && item.indexContent === i
+            )?.[0]?.text.toLowerCase() !== contentType.value.toLowerCase()
           ) {
             errorsMess[
               `message${index}_content${i}_${contentArr[i].type}`
@@ -2451,7 +2394,7 @@ const Preview = () => {
   }
 
   const createOrAddLinesCart = async (res) => {
-    const newArr = scenarioUserResponses.concat(res.data?.data || [])
+    const newArr = state.scenarioUserResponses.concat(res.data?.data || [])
     setScenarioUserResponses([...newArr])
 
     const products = JSON.parse(newArr.findLast(x => x.data_input_name === "text_with_thumbnail_image")?.text_value || null)
@@ -3240,7 +3183,7 @@ const Preview = () => {
                   state.dataMessages[i]?.message_content[0].type
                 ].contentId;
               let variablesData = {};
-              dataVariables.forEach((item) => {
+              state.dataVariables.forEach((item) => {
                 variablesData[item.variable_name] = item.default_value;
               });
 
@@ -3451,12 +3394,14 @@ const Preview = () => {
                         }`
                       )
                       .then((res) => {
-                        captcha.push({
-                          index: i,
-                          indexContent: j,
-                          ...res.data,
+                        let newCaptcha = [...state.captcha];
+                        newCaptcha.push({index: i, indexContent: j, ...res.data});
+                        dispatch({
+                          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+                          payload: {
+                            captcha: [...newCaptcha]
+                          }
                         });
-                        setCaptcha([...captcha]);
                       })
                       .catch((error) => {
                         console.log(error);
@@ -3562,12 +3507,18 @@ const Preview = () => {
                     }`
                   )
                   .then((res) => {
-                    captcha.push({
+                    let newCaptcha = [...state.captcha];
+                    newCaptcha.push({
                       index: state.indexMessageRender + 1,
                       indexContent: j,
                       ...res.data,
                     });
-                    setCaptcha([...captcha]);
+                    dispatch({
+                      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+                      payload: {
+                        captcha: [...newCaptcha]
+                      }
+                    });
                   })
                   .catch((error) => {
                     console.log(error);
@@ -3693,12 +3644,14 @@ const Preview = () => {
                           }`
                         )
                         .then((res) => {
-                          captcha.push({
-                            index: i,
-                            indexContent: j,
-                            ...res.data,
+                          let newCaptcha = [...state.captcha];
+                          newCaptcha.push({index: i, indexContent: j, ...res.data});
+                          dispatch({
+                            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+                            payload: {
+                              captcha: [...newCaptcha]
+                            }
                           });
-                          setCaptcha([...captcha]);
                         })
                         .catch((error) => {
                           console.log(error);
@@ -3776,7 +3729,7 @@ const Preview = () => {
                     state.dataMessages[i]?.message_content[0].type
                   ].contentId;
                 let variablesData = {};
-                dataVariables.forEach((item) => {
+                state.dataVariables.forEach((item) => {
                   variablesData[item.variable_name] = item.default_value;
                 });
 
@@ -4055,7 +4008,7 @@ const Preview = () => {
   };
 
   const handleOpenWithDrawal = () => {
-    if (activePopupCloseBot) {
+    if (state.activePopupCloseBot) {
       setShowPopupCloseBot(true)
       return
     }
@@ -4110,43 +4063,53 @@ const Preview = () => {
   };
 
   const isPopUpZipCode = (isOpen, indexContent) => {
-    if (isOpen === true) {
-      setPrefectures(null);
-      setCities(null);
-      setTowns(null);
-      setZipcode(null);
-      document.getElementById("sp-withdrawal-container").style.display =
-        "block";
-      document.getElementById("sp-popup-zip-code-address").style.display =
-        "block";
-    } else {
-      document.getElementById("sp-withdrawal-container").style.display = "none";
-      document.getElementById("sp-popup-zip-code-address").style.display =
-        "none";
-    }
+    let newState = {};
+
     if (indexContent !== undefined) {
-      setContentZipcode(indexContent);
+      newState.indexContentZipcode = indexContent;
     }
+
+    if (isOpen) {
+      document.getElementById("sp-withdrawal-container").style.display = "block";
+      document.getElementById("sp-popup-zip-code-address").style.display = "block";
+
+      newState = {
+        ...newState,
+        prefectures: null,
+        cities: null,
+        towns: null,
+        zipcode: null,
+      };
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: { ...newState }
+      });
+      return;
+    }
+
+    document.getElementById("sp-withdrawal-container").style.display = "none";
+    document.getElementById("sp-popup-zip-code-address").style.display = "none";
   };
 
   const isPopUpZipCodeShippingAddress = (isOpen, indexContent) => {
-    if (isOpen === true) {
-      setPrefectures(null);
-      setCities(null);
-      setTowns(null);
-      setZipcode(null);
-      document.getElementById("sp-withdrawal-container").style.display =
-        "block";
-      document.getElementById("sp-popup-zip-code-address2").style.display =
-        "block";
-    } else {
-      document.getElementById("sp-withdrawal-container").style.display = "none";
-      document.getElementById("sp-popup-zip-code-address2").style.display =
-        "none";
-    }
-    if (indexContent !== undefined) {
-      setContentZipcode(indexContent);
-    }
+    // TODO: Check to remove
+    // if (isOpen === true) {
+    //   setPrefectures(null);
+    //   setCities(null);
+    //   setTowns(null);
+    //   setZipcode(null);
+    //   document.getElementById("sp-withdrawal-container").style.display =
+    //     "block";
+    //   document.getElementById("sp-popup-zip-code-address2").style.display =
+    //     "block";
+    // } else {
+    //   document.getElementById("sp-withdrawal-container").style.display = "none";
+    //   document.getElementById("sp-popup-zip-code-address2").style.display =
+    //     "none";
+    // }
+    // if (indexContent !== undefined) {
+    //   setContentZipcode(indexContent);
+    // }
   };
 
   const onChangeErrors = (field, value) => {
@@ -4173,7 +4136,37 @@ const Preview = () => {
         previewOrder={previewContent}
       />
     ));
-  }
+  };
+
+  const renderSubmitButton = (message, indexMessage) => {
+    if (!message || !message.belong_to !== "user") return null;
+    if (message.message_content[0]?.type !== "button_submit") return null;
+
+    let btnText = message.buttonName;
+    if (state.submitErrorMessage.length > 0) {
+      btnText = "更新";
+    } else {
+      btnText = userIndexMessage >= userMessageArray.length ? "次へ" : "更新";
+    }
+
+    return (
+      <div className="sp-user-message-button-action">
+        <CustomButton
+          disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
+          style={{
+            backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
+            borderRadius: "25px",
+          }}
+          className="ss-user-message__action-btn"
+          onClick={() => onClickNext(indexMessage, message)}
+          autoClick={state.submitErrorMessage.trim().length > 0}
+          messsagetype={message.message_content[0]?.type}
+        >
+          {btnText}
+        </CustomButton>
+      </div>
+    );
+  };
 
   const renderUserMessageContent = (message, indexMessage) => {
     if (!message || !message.belong_to !== "user") return null;
@@ -4183,7 +4176,7 @@ const Preview = () => {
       <div className="sp-body-user-side slideLeft">
         <div className="sp-body-user-side-messages">
           <UserMessage
-            captcha={captcha}
+            captcha={state.captcha}
             messageContentProps={message.message_content}
             disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
             onChangeValue={(
@@ -4219,7 +4212,7 @@ const Preview = () => {
                 }
               });
             }}
-            dataPrefectures={[...dataPrefectures]}
+            dataPrefectures={[...state.dataPrefectures]}
             isPopUpZipCode={(isOpen, indexContent) =>
               isPopUpZipCode(isOpen, indexContent)
             }
@@ -4233,27 +4226,7 @@ const Preview = () => {
             lpOptionData={state.lpOptionData}
             submitErrorMessage={state.submitErrorMessage}
           />
-          {message.message_content[0]?.type !== "button_submit" && (
-            <div className="sp-user-message-button-action">
-              <CustomButton
-                disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
-                style={{
-                  backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-                  borderRadius: "25px",
-                }}
-                className="ss-user-message__action-btn"
-                onClick={() => onClickNext(indexMessage, message)}
-                autoClick={state.submitErrorMessage.trim().length > 0 ? true : false}
-                messsagetype={message.message_content[0]?.type}
-              >
-                {message.buttonName || (
-                  state.submitErrorMessage.length > 0
-                    ? "更新"
-                    : (userIndexMessage >= userMessageArray.length ? "次へ" : "更新")
-                )}
-              </CustomButton>
-            </div>
-          )}
+          {renderSubmitButton(message, indexMessage)}
         </div>
       </div>
     );
@@ -4270,27 +4243,61 @@ const Preview = () => {
     })
   };
 
+  const getOpeningBotStyle = () => {
+    let containerStyle = {
+      position: 'fixed',
+      bottom: "0px",
+      right: mobileCheck() ? state.isOpen ? 0 : `${state.rightMarginSp}px` : `${state.rightMarginPc}px`,
+      width: mobileCheck() ? `${state.widthSp}%` : `${state.widthPc}px`,
+      height: mobileCheck() ? `${state.heightSp}%` : `${state.heightPc}px`,
+      zIndex: 999,
+      display: "flex",
+      flexDirection: "column",
+      backgroundColor: "white"
+    };
+    let headerStyle = {
+      borderTopLeftRadius: mobileCheck() ? "0px" : "5px",
+      borderTopRightRadius: mobileCheck() ? "0px" : "5px",
+    };
+    let bodyStyle = {
+      backgroundColor: state.botInfor?.opacity_color,
+      flex: 1,
+    };
+
+    if (state.botInfor?.main_color || state.botInfor?.main_color_other) {
+      headerStyle.backgroundColor = state.botInfor?.main_color || state.botInfor?.main_color_other;
+    }
+
+    if (!state.activePopupCloseBot) {
+      containerStyle.height = `${state.heightPc || 600}px`;
+      headerStyle = {
+        ...headerStyle,
+        position: "static",
+        borderBottomLeftRadius: "0px",
+        borderBottomRightRadius: "0px",
+      };
+      bodyStyle.display = "block";
+    }
+
+    return {
+      containerStyle,
+      headerStyle,
+      bodyStyle,
+    };
+  };
+
   const userMessageArray = state.renderMessageArr.filter(x => x.belong_to === 'user');
   let userIndexMessage = 0;
 
   ///body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
+    const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
     return (
       <div
         ref={containerRef}
         id="sp-container1"
         className={`sp-container1 ${mobileCheck() ? 'slideUpSp' : 'slideUp'}`}
-        style={{
-          position: 'fixed',
-          bottom: "0px",
-          right: mobileCheck() === true ? state.isOpen ? 0 : `${rightMarginSp}px` : `${rightMarginPc}px`,
-          width: mobileCheck() === true ? `${widthSp}%` : `${widthPc}px`,
-          height: mobileCheck() === true ? `${heightSp}%` : `${heightPc}px`,
-          zIndex: 999,
-          display: "flex",
-          flexDirection: "column",
-          backgroundColor: "white"
-        }}
+        style={containerStyle}
       >
         <Withdrawal botInfor={state.botInfor}
           delayTimeInSecond={i - state.indexMessageRender}
@@ -4300,7 +4307,7 @@ const Preview = () => {
         />
         <ZipCodePopUp
           isPopUpZipCode={isPopUpZipCode}
-          prefecturesList={dataPrefectures}
+          prefecturesList={state.dataPrefectures}
           message={state.dataMessages[state.indexMessageRender]}
           messageIndex={state.indexMessageRender}
           indexContentZipcode={state.indexContentZipcode}
@@ -4311,14 +4318,7 @@ const Preview = () => {
         {/* popup for shipping address can be used instead of ZipCodePopUp -> remove */}
         <div
           id="sp-header"
-          style={
-            (state.botInfor?.main_color || state.botInfor?.main_color_other) &&
-            {
-              backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-              borderTopLeftRadius: mobileCheck() ? "0px" : "5px",
-              borderTopRightRadius: mobileCheck() ? "0px" : "5px",
-            }
-          }
+          style={headerStyle}
           className="sp-header"
         >
           <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)}>
@@ -4351,11 +4351,11 @@ const Preview = () => {
             </div>
           </div>
         </div>
-        {activePopupCloseBot ?
+        {state.activePopupCloseBot ?
           <ModalPreviewBot
             isMobile={mobileCheck()}
-            styleBot={handleStyleModal()}
-            open={showPopupCloseBot} isAdmin={false} onClose={() => setShowPopupCloseBot(false)}>
+            styleBot={getBotModalStyle()}
+            open={state.showPopupCloseBot} isAdmin={false} onClose={() => setShowPopupCloseBot(false)}>
             <Row>
               <Col md="12">
                 <span className="title-bot-modal">本当に閉じますか？</span>
@@ -4372,9 +4372,7 @@ const Preview = () => {
                 </Button>
               </Col>
               <Col md="6">
-                <Button
-                  className="btn-close__modal-bot"
-                  onClick={() => handleCloseBot()}
+                <Button className="btn-close__modal-bot" onClick={() => handleCloseBot()}
                 >
                   閉じる
                 </Button>
@@ -4386,16 +4384,13 @@ const Preview = () => {
           currentIndex={state.indexUser}
           maxIndex={state.messageUser.length}
         />
-        <div
-          id="sp-body"
-          className="sp-body"
-          style={{ backgroundColor: state.botInfor?.opacity_color, flex: 1 }}
+        <div id="sp-body" className="sp-body" style={bodyStyle}
         >
           {renderMessages()}
         </div>
       </div>
     )
-  } else if (state.isOpen === false && mobileCheck() === false && Number(positionPc) === 1 && Number(buttonTypePc) === 2) {
+  } else if (state.isOpen === false && mobileCheck() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4408,8 +4403,8 @@ const Preview = () => {
           alignItems: "center",
           justifyContent: "center",
           position: 'fixed',
-          bottom: bottomMarginPc ? `${bottomMarginPc}px` : '10px',
-          right: rightMarginPc ? `${rightMarginPc}px` : '0px',
+          bottom: state.bottomMarginPc ? `${state.bottomMarginPc}px` : '10px',
+          right: state.rightMarginPc ? `${state.rightMarginPc}px` : '0px',
         }}
       >
         <img
@@ -4420,7 +4415,7 @@ const Preview = () => {
         />
       </div>
     )
-  } else if (state.isOpen === false && mobileCheck() === false && Number(positionPc) === 1 && Number(buttonTypePc) === 1) {
+  } else if (state.isOpen === false && mobileCheck() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4437,8 +4432,8 @@ const Preview = () => {
           paddingRight: '3px',
           position: 'fixed',
           padding: 'auto',
-          bottom: bottomMarginPc ? `${bottomMarginPc}px` : '10px',
-          right: rightMarginPc ? `${rightMarginPc}px` : '0px',
+          bottom: state.bottomMarginPc ? `${state.bottomMarginPc}px` : '10px',
+          right: state.rightMarginPc ? `${state.rightMarginPc}px` : '0px',
         }}
       >
         <div className="sp-header-left-bt" onClick={() => onOpenPreview(!state.isOpen)}>
@@ -4452,7 +4447,7 @@ const Preview = () => {
         </div>
         <div style={{ alignItems: 'center', justifyContent: "center", padding: 'auto' }}>
           <div id="comment_bubble" style={{ display: 'flex', alignItems: 'center', paddingLeft: '20px', paddingTop: '3px' }}>
-            <span style={{ fontSize: '18px', fontWeight: 900 }}>{titleBubble}</span>
+            <span style={{ fontSize: '18px', fontWeight: 900 }}>{state.titleBubble}</span>
           </div>
         </div>
         <div className="sp-header-right-arrow" style={{ marginRight: '8px' }}>
@@ -4460,7 +4455,7 @@ const Preview = () => {
         </div>
       </div>
     )
-  } else if (state.isOpen === false && mobileCheck() === false && Number(positionPc) === 2) {
+  } else if (state.isOpen === false && mobileCheck() === false && Number(state.positionPc) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4473,7 +4468,7 @@ const Preview = () => {
           justifyContent: "left",
           position: 'fixed',
           transform: ' rotate(-90deg)',
-          bottom: bottomMarginPc ? `${parseInt(bottomMarginPc) + widthPc / 2}px` : '20px',
+          bottom: state.bottomMarginPc ? `${parseInt(state.bottomMarginPc) + state.widthPc / 2}px` : '20px',
           right: `${-120}px`,
         }}
       >
@@ -4486,11 +4481,11 @@ const Preview = () => {
             />PreviewComp
           </div>
           <div className="sp-header-left-label">
-            <div className="sp-header-left-label-title">{rightPcTitle}</div>
+            <div className="sp-header-left-label-title">{state.rightPcTitle}</div>
           </div>
         </div>
       </div>)
-  } else if (state.isOpen === false && mobileCheck() === true && Number(positionSp) === 1 && Number(buttonTypeSp) === 2) {
+  } else if (state.isOpen === false && mobileCheck() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4503,8 +4498,8 @@ const Preview = () => {
           alignItems: "center",
           justifyContent: "center",
           position: 'fixed',
-          bottom: bottomMarginSp ? `${bottomMarginSp}px` : '20px',
-          right: rightMarginSp ? `${rightMarginSp}px` : '20px',
+          bottom: state.bottomMarginSp ? `${state.bottomMarginSp}px` : '20px',
+          right: state.rightMarginSp ? `${state.rightMarginSp}px` : '20px',
         }}
       >
         <img
@@ -4515,7 +4510,7 @@ const Preview = () => {
         />
       </div>
     )
-  } else if (state.isOpen === false && mobileCheck() === true && Number(positionSp) === 1 && Number(buttonTypeSp) === 1) {
+  } else if (state.isOpen === false && mobileCheck() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4527,8 +4522,8 @@ const Preview = () => {
           display: "flex",
           justifyContent: "left",
           position: 'fixed',
-          bottom: bottomMarginSp ? `${bottomMarginSp}px` : '10px',
-          right: rightMarginSp ? `${rightMarginSp}px` : '10px'
+          bottom: state.bottomMarginSp ? `${state.bottomMarginSp}px` : '10px',
+          right: state.rightMarginSp ? `${state.rightMarginSp}px` : '10px'
         }}
       >
         <div className="sp-header-left" onClick={() => onOpenPreview(!state.isOpen)} style={{ width: '100%', padding: '4px' }}>
@@ -4542,7 +4537,7 @@ const Preview = () => {
           </div>
           <div>
             <div id="comment_bubble" className="sp-bubble">
-              <span style={{ fontSize: '14px', fontWeight: 700 }}>{titleBubble}</span>
+              <span style={{ fontSize: '14px', fontWeight: 700 }}>{state.titleBubble}</span>
             </div>
           </div>
           <div className="sp-header-right-arrow" style={{ marginLeft: 'auto' }}>
@@ -4551,7 +4546,7 @@ const Preview = () => {
         </div>
       </div>
     )
-  } else if (state.isOpen === false && mobileCheck() === true && Number(positionSp) === 2) {
+  } else if (state.isOpen === false && mobileCheck() === true && Number(state.positionSp) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4564,7 +4559,7 @@ const Preview = () => {
           justifyContent: "left",
           position: 'fixed',
           transform: ' rotate(-90deg)',
-          bottom: bottomMarginSp ? `${parseInt(bottomMarginSp) + widthPc / 2}px` : '20px',
+          bottom: state.bottomMarginSp ? `${parseInt(state.bottomMarginSp) + state.widthPc / 2}px` : '20px',
           right: `${-120}px`,
         }}
       >
@@ -4577,7 +4572,7 @@ const Preview = () => {
             />
           </div>
           <div className="sp-header-left-label">
-            <div className="sp-header-left-label-title">{rightSpTitle}</div>
+            <div className="sp-header-left-label-title">{state.rightSpTitle}</div>
           </div>
         </div>
       </div>)

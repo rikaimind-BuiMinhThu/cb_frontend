@@ -2,7 +2,6 @@ import React, { } from "react";
 import "../../../../assets/css/bot/preview-chat-bot.css";
 import "moment/locale/zh-cn";
 
-
 const ProcessBar = ({
   botInfor,
   currentIndex,
@@ -41,6 +40,8 @@ const ProcessBar = ({
         style={{
           ...getWidth(),
           ...getBackgroundColor(),
+          display: "block",
+          marginTop: "1px",
         }}
       >
         {getText()}
