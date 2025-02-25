@@ -33,6 +33,7 @@ export const log = (message) => {
 };
 
 export const getEcChatBotApiServerBaseUrl = () => {
+    return "https://ec-chatbot-test1.com";
     const environment = process.env.REACT_APP_CHATBOT_ENV;
     log("Environment: " + environment);
 
@@ -40,6 +41,7 @@ export const getEcChatBotApiServerBaseUrl = () => {
 };
 
 export const getEcChatBotFrontEndBaseUrl = () => {
+    return "http://localhost:3001";
     const environment = getEnvironment();
 
     switch (environment) {

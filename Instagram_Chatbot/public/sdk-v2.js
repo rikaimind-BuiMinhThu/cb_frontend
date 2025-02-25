@@ -43,6 +43,7 @@ function log(message) {
 }
 
 function getEcChatBotApiServerBaseUrl() {
+  return "https://ec-chatbot-test1.com";
   const environment = getEnvironment();
   switch (environment) {
     case "staging":
@@ -58,6 +59,7 @@ function getEcChatBotApiServerBaseUrl() {
 }
 
 function getEcChatBotFrontEndBaseUrl() {
+  return "http://localhost:3001";
   const environment = getEnvironment();
 
   switch (environment) {

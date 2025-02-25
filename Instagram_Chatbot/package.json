@@ -4,7 +4,6 @@
   "private": true,
   "homepage": "/",
   "dependencies": {
-    "@babel/core": "7.14.2",
     "@babel/preset-react": "^7.17.12",
     "@coreui/react": "^4.3.0",
     "@coreui/react-pro": "^4.4.0",
@@ -83,7 +82,7 @@
     "yup": "^1.0.2"
   },
   "scripts": {
-    "start": "set PORT=3001 && react-scripts --openssl-legacy-provider start",
+    "start": "set PORT=3001 && react-scripts start",
     "build": "react-scripts build --openssl-legacy-provider && gulp licenses",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -105,6 +104,7 @@
     "typescript": "4.2.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.26.9",
     "gulp": "4.0.2",
     "gulp-append-prepend": "1.0.9",
     "prettier": "^2.6.2"
