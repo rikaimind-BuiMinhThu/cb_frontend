@@ -9625,6 +9625,20 @@ const UserMessage = ({
                                       : {}
                                 }
                                 onClick={() => {
+                                  if (carousel.is_use_js == true && carousel.jscode?.length > 0) {
+                                    window.parent.postMessage({
+                                      isOpen: true,
+                                      widthPc: 450,
+                                      heightPc: 700,
+                                      widthSp: 100,
+                                      heightSp: 100,
+                                      chatbotRight: 10,
+                                      chatbotBottom: 10,
+                                      action: 'excuteJS',
+                                      jscode: carousel.jscode,
+                                      is_use_js: true
+                                    }, '*');
+                                  }
                                   if (
                                     carousel.initial_selection !==
                                     itemCarousel.id &&
