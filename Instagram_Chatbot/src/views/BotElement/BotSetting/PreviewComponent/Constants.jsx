@@ -1,9 +1,9 @@
-import american_express from "../../../assets/img/payment-method/american_express.png";
-import diner_club from "../../../assets/img/payment-method/diner_club.png";
-import discover from "../../../assets/img/payment-method/discover.png";
-import jcb from "../../../assets/img/payment-method/jcb.png";
-import master_card from "../../../assets/img/payment-method/master_card.png";
-import visa from "../../../assets/img/payment-method/visa.png";
+import american_express from "../../../../assets/img/payment-method/american_express.png";
+import diner_club from "../../../../assets/img/payment-method/diner_club.png";
+import discover from "../../../../assets/img/payment-method/discover.png";
+import jcb from "../../../../assets/img/payment-method/jcb.png";
+import master_card from "../../../../assets/img/payment-method/master_card.png";
+import visa from "../../../../assets/img/payment-method/visa.png";
 
 let dataHourFixed = [];
 for (let i = 0; i <= 23; i++) {
@@ -82,6 +82,13 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
 }));
 
 const SCAN_REGEX = /\{\{(.*?)\}\}/g;
+const CHATBOT_SERVER = {
+  SCENARIO_USER_RESPONSE_PATH: '/api/v1/scenario_users/scenario_user_responses',
+  SCENARIO_CREATE_ORDER_PATH: '/api/v1/scenario_users/scenario_user_responses/create_order',
+  CONVERSION_PATH: '/api/v1/analytics/scenario_counts/:scenario_id',
+  GET_CITIES_PATH: '/api/v1/cities?prefecture_jis_code=:prefecture_jis_code',
+  GET_TOWNS_PATH: '/api/v1/towns?city_jis_code=:city_jis_code',
+};
 
 export {
   dataHourFixed,
@@ -92,4 +99,5 @@ export {
   dataPaymentMethod,
   installmentOptions,
   SCAN_REGEX,
+  CHATBOT_SERVER,
 };

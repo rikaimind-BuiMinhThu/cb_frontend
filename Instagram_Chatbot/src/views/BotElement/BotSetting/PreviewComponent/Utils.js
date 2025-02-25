@@ -1,3 +1,7 @@
+import api from "api/api-management";
+import { tokenExpired } from "api/tokenExpired";
+import { CHATBOT_SERVER } from "./Constants";
+
 const stringNullOrEmpty = (string) => {
   return !string || (string + "").trim() === "";
 };
@@ -64,4 +68,96 @@ const mobileCheck = () => {
   return check;
 }
 
-export { stringNullOrEmpty, getAllUrlParams, lightenColor, mobileCheck };
+const removeLeadingZero = (value) => {
+  let strValue = value.toString();
+  let result = strValue.replace(/^0+/, '');
+  return typeof value === 'number' ? Number(result) : result;
+}
+
+const postToChatBotServer = (url, data, resolve, reject) => {
+  return api
+    .post(url, data)
+    .then((res) => {
+      if (resolve) resolve(res);
+    })
+    .catch((error) => {
+      if (error.response?.data.code === 0) tokenExpired();
+      if (reject) reject(error);
+      console.error(error);
+    });
+}
+
+const patchToChatBotServer = (url, data, resolve, reject) => {
+  return api
+    .patch(url, data)
+    .then((res) => {
+      if (resolve) resolve(res);
+    })
+    .catch((error) => {
+      if (reject) reject(error);
+      console.error(error);
+    });
+}
+
+const getToChatBotServer = (url, resolve, reject) => {
+  return api
+    .get(url)
+    .then((res) => {
+      if (resolve) resolve(res);
+    })
+    .catch((error) => {
+      if (error.response?.data.code === 0) tokenExpired();
+      if (reject) reject(error);
+      console.error(error);
+    });
+};
+
+const sendUserInteractionData = (data, resolve, reject) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.SCENARIO_USER_RESPONSE_PATH,
+    data,
+    resolve,
+    reject
+  );
+}
+
+const sendCreateOrderData = (data, resolve, reject) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.SCENARIO_CREATE_ORDER_PATH,
+    data,
+    resolve,
+    reject
+  );
+}
+
+const sendCountRequest = (scenarioId, data, resolve, reject) => {
+  return patchToChatBotServer(
+    CHATBOT_SERVER.CONVERSION_PATH.replace(":scenario_id", scenarioId),
+    data,
+    resolve,
+    reject
+  );
+}
+
+const getCitiesByPrefecture = (prefectureJisCode, resolve, reject) => {
+  return getToChatBotServer(
+    CHATBOT_SERVER.GET_CITIES_PATH.replace(":prefecture_jis_code", prefectureJisCode),
+    resolve,
+    reject
+  );
+};
+
+const getTownsByCity = (cityJisCode, resolve, reject) => {
+  return getToChatBotServer(
+    CHATBOT_SERVER.GET_TOWNS_PATH.replace(":city_jis_code", cityJisCode),
+    resolve,
+    reject
+  );
+}
+
+export {
+  stringNullOrEmpty, getAllUrlParams, lightenColor,
+  mobileCheck, removeLeadingZero, sendUserInteractionData,
+  sendCreateOrderData, sendCountRequest,
+  getCitiesByPrefecture, getTownsByCity
+};
