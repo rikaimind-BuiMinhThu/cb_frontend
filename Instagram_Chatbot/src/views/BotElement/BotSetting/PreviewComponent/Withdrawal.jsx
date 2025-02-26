@@ -5,7 +5,6 @@ import { sendCountRequest } from "./Utils";
 
 const Withdrawal = (
   botInfor,
-  delayTimeInSecond,
   deviceReceive,
   scenarioId,
   onOpenPreview,
@@ -50,15 +49,13 @@ const Withdrawal = (
     document.getElementById("sp-withdrawal-container").style.display = "none";
     document.getElementById("sp-withdrawal-content").style.display = "none";
 
-    setTimeout(() => {
-      if (document.getElementById("action-bd")) {
-        document.getElementById("action-bd").click();
-        sendInteractionData();
-      } else {
-        sendInteractionData();
-        onOpenPreview(false);
-      }
-    }, delayTimeInSecond * 1000);
+    if (document.getElementById("action-bd")) {
+      document.getElementById("action-bd").click();
+      sendInteractionData();
+    } else {
+      sendInteractionData();
+      onOpenPreview(false);
+    }
   };
 
   return (

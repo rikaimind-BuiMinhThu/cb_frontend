@@ -69,7 +69,7 @@ const previewInitialState = {
   captcha: [],
   withdrawal: {},
   variablesList: [],
-  dataPrefectures: [],
+  prefecturesList: [],
   dataCities: [],
   dataTowns: [],
   prefectures: "",
@@ -288,8 +288,8 @@ const Preview = () => {
   useEffect(() => {
     getPrefectures()
       .then((res) => {
-        console.log("getPrefectures", res);
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { dataPrefectures: res.data.data } });
+        console.log("getPrefectures", res.data.data);
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { prefecturesList: res.data.data } });
       })
   }, []);
 
@@ -400,10 +400,20 @@ const Preview = () => {
     // post message to parent window
     postMessageToParent({isOpen: opening});
 
-    if (state.isOpen && state.activePopupCloseBot) {
-      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: true } });
-      return;
+    let newState = {...state};
+    
+    if (!opening) {
+      if (state.activePopupCloseBot) {
+        newState.isOpen = false;
+        newState.showPopupCloseBot = true;
+      }
+
+      return dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
     }
+    newState.isOpen = true;
+    newState.showPopupCloseBot = false;
+
+    return dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
   }
 
   const createObjParamObject = (message) => {
@@ -614,6 +624,7 @@ const Preview = () => {
     }
 
     return {
+      ...res.data.chatbot,
       opacity_color,
       message_color,
       font_color,
@@ -713,9 +724,7 @@ const Preview = () => {
 
     newState.renderMessagesList.push(messagesList[i]);
     newState.currentMsgIndex = i;
-    if (isPauseScroll === false) {
-      scrollToBottom();
-    }
+    scrollToBottom();
 
     if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
       return redirectToThanksPage();
@@ -761,7 +770,7 @@ const Preview = () => {
     newState.currentMsgIndex = i;
     newState.currentUserMsgIndex++;
 
-    if (!isPauseScroll) scrollToBottom();
+    scrollToBottom();
 
     return newState;
   };
@@ -769,6 +778,7 @@ const Preview = () => {
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
     let newState = {
+      ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
     };
@@ -810,8 +820,8 @@ const Preview = () => {
     }
     
     messagesList = messagesList.filter(x => {
-      return x.hidden !== true && (isLoggedIn && !x.not_display_when_logged_in) &&
-        checkMessageCondition(x, newState.objParam);
+      return x.hidden !== true && checkMessageCondition(x, newState.objParam) &&
+        (!isLoggedIn || (isLoggedIn && !x.not_display_when_logged_in));
     });
 
     newState.variablesList = res.data?.all_variables || [];
@@ -831,7 +841,7 @@ const Preview = () => {
         }
       }
       if (isBotMessage(messagesList[i])) {
-        const firstMsgType = [i]?.message_content[0]?.type;
+        const firstMsgType = messagesList[i]?.message_content[0]?.type;
         let newStateAttributes = {};
 
         switch (firstMsgType) {
@@ -860,7 +870,7 @@ const Preview = () => {
         processForUserMessage(messagesList, i, newState);
         break;
       }
-  }
+    }
 
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
   }
@@ -2698,7 +2708,7 @@ const Preview = () => {
       data,
       async (res) => {
         fukushashikiToLP(getObjectFukushashiki(data));
-        setMessagesSessionStorage(state.renderMessagesList[indexMessage])
+        setMessagesSessionStorage(state.renderMessagesList[state.currentMsgIndex])
         await createOrAddLinesCart(res)
       }
     ).then(() => {
@@ -2720,7 +2730,7 @@ const Preview = () => {
   }
 
   const isLastMessageInCreateOrderFlow = () => {
-    return indexMessage === state.messagesList.length - 1;
+    return state.currentMsgIndex === state.messagesList.length - 1;
   };
 
   const isBotMessage = (message) => {
@@ -2765,7 +2775,7 @@ const Preview = () => {
     }
 
     sendUserInteractionData(
-      data,
+      data_submit,
       async (res) => {
         fukushashikiToLP(getObjectFukushashiki(data));
         setMessagesSessionStorage(state.renderMessagesList[indexMessage])
@@ -3822,7 +3832,7 @@ const Preview = () => {
       document.getElementById("sp-popup-zip-code-address").style.display = "block";
 
       newState = {
-        ...newState,
+        ...state,
         prefectures: null,
         cities: null,
         towns: null,
@@ -3872,23 +3882,23 @@ const Preview = () => {
   };
 
   const renderBotMessageContent = (message, indexMessage) => {
-    if (!message || !message.belong_to !== "bot" || !Array.isArray(message?.message_content)) return null;
+    if (!message || message.belong_to !== "bot" || !Array.isArray(message?.message_content)) return null;
 
-    return message.messageContent.map((content, index) => (
+    return message.message_content.map((content, index) => (
       <BotMessage
         key={indexMessage}
         content={content}
         index={index}
         botInfor={state.botInfor}
         checkoutUrl={state.checkoutUrl}
-        previewOrder={previewOrderContent}
+        previewOrder={state.previewOrderContent}
       />
     ));
   };
 
   const renderSubmitButton = (message, indexMessage) => {
-    if (!message || !message.belong_to !== "user") return null;
-    if (message.message_content[0]?.type !== "button_submit") return null;
+    if (!message || message.belong_to !== "user") return null;
+    if (message.message_content[0]?.type === "button_submit") return null;
 
     let btnText = message.buttonName;
     if (state.submitErrorMessage.length > 0) {
@@ -3917,8 +3927,8 @@ const Preview = () => {
   };
 
   const renderUserMessageContent = (message, indexMessage) => {
-    if (!message || !message.belong_to !== "user") return null;
-    if (!Array.isArray(message?.message_content) || message.messageContent.length === 0) return null;
+    if (!message || message.belong_to !== "user") return null;
+    if (!Array.isArray(message?.message_content) || message.message_content.length === 0) return null;
 
     return (
       <div className="sp-body-user-side slideLeft">
@@ -3960,7 +3970,7 @@ const Preview = () => {
                 }
               });
             }}
-            dataPrefectures={[...state.dataPrefectures]}
+            prefecturesList={[...state.prefecturesList]}
             isPopUpZipCode={(isOpen, indexContent) =>
               isPopUpZipCode(isOpen, indexContent)
             }
@@ -4045,14 +4055,13 @@ const Preview = () => {
         style={containerStyle}
       >
         <Withdrawal botInfor={state.botInfor}
-          delayTimeInSecond={i - state.currentMsgIndex}
           deviceReceive={state.deviceReceive}
           scenarioId={state.scenarioId}
           onOpenPreview={onOpenPreview}
         />
         <ZipCodePopUp
           isPopUpZipCode={isPopUpZipCode}
-          prefecturesList={state.dataPrefectures}
+          prefecturesList={state.prefecturesList}
           message={state.messagesList[state.currentMsgIndex]}
           messageIndex={state.currentMsgIndex}
           indexContentZipcode={state.indexContentZipcode}
@@ -4161,6 +4170,7 @@ const Preview = () => {
       </div>
     )
   } else if (!state.isOpen && mobileCheck() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
+    console.log("botInfor", state.botInfor);
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}

@@ -1,9 +1,11 @@
-import React, { } from "react";
+import React, { useState } from "react";
 import "../../../../assets/css/bot/preview-chat-bot.css";
 import "moment/locale/zh-cn";
 import { getTownsByCity } from "./Utils";
+import { MDBIcon } from "mdbreact";
+import SelectCustom from "../ScenarioSetting/scenarioComon/SelectCustom";
 
-const ZipCodePopUp = (
+const ZipCodePopUp = ({
   isPopUpZipCode,
   prefecturesList,
   message,
@@ -12,7 +14,7 @@ const ZipCodePopUp = (
   onChangeValue,
   onChangeErrors,
   errors = {},
-) => {
+}) => {
   const [state, setState] = useState({});
 
   const onChangePrefecture = (value) => {
@@ -128,6 +130,8 @@ const ZipCodePopUp = (
     document.getElementById("ss-user-input-address").select();
   };
 
+  if (!prefecturesList) return null;
+
   return (
     <div id="sp-popup-zip-code-address" className="sp-popup-zip-code-address">
       <div className="sp-popup-zip-code-address-header">
@@ -173,7 +177,7 @@ const ZipCodePopUp = (
             onChange={onChangeTown}
             value={state.selectedTown}
           />
-          {zipcode && (
+          {state.zipcode && (
             <div className="sp-popup-zip-code-address-body-form-content">
               〒{state.zipcode}
             </div>

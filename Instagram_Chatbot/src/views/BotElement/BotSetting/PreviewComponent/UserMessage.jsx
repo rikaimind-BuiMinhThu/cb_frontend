@@ -42,7 +42,7 @@ const UserMessage = ({
   isPopUpZipCode,
   isPopUpZipCodeShippingAddress,
   onChangeErrors,
-  dataPrefectures,
+  prefecturesList,
   variables,
   lpOptionData = {},
   errorMessageSubmit = ''
@@ -50,7 +50,7 @@ const UserMessage = ({
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
   const [dataCity, setDataCity] = useState([]);
-  // const [dataPrefectures, setDataPrefectures] = useState([...dataPrefectures]);
+  // const [prefecturesList, setprefecturesList] = useState([...prefecturesList]);
   const [startDate, setStartDate] = useState(new Date());
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
@@ -1419,7 +1419,7 @@ const UserMessage = ({
                               <SelectCustom
                                 style={{ width: "100%" }}
                                 value={shippingAddress?.value_prefecture}
-                                data={dataPrefectures}
+                                data={prefecturesList}
                                 keyValue="name"
                                 nameValue="name"
                                 placeholder={shippingAddress.prefecture}
@@ -2877,7 +2877,7 @@ const UserMessage = ({
                     <React.Fragment>
                       <SelectCustom
                         disabled={disabled}
-                        data={dataPrefectures}
+                        data={prefecturesList}
                         placeholder="選択してください。"
                         style={{ width: "100%" }}
                         keyValue="name"
@@ -2926,7 +2926,7 @@ const UserMessage = ({
                       >
                         <SelectCustom
                           disabled={disabled}
-                          data={dataPrefectures}
+                          data={prefecturesList}
                           placeholder="都道府県を選択"
                           style={{ width: "45%" }}
                           keyValue="name"
@@ -2940,7 +2940,7 @@ const UserMessage = ({
                               "prefecture"
                             );
                             if (value) {
-                              let prefecture_jis_code = dataPrefectures.find(
+                              let prefecture_jis_code = prefecturesList.find(
                                 (item) => item.name === value
                               ).prefecture_jis_code;
                               api
@@ -3353,7 +3353,7 @@ const UserMessage = ({
                       <SelectCustom
                         style={{ width: "100%" }}
                         value={zipCodeAddress?.value_prefecture}
-                        data={dataPrefectures}
+                        data={prefecturesList}
                         keyValue="name"
                         nameValue="name"
                         placeholder={zipCodeAddress.prefecture}
