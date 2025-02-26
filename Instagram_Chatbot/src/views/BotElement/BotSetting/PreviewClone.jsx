@@ -167,10 +167,6 @@ const Preview = () => {
     };
   }
 
-  useEffect(() => {
-    console.log('State updated:', state);
-  }, [state]);
-
   // get default obj params
   useEffect(() => {
     if (!state.objParam?.ip) {
@@ -294,13 +290,13 @@ const Preview = () => {
 
   // Get prefectures
   useEffect(() => {
+    if (!state.loadedStateFromSession) return;
     if (state.prefecturesList.length !== 0) return;
     getPrefectures()
       .then((res) => {
-        console.log("getPrefectures", res.data.data);
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { prefecturesList: res.data.data } });
       })
-  }, [state.prefecturesList]);
+  }, [state.prefecturesList, state.loadedStateFromSession]);
 
   const handleCloseBot = () => {
     const element = document.getElementById('sp-container1');
@@ -954,18 +950,29 @@ const Preview = () => {
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
   }
 
+  const fukushashikiSavedStateToLp = (savedState) => {
+    return new Promise((resolve) => {
+      savedState.userMessagesList.forEach((message) => {
+        fukushashikiToLP(convertToFukushashikiObject({message: message}));
+      });
+      resolve();
+    });
+  }
+
   // Get Preview Scenario Data
   useEffect(() => {
     if (!state.loadedStateFromSession) {
       const savedState = getStateFromSessionStorage();
 
       if (savedState) {
-        return dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: {
-            ...savedState,
-            loadedStateFromSession: true,
-          }
+        return fukushashikiSavedStateToLp(savedState).then(() => {
+          dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+            payload: {
+              ...savedState,
+              loadedStateFromSession: true,
+            }
+          });
         });
       }
     }
@@ -1005,8 +1012,6 @@ const Preview = () => {
     state.deviceReceive, state.scenarioId,
     state.isDisplayErrorMessage, state.loadedStateFromSession
   ]);
-
-  
 
   const scrollToBottom = () => {
     if (document.getElementById("sp-body")) {
@@ -2728,7 +2733,7 @@ const Preview = () => {
     window.parent.postMessage({
       ...defaultOptions,
       ...options,
-    }, state.urlReceive);
+    }, state.urlReceive || '*');
   }
 
   const processClickCreateOrder = (data) => {
@@ -3379,7 +3384,6 @@ const Preview = () => {
       </div>
     )
   } else if (!state.isOpen && mobileCheck() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
-    console.log("botInfor", state.botInfor);
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
