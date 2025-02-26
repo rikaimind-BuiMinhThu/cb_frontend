@@ -175,6 +175,7 @@ const installmentOptions = Array.from({ length: 23 }, (_, i) => ({
   value: `${i + 2}`,
 }));
 let SCAN_REGEX = /\{\{(.*?)\}\}/g;
+let globalLpOptionData = {};
 
 var url = new URL(window.location.href);
 let params = new URLSearchParams(url.search);
@@ -378,7 +379,8 @@ function Preview() {
         if (event.data.crawJsonObject) {
           let receiveOptionData = {};
           receiveOptionData[event.data.crawJsonObject.options.search_value] = event.data.crawJsonObject.dates;
-          const newLpOptionData = Object.assign({}, lpOptionData, receiveOptionData)
+          const newLpOptionData = Object.assign({}, globalLpOptionData, receiveOptionData);
+          globalLpOptionData = newLpOptionData;          
           setLpOptionData(newLpOptionData);
           return;
         }
@@ -460,6 +462,89 @@ function Preview() {
         setIsOpen(false);
       }, 680)
     }
+  }
+
+  function checkMessageCondition (message,buildParam) {
+    debugger;
+    var checked = false;
+   if(message.conditions.length > 0){
+    for (let j = 0; j < message.conditions.length; j++) {
+      let conditionItem = message.conditions[j];
+      if (j === 0) {
+        if (conditionItem.condition === "include") {
+          checked = buildParam[
+            conditionItem.nameCondition
+          ].includes(conditionItem.inputCondition);
+        } else if (conditionItem.condition === "is") {
+          checked =
+          buildParam[conditionItem.nameCondition] ==
+            conditionItem.inputCondition;
+        } else if (conditionItem.condition === "not_include") {
+          checked = !buildParam[
+            conditionItem.nameCondition
+          ].includes(conditionItem.inputCondition);
+        } else if (conditionItem.condition === "is_not") {
+          checked =
+          buildParam[conditionItem.nameCondition] !=
+            conditionItem.inputCondition;
+        }
+      } else if (conditionItem?.linkCondition === "and") {
+        if (conditionItem.condition === "include") {
+          checked =
+            checked &&
+            buildParam[conditionItem.nameCondition].includes(
+              conditionItem.inputCondition
+            );
+        } else if (conditionItem.condition === "is") {
+          checked =
+            checked &&
+            buildParam[conditionItem.nameCondition] ==
+            conditionItem.inputCondition;
+        } else if (conditionItem.condition === "not_include") {
+          checked =
+            checked &&
+            !buildParam[conditionItem.nameCondition].includes(
+              conditionItem.inputCondition
+            );
+        } else if (conditionItem.condition === "is_not") {
+          checked =
+            checked &&
+            buildParam[conditionItem.nameCondition] !=
+            conditionItem.inputCondition;
+        }
+      } else if (conditionItem?.linkCondition === "or") {
+        if (conditionItem.condition === "include") {
+          checked =
+            checked ||
+            buildParam[conditionItem.nameCondition].includes(
+              conditionItem.inputCondition
+            );
+        } else if (conditionItem.condition === "is") {
+          checked =
+            checked ||
+            buildParam[conditionItem.nameCondition] ==
+            conditionItem.inputCondition;
+        } else if (conditionItem.condition === "not_include") {
+          checked =
+            checked ||
+            !buildParam[conditionItem.nameCondition].includes(
+              conditionItem.inputCondition
+            );
+        } else if (conditionItem.condition === "is_not") {
+          checked =
+            checked ||
+            buildParam[conditionItem.nameCondition] !=
+            conditionItem.inputCondition;
+        }
+      }
+    }
+   }
+   else 
+   {
+    checked = true;
+   }
+
+    return checked;
   }
 
   function onOpenPreview(opening) {
@@ -559,6 +644,30 @@ function Preview() {
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
   }
 
+  function createObjParamObject(dataMessage)
+  {
+    let result = {};
+    let contents = dataMessage.message_content;
+    contents.forEach((content) => {
+      switch (content.type) {
+        case "pull_down":
+          {
+            if(content.pull_down.is_save_input_content==true)
+            {
+              if(content.pull_down.type=="customization")
+              {
+                var variableName = content.pull_down.save_input_content
+                var variableValue = content.pull_down.customization.value
+                result[variableName]= variableValue
+              }    
+            }            
+          }
+      }
+    })
+
+    return result;
+  }
+
   // useEffect(() => {
   //   api.get(`/api/v1/managements/chatbots/${botId}`).then(res => {
   //     if (res.data.code == 1) {
@@ -580,6 +689,35 @@ function Preview() {
         }
       });
   }, []);
+
+  const buildObjParamFromDataMessage = (messsages) => {
+    let result = {
+      current_url: window.location.href,
+      current_url_param: getAllUrlParams(window.location.href),
+      current_url_title: document.title,
+      user_id: Cookies.get("user_id"),
+      bot_id: Cookies.get("bot_id"),
+    };
+
+    if (!result.user_agent) {
+      // $.getJSON("https://api.ipregistry.co/?key=tryout", function (data) {
+      //   result.user_ip_address = data.ip;
+      //   result.user_country = data.location.country.name;
+      //   result.user_city = data.location.city;
+      //   result.user_device = data.user_agent.device.type;
+      //   result.user_browser = data.user_agent.name;
+      //   result.user_agent = data.user_agent.header;
+      //   result.start_datetime = new Date();
+      // });
+    }
+
+    messsages.forEach(message => {
+      let builtParam = createObjParamObject(message);
+      result = { ...result, ...builtParam };
+    });
+
+    return result;
+  }
 
   useEffect(() => {
     let delayRender;
@@ -1190,18 +1328,31 @@ function Preview() {
                     if (Array.isArray(data.message_content)) {
                       data.message_content = data.message_content.filter(item => item.type !== "delay");
                     }
-                  });
+                  }); 
+                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);                 
+                  dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
+                  filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);                    
                   setRenderMessageArr(dataMesage);
-                  let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
-                  if (isLoggedIn == "true") {
-                    dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
-                    filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
-                    setRenderMessageArr(dataMesage);
-                  }
+                  filteredMessages.forEach(data => {
+                    let objSend = {
+                      message: data
+                    }
+                    window.parent.postMessage({
+                      isOpen: true,
+                      widthPc: widthPc,
+                      heightPc: heightPc,
+                      widthSp: widthSp,
+                      heightSp: heightSp,
+                      chatbotRight: rightMarginPc,
+                      chatbotBottom: bottomMarginPc,
+                      fukushashikiResponse: getObjectFukushashiki(objSend)
+                    }, '*') ;
+                  })               
+                  // setRenderMessageArr(dataMesage);
                   setIndexMessageRender(dataMesage.length - 1);
                   setMessageUser(filteredMessages)
-                  setIndexUser(filteredMessages.length)
-                  setIsOpen(true)
+                  setIndexUser(filteredMessages.length)                
+                  setIsOpen(true)                         
                   setTimeout(() => {
                     const buttons = document.querySelectorAll('button.ss-user-message__action-btn.btn.btn-secondary');
                     if (buttons.length > 0) {
@@ -1212,7 +1363,7 @@ function Preview() {
                         view: window
                       }));
                     }
-                  }, 8000);
+                  }, 8000);       
 
                 }
               }
@@ -2515,13 +2666,28 @@ function Preview() {
                   listFukuObject.push(fukuObjectRight);
                 }
                 else {
-                  const fukuObject = {
-                    type: message.type,
-                    bindingMode: message.fukushashiki_search_mode,
-                    bindingAddress: message.fukushashiki_search_value,
-                    bindingValue: message.text_input.text.value,
-                  };
-                  listFukuObject.push(fukuObject);
+                  if (message.fukushashiki_search_value.includes(',')) {
+                    let address = message.fukushashiki_search_value.split(',');
+                    address.forEach(value => {
+                      const fukuObject = {
+                        type: message.type,
+                        bindingMode: message.fukushashiki_search_mode,
+                        bindingAddress: value,
+                        bindingValue: message.text_input.text.value,
+                      };
+                      listFukuObject.push(fukuObject);
+                    });
+                  }
+                  else 
+                  {
+                    const fukuObject = {
+                      type: message.type,
+                      bindingMode: message.fukushashiki_search_mode,
+                      bindingAddress: message.fukushashiki_search_value,
+                      bindingValue: message.text_input.text.value,
+                    };
+                    listFukuObject.push(fukuObject);
+                  }                 
                 }
               }
 
@@ -2599,13 +2765,28 @@ function Preview() {
                 listFukuObject.push(fukuObject);
               }
               if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
-                const fukuObject = {
-                  type: 'password',
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.text_input.password.value,
-                };
-                listFukuObject.push(fukuObject);
+                if(message.fukushashiki_search_value.includes(',')){
+                  let address = message.fukushashiki_search_value.split(',');
+                  address.forEach(value => {
+                    const fukuObject = {
+                      type: 'password',
+                      bindingMode: message.fukushashiki_search_mode,
+                      bindingAddress: value,
+                      bindingValue: message.text_input.password.value,
+                    };
+                    listFukuObject.push(fukuObject);
+                  });
+                }
+                else 
+                {
+                  const fukuObject = {
+                    type: 'password',
+                    bindingMode: message.fukushashiki_search_mode,
+                    bindingAddress: message.fukushashiki_search_value,
+                    bindingValue: message.text_input.password.value,
+                  };
+                  listFukuObject.push(fukuObject);
+                }
               }
 
               if (Object.keys(message.text_input.password_confirmation).length != 0 && message.text_input.password_confirmation != undefined) {
@@ -2677,7 +2858,7 @@ function Preview() {
                 }
                 else {
                   message.pull_down.customization.options_without_comment.forEach((item) => {
-                    if (item.text == textInDropdown) {
+                    if (item.value == textInDropdown) {
                       const fukuObject = {
                         type: message.type,
                         bindingMode: message.fukushashiki_search_mode,
@@ -2833,7 +3014,7 @@ function Preview() {
           case 'radio_button':
             {
               const initialSelection = message.radio_button.initial_selection;
-              const selectedElement = message.radio_button.default.find(item => item.id === initialSelection);
+              const selectedElement = message.radio_button.default.find(item => item.value === initialSelection);
               if (selectedElement) {
                 const value = selectedElement.value;
                 const fukuObject = {
@@ -4118,18 +4299,15 @@ function Preview() {
               )?.text || item.default_value;
             isSaveParam = true;
           } else if (contentType === "checkbox") {
-            let dataTextChecked;
-            if (
-              field === "checkedValue" &&
-              dataContentType.checkedValue.length > 0
-            ) {
-              dataTextChecked = dataContentType.checkedValue.map(
-                (itemChecked) => {
+            let dataTextChecked = [];
+            if (field === "checkedValue") {
+              if (dataContentType.checkedValue.length > 0) {
+                dataTextChecked = dataContentType.checkedValue.map((itemChecked) => {
                   return dataContentType[dataContentType.type].find(
                     (item) => itemChecked === item.id
                   )?.text;
-                }
-              );
+                });
+              }
               isSaveParam = true;
             } else if (
               field === "initial_selection_picture" &&
@@ -4152,8 +4330,7 @@ function Preview() {
             } else {
               dataTextChecked = [];
             }
-            item.default_value =
-              dataTextChecked.join(",") ?? item.default_value;
+            item.default_value = dataTextChecked.length > 0 ? dataTextChecked.join(",") : "";
           } else if (contentType === "card_payment_radio_button") {
             let dataTextChecked;
             if (field === "initial_selection") {
@@ -4939,9 +5116,9 @@ function Preview() {
           >
             {indexUser
               ? messageUser.length !== indexUser - 1
-                ? `あと${messageUser.length - indexUser + 1}間`
+                ? `あと${messageUser.length - indexUser + 1}問`
                 : "完了しました。"
-              : `あと${messageUser.length}間`}
+              : `あと${messageUser.length}問`}
           </div>
         </div>
         <div
@@ -5502,6 +5679,16 @@ const UserMessage = ({
   const getLPOptionData = (search_element_value) => {
     return lpOptionData[search_element_value];
   }
+
+  const moveToNext = (nextId) => {
+    setTimeout(() => {
+      const nextInput = document.getElementById(nextId);
+      if (nextInput) {
+        nextInput.focus();
+        nextInput.select();
+      }
+    }, 50);
+  };
 
   function loadCaptcha(indexContent) {
     if (
@@ -6148,19 +6335,12 @@ const UserMessage = ({
                           className="ss-message__content--user-text-input ss-input-value"
                           maxLength={3}
                           style={{ marginBottom: "0px", width: "32%" }}
+                          type="tel"
+                          inputMode="numeric"
                           placeholder={textInput[textInput.type]?.number1}
                           onChange={(value) => {
                             if (value.length === 3) {
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_2"
-                                )
-                                .focus();
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_2"
-                                )
-                                .select();
+                              moveToNext("ss-user-message-phone_number_2");
                             }
                             onChangeValue(
                               indexContent,
@@ -6170,6 +6350,11 @@ const UserMessage = ({
                               "value1"
                             );
                           }}
+                          onCompositionEnd={(event) => {
+                            if (event.target.value.length === 3) {
+                              moveToNext("ss-user-message-phone_number_2");
+                            }
+                          }}
                           value={textInput[textInput.type]?.value1}
                         ></InputCustom>
                         <InputCustom
@@ -6177,20 +6362,13 @@ const UserMessage = ({
                           disabled={disabled}
                           className="ss-message__content--user-text-input ss-input-value"
                           style={{ marginBottom: "0px", width: "32%" }}
+                          type="tel"
+                          inputMode="numeric"
                           maxLength={4}
                           placeholder={textInput[textInput.type]?.number2}
                           onChange={(value) => {
                             if (value.length === 4) {
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_3"
-                                )
-                                .focus();
-                              document
-                                .getElementById(
-                                  "ss-user-message-phone_number_3"
-                                )
-                                .select();
+                              moveToNext("ss-user-message-phone_number_3");
                             }
                             onChangeValue(
                               indexContent,
@@ -6199,6 +6377,11 @@ const UserMessage = ({
                               textInput.type,
                               "value2"
                             );
+                          }}
+                          onCompositionEnd={(event) => {
+                            if (event.target.value.length === 4) {
+                              moveToNext("ss-user-message-phone_number_3");
+                            }
                           }}
                           value={textInput[textInput.type]?.value2}
                         ></InputCustom>
@@ -6209,6 +6392,8 @@ const UserMessage = ({
                           style={{ marginBottom: "0px", width: "32%" }}
                           placeholder={textInput[textInput.type]?.number3}
                           maxLength={4}
+                          type="tel"
+                          inputMode="numeric"
                           onChange={(value) =>
                             onChangeValue(
                               indexContent,
@@ -6697,12 +6882,7 @@ const UserMessage = ({
                                   }}
                                   onChange={async (value) => {
                                     if ((value + "").length === 3) {
-                                      document
-                                        .getElementById("ss-user-post-code-right-input2")
-                                        .focus();
-                                      document
-                                        .getElementById("ss-user-post-code-right-input2")
-                                        .select();
+                                      moveToNext("ss-user-post-code-right-input2");
                                     }
                                     onChangeValue(
                                       indexContent,
@@ -8530,7 +8710,8 @@ const UserMessage = ({
                     </div>
                     {zipCodeAddress.split_postal_code !== true ? (
                       <InputCustom
-                        type="number"
+                        type="tel"
+                        inputMode="numeric"
                         placeholder={zipCodeAddress.post_code}
                         disabled={disabled}
                         // controls={false}
@@ -8615,7 +8796,8 @@ const UserMessage = ({
                         }}
                       >
                         <InputCustom
-                          type="number"
+                          type="tel"
+                          inputMode="numeric"
                           placeholder={zipCodeAddress.post_code_left}
                           disabled={disabled}
                           style={{ width: "49%" }}
@@ -8706,7 +8888,8 @@ const UserMessage = ({
                           value={zipCodeAddress.value_post_code_left}
                         />
                         <InputCustom
-                          type="number"
+                          type="tel"
+                          inputMode="numeric"
                           placeholder={zipCodeAddress.post_code_right}
                           disabled={disabled}
                           id="ss-user-post-code-right-input"
@@ -9429,6 +9612,20 @@ const UserMessage = ({
                                       : {}
                                 }
                                 onClick={() => {
+                                  if (carousel.is_use_js == true && carousel.jscode?.length > 0) {
+                                    window.parent.postMessage({
+                                      isOpen: true,
+                                      widthPc: 450,
+                                      heightPc: 700,
+                                      widthSp: 100,
+                                      heightSp: 100,
+                                      chatbotRight: 10,
+                                      chatbotBottom: 10,
+                                      action: 'excuteJS',
+                                      jscode: carousel.jscode,
+                                      is_use_js: true
+                                    }, '*');
+                                  }
                                   if (
                                     carousel.initial_selection !==
                                     itemCarousel.id &&
