@@ -12,7 +12,7 @@ import {
   Col
 } from "antd";
 import moment from "moment";
-import $, { } from "jquery";
+import $, { event } from "jquery";
 import { tokenExpired } from "api/tokenExpired";
 import { EC_CHATBOT_URL } from "../../../variables/constants";
 import "moment/locale/zh-cn";
@@ -24,7 +24,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { SCAN_REGEX, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, SCAN_REGEX, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -110,16 +110,24 @@ const previewInitialState = {
     bot_id: Cookies.get("bot_id")
   },
   previewOrderContent: null,
+  // loadedStateFromSession has 2 values: "wait", "loaded"
+  loadedStateFromSession: false,
 };
 
 const PREVIEW_ACTIONS = {
   UPDATE_MULTI_STATE: "UPDATE_MULTI_STATE",
+  ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
+  UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
 };
 
 const PreviewReducer = (state, action) => {
   switch (action.type) {
     case PREVIEW_ACTIONS.UPDATE_MULTI_STATE:
       return { ...state, ...(action.payload) };
+    case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
+      return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload } };
+    case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
+      return { ...state, previewOrderContent: action.payload };
   }
 
   return state;
@@ -159,22 +167,9 @@ const Preview = () => {
     };
   }
 
-  const updateVariableValues = (variables, messagesList, index, action = "") => {
-    if (variables.length === 0) return variables;
-  
-    const messageContent = messagesList[index]?.message_content[0];
-    const dataVarExist = messageContent[messageContent.type].variables;
-  
-    variables.forEach((variable) => {
-      dataVarExist.forEach((dataVar) => {
-        if (variable.variable_name === dataVar.key) {
-          variable.default_value = action !== "clear_variable" ? dataVar.value : "";
-        }
-      });
-    });
-  
-    return [...variables];
-  }
+  useEffect(() => {
+    console.log('State updated:', state);
+  }, [state]);
 
   // get default obj params
   useEffect(() => {
@@ -237,33 +232,45 @@ const Preview = () => {
       });
   }, [state.botId]);
 
+  const eventHandler = (event) => {
+    if (!event.data || !event.data.actionData) return;
+    const actionData = event.data.actionData;
+
+    switch (event.data.action) {
+      case CHATBOT_ACTIONS.CRAWL_DATA:
+        let receiveOptionData = {};
+        receiveOptionData[actionData.searchAddress] = actionData.result;
+
+        return dispatch({
+          type: PREVIEW_ACTIONS.ADD_LP_OPTION_DATA,
+          payload: receiveOptionData
+        });
+
+      case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: { submitErrorMessage: actionData }
+        });
+
+      case CHATBOT_ACTIONS.OPEN_PREVIEW:
+        if (!state.isOpen)
+          return onOpenPreview(true);
+        break;
+
+      case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
+      case CHATBOT_ACTIONS.PREVIEW_OBJECT:
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT,
+          payload: actionData
+        });
+      default:
+        // TODO
+        break;
+    }
+  };
+
   // Add event listener to receive message from parent window
   useEffect(() => {
-    const eventHandler = (event) => {
-      if (!event.data) return;
-
-      if (event.data === 'openPreview' && state.isOpen !== true) {
-        onOpenPreview(true)
-      }
-      if (event.data.text != undefined && event.data.text.trim().length > 0) {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { submitErrorMessage: event.data.text } });
-        return;
-      }
-
-      if (event.data.objectSend) {
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { previewOrderContent: event.data.objectSend } });
-        return;
-      }
-
-      if (event.data.crawJsonObject) {
-        let receiveOptionData = {};
-        receiveOptionData[event.data.crawJsonObject.options.search_value] = event.data.crawJsonObject.dates;
-        const newLpOptionData = { ...state.lpOptionData, ...receiveOptionData };
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { lpOptionData: newLpOptionData } });
-        return;
-      }
-    };
-
     window.addEventListener("message", eventHandler, false);
 
     return () => {
@@ -287,12 +294,13 @@ const Preview = () => {
 
   // Get prefectures
   useEffect(() => {
+    if (state.prefecturesList.length !== 0) return;
     getPrefectures()
       .then((res) => {
         console.log("getPrefectures", res.data.data);
         dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { prefecturesList: res.data.data } });
       })
-  }, []);
+  }, [state.prefecturesList]);
 
   const handleCloseBot = () => {
     const element = document.getElementById('sp-container1');
@@ -869,14 +877,15 @@ const Preview = () => {
 
     if (btnSubmitItem) {
       const btnSubmitItemContent = btnSubmitItem.message_content[0];
-      const jsQueryErrorData = {
+      const actionData = {
         isDisplay: btnSubmitItemContent.button_submit.is_display_error_message,
         seachMode: btnSubmitItemContent.error_message_display_element_search_type,
         searchValue: btnSubmitItemContent.error_message_display_element_search_value,
       };
       postMessageToParent({
         isOpen: true,
-        getErrorMessage: jsQueryErrorData
+        action: CHATBOT_ACTIONS.GET_ERROR_MESSAGE,
+        actionData: actionData
       });
       newState.isDisplayErrorMessage = btnSubmitItemContent.button_submit.is_display_error_message;
     }
@@ -947,6 +956,23 @@ const Preview = () => {
 
   // Get Preview Scenario Data
   useEffect(() => {
+    if (!state.loadedStateFromSession) {
+      const savedState = getStateFromSessionStorage();
+
+      if (savedState) {
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: {
+            ...savedState,
+            loadedStateFromSession: true,
+          }
+        });
+      }
+    }
+
+    if (state.loadedStateFromSession && state.botId)
+      return;
+
     if (!state.botId) {
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
       return;
@@ -972,24 +998,15 @@ const Preview = () => {
       return;
     }
 
-    getScenarioPreviewData(state.botId, state.scenarioId)
+    return getScenarioPreviewData(state.botId, state.scenarioId)
       .then(extractStateFromPreviewResponse);
-  }, [state.botId, state.urlSend, state.urlReceive, state.deviceReceive, state.scenarioId]);
+  }, [
+    state.botId, state.urlSend, state.urlReceive,
+    state.deviceReceive, state.scenarioId,
+    state.isDisplayErrorMessage, state.loadedStateFromSession
+  ]);
 
-  useEffect(() => {
-    if (state.isDisplayErrorMessage && state.submitErrorMessage.trim().length > 0) {
-      const savedState = getStateFromSessionStorage();
-
-      dispatch({
-        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: {
-          ...savedState,
-          isDisplayErrorMessage: true,
-          submitErrorMessage: state.submitErrorMessage,
-        }
-      });
-    }
-  }, [state.submitErrorMessage, state.isDisplayErrorMessage]);
+  
 
   const scrollToBottom = () => {
     if (document.getElementById("sp-body")) {
@@ -2137,12 +2154,6 @@ const Preview = () => {
     return JSON.parse(data);
   };
 
-  const getMessagesSessionStorage = () => {
-    const data = sessionStorage.getItem(`messages_bot_${state.botId}`)
-    if (!data) return null;
-    return JSON.parse(data)
-  }
-
   const checkUpdateMessagesSessionStorage = (updated_at) => {
     const temp = sessionStorage.getItem("bot_update_at");
 
@@ -2204,7 +2215,7 @@ const Preview = () => {
     }
   }
 
-  const getObjectFukushashiki = (obj) => {
+  const convertToFukushashikiObject = (obj) => {
     if (
       obj &&
       obj.message.message_content &&
@@ -2687,10 +2698,10 @@ const Preview = () => {
     }
   }
 
-  const postMessageForRunJsCode = (jsCode) => {
+  const postMessageForExecuteJs = (jsCode) => {
     postMessageToParent({
-      action: 'excuteJS',
-      jscode: jsCode,
+      action: CHATBOT_ACTIONS.EXCUTE_JS,
+      actionData: jsCode,
       is_use_js: true
     });
   }
@@ -2698,7 +2709,7 @@ const Preview = () => {
   const fukushashikiToLP = (fukushashikiData) => {
     postMessageToParent({
       action: 'fukushashiki',
-      fukushashikiResponse: fukushashikiData
+      actionData: fukushashikiData
     });
   }
 
@@ -2724,7 +2735,7 @@ const Preview = () => {
     sendUserInteractionData(
       data,
     ).then(async (res) => {
-      fukushashikiToLP(getObjectFukushashiki(data));
+      fukushashikiToLP(convertToFukushashikiObject(data));
       setStateToSessionStorage(state);
       await createOrAddLinesCart(res);
       sendCreateOrderData(
@@ -2762,7 +2773,7 @@ const Preview = () => {
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
 
     if (message.button_jscode == true && message.jscode?.length > 0) {
-      postMessageForRunJsCode();
+      postMessageForExecuteJs(message.jscode);
     }
 
     if (!handleValidateField(indexMessage)) {
@@ -2794,7 +2805,7 @@ const Preview = () => {
       });
     }
 
-    fukushashikiToLP(getObjectFukushashiki(submitData));
+    fukushashikiToLP(convertToFukushashikiObject(submitData));
 
     // Update next messages list after clicked next
     const nextMessage = state.messagesList[clickedMsgIndex + 1];
@@ -3084,6 +3095,7 @@ const Preview = () => {
         botInfor={state.botInfor}
         checkoutUrl={state.checkoutUrl}
         previewOrderContent={state.previewOrderContent}
+        postMessageForExecuteJs={postMessageForExecuteJs}
       />
     ));
   };
@@ -3093,7 +3105,7 @@ const Preview = () => {
     if (message.message_content[0]?.type === "button_submit") return null;
 
     let btnText = message.buttonName;
-    if (state.submitErrorMessage.length > 0) {
+    if (state.submitErrorMessage.trim().length > 0) {
       btnText = "更新";
     } else {
       btnText = state.currentUserMsgIndex >= state.userMessagesList.length ? "次へ" : "更新";
@@ -3108,8 +3120,10 @@ const Preview = () => {
             borderRadius: "25px",
           }}
           className="ss-user-message__action-btn"
-          onClick={() => onClickNext(indexMessage, message)}
-          autoClick={state.submitErrorMessage.trim().length > 0}
+          onClick={() => {
+            onClickNext(indexMessage, message)
+          }}
+          autoClick={false}
           messsagetype={message.message_content[0]?.type}
         >
           {btnText}
@@ -3126,6 +3140,7 @@ const Preview = () => {
       <div className="sp-body-user-side slideLeft">
         <div className="sp-body-user-side-messages">
           <UserMessage
+            postMessageToParent={postMessageToParent}
             captcha={state.captcha}
             messageContentProps={message.message_content}
             disabled={state.submitErrorMessage.length > 0 ? false : message.disabled}
@@ -3148,7 +3163,9 @@ const Preview = () => {
               )
             }
             currentMsgIndex={state.currentMsgIndex}
-            onClickNext={() => onClickNext(indexMessage, message)}
+            onClickNext={() => {
+              onClickNext(indexMessage, message)}
+            }
             indexMessage={indexMessage}
             errorsProps={state.errors}
             displayButtonNext={(value) => {

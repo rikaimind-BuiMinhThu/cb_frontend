@@ -1,10 +1,19 @@
-import React, { } from "react";
+import React, { useEffect, useState } from "react";
 import "../../../../assets/css/bot/preview-chat-bot.css";
 import messageTypingGif from "../../../../assets/img/icons8-dots-loading.gif";
 import { EC_CHATBOT_URL } from "../../../../variables/constants";
 import "moment/locale/zh-cn";
 
-const BotMessage = ({ content, index, botInfor, checkoutUrl, previewOrderContent}) => {
+const BotMessage = ({
+  content,
+  index,
+  botInfor,
+  checkoutUrl,
+  previewOrderContent,
+  postMessageForExecuteJs
+}) => {
+  const [textInputContent, setTextInputContent] = useState(""); 
+
   const handleDownloadFile = (file) => {
     let link = document.createElement("a");
     link.href = file;
@@ -15,23 +24,18 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl, previewOrderContent
     link.remove();
   };
 
-  if (content.text_input?.use_for_confirm_message == true && content.text_input?.jscode?.length != 0) {
-    if (content.text_input.jscode.trim().length > 0) {
-      window.parent.postMessage({
-        isOpen: true,
-        widthPc: 450,
-        heightPc: 700,
-        widthSp: 100,
-        heightSp: 100,
-        chatbotRight: 10,
-        chatbotBottom: 10,
-        action: 'excuteJS',
-        jscode: content.text_input.jscode,
-        is_use_js: true
-      }, '*');
-      content.text_input.content = previewOrderContent;
+  useEffect(() => {
+    if (content.text_input?.use_for_confirm_message &&
+      content.text_input?.jscode?.trim() && 
+      !previewOrderContent
+    ) {
+      postMessageForExecuteJs(content.text_input.jscode);
     }
-  }
+  }, [
+    content.text_input?.use_for_confirm_message,
+    content.text_input?.jscode?.trim(),
+    previewOrderContent
+  ]);
 
   const formatResult = () => {
     const cart = JSON.parse(sessionStorage.getItem("cart") || null)
@@ -58,6 +62,11 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl, previewOrderContent
     const currencyCode = cart?.cartCreate?.cart?.cost?.totalAmount?.currencyCode || ""
 
     let result = content[content.type]?.content;
+
+    if (content.text_input?.use_for_confirm_message && previewOrderContent) {
+      result = previewOrderContent;
+    }
+
     result = result?.replace("{checkoutUrl}",
       `<a href="${url}" target="_blank" style="color: ${botInfor?.font_color}">${url}</a>`)
     result = result?.replace("{checkoutUrlBtn}",
@@ -117,15 +126,7 @@ const BotMessage = ({ content, index, botInfor, checkoutUrl, previewOrderContent
                   dangerouslySetInnerHTML={{
                     __html: formatResult()
                   }}
-                // value={content[content.type]?.content || ''}
-                // onChange={() => onChangeValue(indexMessageSelect, index, content.type, value, 'content')}
                 >
-                  {/* {content[content.type]?.content || ''} */}
-                  {/* <div
-                      dangerouslySetInnerHTML={{
-                        __html: content[content.type]?.content,
-                      }}
-                    /> */}
                 </div>
                 <div
                   style={{

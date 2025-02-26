@@ -89,7 +89,7 @@ const CHATBOT_SERVER = {
   GET_CITIES_PATH: '/api/v1/cities?prefecture_jis_code=:prefecture_jis_code',
   GET_TOWNS_PATH: '/api/v1/towns?city_jis_code=:city_jis_code',
   GET_PREFECTURES_PATH: '/api/v1/prefectures',
-  GET_SCENARIO_PREVIEW_DATA_PATH: '/api/v1/managements/chatbots/:bot_id/scenarios/:scenario_id}/preview',
+  GET_SCENARIO_PREVIEW_DATA_PATH: '/api/v1/managements/chatbots/:bot_id/scenarios/:scenario_id/preview',
   GET_CHATBOT_SETTING_PATH: '/api/v1/managements/chatbots/:bot_id',
   SEND_EMAIL_PATH: '/api/v1/managements/emails/:email_id/send_email',
 };
@@ -98,6 +98,27 @@ const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:si
 
 const SESSION_STORAGE_KEY = {
   CHAT_BOT_STATE: 'CHAT_BOT_STATE',
+};
+
+const CRAWL_ELEMENT_TYPES = {
+  SELECT: 'select',
+};
+
+const CHATBOT_ACTIONS = {
+  CLICK_BUTTON: 'clickButton',
+  EXCUTE_JS: 'excuteJS',
+  FUKUSHASHIKI: 'fukushashiki',
+  GET_ERROR_MESSAGE: 'getErrorMessage',
+  CRAWL_DATA: 'crawlData',
+  OPEN_PREVIEW: 'openPreview',
+  GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
+  PREVIEW_OBJECT: 'previewObject',
+};
+
+const SEARCH_MODES = {
+  ID: 1,
+  CSS_SELECTOR: 2,
+  XPATH: 3,
 };
 
 export {
@@ -112,4 +133,7 @@ export {
   CHATBOT_SERVER,
   GET_CAPTCHA_PATH,
   SESSION_STORAGE_KEY,
+  CHATBOT_ACTIONS,
+  CRAWL_ELEMENT_TYPES,
+  SEARCH_MODES,
 };

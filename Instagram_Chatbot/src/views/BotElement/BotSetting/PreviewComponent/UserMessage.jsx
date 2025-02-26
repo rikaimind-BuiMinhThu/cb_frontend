@@ -45,7 +45,8 @@ const UserMessage = ({
   prefecturesList,
   variables,
   lpOptionData = {},
-  errorMessageSubmit = ''
+  submitErrorMessage = '',
+  postMessageToParent
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -962,8 +963,7 @@ const UserMessage = ({
                                         false,
                                         "is_display_card_payment"
                                       );
-                                      if (messageContent.length === 1)
-                                        onClickNext();
+                                      // if (messageContent.length === 1) onClickNext();
                                     }
                                   }}
                                 >
@@ -1795,7 +1795,7 @@ const UserMessage = ({
                                 item.value,
                                 "initial_selection"
                               );
-                              if (messageContent.length === 1) onClickNext();
+                              // if (messageContent.length === 1) onClickNext();
                             }}
                           />
                           {item.text && (
@@ -1826,7 +1826,7 @@ const UserMessage = ({
                                 item.value,
                                 "initial_selection"
                               );
-                              if (messageContent.length === 1) onClickNext();
+                              // if (messageContent.length === 1) onClickNext();
                             }}
                           />
                           <img src={item.img} alt="" />
@@ -1892,7 +1892,7 @@ const UserMessage = ({
                                 item.value,
                                 "initial_selection"
                               );
-                              if (messageContent.length === 1) onClickNext();
+                              // if (messageContent.length === 1) onClickNext();
                             }}
                           >
                             <span>{item.text}</span>
@@ -2902,6 +2902,7 @@ const UserMessage = ({
                       disabled={disabled}
                       pullDown={pullDown}
                       data={getLPOptionData(pullDown.lp_element_search_value)}
+                      postMessageToParent={postMessageToParent}
                       onChange={(value) =>
                         onChangeValue(
                           indexContent,
@@ -3980,11 +3981,11 @@ const UserMessage = ({
                                       itemCarousel.id,
                                       "initial_selection"
                                     );
-                                    if (
-                                      carousel.require &&
-                                      messageContent.length === 1
-                                    )
-                                      onClickNext();
+                                    // if (
+                                    //   carousel.require &&
+                                    //   messageContent.length === 1
+                                    // )
+                                    //   onClickNext();
                                   }
                                 }}
                               >
@@ -5457,7 +5458,7 @@ const UserMessage = ({
                               value.target.value,
                               "initial_selection"
                             );
-                            if (messageContent.length === 1) onClickNext();
+                            // if (messageContent.length === 1) onClickNext();
                           }}
                           value={productPurchaseRadioButton.initial_selection}
                         >
@@ -5467,17 +5468,6 @@ const UserMessage = ({
                                 <Radio
                                   value={itemProduct.id}
                                   key={indexProduct}
-                                // onChange={() => {
-                                //   let selectArr = [...productPurchaseRadioButton.initial_selection];
-                                //   let dataValue;
-                                //   if (selectArr.includes(itemProduct.id)) {
-                                //     dataValue = [];
-                                //   } else {
-                                //     dataValue = [itemProduct.id];
-                                //   }
-                                //   onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
-                                //   onClickNext();
-                                // }}
                                 >
                                   <div className="ss-user-overview-product-purchase-container">
                                     <div className="ss-user-preivew-product-purchase-img">
@@ -5540,7 +5530,7 @@ const UserMessage = ({
                             value.target.value,
                             "initial_selection"
                           );
-                          if (messageContent.length === 1) onClickNext();
+                          // if (messageContent.length === 1) onClickNext();
                         }}
                       >
                         {productPurchaseRadioButton.products.map(
@@ -5549,17 +5539,6 @@ const UserMessage = ({
                               <Radio
                                 value={itemProduct.id}
                                 key={indexProduct}
-                              // onChange={() => {
-                              //   let selectArr = [...productPurchaseRadioButton.initial_selection];
-                              //   let dataValue;
-                              //   if (selectArr.includes(itemProduct.id)) {
-                              //     dataValue = [];
-                              //   } else {
-                              //     dataValue = [itemProduct.id];
-                              //   }
-                              //   onChangeValue(indexContent, content.type, dataValue, 'initial_selection');
-                              //   onClickNext();
-                              // }}
                               >
                                 <div className="ss-user-overview-product-purchase-container-type-text_image">
                                   <div className="ss-user-overview-product-purchase-img-type-text_image">
@@ -5750,8 +5729,7 @@ const UserMessage = ({
                                     false,
                                     "is_display_card_payment"
                                   );
-                                  if (messageContent.length === 1)
-                                    onClickNext();
+                                  // if (messageContent.length === 1) onClickNext();
                                 }
                               }}
                             >
@@ -5800,9 +5778,6 @@ const UserMessage = ({
                                   "initial_selection"
                                 );
 
-                                // if (cardPaymentRadioButton.card_linked_setting !== dataValue && messageContent.length === 1) {
-                                //   onClickNext();
-                                // }
                                 if (
                                   cardPaymentRadioButton.card_linked_setting.includes(dataValue)
                                 ) {
@@ -5821,8 +5796,7 @@ const UserMessage = ({
                                     false,
                                     "is_display_card_payment"
                                   );
-                                  if (messageContent.length === 1)
-                                    onClickNext();
+                                  // if (messageContent.length === 1) onClickNext();
                                 }
                               }}
                             >
@@ -5875,9 +5849,6 @@ const UserMessage = ({
                                           dataValue,
                                           "initial_selection_picture"
                                         );
-                                        // if (cardPaymentRadioButton.card_linked_setting_picture !== dataValue && messageContent.length === 1) {
-                                        //   onClickNext();
-                                        // }
                                         if (
                                           cardPaymentRadioButton.card_linked_setting_picture ===
                                           dataValue
@@ -5897,8 +5868,7 @@ const UserMessage = ({
                                             false,
                                             "is_display_card_payment"
                                           );
-                                          if (messageContent.length === 1)
-                                            onClickNext();
+                                          // if (messageContent.length === 1) onClickNext();
                                         }
                                       }}
                                     >
@@ -6366,7 +6336,7 @@ const UserMessage = ({
             {/* user: type = 'button_submit' */}
             {content.type === 'button_submit' &&
               <>
-                {buttonSubmit.is_display_error_message && errorMessageSubmit.length > 0 && (
+                {buttonSubmit.is_display_error_message && submitErrorMessage.length > 0 && (
                   <div className="ss-user-setting__item-text_input-top">
                     <div
                       style={{
@@ -6381,7 +6351,7 @@ const UserMessage = ({
                         margin: "10px",
                       }}
                       id="error-message"
-                      dangerouslySetInnerHTML={{ __html: errorMessageSubmit }}
+                      dangerouslySetInnerHTML={{ __html: submitErrorMessage }}
                     />
                   </div>
                 )}
