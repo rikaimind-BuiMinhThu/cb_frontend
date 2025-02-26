@@ -5129,9 +5129,9 @@ function Preview() {
           >
             {indexUser
               ? messageUser.length !== indexUser - 1
-                ? `あと${messageUser.length - indexUser + 1}間`
+                ? `あと${messageUser.length - indexUser + 1}問`
                 : "完了しました。"
-              : `あと${messageUser.length}間`}
+              : `あと${messageUser.length}問`}
           </div>
         </div>
         <div
