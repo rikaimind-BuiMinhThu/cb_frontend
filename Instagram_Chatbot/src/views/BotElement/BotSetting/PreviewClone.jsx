@@ -1329,7 +1329,7 @@ function Preview() {
                       data.message_content = data.message_content.filter(item => item.type !== "delay");
                     }
                   }); 
-                  
+                  setRenderMessageArr(dataMesage);
                   let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
                   if(isLoggedIn==="true")
                   {
@@ -1351,7 +1351,7 @@ function Preview() {
                       fukushashikiResponse: getObjectFukushashiki(objSend)
                     }, '*') ;
                   })               
-                  setRenderMessageArr(dataMesage);
+                  // setRenderMessageArr(dataMesage);
                   setIndexMessageRender(dataMesage.length - 1);
                   setMessageUser(filteredMessages)
                   setIndexUser(filteredMessages.length)                
