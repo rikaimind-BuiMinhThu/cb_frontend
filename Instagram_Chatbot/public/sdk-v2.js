@@ -160,6 +160,7 @@ async function displayPopup() {
       chatbotH = e.data.heightPc
       chatbotRight = e.data.chatbotRight
       chatbotBottom = e.data.chatbotBottom
+      debugger;
       if (e.data.fukushashikiResponse) {
         fillDataFromMessage(e.data.fukushashikiResponse)
       }

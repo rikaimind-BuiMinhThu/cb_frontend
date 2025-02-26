@@ -24,7 +24,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { SCAN_REGEX } from "./PreviewComponent/Constants";
+import { SCAN_REGEX, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -977,69 +977,19 @@ const Preview = () => {
   }, [state.botId, state.urlSend, state.urlReceive, state.deviceReceive, state.scenarioId]);
 
   useEffect(() => {
-    try {
-      if (state.isDisplayErrorMessage == true && state.submitErrorMessage.trim().length > 0) {
-        const dataMessageInLocalStorage = getMessagesSessionStorage() || [];
-        if (dataMessageInLocalStorage.length > 0) {
-          const builtObjParam = buildObjParamFromDataMessage(dataMessageInLocalStorage);
-          let filteredMessages = dataMessageInLocalStorage.filter(x => {
-            return x.hidden !== true && (isLoggedIn && !x.not_display_when_logged_in) &&
-              checkMessageCondition(x, builtObjParam);
-          });
-          // I want to remove all dupplicate data of filedredMessage by id then sort them
-          filteredMessages = filteredMessages.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i)
-            .sort((a, b) => a.id - b.id);
-          const userMessages = filteredMessages.filter(x => x.belong_to === 'user');
+    if (state.isDisplayErrorMessage && state.submitErrorMessage.trim().length > 0) {
+      const savedState = getStateFromSessionStorage();
 
-          setTimeout(() => {
-            const buttons = document.querySelectorAll('button.ss-user-message__action-btn.btn.btn-secondary');
-            if (buttons.length > 0) {
-              const lastButton = buttons[buttons.length - 1];
-              lastButton.dispatchEvent(new MouseEvent("click", {
-                bubbles: true,
-                cancelable: true,
-                view: window
-              }));
-            }
-          }, 8000);
-          setTimeout(() => {
-            userMessages.forEach(data => {
-              window.parent.postMessage({
-                isOpen: true,
-                widthPc: state.widthPc,
-                heightPc: state.heightPc,
-                widthSp: state.widthSp,
-                heightSp: state.heightSp,
-                chatbotRight: state.rightMarginPc,
-                chatbotBottom: state.bottomMarginPc,
-                fukushashikiResponse: getObjectFukushashiki({ message: data })
-              }, '*');
-            });
-          }, 1000);
-
-          const payload = {
-            isOpen: true,
-            objParam: builtObjParam,
-            renderMessagesList: filteredMessages,
-            currentMsgIndex: filteredMessages.length - 1,
-            userMessagesList: userMessages,
-            currentUserMsgIndex: userMessages.length,
-          };
-          dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: payload });
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: {
+          ...savedState,
+          isDisplayErrorMessage: true,
+          submitErrorMessage: state.submitErrorMessage,
         }
-      }
+      });
     }
-    catch (ex) {
-      console.error(ex);
-    }
-    scrollToBottom();
   }, [state.submitErrorMessage, state.isDisplayErrorMessage]);
-
-  // useEffect(() => {
-  //   return () => {
-  //     setIsContinuePromise(false);
-  //   }
-  // }, [])
 
   const scrollToBottom = () => {
     if (document.getElementById("sp-body")) {
@@ -2177,31 +2127,28 @@ const Preview = () => {
     return isValid;
   };
 
-  const setMessagesSessionStorage = (data) => {
-    const temp = getMessagesSessionStorage()
-    const bot_id = state.objParam.bot_id || Number(state.objParam?.current_url_param?.bot_id)
-    sessionStorage.setItem(`messages_bot_${bot_id}`, JSON.stringify(state.messagesList.map(x => {
-      if (x.id === data.id) {
-        return { ...data }
-      }
-      return temp && temp.find(o => o.id === x.id) ? temp.find(o => o.id === x.id) : { ...x }
-    })))
-  }
+  const setStateToSessionStorage = (data) => {
+    sessionStorage.setItem(SESSION_STORAGE_KEY.CHAT_BOT_STATE, JSON.stringify(data));
+  };
+
+  const getStateFromSessionStorage = () => {
+    const data = sessionStorage.getItem(SESSION_STORAGE_KEY.CHAT_BOT_STATE);
+    if (!data) return null;
+    return JSON.parse(data);
+  };
 
   const getMessagesSessionStorage = () => {
-    const bot_id = state.objParam.bot_id || Number(state.objParam?.current_url_param?.bot_id)
-    const data = sessionStorage.getItem(`messages_bot_${bot_id}`)
+    const data = sessionStorage.getItem(`messages_bot_${state.botId}`)
     if (!data) return null;
     return JSON.parse(data)
   }
 
   const checkUpdateMessagesSessionStorage = (updated_at) => {
-    const temp = sessionStorage.getItem("bot_update_at")
-    const bot_id = state.objParam.bot_id || Number(state.objParam?.current_url_param?.bot_id)
+    const temp = sessionStorage.getItem("bot_update_at");
 
     if (temp !== updated_at) {
-      sessionStorage.removeItem(`messages_bot_${bot_id}`)
-      sessionStorage.setItem("bot_update_at", updated_at)
+      sessionStorage.removeItem(`messages_bot_${state.botId}`);
+      sessionStorage.setItem("bot_update_at", updated_at);
     }
   }
 
@@ -2751,7 +2698,7 @@ const Preview = () => {
   const fukushashikiToLP = (fukushashikiData) => {
     postMessageToParent({
       action: 'fukushashiki',
-      fukushashiki: fukushashikiData
+      fukushashikiResponse: fukushashikiData
     });
   }
 
@@ -2778,7 +2725,7 @@ const Preview = () => {
       data,
     ).then(async (res) => {
       fukushashikiToLP(getObjectFukushashiki(data));
-      setMessagesSessionStorage(state.renderMessagesList[state.currentMsgIndex])
+      setStateToSessionStorage(state);
       await createOrAddLinesCart(res);
       sendCreateOrderData(
         data,
@@ -2846,6 +2793,8 @@ const Preview = () => {
         payload: newState
       });
     }
+
+    fukushashikiToLP(getObjectFukushashiki(submitData));
 
     // Update next messages list after clicked next
     const nextMessage = state.messagesList[clickedMsgIndex + 1];
@@ -2998,9 +2947,9 @@ const Preview = () => {
       }
     }
 
-    setMessagesSessionStorage(state.messagesList[msgIndex]);
     newState.messagesList = state.messagesList;
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+    setStateToSessionStorage(newState);
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,

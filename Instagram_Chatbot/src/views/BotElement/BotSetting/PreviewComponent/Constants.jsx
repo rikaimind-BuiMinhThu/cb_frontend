@@ -96,6 +96,10 @@ const CHATBOT_SERVER = {
 
 const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:size&color=:color&charPreset=:char_preset`;
 
+const SESSION_STORAGE_KEY = {
+  CHAT_BOT_STATE: 'CHAT_BOT_STATE',
+};
+
 export {
   dataHourFixed,
   dataMinutes,
@@ -107,4 +111,5 @@ export {
   SCAN_REGEX,
   CHATBOT_SERVER,
   GET_CAPTCHA_PATH,
+  SESSION_STORAGE_KEY,
 };
