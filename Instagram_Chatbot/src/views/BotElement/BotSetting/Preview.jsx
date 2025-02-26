@@ -2574,7 +2574,7 @@ function Preview({ onOpenPreview, isOpen, scenarioIdProps, isFromScenario }) {
                 </div>
                 <div id="sp-process-bar" className="sp-process-bar" style={{ backgroundColor: botInfor?.opacity_color }}>
                     <div className="sp-process-bar-color animation" style={{ width: indexUser ? `${((indexUser - 1) < 0 ? 0 : (indexUser - 1)) * 100 / messageUser.length}%` : '100%', ...((botInfor?.main_color || botInfor?.main_color_other) && { backgroundColor: botInfor?.main_color || botInfor?.main_color_other}) }}>
-                        {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}間` : "完了しました。") : `あと${messageUser.length}間`}
+                        {indexUser ? (messageUser.length !== (indexUser - 1) ? `あと${messageUser.length - indexUser + 1}問` : "完了しました。") : `あと${messageUser.length}問`}
                     </div>
                 </div>
                 <div id="sp-body" className="sp-body" style={{ backgroundColor: botInfor?.opacity_color, flex: 1 }}>
