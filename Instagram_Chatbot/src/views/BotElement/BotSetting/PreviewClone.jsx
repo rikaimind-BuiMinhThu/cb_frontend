@@ -37,7 +37,8 @@ import {
   getScenarioPreviewData,
   getChatBotSetting,
   sendEmailRequest,
-  sleep
+  sleep,
+  stringNullOrEmpty
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -466,7 +467,7 @@ const Preview = () => {
     return result;
   }
 
-  const setPulldownValue = (field, dataContentType) => {
+  const setPulldownValue = (dataContentType, field, value) => {
     switch (field) {
       case "customization":
       case "prefectures":
@@ -490,6 +491,67 @@ const Preview = () => {
     }
   }
 
+  const setTextInputValue = (dataContentType, field) => {
+    return `${dataContentType[field]?.valueLeft} ${dataContentType[field]?.valueRight}`;
+  }
+
+  const setCheckboxDefaultValue = (dataContentType, field) => {
+    let dataTextChecked = [];
+    switch (field) {
+      case "checkedValue":
+        break;
+      case "initial_selection_picture":
+        break;
+    }
+    if (field === "checkedValue") {
+      if (dataContentType.checkedValue.length > 0) {
+        dataTextChecked = dataContentType.checkedValue.map((itemChecked) => {
+          return dataContentType[dataContentType.type].find((item) => itemChecked === item.id)?.text;
+        });
+      }
+    } else if (field === "initial_selection_picture" && dataContentType.initial_selection_picture.length > 0) {
+      dataTextChecked = dataContentType.initial_selection_picture.map((itemChecked) => {
+        let dataReturn;
+        dataContentType[dataContentType.type].forEach((item) => {
+          item.contents.forEach((subItem) => {
+            if (itemChecked === `${item.id}-${subItem.id}`) {
+              dataReturn = subItem.text;
+            }
+          });
+        });
+        return dataReturn;
+      });
+    }
+    return dataTextChecked.length > 0 ? dataTextChecked.join(",") : "";
+  }
+
+  const setZipCodeAddressDefaultValue = (dataContentType) => {
+    let dataPostCode = !dataContentType.split_postal_code
+      ? dataContentType?.value_post_code
+      : `${dataContentType.value_post_code_left}${dataContentType.value_post_code_right}`;
+    const prefecture = dataContentType?.value_prefecture || "";
+    const municipality = dataContentType?.value_municipality || "";
+    const address = dataContentType?.value_address || "";
+    const buildingName = dataContentType?.value_building_name || "";
+    return `〒${dataPostCode} ${prefecture}${municipality} ${address}${buildingName}`;
+  }
+
+  const setCardPaymentRadioButtonDefaultValue = (dataContentType, field, value) => {
+    let checkedOptionText = "";
+    if (field === "initial_selection") {
+      checkedOptionText = dataContentType.radio_contents.find((item) => value === item.value)?.text;
+    } else if (field === "initial_selection_picture") {
+      dataContentType.radio_contents_img.forEach((item) => {
+        item.contents.forEach((subItem) => {
+          if (value === `${item.id}-${subItem.id}`) {
+            checkedOptionText = subItem.text;
+          }
+        });
+      });
+    }
+    return checkedOptionText;
+  }
+
   const setDefaultValue = (item, dataContentType, contentType, value, field) => {
     switch (contentType) {
       case "zip_code_address":
@@ -505,14 +567,14 @@ const Preview = () => {
         item.default_value = setCardPaymentRadioButtonDefaultValue(dataContentType, field, value);
         break;
       case "pull_down":
-        item.default_value = setPulldownValue(field, dataContentType);
+        item.default_value = setPulldownValue(dataContentType, field, value);
         break;
       case "carousel":
         item.default_value = setCarouselDefaultValue(dataContentType, value);
         break;
       case "text_input":
         if (field === 'text' && dataContentType[field].isSplitInput) {
-          item.default_value = setTextInputDefaultValue(dataContentType, field);
+          item.default_value = setTextInputValue(dataContentType, field);
         }
         break;
       default:
@@ -629,7 +691,7 @@ const Preview = () => {
       message_color,
       font_color,
       icon_mess,
-      main_color: res.data.chatbot.main_color,
+      main_color: res.data.chatbot.main_color || res.data.chatbot.main_color_other,
       main_color_other: res.data.chatbot.main_color_other,
     };
   }
@@ -642,7 +704,7 @@ const Preview = () => {
         resolve();
       }).then(async () => {
         await sleep(messagesList[i].message_content[0].delay.content * 1000);
-        let newRenderMessagesList = [...state.renderMessagesList, messagesList[i]];
+        let newRenderMessagesList = [...state.renderMessagesList];
         newRenderMessagesList.pop();
         newRenderMessagesList.push({});
         
@@ -732,6 +794,25 @@ const Preview = () => {
     return newState;
   }
 
+  const processForBotMessage = async (messagesList, i, newState) => {
+    const firstMsgType = messagesList[i]?.message_content[0]?.type;
+
+    switch (firstMsgType) {
+      case "delay":
+        return await processBotDelayMessage(messagesList, i, newState);
+      case "email":
+        return processBotEmailMessage(messagesList, i, newState);
+      case "variable_set":
+        return processForBotVariableSetMessage(messagesList, i, newState);
+      case "clear_variable":
+        return processForBotVariableSetMessage(messagesList, i, newState, {forceEmpty: ""});
+      case "pause":
+        return processBotPauseMessage(messagesList, i, newState);
+      default:
+        return processForBotDefaultMessage(messagesList, i, newState);
+    }
+  }
+
   const processForUserCaptchaMessage = async (messagesList, i, msgContentIndex, newState) => {
     const msgContent = messagesList[i]?.message_content?.[msgContentIndex];
     const msgContentType = msgContent.type;
@@ -773,7 +854,7 @@ const Preview = () => {
     scrollToBottom();
 
     return newState;
-  };
+  }
 
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
@@ -841,36 +922,25 @@ const Preview = () => {
         }
       }
       if (isBotMessage(messagesList[i])) {
-        const firstMsgType = messagesList[i]?.message_content[0]?.type;
-        let newStateAttributes = {};
-
-        switch (firstMsgType) {
-          case "delay":
-            newStateAttributes = await processBotDelayMessage(messagesList, i, newState);
-            break;
-          case "email":
-            newStateAttributes = processBotEmailMessage(messagesList, i, newState);
-            break;
-          case "variable_set":
-            newStateAttributes = processForBotVariableSetMessage(messagesList, i, newState);
-            break;
-          case "clear_variable":
-            newStateAttributes = processForBotVariableSetMessage(messagesList, i, newState, {forceEmpty: ""});
-            break;
-          case "pause":
-            newStateAttributes = processBotPauseMessage(messagesList, i, newState);
-            break;
-          default:
-            processForBotDefaultMessage(messagesList, i, newState);
-            break;
-        }
-
-        newState = { ...newState, ...newStateAttributes };
+        newState = {
+          ...newState,
+          ...processForBotMessage(messagesList, i, newState)
+        };
       } else if (isUserMessage(messagesList[i])) {
-        processForUserMessage(messagesList, i, newState);
-        break;
+        newState = {
+          ...newState,
+          ...processForUserMessage(messagesList, i, newState)
+        };
       }
     }
+
+    newState.currentUserMsgIndex = newState.messagesList.findIndex((item) => isUserMessage(item));
+
+    // For the first time, we need to render to the first user message
+    if (newState.currentUserMsgIndex > 0) {
+      newState.currentMsgIndex = newState.currentUserMsgIndex;
+    }
+    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
 
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
   }
@@ -2706,14 +2776,12 @@ const Preview = () => {
   const processClickCreateOrder = (data) => {
     sendUserInteractionData(
       data,
-      async (res) => {
-        fukushashikiToLP(getObjectFukushashiki(data));
-        setMessagesSessionStorage(state.renderMessagesList[state.currentMsgIndex])
-        await createOrAddLinesCart(res)
-      }
-    ).then(() => {
+    ).then(async (res) => {
+      fukushashikiToLP(getObjectFukushashiki(data));
+      setMessagesSessionStorage(state.renderMessagesList[state.currentMsgIndex])
+      await createOrAddLinesCart(res);
       sendCreateOrderData(
-        data_submit,
+        data,
         (res) => console.log(res)
       ).then(() => {
         if (params.get('cartSystem') === 'shopify') return;
@@ -2743,8 +2811,8 @@ const Preview = () => {
 
   const onClickNext = async (indexMessage, message) => {
     let newState = { ...state };
-    let indexClickLocation = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
-    if (indexClickLocation < 0) indexClickLocation = newState.currentMsgIndex;
+    let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
+    if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
 
     if (message.button_jscode == true && message.jscode?.length > 0) {
       postMessageForRunJsCode();
@@ -2753,878 +2821,65 @@ const Preview = () => {
     if (!handleValidateField(indexMessage)) {
       return;
     }
-    let renderMessage = [...state.renderMessagesList];
-    newState.renderMessagesList[indexMessage].disabled = newState.submitErrorMessage.length > 0 ? false : true;
-    newState.renderMessagesList = state.renderMessagesList.sort((a, b) => a.id - b.id);
 
-    let index;
-    let isPauseScroll = false;
-    let delayRender;
-    if (indexClickLocation === state.currentMsgIndex)
-      newState.currentUserMsgIndex = newState.currentUserMsgIndex + 1;
+    newState.messagesList[indexMessage].disabled = newState.submitErrorMessage.length > 0 ? false : true;
+    // newState.renderMessagesList = state.renderMessagesList.sort((a, b) => a.id - b.id);
 
-    let data_submit = {
+    const submitData = {
       scenario_id: state.scenarioId,
-      message: state.renderMessagesList[indexMessage],
+      message: state.renderMessagesList[clickedMsgIndex],
       user_id: state.uuid,
       bot_type: "web"
     };
 
-    if (state.messagesList[indexClickLocation]?.message_content?.[0]?.text_input?.save_input_content === "create_order" || state.messagesList.length - 1 === indexClickLocation) {
-      return processClickCreateOrder(data_submit);
+    const isClickedCreateOrder = state.messagesList[clickedMsgIndex]?.message_content?.[0]?.text_input?.save_input_content === "create_order";
+    const isClickedLastMessage = state.messagesList.length - 1 === clickedMsgIndex;
+
+    if (isClickedCreateOrder) {
+      return processClickCreateOrder(submitData);
     }
 
-    sendUserInteractionData(
-      data_submit,
-      async (res) => {
-        fukushashikiToLP(getObjectFukushashiki(data));
-        setMessagesSessionStorage(state.renderMessagesList[indexMessage])
-        await createOrAddLinesCart(res)
-      }
-    );
-
-    if (!state.messagesList[state.currentMsgIndex + 1] || state.currentMsgIndex > indexClickLocation) {
-      newMessage.renderMessagesList[indexMessage].disabled = false;
-      dispatch({
+    if (isClickedLastMessage) {
+      newState.messagesList[clickedMsgIndex].disabled = false;
+      return dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: {
-          renderMessagesList: renderMessage
-        }
+        payload: newState
       });
-      return;
     }
 
-    if (state.messagesList[state.currentMsgIndex + 1].belong_to === 'user' || state.messagesList[state.currentMsgIndex + 1].belong_to === 'bot') {
+    // Update next messages list after clicked next
+    const nextMessage = state.messagesList[clickedMsgIndex + 1];
+
+    if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
       for (let i = state.currentMsgIndex + 1; i < state.messagesList.length; i++) {
-        if (state.messagesList[i].hidden !== true) {
-          if (state.messagesList[i].conditions) {
-            var checked = true;
-            for (let j = 0; j < state.messagesList[i].conditions.length; j++) {
-              let conditionItem = state.messagesList[i].conditions[j];
-              if (j === 0) {
-                if (conditionItem.condition === "include") {
-                  checked = objParam[conditionItem.nameCondition].includes(
-                    conditionItem.inputCondition
-                  );
-                } else if (conditionItem.condition === "is") {
-                  checked =
-                    objParam[conditionItem.nameCondition] ==
-                    conditionItem.inputCondition;
-                } else if (conditionItem.condition === "not_include") {
-                  checked = !objParam[conditionItem.nameCondition].includes(
-                    conditionItem.inputCondition
-                  );
-                } else if (conditionItem.condition === "is_not") {
-                  checked =
-                    objParam[conditionItem.nameCondition] !=
-                    conditionItem.inputCondition;
-                }
-              } else if (conditionItem?.linkCondition === "and") {
-                if (conditionItem.condition === "include") {
-                  checked =
-                    checked &&
-                    objParam[conditionItem.nameCondition].includes(
-                      conditionItem.inputCondition
-                    );
-                } else if (conditionItem.condition === "is") {
-                  checked =
-                    checked &&
-                    objParam[conditionItem.nameCondition] ==
-                    conditionItem.inputCondition;
-                } else if (conditionItem.condition === "not_include") {
-                  checked =
-                    checked &&
-                    !objParam[conditionItem.nameCondition].includes(
-                      conditionItem.inputCondition
-                    );
-                } else if (conditionItem.condition === "is_not") {
-                  checked =
-                    checked &&
-                    objParam[conditionItem.nameCondition] !=
-                    conditionItem.inputCondition;
-                }
-              } else if (conditionItem?.linkCondition === "or") {
-                if (conditionItem.condition === "include") {
-                  checked =
-                    checked ||
-                    objParam[conditionItem.nameCondition].includes(
-                      conditionItem.inputCondition
-                    );
-                } else if (conditionItem.condition === "is") {
-                  checked =
-                    checked ||
-                    objParam[conditionItem.nameCondition] ==
-                    conditionItem.inputCondition;
-                } else if (conditionItem.condition === "not_include") {
-                  checked =
-                    checked ||
-                    !objParam[conditionItem.nameCondition].includes(
-                      conditionItem.inputCondition
-                    );
-                } else if (conditionItem.condition === "is_not") {
-                  checked =
-                    checked ||
-                    objParam[conditionItem.nameCondition] !=
-                    conditionItem.inputCondition;
-                }
-              }
-            }
-            if (checked === false && state.messagesList[i].belong_to === "user") {
-              newState.currentUserMsgIndex = newState.currentUserMsgIndex + 1;
-              continue;
-            }
-          }
-          if (state.messagesList[i].belong_to === "bot") {
-            if (state.messagesList[i]?.message_content[0].type === "delay") {
-              if (state.messagesList[i]?.message_content[0]?.delay.typing_on) {
-                await new Promise((resolve) => {
-                  renderMessage.push({ ...state.messagesList[i] });
-                  dispatch({
-                    type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                    payload: {
-                      renderMessagesList: [...renderMessage]
-                    }
-                  });
-                  resolve();
-                })
-                  .then(async () => {
-                    await new Promise((resolve) => {
-                      delayRender = setTimeout(() => {
-                        resolve();
-                      }, state.messagesList[i]?.message_content[0].delay.content * 1000);
-                    });
-                  })
-                  .then(() => {
-                    renderMessage.pop();
-                    renderMessage.push({});
-                    renderMessage[indexMessage].disabled = false;
-                    state.renderMessagesList[indexMessage].disabled = false;
-                    dispatch({
-                      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                      payload: {
-                        currentMsgIndex: i,
-                        renderMessagesList: [...renderMessage],
-                      }
-                    });
-                  })
-                  .then(() => {
-                    if (state.messagesList.length - 1 === i && state.urlThanksPage) {
-                      let aTag = document.createElement("a");
-                      aTag.href = state.urlThanksPage;
-                      aTag.target = "_blank";
-
-                      setTimeout(() => {
-                        aTag.click();
-                      }, 2000);
-                    }
-                  });
-              } else {
-                await new Promise((resolve) => {
-                  return (delayRender = setTimeout(() => {
-                    resolve();
-                  }, state.messagesList[i]?.message_content[0]?.delay?.content * 1000));
-                }).then(() => {
-                  if (state.messagesList.length - 1 === i && state.urlThanksPage) {
-                    let aTag = document.createElement("a");
-                    aTag.href = state.urlThanksPage;
-                    aTag.target = "_blank";
-
-                    setTimeout(() => {
-                      aTag.click();
-                    }, 2000);
-                  }
-                });
-              }
-            } else if (state.messagesList[i]?.message_content[0]?.type === "email") {
-              let emailId =
-                state.messagesList[i]?.message_content[0][
-                  state.messagesList[i]?.message_content[0].type
-                ].contentId;
-              let variablesData = {};
-              state.variablesList.forEach((item) => {
-                variablesData[item.variable_name] = item.default_value;
-              });
-
-              state.variables.forEach((item) => {
-                variablesData[item.variable_name] = item.default_value;
-              });
-
-              let data = {
-                variables: variablesData,
-              };
-              renderMessage[indexMessage].disabled = false;
-              state.renderMessagesList[indexMessage].disabled = false;
-              renderMessage.push({});
-
-              api
-                .post(`/api/v1/managements/emails/${emailId}/send_email`, data)
-                .then(() => { })
-                .catch((error) => {
-                  console.log(error);
-                  if (error.response?.data.code === 0) {
-                    tokenExpired();
-                  }
-                });
-              index = i;
-              dispatch({
-                type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                payload: {
-                  currentMsgIndex: i,
-                  renderMessagesList: [...renderMessage],
-                }
-              });
-            } else if (state.messagesList[i]?.message_content[0]?.type === "variable_set") {
-              if (state.variables.length !== 0) {
-                newState.variables = updateVariableValues(state.variables, state.messagesList, i);
-              }
-              renderMessage.push({});
-              index = i;
-              dispatch({
-                type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                payload: {
-                  currentMsgIndex: i,
-                  renderMessagesList: [...renderMessage],
-                  ...newState,
-                }
-              });
-            } else if (state.messagesList[i]?.message_content[0]?.type === "clear_variable") {
-              if (state.variables.length !== 0) {
-                newState.variables = updateVariableValues(state.variables, state.messagesList, i, "clear_variable");
-              }
-              renderMessage[indexMessage].disabled = false;
-              state.renderMessagesList[indexMessage].disabled = false;
-              renderMessage.push({});
-              index = i;
-              dispatch({
-                type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                payload: {
-                  currentMsgIndex: i,
-                  renderMessagesList: [...renderMessage],
-                  ...newState,
-                }
-              });
-            } else if (state.messagesList[i]?.message_content[0]?.type === "pause") {
-              renderMessage.push({});
-              index = i;
-              dispatch({
-                type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                payload: {
-                  currentMsgIndex: i,
-                  renderMessagesList: [...renderMessage],
-                }
-              });
-              break;
-            } else {
-              await new Promise((resolve) => {
-                return (delayRender = setTimeout(() => {
-                  if (
-                    state.messagesList[i].message_content[0].type === "text_input" &&
-                    state.messagesList[i].message_content[0].text_input.content
-                  ) {
-                    state.messagesList[i].message_content[0].text_input.content =
-                      state.messagesList[
-                        i
-                      ].message_content[0].text_input.content.replaceAll(
-                        SCAN_REGEX,
-                        (text, variable) => {
-                          if (state.variables.length !== 0) {
-                            let valueVar = "";
-                            for (let j = 0; j < state.variables.length; j++) {
-                              if (state.variables[j].variable_name === variable) {
-                                valueVar = state.variables[j].default_value;
-                              }
-                            }
-                            return valueVar;
-                          } else {
-                            return "";
-                          }
-                        }
-                      );
-                  }
-                  resolve({ ...state.messagesList[i] });
-                }, 1000));
-              })
-                .then((data) => {
-                  renderMessage[indexMessage].disabled = false;
-                  state.renderMessagesList[indexMessage].disabled = false;
-                  renderMessage.push(data);
-                  dispatch({
-                    type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                    payload: {
-                      currentMsgIndex: i,
-                      renderMessagesList: [...renderMessage],
-                    }
-                  });
-                  if (isPauseScroll === false) {
-                    scrollToBottom();
-                  }
-                  if (
-                    data.message_content[0][data.message_content[0]?.type]
-                      ?.scroll_auto === true
-                  ) {
-                    isPauseScroll = true;
-                  }
-                })
-                .then(() => {
-                  if (state.messagesList[i].message_content[0]?.text_input?.save_input_content === "create_order") {
-                    data_submit = {
-                      scenario_id: state.scenarioId,
-                      user_id: state.uuid,
-                    };
-
-                    api
-                      .post(
-                        `/api/v1/scenario_users/scenario_user_responses/create_order`,
-                        data_submit
-                      )
-                      .then(() => { })
-                      .catch((error) => {
-                        console.log(error);
-                        if (error.response?.data.code === 0) {
-                          tokenExpired();
-                        }
-                      });
-
-                  }
-                  if (state.messagesList.length - 1 === i) {
-                    data_submit = {
-                      scenario_id: state.scenarioId,
-                      user_id: state.uuid,
-                    };
-                    api
-                      .post(
-                        `/api/v1/scenario_users/scenario_user_responses/create_order`,
-                        data_submit
-                      )
-                      .then(() => {
-                        // api.post(`/api/v1/managements/payment_histories`, data_submit).then((res)=>{}).catch((err) => {
-                        //   console.log(err);
-                        // if (err.response?.data.code === 0) {
-                        //   tokenExpired();
-                        // }
-                        // })
-                      })
-                      .catch((error) => {
-                        console.error(error);
-                        if (error.response?.data.code === 0) {
-                          tokenExpired();
-                        }
-                      });
-
-                    if (state.urlThanksPage) {
-                      let aTag = document.createElement("a");
-                      aTag.href = state.urlThanksPage;
-                      aTag.target = "_blank";
-
-                      setTimeout(() => {
-                        aTag.click();
-                      }, 2000);
-                    }
-                  }
-                });
-              index = i;
-            }
-          } else if (
-            state.messagesList[i].belong_to === "user" &&
-            state.messagesList[i].message_content.length > 0
-          ) {
-            await new Promise((resolve) => {
-              return (delayRender = setTimeout(() => {
-                for (
-                  let j = 0;
-                  j < state.messagesList[i].message_content.length;
-                  j++
-                ) {
-                  if (state.messagesList[i].message_content[j].type === "capture") {
-                    api
-                      .get(
-                        `https://svg-captcha-nodejs.vercel.app/captcha?size=${state.messagesList[i].message_content[j][
-                          state.messagesList[i].message_content[j].type
-                        ].length
-                        }${state.messagesList[i].message_content[j][
-                          state.messagesList[i].message_content[j].type
-                        ].colour
-                          ? "&color=true"
-                          : ""
-                        }&charPreset=${state.messagesList[i].message_content[j][
-                          state.messagesList[i].message_content[j].type
-                        ].type
-                        }`
-                      )
-                      .then((res) => {
-                        let newCaptcha = [...state.captcha];
-                        newCaptcha.push({index: i, indexContent: j, ...res.data});
-                        dispatch({
-                          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                          payload: {
-                            captcha: [...newCaptcha]
-                          }
-                        });
-                      })
-                      .catch((error) => {
-                        console.log(error);
-                        if (error.response?.data.code === 0) {
-                          tokenExpired();
-                        }
-                      });
-                  } else if (state.messagesList[i].message_content[j].type === "label" &&
-                    state.messagesList[i].message_content[j].label.lbl_content) {
-                    state.messagesList[i].message_content[j].label.lbl_content =
-                      state.messagesList[
-                        i
-                      ].message_content[j].label.lbl_content.replaceAll(
-                        SCAN_REGEX,
-                        (text, variable) => {
-                          if (state.variables.length !== 0) {
-                            let valueVar = "";
-                            for (let k = 0; k < state.variables.length; k++) {
-                              if (state.variables[k].variable_name === variable) {
-                                valueVar = state.variables[k].default_value;
-                              }
-                            }
-                            return valueVar;
-                          } else {
-                            return "";
-                          }
-                        }
-                      );
-                  }
-                }
-                resolve({ ...state.messagesList[i] });
-              }, 1000));
-            }).then((data) => {
-
-              const dataSessionStorage = getMessagesSessionStorage()
-              if (dataSessionStorage) {
-                const temp = dataSessionStorage.find(x => x.id === data.id)
-                if (temp) data.message_content = [...temp.message_content]
-              }
-              try {
-                renderMessage[indexMessage].disabled = false;
-                state.renderMessagesList[indexMessage].disabled = false;
-                const isIdExist = state.renderMessagesList.some((message) => message.id === data.id);
-
-                if (isIdExist) {
-                  return;
-                }
-                renderMessage.push(data);
-                dispatch({
-                  type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
-                    currentMsgIndex: i, renderMessagesList: [...renderMessage]
-                  }
-                });
-                if (isPauseScroll === false) {
-                  scrollToBottom();
-                }
-              }
-              catch { }
-            });
-            index = i;
-            break;
-          }
+        if (state.messagesList[i].conditions) {
+          const checked = checkMessageCondition(state.messagesList[i], state.objParam);
+          newState.messagesList[i].hidden = !checked;
         }
-      }
-      // setcurrentMsgIndex(index);
-      // setrenderMessagesList([
-      //   ...renderMessage
-      // ]);
-    } else {
-      // handle check message_content for user
-      //if message_content.length !== 0 => show message
-      if (
-        state.messagesList[state.currentMsgIndex + 1].message_content.length > 0 &&
-        state.messagesList[state.currentMsgIndex + 1].hidden !== true
-      ) {
-        await new Promise((resolve) => {
-          return (delayRender = setTimeout(() => {
-            for (
-              let j = 0;
-              j < state.messagesList[state.currentMsgIndex + 1].message_content.length;
-              j++
-            ) {
-              if (
-                state.messagesList[state.currentMsgIndex + 1].message_content[j].type ===
-                "capture"
-              ) {
-                api
-                  .get(
-                    `https://svg-captcha-nodejs.vercel.app/captcha?size=${state.messagesList[state.currentMsgIndex + 1].message_content[j][
-                      state.messagesList[state.currentMsgIndex + 1].message_content[j]
-                        .type
-                    ].length
-                    }${state.messagesList[state.currentMsgIndex + 1].message_content[j][
-                      state.messagesList[state.currentMsgIndex + 1].message_content[j]
-                        .type
-                    ].colour
-                      ? "&color=true"
-                      : ""
-                    }&charPreset=${state.messagesList[state.currentMsgIndex + 1].message_content[j][
-                      state.messagesList[state.currentMsgIndex + 1].message_content[j]
-                        .type
-                    ].type
-                    }`
-                  )
-                  .then((res) => {
-                    let newCaptcha = [...state.captcha];
-                    newCaptcha.push({
-                      index: state.currentMsgIndex + 1,
-                      indexContent: j,
-                      ...res.data,
-                    });
-                    dispatch({
-                      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                      payload: {
-                        captcha: [...newCaptcha]
-                      }
-                    });
-                  })
-                  .catch((error) => {
-                    console.log(error);
-                    if (error.response?.data.code === 0) {
-                      tokenExpired();
-                    }
-                  });
-              }
-            }
-            function replaceVariable(content) {
-              content = content.replaceAll(SCAN_REGEX, (text, variable) => {
-                if (state.variables.length !== 0) {
-                  let valueVar = "";
-                  for (let j = 0; j < state.variables.length; j++) {
-                    if (state.variables[j].variable_name === variable) {
-                      valueVar = state.variables[j].default_value;
-                    }
-                  }
-                  return valueVar;
-                } else {
-                  return "";
-                }
-              })
-              return content;
-            }
-            state.messagesList[state.currentMsgIndex + 1].message_content.forEach((item, index) => {
-              const dataMessageType = item.type;
-              if (dataMessageType == 'label' && item.label && item.label.lbl_content) {
-                item.label.lbl_content = replaceVariable(item.label.lbl_content);
-              }
-              if (dataMessageType == 'textarea' && item.textarea && item.textarea.invalid_input && item.textarea.invalid_input.content) {
-                item.textarea.invalid_input.content = replaceVariable(item.textarea.invalid_input.content);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.urls && item.text_input.urls.placeholder) {
-                item.text_input.urls.placeholder = replaceVariable(item.text_input.urls.placeholder);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.text && item.text_input.text.placeholderLeft) {
-                item.text_input.text.placeholderLeft = replaceVariable(item.text_input.text.placeholderLeft);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.text && item.text_input.text.placeholderRight) {
-                item.text_input.text.placeholderRight = replaceVariable(item.text_input.text.placeholderRight);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_address && item.text_input.email_address.placeholder) {
-                item.text_input.email_address.placeholder = replaceVariable(item.text_input.email_address.placeholder);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_confirmation && item.text_input.email_confirmation.cfEmlAdd_confirm_email) {
-                item.text_input.email_confirmation.cfEmlAdd_confirm_email = replaceVariable(item.text_input.email_confirmation.cfEmlAdd_confirm_email);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.email_confirmation && item.text_input.email_confirmation.cfEmlAdd_email) {
-                item.text_input.email_confirmation.cfEmlAdd_email = replaceVariable(item.text_input.email_confirmation.cfEmlAdd_email);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number) {
-                item.text_input.phone_number.number = replaceVariable(item.text_input.phone_number.number);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number1) {
-                item.text_input.phone_number.number1 = replaceVariable(item.text_input.phone_number.number1);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number2) {
-                item.text_input.phone_number.number2 = replaceVariable(item.text_input.phone_number.number2);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.phone_number && item.text_input.phone_number.number3) {
-                item.text_input.phone_number.number3 = replaceVariable(item.text_input.phone_number.number3);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.password && item.text_input.password.password) {
-                item.text_input.password.password = replaceVariable(item.text_input.password.password);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.password_confirmation && item.text_input.password_confirmation.password) {
-                item.text_input.password_confirmation.password = replaceVariable(item.text_input.password_confirmation.password);
-              }
-              if (dataMessageType == 'text_input' && item.text_input && item.text_input.password_confirmation && item.text_input.password_confirmation.confirm_password) {
-                item.text_input.password_confirmation.confirm_password = replaceVariable(item.text_input.password_confirmation.confirm_password);
-              }
-              state.messagesList[state.currentMsgIndex + 1].message_content[index] = item;
-            })
-            resolve({ ...state.messagesList[state.currentMsgIndex + 1] });
-          }, 1000));
-        }).then((data) => {
-          renderMessage[indexMessage].disabled = false;
-          state.renderMessagesList[indexMessage].disabled = false;
-          renderMessage.push(data);
-          dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-            payload: {
-              currentMsgIndex: state.currentMsgIndex + 1,
-              renderMessagesList: [...renderMessage],
-            }
-          });
-          if (isPauseScroll === false) {
-            scrollToBottom();
-          }
-        });
-        // index = currentMsgIndex + 1;
-      }
-      //if message_content.length === 0 => loop until meet message have message_content.length !== 0 => show message
-      else {
-        for (let i = state.currentMsgIndex + 1; i < state.messagesList.length; i++) {
-          if (
-            state.messagesList[i].message_content.length > 0 &&
-            state.messagesList[i].hidden !== true
-          ) {
-            if (state.messagesList[i].belong_to === "user") {
-              await new Promise((resolve) => {
-                return (delayRender = setTimeout(() => {
-                  for (
-                    let j = 0;
-                    j < state.messagesList[i].message_content.length;
-                    j++
-                  ) {
-                    if (state.messagesList[i].message_content[j].type === "capture") {
-                      api
-                        .get(
-                          `https://svg-captcha-nodejs.vercel.app/captcha?size=${state.messagesList[i].message_content[j][
-                            state.messagesList[i].message_content[j].type
-                          ].length
-                          }${state.messagesList[i].message_content[j][
-                            state.messagesList[i].message_content[j].type
-                          ].colour
-                            ? "&color=true"
-                            : ""
-                          }&charPreset=${state.messagesList[i].message_content[j][
-                            state.messagesList[i].message_content[j].type
-                          ].type
-                          }`
-                        )
-                        .then((res) => {
-                          let newCaptcha = [...state.captcha];
-                          newCaptcha.push({index: i, indexContent: j, ...res.data});
-                          dispatch({
-                            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                            payload: {
-                              captcha: [...newCaptcha]
-                            }
-                          });
-                        })
-                        .catch((error) => {
-                          console.log(error);
-                          if (error.response?.data.code === 0) {
-                            tokenExpired();
-                          }
-                        });
-                    }
-                  }
-                  resolve({ ...state.messagesList[i] });
-                }, 1000));
-              }).then((data) => {
-                renderMessage[indexMessage].disabled = false;
-                state.renderMessagesList[indexMessage].disabled = false;
-                renderMessage.push(data);
-                dispatch({
-                  type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                  payload: {
-                    currentMsgIndex: i,
-                    renderMessagesList: [...renderMessage],
-                  }
-                });
-                if (isPauseScroll === false) {
-                  scrollToBottom();
-                }
-              });
-              index = i;
-              break;
-            } else {
-              if (state.messagesList[i]?.message_content[0].type === "delay") {
-                if (state.messagesList[i]?.message_content[0]?.delay.typing_on) {
-                  await new Promise((resolve) => {
-                    renderMessage[indexMessage].disabled = false;
-                    state.renderMessagesList[indexMessage].disabled = false;
-                    renderMessage.push({ ...state.messagesList[i] });
-                    dispatch({
-                      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                      payload: {
-                        renderMessagesList: [...renderMessage]
-                      }
-                    });
-                    resolve();
-                  })
-                    .then(async () => {
-                      await new Promise((resolve) => {
-                        delayRender = setTimeout(() => {
-                          resolve();
-                        }, state.messagesList[i]?.message_content[0].delay.content * 1000);
-                      });
-                    })
-                    .then(() => {
-                      renderMessage.pop();
-                      renderMessage.push({});
-                      dispatch({
-                        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                        payload: {
-                          currentMsgIndex: i,
-                          renderMessagesList: [...renderMessage],
-                        }
-                      });
-                    });
-                } else {
-                  await new Promise((resolve) => {
-                    return (delayRender = setTimeout(() => {
-                      resolve();
-                    }, state.messagesList[i]?.message_content[0]?.delay?.content * 1000));
-                  });
-                }
-                index = i;
-              } else if (
-                state.messagesList[i]?.message_content[0]?.type === "email"
-              ) {
-                let emailId =
-                  state.messagesList[i]?.message_content[0][
-                    state.messagesList[i]?.message_content[0].type
-                  ].contentId;
-                let variablesData = {};
-                state.variablesList.forEach((item) => {
-                  variablesData[item.variable_name] = item.default_value;
-                });
+        if (newState.messagesList[i].hidden) continue;
 
-                state.variables.forEach((item) => {
-                  variablesData[item.variable_name] = item.default_value;
-                });
-
-                let data = {
-                  variables: variablesData,
-                };
-                renderMessage.push({});
-
-                api
-                  .post(
-                    `/api/v1/managements/emails/${emailId}/send_email`,
-                    data
-                  )
-                  .then(() => { })
-                  .catch((error) => {
-                    console.log(error);
-                    if (error.response?.data.code === 0) {
-                      tokenExpired();
-                    }
-                  });
-                index = i;
-                dispatch({
-                  type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                  payload: {
-                    currentMsgIndex: i,
-                    renderMessagesList: [...renderMessage],
-                  }
-                });
-              } else if (
-                state.messagesList[i]?.message_content[0]?.type === "variable_set"
-              ) {
-                newState.variables = updateVariableValues(state.variables, state.messagesList, i);
-                renderMessage[indexMessage].disabled = false;
-                renderMessage.push({});
-                index = i;
-                dispatch({
-                  type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                  payload: {
-                    ...newState,
-                    currentMsgIndex: i,
-                    renderMessagesList: [...renderMessage],
-                  }
-                });
-              } else if (
-                state.messagesList[i]?.message_content[0]?.type === "clear_variable"
-              ) {
-                newState.variables = updateVariableValues(state.variables, state.messagesList, i, "clear_variable");
-                renderMessage[indexMessage].disabled = false;
-                state.renderMessagesList[indexMessage].disabled = false;
-                renderMessage.push({});
-                index = i;
-                dispatch({
-                  type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                  payload: {
-                    ...newState,
-                    currentMsgIndex: i,
-                    renderMessagesList: [...renderMessage],
-                  }
-                });
-              } else if (
-                state.messagesList[i]?.message_content[0]?.type === "pause"
-              ) {
-                renderMessage[indexMessage].disabled = false;
-                renderMessage.push({});
-                index = i;
-                dispatch({
-                  type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                  payload: {
-                    currentMsgIndex: i,
-                    renderMessagesList: [...renderMessage],
-                  }
-                });
-                break;
-              } else {
-                await new Promise((resolve) => {
-                  return (delayRender = setTimeout(() => {
-                    if (
-                      state.messagesList[i].message_content[0].type ===
-                      "text_input" &&
-                      state.messagesList[i].message_content[0].text_input.content
-                    ) {
-                      state.messagesList[i].message_content[0].text_input.content =
-                        state.messagesList[
-                          i
-                        ].message_content[0].text_input.content.replaceAll(
-                          SCAN_REGEX,
-                          (text, variable) => {
-                            if (state.variables.length !== 0) {
-                              let valueVar = "";
-                              for (let j = 0; j < state.variables.length; j++) {
-                                if (state.variables[j].variable_name === variable) {
-                                  valueVar = state.variables[j].default_value;
-                                }
-                              }
-                              return valueVar;
-                            } else {
-                              return "";
-                            }
-                          }
-                        );
-                    }
-                    resolve({ ...state.messagesList[i] });
-                  }, 1000));
-                }).then((data) => {
-                  renderMessage[indexMessage].disabled = false;
-                  renderMessage.push(data);
-                  dispatch({
-                    type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                    payload: {
-                      currentMsgIndex: i,
-                      renderMessagesList: [...renderMessage],
-                    }
-                  });
-                  if (isPauseScroll === false) {
-                    scrollToBottom();
-                  }
-                });
-              }
-            }
-          } else {
-            renderMessage[indexMessage].disabled = false;
-            state.renderMessagesList[indexMessage].disabled = false;
-            renderMessage.push({});
-            dispatch({
-              type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-              payload: {
-                renderMessagesList: [...renderMessage]
-              }
-            });
-          }
+        if (isBotMessage(newState.messagesList[i])) {
+          newState = {
+            ...newState,
+            ...processForBotMessage(newState.messagesList, i, newState)
+          };
+        } else if (isUserMessage(newState.messagesList[i])) {
+          newState = {
+            ...newState,
+            ...processForUserMessage(newState.messagesList, i, newState)
+          };
         }
       }
     }
+
+    newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => isUserMessage(item) && index > clickedMsgIndex);
+    newState.currentMsgIndex = newState.currentUserMsgIndex;
+
+    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+    return dispatch({
+      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+      payload: newState
+    });
   };
 
   const onChangeValue = (
@@ -3637,15 +2892,8 @@ const Preview = () => {
     message
   ) => {
     let newState = { ...state };
-    let messageContentTypeData = newState.messagesList[index].message_content[indexContent][contentType];
-    let index = state.currentMsgIndex
-
-    if (message) {
-      const foundMessage = state.messagesList.find((msg) => msg?.id === message?.id);
-      if (foundMessage) {
-        index = state.messagesList.indexOf(foundMessage);
-      }
-    }
+    const msgIndex = state.messagesList.findIndex((msg) => msg.id === message.id);
+    let messageContentTypeData = newState.messagesList[msgIndex].message_content[indexContent][contentType];
 
     if (name) {
       messageContentTypeData[field] = messageContentTypeData[field] || {};
@@ -3664,7 +2912,7 @@ const Preview = () => {
       value.length > 0
     ) {
       let dataContentType = {
-        ...state.messagesList[index].message_content[indexContent][contentType],
+        ...state.messagesList[msgIndex].message_content[indexContent][contentType],
       };
       
       const { arrayCode, arrayName, arrayPrice, arrayOrderQuantity } = getProductDetailsForProductPurchase(dataContentType, value);
@@ -3699,7 +2947,7 @@ const Preview = () => {
       field === "initial_selection"
     ) {
       let dataContentType = {
-        ...state.messagesList[index].message_content[indexContent][
+        ...state.messagesList[msgIndex].message_content[indexContent][
         contentType
         ],
       };
@@ -3729,15 +2977,15 @@ const Preview = () => {
     }
 
     if (
-      state.messagesList[index].message_content[indexContent][contentType].is_save_input_content
+      state.messagesList[msgIndex].message_content[indexContent][contentType].is_save_input_content
     ) {
       let isSaveParam = false;
       newState.variables = state.variables.map((item) => {
         let dataContentType = {
-          ...state.messagesList[index].message_content[indexContent][contentType],
+          ...state.messagesList[msgIndex].message_content[indexContent][contentType],
         };
       
-        if (state.messagesList[index].message_content[indexContent][contentType].save_input_content === item.variable_name) {
+        if (state.messagesList[msgIndex].message_content[indexContent][contentType].save_input_content === item.variable_name) {
           setDefaultValue(item, dataContentType, contentType, value, field);
           isSaveParam = true;
         }
@@ -3746,22 +2994,17 @@ const Preview = () => {
       });
       
       if (isSaveParam) {
-        newState.objParam[state.messagesList[index].message_content[indexContent][contentType].save_input_content] = value;
+        newState.objParam[state.messagesList[msgIndex].message_content[indexContent][contentType].save_input_content] = value;
       }
     }
 
-    setMessagesSessionStorage(state.messagesList[index])
+    setMessagesSessionStorage(state.messagesList[msgIndex]);
+    newState.messagesList = state.messagesList;
+    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-      payload: {
-        ...newState,
-        messagesList: [...state.messagesList],
-        renderMessagesList: state.renderMessagesList.map(x => {
-          if (x?.id === state.messagesList[index]?.id) return { ...state.messagesList[index] }
-          return { ...x }
-        })
-      }
+      payload: newState
     });
   };
 
@@ -3891,7 +3134,7 @@ const Preview = () => {
         index={index}
         botInfor={state.botInfor}
         checkoutUrl={state.checkoutUrl}
-        previewOrder={state.previewOrderContent}
+        previewOrderContent={state.previewOrderContent}
       />
     ));
   };
@@ -4202,7 +3445,7 @@ const Preview = () => {
         </div>
         <div style={{ alignItems: 'center', justifyContent: "center", padding: 'auto' }}>
           <div id="comment_bubble" style={{ display: 'flex', alignItems: 'center', paddingLeft: '20px', paddingTop: '3px' }}>
-            <span style={{ fontSize: '18px', fontWeight: 900 }}>{state.titleBubble}</span>
+            <span style={{ fontSize: '18px', fontWeight: 900 }}>{state.botInfor.title}</span>
           </div>
         </div>
         <div className="sp-header-right-arrow" style={{ marginRight: '8px' }}>
@@ -4292,7 +3535,7 @@ const Preview = () => {
           </div>
           <div>
             <div id="comment_bubble" className="sp-bubble">
-              <span style={{ fontSize: '14px', fontWeight: 700 }}>{state.titleBubble}</span>
+              <span style={{ fontSize: '14px', fontWeight: 700 }}>{state.botInfor.title}</span>
             </div>
           </div>
           <div className="sp-header-right-arrow" style={{ marginLeft: 'auto' }}>

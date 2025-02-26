@@ -4,7 +4,7 @@ import messageTypingGif from "../../../../assets/img/icons8-dots-loading.gif";
 import { EC_CHATBOT_URL } from "../../../../variables/constants";
 import "moment/locale/zh-cn";
 
-const BotMessage = ({ content, index, botInfor }) => {
+const BotMessage = ({ content, index, botInfor, checkoutUrl, previewOrderContent}) => {
   const handleDownloadFile = (file) => {
     let link = document.createElement("a");
     link.href = file;
@@ -29,7 +29,7 @@ const BotMessage = ({ content, index, botInfor }) => {
         jscode: content.text_input.jscode,
         is_use_js: true
       }, '*');
-      content.text_input.content = previewContent;
+      content.text_input.content = previewOrderContent;
     }
   }
 
@@ -83,7 +83,7 @@ const BotMessage = ({ content, index, botInfor }) => {
     result = result?.replace("{zip}", zip)
     result = result?.replace("{province}", province)
     result = result?.replace("{city}", city)
-    result.replace(/\n/g, "<br>");
+    result = result?.replace(/\n/g, "<br>");
     return result;
   }
 
