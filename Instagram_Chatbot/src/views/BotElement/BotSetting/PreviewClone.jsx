@@ -1331,18 +1331,11 @@ function Preview() {
                   }); 
                   
                   let filteredMessages = dataMessageInLocalStorage.filter(x => x.belong_to === 'user' && x.hidden !== true);
-                  dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
-                  filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);
-                  setObjParam(buildObjParamFromDataMessage(filteredMessages));
-                  filteredMessages.forEach(data => {
-                    let a = buildObjParamFromDataMessage(filteredMessages)
-                    let checkResult = checkMessageCondition(data,a)
-                    if(checkMessageCondition(data,buildObjParamFromDataMessage(filteredMessages))!=true)
-                    {
-                      filteredMessages.remove(data);
-                    }
-                  })
-
+                  if(isLoggedIn==="true")
+                  {
+                    dataMesage = dataMessageInLocalStorage.filter(x => x.hidden !== true && !x.not_display_when_logged_in);
+                    filteredMessages = filteredMessages.filter(x => !x.not_display_when_logged_in);                    
+                  }
                   filteredMessages.forEach(data => {
                     let objSend = {
                       message: data
@@ -1356,12 +1349,9 @@ function Preview() {
                       chatbotRight: rightMarginPc,
                       chatbotBottom: bottomMarginPc,
                       fukushashikiResponse: getObjectFukushashiki(objSend)
-                    }, '*');
-                  });
-
-                 
+                    }, '*') ;
+                  })               
                   setRenderMessageArr(dataMesage);
-
                   setIndexMessageRender(dataMesage.length - 1);
                   setMessageUser(filteredMessages)
                   setIndexUser(filteredMessages.length)                
