@@ -1,6 +1,6 @@
 import api from "api/api-management";
 import { tokenExpired } from "api/tokenExpired";
-import { CHATBOT_SERVER } from "./Constants";
+import { CHATBOT_SERVER, GET_CAPTCHA_PATH } from "./Constants";
 
 const stringNullOrEmpty = (string) => {
   return !string || (string + "").trim() === "";
@@ -169,10 +169,40 @@ const getChatBotSetting = (botId) => {
   );
 }
 
+const sendEmailRequest = (emailId, data) => {
+  return postToChatBotServer(
+    CHATBOT_SERVER.SEND_EMAIL_PATH.replace(":email_id", emailId),
+    data
+  );
+}
+
+const getCaptcha = (size, color, charPreset) => {
+  const url = GET_CAPTCHA_PATH.replace(":size", size)
+    .replace(":color", color)
+    .replace(":char_preset", charPreset);
+
+  return new Promise((resolve, reject) => {
+    api
+      .get(url, data)
+      .then((res) => {
+        if (resolve) resolve(res);
+      })
+      .catch((error) => {
+        if (reject) reject(error);
+        console.error(error);
+      });
+  });
+};
+
+const sleep = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export {
   stringNullOrEmpty, getAllUrlParams, lightenColor,
   mobileCheck, removeLeadingZero, sendUserInteractionData,
   sendCreateOrderData, sendCountRequest,
   getCitiesByPrefecture, getTownsByCity, getPrefectures,
-  getScenarioPreviewData, getChatBotSetting,
+  getScenarioPreviewData, getChatBotSetting, sendEmailRequest,
+  sleep, getCaptcha,
 };

@@ -91,7 +91,10 @@ const CHATBOT_SERVER = {
   GET_PREFECTURES_PATH: '/api/v1/prefectures',
   GET_SCENARIO_PREVIEW_DATA_PATH: '/api/v1/managements/chatbots/:bot_id/scenarios/:scenario_id}/preview',
   GET_CHATBOT_SETTING_PATH: '/api/v1/managements/chatbots/:bot_id',
+  SEND_EMAIL_PATH: '/api/v1/managements/emails/:email_id/send_email',
 };
+
+const GET_CAPTCHA_PATH = `https://svg-captcha-nodejs.vercel.app/captcha?size=:size&color=:color&charPreset=:char_preset`;
 
 export {
   dataHourFixed,
@@ -103,4 +106,5 @@ export {
   installmentOptions,
   SCAN_REGEX,
   CHATBOT_SERVER,
+  GET_CAPTCHA_PATH,
 };

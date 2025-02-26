@@ -34,7 +34,10 @@ import {
   sendCreateOrderData,
   sendUserInteractionData,
   getPrefectures,
-  getScenarioPreviewData
+  getScenarioPreviewData,
+  getChatBotSetting,
+  sendEmailRequest,
+  sleep
 } from "./PreviewComponent/Utils";
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
@@ -54,18 +57,18 @@ const previewInitialState = {
   botId: Cookies.get("bot_id"),
   scenarioId: params.get("scenario_id"),
   botInfor: {},
-  dataMessages: [],
+  messagesList: [],
   urlThanksPage: "",
-  indexMessageRender: 0,
-  renderMessageArr: [],
-  indexUser: 0,
-  messageUser: [],
+  currentMsgIndex: 0,
+  renderMessagesList: [],
+  currentUserMsgIndex: 0,
+  userMessagesList: [],
   errors: {},
   variables: [],
   isDisplayButtonNext: false,
   captcha: [],
   withdrawal: {},
-  dataVariables: [],
+  variablesList: [],
   dataPrefectures: [],
   dataCities: [],
   dataTowns: [],
@@ -125,26 +128,6 @@ const Preview = () => {
   const [state, dispatch] = useReducer(PreviewReducer, previewInitialState);
   const containerRef = useRef(null);
   const isFromScenario = false;
-  //new
-  const [objParam, setObjParam] = useState(() => {
-    let dataObj = {
-      current_url: window.location.href,
-      current_url_param: getAllUrlParams(window.location.href),
-      current_url_title: document.title,
-      user_id: Cookies.get("user_id"),
-      bot_id: Cookies.get("bot_id"),
-    };
-    $.getJSON("https://api.ipregistry.co/?key=tryout", function (data) {
-      dataObj.user_ip_address = data.ip;
-      dataObj.user_country = data.location.country.name;
-      dataObj.user_city = data.location.city;
-      dataObj.user_device = data.user_agent.device.type;
-      dataObj.user_browser = data.user_agent.name;
-      dataObj.user_agent = data.user_agent.header;
-      dataObj.start_datetime = new Date();
-    });
-    return dataObj;
-  });
 
   const setShowPopupCloseBot = (value) => {
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: value } });
@@ -175,10 +158,10 @@ const Preview = () => {
     };
   }
 
-  const updateVariableValues = (variables, dataMessages, index, action = "") => {
+  const updateVariableValues = (variables, messagesList, index, action = "") => {
     if (variables.length === 0) return variables;
   
-    const messageContent = dataMessages[index]?.message_content[0];
+    const messageContent = messagesList[index]?.message_content[0];
     const dataVarExist = messageContent[messageContent.type].variables;
   
     variables.forEach((variable) => {
@@ -192,9 +175,29 @@ const Preview = () => {
     return [...variables];
   }
 
-  //get chat bot setting
+  // get default obj params
   useEffect(() => {
-    console.log("useEffect getBotSetting: " + params.get("bot_id"));
+    if (!state.objParam?.ip) {
+      $.getJSON("https://api.ipregistry.co/?key=tryout", function (data) {
+        const defaultObjParam = {
+          user_ip_address: data.ip,
+          user_country: data.location.country.name,
+          user_city: data.location.city,
+          user_device: data.user_agent.device.type,
+          user_browser: data.user_agent.name,
+          user_agent: data.user_agent.header,
+          start_datetime: new Date(),
+        };
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: { objParam: { ...state.objParam, ...defaultObjParam } }
+        });
+      });
+    }
+  }, [state.objParam.ip]);
+
+  // Get chat bot setting
+  useEffect(() => {
     if (!state.botId && params.get("bot_id")) {
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
       return;
@@ -233,52 +236,64 @@ const Preview = () => {
       });
   }, [state.botId]);
 
+  // Add event listener to receive message from parent window
   useEffect(() => {
-    window.addEventListener(
-      "message",
-      (event) => {
-        if (!event.data) return;
+    const eventHandler = (event) => {
+      if (!event.data) return;
 
-        if (event.data === 'openPreview' && state.isOpen !== true) {
-          onOpenPreview(true)
-        }
-        if (event.data.text != undefined && event.data.text.trim().length > 0) {
-          dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { submitErrorMessage: event.data.text } });
-          return;
-        }
+      if (event.data === 'openPreview' && state.isOpen !== true) {
+        onOpenPreview(true)
+      }
+      if (event.data.text != undefined && event.data.text.trim().length > 0) {
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { submitErrorMessage: event.data.text } });
+        return;
+      }
 
-        if (event.data.objectSend) {
-          dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { previewOrderContent: event.data.objectSend } });
-          return;
-        }
+      if (event.data.objectSend) {
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { previewOrderContent: event.data.objectSend } });
+        return;
+      }
 
-        if (event.data.crawJsonObject) {
-          let receiveOptionData = {};
-          receiveOptionData[event.data.crawJsonObject.options.search_value] = event.data.crawJsonObject.dates;
-          const newLpOptionData = { ...state.lpOptionData, ...receiveOptionData };
-          dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { lpOptionData: newLpOptionData } });
-          return;
-        }
-      },
-      false,
-    );
+      if (event.data.crawJsonObject) {
+        let receiveOptionData = {};
+        receiveOptionData[event.data.crawJsonObject.options.search_value] = event.data.crawJsonObject.dates;
+        const newLpOptionData = { ...state.lpOptionData, ...receiveOptionData };
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { lpOptionData: newLpOptionData } });
+        return;
+      }
+    };
+
+    window.addEventListener("message", eventHandler, false);
+
+    return () => {
+      window.removeEventListener("message", eventHandler);
+    };
   }, [])
 
-
+  // Add style to body tag if it's mobile
   useEffect(() => {
     if (mobileCheck()) {
       document.body.classList.add('is_mobile');
     }
   }, [])
 
+  // post message to parent window
   useEffect(() => {
     if (!state.urlReceive) return;
 
     postMessageToParent();
-  }, [state.urlReceive])
+  }, [state.urlReceive]);
 
+  // Get prefectures
+  useEffect(() => {
+    getPrefectures()
+      .then((res) => {
+        console.log("getPrefectures", res);
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { dataPrefectures: res.data.data } });
+      })
+  }, []);
 
-  function handleCloseBot() {
+  const handleCloseBot = () => {
     const element = document.getElementById('sp-container1');
     if (mobileCheck()) {
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { showPopupCloseBot: false, isOpen: false } });
@@ -465,7 +480,7 @@ const Preview = () => {
     }
   }
 
-  function setDefaultValue(item, dataContentType, contentType, value, field) {
+  const setDefaultValue = (item, dataContentType, contentType, value, field) => {
     switch (contentType) {
       case "zip_code_address":
         item.default_value = setZipCodeAddressDefaultValue(dataContentType);
@@ -563,6 +578,7 @@ const Preview = () => {
       message_color = "#EF8D2F";
       font_color = "#fff";
       icon_mess = iconMessageOrange;
+
     } else if (res.data.chatbot.main_color === "yellow") {
       opacity_color = "#F0EFEB";
       message_color = "#F3AA2D";
@@ -592,7 +608,6 @@ const Preview = () => {
       font_color = "#000";
       icon_mess = iconMessageWhite;
     } else if (res.data.chatbot.main_color_other) {
-      // opacity_color = lightenColor(res.data.chatbot.main_color_other, 0.1);
       opacity_color = lightenColor(res.data.chatbot.main_color_other, 0.1);
       message_color = res.data.chatbot.main_color_other;
       font_color = "#fff";
@@ -603,20 +618,255 @@ const Preview = () => {
       message_color,
       font_color,
       icon_mess,
-      main_color: res.data.chatbot.main_color
+      main_color: res.data.chatbot.main_color,
+      main_color_other: res.data.chatbot.main_color_other,
     };
   }
 
-  useEffect(() => {
-    getPrefectures()
-      .then((res) => {
-        console.log("getPrefectures", res);
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { dataPrefectures: res.data.data } });
-      })
-  }, []);
+  const processBotDelayMessage = async (messagesList, i, newState) => {
+    if (messagesList[i]?.message_content[0]?.delay?.typing_on) {
+      return new Promise((resolve) => {
+        const newRenderMessagesList = [...state.renderMessagesList, messagesList[i]];
+        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { renderMessagesList: newRenderMessagesList } });
+        resolve();
+      }).then(async () => {
+        await sleep(messagesList[i].message_content[0].delay.content * 1000);
+        let newRenderMessagesList = [...state.renderMessagesList, messagesList[i]];
+        newRenderMessagesList.pop();
+        newRenderMessagesList.push({});
+        
+        if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
+          return redirectToThanksPage();
+        return dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
+            renderMessagesList: [...newRenderMessagesList],
+            currentMsgIndex: i,
+          }
+        });
+      });
+    }
 
+    await sleep(messagesList[i].message_content[0].delay.content * 1000);
+
+    if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
+      return redirectToThanksPage();
+    
+    newState.currentMsgIndex = i;
+    return newState;
+  }
+
+  const processBotEmailMessage = (messagesList, i, newState) => {
+    const msgContent = messagesList[i]?.message_content?.[0];
+    const emailId = msgContent[msgContent.type].contentId;
+    let variablesData = {};
+
+    newState.variablesList.forEach((item) => {
+      variablesData[item.variable_name] = item.default_value;
+    });
+
+    sendEmailRequest(emailId, {variables: variablesData})
+      then((res) => {console.log(res)});
+
+    newState.renderMessagesList.push({});
+    newState.currentMsgIndex = i;
+    return newState;
+  }
+
+  const processBotPauseMessage = (messagesList, i, newState) => {
+    newState.renderMessagesList.push({});
+    newState.currentMsgIndex = i;
+  }
+
+  const processForBotVariableSetMessage = (messagesList, i, newState, options = {forceEmpty: false}) => {
+    const msgContent = messagesList[i]?.message_content?.[0];
+    if (!msgContent) return newState;
+
+    if (newState.variables.length !== 0) {
+      const msgVariables = msgContent[msgContent.type].variables;
+
+      newState.variables.forEach((item) => {
+        const matchingVariable = msgVariables.find(variable => item.variable_name === variable.key);
+        if (matchingVariable) {
+          item.default_value = options.forceEmpty ? "" : matchingVariable.value;
+        }
+      });
+    }
+
+    newState.renderMessagesList.push({});
+    newState.currentMsgIndex = i;
+    return newState;
+  }
+
+  const processForBotDefaultMessage = async (messagesList, i, newState) => {
+    const msgContent = messagesList[i]?.message_content?.[0];
+    if (!msgContent) return newState;
+
+    await sleep(1000);
+    if (msgContent.type === "text_input" && msgContent.text_input.content) {
+      if (newState.variables.length === 0) return;
+
+      newState.variables.forEach((variable) => {
+        msgContent.text_input.content = msgContent.text_input.content
+          .replaceAll(variable.key, variable.value);
+      });
+    }
+
+    newState.renderMessagesList.push(messagesList[i]);
+    newState.currentMsgIndex = i;
+    if (isPauseScroll === false) {
+      scrollToBottom();
+    }
+
+    if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
+      return redirectToThanksPage();
+
+    return newState;
+  }
+
+  const processForUserCaptchaMessage = async (messagesList, i, msgContentIndex, newState) => {
+    const msgContent = messagesList[i]?.message_content?.[msgContentIndex];
+    const msgContentType = msgContent.type;
+    if (!msgContent) return newState;
+
+    const size = msgContent[msgContentType].length;
+    const color = msgContent[msgContentType].colour ? "true" : "";
+    const charPreset = msgContent[msgContentType].type;
+
+    getCaptcha(size, color, charPreset)
+      .then((res) => {
+        let newCaptcha = [...state.captcha];
+        newCaptcha.push({index: i, indexContent: j, ...res.data});
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+          payload: {
+            captcha: [...newCaptcha]
+          }
+        });
+      });
+  }
+
+  const processForUserMessage = async (messagesList, i, newState) => {
+    await sleep(1000);
+    for (
+      let j = 0;
+      j < messagesList[i].message_content.length;
+      j++
+    ) {
+      if (messagesList[i].message_content[j].type === "capture") {
+        await processForUserCaptchaMessage(messagesList, i, j, newState);
+      }
+    }
+
+    newState.renderMessagesList.push(messagesList[i]);
+    newState.currentMsgIndex = i;
+    newState.currentUserMsgIndex++;
+
+    if (!isPauseScroll) scrollToBottom();
+
+    return newState;
+  };
+
+  const extractStateFromPreviewResponse = async (res) => {
+    if (!res || !res.data || res.data.code !== 1) return;
+    let newState = {
+      botInfor: getBotInforFromPreviewResponse(res),
+      objParam: {},
+    };
+
+    let messagesList = res.data.data?.conversation?.messages || [];
+    const btnSubmitItem = messagesList.find(x => x.message_content.find(y => y.type == "button_submit"));
+
+    if (btnSubmitItem) {
+      const btnSubmitItemContent = btnSubmitItem.message_content[0];
+      const jsQueryErrorData = {
+        isDisplay: btnSubmitItemContent.button_submit.is_display_error_message,
+        seachMode: btnSubmitItemContent.error_message_display_element_search_type,
+        searchValue: btnSubmitItemContent.error_message_display_element_search_value,
+      };
+      postMessageToParent({
+        isOpen: true,
+        getErrorMessage: jsQueryErrorData
+      });
+      newState.isDisplayErrorMessage = btnSubmitItemContent.button_submit.is_display_error_message;
+    }
+
+    if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
+      sessionStorage.setItem("prevOpenStatus", "1");
+      const openChatbotCountApiParams = {
+        scenario_data: `${state.deviceReceive}_open_chatbot_window`,
+      };
+      sendCountRequest(state.scenarioId, openChatbotCountApiParams);
+    }
+
+    if (res.data.variables) {
+      newState.variables = [
+        ...res.data.variables,
+        ...res.data.all_variables,
+      ];
+
+      res.data.variables.forEach((item) => {
+        newState.objParam[item.variable_name] = item.default_value;
+      });
+    }
+    
+    messagesList = messagesList.filter(x => {
+      return x.hidden !== true && (isLoggedIn && !x.not_display_when_logged_in) &&
+        checkMessageCondition(x, newState.objParam);
+    });
+
+    newState.variablesList = res.data?.all_variables || [];
+    newState.messagesList = messagesList;
+    newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";
+
+    checkUpdateMessagesSessionStorage(res.data.data.updated_at)
+    
+    newState.userMessagesList = messagesList.filter((item) => isUserMessage(item));
+    for (let i = 0; i < messagesList.length; i++) {
+      if (messagesList[i].conditions?.length > 0) {
+        const checked = checkMessageCondition(messagesList[i], newState.objParam);
+
+        if (!checked && isUserMessage(messagesList[i])) {
+          newState.currentUserMsgIndex++;
+          continue;
+        }
+      }
+      if (isBotMessage(messagesList[i])) {
+        const firstMsgType = [i]?.message_content[0]?.type;
+        let newStateAttributes = {};
+
+        switch (firstMsgType) {
+          case "delay":
+            newStateAttributes = await processBotDelayMessage(messagesList, i, newState);
+            break;
+          case "email":
+            newStateAttributes = processBotEmailMessage(messagesList, i, newState);
+            break;
+          case "variable_set":
+            newStateAttributes = processForBotVariableSetMessage(messagesList, i, newState);
+            break;
+          case "clear_variable":
+            newStateAttributes = processForBotVariableSetMessage(messagesList, i, newState, {forceEmpty: ""});
+            break;
+          case "pause":
+            newStateAttributes = processBotPauseMessage(messagesList, i, newState);
+            break;
+          default:
+            processForBotDefaultMessage(messagesList, i, newState);
+            break;
+        }
+
+        newState = { ...newState, ...newStateAttributes };
+      } else if (isUserMessage(messagesList[i])) {
+        processForUserMessage(messagesList, i, newState);
+        break;
+      }
+  }
+
+    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
+  }
+
+  // Get Preview Scenario Data
   useEffect(() => {
-    let delayRender;
     if (!state.botId) {
       dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { botId: params.get("bot_id") } });
       return;
@@ -643,493 +893,7 @@ const Preview = () => {
     }
 
     getScenarioPreviewData(state.botId, state.scenarioId)
-      .then(async (res) => {
-        if (!res || !res.data || res.data.code !== 1) return;
-        let newState = {
-          botInfor: getBotInforFromPreviewResponse(res)
-        };
-
-        let messagesList = res.data.data?.conversation?.messages || [];
-        const btnSubmitItem = messagesList.find(x => x.message_content.find(y => y.type == "button_submit"));
-
-        if (btnSubmitItem) {
-          const btnSubmitItemContent = btnSubmitItem.message_content[0];
-          const jsQueryErrorData = {
-            isDisplay: btnSubmitItemContent.button_submit.is_display_error_message,
-            seachMode: btnSubmitItemContent.error_message_display_element_search_type,
-            searchValue: btnSubmitItemContent.error_message_display_element_search_value,
-          };
-          postMessageToParent({
-            isOpen: true,
-            getErrorMessage: jsQueryErrorData
-          });
-          newState.isDisplayErrorMessage = btnSubmitItemContent.button_submit.is_display_error_message;
-        }
-
-        if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
-          sessionStorage.setItem("prevOpenStatus", "1");
-          const openChatbotCountApiParams = {
-            scenario_data: `${state.deviceReceive}_open_chatbot_window`,
-          };
-          sendCountRequest(state.scenarioId, openChatbotCountApiParams);
-        }
-        
-        messagesList = messagesList.filter(x => {
-          return x.hidden !== true && (isLoggedIn && !x.not_display_when_logged_in) &&
-            checkMessageCondition(x, builtObjParam);
-        });
-        if (res.data.data?.conversation?.messages?.length > 0) {
-          messagesList = [...res.data.data?.conversation?.messages.filter(x => !x.hidden)];
-          if (isLoggedIn) {
-            messagesList = messagesList.filter(x => !x.not_display_when_logged_in);
-          }
-        }
-
-        newState.dataVariables = res.data?.all_variables || [];
-        newState.dataMessages = messagesList;
-        newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";;
-
-        checkUpdateMessagesSessionStorage(res.data.data.updated_at)
-
-        if (res.data.variables) {
-          newState.variables = [
-            ...res.data.variables,
-            ...newState.dataVariables
-          ];
-
-          res.data.variables.forEach((item) => {
-            objParam[item.variable_name] = item.default_value;
-          });
-        }
-
-        newState.objParam = { ...objParam };
-        let variables = [...res.data.variables];
-        let messageUserVar = messagesList.filter(
-          (item) =>
-            item.belong_to === "user" && item.message_content.length > 0
-        );
-        newState.messageUser = messageUserVar;
-        let renderMessage = [];
-        let index;
-        let isPauseScroll = false;
-        for (let i = 0; i < messagesList.length; i++) {
-          if (messagesList[i].hidden !== true) {
-            if (messagesList[i].conditions?.length > 0) {
-              const checked = checkMessageCondition(messagesList[i], objParam);
-
-              if (!checked && messagesList[i].belong_to === "user") {
-                dispatch({
-                  type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                  payload: { indexUser: state.indexUser + 1 }
-                });
-                continue;
-              }
-            }
-            if (
-              messagesList[0].belong_to === "bot" &&
-              messagesList[i].message_content.length > 0
-            ) {
-              if (messagesList[i]?.message_content[0]?.type === "delay") {
-                if (messagesList[i]?.message_content[0]?.delay.typing_on) {
-                  await new Promise((resolve) => {
-                    renderMessage.push({ ...messagesList[i] });
-                    dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { renderMessageArr: [...renderMessage] } });
-                    resolve();
-                  })
-                    .then(async () => {
-                      await new Promise((resolve) => {
-                        delayRender = setTimeout(() => {
-                          resolve();
-                        }, messagesList[i]?.message_content[0].delay.content * 1000);
-                      });
-                    })
-                    .then(() => {
-                      renderMessage.pop();
-                      renderMessage.push({});
-                      dispatch({
-                        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
-                          renderMessageArr: [...renderMessage],
-                          indexMessageRender: i,
-                        }
-                      });
-                    })
-                    .then(() => {
-                      if (messagesList.length - 1 === i && state.urlThanks) {
-                        let aTag = document.createElement("a");
-                        aTag.href = state.urlThanks;
-                        aTag.target = "_blank";
-
-                        setTimeout(() => {
-                          aTag.click();
-                        }, 2000);
-                      }
-                    });
-                } else {
-                  await new Promise((resolve) => {
-                    return (delayRender = setTimeout(() => {
-                      resolve();
-                    }, messagesList[i]?.message_content[0]?.delay?.content * 1000));
-                  })
-                    .then(() => {
-                      dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { indexMessageRender: i } });
-                    })
-                    .then(() => {
-                      if (messagesList.length - 1 === i && state.urlThanks) {
-                        let aTag = document.createElement("a");
-                        aTag.href = state.urlThanks;
-                        aTag.target = "_blank";
-
-                        setTimeout(() => {
-                          aTag.click();
-                        }, 2000);
-                      }
-                    });
-                }
-                index = i;
-              } else if (
-                messagesList[i]?.message_content[0]?.type === "email"
-              ) {
-                let emailId =
-                  messagesList[i]?.message_content[0][
-                    messagesList[i]?.message_content[0].type
-                  ].contentId;
-                let variablesData = {};
-                newState.dataVariables.forEach((item) => {
-                  variablesData[item.variable_name] = item.default_value;
-                });
-
-                variables.forEach((item) => {
-                  variablesData[item.variable_name] = item.default_value;
-                });
-
-                let data = {
-                  variables: variablesData,
-                };
-
-                api
-                  .post(
-                    `/api/v1/managements/emails/${emailId}/send_email`,
-                    data
-                  )
-                  .then(() => { })
-                  .catch((error) => {
-                    console.log(error);
-                    if (error.response?.data.code === 0) {
-                      tokenExpired();
-                    }
-                  });
-                renderMessage.push({});
-                index = i;
-                dispatch({
-                  type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
-                    renderMessageArr: [...renderMessage],
-                    indexMessageRender: i,
-                  }
-                });
-
-              } else if (
-                messagesList[i]?.message_content[0]?.type === "variable_set"
-              ) {
-                if (variables.length !== 0) {
-                  let dataVarExist =
-                    messagesList[i]?.message_content[0][
-                      messagesList[i]?.message_content[0].type
-                    ].variables;
-                  variables.forEach((item) => {
-                    for (let z = 0; z < dataVarExist.length; z++) {
-                      if (item.variable_name === dataVarExist[z].key) {
-                        item.default_value = dataVarExist[z].value;
-                      }
-                    }
-                  });
-                  newState.variables = [...variables];
-                }
-                renderMessage.push({});
-                newState.renderMessageArr = [...renderMessage];
-                newState.indexMessageRender = i;
-                index = i;
-              } else if (
-                messagesList[i]?.message_content[0]?.type === "clear_variable"
-              ) {
-                if (variables.length !== 0) {
-                  let dataVarExist =
-                    messagesList[i]?.message_content[0][
-                      messagesList[i]?.message_content[0].type
-                    ].variables;
-                  variables.forEach((item) => {
-                    for (let z = 0; z < dataVarExist.length; z++) {
-                      if (item.variable_name === dataVarExist[z]) {
-                        item.default_value = "";
-                      }
-                    }
-                  });
-                  newState.variables = [...variables];
-                }
-                renderMessage.push({});
-                newState.renderMessageArr = [...renderMessage];
-                newState.indexMessageRender = i;
-                index = i;
-              } else if (
-                messagesList[i]?.message_content[0]?.type === "pause"
-              ) {
-                renderMessage.push({});
-                newState.renderMessageArr = [...renderMessage];
-                newState.indexMessageRender = i;
-                index = i;
-                break;
-              } else if (messagesList[i].belong_to !== "bot") {
-                await new Promise((resolve) => {
-                  return (delayRender = setTimeout(() => {
-                    for (
-                      let j = 0;
-                      j < messagesList[i].message_content.length;
-                      j++
-                    ) {
-                      if (
-                        messagesList[i].message_content[j].type === "capture"
-                      ) {
-                        api
-                          .get(
-                            `https://svg-captcha-nodejs.vercel.app/captcha?size=${messagesList[i].message_content[j][
-                              messagesList[i].message_content[j].type
-                            ].length
-                            }${messagesList[i].message_content[j][
-                              messagesList[i].message_content[j].type
-                            ].colour
-                              ? "&color=true"
-                              : ""
-                            }&charPreset=${messagesList[i].message_content[j][
-                              messagesList[i].message_content[j].type
-                            ].type
-                            }`
-                          )
-                          .then((res) => {
-                            let newCaptcha = [...state.captcha];
-                            newCaptcha.push({index: i, indexContent: j, ...res.data});
-                            dispatch({
-                              type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                              payload: {
-                                captcha: [...newCaptcha]
-                              }
-                            });
-                          })
-                          .catch((error) => {
-                            console.log(error);
-                            if (error.response?.data.code === 0) {
-                              tokenExpired();
-                            }
-                          });
-                        // break;
-                      }
-                    }
-                    resolve({ ...messagesList[i] });
-                  }, 1000));
-                })
-                  .then((data) => {
-                    renderMessage.push(data);
-                    dispatch({
-                      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
-                        renderMessageArr: [...renderMessage],
-                        indexMessageRender: i,
-                      }
-                    });
-                    if (isPauseScroll === false) {
-                      scrollToBottom();
-                    }
-                  })
-                  .then(() => {
-                    // document.getElementById(`sp-body-user-side-${i}`).style.animation = 'moveRight 2s linear';
-                  })
-                  .catch((error) => {
-                    console.log(error);
-                    if (error.response?.data.code === 0) {
-                      tokenExpired();
-                    }
-                  });
-                index = i;
-                dispatch({
-                  type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                  payload: { indexUser: state.indexUser + 1 }
-                });
-                
-                break;
-              } else {
-                await new Promise((resolve) => {
-                  return (delayRender = setTimeout(() => {
-                    if (
-                      messagesList[i].message_content[0]?.type ===
-                      "text_input" &&
-                      messagesList[i].message_content[0].text_input.content
-                    ) {
-                      messagesList[i].message_content[0].text_input.content =
-                        messagesList[
-                          i
-                        ].message_content[0].text_input.content.replaceAll(
-                          SCAN_REGEX,
-                          (text, variable) => {
-                            if (variables.length !== 0) {
-                              let valueVar = "";
-                              for (let j = 0; j < variables.length; j++) {
-                                if (
-                                  variables[j].variable_name === variable
-                                ) {
-                                  valueVar = variables[j].default_value;
-                                }
-                              }
-                              return valueVar;
-                            } else {
-                              return "";
-                            }
-                          }
-                        );
-                    }
-                    resolve({ ...messagesList[i] });
-                  }, 1000));
-                })
-                  .then((data) => {
-                    renderMessage.push(data);
-                    dispatch({
-                      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
-                        renderMessageArr: [...renderMessage],
-                        indexMessageRender: i,
-                      }
-                    });
-                    if (isPauseScroll === false) {
-                      scrollToBottom();
-                    }
-                    if (
-                      data.message_content[0]?.type !== "delay" &&
-                      data.message_content[0][data.message_content[0]?.type]
-                        .scroll_auto === true
-                    ) {
-                      isPauseScroll = true;
-                    }
-                  })
-                  .then(() => {
-                    if (messagesList.length - 1 === i && newState.urlThanksPage) {
-                      let aTag = document.createElement("a");
-                      aTag.href = newState.urlThanksPage;
-                      aTag.target = "_blank";
-
-                      setTimeout(() => {
-                        aTag.click();
-                      }, 2000);
-                    }
-                  });
-                index = i;
-              }
-            } else if (
-              messagesList[0].belong_to === "user" &&
-              messagesList[i].message_content.length > 0
-            ) {
-              // if (messageArr[i].belong_to !== 'user') {
-              //   await new Promise((resolve) => {
-              //     return delayRender = setTimeout(() => {
-              //       if (messageArr[i].message_content[0]?.type === 'text_input') {
-              //         messageArr[i].message_content[0].text_input.content = messageArr[i].message_content[0].text_input.content.replaceAll(SCAN_REGEX, (text, variable) => {
-              //           for (let j = 0; j < variables.length; j++) {
-              //             if (variables[j].variable_name === variable) {
-              //               return variables[j].default_value;
-              //             }
-              //           }
-              //         });
-              //       }
-              //       resolve({ ...messageArr[i] });
-              //     }, 1000);
-              //   }).then(data => {
-              //     renderMessage.push(data);
-              //     setRenderMessageArr([
-              //       ...renderMessage
-              //     ]);
-              //     setIndexMessageRender(i);
-              //     if (isPauseScroll === false) {
-              //       scrollToBottom();
-              //     }
-              //     if (data.message_content[0]?.type !== 'delay' && data.message_content[0][data.message_content[0]?.type].scroll_auto === true) {
-              //       isPauseScroll = true;
-              //     }
-              //   })
-              //   index = i;
-              // } else {
-              await new Promise((resolve) => {
-                return (delayRender = setTimeout(() => {
-                  for (
-                    let j = 0;
-                    j < messagesList[i].message_content.length;
-                    j++
-                  ) {
-                    if (
-                      messagesList[i].message_content[j].type === "capture"
-                    ) {
-                      api
-                        .get(
-                          `https://svg-captcha-nodejs.vercel.app/captcha?size=${messagesList[i].message_content[j][
-                            messagesList[i].message_content[j].type
-                          ].length
-                          }${messagesList[i].message_content[j][
-                            messagesList[i].message_content[j].type
-                          ].colour
-                            ? "&color=true"
-                            : ""
-                          }&charPreset=${messagesList[i].message_content[j][
-                            messagesList[i].message_content[j].type
-                          ].type
-                          }`
-                        )
-                        .then((res) => {
-                          let newCaptcha = [...state.captcha];
-                          newCaptcha.push({index: i, indexContent: j, ...res.data});
-                          dispatch({
-                            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                            payload: {
-                              captcha: [...newCaptcha]
-                            }
-                          });
-                        })
-                        .catch((error) => {
-                          console.log(error);
-                          if (error.response?.data.code === 0) {
-                            tokenExpired();
-                          }
-                        });
-                    }
-                  }
-                  resolve({ ...messagesList[i] });
-                }, 1000));
-              }).then((data) => {
-                renderMessage.push(data);
-                dispatch({
-                  type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
-                    renderMessageArr: [...renderMessage],
-                    indexMessageRender: i,
-                  }
-                });
-                if (isPauseScroll === false) {
-                  scrollToBottom();
-                }
-              });
-              index = i;
-              dispatch({
-                type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-                payload: { indexUser: state.indexUser + 1 }
-              });
-              break;
-            }
-          }
-        }
-
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
-      })
-      .catch((error) => {
-        if (error.response?.data.code === 0) {
-          tokenExpired();
-        }
-        console.error(error);
-      });
-
-    return () => {
-      clearTimeout(delayRender);
-    };
+      .then(extractStateFromPreviewResponse);
   }, [state.botId, state.urlSend, state.urlReceive, state.deviceReceive, state.scenarioId]);
 
   useEffect(() => {
@@ -1176,10 +940,10 @@ const Preview = () => {
           const payload = {
             isOpen: true,
             objParam: builtObjParam,
-            renderMessageArr: filteredMessages,
-            indexMessageRender: filteredMessages.length - 1,
-            messageUser: userMessages,
-            indexUser: userMessages.length,
+            renderMessagesList: filteredMessages,
+            currentMsgIndex: filteredMessages.length - 1,
+            userMessagesList: userMessages,
+            currentUserMsgIndex: userMessages.length,
           };
           dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: payload });
         }
@@ -1207,7 +971,7 @@ const Preview = () => {
   };
 
   const handleValidateField = (index) => {
-    let contentArr = [...state.renderMessageArr[index].message_content];
+    let contentArr = [...state.renderMessagesList[index].message_content];
     let isValid = true;
     let errorsMess = {};
 
@@ -2335,8 +2099,8 @@ const Preview = () => {
 
   const setMessagesSessionStorage = (data) => {
     const temp = getMessagesSessionStorage()
-    const bot_id = objParam.bot_id || Number(objParam?.current_url_param?.bot_id)
-    sessionStorage.setItem(`messages_bot_${bot_id}`, JSON.stringify(state.dataMessages.map(x => {
+    const bot_id = state.objParam.bot_id || Number(state.objParam?.current_url_param?.bot_id)
+    sessionStorage.setItem(`messages_bot_${bot_id}`, JSON.stringify(state.messagesList.map(x => {
       if (x.id === data.id) {
         return { ...data }
       }
@@ -2345,7 +2109,7 @@ const Preview = () => {
   }
 
   const getMessagesSessionStorage = () => {
-    const bot_id = objParam.bot_id || Number(objParam?.current_url_param?.bot_id)
+    const bot_id = state.objParam.bot_id || Number(state.objParam?.current_url_param?.bot_id)
     const data = sessionStorage.getItem(`messages_bot_${bot_id}`)
     if (!data) return null;
     return JSON.parse(data)
@@ -2353,7 +2117,8 @@ const Preview = () => {
 
   const checkUpdateMessagesSessionStorage = (updated_at) => {
     const temp = sessionStorage.getItem("bot_update_at")
-    const bot_id = objParam.bot_id || Number(objParam?.current_url_param?.bot_id)
+    const bot_id = state.objParam.bot_id || Number(state.objParam?.current_url_param?.bot_id)
+
     if (temp !== updated_at) {
       sessionStorage.removeItem(`messages_bot_${bot_id}`)
       sessionStorage.setItem("bot_update_at", updated_at)
@@ -2412,7 +2177,7 @@ const Preview = () => {
     }
   }
 
-  function getObjectFukushashiki(obj) {
+  const getObjectFukushashiki = (obj) => {
     if (
       obj &&
       obj.message.message_content &&
@@ -2933,7 +2698,7 @@ const Preview = () => {
       data,
       async (res) => {
         fukushashikiToLP(getObjectFukushashiki(data));
-        setMessagesSessionStorage(state.renderMessageArr[indexMessage])
+        setMessagesSessionStorage(state.renderMessagesList[indexMessage])
         await createOrAddLinesCart(res)
       }
     ).then(() => {
@@ -2954,10 +2719,22 @@ const Preview = () => {
     });
   }
 
+  const isLastMessageInCreateOrderFlow = () => {
+    return indexMessage === state.messagesList.length - 1;
+  };
+
+  const isBotMessage = (message) => {
+    return message.belong_to === 'bot' && message.message_content.length > 0;
+  }
+
+  const isUserMessage = (message) => {
+    return message.belong_to === 'user' && message.message_content.length > 0;
+  }
+
   const onClickNext = async (indexMessage, message) => {
     let newState = { ...state };
-    let indexClickLocation = newState.dataMessages.findIndex((msg) => msg?.id === message?.id);
-    if (indexClickLocation < 0) indexClickLocation = newState.indexMessageRender;
+    let indexClickLocation = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
+    if (indexClickLocation < 0) indexClickLocation = newState.currentMsgIndex;
 
     if (message.button_jscode == true && message.jscode?.length > 0) {
       postMessageForRunJsCode();
@@ -2966,24 +2743,24 @@ const Preview = () => {
     if (!handleValidateField(indexMessage)) {
       return;
     }
-    let renderMessage = [...state.renderMessageArr];
-    newState.renderMessageArr[indexMessage].disabled = newState.submitErrorMessage.length > 0 ? false : true;
-    newState.renderMessageArr = state.renderMessageArr.sort((a, b) => a.id - b.id);
+    let renderMessage = [...state.renderMessagesList];
+    newState.renderMessagesList[indexMessage].disabled = newState.submitErrorMessage.length > 0 ? false : true;
+    newState.renderMessagesList = state.renderMessagesList.sort((a, b) => a.id - b.id);
 
     let index;
     let isPauseScroll = false;
     let delayRender;
-    if (indexClickLocation === state.indexMessageRender)
-      newState.indexUser = newState.indexUser + 1;
+    if (indexClickLocation === state.currentMsgIndex)
+      newState.currentUserMsgIndex = newState.currentUserMsgIndex + 1;
 
     let data_submit = {
       scenario_id: state.scenarioId,
-      message: state.renderMessageArr[indexMessage],
+      message: state.renderMessagesList[indexMessage],
       user_id: state.uuid,
       bot_type: "web"
     };
 
-    if (state.dataMessages[indexClickLocation]?.message_content?.[0]?.text_input?.save_input_content === "create_order" || state.dataMessages.length - 1 === indexClickLocation) {
+    if (state.messagesList[indexClickLocation]?.message_content?.[0]?.text_input?.save_input_content === "create_order" || state.messagesList.length - 1 === indexClickLocation) {
       return processClickCreateOrder(data_submit);
     }
 
@@ -2991,29 +2768,29 @@ const Preview = () => {
       data,
       async (res) => {
         fukushashikiToLP(getObjectFukushashiki(data));
-        setMessagesSessionStorage(state.renderMessageArr[indexMessage])
+        setMessagesSessionStorage(state.renderMessagesList[indexMessage])
         await createOrAddLinesCart(res)
       }
     );
 
-    if (!state.dataMessages[state.indexMessageRender + 1] || state.indexMessageRender > indexClickLocation) {
-      newMessage.renderMessageArr[indexMessage].disabled = false;
+    if (!state.messagesList[state.currentMsgIndex + 1] || state.currentMsgIndex > indexClickLocation) {
+      newMessage.renderMessagesList[indexMessage].disabled = false;
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
         payload: {
-          renderMessageArr: renderMessage
+          renderMessagesList: renderMessage
         }
       });
       return;
     }
 
-    if (state.dataMessages[state.indexMessageRender + 1].belong_to === 'user' || state.dataMessages[state.indexMessageRender + 1].belong_to === 'bot') {
-      for (let i = state.indexMessageRender + 1; i < state.dataMessages.length; i++) {
-        if (state.dataMessages[i].hidden !== true) {
-          if (state.dataMessages[i].conditions) {
+    if (state.messagesList[state.currentMsgIndex + 1].belong_to === 'user' || state.messagesList[state.currentMsgIndex + 1].belong_to === 'bot') {
+      for (let i = state.currentMsgIndex + 1; i < state.messagesList.length; i++) {
+        if (state.messagesList[i].hidden !== true) {
+          if (state.messagesList[i].conditions) {
             var checked = true;
-            for (let j = 0; j < state.dataMessages[i].conditions.length; j++) {
-              let conditionItem = state.dataMessages[i].conditions[j];
+            for (let j = 0; j < state.messagesList[i].conditions.length; j++) {
+              let conditionItem = state.messagesList[i].conditions[j];
               if (j === 0) {
                 if (conditionItem.condition === "include") {
                   checked = objParam[conditionItem.nameCondition].includes(
@@ -3082,20 +2859,20 @@ const Preview = () => {
                 }
               }
             }
-            if (checked === false && state.dataMessages[i].belong_to === "user") {
-              newState.indexUser = newState.indexUser + 1;
+            if (checked === false && state.messagesList[i].belong_to === "user") {
+              newState.currentUserMsgIndex = newState.currentUserMsgIndex + 1;
               continue;
             }
           }
-          if (state.dataMessages[i].belong_to === "bot") {
-            if (state.dataMessages[i]?.message_content[0].type === "delay") {
-              if (state.dataMessages[i]?.message_content[0]?.delay.typing_on) {
+          if (state.messagesList[i].belong_to === "bot") {
+            if (state.messagesList[i]?.message_content[0].type === "delay") {
+              if (state.messagesList[i]?.message_content[0]?.delay.typing_on) {
                 await new Promise((resolve) => {
-                  renderMessage.push({ ...state.dataMessages[i] });
+                  renderMessage.push({ ...state.messagesList[i] });
                   dispatch({
                     type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                     payload: {
-                      renderMessageArr: [...renderMessage]
+                      renderMessagesList: [...renderMessage]
                     }
                   });
                   resolve();
@@ -3104,24 +2881,24 @@ const Preview = () => {
                     await new Promise((resolve) => {
                       delayRender = setTimeout(() => {
                         resolve();
-                      }, state.dataMessages[i]?.message_content[0].delay.content * 1000);
+                      }, state.messagesList[i]?.message_content[0].delay.content * 1000);
                     });
                   })
                   .then(() => {
                     renderMessage.pop();
                     renderMessage.push({});
                     renderMessage[indexMessage].disabled = false;
-                    state.renderMessageArr[indexMessage].disabled = false;
+                    state.renderMessagesList[indexMessage].disabled = false;
                     dispatch({
                       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                       payload: {
-                        indexMessageRender: i,
-                        renderMessageArr: [...renderMessage],
+                        currentMsgIndex: i,
+                        renderMessagesList: [...renderMessage],
                       }
                     });
                   })
                   .then(() => {
-                    if (state.dataMessages.length - 1 === i && state.urlThanksPage) {
+                    if (state.messagesList.length - 1 === i && state.urlThanksPage) {
                       let aTag = document.createElement("a");
                       aTag.href = state.urlThanksPage;
                       aTag.target = "_blank";
@@ -3135,9 +2912,9 @@ const Preview = () => {
                 await new Promise((resolve) => {
                   return (delayRender = setTimeout(() => {
                     resolve();
-                  }, state.dataMessages[i]?.message_content[0]?.delay?.content * 1000));
+                  }, state.messagesList[i]?.message_content[0]?.delay?.content * 1000));
                 }).then(() => {
-                  if (state.dataMessages.length - 1 === i && state.urlThanksPage) {
+                  if (state.messagesList.length - 1 === i && state.urlThanksPage) {
                     let aTag = document.createElement("a");
                     aTag.href = state.urlThanksPage;
                     aTag.target = "_blank";
@@ -3148,13 +2925,13 @@ const Preview = () => {
                   }
                 });
               }
-            } else if (state.dataMessages[i]?.message_content[0]?.type === "email") {
+            } else if (state.messagesList[i]?.message_content[0]?.type === "email") {
               let emailId =
-                state.dataMessages[i]?.message_content[0][
-                  state.dataMessages[i]?.message_content[0].type
+                state.messagesList[i]?.message_content[0][
+                  state.messagesList[i]?.message_content[0].type
                 ].contentId;
               let variablesData = {};
-              state.dataVariables.forEach((item) => {
+              state.variablesList.forEach((item) => {
                 variablesData[item.variable_name] = item.default_value;
               });
 
@@ -3166,7 +2943,7 @@ const Preview = () => {
                 variables: variablesData,
               };
               renderMessage[indexMessage].disabled = false;
-              state.renderMessageArr[indexMessage].disabled = false;
+              state.renderMessagesList[indexMessage].disabled = false;
               renderMessage.push({});
 
               api
@@ -3182,48 +2959,48 @@ const Preview = () => {
               dispatch({
                 type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                 payload: {
-                  indexMessageRender: i,
-                  renderMessageArr: [...renderMessage],
+                  currentMsgIndex: i,
+                  renderMessagesList: [...renderMessage],
                 }
               });
-            } else if (state.dataMessages[i]?.message_content[0]?.type === "variable_set") {
+            } else if (state.messagesList[i]?.message_content[0]?.type === "variable_set") {
               if (state.variables.length !== 0) {
-                newState.variables = updateVariableValues(state.variables, state.dataMessages, i);
+                newState.variables = updateVariableValues(state.variables, state.messagesList, i);
               }
               renderMessage.push({});
               index = i;
               dispatch({
                 type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                 payload: {
-                  indexMessageRender: i,
-                  renderMessageArr: [...renderMessage],
+                  currentMsgIndex: i,
+                  renderMessagesList: [...renderMessage],
                   ...newState,
                 }
               });
-            } else if (state.dataMessages[i]?.message_content[0]?.type === "clear_variable") {
+            } else if (state.messagesList[i]?.message_content[0]?.type === "clear_variable") {
               if (state.variables.length !== 0) {
-                newState.variables = updateVariableValues(state.variables, state.dataMessages, i, "clear_variable");
+                newState.variables = updateVariableValues(state.variables, state.messagesList, i, "clear_variable");
               }
               renderMessage[indexMessage].disabled = false;
-              state.renderMessageArr[indexMessage].disabled = false;
+              state.renderMessagesList[indexMessage].disabled = false;
               renderMessage.push({});
               index = i;
               dispatch({
                 type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                 payload: {
-                  indexMessageRender: i,
-                  renderMessageArr: [...renderMessage],
+                  currentMsgIndex: i,
+                  renderMessagesList: [...renderMessage],
                   ...newState,
                 }
               });
-            } else if (state.dataMessages[i]?.message_content[0]?.type === "pause") {
+            } else if (state.messagesList[i]?.message_content[0]?.type === "pause") {
               renderMessage.push({});
               index = i;
               dispatch({
                 type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                 payload: {
-                  indexMessageRender: i,
-                  renderMessageArr: [...renderMessage],
+                  currentMsgIndex: i,
+                  renderMessagesList: [...renderMessage],
                 }
               });
               break;
@@ -3231,11 +3008,11 @@ const Preview = () => {
               await new Promise((resolve) => {
                 return (delayRender = setTimeout(() => {
                   if (
-                    state.dataMessages[i].message_content[0].type === "text_input" &&
-                    state.dataMessages[i].message_content[0].text_input.content
+                    state.messagesList[i].message_content[0].type === "text_input" &&
+                    state.messagesList[i].message_content[0].text_input.content
                   ) {
-                    state.dataMessages[i].message_content[0].text_input.content =
-                      state.dataMessages[
+                    state.messagesList[i].message_content[0].text_input.content =
+                      state.messagesList[
                         i
                       ].message_content[0].text_input.content.replaceAll(
                         SCAN_REGEX,
@@ -3254,18 +3031,18 @@ const Preview = () => {
                         }
                       );
                   }
-                  resolve({ ...state.dataMessages[i] });
+                  resolve({ ...state.messagesList[i] });
                 }, 1000));
               })
                 .then((data) => {
                   renderMessage[indexMessage].disabled = false;
-                  state.renderMessageArr[indexMessage].disabled = false;
+                  state.renderMessagesList[indexMessage].disabled = false;
                   renderMessage.push(data);
                   dispatch({
                     type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                     payload: {
-                      indexMessageRender: i,
-                      renderMessageArr: [...renderMessage],
+                      currentMsgIndex: i,
+                      renderMessagesList: [...renderMessage],
                     }
                   });
                   if (isPauseScroll === false) {
@@ -3279,7 +3056,7 @@ const Preview = () => {
                   }
                 })
                 .then(() => {
-                  if (state.dataMessages[i].message_content[0]?.text_input?.save_input_content === "create_order") {
+                  if (state.messagesList[i].message_content[0]?.text_input?.save_input_content === "create_order") {
                     data_submit = {
                       scenario_id: state.scenarioId,
                       user_id: state.uuid,
@@ -3299,7 +3076,7 @@ const Preview = () => {
                       });
 
                   }
-                  if (state.dataMessages.length - 1 === i) {
+                  if (state.messagesList.length - 1 === i) {
                     data_submit = {
                       scenario_id: state.scenarioId,
                       user_id: state.uuid,
@@ -3338,29 +3115,29 @@ const Preview = () => {
               index = i;
             }
           } else if (
-            state.dataMessages[i].belong_to === "user" &&
-            state.dataMessages[i].message_content.length > 0
+            state.messagesList[i].belong_to === "user" &&
+            state.messagesList[i].message_content.length > 0
           ) {
             await new Promise((resolve) => {
               return (delayRender = setTimeout(() => {
                 for (
                   let j = 0;
-                  j < state.dataMessages[i].message_content.length;
+                  j < state.messagesList[i].message_content.length;
                   j++
                 ) {
-                  if (state.dataMessages[i].message_content[j].type === "capture") {
+                  if (state.messagesList[i].message_content[j].type === "capture") {
                     api
                       .get(
-                        `https://svg-captcha-nodejs.vercel.app/captcha?size=${state.dataMessages[i].message_content[j][
-                          state.dataMessages[i].message_content[j].type
+                        `https://svg-captcha-nodejs.vercel.app/captcha?size=${state.messagesList[i].message_content[j][
+                          state.messagesList[i].message_content[j].type
                         ].length
-                        }${state.dataMessages[i].message_content[j][
-                          state.dataMessages[i].message_content[j].type
+                        }${state.messagesList[i].message_content[j][
+                          state.messagesList[i].message_content[j].type
                         ].colour
                           ? "&color=true"
                           : ""
-                        }&charPreset=${state.dataMessages[i].message_content[j][
-                          state.dataMessages[i].message_content[j].type
+                        }&charPreset=${state.messagesList[i].message_content[j][
+                          state.messagesList[i].message_content[j].type
                         ].type
                         }`
                       )
@@ -3380,10 +3157,10 @@ const Preview = () => {
                           tokenExpired();
                         }
                       });
-                  } else if (state.dataMessages[i].message_content[j].type === "label" &&
-                    state.dataMessages[i].message_content[j].label.lbl_content) {
-                    state.dataMessages[i].message_content[j].label.lbl_content =
-                      state.dataMessages[
+                  } else if (state.messagesList[i].message_content[j].type === "label" &&
+                    state.messagesList[i].message_content[j].label.lbl_content) {
+                    state.messagesList[i].message_content[j].label.lbl_content =
+                      state.messagesList[
                         i
                       ].message_content[j].label.lbl_content.replaceAll(
                         SCAN_REGEX,
@@ -3403,7 +3180,7 @@ const Preview = () => {
                       );
                   }
                 }
-                resolve({ ...state.dataMessages[i] });
+                resolve({ ...state.messagesList[i] });
               }, 1000));
             }).then((data) => {
 
@@ -3414,8 +3191,8 @@ const Preview = () => {
               }
               try {
                 renderMessage[indexMessage].disabled = false;
-                state.renderMessageArr[indexMessage].disabled = false;
-                const isIdExist = state.renderMessageArr.some((message) => message.id === data.id);
+                state.renderMessagesList[indexMessage].disabled = false;
+                const isIdExist = state.renderMessagesList.some((message) => message.id === data.id);
 
                 if (isIdExist) {
                   return;
@@ -3423,7 +3200,7 @@ const Preview = () => {
                 renderMessage.push(data);
                 dispatch({
                   type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
-                    indexMessageRender: i, renderMessageArr: [...renderMessage]
+                    currentMsgIndex: i, renderMessagesList: [...renderMessage]
                   }
                 });
                 if (isPauseScroll === false) {
@@ -3437,42 +3214,42 @@ const Preview = () => {
           }
         }
       }
-      // setIndexMessageRender(index);
-      // setRenderMessageArr([
+      // setcurrentMsgIndex(index);
+      // setrenderMessagesList([
       //   ...renderMessage
       // ]);
     } else {
       // handle check message_content for user
       //if message_content.length !== 0 => show message
       if (
-        state.dataMessages[state.indexMessageRender + 1].message_content.length > 0 &&
-        state.dataMessages[state.indexMessageRender + 1].hidden !== true
+        state.messagesList[state.currentMsgIndex + 1].message_content.length > 0 &&
+        state.messagesList[state.currentMsgIndex + 1].hidden !== true
       ) {
         await new Promise((resolve) => {
           return (delayRender = setTimeout(() => {
             for (
               let j = 0;
-              j < state.dataMessages[state.indexMessageRender + 1].message_content.length;
+              j < state.messagesList[state.currentMsgIndex + 1].message_content.length;
               j++
             ) {
               if (
-                state.dataMessages[state.indexMessageRender + 1].message_content[j].type ===
+                state.messagesList[state.currentMsgIndex + 1].message_content[j].type ===
                 "capture"
               ) {
                 api
                   .get(
-                    `https://svg-captcha-nodejs.vercel.app/captcha?size=${state.dataMessages[state.indexMessageRender + 1].message_content[j][
-                      state.dataMessages[state.indexMessageRender + 1].message_content[j]
+                    `https://svg-captcha-nodejs.vercel.app/captcha?size=${state.messagesList[state.currentMsgIndex + 1].message_content[j][
+                      state.messagesList[state.currentMsgIndex + 1].message_content[j]
                         .type
                     ].length
-                    }${state.dataMessages[state.indexMessageRender + 1].message_content[j][
-                      state.dataMessages[state.indexMessageRender + 1].message_content[j]
+                    }${state.messagesList[state.currentMsgIndex + 1].message_content[j][
+                      state.messagesList[state.currentMsgIndex + 1].message_content[j]
                         .type
                     ].colour
                       ? "&color=true"
                       : ""
-                    }&charPreset=${state.dataMessages[state.indexMessageRender + 1].message_content[j][
-                      state.dataMessages[state.indexMessageRender + 1].message_content[j]
+                    }&charPreset=${state.messagesList[state.currentMsgIndex + 1].message_content[j][
+                      state.messagesList[state.currentMsgIndex + 1].message_content[j]
                         .type
                     ].type
                     }`
@@ -3480,7 +3257,7 @@ const Preview = () => {
                   .then((res) => {
                     let newCaptcha = [...state.captcha];
                     newCaptcha.push({
-                      index: state.indexMessageRender + 1,
+                      index: state.currentMsgIndex + 1,
                       indexContent: j,
                       ...res.data,
                     });
@@ -3515,7 +3292,7 @@ const Preview = () => {
               })
               return content;
             }
-            state.dataMessages[state.indexMessageRender + 1].message_content.forEach((item, index) => {
+            state.messagesList[state.currentMsgIndex + 1].message_content.forEach((item, index) => {
               const dataMessageType = item.type;
               if (dataMessageType == 'label' && item.label && item.label.lbl_content) {
                 item.label.lbl_content = replaceVariable(item.label.lbl_content);
@@ -3562,55 +3339,55 @@ const Preview = () => {
               if (dataMessageType == 'text_input' && item.text_input && item.text_input.password_confirmation && item.text_input.password_confirmation.confirm_password) {
                 item.text_input.password_confirmation.confirm_password = replaceVariable(item.text_input.password_confirmation.confirm_password);
               }
-              state.dataMessages[state.indexMessageRender + 1].message_content[index] = item;
+              state.messagesList[state.currentMsgIndex + 1].message_content[index] = item;
             })
-            resolve({ ...state.dataMessages[state.indexMessageRender + 1] });
+            resolve({ ...state.messagesList[state.currentMsgIndex + 1] });
           }, 1000));
         }).then((data) => {
           renderMessage[indexMessage].disabled = false;
-          state.renderMessageArr[indexMessage].disabled = false;
+          state.renderMessagesList[indexMessage].disabled = false;
           renderMessage.push(data);
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
-              indexMessageRender: state.indexMessageRender + 1,
-              renderMessageArr: [...renderMessage],
+              currentMsgIndex: state.currentMsgIndex + 1,
+              renderMessagesList: [...renderMessage],
             }
           });
           if (isPauseScroll === false) {
             scrollToBottom();
           }
         });
-        // index = indexMessageRender + 1;
+        // index = currentMsgIndex + 1;
       }
       //if message_content.length === 0 => loop until meet message have message_content.length !== 0 => show message
       else {
-        for (let i = state.indexMessageRender + 1; i < state.dataMessages.length; i++) {
+        for (let i = state.currentMsgIndex + 1; i < state.messagesList.length; i++) {
           if (
-            state.dataMessages[i].message_content.length > 0 &&
-            state.dataMessages[i].hidden !== true
+            state.messagesList[i].message_content.length > 0 &&
+            state.messagesList[i].hidden !== true
           ) {
-            if (state.dataMessages[i].belong_to === "user") {
+            if (state.messagesList[i].belong_to === "user") {
               await new Promise((resolve) => {
                 return (delayRender = setTimeout(() => {
                   for (
                     let j = 0;
-                    j < state.dataMessages[i].message_content.length;
+                    j < state.messagesList[i].message_content.length;
                     j++
                   ) {
-                    if (state.dataMessages[i].message_content[j].type === "capture") {
+                    if (state.messagesList[i].message_content[j].type === "capture") {
                       api
                         .get(
-                          `https://svg-captcha-nodejs.vercel.app/captcha?size=${state.dataMessages[i].message_content[j][
-                            state.dataMessages[i].message_content[j].type
+                          `https://svg-captcha-nodejs.vercel.app/captcha?size=${state.messagesList[i].message_content[j][
+                            state.messagesList[i].message_content[j].type
                           ].length
-                          }${state.dataMessages[i].message_content[j][
-                            state.dataMessages[i].message_content[j].type
+                          }${state.messagesList[i].message_content[j][
+                            state.messagesList[i].message_content[j].type
                           ].colour
                             ? "&color=true"
                             : ""
-                          }&charPreset=${state.dataMessages[i].message_content[j][
-                            state.dataMessages[i].message_content[j].type
+                          }&charPreset=${state.messagesList[i].message_content[j][
+                            state.messagesList[i].message_content[j].type
                           ].type
                           }`
                         )
@@ -3632,17 +3409,17 @@ const Preview = () => {
                         });
                     }
                   }
-                  resolve({ ...state.dataMessages[i] });
+                  resolve({ ...state.messagesList[i] });
                 }, 1000));
               }).then((data) => {
                 renderMessage[indexMessage].disabled = false;
-                state.renderMessageArr[indexMessage].disabled = false;
+                state.renderMessagesList[indexMessage].disabled = false;
                 renderMessage.push(data);
                 dispatch({
                   type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                   payload: {
-                    indexMessageRender: i,
-                    renderMessageArr: [...renderMessage],
+                    currentMsgIndex: i,
+                    renderMessagesList: [...renderMessage],
                   }
                 });
                 if (isPauseScroll === false) {
@@ -3652,16 +3429,16 @@ const Preview = () => {
               index = i;
               break;
             } else {
-              if (state.dataMessages[i]?.message_content[0].type === "delay") {
-                if (state.dataMessages[i]?.message_content[0]?.delay.typing_on) {
+              if (state.messagesList[i]?.message_content[0].type === "delay") {
+                if (state.messagesList[i]?.message_content[0]?.delay.typing_on) {
                   await new Promise((resolve) => {
                     renderMessage[indexMessage].disabled = false;
-                    state.renderMessageArr[indexMessage].disabled = false;
-                    renderMessage.push({ ...state.dataMessages[i] });
+                    state.renderMessagesList[indexMessage].disabled = false;
+                    renderMessage.push({ ...state.messagesList[i] });
                     dispatch({
                       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                       payload: {
-                        renderMessageArr: [...renderMessage]
+                        renderMessagesList: [...renderMessage]
                       }
                     });
                     resolve();
@@ -3670,7 +3447,7 @@ const Preview = () => {
                       await new Promise((resolve) => {
                         delayRender = setTimeout(() => {
                           resolve();
-                        }, state.dataMessages[i]?.message_content[0].delay.content * 1000);
+                        }, state.messagesList[i]?.message_content[0].delay.content * 1000);
                       });
                     })
                     .then(() => {
@@ -3679,8 +3456,8 @@ const Preview = () => {
                       dispatch({
                         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                         payload: {
-                          indexMessageRender: i,
-                          renderMessageArr: [...renderMessage],
+                          currentMsgIndex: i,
+                          renderMessagesList: [...renderMessage],
                         }
                       });
                     });
@@ -3688,19 +3465,19 @@ const Preview = () => {
                   await new Promise((resolve) => {
                     return (delayRender = setTimeout(() => {
                       resolve();
-                    }, state.dataMessages[i]?.message_content[0]?.delay?.content * 1000));
+                    }, state.messagesList[i]?.message_content[0]?.delay?.content * 1000));
                   });
                 }
                 index = i;
               } else if (
-                state.dataMessages[i]?.message_content[0]?.type === "email"
+                state.messagesList[i]?.message_content[0]?.type === "email"
               ) {
                 let emailId =
-                  state.dataMessages[i]?.message_content[0][
-                    state.dataMessages[i]?.message_content[0].type
+                  state.messagesList[i]?.message_content[0][
+                    state.messagesList[i]?.message_content[0].type
                   ].contentId;
                 let variablesData = {};
-                state.dataVariables.forEach((item) => {
+                state.variablesList.forEach((item) => {
                   variablesData[item.variable_name] = item.default_value;
                 });
 
@@ -3729,14 +3506,14 @@ const Preview = () => {
                 dispatch({
                   type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                   payload: {
-                    indexMessageRender: i,
-                    renderMessageArr: [...renderMessage],
+                    currentMsgIndex: i,
+                    renderMessagesList: [...renderMessage],
                   }
                 });
               } else if (
-                state.dataMessages[i]?.message_content[0]?.type === "variable_set"
+                state.messagesList[i]?.message_content[0]?.type === "variable_set"
               ) {
-                newState.variables = updateVariableValues(state.variables, state.dataMessages, i);
+                newState.variables = updateVariableValues(state.variables, state.messagesList, i);
                 renderMessage[indexMessage].disabled = false;
                 renderMessage.push({});
                 index = i;
@@ -3744,28 +3521,28 @@ const Preview = () => {
                   type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                   payload: {
                     ...newState,
-                    indexMessageRender: i,
-                    renderMessageArr: [...renderMessage],
+                    currentMsgIndex: i,
+                    renderMessagesList: [...renderMessage],
                   }
                 });
               } else if (
-                state.dataMessages[i]?.message_content[0]?.type === "clear_variable"
+                state.messagesList[i]?.message_content[0]?.type === "clear_variable"
               ) {
-                newState.variables = updateVariableValues(state.variables, state.dataMessages, i, "clear_variable");
+                newState.variables = updateVariableValues(state.variables, state.messagesList, i, "clear_variable");
                 renderMessage[indexMessage].disabled = false;
-                state.renderMessageArr[indexMessage].disabled = false;
+                state.renderMessagesList[indexMessage].disabled = false;
                 renderMessage.push({});
                 index = i;
                 dispatch({
                   type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                   payload: {
                     ...newState,
-                    indexMessageRender: i,
-                    renderMessageArr: [...renderMessage],
+                    currentMsgIndex: i,
+                    renderMessagesList: [...renderMessage],
                   }
                 });
               } else if (
-                state.dataMessages[i]?.message_content[0]?.type === "pause"
+                state.messagesList[i]?.message_content[0]?.type === "pause"
               ) {
                 renderMessage[indexMessage].disabled = false;
                 renderMessage.push({});
@@ -3773,8 +3550,8 @@ const Preview = () => {
                 dispatch({
                   type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                   payload: {
-                    indexMessageRender: i,
-                    renderMessageArr: [...renderMessage],
+                    currentMsgIndex: i,
+                    renderMessagesList: [...renderMessage],
                   }
                 });
                 break;
@@ -3782,12 +3559,12 @@ const Preview = () => {
                 await new Promise((resolve) => {
                   return (delayRender = setTimeout(() => {
                     if (
-                      state.dataMessages[i].message_content[0].type ===
+                      state.messagesList[i].message_content[0].type ===
                       "text_input" &&
-                      state.dataMessages[i].message_content[0].text_input.content
+                      state.messagesList[i].message_content[0].text_input.content
                     ) {
-                      state.dataMessages[i].message_content[0].text_input.content =
-                        state.dataMessages[
+                      state.messagesList[i].message_content[0].text_input.content =
+                        state.messagesList[
                           i
                         ].message_content[0].text_input.content.replaceAll(
                           SCAN_REGEX,
@@ -3806,7 +3583,7 @@ const Preview = () => {
                           }
                         );
                     }
-                    resolve({ ...state.dataMessages[i] });
+                    resolve({ ...state.messagesList[i] });
                   }, 1000));
                 }).then((data) => {
                   renderMessage[indexMessage].disabled = false;
@@ -3814,8 +3591,8 @@ const Preview = () => {
                   dispatch({
                     type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                     payload: {
-                      indexMessageRender: i,
-                      renderMessageArr: [...renderMessage],
+                      currentMsgIndex: i,
+                      renderMessagesList: [...renderMessage],
                     }
                   });
                   if (isPauseScroll === false) {
@@ -3826,12 +3603,12 @@ const Preview = () => {
             }
           } else {
             renderMessage[indexMessage].disabled = false;
-            state.renderMessageArr[indexMessage].disabled = false;
+            state.renderMessagesList[indexMessage].disabled = false;
             renderMessage.push({});
             dispatch({
               type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
               payload: {
-                renderMessageArr: [...renderMessage]
+                renderMessagesList: [...renderMessage]
               }
             });
           }
@@ -3850,13 +3627,13 @@ const Preview = () => {
     message
   ) => {
     let newState = { ...state };
-    let messageContentTypeData = newState.dataMessages[index].message_content[indexContent][contentType];
-    let index = state.indexMessageRender
+    let messageContentTypeData = newState.messagesList[index].message_content[indexContent][contentType];
+    let index = state.currentMsgIndex
 
     if (message) {
-      const foundMessage = state.dataMessages.find((msg) => msg?.id === message?.id);
+      const foundMessage = state.messagesList.find((msg) => msg?.id === message?.id);
       if (foundMessage) {
-        index = state.dataMessages.indexOf(foundMessage);
+        index = state.messagesList.indexOf(foundMessage);
       }
     }
 
@@ -3877,7 +3654,7 @@ const Preview = () => {
       value.length > 0
     ) {
       let dataContentType = {
-        ...state.dataMessages[index].message_content[indexContent][contentType],
+        ...state.messagesList[index].message_content[indexContent][contentType],
       };
       
       const { arrayCode, arrayName, arrayPrice, arrayOrderQuantity } = getProductDetailsForProductPurchase(dataContentType, value);
@@ -3912,7 +3689,7 @@ const Preview = () => {
       field === "initial_selection"
     ) {
       let dataContentType = {
-        ...state.dataMessages[index].message_content[indexContent][
+        ...state.messagesList[index].message_content[indexContent][
         contentType
         ],
       };
@@ -3942,15 +3719,15 @@ const Preview = () => {
     }
 
     if (
-      state.dataMessages[index].message_content[indexContent][contentType].is_save_input_content
+      state.messagesList[index].message_content[indexContent][contentType].is_save_input_content
     ) {
       let isSaveParam = false;
       newState.variables = state.variables.map((item) => {
         let dataContentType = {
-          ...state.dataMessages[index].message_content[indexContent][contentType],
+          ...state.messagesList[index].message_content[indexContent][contentType],
         };
       
-        if (state.dataMessages[index].message_content[indexContent][contentType].save_input_content === item.variable_name) {
+        if (state.messagesList[index].message_content[indexContent][contentType].save_input_content === item.variable_name) {
           setDefaultValue(item, dataContentType, contentType, value, field);
           isSaveParam = true;
         }
@@ -3959,19 +3736,19 @@ const Preview = () => {
       });
       
       if (isSaveParam) {
-        newState.objParam[state.dataMessages[index].message_content[indexContent][contentType].save_input_content] = value;
+        newState.objParam[state.messagesList[index].message_content[indexContent][contentType].save_input_content] = value;
       }
     }
 
-    setMessagesSessionStorage(state.dataMessages[index])
+    setMessagesSessionStorage(state.messagesList[index])
 
     dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
       payload: {
         ...newState,
-        dataMessages: [...state.dataMessages],
-        renderMessageArr: state.renderMessageArr.map(x => {
-          if (x?.id === state.dataMessages[index]?.id) return { ...state.dataMessages[index] }
+        messagesList: [...state.messagesList],
+        renderMessagesList: state.renderMessagesList.map(x => {
+          if (x?.id === state.messagesList[index]?.id) return { ...state.messagesList[index] }
           return { ...x }
         })
       }
@@ -3988,26 +3765,26 @@ const Preview = () => {
       setScenarioUserResponses([])
       dispatch({
         type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-        payload: { indexUser: 0 }
+        payload: { currentUserMsgIndex: 0 }
       });
       let indexTiming = 0;
       let i;
-      for (i = state.indexMessageRender; i < state.dataMessages.length; i++) {
+      for (i = state.currentMsgIndex; i < state.messagesList.length; i++) {
         if (
-          state.dataMessages[i].belong_to === "user" ||
-          i === state.dataMessages.length - 1
+          state.messagesList[i].belong_to === "user" ||
+          i === state.messagesList.length - 1
         )
           break;
         if (
-          state.dataMessages[i].belong_to === "bot" &&
-          state.dataMessages[i].message_content[0].type === "delay"
+          state.messagesList[i].belong_to === "bot" &&
+          state.messagesList[i].message_content[0].type === "delay"
         ) {
-          indexTiming += state.dataMessages[i].message_content[0].delay.content;
+          indexTiming += state.messagesList[i].message_content[0].delay.content;
         }
       }
       if (!isFromScenario) dispatch({ type: PREVIEW_ACTIONS.SET_IS_OPEN, payload: { scenarioId: null } });
       setTimeout(() => {
-        dispatch({ type: PREVIEW_ACTIONS.SET_IS_OPEN, payload: { renderMessageArr: [] } });
+        dispatch({ type: PREVIEW_ACTIONS.SET_IS_OPEN, payload: { renderMessagesList: [] } });
         if (!isFromScenario)
           dispatch({ type: PREVIEW_ACTIONS.SET_IS_OPEN, payload: { scenarioId: params.get("scenario_id") } });
         if (document.getElementById("action-bd")) {
@@ -4022,7 +3799,7 @@ const Preview = () => {
         }).catch(err => {
           console.log(err)
         })
-      }, (indexTiming + i - state.indexMessageRender - 1) * 1000);
+      }, (indexTiming + i - state.currentMsgIndex - 1) * 1000);
     } else if (
       state.botInfor?.withdrawal_prevention_status === "standard_exit_popup" ||
       state.botInfor?.withdrawal_prevention_status === "image_popup"
@@ -4117,7 +3894,7 @@ const Preview = () => {
     if (state.submitErrorMessage.length > 0) {
       btnText = "更新";
     } else {
-      btnText = userIndexMessage >= userMessageArray.length ? "次へ" : "更新";
+      btnText = state.currentUserMsgIndex >= state.userMessagesList.length ? "次へ" : "更新";
     }
 
     return (
@@ -4168,18 +3945,18 @@ const Preview = () => {
                 message
               )
             }
-            indexMessageRender={state.indexMessageRender}
+            currentMsgIndex={state.currentMsgIndex}
             onClickNext={() => onClickNext(indexMessage, message)}
             indexMessage={indexMessage}
             errorsProps={state.errors}
             displayButtonNext={(value) => {
-              if (!state.dataMessages[state.indexMessageRender]) return;
-              let newDataMessages = [...state.dataMessages];
-              newDataMessages[state.indexMessageRender].is_display_button_next = value;
+              if (!state.messagesList[state.currentMsgIndex]) return;
+              let newMessagesList = [...state.messagesList];
+              newMessagesList[state.currentMsgIndex].is_display_button_next = value;
               dispatch({
                 type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
                 payload: {
-                  dataMessages: [...newDataMessages],
+                  messagesList: [...newMessagesList],
                 }
               });
             }}
@@ -4204,7 +3981,7 @@ const Preview = () => {
   };
   
   const renderMessages = () => {
-    return state.renderMessageArr.map((message, indexMessage) => {
+    return state.renderMessagesList.map((message, indexMessage) => {
       return (
         <React.Fragment key={indexMessage}>
           {renderBotMessageContent(message, indexMessage)}
@@ -4257,9 +4034,6 @@ const Preview = () => {
     };
   };
 
-  const userMessageArray = state.renderMessageArr.filter(x => x.belong_to === 'user');
-  let userIndexMessage = 0;
-
   ///body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
@@ -4271,7 +4045,7 @@ const Preview = () => {
         style={containerStyle}
       >
         <Withdrawal botInfor={state.botInfor}
-          delayTimeInSecond={i - state.indexMessageRender}
+          delayTimeInSecond={i - state.currentMsgIndex}
           deviceReceive={state.deviceReceive}
           scenarioId={state.scenarioId}
           onOpenPreview={onOpenPreview}
@@ -4279,8 +4053,8 @@ const Preview = () => {
         <ZipCodePopUp
           isPopUpZipCode={isPopUpZipCode}
           prefecturesList={state.dataPrefectures}
-          message={state.dataMessages[state.indexMessageRender]}
-          messageIndex={state.indexMessageRender}
+          message={state.messagesList[state.currentMsgIndex]}
+          messageIndex={state.currentMsgIndex}
           indexContentZipcode={state.indexContentZipcode}
           onChangeValue={onChangeValue}
           onChangeErrors={onChangeErrors}
@@ -4352,8 +4126,8 @@ const Preview = () => {
           </ModalPreviewBot>
           : ""}
         <ProcessBar botInfor={state.botInfor}
-          currentIndex={state.indexUser}
-          maxIndex={state.messageUser.length}
+          currentIndex={state.currentUserMsgIndex}
+          maxIndex={state.userMessagesList.length}
         />
         <div id="sp-body" className="sp-body" style={bodyStyle}
         >
@@ -4361,7 +4135,7 @@ const Preview = () => {
         </div>
       </div>
     )
-  } else if (state.isOpen === false && mobileCheck() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
+  } else if (!state.isOpen && mobileCheck() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4386,7 +4160,7 @@ const Preview = () => {
         />
       </div>
     )
-  } else if (state.isOpen === false && mobileCheck() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
+  } else if (!state.isOpen && mobileCheck() === false && Number(state.positionPc) === 1 && Number(state.buttonTypePc) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4426,7 +4200,7 @@ const Preview = () => {
         </div>
       </div>
     )
-  } else if (state.isOpen === false && mobileCheck() === false && Number(state.positionPc) === 2) {
+  } else if (!state.isOpen && mobileCheck() === false && Number(state.positionPc) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4456,7 +4230,7 @@ const Preview = () => {
           </div>
         </div>
       </div>)
-  } else if (state.isOpen === false && mobileCheck() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 2) {
+  } else if (!state.isOpen && mobileCheck() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4481,7 +4255,7 @@ const Preview = () => {
         />
       </div>
     )
-  } else if (state.isOpen === false && mobileCheck() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
+  } else if (!state.isOpen && mobileCheck() === true && Number(state.positionSp) === 1 && Number(state.buttonTypeSp) === 1) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
@@ -4517,7 +4291,7 @@ const Preview = () => {
         </div>
       </div>
     )
-  } else if (state.isOpen === false && mobileCheck() === true && Number(state.positionSp) === 2) {
+  } else if (!state.isOpen && mobileCheck() === true && Number(state.positionSp) === 2) {
     return (
       <div
         onClick={() => onOpenPreview(!state.isOpen)}
