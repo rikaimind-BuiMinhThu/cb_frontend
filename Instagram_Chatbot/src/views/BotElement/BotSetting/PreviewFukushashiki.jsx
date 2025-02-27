@@ -775,18 +775,22 @@ const PreviewFukushashiki = () => {
     return newState;
   }
 
-  const processForBotDefaultMessage = async (messagesList, i, newState) => {
+  const processForBotDefaultMessage = async (messagesList, i, newState, isUpdateSourceContent) => {
     const msgContent = messagesList[i]?.message_content?.[0];
     if (!msgContent) return newState;
 
-    await sleep(1000);
+    // await sleep(1000);
     if (msgContent.type === "text_input" && msgContent.text_input.content) {
+      if (isUpdateSourceContent) {
+        msgContent.text_input.sourceContent = msgContent.text_input.content;
+      }
       if (newState.variables.length === 0) return;
-
+      let newContent = msgContent.text_input.sourceContent;
       newState.variables.forEach((variable) => {
-        msgContent.text_input.content = msgContent.text_input.content
-          .replaceAll(variable.key, variable.value);
+        newContent = newContent.replaceAll(`{{${variable.variable_name}}}`, variable.default_value);
       });
+      msgContent.text_input.content = newContent;
+      messagesList[i].message_content[0] = msgContent;
     }
 
     newState.renderMessagesList.push(messagesList[i]);
@@ -799,7 +803,7 @@ const PreviewFukushashiki = () => {
     return newState;
   }
 
-  const processForBotMessage = async (messagesList, i, newState) => {
+  const processForBotMessage = async (messagesList, i, newState, isUpdateSourceContent =+ false) => {
     const firstMsgType = messagesList[i]?.message_content[0]?.type;
 
     switch (firstMsgType) {
@@ -814,7 +818,7 @@ const PreviewFukushashiki = () => {
       case "pause":
         return processBotPauseMessage(messagesList, i, newState);
       default:
-        return processForBotDefaultMessage(messagesList, i, newState);
+        return processForBotDefaultMessage(messagesList, i, newState, isUpdateSourceContent);
     }
   }
 
@@ -932,7 +936,7 @@ const PreviewFukushashiki = () => {
       if (isBotMessage(messagesList[i])) {
         newState = {
           ...newState,
-          ...processForBotMessage(messagesList, i, newState)
+          ...processForBotMessage(messagesList, i, newState, true)
         };
       } else if (isUserMessage(messagesList[i])) {
         newState = {
