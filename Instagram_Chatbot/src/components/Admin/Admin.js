@@ -11,6 +11,7 @@ import Company from 'views/Public/Company';
 import Contact from 'views/Public/Contact';
 import ShortUrl from 'views/Public/ShortUrl';
 import PreviewClone from 'views/BotElement/BotSetting/PreviewClone';
+import PreviewFukushashiki from 'views/BotElement/BotSetting/PreviewFukushashiki';
 import News from 'views/Public/News';
 import Instagram from 'views/Public/Instagram';
 
@@ -29,6 +30,7 @@ class App extends Component {
             <Route exact path="/company" component={Company} />
             <Route exact path="/contact" component={Contact} />
             <Route exact path="/preview-customer" component={PreviewClone} />
+            <Route exact path="/preview-customer-fukushashiki" component={PreviewFukushashiki} />
             <Route exact path="/news" component={News} />
             <Route exact path="/instagram" component={Instagram} />
             <Route exact path="/" component={Login} />

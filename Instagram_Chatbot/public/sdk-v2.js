@@ -151,7 +151,7 @@ const displayPopup = async () => {
   iframe.style.borderRadius = "0px";
   // iframe.style.display = "none";
   iframe.style.zIndex = "999999";
-  iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
+  iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
     }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
   currentIframe = iframe
   body.appendChild(iframe);
