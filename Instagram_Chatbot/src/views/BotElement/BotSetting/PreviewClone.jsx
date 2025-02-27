@@ -77,7 +77,7 @@ const previewInitialState = {
   cities: "",
   towns: "",
   zipcode: "",
-  indexContentZipcode: "",
+  zipcodeContentIndex: "",
   buttonTypePc: "1",
   positionPc: "1",
   widthPc: 450,
@@ -169,24 +169,25 @@ const Preview = () => {
 
   // get default obj params
   useEffect(() => {
-    if (!state.objParam?.ip) {
-      $.getJSON("https://api.ipregistry.co/?key=tryout", function (data) {
-        const defaultObjParam = {
-          user_ip_address: data.ip,
-          user_country: data.location.country.name,
-          user_city: data.location.city,
-          user_device: data.user_agent.device.type,
-          user_browser: data.user_agent.name,
-          user_agent: data.user_agent.header,
-          start_datetime: new Date(),
-        };
-        dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-          payload: { objParam: { ...state.objParam, ...defaultObjParam } }
-        });
+    if (!state.loadedStateFromSession) return;
+    if (!state.objParam?.ip) return;
+
+    $.getJSON("https://api.ipregistry.co/?key=tryout", (data) => {
+      const defaultObjParam = {
+        user_ip_address: data.ip,
+        user_country: data.location.country.name,
+        user_city: data.location.city,
+        user_device: data.user_agent.device.type,
+        user_browser: data.user_agent.name,
+        user_agent: data.user_agent.header,
+        start_datetime: new Date(),
+      };
+      dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: { objParam: { ...state.objParam, ...defaultObjParam } }
       });
-    }
-  }, [state.objParam.ip]);
+    });
+  }, [state.objParam.ip, state.loadedStateFromSession]);
 
   // Get chat bot setting
   useEffect(() => {
@@ -3032,7 +3033,7 @@ const Preview = () => {
     let newState = {};
 
     if (indexContent !== undefined) {
-      newState.indexContentZipcode = indexContent;
+      newState.zipcodeContentIndex = indexContent;
     }
 
     if (isOpen) {
@@ -3278,7 +3279,7 @@ const Preview = () => {
           prefecturesList={state.prefecturesList}
           message={state.messagesList[state.currentMsgIndex]}
           messageIndex={state.currentMsgIndex}
-          indexContentZipcode={state.indexContentZipcode}
+          zipcodeContentIndex={state.zipcodeContentIndex}
           onChangeValue={onChangeValue}
           onChangeErrors={onChangeErrors}
           errors={state.errors}

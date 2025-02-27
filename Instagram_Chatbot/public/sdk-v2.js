@@ -500,13 +500,13 @@ const fillDataWithId = (id, value) => {
 }
 
 const removeLeadingZero = (value) => {
-  let strValue = value.toString();
+  let strValue = value?.toString() || "";
   let result = strValue.replace(/^0+/, '');
   return typeof value === 'number' ? Number(result) : result;
 }
 
 const removeFirstTwoChars = (input) => {
-  const str = input.toString();
+  const str = input?.toString() || "";
   if (str.length > 2) {
     return str.slice(2);
   } else {

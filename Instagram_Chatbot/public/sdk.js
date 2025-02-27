@@ -180,6 +180,8 @@ const displayPopup = async () => {
           if (!button) throw new Error(`Button not found: id ${e.data.id_value}`);
           button.click();
           break;
+        case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
+          break;
       };
       
       if (e.data.isOpen && mobileCheck()) {
@@ -498,13 +500,13 @@ const fillDataWithId = (id, value) => {
 }
 
 const removeLeadingZero = (value) => {
-  let strValue = value.toString();
+  let strValue = value?.toString() || "";
   let result = strValue.replace(/^0+/, '');
   return typeof value === 'number' ? Number(result) : result;
 }
 
 const removeFirstTwoChars = (input) => {
-  const str = input.toString();
+  const str = input?.toString() || "";
   if (str.length > 2) {
     return str.slice(2);
   } else {
