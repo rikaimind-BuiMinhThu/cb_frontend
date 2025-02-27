@@ -2861,15 +2861,21 @@ const PreviewFukushashiki = () => {
     const msgIndex = state.messagesList.findIndex((msg) => msg.id === message.id);
     let messageContentTypeData = newState.messagesList[msgIndex].message_content[indexContent][contentType];
 
-    if (name) {
-      messageContentTypeData[field] = messageContentTypeData[field] || {};
-      messageContentTypeData[field][subFiled] = messageContentTypeData[field][subFiled] || {};
-      messageContentTypeData[field][subFiled][name] = value;
-    } else if (subFiled) {
-      messageContentTypeData[field] = messageContentTypeData[field] || {};
-      messageContentTypeData[field][subFiled] = value;
-    } else if (field) {
-      messageContentTypeData[field] = value;
+    if (contentType === "zip_code_address") {
+      Object.keys(value).forEach((key) => {
+        messageContentTypeData[key] = value[key];
+      });
+    } else {
+      if (name) {
+        messageContentTypeData[field] = messageContentTypeData[field] || {};
+        messageContentTypeData[field][subFiled] = messageContentTypeData[field][subFiled] || {};
+        messageContentTypeData[field][subFiled][name] = value;
+      } else if (subFiled) {
+        messageContentTypeData[field] = messageContentTypeData[field] || {};
+        messageContentTypeData[field][subFiled] = value;
+      } else if (field) {
+        messageContentTypeData[field] = value;
+      }
     }
 
     if (
