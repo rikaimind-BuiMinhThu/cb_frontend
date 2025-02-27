@@ -887,6 +887,8 @@ const PreviewFukushashiki = () => {
       newState.isDisplayErrorMessage = btnSubmitItemContent.button_submit.is_display_error_message;
     }
 
+    const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
+
     if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
       sessionStorage.setItem("prevOpenStatus", "1");
       const openChatbotCountApiParams = {
@@ -966,11 +968,13 @@ const PreviewFukushashiki = () => {
       const savedState = getStateFromSessionStorage();
 
       if (savedState) {
-        return fukushashikiSavedStateToLp(savedState).then(() => {
+        return fukushashikiSavedStateToLp(savedState).then(async () => {
+          await sleep(1000);
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
               ...savedState,
+              isOpen: true,
               loadedStateFromSession: true,
             }
           });
