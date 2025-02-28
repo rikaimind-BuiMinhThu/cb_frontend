@@ -397,18 +397,21 @@ const fillDataFromMessage = (obj) => {
       case "pull_down":
         {
           if (item.bindingMode !== undefined) {
+            let element = getElementByAddress(item.bindingMode, item.bindingAddress);
+            if (element) {
+              let hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
+              if (!hasOption)
+                item.bindingValue = '';
+            }
             if (item.bindingMode == 1) {
-              let element = document.getElementById(item.bindingAddress);
               fillDataWithId(item.bindingAddress, item.bindingValue)
               element.dispatchEvent(new Event('change', { bubbles: true }));
             }
             else if (item.bindingMode == 2) {
-              let element = document.querySelector(item.bindingAddress);
               fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
               element.dispatchEvent(new Event('change', { bubbles: true }));
             }
             else {
-              let element = document.evaluate(item.bindingAddress, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
               fillDataWithXPath(item.bindingAddress, item.bindingValue)
               element.dispatchEvent(new Event('change', { bubbles: true }));
             }
