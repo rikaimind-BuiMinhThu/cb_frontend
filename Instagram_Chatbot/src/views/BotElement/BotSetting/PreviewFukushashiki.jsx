@@ -872,26 +872,9 @@ const PreviewFukushashiki = () => {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
+      loadedStateFromSession: true,
     };
-
     let messagesList = res.data.data?.conversation?.messages || [];
-    const btnSubmitItem = messagesList.find(x => x.message_content.find(y => y.type == "button_submit"));
-
-    if (btnSubmitItem) {
-      const btnSubmitItemContent = btnSubmitItem.message_content[0];
-      const actionData = {
-        isDisplay: btnSubmitItemContent.button_submit.is_display_error_message,
-        seachMode: btnSubmitItemContent.error_message_display_element_search_type,
-        searchValue: btnSubmitItemContent.error_message_display_element_search_value,
-      };
-      postMessageToParent({
-        isOpen: true,
-        action: CHATBOT_ACTIONS.GET_ERROR_MESSAGE,
-        actionData: actionData
-      });
-      newState.isDisplayErrorMessage = btnSubmitItemContent.button_submit.is_display_error_message;
-    }
-
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
     if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
@@ -972,9 +955,27 @@ const PreviewFukushashiki = () => {
   // Get Preview Scenario Data
   useEffect(() => {
     if (!state.loadedStateFromSession) {
-      const savedState = getStateFromSessionStorage();
+      let savedState = getStateFromSessionStorage();
 
       if (savedState) {
+        const renderMessagesList = savedState.renderMessagesList;
+        const btnSubmitItem = renderMessagesList.find(x => x.message_content.find(y => y.type == "button_submit"));
+
+        if (btnSubmitItem) {
+          const btnSubmitItemContent = btnSubmitItem.message_content[0];
+          const actionData = {
+            isDisplay: btnSubmitItemContent.button_submit.is_display_error_message,
+            seachMode: btnSubmitItemContent.error_message_display_element_search_type,
+            searchValue: btnSubmitItemContent.error_message_display_element_search_value,
+          };
+          savedState.isDisplayErrorMessage = btnSubmitItemContent.button_submit.is_display_error_message;
+          postMessageToParent({
+            isOpen: true,
+            action: CHATBOT_ACTIONS.GET_ERROR_MESSAGE,
+            actionData: actionData
+          });
+        }
+
         return fukushashikiSavedStateToLp(savedState).then(async () => {
           await sleep(1000);
           dispatch({
@@ -2858,14 +2859,17 @@ const PreviewFukushashiki = () => {
     newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => isUserMessage(item) && index > clickedMsgIndex);
     newState.currentMsgIndex = newState.currentUserMsgIndex;
     
-    const isUpdateMessage = indexMessage < newState.renderMessagesList.length - 1;
+    const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-    if (isUpdateMessage) {
+
+    if (isBtnUpdateClick) {
       newState.passedUserMsgCount++;
     } else {
-       newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
+      newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
     }
+
+    setStateToSessionStorage(newState);
 
     return dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
