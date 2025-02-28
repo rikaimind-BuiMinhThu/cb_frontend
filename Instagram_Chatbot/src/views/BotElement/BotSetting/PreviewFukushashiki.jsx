@@ -63,6 +63,7 @@ const previewInitialState = {
   currentMsgIndex: 0,
   renderMessagesList: [],
   currentUserMsgIndex: 0,
+  passedUserMsgCount: 0,
   userMessagesList: [],
   errors: {},
   variables: [],
@@ -935,7 +936,9 @@ const PreviewFukushashiki = () => {
     if (newState.currentUserMsgIndex > 0) {
       newState.currentMsgIndex = newState.currentUserMsgIndex;
     }
+
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+    newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(item))?.length;
 
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
   }
@@ -1023,11 +1026,17 @@ const PreviewFukushashiki = () => {
     state.isDisplayErrorMessage, state.loadedStateFromSession
   ]);
 
-  const scrollToBottom = () => {
+  useEffect(() => {
+    if (state.submitErrorMessage.trim().length > 0) {
+      scrollToBottom(true);
+    }
+  }, [state.submitErrorMessage]);
+
+  const scrollToBottom = (forceScroll = false) => {
     if (document.getElementById("sp-body")) {
       document.getElementById("sp-body").scrollTo({
         top: document.getElementById("sp-body").scrollHeight,
-        behavior: "smooth",
+        behavior: forceScroll ? "auto" : "smooth"
       });
     }
   };
@@ -2261,7 +2270,7 @@ const PreviewFukushashiki = () => {
                   listFukuObject.push(fukuObjectRight);
                 }
                 else {
-                  if (message.fukushashiki_search_value.includes(',')) {
+                  if (message.fukushashiki_search_value?.includes(',')) {
                     let address = message.fukushashiki_search_value.split(',');
                     address.forEach(value => {
                       const fukuObject = {
@@ -2849,10 +2858,19 @@ const PreviewFukushashiki = () => {
 
     newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => isUserMessage(item) && index > clickedMsgIndex);
     newState.currentMsgIndex = newState.currentUserMsgIndex;
+    
+    const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
 
+    if (isBtnUpdateClick) {
+      newState.passedUserMsgCount++;
+    } else {
+      newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
+    }
+
     setStateToSessionStorage(newState);
+
     return dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
       payload: newState
@@ -3367,7 +3385,7 @@ const PreviewFukushashiki = () => {
           </ModalPreviewBot>
           : ""}
         <ProcessBar botInfor={state.botInfor}
-          currentIndex={state.currentUserMsgIndex}
+          currentIndex={state.passedUserMsgCount}
           maxIndex={state.userMessagesList.length}
         />
         <div id="sp-body" className="sp-body" style={bodyStyle}
