@@ -871,6 +871,7 @@ const PreviewFukushashiki = () => {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
+      loadedStateFromSession: true,
     };
 
     let messagesList = res.data.data?.conversation?.messages || [];
