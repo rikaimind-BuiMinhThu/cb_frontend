@@ -14,16 +14,16 @@ const ProcessBar = ({
   };
 
   const getWidth = () => {
-    let width;
-    if (!currentIndex || currentIndex >= maxIndex) width = "100%";
-    else width = `${((currentIndex - 1 < 0 ? 0 : currentIndex - 1) * 100) / maxIndex }%`;
+    let width = "0%";
+    if (parseInt(currentIndex || "0") >= maxIndex) width = "100%";
+    else width = `${(currentIndex /maxIndex ) * 100}%`;
 
     return { width: width };
   };
 
   const getText = () => {
     if (currentIndex) {
-      if (maxIndex !== currentIndex - 1) return `あと${maxIndex - currentIndex + 1}間`;
+      if (maxIndex > currentIndex) return `あと${maxIndex - currentIndex}間`;
       return "完了しました。";
     }
     return `あと${maxIndex}間`;
