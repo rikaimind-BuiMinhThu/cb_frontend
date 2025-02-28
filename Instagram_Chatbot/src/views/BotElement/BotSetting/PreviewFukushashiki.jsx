@@ -63,6 +63,7 @@ const previewInitialState = {
   currentMsgIndex: 0,
   renderMessagesList: [],
   currentUserMsgIndex: 0,
+  passedUserMsgCount: 0,
   userMessagesList: [],
   errors: {},
   variables: [],
@@ -952,7 +953,9 @@ const PreviewFukushashiki = () => {
     if (newState.currentUserMsgIndex > 0) {
       newState.currentMsgIndex = newState.currentUserMsgIndex;
     }
+
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+    newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(item))?.length;
 
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
   }
@@ -2848,8 +2851,16 @@ const PreviewFukushashiki = () => {
 
     newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => isUserMessage(item) && index > clickedMsgIndex);
     newState.currentMsgIndex = newState.currentUserMsgIndex;
+    
+    const isUpdateMessage = indexMessage < newState.renderMessagesList.length - 1;
 
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+    if (isUpdateMessage) {
+      newState.passedUserMsgCount++;
+    } else {
+       newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
+    }
+
     return dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
       payload: newState
@@ -3364,7 +3375,7 @@ const PreviewFukushashiki = () => {
           </ModalPreviewBot>
           : ""}
         <ProcessBar botInfor={state.botInfor}
-          currentIndex={state.currentUserMsgIndex}
+          currentIndex={state.passedUserMsgCount}
           maxIndex={state.userMessagesList.length}
         />
         <div id="sp-body" className="sp-body" style={bodyStyle}
