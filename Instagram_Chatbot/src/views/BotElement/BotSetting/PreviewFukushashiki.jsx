@@ -949,7 +949,7 @@ const PreviewFukushashiki = () => {
     }
 
     const renderMsgList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-    newState.passedUserMsgCount = (renderMsgList?.filter((item) => isUserMessage(item)).length || 1) - 1;
+    newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(item))?.length;
 
     newState.renderMessagesList = renderMsgList;
 
