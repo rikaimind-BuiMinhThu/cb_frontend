@@ -2260,7 +2260,7 @@ const PreviewFukushashiki = () => {
                   listFukuObject.push(fukuObjectRight);
                 }
                 else {
-                  if (message.fukushashiki_search_value.includes(',')) {
+                  if (message.fukushashiki_search_value?.includes(',')) {
                     let address = message.fukushashiki_search_value.split(',');
                     address.forEach(value => {
                       const fukuObject = {
