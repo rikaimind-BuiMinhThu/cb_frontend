@@ -948,10 +948,8 @@ const PreviewFukushashiki = () => {
       newState.currentMsgIndex = newState.currentUserMsgIndex;
     }
 
-    const renderMsgList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
     newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(item))?.length;
-
-    newState.renderMessagesList = renderMsgList;
 
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
   }
@@ -2847,12 +2845,12 @@ const PreviewFukushashiki = () => {
     newState.currentMsgIndex = newState.currentUserMsgIndex;
 
     const isUpdateMessage = indexMessage < newState.renderMessagesList.length - 1;
-    if(!isUpdateMessage) {
+    if (!isUpdateMessage) {
       newState.passedUserMsgCount++;
     }
 
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-    if(isUpdateMessage) {
+    if (isUpdateMessage) {
       newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
     }
     
