@@ -873,7 +873,7 @@ const PreviewFukushashiki = () => {
       objParam: {},
       loadedStateFromSession: true,
     };
-
+    let messagesList = res.data.data?.conversation?.messages || [];
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
     if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
