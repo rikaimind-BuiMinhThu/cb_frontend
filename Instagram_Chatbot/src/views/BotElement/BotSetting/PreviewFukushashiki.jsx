@@ -1022,11 +1022,17 @@ const PreviewFukushashiki = () => {
     state.isDisplayErrorMessage, state.loadedStateFromSession
   ]);
 
-  const scrollToBottom = () => {
+  useEffect(() => {
+    if (state.submitErrorMessage.trim().length > 0) {
+      scrollToBottom(true);
+    }
+  }, [state.submitErrorMessage]);
+
+  const scrollToBottom = (forceScroll = false) => {
     if (document.getElementById("sp-body")) {
       document.getElementById("sp-body").scrollTo({
         top: document.getElementById("sp-body").scrollHeight,
-        behavior: "smooth",
+        behavior: forceScroll ? "auto" : "smooth"
       });
     }
   };
