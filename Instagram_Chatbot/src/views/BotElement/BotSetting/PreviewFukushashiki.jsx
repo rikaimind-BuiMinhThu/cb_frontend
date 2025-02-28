@@ -63,6 +63,7 @@ const previewInitialState = {
   currentMsgIndex: 0,
   renderMessagesList: [],
   currentUserMsgIndex: 0,
+  passedUserMsgCount: 0,
   userMessagesList: [],
   errors: {},
   variables: [],
@@ -946,7 +947,11 @@ const PreviewFukushashiki = () => {
     if (newState.currentUserMsgIndex > 0) {
       newState.currentMsgIndex = newState.currentUserMsgIndex;
     }
-    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+
+    const renderMsgList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+    newState.passedUserMsgCount = (renderMsgList?.filter((item) => isUserMessage(item)).length || 1) - 1;
+
+    newState.renderMessagesList = renderMsgList;
 
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
   }
@@ -2838,8 +2843,17 @@ const PreviewFukushashiki = () => {
       }
     }
 
-    newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => isUserMessage(item) && index > clickedMsgIndex);
-    newState.currentMsgIndex = newState.currentUserMsgIndex;
+    const currentUserMsgIndex = newState.messagesList.findIndex((item, index) => isUserMessage(item) && index > clickedMsgIndex);
+
+    newState.currentUserMsgIndex = currentUserMsgIndex;
+    newState.currentMsgIndex = currentUserMsgIndex;
+
+    const renderMessageList = [...newState.renderMessagesList]
+    const isUpdateMessage = indexMessage < renderMessageList.length - 1;
+
+    if(!isUpdateMessage) {
+      newState.passedUserMsgCount++;
+    }
 
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
     return dispatch({
@@ -3356,7 +3370,7 @@ const PreviewFukushashiki = () => {
           </ModalPreviewBot>
           : ""}
         <ProcessBar botInfor={state.botInfor}
-          currentIndex={state.currentUserMsgIndex}
+          currentIndex={state.passedUserMsgCount}
           maxIndex={state.userMessagesList.length}
         />
         <div id="sp-body" className="sp-body" style={bodyStyle}
