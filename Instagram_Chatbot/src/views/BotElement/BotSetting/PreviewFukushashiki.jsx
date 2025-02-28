@@ -2850,6 +2850,8 @@ const PreviewFukushashiki = () => {
     newState.currentMsgIndex = newState.currentUserMsgIndex;
 
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+
+    setStateToSessionStorage(newState);
     return dispatch({
       type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
       payload: newState
