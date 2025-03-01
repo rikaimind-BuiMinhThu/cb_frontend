@@ -3068,10 +3068,8 @@ const PreviewFukushashiki = () => {
     if (message.message_content[0]?.type === "button_submit") return null;
 
     let btnText = message.buttonName;
-    if (state.submitErrorMessage.trim().length > 0) {
-      btnText = "更新";
-    } else {
-      btnText = state.currentUserMsgIndex >= state.userMessagesList.length ? "次へ" : "更新";
+    if (!btnText) {
+      btnText = indexMessage >= state.renderMessagesList.length - 1 ? "次へ" : "更新";
     }
 
     return (
