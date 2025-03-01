@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useReducer } from "react";
+import React, { useEffect, useRef, useReducer } from "react";
 import "../../../assets/css/bot/preview-chat-bot.css";
 import api from "../../../api/api-management";
 import Cookies from "js-cookie";
@@ -12,8 +12,7 @@ import {
   Col
 } from "antd";
 import moment from "moment";
-import $, { event } from "jquery";
-import { tokenExpired } from "api/tokenExpired";
+import $ from "jquery";
 import { EC_CHATBOT_URL } from "../../../variables/constants";
 import "moment/locale/zh-cn";
 import iconMessageBlue from "../../../assets/img/icon-mess/icon-message-chat-blue.png";
@@ -24,7 +23,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { CHATBOT_ACTIONS, SCAN_REGEX, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
@@ -314,77 +313,36 @@ const PreviewFukushashiki = () => {
   }
 
   const checkMessageCondition = (message, buildParam) => {
-    if (message.conditions.length === 0) return true;
+    if (message.conditions.length === 0) return false;
 
     let checked = false;
     for (let j = 0; j < message.conditions.length; j++) {
-      let conditionItem = message.conditions[j];
+      const conditionItem = message.conditions[j];
+      const buildParamValue = buildParam[conditionItem.nameCondition];
+      let subCheck = false;
+
+      switch (conditionItem.condition) {
+        case "include":
+          subCheck = buildParamValue.includes(conditionItem.inputCondition);
+          break;
+        case "is":
+          subCheck = buildParamValue == conditionItem.inputCondition;
+          break;
+        case "not_include":
+          subCheck = !buildParamValue.includes(conditionItem.inputCondition);
+          break;
+        case "is_not":
+          subCheck = buildParamValue != conditionItem.inputCondition;
+          break;
+        default:
+          break;
+      }
       if (j === 0) {
-        if (conditionItem.condition === "include") {
-          checked = buildParam[
-            conditionItem.nameCondition
-          ].includes(conditionItem.inputCondition);
-        } else if (conditionItem.condition === "is") {
-          checked =
-            buildParam[conditionItem.nameCondition] ==
-            conditionItem.inputCondition;
-        } else if (conditionItem.condition === "not_include") {
-          checked = !buildParam[
-            conditionItem.nameCondition
-          ].includes(conditionItem.inputCondition);
-        } else if (conditionItem.condition === "is_not") {
-          checked =
-            buildParam[conditionItem.nameCondition] !=
-            conditionItem.inputCondition;
-        }
+        checked = subCheck;
       } else if (conditionItem?.linkCondition === "and") {
-        if (conditionItem.condition === "include") {
-          checked =
-            checked &&
-            buildParam[conditionItem.nameCondition].includes(
-              conditionItem.inputCondition
-            );
-        } else if (conditionItem.condition === "is") {
-          checked =
-            checked &&
-            buildParam[conditionItem.nameCondition] ==
-            conditionItem.inputCondition;
-        } else if (conditionItem.condition === "not_include") {
-          checked =
-            checked &&
-            !buildParam[conditionItem.nameCondition].includes(
-              conditionItem.inputCondition
-            );
-        } else if (conditionItem.condition === "is_not") {
-          checked =
-            checked &&
-            buildParam[conditionItem.nameCondition] !=
-            conditionItem.inputCondition;
-        }
+        checked = checked && subCheck;
       } else if (conditionItem?.linkCondition === "or") {
-        if (conditionItem.condition === "include") {
-          checked =
-            checked ||
-            buildParam[conditionItem.nameCondition].includes(
-              conditionItem.inputCondition
-            );
-        } else if (conditionItem.condition === "is") {
-          checked =
-            checked ||
-            buildParam[conditionItem.nameCondition] ==
-            conditionItem.inputCondition;
-        } else if (conditionItem.condition === "not_include") {
-          checked =
-            checked ||
-            !buildParam[conditionItem.nameCondition].includes(
-              conditionItem.inputCondition
-            );
-        } else if (conditionItem.condition === "is_not") {
-          checked =
-            checked ||
-            buildParam[conditionItem.nameCondition] !=
-            conditionItem.inputCondition;
-        }
+        checked = checked || subCheck;
       }
     }
 
@@ -439,35 +397,6 @@ const PreviewFukushashiki = () => {
           }
           break;
       }
-    });
-
-    return result;
-  }
-
-  const buildObjParamFromDataMessage = (messsages) => {
-    let result = {
-      current_url: window.location.href,
-      current_url_param: getAllUrlParams(window.location.href),
-      current_url_title: document.title,
-      user_id: Cookies.get("user_id"),
-      bot_id: Cookies.get("bot_id"),
-    };
-
-    if (!result.user_agent) {
-      // $.getJSON("https://api.ipregistry.co/?key=tryout", function (data) {
-      //   result.user_ip_address = data.ip;
-      //   result.user_country = data.location.country.name;
-      //   result.user_city = data.location.city;
-      //   result.user_device = data.user_agent.device.type;
-      //   result.user_browser = data.user_agent.name;
-      //   result.user_agent = data.user_agent.header;
-      //   result.start_datetime = new Date();
-      // });
-    }
-
-    messsages.forEach(message => {
-      const builtParam = createObjParamObject(message);
-      result = { ...result, ...builtParam };
     });
 
     return result;
@@ -873,8 +802,8 @@ const PreviewFukushashiki = () => {
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
       loadedStateFromSession: true,
+      messagesList: res.data.data?.conversation?.messages || [],
     };
-    let messagesList = res.data.data?.conversation?.messages || [];
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
     if (res.data.design_settings.display_type == 1 && prevOpenStatus == "0") {
@@ -891,41 +820,41 @@ const PreviewFukushashiki = () => {
         ...res.data.all_variables,
       ];
 
-      res.data.variables.forEach((item) => {
+      newState.variables.forEach((item) => {
         newState.objParam[item.variable_name] = item.default_value;
       });
     }
+
+    if (isLoggedIn) {
+      newState.messagesList = newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
+    }
     
-    messagesList = messagesList.filter(x => {
-      return x.hidden !== true && checkMessageCondition(x, newState.objParam) &&
-        (!isLoggedIn || (isLoggedIn && !x.not_display_when_logged_in));
-    });
+    // messagesList = messagesList.filter(x => !x.hidden);
 
     newState.variablesList = res.data?.all_variables || [];
-    newState.messagesList = messagesList;
     newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";
 
     checkUpdateMessagesSessionStorage(res.data.data.updated_at)
     
-    newState.userMessagesList = messagesList.filter((item) => isUserMessage(item));
-    for (let i = 0; i < messagesList.length; i++) {
-      if (messagesList[i].conditions?.length > 0) {
-        const checked = checkMessageCondition(messagesList[i], newState.objParam);
+    newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));
+    for (let i = 0; i < newState.messagesList.length; i++) {
+      if (newState.messagesList[i].conditions?.length > 0) {
+        const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
 
-        if (!checked && isUserMessage(messagesList[i])) {
+        if (!result && isUserMessage(newState.messagesList[i])) {
           newState.currentUserMsgIndex++;
           continue;
         }
       }
-      if (isBotMessage(messagesList[i])) {
+      if (isBotMessage(newState.messagesList[i])) {
         newState = {
           ...newState,
-          ...processForBotMessage(messagesList, i, newState, true)
+          ...processForBotMessage(newState.messagesList, i, newState, true)
         };
-      } else if (isUserMessage(messagesList[i])) {
+      } else if (isUserMessage(newState.messagesList[i])) {
         newState = {
           ...newState,
-          ...processForUserMessage(messagesList, i, newState)
+          ...processForUserMessage(newState.messagesList, i, newState)
         };
       }
     }
@@ -938,7 +867,7 @@ const PreviewFukushashiki = () => {
     }
 
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
-    newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(item))?.length;
+    newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
 
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
   }
@@ -1102,14 +1031,6 @@ const PreviewFukushashiki = () => {
             ] = messageError;
             isValid = false;
           }
-          //  else if (contentType.type === 'password_confirmation' &&
-          //   (contentType[contentType.type].value.length < limitFrom
-          //     || contentType[contentType.type].value.length > limitTo
-          //     || contentType[contentType.type].valueConfirm.length < limitFrom
-          //     || contentType[contentType.type].valueConfirm.length > limitTo)) {
-          //   errorsMess[`message${index}_content${i}_${contentArr[i].type}_${contentType.type}`] = `${limitFrom}文字以上${limitTo}文字以下にしてください。`;
-          //   isValid = false;
-          // }
         } else if (contentType.type === "customization") {
           if (contentType[contentType.type].is_comment) {
             if (
@@ -2804,9 +2725,6 @@ const PreviewFukushashiki = () => {
       return;
     }
 
-    newState.messagesList[indexMessage].disabled = newState.submitErrorMessage.length > 0 ? false : true;
-    // newState.renderMessagesList = state.renderMessagesList.sort((a, b) => a.id - b.id);
-
     const submitData = {
       scenario_id: state.scenarioId,
       message: state.renderMessagesList[clickedMsgIndex],
@@ -2831,14 +2749,18 @@ const PreviewFukushashiki = () => {
 
     fukushashikiToLP(convertToFukushashikiObject(submitData));
 
+    if (isLoggedIn) {
+      newState.messagesList = newState.messagesList.forEach(x => x.hidden = x.not_display_when_logged_in); 
+    }
+    
     // Update next messages list after clicked next
-    const nextMessage = state.messagesList[clickedMsgIndex + 1];
+    const nextMessage = newState.messagesList[clickedMsgIndex + 1];
 
     if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
-      for (let i = state.currentMsgIndex + 1; i < state.messagesList.length; i++) {
-        if (state.messagesList[i].conditions) {
-          const checked = checkMessageCondition(state.messagesList[i], state.objParam);
-          newState.messagesList[i].hidden = !checked;
+      for (let i = clickedMsgIndex + 1; i < newState.messagesList.length; i++) {
+        if (newState.messagesList[i].conditions.length !== 0) {
+          const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
+          newState.messagesList[i].hidden = !result;
         }
         if (newState.messagesList[i].hidden) continue;
 
@@ -2856,7 +2778,7 @@ const PreviewFukushashiki = () => {
       }
     }
 
-    newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => isUserMessage(item) && index > clickedMsgIndex);
+    newState.currentUserMsgIndex = newState.messagesList.findIndex((item, index) => !item.hidden && isUserMessage(item) && index > clickedMsgIndex);
     newState.currentMsgIndex = newState.currentUserMsgIndex;
     
     const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
@@ -3242,6 +3164,7 @@ const PreviewFukushashiki = () => {
   
   const renderMessages = () => {
     return state.renderMessagesList.map((message, indexMessage) => {
+      if (message.hidden) return null;
       return (
         <React.Fragment key={indexMessage}>
           {renderBotMessageContent(message, indexMessage)}
