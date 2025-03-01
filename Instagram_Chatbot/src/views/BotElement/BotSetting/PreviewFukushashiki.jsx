@@ -3219,8 +3219,6 @@ const PreviewFukushashiki = () => {
     };
   };
 
-  console.log(state.messagesList);
-
   ///body container
   if (state.scenarioId && state.botInfor && state.isOpen) {
     const { containerStyle, headerStyle, bodyStyle } = getOpeningBotStyle();
