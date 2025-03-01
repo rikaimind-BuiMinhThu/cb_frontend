@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useReducer } from "react";
+import React, { useEffect, useRef, useReducer } from "react";
 import "../../../assets/css/bot/preview-chat-bot.css";
 import api from "../../../api/api-management";
 import Cookies from "js-cookie";
@@ -9,12 +9,10 @@ import CustomButton from "./CustomButton";
 import { UserMessage, BotMessage } from "./PreviewComponent";
 import {
   Row,
-  Col,
-  message
+  Col
 } from "antd";
 import moment from "moment";
-import $, { event } from "jquery";
-import { tokenExpired } from "api/tokenExpired";
+import $ from "jquery";
 import { EC_CHATBOT_URL } from "../../../variables/constants";
 import "moment/locale/zh-cn";
 import iconMessageBlue from "../../../assets/img/icon-mess/icon-message-chat-blue.png";
@@ -25,7 +23,7 @@ import iconMessagePink from "../../../assets/img/icon-mess/icon-message-chat-pin
 import iconMessagePurple from "../../../assets/img/icon-mess/icon-message-chat-purple.png";
 import iconMessageBlack from "../../../assets/img/icon-mess/icon-message-chat-black.png";
 import iconMessageWhite from "../../../assets/img/icon-mess/icon-message-chat-white.png";
-import { CHATBOT_ACTIONS, SCAN_REGEX, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
+import { CHATBOT_ACTIONS, SESSION_STORAGE_KEY } from "./PreviewComponent/Constants";
 import {
   getAllUrlParams,
   lightenColor,
