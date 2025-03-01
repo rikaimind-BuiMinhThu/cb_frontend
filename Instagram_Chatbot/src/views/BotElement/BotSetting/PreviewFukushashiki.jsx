@@ -3350,7 +3350,7 @@ const PreviewFukushashiki = () => {
         onClick={() => onOpenPreview(!state.isOpen)}
         style={{
           backgroundColor: state.botInfor?.main_color || state.botInfor?.main_color_other,
-          width: `${widthPc}px`,
+          // width: `${widthPc}px`,
           width: `360px`,
           height: "66px",
           borderRadius: '35px',
