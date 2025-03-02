@@ -2747,8 +2747,8 @@ const PreviewFukushashiki = () => {
     const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
     if (nextUserMessage && isUserMessage(nextUserMessage) &&
       nextUserMessage.button_jscode == true && nextUserMessage.jscode?.length > 0) {
-      await sleep(1000);
       postMessageForExecuteJs(nextUserMessage.jscode);
+      await sleep(1000);
     }
 
     setStateToSessionStorage(newState);
