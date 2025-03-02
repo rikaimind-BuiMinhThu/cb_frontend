@@ -381,27 +381,6 @@ const PreviewFukushashiki = () => {
     return dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
   }
 
-  const createObjParamObject = (message) => {
-    let result = {};
-    let contents = message.message_content;
-
-    contents.forEach((content) => {
-      switch (content.type) {
-        case "pull_down":
-          if (content.pull_down.is_save_input_content) {
-            if (content.pull_down.type === "customization") {
-              const variableName = content.pull_down.save_input_content;
-              const variableValue = content.pull_down.customization.value;
-              result[variableName] = variableValue;
-            }
-          }
-          break;
-      }
-    });
-
-    return result;
-  }
-
   const setPulldownValue = (dataContentType, field, value) => {
     switch (field) {
       case "customization":
@@ -2696,6 +2675,7 @@ const PreviewFukushashiki = () => {
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
 
     if (message.button_jscode == true && message.jscode?.length > 0) {
+      await sleep(1000);
       postMessageForExecuteJs(message.jscode);
     }
 

@@ -57,6 +57,10 @@ const log = (message) =>{
   }
 }
 
+const sleep = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 const getEcChatBotApiServerBaseUrl = () => {
   // Comment out below line if you want to connect the staging backend API server
   // return "https://ec-chatbot-test1.com";
@@ -281,9 +285,11 @@ const processGetErrorMessage = (data) => {
 }
 
 const fillDataFromMessage = (data) => {
-  data.forEach((item) => {
+  data.forEach(async (item) => {
     let element = getElementByAddress(item.bindingMode, item.bindingAddress);
     if (!element) return;
+
+    await sleep(500);
 
     switch (item.type) {
       case "card_payment_radio_button":
