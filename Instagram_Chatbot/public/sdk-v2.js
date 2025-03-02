@@ -109,7 +109,6 @@ const displayPopup = async () => {
         : "smartphone";
   const response = await fetch(
     `${getEcChatBotApiServerBaseUrl()}/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
-    // `https://ec-chatbot-test1.com/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
     {
       method: "GET",
       headers: {
@@ -183,6 +182,7 @@ const displayPopup = async () => {
           button.click();
           break;
         case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
+          // TODO
           break;
       };
       
@@ -224,8 +224,7 @@ const displayPopup = async () => {
 
   log("device: ", device);
   setTimeout(() => {
-    let checkDevice = { scenario_data: device };
-    // submitForm(url, checkDevice)
+    const checkDevice = { scenario_data: device };
     getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
   }, 5000);
 }
@@ -281,197 +280,62 @@ const processGetErrorMessage = (data) => {
   sendMessageToChatbot(element.innerHTML, CHATBOT_ACTIONS.GET_ERROR_MESSAGE);
 }
 
-const fillDataFromMessage = (obj) => {
-  const initialSelectionItem = obj.find((item) => item.type === "initial_selection");
-  if (initialSelectionItem != undefined) {
-    try {
-      var typeElementSelector = getElementByAddress(initialSelectionItem.bindingMode, initialSelectionItem.bindingAddress)
-      typeElementSelector.value = initialSelectionItem.bindingValue;
-      const event = new Event('change', { bubbles: true });
-      typeElementSelector.dispatchEvent(event);
+const fillDataFromMessage = (data) => {
+  data.forEach((item) => {
+    let element = getElementByAddress(item.bindingMode, item.bindingAddress);
+    if (!element) return;
 
-      try {
-        setTimeout(() => {
-          const cardNumberItem = obj.find((item) => item.type === "card_number");
-          if (cardNumberItem) {
-            const inputCardNumber = getElementByAddress(cardNumberItem.bindingMode, cardNumberItem.bindingAddress);
-            if (inputCardNumber) {
-              inputCardNumber.focus();
-              inputCardNumber.value = cardNumberItem.bindingValue;
-              const inputEvent = new Event('input', { bubbles: true });
-              const changeEvent = new Event('change', { bubbles: true });
-              inputCardNumber.dispatchEvent(inputEvent);
-              inputCardNumber.dispatchEvent(changeEvent);
-              inputCardNumber.blur();
-            }
-          }
-
-          const listShippingAddress = obj.filter((item) => item.type === "shipping_address");
-          if (listShippingAddress.length > 0) {
-            listShippingAddress.forEach((item) => {
-              const inputShippingAddress = getElementByAddress(item.bindingMode, item.bindingAddress);
-              if (inputShippingAddress) {
-                inputShippingAddress.value = item.bindingValue;
-                const inputEvent = new Event('input', { bubbles: true });
-                const changeEvent = new Event('change', { bubbles: true });
-                inputShippingAddress.dispatchEvent(inputEvent);
-                inputShippingAddress.dispatchEvent(changeEvent);
-              }
-            });
-          }
-
-        }, 4000);
-      }
-      catch (e) {
-        console.log(e)
-      }
-
-    }
-    catch (e) {
-      console.log(e)
-    }
-  }
-
-  obj.forEach((item) => {
     switch (item.type) {
       case "card_payment_radio_button":
       case "text_input":
-        {
-          if (item.bindingMode == 1) {
-            fillDataWithId(item.bindingAddress, item.bindingValue)
-          }
-          else if (item.bindingMode == 2) {
-            fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-          }
-          else {
-            fillDataWithXPath(item.bindingAddress, item.bindingValue)
-          }
-          break;
-        }
-
-      case 'dropdown_prefecture':
-        {
-          fillDataWithTextInSelector(item.bindingMode, item.bindingAddress, item.bindingValue);
-          break;
-        }
-
-      case "zip_code_address":
-        {
-          if (item.bindingMode == 1) {
-            fillDataWithId(item.bindingAddress, item.bindingValue)
-          }
-          else if (item.bindingMode == 2) {
-            fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-          }
-          else {
-            fillDataWithXPath(item.bindingAddress, item.bindingValue)
-          }
-          break;
-        }
-      case "agree_term":
-        {
-          if (item.bindingMode == 1) {
-            fillDataAgreementWithId(item.bindingAddress, item.bindingValue)
-          }
-          else if (item.bindingMode == 2) {
-            fillDataAgreementWithCssSelector(item.bindingAddress, item.bindingValue)
-          }
-          else {
-            fillDataAgreementWithXPath(item.bindingAddress, item.bindingValue)
-          }
-          break;
-        }
-      case "slider":
-        {
-          if (item.bindingMode == 1) {
-            fillDataWithId(item.bindingAddress, item.bindingValue)
-          }
-          else if (item.bindingMode == 2) {
-            fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-          }
-          else {
-            fillDataWithXPath(item.bindingAddress, item.bindingValue)
-          }
-        }
-
-      case "pull_down":
-        {
-          if (item.bindingMode !== undefined) {
-            let element = getElementByAddress(item.bindingMode, item.bindingAddress);
-            if (element) {
-              let hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
-              if (!hasOption)
-                item.bindingValue = '';
-            }
-            if (item.bindingMode == 1) {
-              fillDataWithId(item.bindingAddress, item.bindingValue)
-              element.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-            else if (item.bindingMode == 2) {
-              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-              element.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-            else {
-              fillDataWithXPath(item.bindingAddress, item.bindingValue)
-              element.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-          }
-          break;
-        }
-
-      case "radio_button":
-        {
-          elementContain = getElementByAddress(item.bindingMode, item.bindingAddress);
-          if (elementContain) {
-            const radioButtons = elementContain.querySelectorAll('input[type="radio"]');
-            radioButtons.forEach(radio => {
-              if (radio.value == item.bindingValue) {
-                radio.checked = true;
-                const changeEvent = new Event('change', { bubbles: true });
-                radio.dispatchEvent(changeEvent);
-              }
-            });
-          }
-          break;
-        }
-      case 'checkbox':
-        {
-          const elementToCheck = getElementByAddress(item.bindingMode, item.bindingAddress)
-          if (elementToCheck) {
-            elementToCheck.checked = item.bindingValue;
-            const changeEvent = new Event('change', { bubbles: true });
-            elementToCheck.dispatchEvent(changeEvent);
-          }
-          break;
-        }
-
-      case "password":
-        {
-          const passwordInput = getElementByAddress(item.bindingMode, item.bindingAddress)
-          if (passwordInput)
-            passwordInput.setRangeText(item.bindingValue)
-        }
       case "textarea":
-        {
-          if (item.bindingMode == 1) {
-            fillDataWithId(item.bindingAddress, item.bindingValue)
-          }
-          else if (item.bindingMode == 2) {
-            fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-          }
-          else {
-            fillDataWithXPath(item.bindingAddress, item.bindingValue)
-          }
-          break;
-        }
-      default:
-        return;
-    }
+      case "zip_code_address":
+      case "payment_method_id":
+      case "slider": {
+        setValueToElement(element, item.bindingValue);
+        break;
+      }
 
+      case 'dropdown_prefecture': {
+        if (element.tagName === 'SELECT') {
+          const selectedOption = Array.from(element.options).find(option => option.value === item.bindingValue.toString());
+          if (!selectedOption) item.bindingValue = '';
+        };
+        
+        setValueToElement(element, item.bindingValue);
+        break;
+      }
+
+      case "agree_term":
+      case 'checkbox': {
+        setCheckToCheckboxElement(element, item.bindingValue);
+        break;
+      }
+
+      case "pull_down": {
+        const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
+        if (!hasOption) item.bindingValue = '';
+        setValueToElement(element, item.bindingValue);
+        break;
+      }
+
+      case "radio_button": {
+        setRadioValue(element, item.bindingValue);
+        break;
+      }
+
+      case "password": {
+        element.setRangeText(item.bindingValue);
+        break;
+      }
+      default:
+        break;
+    }
   })
 }
 
 const getElementByAddress = (mode, address) => {
+  if (!mode || !address) return null;
   switch (mode) {
     case SEARCH_MODES.ID:
       return document.getElementById(address);
@@ -480,27 +344,7 @@ const getElementByAddress = (mode, address) => {
     case SEARCH_MODES.XPATH:
       return document.evaluate(address, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     default:
-      throw new Error('Invalid search mode');
-  }
-}
-
-const fillDataWithTextInSelector = (mode, address, value) => {
-  const element = getElementByAddress(mode, address);
-  if (element.tagName === 'SELECT') {
-    const selectOption = Array.from(element.options).find(option => option.text === value);
-    if (selectOption) {
-      fillDataToElement(element, selectOption.value);
-      element.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-  } else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-    fillDataToElement(element, value);
-  }
-}
-
-const fillDataWithId = (id, value) => {
-  let element = document.getElementById(id);
-  if (element) {
-    fillDataToElement(element, value)
+      throw new Error(`Invalid search mode ${mode}, address: ${address}`);
   }
 }
 
@@ -519,57 +363,25 @@ const removeFirstTwoChars = (input) => {
   }
 }
 
-const fillDataToElement = (element, value) => {
+const setCheckToCheckboxElement = (element, value) => {
+  if (!element.type === 'checkbox') return;
+  element.checked = value;
+  const changeEvent = new Event('change', { bubbles: true });
+  element.dispatchEvent(changeEvent);
+}
+
+const setValueToElement = (element, value) => {
   element.value = value;
-  if (element.value == undefined || element.value == "") {
-    element.value = removeLeadingZero(value);
-  }
-  if (element.value == undefined || element.value == "") {
-    element.value = removeFirstTwoChars(value);
-  }
+  element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
-const fillDataWithCssSelector = (cssSelector, value) => {
-  let element = document.querySelector(cssSelector);
-  if (element) {
-    fillDataToElement(element, value)
-  }
-
-}
-
-const fillDataWithXPath = (xpathElement, value) => {
-  let element = document.evaluate(xpathElement, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-  if (element) {
-    fillDataToElement(element, value)
-  }
-
-}
-
-const fillDataAgreementWithId = (id, value) => {
-  let element = document.getElementById(id);
-  if (element && element.type === 'checkbox') {
-    const changeEvent = new Event('change', { bubbles: true });
-    element.checked = value === true;
-    element.dispatchEvent(changeEvent)
-  }
-}
-
-const fillDataAgreementWithCssSelector = (cssSelector, value) => {
-  let element = document.querySelector(cssSelector);
-  if (element && element.type === 'checkbox') {
-    const changeEvent = new Event('change', { bubbles: true });
-    element.checked = value === true;
-    element.dispatchEvent(changeEvent)
-  }
-}
-
-const fillDataAgreementWithXPath = (xpathElement, value) => {
-  let element = document.evaluate(xpathElement, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-  if (element && element.type === 'checkbox') {
-    const changeEvent = new Event('change', { bubbles: true });
-    element.checked = value === true;
-    element.dispatchEvent(changeEvent)
-  }
+const setRadioValue = (element, value) => {
+  const radioButtons = element.querySelectorAll('input[type="radio"]');
+  const selecteddRadio = radioButtons.find(radio => radio.value === value);
+  if (!selecteddRadio) return;
+  selecteddRadio.checked = true;
+  const changeEvent = new Event('change', { bubbles: true });
+  selecteddRadio.dispatchEvent(changeEvent);
 }
 
 const getUser = async (url, datacount) => {
