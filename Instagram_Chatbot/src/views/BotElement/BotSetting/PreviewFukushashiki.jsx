@@ -2674,11 +2674,6 @@ const PreviewFukushashiki = () => {
     let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
 
-    if (message.button_jscode == true && message.jscode?.length > 0) {
-      await sleep(1000);
-      postMessageForExecuteJs(message.jscode);
-    }
-
     if (!handleValidateField(indexMessage)) {
       return;
     }
@@ -2747,6 +2742,13 @@ const PreviewFukushashiki = () => {
       newState.passedUserMsgCount++;
     } else {
       newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
+    }
+
+    const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
+    if (nextUserMessage && isUserMessage(nextUserMessage) &&
+      nextUserMessage.button_jscode == true && nextUserMessage.jscode?.length > 0) {
+      await sleep(1000);
+      postMessageForExecuteJs(nextUserMessage.jscode);
     }
 
     setStateToSessionStorage(newState);
