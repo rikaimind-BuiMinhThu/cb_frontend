@@ -19,7 +19,7 @@ const ZipCodePopUp = ({
 
   const onChangePrefecture = (value) => {
     if (!value) return;
-    const prefecture_jis_code = prefecturesList.find((item) => item.name === value)?.prefecture_jis_code;
+    const prefecture_jis_code = prefecturesList.find((item) => item.id === value)?.prefecture_jis_code;
     
     if (!prefecture_jis_code) {
       console.error("prefecture_jis_code not found");
@@ -158,7 +158,7 @@ const ZipCodePopUp = ({
         <div className="sp-popup-zip-code-address-body-form">
           <SelectCustom
             style={{ width: "100%", marginBottom: "7px" }}
-            keyValue="name"
+            keyValue="id"
             nameValue="name"
             placeholder="都道府県を選択してください"
             data={prefecturesList}
