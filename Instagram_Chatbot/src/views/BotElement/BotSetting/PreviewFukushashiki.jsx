@@ -2167,7 +2167,7 @@ const PreviewFukushashiki = () => {
       obj.message.message_content.length > 0
     ) {
       const messageArray = obj.message.message_content;
-      const listFukuObject = [];
+      const fukuDataList = [];
       messageArray.forEach((message) => {
         switch (message.type) {
           case 'text_input':
@@ -2187,8 +2187,8 @@ const PreviewFukushashiki = () => {
                     bindingAddress: message.right_fukushashiki_search_value,
                     bindingValue: message.text_input.text.valueRight,
                   };
-                  listFukuObject.push(fukuObjectLeft);
-                  listFukuObject.push(fukuObjectRight);
+                  fukuDataList.push(fukuObjectLeft);
+                  fukuDataList.push(fukuObjectRight);
                 }
                 else {
                   if (message.fukushashiki_search_value?.includes(',')) {
@@ -2200,7 +2200,7 @@ const PreviewFukushashiki = () => {
                         bindingAddress: value,
                         bindingValue: message.text_input.text.value,
                       };
-                      listFukuObject.push(fukuObject);
+                      fukuDataList.push(fukuObject);
                     });
                   }
                   else {
@@ -2210,7 +2210,7 @@ const PreviewFukushashiki = () => {
                       bindingAddress: message.fukushashiki_search_value,
                       bindingValue: message.text_input.text.value,
                     };
-                    listFukuObject.push(fukuObject);
+                    fukuDataList.push(fukuObject);
                   }
                 }
               }
@@ -2222,7 +2222,7 @@ const PreviewFukushashiki = () => {
                   bindingAddress: message.fukushashiki_search_value,
                   bindingValue: message.text_input.urls.value,
                 };
-                listFukuObject.push(fukuObject);
+                fukuDataList.push(fukuObject);
               }
 
               if (Object.keys(message.text_input.email_confirmation).length != 0 && message.text_input.email_confirmation != undefined) {
@@ -2241,7 +2241,7 @@ const PreviewFukushashiki = () => {
                     bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
                     bindingValue: userInputData[`${type}`]
                   }));
-                listFukuObject.push(...result);
+                fukuDataList.push(...result);
               }
 
               if (message.text_input?.phone_number.value != undefined ||
@@ -2256,7 +2256,7 @@ const PreviewFukushashiki = () => {
                     bindingAddress: message.fukushashiki_search_value,
                     bindingValue: message.text_input.phone_number.value,
                   };
-                  listFukuObject.push(fukuObject);
+                  fukuDataList.push(fukuObject);
                 }
                 else {
                   const userInputData = Object.fromEntries(
@@ -2274,7 +2274,7 @@ const PreviewFukushashiki = () => {
                       bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
                       bindingValue: userInputData[`${type}`]
                     }));
-                  listFukuObject.push(...result);
+                  fukuDataList.push(...result);
                 }
               }
 
@@ -2285,7 +2285,7 @@ const PreviewFukushashiki = () => {
                   bindingAddress: message.fukushashiki_search_value,
                   bindingValue: message.text_input.email_address.value,
                 };
-                listFukuObject.push(fukuObject);
+                fukuDataList.push(fukuObject);
               }
               if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
                 if (message.fukushashiki_search_value.includes(',')) {
@@ -2297,7 +2297,7 @@ const PreviewFukushashiki = () => {
                       bindingAddress: value,
                       bindingValue: message.text_input.password.value,
                     };
-                    listFukuObject.push(fukuObject);
+                    fukuDataList.push(fukuObject);
                   });
                 }
                 else {
@@ -2307,7 +2307,7 @@ const PreviewFukushashiki = () => {
                     bindingAddress: message.fukushashiki_search_value,
                     bindingValue: message.text_input.password.value,
                   };
-                  listFukuObject.push(fukuObject);
+                  fukuDataList.push(fukuObject);
                 }
               }
 
@@ -2325,8 +2325,8 @@ const PreviewFukushashiki = () => {
                   bindingAddress: message.fukushashiki_search_value,
                   bindingValue: message.text_input.password_confirmation.valueConfirm,
                 };
-                listFukuObject.push(fukuObject1);
-                listFukuObject.push(fukuObject2);
+                fukuDataList.push(fukuObject1);
+                fukuDataList.push(fukuObject2);
               }
             }
             break;
@@ -2343,7 +2343,7 @@ const PreviewFukushashiki = () => {
                     bindingAddress: trimmedValue,
                     bindingValue: message.agree_term.isAgree,
                   };
-                  listFukuObject.push(fukuObject);
+                  fukuDataList.push(fukuObject);
                 });
               } else {
                 const fukuObject = {
@@ -2352,7 +2352,7 @@ const PreviewFukushashiki = () => {
                   bindingAddress: message.fukushashiki_search_value,
                   bindingValue: message.agree_term.isAgree,
                 };
-                listFukuObject.push(fukuObject);
+                fukuDataList.push(fukuObject);
               }
               break;
             }
@@ -2364,7 +2364,7 @@ const PreviewFukushashiki = () => {
                 bindingAddress: message.fukushashiki_search_value,
                 bindingValue: message.slider.value,
               };
-              listFukuObject.push(fukuObject);
+              fukuDataList.push(fukuObject);
 
               break;
             }
@@ -2385,7 +2385,7 @@ const PreviewFukushashiki = () => {
                         bindingAddress: message.fukushashiki_search_value,
                         bindingValue: item.value
                       };
-                      listFukuObject.push(fukuObject);
+                      fukuDataList.push(fukuObject);
                     }
 
                   })
@@ -2400,7 +2400,7 @@ const PreviewFukushashiki = () => {
                     bindingAddress: message.pull_down.lp_element_search_value,
                     bindingValue: message.pull_down.lp_integration_option.value
                   };
-                  listFukuObject.push(fukuObject);
+                  fukuDataList.push(fukuObject);
                 }
               }
 
@@ -2439,7 +2439,7 @@ const PreviewFukushashiki = () => {
                   bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
                   bindingValue: removeLeadingZero(userInputData[`${type}`]),
                 }));
-              listFukuObject.push(...result);
+              fukuDataList.push(...result);
 
               break;
             }
@@ -2452,7 +2452,7 @@ const PreviewFukushashiki = () => {
                   bindingAddress: message.fukushashiki_search_value,
                   bindingValue: message.textarea.text_input.value,
                 };
-                listFukuObject.push(fukuObject);
+                fukuDataList.push(fukuObject);
               }
               break;
             }
@@ -2481,7 +2481,7 @@ const PreviewFukushashiki = () => {
                 })
                 .filter(item => item !== null);
 
-              listFukuObject.push(...result);
+              fukuDataList.push(...result);
               break;
             }
           case 'shipping_address':
@@ -2508,7 +2508,7 @@ const PreviewFukushashiki = () => {
                       bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
                       bindingValue: userInputData[`value_${type}`]
                     };
-                    listFukuObject.push(objA)
+                    fukuDataList.push(objA)
                   }
                   if (type == "address") {
                     const objA = {
@@ -2517,7 +2517,7 @@ const PreviewFukushashiki = () => {
                       bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
                       bindingValue: userInputData[`value_${type}`]
                     };
-                    listFukuObject.push(objA)
+                    fukuDataList.push(objA)
                   }
                   return {
                     type: message.shipping_address.is_use_dropdown ? "dropdown_prefecture" : "shipping_address",
@@ -2527,7 +2527,7 @@ const PreviewFukushashiki = () => {
                   };
                 })
                 .filter(item => item !== null);
-              listFukuObject.push(...result);
+              fukuDataList.push(...result);
               break;
             }
 
@@ -2543,7 +2543,7 @@ const PreviewFukushashiki = () => {
                   bindingAddress: message.initial_selection_fukushashiki_search_value,
                   bindingValue: value.toString()
                 };
-                listFukuObject.push(fukuObject);
+                fukuDataList.push(fukuObject);
               }
 
               break;
@@ -2557,7 +2557,7 @@ const PreviewFukushashiki = () => {
                   bindingAddress: message.checkedValue_fukushashiki_search_value,
                   bindingValue: true
                 };
-                listFukuObject.push(fukuObject);
+                fukuDataList.push(fukuObject);
               }
               else {
                 const fukuObject = {
@@ -2566,80 +2566,58 @@ const PreviewFukushashiki = () => {
                   bindingAddress: message.checkedValue_fukushashiki_search_value,
                   bindingValue: false
                 };
-                listFukuObject.push(fukuObject);
+                fukuDataList.push(fukuObject);
               }
               break;
             }
 
-          case 'card_payment_radio_button':
-            {
-              const keysToExtract = [
-                "initial_selection",
-                "card_holder1",
-                "card_holder2",
-                "card_number1",
-                "card_number2",
-                "card_number3",
-                "card_number4",
-                "card_holder",
-                "card_number",
-                "year",
-                "month",
-                "cvc",
-                "installment"
-              ];
-              const userInputData = keysToExtract.reduce((result, key) => {
-                if (message.card_payment_radio_button[key] !== undefined) {
-                  result[key] = message.card_payment_radio_button[key];
+          case 'card_payment_radio_button': {
+            const keysToExtract = [
+              "initial_selection", "card_holder1", "card_holder2",
+              "card_number1", "card_number2", "card_number3", "card_number4",
+              "card_holder", "card_number",
+              "year", "month", "cvc", "installment"
+            ];
+            const userInputData = keysToExtract.reduce((result, key) => {
+              if (message.card_payment_radio_button[key] !== undefined) {
+                result[key] = message.card_payment_radio_button[key];
+              }
+              return result;
+            }, {});
+            const dataInforFukushashiki = Object.fromEntries(
+              Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
+            );
+            const types = ["card_number", "card_holder1", "card_holder2",
+              "card_holder", "year", "month",
+              "cvc", "card_number1", "card_number2", "card_number3",
+              "card_number4", "installment", "initial_selection"];
+            const result = types
+              .filter(type => type in userInputData)
+              .map(type => {
+                const fukuData = {
+                  bindingMode: dataInforFukushashiki[`${type}_fukushashiki_search_mode`],
+                  bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
+                  bindingValue: userInputData[`${type}`]
                 }
-                return result;
-              }, {});
-              const dataInforFukushashiki = Object.fromEntries(
-                Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
-              );
-              const types = ["card_number", "card_holder1", "card_holder2", "card_holder", "year", "month", "cvc", "card_number1", "card_number2", "card_number3", "card_number4", "installment", "initial_selection"];
-              const result = types
-                .filter(type => `${type}` in userInputData)
-                .map(type => {
-                  const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
-                  const bindingValue = userInputData[`${type}`];
-                  if (type == "initial_selection") {
-                    return {
-                      type: "initial_selection",
-                      bindingMode,
-                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                      bindingValue
-                    };
-                  }
-                  if (type == "card_number") {
-                    return {
-                      type: "card_number",
-                      bindingMode,
-                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                      bindingValue
-                    };
-                  }
-                  if (bindingMode !== undefined && bindingValue !== undefined) {
-                    return {
-                      type: "card_payment_radio_button",
-                      bindingMode,
-                      bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                      bindingValue
-                    };
-                  } else {
-                    return null;
-                  }
-                })
-                .filter(item => item !== null);
-              listFukuObject.push(...result);
-            }
-          default:
-            {
-              return;
-            }
+
+                if (!fukuData.bindingMode || !fukuData.bindingValue || !fukuData.bindingAddress) return;
+
+                if (type == "initial_selection") {
+                  return { type: "payment_method_id", ...fukuData }
+                }
+                if (type == "card_number") {
+                  return { type: "card_number", ...fukuData };
+                }
+                return { type: "card_payment_radio_button", ...fukuData };
+              })
+              .filter(item => item !== null);
+            fukuDataList.push(...result);
+          }
+          default: 
+            break;
         }
       })
-      return listFukuObject;
+      return fukuDataList;
     }
   }
 

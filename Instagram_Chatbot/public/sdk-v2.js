@@ -290,6 +290,7 @@ const fillDataFromMessage = (data) => {
       case "text_input":
       case "textarea":
       case "zip_code_address":
+      case "payment_method_id":
       case "slider": {
         setValueToElement(element, item.bindingValue);
         break;
