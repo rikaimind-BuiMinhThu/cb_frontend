@@ -357,10 +357,6 @@ const fillDataFromMessage = (data) => {
             const selectedOption = Array.from(element.options).find(option => option.value === item.bindingValue.toString());
             if (!selectedOption) item.bindingValue = '';
           };
-          if (element.tagName === 'INPUT') {
-            setValueToElementWithoutDispatch(element,item.bindingValue);
-            break;
-          }
           waitForElement(
             item.bindingMode, item.bindingAddress,
             {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
@@ -440,10 +436,6 @@ const setValueToElement = (element, value) => {
     element.value = removeLeadingZero(value);
   }
   element.dispatchEvent(new Event('change', { bubbles: true }));
-}
-
-const setValueToElementWithoutDispatch = (element, value) => {
-  element.value = value;
 }
 
 const setRadioValue = (element, value) => {
