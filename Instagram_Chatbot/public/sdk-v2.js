@@ -340,8 +340,6 @@ const fillDataFromMessage = (data) => {
 
       switch (item.type) {
         case "zip_code_address":
-          setValueToElementWithoutDispatch(element,item.bindingValue)
-          break;
         case "card_number":
         case "card_payment_radio_button":
         case "text_input":
@@ -359,7 +357,10 @@ const fillDataFromMessage = (data) => {
             const selectedOption = Array.from(element.options).find(option => option.value === item.bindingValue.toString());
             if (!selectedOption) item.bindingValue = '';
           };
-
+          if (element.tagName === 'INPUT') {
+            setValueToElementWithoutDispatch(element,item.bindingValue);
+            break;
+          }
           waitForElement(
             item.bindingMode, item.bindingAddress,
             {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
