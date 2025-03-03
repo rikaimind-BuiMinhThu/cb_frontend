@@ -760,7 +760,6 @@ const PreviewFukushashiki = () => {
   }
 
   const processForUserMessage = (messagesList, i, newState) => {
-    // await sleep(1000);
     for (
       let j = 0;
       j < messagesList[i].message_content.length;
@@ -832,7 +831,6 @@ const PreviewFukushashiki = () => {
         }
       }
       if (isBotMessage(newState.messagesList[i])) {
-        
         newState = {
           ...newState,
           ...(await processForBotMessage(newState.messagesList, i, newState, true))
@@ -941,11 +939,11 @@ const PreviewFukushashiki = () => {
     state.isDisplayErrorMessage, state.loadedStateFromSession
   ]);
 
-  useEffect(() => {
-    if (state.submitErrorMessage.trim().length > 0) {
-      scrollToBottom(true);
-    }
-  }, [state.submitErrorMessage]);
+  useEffect(async () => {
+    if (!state.isOpen) return;
+    await sleep(1000);
+    scrollToBottom(false);
+  }, [state.isOpen, state.renderMessagesList]);
 
   const scrollToBottom = (forceScroll = false) => {
     if (document.getElementById("sp-body")) {
