@@ -2760,8 +2760,10 @@ const PreviewFukushashiki = () => {
     const botConfirmJsCode = botConfirmMessage.message_content
       .find(x => x.text_input?.use_for_confirm_message)
       ?.text_input?.jscode;
-
-    if (botConfirmJsCode && botConfirmJsCode.length > 0) {
+    const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
+    const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
+    
+    if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
       postMessageForGetPreviewOrderContent(botConfirmJsCode);
     }
 
