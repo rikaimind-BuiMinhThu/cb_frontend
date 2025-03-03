@@ -433,7 +433,7 @@ const setCheckToCheckboxElement = (element, value) => {
 
 const setValueToElement = (element, value) => {
   element.value = value;
-  if (element.value == undefined || element.value == "") {
+  if (!element.value) {
     element.value = removeLeadingZero(value);
   } 
   element.dispatchEvent(new Event('change', { bubbles: true }));
