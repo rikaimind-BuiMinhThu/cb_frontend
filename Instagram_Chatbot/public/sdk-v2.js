@@ -339,11 +339,13 @@ const fillDataFromMessage = (data) => {
       await sleep(500);
 
       switch (item.type) {
+        case "zip_code_address":
+          setValueToElementWithoutDispatch(element,item.bindingValue)
+          break;
         case "card_number":
         case "card_payment_radio_button":
         case "text_input":
         case "textarea":
-        case "zip_code_address":
         case "payment_method_id":
         case "slider": {
           waitForElement(
@@ -435,8 +437,12 @@ const setValueToElement = (element, value) => {
   element.value = value;
   if (!element.value) {
     element.value = removeLeadingZero(value);
-  } 
+  }
   element.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+const setValueToElementWithoutDispatch = (element, value) => {
+  element.value = value;
 }
 
 const setRadioValue = (element, value) => {
