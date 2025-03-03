@@ -2683,6 +2683,8 @@ const PreviewFukushashiki = () => {
     let newState = { ...state };
     let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
+    
+    const clickedMsg = newState.messagesList[clickedMsgIndex];
 
     if (!handleValidateField(indexMessage)) {
       return;
@@ -2690,7 +2692,7 @@ const PreviewFukushashiki = () => {
 
     const submitData = {
       scenario_id: state.scenarioId,
-      message: state.renderMessagesList[clickedMsgIndex],
+      message: clickedMsg,
       user_id: state.uuid,
       bot_type: "web"
     };
@@ -2711,6 +2713,10 @@ const PreviewFukushashiki = () => {
     }
 
     fukushashikiToLP(convertToFukushashikiObject(submitData));
+
+    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
+      postMessageForExecuteJs(clickedMsg.jscode);
+    }
 
     if (isLoggedIn) {
       newState.messagesList = newState.messagesList.forEach(x => x.hidden = x.not_display_when_logged_in); 
