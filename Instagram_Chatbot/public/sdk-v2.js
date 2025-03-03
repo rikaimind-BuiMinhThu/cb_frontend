@@ -186,7 +186,7 @@ const displayPopup = async () => {
           button.click();
           break;
         case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
-          // TODO
+          excuteJSCode(e.data.actionData);
           break;
       };
       
