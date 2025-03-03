@@ -61,6 +61,41 @@ const sleep = (ms) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const WAIT_OPTION_TYPES = {
+  WAIT_FOR_LOADING: "WAIT_FOR_LOADING",
+  WAIT_FOR_SETTING_VALUE: "WAIT_FOR_SETTING_VALUE",
+};
+
+const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, callback = () => {}) => {
+  let count = 0;
+  const poops = setInterval(function(){
+    count ++;
+    if (count > 50) {
+      clearInterval(poops);
+      throw new Error(`Timeout for ${options.type} element ${address}`);
+      return;
+    }
+
+    const element = getElementByAddress(mode, address);
+    switch (options.type) {
+      case WAIT_OPTION_TYPES.WAIT_FOR_LOADING:
+        if (!element) return;
+        clearInterval(poops);
+        callback();
+        break;
+      case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
+        if (!element || element.value != options.value) {
+          setValueToElement(element, options.value);
+          break;
+        }
+
+        clearInterval(poops);
+        callback();
+        break;
+    }
+  }, 100);
+}
+
 const getEcChatBotApiServerBaseUrl = () => {
   // Comment out below line if you want to connect the staging backend API server
   // return "https://ec-chatbot-test1.com";
@@ -161,7 +196,7 @@ const displayPopup = async () => {
 
   window.addEventListener(
     "message",
-    function (e) {
+    async (e) => {
       chatbotW = e.data.widthPc;
       chatbotH = e.data.heightPc;
       chatbotRight = e.data.chatbotRight;
@@ -186,6 +221,7 @@ const displayPopup = async () => {
           button.click();
           break;
         case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
+          await sleep(2000);
           excuteJSCode(e.data.actionData);
           break;
       };
@@ -309,7 +345,9 @@ const fillDataFromMessage = (data) => {
         case "zip_code_address":
         case "payment_method_id":
         case "slider": {
-          setValueToElement(element, item.bindingValue);
+          waitForElement(
+            item.bindingMode, item.bindingAddress,
+            {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
           break;
         }
   
@@ -318,8 +356,10 @@ const fillDataFromMessage = (data) => {
             const selectedOption = Array.from(element.options).find(option => option.value === item.bindingValue.toString());
             if (!selectedOption) item.bindingValue = '';
           };
-          
-          setValueToElement(element, item.bindingValue);
+
+          waitForElement(
+            item.bindingMode, item.bindingAddress,
+            {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
           break;
         }
   
@@ -332,7 +372,9 @@ const fillDataFromMessage = (data) => {
         case "pull_down": {
           const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
           if (!hasOption) item.bindingValue = '';
-          setValueToElement(element, item.bindingValue);
+          waitForElement(
+            item.bindingMode, item.bindingAddress,
+            {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
           break;
         }
   
