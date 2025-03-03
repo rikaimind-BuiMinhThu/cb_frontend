@@ -284,59 +284,71 @@ const processGetErrorMessage = (data) => {
   sendMessageToChatbot(element.innerHTML, CHATBOT_ACTIONS.GET_ERROR_MESSAGE);
 }
 
+const isDisabledElement = (element) => {
+  // For check GINZA AIRA
+  if (element.classList.contains('disabled-input-ec')) return true;
+
+  // For other customer
+  return element.disabled;
+}
+
 const fillDataFromMessage = (data) => {
-  data.forEach(async (item) => {
+  data.forEach((item) => {
     let element = getElementByAddress(item.bindingMode, item.bindingAddress);
     if (!element) return;
 
-    await sleep(500);
+    if (isDisabledElement(element)) return;
 
-    switch (item.type) {
-      case "card_payment_radio_button":
-      case "text_input":
-      case "textarea":
-      case "zip_code_address":
-      case "payment_method_id":
-      case "slider": {
-        setValueToElement(element, item.bindingValue);
-        break;
-      }
+    return new Promise(async (resolve) => {
+      await sleep(500);
 
-      case 'dropdown_prefecture': {
-        if (element.tagName === 'SELECT') {
-          const selectedOption = Array.from(element.options).find(option => option.value === item.bindingValue.toString());
-          if (!selectedOption) item.bindingValue = '';
-        };
-        
-        setValueToElement(element, item.bindingValue);
-        break;
+      switch (item.type) {
+        case "card_payment_radio_button":
+        case "text_input":
+        case "textarea":
+        case "zip_code_address":
+        case "payment_method_id":
+        case "slider": {
+          setValueToElement(element, item.bindingValue);
+          break;
+        }
+  
+        case 'dropdown_prefecture': {
+          if (element.tagName === 'SELECT') {
+            const selectedOption = Array.from(element.options).find(option => option.value === item.bindingValue.toString());
+            if (!selectedOption) item.bindingValue = '';
+          };
+          
+          setValueToElement(element, item.bindingValue);
+          break;
+        }
+  
+        case "agree_term":
+        case 'checkbox': {
+          setCheckToCheckboxElement(element, item.bindingValue);
+          break;
+        }
+  
+        case "pull_down": {
+          const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
+          if (!hasOption) item.bindingValue = '';
+          setValueToElement(element, item.bindingValue);
+          break;
+        }
+  
+        case "radio_button": {
+          setRadioValue(element, item.bindingValue);
+          break;
+        }
+  
+        case "password": {
+          element.setRangeText(item.bindingValue);
+          break;
+        }
+        default:
+          break;
       }
-
-      case "agree_term":
-      case 'checkbox': {
-        setCheckToCheckboxElement(element, item.bindingValue);
-        break;
-      }
-
-      case "pull_down": {
-        const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
-        if (!hasOption) item.bindingValue = '';
-        setValueToElement(element, item.bindingValue);
-        break;
-      }
-
-      case "radio_button": {
-        setRadioValue(element, item.bindingValue);
-        break;
-      }
-
-      case "password": {
-        element.setRangeText(item.bindingValue);
-        break;
-      }
-      default:
-        break;
-    }
+    });
   })
 }
 
