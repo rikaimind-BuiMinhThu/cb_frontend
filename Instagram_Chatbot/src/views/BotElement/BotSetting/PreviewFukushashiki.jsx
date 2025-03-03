@@ -613,25 +613,29 @@ const PreviewFukushashiki = () => {
 
   const processBotDelayMessage = async (messagesList, i, newState) => {
     if (messagesList[i]?.message_content[0]?.delay?.typing_on) {
-      return new Promise((resolve) => {
-        const newRenderMessagesList = [...state.renderMessagesList, messagesList[i]];
-        dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { renderMessagesList: newRenderMessagesList } });
-        resolve();
-      }).then(async () => {
-        await sleep(messagesList[i].message_content[0].delay.content * 1000);
-        let newRenderMessagesList = [...state.renderMessagesList];
-        newRenderMessagesList.pop();
-        newRenderMessagesList.push({});
+      // TODO: Need display typing on
+      // return new Promise(async (resolve) => {
+      //   const newRenderMessagesList = [...state.renderMessagesList, messagesList[i]];
+      //   dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: { renderMessagesList: newRenderMessagesList } });
+      //   await sleep(messagesList[i].message_content[0].delay.content * 1000);
+      //   resolve();
+      // }).then(() => {
+      //   let messagesList = state.messagesList;
+      //   messagesList[i].hidden = true;
+      //   let newRenderMessagesList = [...state.renderMessagesList];
+      //   newRenderMessagesList[i].hidden = true;
         
-        if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
-          return redirectToThanksPage();
-        return dispatch({
-          type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
-            renderMessagesList: [...newRenderMessagesList],
-            currentMsgIndex: i,
-          }
-        });
-      });
+      //   if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
+      //     return redirectToThanksPage();
+
+      //   return dispatch({
+      //     type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: {
+      //       renderMessagesList: [...newRenderMessagesList],
+      //       messagesList: messagesList,
+      //       currentMsgIndex: i,
+      //     }
+      //   });
+      // });
     }
 
     await sleep(messagesList[i].message_content[0].delay.content * 1000);
@@ -640,6 +644,7 @@ const PreviewFukushashiki = () => {
       return redirectToThanksPage();
     
     newState.currentMsgIndex = i;
+    newState.messagesList[i].hidden = true;
     return newState;
   }
 
@@ -732,7 +737,7 @@ const PreviewFukushashiki = () => {
     }
   }
 
-  const processForUserCaptchaMessage = async (messagesList, i, msgContentIndex, newState) => {
+  const processForUserCaptchaMessage = (messagesList, i, msgContentIndex, newState) => {
     const msgContent = messagesList[i]?.message_content?.[msgContentIndex];
     const msgContentType = msgContent.type;
     if (!msgContent) return newState;
@@ -754,15 +759,15 @@ const PreviewFukushashiki = () => {
       });
   }
 
-  const processForUserMessage = async (messagesList, i, newState) => {
-    await sleep(1000);
+  const processForUserMessage = (messagesList, i, newState) => {
+    // await sleep(1000);
     for (
       let j = 0;
       j < messagesList[i].message_content.length;
       j++
     ) {
       if (messagesList[i].message_content[j].type === "capture") {
-        await processForUserCaptchaMessage(messagesList, i, j, newState);
+        processForUserCaptchaMessage(messagesList, i, j, newState);
       }
     }
 
@@ -827,9 +832,10 @@ const PreviewFukushashiki = () => {
         }
       }
       if (isBotMessage(newState.messagesList[i])) {
+        
         newState = {
           ...newState,
-          ...processForBotMessage(newState.messagesList, i, newState, true)
+          ...(await processForBotMessage(newState.messagesList, i, newState, true))
         };
       } else if (isUserMessage(newState.messagesList[i])) {
         newState = {
