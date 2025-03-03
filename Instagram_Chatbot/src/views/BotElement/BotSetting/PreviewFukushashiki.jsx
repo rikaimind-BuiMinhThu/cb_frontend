@@ -42,6 +42,7 @@ import {
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
+import RenderMessageStack from "./PreviewComponent/RenderMessageStack";
 
 sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
@@ -637,8 +638,6 @@ const PreviewFukushashiki = () => {
       //   });
       // });
     }
-
-    await sleep(messagesList[i].message_content[0].delay.content * 1000);
 
     if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
       return redirectToThanksPage();
@@ -3226,7 +3225,21 @@ const PreviewFukushashiki = () => {
       </div>
     );
   };
-  
+
+  // Set DelayMessage hidden property to "TRUE", prevent render onReload
+  const handleExpiredDelayMessage = (indexMessage) => {
+    const newState = { ...state };
+    if (!newState.renderMessagesList[indexMessage]) return;
+
+    newState.renderMessagesList[indexMessage].hidden = true;
+
+    dispatch({
+      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+      state: newState,
+    });
+  };
+
+  // Using RenderMessageStack components, controlled by currentUserMsgIndex
   const renderMessages = () => {
     return state.renderMessagesList.map((message, indexMessage) => {
       if (message.hidden) return null;

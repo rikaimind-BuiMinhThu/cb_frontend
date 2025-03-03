@@ -100,7 +100,7 @@ const BotMessage = ({
     <div key={index} className="sp-body-bot-side slideRight">
       {(content.type === "text_input" ||
         content.type === "file" ||
-        content.type === "delay") && (
+        (content.type === "delay" && content.delay?.typing_on))  && (
           <div className="sp-body-bot-side-avatar sp-avatar">
             <img src={EC_CHATBOT_URL + "/" + botInfor?.icon?.url} />
           </div>
@@ -209,7 +209,7 @@ const BotMessage = ({
                   }}
                 ></textarea>
               ))}
-            {content.type === "delay" && (
+            {content.type === "delay" && content.delay?.typing_on && (
               <img
                 src={messageTypingGif}
                 style={{
