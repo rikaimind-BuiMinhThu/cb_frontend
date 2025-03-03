@@ -339,6 +339,7 @@ const fillDataFromMessage = (data) => {
       await sleep(500);
 
       switch (item.type) {
+        case "card_number":
         case "card_payment_radio_button":
         case "text_input":
         case "textarea":
@@ -432,6 +433,9 @@ const setCheckToCheckboxElement = (element, value) => {
 
 const setValueToElement = (element, value) => {
   element.value = value;
+  if (!element.value) {
+    element.value = removeLeadingZero(value);
+  } 
   element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 

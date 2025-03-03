@@ -59,6 +59,13 @@ const UserMessage = ({
   const [bot_id, setBotId] = useState(Cookies.get("bot_id"));
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
+  
+  const cardExpiredYearOptions =  Array.from({ length: 10 }, (_, i) => {
+    return {
+      key: moment().add(i, "years").format("YY"),
+      value: moment().add(i, "years").format("YY"),
+    };
+  });
 
   const getLPOptionData = (search_element_value) => {
     return lpOptionData[search_element_value];
@@ -4253,11 +4260,7 @@ const UserMessage = ({
                         value={creditCardPayment.year}
                         disabled={disabled}
                         placeholder={creditCardPayment.year_placeholder}
-                        data={dataYearFixed.filter(
-                          (item) =>
-                            item.key >= new Date().getFullYear() &&
-                            item.key <= new Date().getFullYear() + 10
-                        )}
+                        data={cardExpiredYearOptions}
                         onChange={(value) =>
                           onChangeValue(
                             indexContent,
@@ -4306,11 +4309,7 @@ const UserMessage = ({
                         value={creditCardPayment.year}
                         disabled={disabled}
                         placeholder={creditCardPayment.year_placeholder}
-                        data={dataYearFixed.filter(
-                          (item) =>
-                            item.key >= new Date().getFullYear() &&
-                            item.key <= new Date().getFullYear() + 10
-                        )}
+                        data={cardExpiredYearOptions}
                         onChange={(value) =>
                           onChangeValue(
                             indexContent,
@@ -6218,11 +6217,7 @@ const UserMessage = ({
                               value={cardPaymentRadioButton.year}
                               disabled={disabled}
                               placeholder={"年"}
-                              data={dataYearFixed.filter(
-                                (item) =>
-                                  item.key >= new Date().getFullYear() &&
-                                  item.key <= new Date().getFullYear() + 10
-                              )}
+                              data={cardExpiredYearOptions}
                               onChange={(value) =>
                                 onChangeValue(
                                   indexContent,
@@ -6271,11 +6266,7 @@ const UserMessage = ({
                               value={cardPaymentRadioButton.year}
                               disabled={disabled}
                               placeholder={"年"}
-                              data={dataYearFixed.filter(
-                                (item) =>
-                                  item.key >= new Date().getFullYear() &&
-                                  item.key <= new Date().getFullYear() + 10
-                              )}
+                              data={cardExpiredYearOptions}
                               onChange={(value) =>
                                 onChangeValue(
                                   indexContent,
