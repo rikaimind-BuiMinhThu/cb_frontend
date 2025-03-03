@@ -357,9 +357,9 @@ const fillDataFromMessage = (data) => {
             const selectedOption = Array.from(element.options).find(option => option.value === item.bindingValue.toString());
             if (!selectedOption) item.bindingValue = '';
           };
-          if(element.tagName === 'INPUT') {
-          setValueToElementWithoutDispatch(element,item.bindingValue)
-          break;
+          if (element.tagName === 'INPUT') {
+            setValueToElementWithoutDispatch(element,item.bindingValue);
+            break;
           }
           waitForElement(
             item.bindingMode, item.bindingAddress,
