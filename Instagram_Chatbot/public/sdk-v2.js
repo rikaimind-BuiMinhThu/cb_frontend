@@ -435,10 +435,7 @@ const setValueToElement = (element, value) => {
   element.value = value;
   if (element.value == undefined || element.value == "") {
     element.value = removeLeadingZero(value);
-  }
-  if (element.value == undefined || element.value == "") {
-    element.value = removeFirstTwoChars(value);
-  }
+  } 
   element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
