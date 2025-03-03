@@ -229,7 +229,7 @@ const PreviewFukushashiki = () => {
       });
   }, [state.botId]);
 
-  const eventHandler = (event) => {
+  const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
     const actionData = event.data.actionData;
 
@@ -244,6 +244,7 @@ const PreviewFukushashiki = () => {
         });
 
       case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
+        await sleep(1000);
         return dispatch({
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
           payload: { submitErrorMessage: actionData }
