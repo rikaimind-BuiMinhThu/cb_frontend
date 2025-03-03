@@ -2744,10 +2744,12 @@ const PreviewFukushashiki = () => {
       newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
     }
 
-    const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
-    if (nextUserMessage && isUserMessage(nextUserMessage) &&
-      nextUserMessage.button_jscode == true && nextUserMessage.jscode?.length > 0) {
-      postMessageForExecuteJs(nextUserMessage.jscode);
+    const botConfirmMessage = newState.messagesList.find(msg => msg.message_content.find(x => x.text_input?.use_for_confirm_message));
+    const botConfirmJsCode = botConfirmMessage.message_content
+      .find(x => x.text_input?.use_for_confirm_message)
+      ?.text_input?.js_code;
+    if (botConfirmJsCode && botConfirmJsCode.length > 0) {
+      postMessageForExecuteJs(botConfirmJsCode);
       await sleep(1000);
     }
 
