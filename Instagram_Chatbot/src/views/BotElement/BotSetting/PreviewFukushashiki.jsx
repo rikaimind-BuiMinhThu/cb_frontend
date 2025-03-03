@@ -2608,6 +2608,16 @@ const PreviewFukushashiki = () => {
     });
   }
 
+  const postMessageForGetPreviewOrderContent = async (jsCode) => {
+    postMessageToParent({
+      action: CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT,
+      actionData: jsCode,
+      is_use_js: true
+    });
+
+    await sleep(2000);
+  }
+
   const fukushashikiToLP = (fukushashikiData) => {
     postMessageToParent({
       action: 'fukushashiki',
@@ -2752,8 +2762,7 @@ const PreviewFukushashiki = () => {
       ?.text_input?.jscode;
 
     if (botConfirmJsCode && botConfirmJsCode.length > 0) {
-      postMessageForExecuteJs(botConfirmJsCode);
-      await sleep(1000);
+      postMessageForGetPreviewOrderContent(botConfirmJsCode);
     }
 
     setStateToSessionStorage(newState);
