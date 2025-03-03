@@ -70,21 +70,21 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
   let count = 0;
   const poops = setInterval(function(){
     count ++;
+    log(`Waiting for ${options.type} element ${address}: ${count} times`);
     if (count > 50) {
       clearInterval(poops);
       throw new Error(`Timeout for ${options.type} element ${address}`);
-      return;
     }
 
     const element = getElementByAddress(mode, address);
+    if (!element) return;
     switch (options.type) {
       case WAIT_OPTION_TYPES.WAIT_FOR_LOADING:
-        if (!element) return;
         clearInterval(poops);
         callback();
         break;
       case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
-        if (!element || element.value != options.value) {
+        if (element.value != options.value) {
           setValueToElement(element, options.value);
           break;
         }
@@ -92,8 +92,10 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
         clearInterval(poops);
         callback();
         break;
+      default:
+        throw new Error(`Invalid wait option type ${options.type}`);
     }
-  }, 100);
+  }, 500);
 }
 
 const getEcChatBotApiServerBaseUrl = () => {
