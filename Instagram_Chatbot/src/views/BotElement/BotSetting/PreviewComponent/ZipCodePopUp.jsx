@@ -127,6 +127,9 @@ const ZipCodePopUp = ({
         };
       }
 
+      newZipCodeAddress.is_use_dropdown = true;
+      newZipCodeAddress.value_prefecture = prefecturesList.find((i) => i.id === state.selectedPrefecture)?.name || "";
+
       onChangeValue(index, "zip_code_address", newZipCodeAddress, null, null, null, message);
       // TODO: Need refactor for this part to render only 1 time instead of 2 times
       onChangeErrors(`message${messageIndex}_content${zipcodeContentIndex}_zip_code_address`, "");
