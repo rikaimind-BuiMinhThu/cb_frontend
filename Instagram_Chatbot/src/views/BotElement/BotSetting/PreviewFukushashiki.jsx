@@ -2448,23 +2448,34 @@ const PreviewFukushashiki = () => {
               const dataInforFukushashiki = Object.fromEntries(
                 Object.entries(message).filter(([key]) => key.includes("fukushashiki"))
               );
-              const types = ["building_name", "address", "municipality", "prefecture", "post_code", "post_code_left", "post_code_right"];
+              const types = [
+                "post_code",
+                "post_code_left",
+                "post_code_right",
+                "await",
+                "prefecture",
+                "address",
+                "building_name",
+                "municipality"
+              ];              
               const result = types
-                .filter(type => `value_${type}` in userInputData)
+                .filter(type => type === "await" || `value_${type}` in userInputData)
                 .map(type => {
                   const bindingMode = dataInforFukushashiki[`${type}_fukushashiki_search_mode`];
-                  if (bindingMode === undefined) {
+
+                  if (bindingMode === undefined && type !== "await") {
                     return null;
                   }
+
                   return {
                     type: message.zip_code_address.is_use_dropdown ? "dropdown_prefecture" : "zip_code_address",
                     bindingMode: bindingMode,
+                    additionalType: type,
                     bindingAddress: dataInforFukushashiki[`${type}_fukushashiki_search_value`],
-                    bindingValue: userInputData[`value_${type}`]
+                    bindingValue: userInputData[`value_${type}`] || null
                   };
                 })
                 .filter(item => item !== null);
-
               fukuDataList.push(...result);
               break;
             }
