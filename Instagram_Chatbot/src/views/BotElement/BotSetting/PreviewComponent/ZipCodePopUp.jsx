@@ -19,21 +19,21 @@ const ZipCodePopUp = ({
 
   const onChangePrefecture = (value) => {
     if (!value) return;
-    const prefecture = prefecturesList.find((item) => item.id === value);
-
-    if (!prefecture || !prefecture?.prefecture_jis_code) {
+    const prefecture_jis_code = prefecturesList.find((item) => item.id === value)?.prefecture_jis_code;
+    
+    if (!prefecture_jis_code) {
       console.error("prefecture_jis_code not found");
       return;
     }
 
-    getCitiesByPrefecture(prefecture.prefecture_jis_code)
+    getCitiesByPrefecture(prefecture_jis_code)
       .then((res) => {
         if (res.data.code !== 1) return;
 
         const newState = { ...state };
         newState.citiesList = res.data.data;
 
-        newState.selectedPrefecture = prefecture?.name || "";
+        newState.selectedPrefecture = value;
         newState.selectedCity = null;
         newState.selectedTown = null;
         newState.selectedZipcode = null;
@@ -42,7 +42,7 @@ const ZipCodePopUp = ({
       .catch((error) => {
         const newState = { ...state };
 
-        newState.selectedPrefecture = prefecture?.name || "";
+        newState.selectedPrefecture = value;
         newState.selectedCity = null;
         newState.selectedTown = null;
         newState.selectedZipcode = null;
