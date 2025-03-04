@@ -101,8 +101,6 @@ const ZipCodePopUp = ({
       index = message.message_content
         .findIndex((item) => item.type === "zip_code_address");
     }
-    const isSplitPostalCode = index &&
-      message.message_content[index]?.zip_code_address?.split_postal_code;
 
     if (state.selectedZipcode) {
       document.getElementById("sp-withdrawal-container").style.display = "none";
@@ -110,30 +108,19 @@ const ZipCodePopUp = ({
 
       let newErrors = { ...errors };
       newErrors[`message${messageIndex}_content${index}_zip_code_address`] = "";
-      let newZipCodeAddress = {};
 
-      if (isSplitPostalCode) {
-        newZipCodeAddress = {
-          value_post_code: state.selectedZipcode,
-          value_prefecture: state.selectedPrefecture,
-          value_municipality: `${state.selectedCity}${state.selectedTown}`,
-        };
-      } else {
-        newZipCodeAddress = {
-          value_post_code_left: state.selectedZipcode.slice(0, 3),
-          value_post_code_right: state.selectedZipcode.slice(3),
-          value_prefecture: state.selectedPrefecture,
-          value_municipality: `${state.selectedCity}${state.selectedTown}`,
-        };
-      }
+      const newZipCodeAddress = {
+        value_post_code: state.selectedZipcode,
+        value_post_code_left: state.selectedZipcode.slice(0, 3),
+        value_post_code_right: state.selectedZipcode.slice(3),
+        value_prefecture: state.selectedPrefecture,
+        value_municipality: `${state.selectedCity}${state.selectedTown}`,
+      };
 
       onChangeValue(index, "zip_code_address", newZipCodeAddress, null, null, null, message);
       // TODO: Need refactor for this part to render only 1 time instead of 2 times
       onChangeErrors(`message${messageIndex}_content${zipcodeContentIndex}_zip_code_address`, "");
     }
-
-    document.getElementById("ss-user-input-address").focus();
-    document.getElementById("ss-user-input-address").select();
   };
 
   if (!prefecturesList) return null;
