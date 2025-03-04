@@ -810,11 +810,9 @@ const PreviewFukushashiki = () => {
     }
 
     if (isLoggedIn) {
-      newState.messagesList = newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
+      newState.messagesList.forEach((x) => x.hidden = x.not_display_when_logged_in);
     }
     
-    // messagesList = messagesList.filter(x => !x.hidden);
-
     newState.variablesList = res.data?.all_variables || [];
     newState.urlThanksPage = res.data.data?.conversation?.urlThanksPage || "";
 
