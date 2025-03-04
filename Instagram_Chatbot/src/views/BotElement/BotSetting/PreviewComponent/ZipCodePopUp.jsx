@@ -127,6 +127,7 @@ const ZipCodePopUp = ({
         };
       }
 
+      // TODO: Need Refactor
       newZipCodeAddress.is_use_dropdown = true;
       newZipCodeAddress.value_prefecture = prefecturesList.find((i) => i.id === state.selectedPrefecture)?.name || "";
 
