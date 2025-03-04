@@ -2747,9 +2747,9 @@ const PreviewFukushashiki = () => {
     }
 
     if (isLoggedIn) {
-      newState.messagesList = newState.messagesList.forEach(x => x.hidden = x.not_display_when_logged_in); 
+      newState.messagesList.forEach(x => x.hidden = x.not_display_when_logged_in);
     }
-    
+
     // Update next messages list after clicked next
     const nextMessage = newState.messagesList[clickedMsgIndex + 1];
 
