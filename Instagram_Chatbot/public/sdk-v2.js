@@ -73,7 +73,7 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
     log(`Waiting for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}: ${count} times`);
     if (count > 50) {
       clearInterval(poops);
-      console.error(`Timeout for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}`);
+      console.log(`Timeout for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}`);
       return;
     }
 
@@ -319,7 +319,10 @@ const processGetErrorMessage = (data) => {
 
   const element = getElementByAddress(data.seachMode, data.searchValue)
 
-  if (!element) throw new Error(`Element ${data.searchValue} not found`);
+  if (!element) {
+    console.log(`Element ${data.searchValue} not found`);
+    return;
+  }
   sendMessageToChatbot(element.innerHTML, CHATBOT_ACTIONS.GET_ERROR_MESSAGE);
 }
 
@@ -437,10 +440,15 @@ const setCheckToCheckboxElement = (element, value) => {
 }
 
 const setValueToElement = (element, value) => {
-  element.value = value;
-  if (!element.value) {
-    element.value = removeLeadingZero(value);
+  if (element.tagName === 'SELECT') {
+    const selectedOption = Array.from(element.options).find(option => {
+      return option.value === value.toString() || option.value === removeLeadingZero(value).toString();
+    });
+
+    if (!selectedOption) value = '';
   }
+
+  element.value = value;
   element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
