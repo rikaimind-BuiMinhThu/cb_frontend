@@ -869,8 +869,19 @@ const PreviewFukushashiki = () => {
   useEffect(() => {
     if (!state.loadedStateFromSession) {
       let savedState = getStateFromSessionStorage();
-
       if (savedState) {
+        if (isLoggedIn) {
+          savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
+          savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
+          savedState.renderMessagesList = savedState.messagesList.slice(0, savedState.currentMsgIndex + 1);
+          return dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+            payload: {
+              ...savedState,
+              isOpen: true
+            }
+          });
+        }
         const renderMessagesList = savedState.renderMessagesList;
         const btnSubmitItem = renderMessagesList.find(x => x.message_content.find(y => y.type == "button_submit"));
 
@@ -2700,7 +2711,7 @@ const PreviewFukushashiki = () => {
     let newState = { ...state };
     let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
-    
+
     const clickedMsg = newState.messagesList[clickedMsgIndex];
 
     if (!handleValidateField(indexMessage)) {
