@@ -206,7 +206,7 @@ const displayPopup = async () => {
 
       switch (e.data.action) {
         case CHATBOT_ACTIONS.FUKUSHASHIKI:
-          fillDataFromMessage(e.data.actionData);
+          await fillDataFromMessage(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
           processGetErrorMessage(e.data.actionData);
@@ -330,70 +330,73 @@ const isDisabledElement = (element) => {
   return element.disabled;
 }
 
-const fillDataFromMessage = (data) => {
-  data.forEach((item) => {
+const fillDataFromMessage = async (data) => {
+  for (let i = 0; i < data.length; i++) {
+    const item = data[i];
+
+    if (item.additionalType === "await") {
+      await sleep(1500);
+      continue;
+    }
+
     let element = getElementByAddress(item.bindingMode, item.bindingAddress);
-    if (!element) return;
+    if (!element) continue;
 
-    if (isDisabledElement(element)) return;
+    if (isDisabledElement(element)) continue;
 
-    return new Promise(async (resolve) => {
-      await sleep(500);
-
-      switch (item.type) {
-        case "zip_code_address":
-        case "card_number":
-        case "card_payment_radio_button":
-        case "text_input":
-        case "textarea":
-        case "payment_method_id":
-        case "slider": {
-          waitForElement(
-            item.bindingMode, item.bindingAddress,
-            {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
-          break;
-        }
-  
-        case 'dropdown_prefecture': {
-          if (element.tagName === 'SELECT') {
-            const selectedOption = Array.from(element.options).find(option => option.value === item.bindingValue.toString());
-            if (!selectedOption) item.bindingValue = '';
-          };
-          waitForElement(
-            item.bindingMode, item.bindingAddress,
-            {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
-          break;
-        }
-  
-        case "agree_term":
-        case 'checkbox': {
-          setCheckToCheckboxElement(element, item.bindingValue);
-          break;
-        }
-  
-        case "pull_down": {
-          const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
-          if (!hasOption) item.bindingValue = '';
-          waitForElement(
-            item.bindingMode, item.bindingAddress,
-            {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
-          break;
-        }
-  
-        case "radio_button": {
-          setRadioValue(element, item.bindingValue);
-          break;
-        }
-  
-        case "password": {
-          element.setRangeText(item.bindingValue);
-          break;
-        }
-        default:
-          break;
+    switch (item.type) {
+      case "zip_code_address":
+      case "card_number":
+      case "card_payment_radio_button":
+      case "text_input":
+      case "textarea":
+      case "payment_method_id":
+      case "slider": {
+        waitForElement(
+          item.bindingMode, item.bindingAddress,
+          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+        break;
       }
-    });
-  })
+
+      case 'dropdown_prefecture': {
+        if (element.tagName === 'SELECT') {
+          const selectedOption = Array.from(element.options).find(option => option.value === item.bindingValue.toString());
+          if (!selectedOption) item.bindingValue = '';
+        };
+        waitForElement(
+          item.bindingMode, item.bindingAddress,
+          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+        break;
+      }
+
+      case "agree_term":
+      case 'checkbox': {
+        setCheckToCheckboxElement(element, item.bindingValue);
+        break;
+      }
+
+      case "pull_down": {
+        const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
+        if (!hasOption) item.bindingValue = '';
+        waitForElement(
+          item.bindingMode, item.bindingAddress,
+          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+        break;
+      }
+
+      case "radio_button": {
+        setRadioValue(element, item.bindingValue);
+        break;
+      }
+
+      case "password": {
+        element.setRangeText(item.bindingValue);
+        break;
+      }
+      default:
+        break;
+    }
+  }
 }
 
 const getElementByAddress = (mode, address) => {
