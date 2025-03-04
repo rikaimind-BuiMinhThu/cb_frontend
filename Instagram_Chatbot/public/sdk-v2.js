@@ -70,10 +70,10 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
   let count = 0;
   const poops = setInterval(function(){
     count ++;
-    log(`Waiting for element address: ${address}, mode: ${mode}, options: ${options}: ${count} times`);
+    log(`Waiting for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}: ${count} times`);
     if (count > 50) {
       clearInterval(poops);
-      console.error(`Timeout for element address: ${address}, mode: ${mode}, options: ${options}`);
+      console.error(`Timeout for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}`);
       return;
     }
 
