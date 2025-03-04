@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "../../../../assets/css/bot/preview-chat-bot.css";
 import "moment/locale/zh-cn";
-import { getTownsByCity, getCitiesByPrefecture, stringNullOrEmpty } from "./Utils";
+import { getTownsByCity, getCitiesByPrefecture } from "./Utils";
 import { MDBIcon } from "mdbreact";
 import SelectCustom from "../ScenarioSetting/scenarioComon/SelectCustom";
 
