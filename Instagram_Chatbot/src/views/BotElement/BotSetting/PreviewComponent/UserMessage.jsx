@@ -1427,7 +1427,7 @@ const UserMessage = ({
                                 style={{ width: "100%" }}
                                 value={shippingAddress?.value_prefecture}
                                 data={prefecturesList}
-                                keyValue="name"
+                                keyValue="id"
                                 nameValue="name"
                                 placeholder={shippingAddress.prefecture}
                                 onChange={(value) =>
@@ -2887,7 +2887,7 @@ const UserMessage = ({
                         data={prefecturesList}
                         placeholder="選択してください。"
                         style={{ width: "100%" }}
-                        keyValue="name"
+                        keyValue="id"
                         nameValue="name"
                         onChange={(value) =>
                           onChangeValue(
@@ -2937,7 +2937,7 @@ const UserMessage = ({
                           data={prefecturesList}
                           placeholder="都道府県を選択"
                           style={{ width: "45%" }}
-                          keyValue="name"
+                          keyValue="id"
                           nameValue="name"
                           onChange={async (value) => {
                             onChangeValue(
@@ -2949,7 +2949,7 @@ const UserMessage = ({
                             );
                             if (value) {
                               let prefecture_jis_code = prefecturesList.find(
-                                (item) => item.name === value
+                                (item) => item.id === value
                               ).prefecture_jis_code;
                               api
                                 .get(
@@ -3362,7 +3362,7 @@ const UserMessage = ({
                         style={{ width: "100%" }}
                         value={zipCodeAddress?.value_prefecture}
                         data={prefecturesList}
-                        keyValue="name"
+                        keyValue="id"
                         nameValue="name"
                         placeholder={zipCodeAddress.prefecture}
                         onChange={(value) =>
