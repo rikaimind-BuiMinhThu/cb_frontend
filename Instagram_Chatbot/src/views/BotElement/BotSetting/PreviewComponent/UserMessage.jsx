@@ -1113,7 +1113,7 @@ const UserMessage = ({
                           <span
                             style={!disabled ? { cursor: "pointer" } : {}}
                             onClick={() => {
-                              if (disabled !== true) isPopUpZipCodeShippingAddress(true, indexContent);
+                              if (disabled !== true) isPopUpZipCode(true, indexContent);
                             }}
                           >
                             〒検索はこちら
@@ -1152,7 +1152,8 @@ const UserMessage = ({
                             </div>
                             {shippingAddress.split_postal_code !== true ? (
                               <InputCustom
-                                type="number"
+                                type="tel"
+                                inputMode="numeric"
                                 placeholder={shippingAddress.post_code}
                                 disabled={disabled}
                                 // controls={false}

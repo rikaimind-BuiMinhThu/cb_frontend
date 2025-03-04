@@ -114,14 +114,14 @@ const ZipCodePopUp = ({
 
       if (isSplitPostalCode) {
         newZipCodeAddress = {
-          value_post_code: state.selectedZipcode,
+          value_post_code_left: state.selectedZipcode.slice(0, 3),
+          value_post_code_right: state.selectedZipcode.slice(3),
           value_prefecture: state.selectedPrefecture,
           value_municipality: `${state.selectedCity}${state.selectedTown}`,
         };
       } else {
         newZipCodeAddress = {
-          value_post_code_left: state.selectedZipcode.slice(0, 3),
-          value_post_code_right: state.selectedZipcode.slice(3),
+          value_post_code: state.selectedZipcode,
           value_prefecture: state.selectedPrefecture,
           value_municipality: `${state.selectedCity}${state.selectedTown}`,
         };
@@ -131,9 +131,6 @@ const ZipCodePopUp = ({
       // TODO: Need refactor for this part to render only 1 time instead of 2 times
       onChangeErrors(`message${messageIndex}_content${zipcodeContentIndex}_zip_code_address`, "");
     }
-
-    document.getElementById("ss-user-input-address").focus();
-    document.getElementById("ss-user-input-address").select();
   };
 
   if (!prefecturesList) return null;
