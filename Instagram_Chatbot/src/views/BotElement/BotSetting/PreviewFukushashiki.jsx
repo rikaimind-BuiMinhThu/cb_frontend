@@ -2634,10 +2634,11 @@ const PreviewFukushashiki = () => {
     await sleep(2000);
   }
 
-  const fukushashikiToLP = (fukushashikiData) => {
+  const fukushashikiToLP = (fukushashikiData) => {  
     postMessageToParent({
       action: 'fukushashiki',
-      actionData: fukushashikiData
+      actionData: fukushashikiData,
+      isOpen: true
     });
   }
 
