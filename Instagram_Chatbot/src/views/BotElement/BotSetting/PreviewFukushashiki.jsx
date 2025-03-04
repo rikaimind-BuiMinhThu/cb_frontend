@@ -851,6 +851,15 @@ const PreviewFukushashiki = () => {
     }
 
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+    newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
+      if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
+        return {
+          ...msg,
+          hidden: true,
+        };
+      }
+      return msg;
+    }); 
     newState.passedUserMsgCount = newState.renderMessagesList?.filter(msg => isUserMessage(msg))?.length;
 
     dispatch({ type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE, payload: newState });
@@ -882,7 +891,16 @@ const PreviewFukushashiki = () => {
             }
           });
         }
-        const renderMessagesList = savedState.renderMessagesList;
+        const renderMessagesList = savedState.renderMessagesList.map((msg) => {
+          if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
+            return {
+              ...msg,
+              hidden: true,
+            };
+          }
+          return msg;
+        });
+
         const btnSubmitItem = renderMessagesList.find(x => x.message_content.find(y => y.type == "button_submit"));
 
         if (btnSubmitItem) {
@@ -2780,7 +2798,16 @@ const PreviewFukushashiki = () => {
     
     const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
-    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1); 
+    newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
+      if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
+        return {
+          ...msg,
+          hidden: true,
+        };
+      }
+      return msg;
+    }); 
 
     if (isBtnUpdateClick) {
       newState.passedUserMsgCount++;
@@ -2933,6 +2960,15 @@ const PreviewFukushashiki = () => {
 
     newState.messagesList = state.messagesList;
     newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1);
+    newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
+      if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
+        return {
+          ...msg,
+          hidden: true,
+        };
+      }
+      return msg;
+    });
     setStateToSessionStorage(newState);
 
     dispatch({
