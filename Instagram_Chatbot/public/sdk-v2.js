@@ -70,10 +70,11 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
   let count = 0;
   const poops = setInterval(function(){
     count ++;
-    log(`Waiting for ${options.type} element ${address}: ${count} times`);
+    log(`Waiting for element address: ${address}, mode: ${mode}, options: ${options}: ${count} times`);
     if (count > 50) {
       clearInterval(poops);
-      throw new Error(`Timeout for ${options.type} element ${address}`);
+      console.error(`Timeout for element address: ${address}, mode: ${mode}, options: ${options}`);
+      return;
     }
 
     const element = getElementByAddress(mode, address);
