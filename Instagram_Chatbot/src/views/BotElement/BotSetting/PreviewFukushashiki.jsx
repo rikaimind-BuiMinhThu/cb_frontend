@@ -2705,15 +2705,6 @@ const PreviewFukushashiki = () => {
       return;
     }
 
-    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
-      postMessageForExecuteJs(clickedMsg.jscode);
-    }
-
-    if (isDislayingLoginForm(clickedMsg)) {
-      // For GINZA AIRA,
-      return;
-    }
-
     const submitData = {
       scenario_id: state.scenarioId,
       message: clickedMsg,
@@ -2737,6 +2728,15 @@ const PreviewFukushashiki = () => {
     }
 
     fukushashikiToLP(convertToFukushashikiObject(submitData));
+
+    if (clickedMsg.button_jscode && clickedMsg.jscode.length > 0) {
+      postMessageForExecuteJs(clickedMsg.jscode);
+    }
+
+    if (isDislayingLoginForm(clickedMsg)) {
+      // For GINZA AIRA,
+      return;
+    }
 
     if (isLoggedIn) {
       newState.messagesList = newState.messagesList.forEach(x => x.hidden = x.not_display_when_logged_in); 
