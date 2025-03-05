@@ -18,6 +18,11 @@ const CRAWL_ELEMENT_TYPES = {
   SELECT: 'select',
 };
 
+const ELEMENT_TAGS = {
+  SELECT: "SELECT",
+  INPUT: "INPUT",
+};
+
 const botId = sessionStorage.getItem("bot_id");
 const uuid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 let chatbotBottom = sessionStorage.getItem("chatbotBottom");
@@ -447,7 +452,7 @@ const setValueToElement = (element, value) => {
       return acceptableValues.includes(option.value.toString());
     });
 
-    if (selectedOption) {
+    if (!selectedOption) {
       console.error(`Option not found: ${value}, element: ${element.id}`);
       return;
     }
