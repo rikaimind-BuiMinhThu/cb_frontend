@@ -2289,15 +2289,19 @@ const PreviewFukushashiki = () => {
                 }
               }
 
-              if (Object.keys(message.text_input.email_address).length != 0 && message.text_input.email_address != undefined) {
-                const fukuObject = {
-                  type: message.type,
-                  bindingMode: message.fukushashiki_search_mode,
-                  bindingAddress: message.fukushashiki_search_value,
-                  bindingValue: message.text_input.email_address.value,
-                };
-                fukuDataList.push(fukuObject);
+              if (Object.keys(message.text_input.email_address).length !== 0 && message.text_input.email_address !== undefined) {
+                const addresses = message.fukushashiki_search_value?.split(',') || [message.fukushashiki_search_value];
+                addresses.forEach(value => {
+                  const fukuObject = {
+                    type: message.type,
+                    bindingMode: message.fukushashiki_search_mode,
+                    bindingAddress: value.trim(),
+                    bindingValue: message.text_input.email_address.value,
+                  };
+                  fukuDataList.push(fukuObject);
+                });
               }
+
               if (Object.keys(message.text_input.password).length != 0 && message.text_input.password != undefined) {
                 if (message.fukushashiki_search_value.includes(',')) {
                   let address = message.fukushashiki_search_value.split(',');
