@@ -1,16 +1,31 @@
-let botId = sessionStorage.getItem("bot_id");
+const CHATBOT_ACTIONS = {
+  CLICK_BUTTON: 'clickButton',
+  EXCUTE_JS: 'excuteJS',
+  FUKUSHASHIKI: 'fukushashiki',
+  GET_ERROR_MESSAGE: 'getErrorMessage',
+  CRAWL_DATA: 'crawlData',
+  OPEN_PREVIEW: 'openPreview',
+  GET_PREVIEW_ORDER_CONTENT: 'getPreviewOrderContent',
+};
+
+const SEARCH_MODES = {
+  ID: 1,
+  CSS_SELECTOR: 2,
+  XPATH: 3,
+};
+
+const CRAWL_ELEMENT_TYPES = {
+  SELECT: 'select',
+};
+
+const botId = sessionStorage.getItem("bot_id");
+const uuid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 let chatbotBottom = sessionStorage.getItem("chatbotBottom");
 let chatbotH = sessionStorage.getItem("chatbotH");
 let chatbotRight = sessionStorage.getItem("chatbotRight");
 let chatbotW = sessionStorage.getItem("chatbotW");
 let scenarioId = "";
-let displayErrorMessage = {
 
-  isDisplay: "false",
-  seachMode: "",
-  searchValue: ""
-
-}
 if (typeof window.jQuery === 'undefined') {
   let head = document.getElementsByTagName("head")[0];
   let script = document.createElement("script");
@@ -19,14 +34,14 @@ if (typeof window.jQuery === 'undefined') {
   head.appendChild(script);
 }
 
-function getEnvironment() {
+const getEnvironment = () => {
   const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
   });
   return params.env || "production";
 }
 
-function getDebugFlag() {
+const getDebugFlag = () => {
   const params = new Proxy(new URLSearchParams(window.location.search), {
     get: (searchParams, prop) => searchParams.get(prop),
   });
@@ -34,7 +49,7 @@ function getDebugFlag() {
   return params.debug || true;
 }
 
-function log(message) {
+const log = (message) =>{
   let debugFlag = getDebugFlag();
 
   if (debugFlag) {
@@ -42,7 +57,51 @@ function log(message) {
   }
 }
 
-function getEcChatBotApiServerBaseUrl() {
+const sleep = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+const WAIT_OPTION_TYPES = {
+  WAIT_FOR_LOADING: "WAIT_FOR_LOADING",
+  WAIT_FOR_SETTING_VALUE: "WAIT_FOR_SETTING_VALUE",
+};
+
+const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, callback = () => {}) => {
+  let count = 0;
+  const poops = setInterval(function(){
+    count ++;
+    log(`Waiting for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}: ${count} times`);
+    if (count > 50) {
+      clearInterval(poops);
+      console.log(`Timeout for element address: ${address}, mode: ${mode}, options: ${JSON.stringify(options)}`);
+      return;
+    }
+
+    const element = getElementByAddress(mode, address);
+    if (!element) return;
+    switch (options.type) {
+      case WAIT_OPTION_TYPES.WAIT_FOR_LOADING:
+        clearInterval(poops);
+        callback();
+        break;
+      case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
+        if (element.value != options.value) {
+          setValueToElement(element, options.value);
+          break;
+        }
+
+        clearInterval(poops);
+        callback();
+        break;
+      default:
+        throw new Error(`Invalid wait option type ${options.type}`);
+    }
+  }, 500);
+}
+
+const getEcChatBotApiServerBaseUrl = () => {
+  // Comment out below line if you want to connect the staging backend API server
+  // return "https://ec-chatbot-test1.com";
   const environment = getEnvironment();
   switch (environment) {
     case "staging":
@@ -57,7 +116,9 @@ function getEcChatBotApiServerBaseUrl() {
   }
 }
 
-function getEcChatBotFrontEndBaseUrl() {
+const getEcChatBotFrontEndBaseUrl = () => {
+  // Comment out below line if you want to use the local frontend
+  // return "http://localhost:3001";
   const environment = getEnvironment();
 
   switch (environment) {
@@ -72,28 +133,16 @@ function getEcChatBotFrontEndBaseUrl() {
       return "http://localhost:3001";
   }
 }
-let globalIframe
-function sendMessageToChatbot(contentMessage, type) {
-  if (type == "text") {
-    const message = { text: String(contentMessage) };
-    globalIframe.contentWindow.postMessage(message, "*");
-  }
-  if (type == "previewObject") {
-    const message = { objectSend: contentMessage };
-    globalIframe.contentWindow.postMessage(message, "*");
-  }
-  if (type == "crawJsonObject") {
-    const message = {
-      crawJsonObject: contentMessage,
-      type: "date"
 
-    };
-    globalIframe.contentWindow.postMessage(message, "*");
-  }
+let globalIframe;
 
+const sendMessageToChatbot = (contentMessage, action) => {
+  let data = {action: action, actionData: contentMessage};
+
+  globalIframe.contentWindow.postMessage(data, "*");
 }
 
-async function displayPopup() {
+const displayPopup = async () => {
   const device =
     !tabletCheck() && !mobileCheck()
       ? "pc"
@@ -102,7 +151,6 @@ async function displayPopup() {
         : "smartphone";
   const response = await fetch(
     `${getEcChatBotApiServerBaseUrl()}/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
-    // `https://ec-chatbot-test1.com/api/v1/managements/chatbots/${botId}/get_scenario_selected`,
     {
       method: "GET",
       headers: {
@@ -114,9 +162,7 @@ async function displayPopup() {
 
   const data = await response.json();
   scenarioId = data.data.id;
-  let uuid =
-    Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15);
+  
   let body = document.getElementsByTagName("BODY")[0];
   let iframe = document.createElement("iframe");
 
@@ -146,38 +192,43 @@ async function displayPopup() {
   iframe.style.borderRadius = "0px";
   // iframe.style.display = "none";
   iframe.style.zIndex = "999999";
-  iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
+  iframe.src = `${getEcChatBotFrontEndBaseUrl()}/preview-customer-fukushashiki?bot_id=${botId}&scenario_id=${scenarioId}&urlReceive=${window.location.origin
     }&deviceReceive=${device}&uuid=${uuid}&env=${getEnvironment()}&debug=${getDebugFlag()}&cartSystem=${data.cart_system}&isLoggedIn=${window.logged_in}`;
-  currentIframe = iframe
+  globalIframe = iframe
   body.appendChild(iframe);
 
   window.addEventListener(
     "message",
-    function (e) {
-      chatbotW = e.data.widthPc
-      chatbotH = e.data.heightPc
-      chatbotRight = e.data.chatbotRight
-      chatbotBottom = e.data.chatbotBottom
-      if (e.data.fukushashikiResponse) {
-        fillDataFromMessage(e.data.fukushashikiResponse)
-      }
-      if (e.data.getErrorMessage) {
-        processErrorMessage(e.data.getErrorMessage)
-      }
-      if(e.data.actionSDK)
-      {
-        if(e.data.actionSDK.searchAddress!= undefined && e.data.actionSDK.searchMode!= undefined)
-        {
-          const selectElement = getElementByAddress(e.data.actionSDK.searchMode,e.data.actionSDK.searchAddress)
-          const crawlOption = {
-            search_value: e.data.actionSDK.searchAddress,
-            search_mode: e.data.actionSDK.searchMode
-          }
-          const crawJsonData = extractSelectOptions(selectElement,crawlOption);
-          sendMessageToChatbot(crawJsonData,"crawJsonObject")
-        }
+    async (e) => {
+      chatbotW = e.data.widthPc;
+      chatbotH = e.data.heightPc;
+      chatbotRight = e.data.chatbotRight;
+      chatbotBottom = e.data.chatbotBottom;
 
-      }
+      switch (e.data.action) {
+        case CHATBOT_ACTIONS.FUKUSHASHIKI:
+          await fillDataFromMessage(e.data.actionData);
+          break;
+        case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
+          processGetErrorMessage(e.data.actionData);
+          break;
+        case CHATBOT_ACTIONS.EXCUTE_JS:
+          excuteJSCode(e.data.actionData);
+          break;
+        case CHATBOT_ACTIONS.CRAWL_DATA:
+          crawlDataAndSendMessage(e.data.actionData);
+          break;
+        case CHATBOT_ACTIONS.CLICK_BUTTON:
+          const button = document.getElementById(e.data.id_value);
+          if (!button) throw new Error(`Button not found: id ${e.data.id_value}`);
+          button.click();
+          break;
+        case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
+          await sleep(2000);
+          excuteJSCode(e.data.actionData);
+          break;
+      };
+      
       if (e.data.isOpen && mobileCheck()) {
         iframe.width = "100%";
         // iframe.height = "620px";
@@ -210,355 +261,207 @@ async function displayPopup() {
         iframe.style.right = "0px";
       }
       globalIframe = iframe;
-
-      if (e.data.action === 'clickButton') {
-        var button = document.getElementById(e.data.id_value);
-        if (button) {
-          button.click();          
-        }
-      }
-
-      if (e.data.action === 'excuteJS') {       
-        if (e.data.jscode && e.data.is_use_js == true) {         
-          const executeCode = new Function(e.data.jscode);
-          executeCode();
-        }
-      }
     },
     false
   );
 
-  function extractSelectOptions(selectElement,crawlOption) {
-    if (!selectElement || selectElement.tagName !== "SELECT") return null;
-    const options = Array.from(selectElement.options)
-      .map((option, index) => ({
-        id: index + 1,
-        text: option.innerText,
-        value: option.innerText
-      }));
-
-    return { dates: options,
-              options:crawlOption
-     };
-  }
-
-  function processErrorMessage(obj) {
-    displayErrorMessage.isDisplay = obj.isDisplay
-    displayErrorMessage.searchValue = obj.searchValue
-    displayErrorMessage.seachMode = obj.seachMode
-    if (displayErrorMessage.isDisplay) {
-      var element = getElementByAddress(displayErrorMessage.seachMode, displayErrorMessage.searchValue)
-      if (element) {
-        var contentMessage = element.innerHTML;
-        sendMessageToChatbot(contentMessage, "text");
-      }
-    }
-  }
-
-  function fillDataFromMessage(obj) {
-    const initialSelectionItem = obj.find((item) => item.type === "initial_selection");
-    if (initialSelectionItem != undefined) {
-      try {
-        var typeElementSelector = getElementByAddress(initialSelectionItem.bindingMode, initialSelectionItem.bindingAddress)
-        typeElementSelector.value = initialSelectionItem.bindingValue;
-        const event = new Event('change', { bubbles: true });
-        typeElementSelector.dispatchEvent(event);
-
-        try {
-          setTimeout(() => {
-            const cardNumberItem = obj.find((item) => item.type === "card_number");
-            if (cardNumberItem) {
-              const inputCardNumber = getElementByAddress(cardNumberItem.bindingMode, cardNumberItem.bindingAddress);
-              if (inputCardNumber) {
-                inputCardNumber.focus();
-                inputCardNumber.value = cardNumberItem.bindingValue;
-                const inputEvent = new Event('input', { bubbles: true });
-                const changeEvent = new Event('change', { bubbles: true });
-                inputCardNumber.dispatchEvent(inputEvent);
-                inputCardNumber.dispatchEvent(changeEvent);
-                inputCardNumber.blur();
-              }
-            }
-
-            const listShippingAddress = obj.filter((item) => item.type === "shipping_address");
-            if (listShippingAddress.length > 0) {
-              listShippingAddress.forEach((item) => {
-                const inputShippingAddress = getElementByAddress(item.bindingMode, item.bindingAddress);
-                if (inputShippingAddress) {
-                  inputShippingAddress.value = item.bindingValue;
-                  const inputEvent = new Event('input', { bubbles: true });
-                  const changeEvent = new Event('change', { bubbles: true });
-                  inputShippingAddress.dispatchEvent(inputEvent);
-                  inputShippingAddress.dispatchEvent(changeEvent);
-                }
-              });
-            }
-
-          }, 4000);
-        }
-        catch (e) {
-          console.log(e)
-        }
-
-      }
-      catch (e) {
-        console.log(e)
-      }
-    }
-
-    obj.forEach((item) => {
-      switch (item.type) {
-        case "card_payment_radio_button":
-        case "text_input":
-          {
-            if (item.bindingMode == 1) {
-              fillDataWithId(item.bindingAddress, item.bindingValue)
-            }
-            else if (item.bindingMode == 2) {
-              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-            }
-            else {
-              fillDataWithXPath(item.bindingAddress, item.bindingValue)
-            }
-            break;
-          }
-
-        case 'dropdown_prefecture':
-          {
-            fillDataWithTextInSelector(item.bindingMode, item.bindingAddress, item.bindingValue)
-            break;
-          }
-
-        case "zip_code_address":
-          {
-            if (item.bindingMode == 1) {
-              fillDataWithId(item.bindingAddress, item.bindingValue)
-            }
-            else if (item.bindingMode == 2) {
-              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-            }
-            else {
-              fillDataWithXPath(item.bindingAddress, item.bindingValue)
-            }
-            break;
-          }
-        case "agree_term":
-          {
-            if (item.bindingMode == 1) {
-              fillDataAgreementWithId(item.bindingAddress, item.bindingValue)
-            }
-            else if (item.bindingMode == 2) {
-              fillDataAgreementWithCssSelector(item.bindingAddress, item.bindingValue)
-            }
-            else {
-              fillDataAgreementWithXPath(item.bindingAddress, item.bindingValue)
-            }
-            break;
-          }
-        case "slider":
-          {
-            if (item.bindingMode == 1) {
-              fillDataWithId(item.bindingAddress, item.bindingValue)
-            }
-            else if (item.bindingMode == 2) {
-              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-            }
-            else {
-              fillDataWithXPath(item.bindingAddress, item.bindingValue)
-            }
-          }
-
-        case "pull_down":
-          {
-            if (item.bindingMode !== undefined) {
-              if (item.bindingMode == 1) {
-                let element = document.getElementById(item.bindingAddress);
-                fillDataWithId(item.bindingAddress, item.bindingValue)
-                element.dispatchEvent(new Event('change', { bubbles: true }));
-              }
-              else if (item.bindingMode == 2) {
-                let element = document.querySelector(item.bindingAddress);
-                fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-                element.dispatchEvent(new Event('change', { bubbles: true }));
-              }
-              else {
-                let element = document.evaluate(item.bindingAddress, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                fillDataWithXPath(item.bindingAddress, item.bindingValue)
-                element.dispatchEvent(new Event('change', { bubbles: true }));
-              }
-            }
-            break;
-          }
-
-        case "radio_button":
-          {
-            elementContain = getElementByAddress(item.bindingMode, item.bindingAddress);
-            if (elementContain) {
-              const radioButtons = elementContain.querySelectorAll('input[type="radio"]');
-              radioButtons.forEach(radio => {
-                if (radio.value == item.bindingValue) {
-                  radio.checked = true;
-                  const changeEvent = new Event('change', { bubbles: true });
-                  radio.dispatchEvent(changeEvent);
-                }
-              });
-            }
-            break;
-          }
-        case 'checkbox':
-          {
-            const elementToCheck = getElementByAddress(item.bindingMode,item.bindingAddress)
-            if (elementToCheck)
-            {
-              elementToCheck.checked=item.bindingValue;
-              const changeEvent = new Event('change', { bubbles: true });
-              elementToCheck.dispatchEvent(changeEvent);
-            }      
-            break;
-          }
-
-        case "password":
-          {
-            const passwordInput = getElementByAddress(item.bindingMode, item.bindingAddress)
-            if (passwordInput)
-              passwordInput.setRangeText(item.bindingValue)
-          }
-        case "textarea":
-          {
-            if (item.bindingMode == 1) {
-              fillDataWithId(item.bindingAddress, item.bindingValue)
-            }
-            else if (item.bindingMode == 2) {
-              fillDataWithCssSelector(item.bindingAddress, item.bindingValue)
-            }
-            else {
-              fillDataWithXPath(item.bindingAddress, item.bindingValue)
-            }
-            break;
-          }
-        default:
-          return;
-      }
-
-    })
-
-
-  }
-
-  function getElementByAddress(mode, address) {
-    if (mode == 1) {
-      const element = document.getElementById(address);
-      return element;
-    }
-    else if (mode == 2) {
-      const element = document.querySelector(address);
-      return element;
-    }
-    else {
-      const element = document.evaluate(address, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-      return element;
-    }
-  }
-
-  function fillDataWithTextInSelector(mode, address, value) {
-    const element = getElementByAddress(mode, address);
-    if (element.tagName === 'SELECT') {
-      const optionToSelect = Array.from(element.options).find(option => option.text === value);
-      if (optionToSelect) {
-        fillDataToElement(element, optionToSelect.value);
-        element.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-    }
-    else if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-      fillDataToElement(element, value);
-    }
-  }
-
-  function fillDataWithId(id, value) {
-    let element = document.getElementById(id);
-    if (element) {
-      fillDataToElement(element, value)
-    }
-
-  }
-
-  function removeLeadingZero(value) {
-    let strValue = value.toString();
-    let result = strValue.replace(/^0+/, '');
-    return typeof value === 'number' ? Number(result) : result;
-  }
-
-  function removeFirstTwoChars(input) {
-    const str = input.toString();
-    if (str.length > 2) {
-      return str.slice(2);
-    } else {
-      return '';
-    }
-  }
-
-  function fillDataToElement(element, value) {
-    element.value = value;
-    if (element.value == undefined || element.value == "") {
-      element.value = removeLeadingZero(value);
-    }
-    if (element.value == undefined || element.value == "") {
-      element.value = removeFirstTwoChars(value);
-    }
-  }
-
-  function fillDataWithCssSelector(cssSelector, value) {
-    let element = document.querySelector(cssSelector);
-    if (element) {
-      fillDataToElement(element, value)
-    }
-
-  }
-
-  function fillDataWithXPath(xpathElement, value) {
-    let element = document.evaluate(xpathElement, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    if (element) {
-      fillDataToElement(element, value)
-    }
-
-  }
-
-  function fillDataAgreementWithId(id, value) {
-    let element = document.getElementById(id);
-    if (element && element.type === 'checkbox') {
-      const changeEvent = new Event('change', { bubbles: true });
-      element.checked = value === true;
-      element.dispatchEvent(changeEvent)
-    }
-  }
-
-  function fillDataAgreementWithCssSelector(cssSelector, value) {
-    let element = document.querySelector(cssSelector);
-    if (element && element.type === 'checkbox') {
-      const changeEvent = new Event('change', { bubbles: true });
-      element.checked = value === true;
-      element.dispatchEvent(changeEvent)
-    }
-  }
-
-  function fillDataAgreementWithXPath(xpathElement, value) {
-    let element = document.evaluate(xpathElement, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    if (element && element.type === 'checkbox') {
-      const changeEvent = new Event('change', { bubbles: true });
-      element.checked = value === true;
-      element.dispatchEvent(changeEvent)
-    }
-  }
-
   log("device: ", device);
   setTimeout(() => {
-    let checkDevice = { scenario_data: device };
-    // submitForm(url, checkDevice)
+    const checkDevice = { scenario_data: device };
     getUser(`${getEcChatBotApiServerBaseUrl()}/api/v1/analytics/scenario_counts/${scenarioId}`, checkDevice)
   }, 5000);
 }
 
-async function getUser(url, datacount) {
+const crawl = (options) => {
+  const targetElement = getElementByAddress(options.searchMode, options.searchAddress);
+  if (!targetElement) {
+    throw new Error('Element not found');
+  };
+
+  switch (options.targetElementType) {
+    case CRAWL_ELEMENT_TYPES.SELECT:
+      return extractSelectOptions(targetElement, options);
+    default:
+      throw new Error(`Not support target element type ${options.targetElementType}`);
+  }
+}
+
+const crawlDataAndSendMessage = (options) => {
+  if (!options.searchAddress || !options.searchMode) return;
+
+  const message = {
+    ...options,
+    result: crawl(options),
+  };
+  
+  sendMessageToChatbot(message, CHATBOT_ACTIONS.CRAWL_DATA);
+}
+
+const excuteJSCode = (jscode) => {
+  if (!jscode) return;
+  const func = new Function(jscode);
+  func();
+}
+
+const extractSelectOptions = (selectElement) => {
+  if (!selectElement || selectElement.tagName !== "SELECT") return null;
+
+  return Array.from(selectElement.options)
+    .map((option, index) => ({
+      id: index + 1,
+      text: option.innerText,
+      value: option.innerText
+    }));
+}
+
+const processGetErrorMessage = (data) => {
+  if (!data.isDisplay) return;
+
+  const element = getElementByAddress(data.seachMode, data.searchValue)
+
+  if (!element) {
+    console.log(`Element ${data.searchValue} not found`);
+    return;
+  }
+  sendMessageToChatbot(element.innerHTML, CHATBOT_ACTIONS.GET_ERROR_MESSAGE);
+}
+
+const isDisabledElement = (element) => {
+  // For check GINZA AIRA
+  if (element.classList.contains('disabled-input-ec')) return true;
+
+  // For other customer
+  return element.disabled;
+}
+
+const fillDataFromMessage = async (data) => {
+  for (let i = 0; i < data.length; i++) {
+    const item = data[i];
+
+    if (item.additionalType === "await") {
+      await sleep(1500);
+      continue;
+    }
+
+    let element = getElementByAddress(item.bindingMode, item.bindingAddress);
+    if (!element) continue;
+
+    if (isDisabledElement(element)) continue;
+
+    switch (item.type) {
+      case "zip_code_address":
+      case "card_number":
+      case "card_payment_radio_button":
+      case "text_input":
+      case "textarea":
+      case "payment_method_id":
+      case "slider": {
+        waitForElement(
+          item.bindingMode, item.bindingAddress,
+          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+        break;
+      }
+
+      case 'dropdown_prefecture': {
+        if (element.tagName === 'SELECT') {
+          const selectedOption = Array.from(element.options).find(option => option.value === item.bindingValue.toString());
+          if (!selectedOption) item.bindingValue = '';
+        };
+        waitForElement(
+          item.bindingMode, item.bindingAddress,
+          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+        break;
+      }
+
+      case "agree_term":
+      case 'checkbox': {
+        setCheckToCheckboxElement(element, item.bindingValue);
+        break;
+      }
+
+      case "pull_down": {
+        const hasOption = Array.from(element.options).some(option => option.value === item.bindingValue);
+        if (!hasOption) item.bindingValue = '';
+        waitForElement(
+          item.bindingMode, item.bindingAddress,
+          {type: WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE, value: item.bindingValue});
+        break;
+      }
+
+      case "radio_button": {
+        setRadioValue(element, item.bindingValue);
+        break;
+      }
+
+      case "password": {
+        element.setRangeText(item.bindingValue);
+        break;
+      }
+      default:
+        break;
+    }
+  }
+}
+
+const getElementByAddress = (mode, address) => {
+  if (!mode || !address) return null;
+  switch (mode) {
+    case SEARCH_MODES.ID:
+      return document.getElementById(address);
+    case SEARCH_MODES.CSS_SELECTOR:
+      return document.querySelector(address);
+    case SEARCH_MODES.XPATH:
+      return document.evaluate(address, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    default:
+      throw new Error(`Invalid search mode ${mode}, address: ${address}`);
+  }
+}
+
+const removeLeadingZero = (value) => {
+  let strValue = value?.toString() || "";
+  let result = strValue.replace(/^0+/, '');
+  return typeof value === 'number' ? Number(result) : result;
+}
+
+const removeFirstTwoChars = (input) => {
+  const str = input?.toString() || "";
+  if (str.length > 2) {
+    return str.slice(2);
+  } else {
+    return '';
+  }
+}
+
+const setCheckToCheckboxElement = (element, value) => {
+  if (!element.type === 'checkbox') return;
+  element.checked = value;
+  const changeEvent = new Event('change', { bubbles: true });
+  element.dispatchEvent(changeEvent);
+}
+
+const setValueToElement = (element, value) => {
+  if (element.tagName === 'SELECT') {
+    const selectedOption = Array.from(element.options).find(option => {
+      return option.value === value.toString() || option.value === removeLeadingZero(value).toString();
+    });
+
+    if (!selectedOption) value = '';
+  }
+
+  element.value = value;
+  element.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+const setRadioValue = (element, value) => {
+  const radioButtons = element.querySelectorAll('input[type="radio"]');
+  const selecteddRadio = radioButtons.find(radio => radio.value === value);
+  if (!selecteddRadio) return;
+  selecteddRadio.checked = true;
+  const changeEvent = new Event('change', { bubbles: true });
+  selecteddRadio.dispatchEvent(changeEvent);
+}
+
+const getUser = async (url, datacount) => {
   const response = await fetch(url, {
     method: "PATCH",
     headers: {
@@ -571,7 +474,7 @@ async function getUser(url, datacount) {
   log(data);
 }
 
-function tabletCheck() {
+const tabletCheck = () => {
   const userAgent = navigator.userAgent.toLowerCase();
   const isTablet =
     /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/.test(
@@ -581,7 +484,7 @@ function tabletCheck() {
   return isTablet;
 }
 
-function mobileCheck() {
+const mobileCheck = () => {
   let check = false;
   (function (a) {
     if (
