@@ -90,7 +90,7 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
         callback();
         break;
       case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
-        if (element.value != options.value) {
+        if (element.value != options.value && element.value != removeLeadingZero(options.value)) {
           setValueToElement(element, options.value);
           break;
         }
