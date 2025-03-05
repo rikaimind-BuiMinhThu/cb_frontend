@@ -18,6 +18,11 @@ const CRAWL_ELEMENT_TYPES = {
   SELECT: 'select',
 };
 
+const ELEMENT_TAGS = {
+  SELECT: "SELECT",
+  INPUT: "INPUT",
+};
+
 const botId = sessionStorage.getItem("bot_id");
 const uuid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 let chatbotBottom = sessionStorage.getItem("chatbotBottom");
@@ -85,7 +90,7 @@ const waitForElement = (mode, address, options = {type: "WAIT_FOR_LOADING"}, cal
         callback();
         break;
       case WAIT_OPTION_TYPES.WAIT_FOR_SETTING_VALUE:
-        if (element.value != options.value) {
+        if (element.value != options.value && element.value != removeLeadingZero(options.value)) {
           setValueToElement(element, options.value);
           break;
         }
@@ -363,8 +368,9 @@ const fillDataFromMessage = async (data) => {
       }
 
       case 'dropdown_prefecture': {
-        if (element.tagName === 'SELECT') {
-          const selectedOption = Array.from(element.options).find(option => option.value === item.bindingValue.toString());
+        if (element.tagName === ELEMENT_TAGS.SELECT) {
+          const acceptableValues = [item.bindingValue.toString(), removeLeadingZero(item.bindingValue).toString()];
+          const selectedOption = Array.from(element.options).find(option => acceptableValues.includes(option.value.toString()));
           if (!selectedOption) item.bindingValue = '';
         };
         waitForElement(
@@ -440,15 +446,21 @@ const setCheckToCheckboxElement = (element, value) => {
 }
 
 const setValueToElement = (element, value) => {
-  if (element.tagName === 'SELECT') {
-    const selectedOption = Array.from(element.options).find(option => {
-      return option.value === value.toString() || option.value === removeLeadingZero(value).toString();
-    });
+  let newElementValue = value;
 
-    if (!selectedOption) value = '';
+  if (element.tagName === ELEMENT_TAGS.SELECT) {
+    const acceptableValues = [value.toString(), removeLeadingZero(value).toString()];
+    newElementValue = acceptableValues.find(v => {
+      return Array.from(element.options).some(option => option.value === v);
+    });;
+
+    if (!newElementValue) {
+      console.error(`Option not found: ${value}, element: ${element.id}`);
+      return;
+    }
   }
 
-  element.value = value;
+  element.value = newElementValue;
   element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
