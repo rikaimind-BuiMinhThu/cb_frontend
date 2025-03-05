@@ -446,19 +446,21 @@ const setCheckToCheckboxElement = (element, value) => {
 }
 
 const setValueToElement = (element, value) => {
+  let newElementValue = value;
+
   if (element.tagName === ELEMENT_TAGS.SELECT) {
     const acceptableValues = [value.toString(), removeLeadingZero(value).toString()];
-    const selectedOption = Array.from(element.options).find(option => {
-      return acceptableValues.includes(option.value.toString());
-    });
+    newElementValue = acceptableValues.find(v => {
+      return Array.from(element.options).some(option => option.value === v);
+    });;
 
-    if (!selectedOption) {
+    if (!newElementValue) {
       console.error(`Option not found: ${value}, element: ${element.id}`);
       return;
     }
   }
 
-  element.value = value;
+  element.value = newElementValue;
   element.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
