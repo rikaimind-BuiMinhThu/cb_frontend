@@ -18,6 +18,11 @@ const CRAWL_ELEMENT_TYPES = {
   SELECT: 'select',
 };
 
+const ELEMENT_TAGS = {
+  SELECT: "SELECT",
+  INPUT: "INPUT",
+};
+
 const botId = sessionStorage.getItem("bot_id");
 const uuid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 let chatbotBottom = sessionStorage.getItem("chatbotBottom");
@@ -441,12 +446,16 @@ const setCheckToCheckboxElement = (element, value) => {
 }
 
 const setValueToElement = (element, value) => {
-  if (element.tagName === 'SELECT') {
+  if (element.tagName === ELEMENT_TAGS.SELECT) {
+    const acceptableValues = [value.toString(), removeLeadingZero(value).toString()];
     const selectedOption = Array.from(element.options).find(option => {
-      return option.value === value.toString() || option.value === removeLeadingZero(value).toString();
+      return acceptableValues.includes(option.value.toString());
     });
 
-    if (!selectedOption) value = '';
+    if (!selectedOption) {
+      console.error(`Option not found: ${value}, element: ${element.id}`);
+      return;
+    }
   }
 
   element.value = value;
