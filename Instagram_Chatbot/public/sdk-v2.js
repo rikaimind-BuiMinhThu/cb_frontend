@@ -364,7 +364,7 @@ const fillDataFromMessage = async (data) => {
 
       case 'dropdown_prefecture': {
         if (element.tagName === ELEMENT_TAGS.SELECT) {
-          const acceptableValues = [item.bindingValue.toString(), removeFirstTwoChars(item.bindingValue).toString()];
+          const acceptableValues = [item.bindingValue.toString(), removeLeadingZero(item.bindingValue).toString()];
           const selectedOption = Array.from(element.options).find(option => acceptableValues.includes(option.value.toString()));
           if (!selectedOption) item.bindingValue = '';
         };
