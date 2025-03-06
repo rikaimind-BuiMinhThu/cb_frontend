@@ -246,7 +246,6 @@ const PreviewFukushashiki = () => {
       case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
         await sleep(1000);
         return dispatch({
-          isOpen: true,
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
           payload: { submitErrorMessage: actionData }
         });
@@ -258,6 +257,12 @@ const PreviewFukushashiki = () => {
 
       case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
       case CHATBOT_ACTIONS.PREVIEW_OBJECT:
+        const newState = {
+          ...state,
+          previewOrderContent: actionData,
+          isOpen: true
+        };
+        setStateToSessionStorage(newState);
         return dispatch({
           type: PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT,
           payload: actionData
@@ -918,15 +923,7 @@ const PreviewFukushashiki = () => {
         }
 
         return fukushashikiSavedStateToLp(savedState).then(async () => {
-          dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-            payload: {
-              ...savedState,
-              isOpen: true,
-              loadedStateFromSession: true,
-            }
-          });
-          await sleep(2000);
+          await sleep(1000);
           // GetPreviewOrderContent
           const botConfirmMessage = savedState.messagesList.find(msg => {
             return !!msg.message_content.find(x => x.text_input?.use_for_confirm_message)
@@ -939,6 +936,14 @@ const PreviewFukushashiki = () => {
               postMessageForGetPreviewOrderContent(botConfirmJsCode);
             }
           }
+          dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+            payload: {
+              ...savedState,
+              isOpen: true,
+              loadedStateFromSession: true,
+            }
+          });
         });
       }
     }
