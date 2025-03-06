@@ -259,7 +259,6 @@ const PreviewFukushashiki = () => {
       case CHATBOT_ACTIONS.PREVIEW_OBJECT:
         return dispatch({
           type: PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT,
-          //payload: actionData,
           payload: {
             previewOrderContent: actionData,
             isOpen: true,
