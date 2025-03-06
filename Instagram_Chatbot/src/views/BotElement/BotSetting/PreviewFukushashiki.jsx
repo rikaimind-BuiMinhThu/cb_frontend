@@ -2731,7 +2731,7 @@ const PreviewFukushashiki = () => {
     let newState = { ...state };
     let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
-
+    newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));   
     const clickedMsg = newState.messagesList[clickedMsgIndex];
 
     if (!handleValidateField(indexMessage)) {
@@ -2777,7 +2777,15 @@ const PreviewFukushashiki = () => {
 
     // Update next messages list after clicked next
     const nextMessage = newState.messagesList[clickedMsgIndex + 1];
-
+    for (let i = 0; i < newState.messagesList.length; i++) {
+      if (newState.messagesList[i].conditions?.length > 0) {
+        const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
+        if (!result && isUserMessage(newState.messagesList[i])) {
+          newState.messagesList[i].hidden = true;
+          continue;
+        }
+      }
+    }
     if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
       for (let i = clickedMsgIndex + 1; i < newState.messagesList.length; i++) {
         if (newState.messagesList[i].conditions.length !== 0) {
