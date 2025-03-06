@@ -918,6 +918,18 @@ const PreviewFukushashiki = () => {
 
         return fukushashikiSavedStateToLp(savedState).then(async () => {
           await sleep(1000);
+          // GetPreviewOrderContent
+          const botConfirmMessage = savedState.messagesList.find(msg => {
+            return !!msg.message_content.find(x => x.text_input?.use_for_confirm_message)
+          });
+          if (botConfirmMessage) {
+            const botConfirmJsCode = botConfirmMessage.message_content
+              .find(x => x.text_input?.use_for_confirm_message)
+              ?.text_input?.jscode;
+            if (botConfirmJsCode && botConfirmJsCode.length > 0) {
+              postMessageForGetPreviewOrderContent(botConfirmJsCode);
+            }
+          }
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
