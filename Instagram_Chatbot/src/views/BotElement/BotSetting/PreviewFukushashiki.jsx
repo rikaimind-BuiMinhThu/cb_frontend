@@ -881,7 +881,7 @@ const PreviewFukushashiki = () => {
           savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
           savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
           savedState.renderMessagesList = savedState.messagesList.slice(0, savedState.currentMsgIndex + 1);
-          savedState.renderMessagesList = savedState.messagesList.map((msg) => {
+          savedState.renderMessagesList = savedState.renderMessagesList.map((msg) => {
             if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
               return {
                 ...msg,
