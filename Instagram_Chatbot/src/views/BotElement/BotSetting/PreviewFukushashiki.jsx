@@ -246,6 +246,7 @@ const PreviewFukushashiki = () => {
       case CHATBOT_ACTIONS.GET_ERROR_MESSAGE:
         await sleep(1000);
         return dispatch({
+          isOpen: true,
           type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
           payload: { submitErrorMessage: actionData }
         });
