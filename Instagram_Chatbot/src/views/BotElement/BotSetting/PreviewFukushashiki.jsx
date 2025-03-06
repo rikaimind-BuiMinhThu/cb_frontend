@@ -881,6 +881,15 @@ const PreviewFukushashiki = () => {
           savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
           savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
           savedState.renderMessagesList = savedState.messagesList.slice(0, savedState.currentMsgIndex + 1);
+          savedState.renderMessagesList = savedState.renderMessagesList.map((msg) => {
+            if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
+              return {
+                ...msg,
+                hidden: true,
+              };
+            }
+            return msg;
+          }); 
           return dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
@@ -3226,7 +3235,7 @@ const PreviewFukushashiki = () => {
       </div>
     );
   };
-  
+
   const renderMessages = () => {
     return state.renderMessagesList.map((message, indexMessage) => {
       if (message.hidden) return null;
