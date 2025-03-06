@@ -926,7 +926,6 @@ const PreviewFukushashiki = () => {
         }
 
         return fukushashikiSavedStateToLp(savedState).then(async () => {
-          await sleep(1000);
           dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
@@ -935,6 +934,19 @@ const PreviewFukushashiki = () => {
               loadedStateFromSession: true,
             }
           });
+          await sleep(2000);
+          // GetPreviewOrderContent
+          const botConfirmMessage = savedState.messagesList.find(msg => {
+            return !!msg.message_content.find(x => x.text_input?.use_for_confirm_message)
+          });
+          if (botConfirmMessage) {
+            const botConfirmJsCode = botConfirmMessage.message_content
+              .find(x => x.text_input?.use_for_confirm_message)
+              ?.text_input?.jscode;
+            if (botConfirmJsCode && botConfirmJsCode.length > 0) {
+              postMessageForGetPreviewOrderContent(botConfirmJsCode);
+            }
+          }
         });
       }
     }
@@ -2668,7 +2680,8 @@ const PreviewFukushashiki = () => {
     postMessageToParent({
       action: CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT,
       actionData: jsCode,
-      is_use_js: true
+      is_use_js: true,
+      isOpen: true
     });
 
     await sleep(2000);
@@ -2833,7 +2846,7 @@ const PreviewFukushashiki = () => {
       return msg;
     }); 
 
-    if (isBtnUpdateClick) {
+    if (!isBtnUpdateClick) {
       newState.passedUserMsgCount++;
     } else {
       newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
