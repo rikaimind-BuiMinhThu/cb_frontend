@@ -257,6 +257,12 @@ const PreviewFukushashiki = () => {
 
       case CHATBOT_ACTIONS.GET_PREVIEW_ORDER_CONTENT:
       case CHATBOT_ACTIONS.PREVIEW_OBJECT:
+        const newState = {
+          ...state,
+          previewOrderContent: actionData,
+          isOpen: true
+        };
+        setStateToSessionStorage(newState);
         return dispatch({
           type: PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT,
           payload: actionData
