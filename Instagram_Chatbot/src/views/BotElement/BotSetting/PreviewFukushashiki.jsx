@@ -923,7 +923,15 @@ const PreviewFukushashiki = () => {
         }
 
         return fukushashikiSavedStateToLp(savedState).then(async () => {
-          await sleep(1000);
+          dispatch({
+            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+            payload: {
+              ...savedState,
+              isOpen: true,
+              loadedStateFromSession: true,
+            }
+          });
+          await sleep(2000);
           // GetPreviewOrderContent
           const botConfirmMessage = savedState.messagesList.find(msg => {
             return !!msg.message_content.find(x => x.text_input?.use_for_confirm_message)
@@ -936,14 +944,6 @@ const PreviewFukushashiki = () => {
               postMessageForGetPreviewOrderContent(botConfirmJsCode);
             }
           }
-          dispatch({
-            type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-            payload: {
-              ...savedState,
-              isOpen: true,
-              loadedStateFromSession: true,
-            }
-          });
         });
       }
     }
