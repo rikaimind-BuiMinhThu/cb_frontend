@@ -638,6 +638,8 @@ const PreviewFukushashiki = () => {
       // });
     }
 
+    await sleep(messagesList[i].message_content[0].delay.content * 1000);
+
     if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
       return redirectToThanksPage();
     
