@@ -42,7 +42,6 @@ import {
 import Withdrawal from "./PreviewComponent/Withdrawal";
 import ProcessBar from "./PreviewComponent/ProcessBar";
 import ZipCodePopUp from "./PreviewComponent/ZipCodePopUp";
-import RenderMessageStack from "./PreviewComponent/RenderMessageStack";
 
 sessionStorage.setItem("prevOpenStatus", "0");
 var url = new URL(window.location.href);
@@ -880,6 +879,15 @@ const PreviewFukushashiki = () => {
           savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
           savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
           savedState.renderMessagesList = savedState.messagesList.slice(0, savedState.currentMsgIndex + 1);
+          savedState.renderMessagesList = savedState.messagesList.map((msg) => {
+            if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
+              return {
+                ...msg,
+                hidden: true,
+              };
+            }
+            return msg;
+          }); 
           return dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
@@ -3226,20 +3234,6 @@ const PreviewFukushashiki = () => {
     );
   };
 
-  // Set DelayMessage hidden property to "TRUE", prevent render onReload
-  const handleExpiredDelayMessage = (indexMessage) => {
-    const newState = { ...state };
-    if (!newState.renderMessagesList[indexMessage]) return;
-
-    newState.renderMessagesList[indexMessage].hidden = true;
-
-    dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-      state: newState,
-    });
-  };
-
-  // Using RenderMessageStack components, controlled by currentUserMsgIndex
   const renderMessages = () => {
     return state.renderMessagesList.map((message, indexMessage) => {
       if (message.hidden) return null;
