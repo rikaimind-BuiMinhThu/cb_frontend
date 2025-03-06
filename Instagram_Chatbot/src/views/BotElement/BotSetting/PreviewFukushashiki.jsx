@@ -2824,7 +2824,7 @@ const PreviewFukushashiki = () => {
       return msg;
     }); 
 
-    if (isBtnUpdateClick) {
+    if (!isBtnUpdateClick) {
       newState.passedUserMsgCount++;
     } else {
       newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
