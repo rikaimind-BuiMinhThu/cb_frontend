@@ -881,6 +881,15 @@ const PreviewFukushashiki = () => {
           savedState.messagesList.forEach((x) => x.hidden = !!x?.not_display_when_logged_in);
           savedState.currentMsgIndex = savedState.messagesList.findIndex((item) => isUserMessage(item) && item.hidden == false);
           savedState.renderMessagesList = savedState.messagesList.slice(0, savedState.currentMsgIndex + 1);
+          savedState.renderMessagesList = savedState.renderMessagesList.map((msg) => {
+            if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
+              return {
+                ...msg,
+                hidden: true,
+              };
+            }
+            return msg;
+          }); 
           return dispatch({
             type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
             payload: {
@@ -2731,7 +2740,7 @@ const PreviewFukushashiki = () => {
     let newState = { ...state };
     let clickedMsgIndex = newState.messagesList.findIndex((msg) => msg?.id === message?.id);
     if (clickedMsgIndex < 0) clickedMsgIndex = newState.currentMsgIndex;
-
+    newState.userMessagesList = newState.messagesList.filter((item) => isUserMessage(item));   
     const clickedMsg = newState.messagesList[clickedMsgIndex];
 
     if (!handleValidateField(indexMessage)) {
@@ -2777,7 +2786,15 @@ const PreviewFukushashiki = () => {
 
     // Update next messages list after clicked next
     const nextMessage = newState.messagesList[clickedMsgIndex + 1];
-
+    for (let i = 0; i < newState.messagesList.length; i++) {
+      if (newState.messagesList[i].conditions?.length > 0) {
+        const result = checkMessageCondition(newState.messagesList[i], newState.objParam);
+        if (!result && isUserMessage(newState.messagesList[i])) {
+          newState.messagesList[i].hidden = true;
+          continue;
+        }
+      }
+    }
     if (isUserMessage(nextMessage) || isBotMessage(nextMessage)) {
       for (let i = clickedMsgIndex + 1; i < newState.messagesList.length; i++) {
         if (newState.messagesList[i].conditions.length !== 0) {
@@ -3218,7 +3235,7 @@ const PreviewFukushashiki = () => {
       </div>
     );
   };
-  
+
   const renderMessages = () => {
     return state.renderMessagesList.map((message, indexMessage) => {
       if (message.hidden) return null;

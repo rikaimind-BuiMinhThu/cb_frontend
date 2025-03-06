@@ -456,7 +456,6 @@ const setValueToElement = (element, value) => {
 
     if (!newElementValue) {
       console.error(`Option not found: ${value}, element: ${element.id}`);
-      return;
     }
   }
 
