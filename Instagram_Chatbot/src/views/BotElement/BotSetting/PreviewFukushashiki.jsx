@@ -127,7 +127,7 @@ const PreviewFukushashikiReducer = (state, action) => {
     case PREVIEW_ACTIONS.ADD_LP_OPTION_DATA:
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload } };
     case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
-      return { ...state, previewOrderContent: action.payload };
+      return { ...state, ...(action.payload) };
   }
 
   return state;
@@ -232,7 +232,7 @@ const PreviewFukushashiki = () => {
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
     const actionData = event.data.actionData;
-
+    
     switch (event.data.action) {
       case CHATBOT_ACTIONS.CRAWL_DATA:
         let receiveOptionData = {};
@@ -259,7 +259,11 @@ const PreviewFukushashiki = () => {
       case CHATBOT_ACTIONS.PREVIEW_OBJECT:
         return dispatch({
           type: PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT,
-          payload: actionData
+          //payload: actionData,
+          payload: {
+            previewOrderContent: actionData,
+            isOpen: true,
+          }
         });
       default:
         // TODO
