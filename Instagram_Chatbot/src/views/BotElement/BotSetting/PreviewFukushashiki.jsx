@@ -468,6 +468,13 @@ const PreviewFukushashiki = () => {
     return checkedOptionText;
   }
 
+  const setCarouselDefaultValue=(dataContentType,value) => {
+    let default_value = dataContentType[
+      dataContentType.carousel
+    ].contents.find((item) => item.id === value).title;
+    return default_value;
+  }
+
   const setDefaultValue = (item, dataContentType, contentType, value, field) => {
     switch (contentType) {
       case "zip_code_address":
@@ -699,7 +706,7 @@ const PreviewFukushashiki = () => {
       if (isUpdateSourceContent) {
         msgContent.text_input.sourceContent = msgContent.text_input.content;
       }
-      if (newState.variables.length === 0) return;
+      if (newState.variables.length === 0) return; 
       let newContent = msgContent.text_input.sourceContent;
       newState.variables.forEach((variable) => {
         newContent = newContent.replaceAll(`{{${variable.variable_name}}}`, variable.default_value);
@@ -2853,11 +2860,10 @@ const PreviewFukushashiki = () => {
     }
 
     const botConfirmMessage = newState.messagesList.find(msg => {
-      return !!msg.message_content.find(x => x.text_input?.use_for_confirm_message)
+      return !!msg.message_content?.find(x => x.text_input?.use_for_confirm_message)
     });
 
-    const botConfirmJsCode = botConfirmMessage.message_content
-      .find(x => x.text_input?.use_for_confirm_message)
+    const botConfirmJsCode = botConfirmMessage?.message_content?.find(x => x.text_input?.use_for_confirm_message)
       ?.text_input?.jscode;
     const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
     const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
