@@ -232,7 +232,7 @@ const PreviewFukushashiki = () => {
   const eventHandler = async (event) => {
     if (!event.data || !event.data.actionData) return;
     const actionData = event.data.actionData;
-
+    
     switch (event.data.action) {
       case CHATBOT_ACTIONS.CRAWL_DATA:
         let receiveOptionData = {};
@@ -351,14 +351,15 @@ const PreviewFukushashiki = () => {
   }
 
   const onOpenPreview = (opening) => {
-    if (!state.deviceReceive) return;
+    const deviceReceive = state.deviceReceive || params.get("deviceReceive");
+    if (!deviceReceive) return;
 
     // Send data to count open chatbot window
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
     if (prevOpenStatus == "0" && opening) {
       sessionStorage.setItem("prevOpenStatus", "1");
       const openChatbotCountApiParams = {
-        scenario_data: `${state.deviceReceive}_open_chatbot_window`,
+        scenario_data: `${deviceReceive}_open_chatbot_window`,
       };
       sendCountRequest(state.scenarioId, openChatbotCountApiParams);
     }
@@ -637,12 +638,11 @@ const PreviewFukushashiki = () => {
       //   });
       // });
     }
-
-    await sleep(messagesList[i].message_content[0].delay.content * 1000);
-
+    if (state.renderMessagesList.length - 1 === i) {
+      await sleep(messagesList[i].message_content[0].delay.content * 1000);
+    }
     if (isLastMessageInCreateOrderFlow() && state.urlThanksPage)
       return redirectToThanksPage();
-    
     newState.currentMsgIndex = i;
     newState.messagesList[i].hidden = true;
     return newState;
@@ -897,7 +897,7 @@ const PreviewFukushashiki = () => {
               isOpen: true
             }
           });
-        }
+        }        
         const renderMessagesList = savedState.renderMessagesList.map((msg) => {
           if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
             return {
