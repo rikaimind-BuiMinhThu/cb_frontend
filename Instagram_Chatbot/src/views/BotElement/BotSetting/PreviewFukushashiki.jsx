@@ -2890,6 +2890,7 @@ const PreviewFukushashiki = () => {
   ) => {
     let newState = { ...state };
     const msgIndex = state.messagesList.findIndex((msg) => msg.id === message.id);
+    if (newState.messagesList.length == 0) return;
     let messageContentTypeData = newState.messagesList[msgIndex].message_content[indexContent][contentType];
     
     if (name) {
