@@ -2849,7 +2849,7 @@ const PreviewFukushashiki = () => {
       for (let i = clickedMsgIndex + 1; i <= newState.currentMsgIndex; i++) {
         newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
         dispatch({
-          type: "UPDATE_RENDER_MESSAGES",
+          type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
           payload: newState.renderMessagesList
         });
         await sleep(500);
