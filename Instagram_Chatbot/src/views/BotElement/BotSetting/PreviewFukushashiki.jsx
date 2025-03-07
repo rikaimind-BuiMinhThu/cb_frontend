@@ -912,7 +912,7 @@ const PreviewFukushashiki = () => {
           if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
             return {
               ...msg,
-              //hidden: true,
+              hidden: true,
             };
           }
           return msg;
@@ -2852,7 +2852,6 @@ const PreviewFukushashiki = () => {
           type: "UPDATE_RENDER_MESSAGES",
           payload: newState.renderMessagesList
         });
-        // await sleep 0. 5s
         await sleep(500);
       }
       resolve();
