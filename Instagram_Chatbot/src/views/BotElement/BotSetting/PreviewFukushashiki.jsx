@@ -848,7 +848,7 @@ const PreviewFukushashiki = () => {
       }
     }
 
-    newState.currentUserMsgIndex = newState.messagesList.findIndex((item) => isUserMessage(item));
+    newState.currentUserMsgIndex = newState.messagesList.findIndex((item) => !item.hidden && isUserMessage(item));
 
     // For the first time, we need to render to the first user message
     if (newState.currentUserMsgIndex > 0) {
