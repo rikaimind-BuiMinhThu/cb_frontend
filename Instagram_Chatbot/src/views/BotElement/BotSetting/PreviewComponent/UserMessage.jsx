@@ -9,6 +9,7 @@ import CheckboxCustom from "../ScenarioSetting/scenarioComon/CheckboxCustom";
 import InputCustom from "../ScenarioSetting/scenarioComon/InputCustom";
 import { Button } from "reactstrap";
 import ModalNoti from "../../../Popup/ModalNoti";
+import { CHATBOT_ACTIONS } from "../PreviewComponent/Constants";
 import {
   Checkbox,
   Radio,
@@ -3978,6 +3979,13 @@ const UserMessage = ({
                                       : {}
                                 }
                                 onClick={() => {
+                                  if (carousel.is_use_js == true && carousel.jscode?.length > 0) {
+                                    postMessageToParent({
+                                      action: CHATBOT_ACTIONS.EXCUTE_JS,
+                                      actionData: carousel.jscode,
+                                      is_use_js: true
+                                    });
+                                  }
                                   if (
                                     carousel.initial_selection !==
                                     itemCarousel.id &&
