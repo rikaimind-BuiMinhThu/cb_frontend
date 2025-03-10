@@ -47,7 +47,8 @@ const UserMessage = ({
   variables,
   lpOptionData = {},
   submitErrorMessage = '',
-  postMessageToParent
+  postMessageToParent,
+  botId
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -57,7 +58,6 @@ const UserMessage = ({
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
   const [checked, setChecked] = useState([]);
-  const [bot_id, setBotId] = useState(Cookies.get("bot_id"));
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
   
@@ -499,14 +499,13 @@ const UserMessage = ({
   };
 
   const handleClickCarousel = (urls, use_shortened_urls) => {
-    const SHOW_MESSAGE_ERR = false;
     let data = {
       history_click_url: {
         origin_url: urls,
       },
     };
     api
-      .post(`/api/v1/managements/history_click_urls?chatbot_id=${bot_id}`, data)
+      .post(`/api/v1/managements/history_click_urls?chatbot_id=${botId}`, data)
       .then((response) => {
         if (response.data.code === 1) {
           let message = response.data.message;
@@ -516,7 +515,7 @@ const UserMessage = ({
             : message.origin_url;
           link.target = "_blank";
           link.click();
-        } else if (response.data.code === 2 && SHOW_MESSAGE_ERR) {
+        } else if (response.data.code === 2) {
           setMessageNoti(response.data.message[0]);
           setIsOpenNoti(true);
           setTimeout(() => {
