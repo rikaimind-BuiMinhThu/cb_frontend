@@ -115,6 +115,7 @@ const previewInitialState = {
 };
 
 const PREVIEW_ACTIONS = {
+  UPDATE_RENDER_MESSAGES: "UPDATE_RENDER_MESSAGES",
   UPDATE_MULTI_STATE: "UPDATE_MULTI_STATE",
   ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
   UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
@@ -128,6 +129,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload } };
     case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
       return { ...state, previewOrderContent: action.payload };
+    case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
+      return { ...state, renderMessagesList: action.payload };
   }
 
   return state;
@@ -286,9 +289,17 @@ const PreviewFukushashiki = () => {
   // post message to parent window
   useEffect(() => {
     if (!state.urlReceive) return;
-
     postMessageToParent();
-  }, [state.urlReceive]);
+  }, [
+    state.urlReceive,
+    state.isOpen,
+    state.widthPc,
+    state.heightPc,
+    state.widthSp,
+    state.heightSp,
+    state.rightMarginPc,
+    state.bottomMarginPc
+  ]);
 
   // Get prefectures
   useEffect(() => {
@@ -788,12 +799,32 @@ const PreviewFukushashiki = () => {
 
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
+    
+    const designSetting = res.data.design_settings;
     let newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
       loadedStateFromSession: true,
       messagesList: res.data.data?.conversation?.messages || [],
+      isOpen: Number(designSetting.display_type) === 1,
+      activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
+      titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
+      displayType: designSetting?.display_type,
+      widthPc: designSetting?.width_pc || 450,
+      heightPc: designSetting?.height_pc || 700,
+      widthSp: designSetting?.width_sp || 100,
+      heightSp: designSetting?.height_sp || 100,
+      positionPc: designSetting?.position_pc || "1",
+      rightPcTitle: designSetting?.right_position_pc_title,
+      buttonTypePc: designSetting?.button_type_pc || "1",
+      rightMarginPc: designSetting?.right_margin_pc || 10,
+      bottomMarginPc: designSetting?.bottom_margin_pc || 0,
+      positionSp: designSetting?.position_sp || "1",
+      buttonTypeSp: designSetting?.button_type_sp || "1",
+      rightSpTitle: designSetting?.right_position_sp_title,
+      rightMarginSp: designSetting?.right_margin_sp,
+      bottomMarginSp: designSetting?.bottom_margin_sp,
     };
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
@@ -851,7 +882,7 @@ const PreviewFukushashiki = () => {
     newState.currentUserMsgIndex = newState.messagesList.findIndex((item) => !item.hidden && isUserMessage(item));
 
     // For the first time, we need to render to the first user message
-    if (newState.currentUserMsgIndex > 0) {
+    if (newState.currentUserMsgIndex >= 0) {
       newState.currentMsgIndex = newState.currentUserMsgIndex;
     }
 
@@ -2842,41 +2873,53 @@ const PreviewFukushashiki = () => {
     
     const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
-    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1); 
-    newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-      if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
-        return {
-          ...msg,
-          hidden: true,
-        };
+    new Promise(async (resolve) => {
+      for (let i = clickedMsgIndex + 1; i <= newState.currentMsgIndex; i++) {
+        newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+          payload: newState.renderMessagesList
+        });
+        await sleep(500);
       }
-      return msg;
-    }); 
-
-    if (!isBtnUpdateClick) {
-      newState.passedUserMsgCount++;
-    } else {
-      newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
-    }
-
-    const botConfirmMessage = newState.messagesList.find(msg => {
-      return !!msg.message_content?.find(x => x.text_input?.use_for_confirm_message)
-    });
-
-    const botConfirmJsCode = botConfirmMessage?.message_content?.find(x => x.text_input?.use_for_confirm_message)
-      ?.text_input?.jscode;
-    const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
-    const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
-    
-    if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
-      postMessageForGetPreviewOrderContent(botConfirmJsCode);
-    }
-
-    setStateToSessionStorage(newState);
-
-    return dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-      payload: newState
+      resolve();
+    }).then(() => {
+      newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
+        if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
+          return {
+            ...msg,
+            hidden: true,
+          };
+        }
+        return msg;
+      }); 
+  
+      if (!isBtnUpdateClick) {
+        newState.passedUserMsgCount++;
+      } else {
+        newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
+      }
+  
+      const botConfirmMessage = newState.messagesList.find(msg => {
+        return !!msg.message_content?.find(x => x.text_input?.use_for_confirm_message)
+      });
+  
+      const botConfirmJsCode = botConfirmMessage?.message_content
+        ?.find(x => x.text_input?.use_for_confirm_message)
+        ?.text_input?.jscode;
+      const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
+      const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
+      
+      if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
+        postMessageForGetPreviewOrderContent(botConfirmJsCode);
+      }
+  
+      setStateToSessionStorage(newState);
+  
+      return dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: newState
+      });
     });
   };
 
@@ -3249,6 +3292,7 @@ const PreviewFukushashiki = () => {
             variables={state.variables}
             lpOptionData={state.lpOptionData}
             submitErrorMessage={state.submitErrorMessage}
+            botId={state.botId}
           />
           {renderSubmitButton(message, indexMessage)}
         </div>
