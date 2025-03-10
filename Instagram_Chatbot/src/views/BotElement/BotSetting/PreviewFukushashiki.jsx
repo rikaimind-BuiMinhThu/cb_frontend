@@ -115,6 +115,7 @@ const previewInitialState = {
 };
 
 const PREVIEW_ACTIONS = {
+  UPDATE_RENDER_MESSAGES: "UPDATE_RENDER_MESSAGES",
   UPDATE_MULTI_STATE: "UPDATE_MULTI_STATE",
   ADD_LP_OPTION_DATA: "ADD_LP_OPTION_DATA",
   UPDATE_PREVIEW_ORDER_CONTENT: "UPDATE_PREVIEW_ORDER_CONTENT",
@@ -128,6 +129,8 @@ const PreviewFukushashikiReducer = (state, action) => {
       return { ...state, lpOptionData: { ...state.lpOptionData, ...action.payload } };
     case PREVIEW_ACTIONS.UPDATE_PREVIEW_ORDER_CONTENT:
       return { ...state, previewOrderContent: action.payload };
+    case PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES:
+      return { ...state, renderMessagesList: action.payload };
   }
 
   return state;
@@ -851,7 +854,7 @@ const PreviewFukushashiki = () => {
     newState.currentUserMsgIndex = newState.messagesList.findIndex((item) => !item.hidden && isUserMessage(item));
 
     // For the first time, we need to render to the first user message
-    if (newState.currentUserMsgIndex > 0) {
+    if (newState.currentUserMsgIndex >= 0) {
       newState.currentMsgIndex = newState.currentUserMsgIndex;
     }
 
@@ -2842,41 +2845,53 @@ const PreviewFukushashiki = () => {
     
     const isBtnUpdateClick = indexMessage < newState.renderMessagesList.length - 1;
 
-    newState.renderMessagesList = newState.messagesList.slice(0, newState.currentMsgIndex + 1); 
-    newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
-      if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
-        return {
-          ...msg,
-          hidden: true,
-        };
+    new Promise(async (resolve) => {
+      for (let i = clickedMsgIndex + 1; i <= newState.currentMsgIndex; i++) {
+        newState.renderMessagesList = newState.messagesList.slice(0, i + 1);
+        dispatch({
+          type: PREVIEW_ACTIONS.UPDATE_RENDER_MESSAGES,
+          payload: newState.renderMessagesList
+        });
+        await sleep(500);
       }
-      return msg;
-    }); 
-
-    if (!isBtnUpdateClick) {
-      newState.passedUserMsgCount++;
-    } else {
-      newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
-    }
-
-    const botConfirmMessage = newState.messagesList.find(msg => {
-      return !!msg.message_content?.find(x => x.text_input?.use_for_confirm_message)
-    });
-
-    const botConfirmJsCode = botConfirmMessage?.message_content?.find(x => x.text_input?.use_for_confirm_message)
-      ?.text_input?.jscode;
-    const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
-    const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
-    
-    if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
-      postMessageForGetPreviewOrderContent(botConfirmJsCode);
-    }
-
-    setStateToSessionStorage(newState);
-
-    return dispatch({
-      type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
-      payload: newState
+      resolve();
+    }).then(() => {
+      newState.renderMessagesList = newState.renderMessagesList.map((msg) => {
+        if (isBotMessage(msg) && msg.message_content[0]?.type === "delay") {
+          return {
+            ...msg,
+            hidden: true,
+          };
+        }
+        return msg;
+      }); 
+  
+      if (!isBtnUpdateClick) {
+        newState.passedUserMsgCount++;
+      } else {
+        newState.passedUserMsgCount = newState.renderMessagesList.filter((item) => isUserMessage(item)).length - 1 ;
+      }
+  
+      const botConfirmMessage = newState.messagesList.find(msg => {
+        return !!msg.message_content?.find(x => x.text_input?.use_for_confirm_message)
+      });
+  
+      const botConfirmJsCode = botConfirmMessage?.message_content
+        ?.find(x => x.text_input?.use_for_confirm_message)
+        ?.text_input?.jscode;
+      const nextUserMessage = newState.messagesList[newState.currentUserMsgIndex];
+      const isNextUserMessageButtonSubmit = nextUserMessage?.message_content?.[0]?.type === "button_submit";
+      
+      if (botConfirmJsCode && botConfirmJsCode.length > 0 && isNextUserMessageButtonSubmit) {
+        postMessageForGetPreviewOrderContent(botConfirmJsCode);
+      }
+  
+      setStateToSessionStorage(newState);
+  
+      return dispatch({
+        type: PREVIEW_ACTIONS.UPDATE_MULTI_STATE,
+        payload: newState
+      });
     });
   };
 
