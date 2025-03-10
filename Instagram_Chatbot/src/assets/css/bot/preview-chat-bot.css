@@ -266,6 +266,12 @@
     border-top-right-radius: 9px;
     /* height: 145px; */
 }
+.sp-carousel-preview-title_holder {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px 10px;
+    height: fit-content;
+}
 
 .sp-carousel-preview-title {
     font-weight: 800;

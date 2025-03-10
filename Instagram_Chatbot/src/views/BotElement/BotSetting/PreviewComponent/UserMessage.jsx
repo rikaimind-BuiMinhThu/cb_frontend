@@ -3962,11 +3962,13 @@ const UserMessage = ({
                                     style={{ width: "100%" }}
                                   />
                                 </div>
-                                <div className="sp-carousel-preview-title">
-                                  {itemCarousel.title}
-                                </div>
-                                <div className="sp-carousel-preview-sub-title">
-                                  {itemCarousel.subtitle}
+                                <div className="sp-carousel-preview-title_holder">
+                                  <div className="sp-carousel-preview-title">
+                                    {itemCarousel.title}
+                                  </div>
+                                  <div className="sp-carousel-preview-sub-title">
+                                    {itemCarousel.subtitle}
+                                  </div>
                                 </div>
                               </div>
                               <div
