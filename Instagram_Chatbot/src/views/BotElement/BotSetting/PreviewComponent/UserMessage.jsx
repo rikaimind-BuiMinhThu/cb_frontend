@@ -60,6 +60,10 @@ const UserMessage = ({
   const [checked, setChecked] = useState([]);
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
+
+  const getPrefectureIdCodeFromName = (name) => {
+    return prefecturesList.find((prefecture) => prefecture.name === name)?.id;
+  }
   
   const cardExpiredYearOptions =  Array.from({ length: 10 }, (_, i) => {
     return {
@@ -3105,7 +3109,7 @@ const UserMessage = ({
                                   onChangeValue(
                                     indexContent,
                                     content.type,
-                                    res.data.data.prefecture_name,
+                                    getPrefectureIdCodeFromName(res.data.data.prefecture_name),
                                     "value_prefecture"
                                   );
                                   onChangeValue(
