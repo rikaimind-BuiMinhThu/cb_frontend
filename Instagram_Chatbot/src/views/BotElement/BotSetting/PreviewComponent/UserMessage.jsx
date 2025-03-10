@@ -47,7 +47,8 @@ const UserMessage = ({
   variables,
   lpOptionData = {},
   submitErrorMessage = '',
-  postMessageToParent
+  postMessageToParent,
+  botId
 }) => {
   const [dataHour, setDataHour] = useState(dataHourFixed);
   const [dataYear, setDataYear] = useState(dataYearFixed);
@@ -57,7 +58,6 @@ const UserMessage = ({
   const [messageContent, setMessageContent] = useState(messageContentProps);
   const [errors, setErrors] = useState(errorsProps);
   const [checked, setChecked] = useState([]);
-  const [bot_id, setBotId] = useState(Cookies.get("bot_id"));
   const [isOpenNoti, setIsOpenNoti] = useState(false);
   const [messageNoti, setMessageNoti] = useState("");
   
@@ -505,7 +505,7 @@ const UserMessage = ({
       },
     };
     api
-      .post(`/api/v1/managements/history_click_urls?chatbot_id=${bot_id}`, data)
+      .post(`/api/v1/managements/history_click_urls?chatbot_id=${botId}`, data)
       .then((response) => {
         if (response.data.code === 1) {
           let message = response.data.message;

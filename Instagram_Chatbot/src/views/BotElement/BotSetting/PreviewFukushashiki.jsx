@@ -3292,6 +3292,7 @@ const PreviewFukushashiki = () => {
             variables={state.variables}
             lpOptionData={state.lpOptionData}
             submitErrorMessage={state.submitErrorMessage}
+            botId={state.botId}
           />
           {renderSubmitButton(message, indexMessage)}
         </div>
