@@ -9365,7 +9365,7 @@ const Scenario = () => {
                                                             </div>
                                                           </div>
                                                         }
-                                                        <div className="ss-user-setting__item-text_input-use-api-wrapper">
+                                                        <div className="ss-user-setting__item-text_input-use-api-wrapper" style={{marginBottom: '0px'}}>
                                                           <div>
                                                             <CheckboxCustom
                                                               label="短縮URLを利用する"
@@ -9380,6 +9380,13 @@ const Scenario = () => {
                                                               value={carousel.require}
                                                             />
                                                           </div>
+                                                        </div>
+                                                        <div>
+                                                          <CheckboxCustom
+                                                            label="JavaScriptの利用"
+                                                            onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, 'is_use_js')}
+                                                            value={carousel.is_use_js}
+                                                          />
                                                         </div>
                                                       </div>
                                                       <div className="ss-user-setting__item-bottom">
@@ -9525,6 +9532,25 @@ const Scenario = () => {
                                                               onChange={value => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, value, carousel.type, 'contents', indexCarouselSlide, 'buttonTitle')}
                                                             />
                                                           </div>
+                                                          {carousel.is_use_js &&
+                                                            <>
+                                                              <div className='ss-user-setting__item-bottom' style={{ width: '18%', fontSize: '14px', fontWeight: '400', marginBottom: '5px' }}>
+                                                                jscode
+                                                              </div>
+                                                              <div className="ss-user-setting__item-bottom">
+                                                                <textarea
+                                                                  style={{ width: '90%' }}
+                                                                  className="ss-user-setting-item-textarea-label ss-input-value"
+                                                                  placeholder="テキスト"
+                                                                  rows="5"
+                                                                  value={carousel.jscode}
+                                                                  onChange={e => onChangeValueMessageContent(indexMessageSelect, indexContent, content.type, e.target.value, 'jscode')}
+                                                                />
+                                                              </div>
+                                                            </>
+                                                          }
+
+
                                                         </React.Fragment>
                                                       )}
                                                     </>

@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import SelectCustom from "./SelectCustom";
+import { CRAWL_ELEMENT_TYPES, CHATBOT_ACTIONS } from "../../PreviewComponent/Constants";
 
 const LPIntegrationOptionPullDown = ({
   search_element_type,
@@ -7,33 +8,19 @@ const LPIntegrationOptionPullDown = ({
   disabled,
   pullDown,
   onChange,
-  data
+  data,
+  postMessageToParent
 }) => {
   useEffect(() => {
-    const crawObject = {
-        type: "lp_integration_option",
-        searchMode: search_element_type,
-        searchAddress: search_element_value,
-        action: "craw",
-      };
-    
-    window.parent.postMessage(
-      {
-        isOpen: true,
-        widthPc: 450,
-        heightPc: 700,
-        widthSp: 100,
-        heightSp: 100,
-        chatbotRight: 10,
-        chatbotBottom: 10,
-        fukushashikiResponse: undefined,
-        getErrorMessage: undefined,
-        actionSDK: crawObject,
-      },
-      "*"
-    );
-
-    return;
+    const crawlOption = {
+      targetElementType: CRAWL_ELEMENT_TYPES.SELECT,
+      searchMode: search_element_type,
+      searchAddress: search_element_value,
+    };
+    postMessageToParent({
+      actionData: crawlOption,
+      action: CHATBOT_ACTIONS.CRAWL_DATA,
+    });
   }, []);
 
   if (data === null) return null;
