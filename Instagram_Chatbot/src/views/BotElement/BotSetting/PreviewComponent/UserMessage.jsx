@@ -499,6 +499,7 @@ const UserMessage = ({
   };
 
   const handleClickCarousel = (urls, use_shortened_urls) => {
+    const SHOW_MESSAGE_ERR = false;
     let data = {
       history_click_url: {
         origin_url: urls,
@@ -515,7 +516,7 @@ const UserMessage = ({
             : message.origin_url;
           link.target = "_blank";
           link.click();
-        } else if (response.data.code === 2) {
+        } else if (response.data.code === 2 && SHOW_MESSAGE_ERR) {
           setMessageNoti(response.data.message[0]);
           setIsOpenNoti(true);
           setTimeout(() => {
