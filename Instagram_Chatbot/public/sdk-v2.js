@@ -400,7 +400,7 @@ const fillDataFromMessage = async (data) => {
       }
 
       case "password": {
-        element.setRangeText(item.bindingValue);
+        element.setRangeText(item.bindingValue, 0, element.value.length);
         break;
       }
       default:
