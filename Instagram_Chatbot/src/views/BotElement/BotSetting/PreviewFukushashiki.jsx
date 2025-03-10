@@ -800,31 +800,31 @@ const PreviewFukushashiki = () => {
   const extractStateFromPreviewResponse = async (res) => {
     if (!res || !res.data || res.data.code !== 1) return;
     
-    const result = res.data.design_settings;
+    const designSetting = res.data.design_settings;
     let newState = {
       ...state,
       botInfor: getBotInforFromPreviewResponse(res),
       objParam: {},
       loadedStateFromSession: true,
       messagesList: res.data.data?.conversation?.messages || [],
-      isOpen: Number(result.display_type) === 1,
-      activePopupCloseBot: Boolean(result?.popup_close_bot),
-      titleBubble: result?.title_bubble || "簡単90秒で注文完了",
-      displayType: result?.display_type,
-      widthPc: result?.width_pc || 450,
-      heightPc: result?.height_pc || 700,
-      widthSp: result?.width_sp || 100,
-      heightSp: result?.height_sp || 100,
-      positionPc: result?.position_pc || "1",
-      rightPcTitle: result?.right_position_pc_title,
-      buttonTypePc: result?.button_type_pc || "1",
-      rightMarginPc: result?.right_margin_pc || 10,
-      bottomMarginPc: result?.bottom_margin_pc || 0,
-      positionSp: result?.position_sp || "1",
-      buttonTypeSp: result?.button_type_sp || "1",
-      rightSpTitle: result?.right_position_sp_title,
-      rightMarginSp: result?.right_margin_sp,
-      bottomMarginSp: result?.bottom_margin_sp,
+      isOpen: Number(designSetting.display_type) === 1,
+      activePopupCloseBot: Boolean(designSetting?.popup_close_bot),
+      titleBubble: designSetting?.title_bubble || "簡単90秒で注文完了",
+      displayType: designSetting?.display_type,
+      widthPc: designSetting?.width_pc || 450,
+      heightPc: designSetting?.height_pc || 700,
+      widthSp: designSetting?.width_sp || 100,
+      heightSp: designSetting?.height_sp || 100,
+      positionPc: designSetting?.position_pc || "1",
+      rightPcTitle: designSetting?.right_position_pc_title,
+      buttonTypePc: designSetting?.button_type_pc || "1",
+      rightMarginPc: designSetting?.right_margin_pc || 10,
+      bottomMarginPc: designSetting?.bottom_margin_pc || 0,
+      positionSp: designSetting?.position_sp || "1",
+      buttonTypeSp: designSetting?.button_type_sp || "1",
+      rightSpTitle: designSetting?.right_position_sp_title,
+      rightMarginSp: designSetting?.right_margin_sp,
+      bottomMarginSp: designSetting?.bottom_margin_sp,
     };
     const prevOpenStatus = sessionStorage.getItem("prevOpenStatus");
 
