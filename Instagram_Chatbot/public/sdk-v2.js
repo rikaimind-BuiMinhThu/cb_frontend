@@ -221,6 +221,7 @@ const displayPopup = async () => {
           excuteJSCode(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.CRAWL_DATA:
+          await sleep(500);
           crawlDataAndSendMessage(e.data.actionData);
           break;
         case CHATBOT_ACTIONS.CLICK_BUTTON:
