@@ -503,6 +503,8 @@ const UserMessage = ({
   };
 
   const handleClickCarousel = (urls, use_shortened_urls) => {
+    if (!urls.trim().length) return;
+
     let data = {
       history_click_url: {
         origin_url: urls,
