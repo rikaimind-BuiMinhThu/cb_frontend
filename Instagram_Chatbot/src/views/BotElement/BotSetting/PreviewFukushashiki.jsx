@@ -627,6 +627,7 @@ const PreviewFukushashiki = () => {
       icon_mess,
       main_color: res.data.chatbot.main_color || res.data.chatbot.main_color_other,
       main_color_other: res.data.chatbot.main_color_other,
+      titleBelowWhenDisplay:res.data.design_settings.title_bubble
     };
   }
 
@@ -3398,7 +3399,7 @@ const PreviewFukushashiki = () => {
               <div className="sp-header-left-label-sub-title">
                 {state.botInfor?.subtitle}
               </div>
-              <div className="sp-header-left-label-title">{state.botInfor?.title}</div>
+              <div className="sp-header-left-label-title">{state.botInfor?.titleBelowWhenDisplay}</div>
             </div>
           </div>
           <div
