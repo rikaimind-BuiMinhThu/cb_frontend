@@ -465,13 +465,13 @@ const setValueToElement = (element, value) => {
 }
 
 const setRadioValue = (element, value) => {
-  const radioButtons = element.querySelectorAll('input[type="radio"]');
-  const selecteddRadio = radioButtons.find(radio => radio.value === value);
-  if (!selecteddRadio) return;
-  selecteddRadio.checked = true;
+  const radioButtons = [...element.querySelectorAll('input[type="radio"]')];
+  const selectedRadio = radioButtons.find(radio => radio.value === value);
+  if (!selectedRadio) return;
+  selectedRadio.checked = true;
   const changeEvent = new Event('change', { bubbles: true });
-  selecteddRadio.dispatchEvent(changeEvent);
-}
+  selectedRadio.dispatchEvent(changeEvent);
+};
 
 const getUser = async (url, datacount) => {
   const response = await fetch(url, {
