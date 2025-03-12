@@ -1030,7 +1030,7 @@ const PreviewFukushashiki = () => {
     if (!state.isOpen) return;
     await sleep(1000);
     scrollToBottom(false);
-  }, [state.isOpen, state.renderMessagesList]);
+  }, [state.isOpen, state.renderMessagesList.length]);
 
   const scrollToBottom = (forceScroll = false) => {
     if (document.getElementById("sp-body")) {
