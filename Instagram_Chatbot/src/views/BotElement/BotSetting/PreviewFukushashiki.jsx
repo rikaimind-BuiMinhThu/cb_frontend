@@ -414,6 +414,10 @@ const PreviewFukushashiki = () => {
     return `${dataContentType[field]?.valueLeft} ${dataContentType[field]?.valueRight}`;
   }
 
+  const setRadioButtonDefaultValue = (dataContentType, value) => {
+    return dataContentType[dataContentType.type].find(item => item.value === value)?.text;
+  }
+  
   const setCheckboxDefaultValue = (dataContentType, field) => {
     let dataTextChecked = [];
     switch (field) {
